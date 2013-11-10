@@ -1,0 +1,291 @@
+/* template.normalise.css
+
+   Much borrowed from Normalize.css:
+   http://github.com/necolas/normalize.css
+
+   Also parts from blueprint:
+   http://blueprintcss.org/
+
+   And a few ideas from html5boilerplate:
+   http://html5boilerplate.com/
+
+   Normalisation for forms can be found in template.forms.css. Similarly,
+   most normalisation for typography can be found in template.typography.css.
+*/
+
+
+/* html5 */
+
+/* This is very important. We give his the strongest possible selector. */
+html > body template {
+	display: none !important;
+}
+
+article,
+aside,
+details,
+dialog,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+nav,
+section,
+summary {
+	display: block;
+}
+
+audio,
+canvas,
+video {
+	display: inline-block;
+}
+
+
+/* Reset */
+
+html {
+	/* Corrects text resizing oddly in IE6/7 when body font-size is set using em units
+	   http://clagnut.com/blog/348/#c790 */
+	font-size: 100%;
+	/* Prevents iOS text size adjust after orientation change, without disabling user zoom
+	   www.456bereastreet.com/archive/201012/controlling_text_size_in_safari_for_ios_without_disabling_user_zoom/ */
+	-webkit-text-size-adjust: 100%;
+	-ms-text-size-adjust: 100%;
+}
+
+html, body, div, span,
+object, iframe, canvas, img, svg, audio,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, code, time,
+del, dfn, em, img, q, dl, dt, dd, ol, ul, li,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, dialog, figure, footer, header,
+hgroup, nav, section {
+	/* Here's what makes Bolt a little different. Border box.
+	   It'a a breath of fresh air to work with.
+
+	   Box-sizing breaks in IE8 when min- or max- width or height
+	   are defined, and in FF when min- or max- height are defined
+	   but height is auto. These cases are feature detected and the
+	   classes:
+
+	   min-width_border-box
+	   min-width_content-box
+	   min-height_border-box
+	   min-height_content-box
+
+	   applied to the html element, allowing you to style to overcome
+	   these problems. */
+	-webkit-box-sizing: border-box;
+	   -moz-box-sizing: border-box;
+	    -ms-box-sizing: border-box;
+	        box-sizing: border-box;
+
+	/* Set the dimensions of backgrounds to the limits of the
+	   padding box. */
+	-webkit-background-origin: padding-box;
+	   -moz-background-origin: padding;
+	        background-origin: padding-box;
+
+	/* Default to backgrounds that don't repeat. */
+	background-repeat: no-repeat;
+}
+
+:before,
+:after {
+	/* Default to backgrounds that don't repeat. */
+	background-repeat: no-repeat;
+}
+
+body {
+	padding: 0;
+	margin: 0;
+}
+
+p,
+dl,
+menu,
+ol,
+ul,
+dd {
+	/* margins set differently in IE6/7 */
+	margin: 0;
+}
+
+menu,
+ol,
+ul {
+	/* paddings set differently in IE6/7 */
+	padding: 0 0 0 2.5em;
+}
+
+a:focus {
+	/* Outline displays oddly in Chrome */
+	outline: thin dotted;
+}
+
+a:hover,
+a:active {
+	/* Improves readability when focused and also mouse hovered in all browsers
+	   people.opera.com/patrickl/experiments/keyboard/test */
+	outline: 0;
+}
+
+mark {
+	/* styling not present in IE6/7/8/9 */
+	background: #ff0;
+	color: #000;
+}
+
+img,
+svg,
+canvas,
+video,
+object,
+embed,
+iframe {
+	/* Media are most often used as block level elements. */
+	display: block;
+	border: 0;
+}
+
+img,
+svg,
+canvas,
+video {
+	height: auto;
+}
+
+img {
+	/* Improves image quality when scaled in IE7
+	   code.flickr.com/blog/2008/11/12/on-ui-quality-the-little-things-client-side-image-resizing/ */
+	-ms-interpolation-mode: bicubic;
+}
+
+svg:not(:root) {
+	/* Overflow displayed oddly in IE9 */
+	overflow: hidden;
+}
+
+audio:not([controls]) {
+	/* Prevents modern browsers from displaying 'audio' without controls
+	   Remove excess height in iOS5 devices */
+	display: none;
+	height: 0;
+}
+
+figure {
+	margin: 0;
+}
+
+table {
+	/* Remove most spacing between table cells. They still need
+	   'cellspacing="0"' in the markup. */
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+caption,
+th,
+td {
+	text-align: left;
+	font-weight: normal;
+}
+
+table,
+td,
+th {
+	vertical-align: top;
+}
+
+[hidden] {
+	/* styling for 'hidden' attribute not present in IE7/8/9, FF3, S4. */
+	display: none;
+}
+
+[placeholder]:focus::-webkit-input-placeholder {
+	/* Get rid of persistent placeholders in webkit, where the placeholder
+	   hangs around like an old fart. More here:
+	   http://adactio.com/journal/6147/
+	*/
+	color: transparent;
+}
+
+[placeholder]:focus::-moz-placeholder {
+	/* Get rid of persistent placeholders in Firefox. */
+	color: transparent;
+}
+
+[draggable] {
+	/* Make draggable elements draggable in WebKit */
+	-webkit-user-drag: element;
+
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	    -ms-user-select: none;
+
+	cursor: move;
+}
+
+[draggable="false"] {
+ 	-webkit-user-drag: none;
+
+	-webkit-user-select: text;
+	   -moz-user-select: text;
+	    -ms-user-select: text;
+
+	cursor: auto;
+}
+
+
+/* Default print styles. */
+
+@media print {
+	@page {
+	  margin: 0.5cm;
+	}
+
+	html,
+	body {
+	  background: transparent;
+	  text-shadow: none !important;
+	}
+
+	/* Display external links after their text. */
+	a[href^="http://"],
+	a[href^="http://"]:visited,
+	a[href^="https://"],
+	a[href^="https://"]:visited {
+		text-decoration: underline;
+	}
+
+	a[href^="http://"]:after,
+	a[href^="https://"]:after {
+		content: " [" attr(href) "] ";
+		font-size: 0.9167em;
+		opacity: 0.75;
+	}
+
+	pre,
+	blockquote,
+	tr,
+	img {
+		page-break-inside: avoid;
+	}
+
+	h1, h2, h3, h4, h5, h6 {
+		page-break-after: avoid;
+	}
+
+	/* css-discuss.incutio.com/wiki/Printing_Tables */
+	thead {
+		display: table-header-group;
+	}
+
+	p, h2, h3, h4, h5, h6 {
+		orphans: 3;
+		widows: 3;
+	}
+}

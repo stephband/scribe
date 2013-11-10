@@ -1,0 +1,1296 @@
+/* bolt.classes.css
+
+   Defines base classes and common extended classes, mostly for layout. */
+
+
+/* .wrap */
+
+.wrap {
+	display: block;
+	/* Set as position parent. */
+	position: relative;
+	/* Wraps automatically centre themselves. */
+	margin: 0 auto;
+}
+
+.wrap > img,
+.wrap > svg,
+.wrap > video,
+.wrap > canvas,
+.wrap > object,
+.wrap > embed,
+.wrap > iframe {
+	/* Don't allow media to break out of container bounds. */
+	max-width: 100%;
+}
+
+.slides_wrap {
+	overflow: hidden;
+}
+
+
+/* .block */
+
+.block {
+	display: block;
+	/* Set as position parent */
+	position: relative;
+	/* Set them up to play nice as inline-blocks. */
+	vertical-align: top;
+	overflow: visible;
+}
+
+.block > img,
+.block > svg,
+.block > video,
+.block > canvas,
+.block > object,
+.block > embed,
+.block > iframe {
+	/* Don't allow media to break out of container bounds. */
+	max-width: 100%;
+}
+
+
+/* .panel */
+
+.panel {
+	display: block;
+	/* Set as position parent. */
+	position: relative;
+}
+
+
+/* .layer */
+
+.layer {
+	/* Permit possible scrollbars. */
+	overflow: auto;
+	
+	/* Make layer occupy the whole of the area in its position parent. */
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	
+	/* Height and width override the top, right, bottom, left declaration.
+	   To use height and width we must change the box model to make sure
+	   padding and border do not make the layer bigger than its container.
+	   The technique above does not work for iframes and can break as soon
+	   as height or width are declared, but the technique below will not
+	   work in IE7, where the box model can't be changed. */
+	width: 100%;
+	height: 100%;
+	
+	/* Make the corners of layers the same as their parents', allowing you
+	   to use layers as screens over specific elements. */
+	-webkit-border-radius: inherit;
+	   -moz-border-radius: inherit;
+	        border-radius: inherit;
+}
+
+.screen_layer {
+	background-color: rgba(0,0,0,0.6);
+}
+
+.pushscroll_layer {
+	/* A technique for hiding scrollbars by nesting two layers, and pushing
+	   the scrollbars on the inner .scroll_layer outside the hidden boundary
+	   of the outer .pushscroll_layer. */
+	   
+	/* These values, representing the thickness of a scrollbar, should be
+	   overriden by feature testing with some js */
+	padding-right: 16px;
+	padding-bottom: 16px;
+	
+	overflow: hidden;
+	width: 100%;
+	height: 100%;
+	
+	/* Make sure we're using the right box model for this technique */
+	-webkit-box-sizing: content-box;
+	   -moz-box-sizing: content-box;
+	    -ms-box-sizing: content-box;
+	        box-sizing: content-box;
+}
+
+.dialog_layer {
+	position: fixed;
+}
+
+.middle,
+.dialog_layer {
+	/* Center inline-block contents horizontally */
+	text-align: center;
+}
+
+.middle:before,
+.dialog_layer:before {
+	/* Center inline-block contents vertically */
+	display: inline-block;
+	content: '';
+	height: 100%;
+	width: 0;
+	vertical-align: middle;
+}
+
+.middle > *,
+.dialog_layer > * {
+	text-align: left;
+}
+
+/* TODO: We should be able to merge the .gif technique with
+   the <canvas> technique, so that when canvas is not available
+   the gif displays - can we set the gif as background to the
+   canvas and still expect it to display? */
+
+/* Use a .gif as a loading icon */
+
+/*
+.loading_layer {
+		display: none;
+		background-position: 50% 50%;
+		background-image: url('../../images/loading-icon-16-white.gif');
+		background-color: transparent;
+		background-repeat: no-repeat;
+}*/
+
+/* Use a <canvas> as a loading icon */
+.loading_layer,
+.dialog_layer {
+	background-image: none;
+	background-color: rgba(31, 32, 33, 0.746094);
+	z-index: 4;
+}
+
+.loading_layer > canvas {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 80px;
+	height: 80px;
+	margin-left: -40px;
+	margin-top: -40px;
+}
+
+
+/* .dialog */
+
+.middle > *,
+.dialog {
+	/* Use inline-block to make dialog collapse
+	   to the width of its contents. */
+	display: inline-block;
+	
+	/* Center the dialog vertically, working in tandem
+	   with the :before rule of .dialog_layer. */
+	vertical-align: middle;
+	
+	/* But let's make sure it doesn't touch the top or
+	   bottom. */
+	margin-top: 2.5em;
+	margin-bottom: 2.5em;
+}
+
+.dialog {
+	/* Act as position parent */
+	position: relative;
+	
+	padding: 0.8333em;
+	margin: 0;
+	max-width: 72%;
+	
+	background-color: white;
+	
+ 	-webkit-border-radius: 0.3333em;
+	   -moz-border-radius: 0.3333em;
+	        border-radius: 0.3333em;
+	
+	-webkit-box-shadow: 0 2px 24px rgba(0,0,0,0.6);
+	   -moz-box-shadow: 0 2px 24px rgba(0,0,0,0.6);
+	        box-shadow: 0 2px 24px rgba(0,0,0,0.6);
+}
+
+.dialog > img,
+.dialog > svg,
+.dialog > video,
+.dialog > canvas,
+.dialog > object,
+.dialog > embed,
+.dialog > iframe {
+	/* Don't allow media to break out of container bounds. */
+	max-width: 100%;
+}
+
+.dialog > img,
+.dialog > svg,
+.dialog > video,
+.dialog > canvas {
+	/* Allow images to rescale freely. */
+	height: auto;
+}
+
+.dialog > .close_button,
+.dialog > .close_thumb {
+	position: absolute;
+	top: -16px;
+	top: -1rem;
+	right: -16px;
+	right: -1rem;
+	
+	-webkit-box-shadow: 0 0 24px rgba(0,0,0,0.6);
+	   -moz-box-shadow: 0 0 24px rgba(0,0,0,0.6);
+	        box-shadow: 0 0 24px rgba(0,0,0,0.6);
+}
+
+
+
+
+
+/* .index
+   
+   To be applied to <ul>, <ol> and <dl> elements, when you want them to
+   be displayed in a non-default style. Defines styles for lists of
+   inline-blocks like buttons, thumbs or toolbars, as well as lists
+   with dividers. */
+
+.index {
+	/* Remove default styling from list items. */
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.index > li {
+	/* Specifically remove default margin and padding from
+	   list items in case some typography rules have added
+	   these back in after the reset. */
+	margin: 0;
+	padding: 0;
+	
+	/* Make index items act as position parents. */
+	position: relative;
+}
+
+.index > li:first-child {
+	margin-top: 0;
+}
+
+.dropdown_index {
+	padding: 0.5em 0;
+}
+
+.dropdown_index > li {
+	margin-right: 0;
+}
+
+.dropdown_index > li > a {
+	display: block;
+	white-space: nowrap;
+	width: 100%;
+	padding-left: 10px;
+	padding-right: 10px;
+	font-size: 0.9167em;
+	font-weight: bold;
+}
+
+.index > li > .menu_button {
+	width: 100%;
+}
+
+.dots_index > li > .thumb {
+	vertical-align: top;
+}
+
+.dots_index {
+  text-align: center;
+}
+
+@media print {
+	.dots_index {
+		display: none;
+	}
+}
+
+.tabs_index > li {
+	/* Stop content pushing li wider than it should be */
+	overflow: visible;
+	margin-right: 0;
+}
+
+.two_tabs_index > li        { width: 50%; }
+.three_tabs_index > li      { width: 33.33%; }
+.four_tabs_index > li       { width: 25%; }
+.five_tabs_index > li       { width: 20%; }
+.six_tabs_index > li        { width: 16.66%; }
+.seven_tabs_index > li      { width: 14.28%; }
+.eight_tabs_index > li      { width: 12.5%; }
+
+.tabs_index > li:last-child { margin-right: 0; }
+.tabs_index > li.last       { margin-right: 0; }
+
+.tabs_index > li > .tab_button {
+	width: 100%;
+}
+
+.crumbs_index,
+.crumbs_index > li {
+	white-space: nowrap;
+}
+
+.crumbs_index > li + li {
+	padding-left: 1.5em;
+}
+
+.crumbs_index > li + li:before {
+	content: "▶";
+	font-size: 0.75em;
+	display: inline-block;
+	display: inline !IE7;
+	vertical-align: baseline;
+	width: 2em;
+	text-align: center;
+	margin-left: -2em;
+	margin-right: 0;
+}
+
+.crumbs_index > li > .button {
+	width: 100%;
+}
+
+.tabs_index > li > .button,
+.crumbs_index > li > .button,
+.buttons_index > li > .button,
+.thumbs_index > li > .thumb {
+	/* Handle lists that contain just a single type of item. If 
+	   buttons or thumbs are aligned to the baseline, there will be
+	   a gap below them. */
+	vertical-align: top;
+}
+
+.actions_index {
+	/* Send action buttons over to the right */
+	text-align: right;
+}
+
+
+/* .index classes with horizontal layout.
+		
+	 Simulate a bunch of blocks pushed against each other horizontally
+	 by using inline-block layout to create a horizontal effect. Because
+	 they're in the flow, children must have no space between them in
+	 the html.
+*/
+
+.inline_index,
+.tabs_index,
+.dots_index,
+.crumbs_index,
+.actions_index {
+	/* To form grids with a horizontal index, line-height
+	   needs to be smaller than the items in the index. */
+	line-height: 0;
+}
+
+.inline_index > li,
+.tabs_index > li,
+.dots_index > li,
+.crumbs_index > li,
+.actions_index > li {
+	display: inline-block;
+	vertical-align: top;
+}
+
+.inline_index > li:first-child,
+.tabs_index > li:first-child,
+.dots_index > li:first-child,
+.crumbs_index > li:first-child,
+.actions_index > li:first-child {
+	margin-left: 0;
+}
+
+
+.horizontal > input[type='radio'],
+.horizontal > input[type='checkbox'] {
+	/* Percentage heights on checkboxes can make them dissapear. */
+	height: auto;
+	width: auto;
+	margin-top: 0.25em;
+}
+
+.horizontal.index > dt,
+.horizontal.index > dd {
+	margin: 0;
+}
+.horizontal.index > dt,
+.horizontal.index > dd {
+	width: 160px;
+	line-height: 1.6em;
+}
+.horizontal.index > dt {
+	vertical-align: text-bottom;
+}
+.horizontal.index > dd {
+	vertical-align: text-top;
+	/* reset the margin that usually indents a dd */
+	margin-left: 0;
+	/* Move it down by one line-height */
+	margin-top: 1.6667em;
+	/* Move it left with a negative margin accounting for size, padding and margin of dt */
+	margin-left: -166px;
+	/* Space at the bottom for when the items wrap */
+	margin-bottom: 1.6667em;
+}
+
+
+/* .card */
+
+.card {
+	display: block;
+	min-height: 84px;
+	
+	padding-top: 10px; 
+	padding-right: 10px;
+	padding-bottom: 0;
+	padding-left: 84px;
+	
+	/* Act as position parent */
+	position: relative;
+	
+	/* A card is meant to have drag data attached. */
+	-webkit-user-drag: element;
+}
+
+.card > .thumb {
+	/* Cards have thumbs. Put them on the left by default. */
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.card a,
+.card img {
+	-webkit-user-drag: none;
+}
+
+
+/* .thumb */
+
+.thumb {
+	display: inline-block;
+	vertical-align: top;
+	overflow: hidden;
+	
+	/* Hide overflowing text. This technique is better
+	   than using -ve text-indent because IE7 moves
+	   the background image with the text-indent. */
+	padding-top: 64px;
+	height: 0;
+	width: 64px;
+	
+	-webkit-background-size: cover;
+	   -moz-background-size: cover;
+	     -o-background-size: cover;
+	        background-size: cover;
+
+	/* background-position is set for the case where an image is used as the 
+	   the background. 50% to keep it centred, and 33% because faces are often
+	   centred in the upper portion of the image. */
+	background-position: 50% 33%;
+	background-repeat: no-repeat;
+	
+	text-decoration: none;
+	color: inherit;
+}
+
+@media print {
+	.thumb {
+		/* Encourage webkit to print background image. */
+		-webkit-print-color-adjust: exact;
+	}
+}
+
+.banner_thumb {
+	display: block;
+	width: auto;
+}
+
+.text_thumb,
+.text_thumbs .thumb {
+	/* Make the text show below the thumb. Text appears
+		 outside of the box - ie, it overflows - so that
+		 we dont see any more of the image than necessary. */
+	overflow: visible;
+	white-space: nowrap;
+	text-align: center;
+	margin-bottom: 1em;
+	line-height: 2.3333em;
+	
+	font-size: 0.9167em;
+	font-weight: bold;
+	color: rgb(100,100,100);
+}
+
+.text_thumb > span {
+	/* We can't use text-overflow because overflow is
+	   visible, so if you want to truncate the text you
+	   need to put a span inside the thumb. */
+	overflow: hidden;
+	display: block;
+	text-align: center;
+	white-space: nowrap;
+	-ms-text-overflow: ellipsis;
+	 -o-text-overflow: ellipsis;
+			text-overflow: ellipsis;
+}
+
+.browser_thumb {
+	width: 64px;
+	padding-top: 64px;
+	height: 2em;
+	line-height: 2em;
+	font-size: 0.8333em;
+	overflow: visible;
+	text-align: center;
+	font-weight: bold;
+	background-repeat: no-repeat;
+	background-size: auto;
+	white-space: nowrap;
+	
+	background-image: url('../images/thumbs/browser_logos.png');
+	-moz-background-size: 342px 64px;
+	     background-size: 342px 64px;
+}
+
+.chrome_browser_thumb		{ background-position: -5px 0; }
+.firefox_browser_thumb	{ background-position: -75px 0; }
+.opera_browser_thumb		{ background-position: -140px 0; }
+.safari_browser_thumb		{ background-position: -205px 0; }
+.ie_browser_thumb				{ background-position: -272px 0; }
+
+.chromeframe_browser_thumb {
+	background-image: url('/images/thumbs/logo_chromeframe.gif');
+	background-position: 0 0;
+	
+	-moz-background-size: 64px 64px;
+			 background-size: 64px 64px;
+}
+
+.fb_thumb,
+.tw_thumb,
+.yt_thumb {
+	padding-top: 20px;
+	width: 20px;
+	overflow: hidden;
+	background-image: url('../images/thumbs/logos_social.png');
+}
+
+.fb_thumb { background-position: 0 0; }
+.tw_thumb { background-position: -25px 0; }
+.yt_thumb { background-position: -49px 0; }
+
+.dot_thumb {
+	font-size: 1.75em;
+	opacity: 0.6;
+	color: #484848;
+	width: 0.8571em;
+	padding-top: 0.8571em;
+	line-height:  0.8571em;
+}
+
+.dot_thumb:after {
+	content: '●';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	vertical-align: middle;
+	text-align: center;
+}
+
+.dot_thumb.on,
+.dot_thumb:hover,
+.dot_thumb:focus {
+	opacity: 1;
+}
+
+
+/* .button */
+
+button {
+	/* buttons have standard padding that needs to be avoided. */
+	padding-top: 0;
+	padding-bottom: 0;
+	/* And they don't automatically inherit font styles. */
+	font-size: inherit;
+	font-family: inherit;
+}
+
+.button:hover,
+.button:focus {
+	/* If button is link, it may have hover styles. */
+	text-decoration: none;
+}
+
+button,
+.button {
+	display: inline-block;
+	position: relative;
+	
+	cursor: pointer;
+	
+	width: auto;
+	height: 2em;
+	/* button elements ignore line-height, centering text automaticaly. */
+	line-height: 2em;
+	padding-left: 0.75em;
+	padding-right: 0.75em;
+	vertical-align: baseline;
+	
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	text-align: center;
+	text-decoration: none;
+	
+	background-repeat: no-repeat;
+	border-width: 0;
+
+	-webkit-background-clip: padding-box;
+	   -moz-background-clip: padding-box;
+	    -ms-background-clip: padding-box;
+	     -o-background-clip: padding-box;
+	        background-clip: padding-box;
+
+	-webkit-background-origin: padding-box;
+	   -moz-background-origin: padding;
+	   -moz-background-origin: padding-box;
+	    -ms-background-origin: padding-box;
+	     -o-background-origin: padding-box;
+	        background-origin: padding-box;
+}
+
+button:hover,
+.button:hover {
+	color: rgb(63,63,63);
+}
+
+button.loading,
+.button.loading {
+	opacity: 0.4;
+}
+
+.button > input[type="radio"],
+.button > input[type="checkbox"] {
+	display: inline;
+	height: auto;
+	vertical-align: baseline;
+	margin-right: 0.5em;
+	/* Stop radio's left edges getting cut off inside buttons. */
+	margin-left: 1px;
+}
+
+.radio_button,
+.checkbox_button {
+	/* Overflow will hide the browser generated error messages. No no no. */
+	overflow: visible;
+}
+
+/* Select boxes and file inputs wrapped in buttons for
+   restyling, like this:
+
+   <label class="button" for="select">
+     <span class="value">Price range</span>
+     <select id="select">
+       <option value="0">...</option>
+     </select>
+   </label>
+   
+   When JavaScript is not enabled, we don't want to hide
+   the select, as that would remove the ability to see
+   the current value. */
+
+.button > select,
+.button > input[type="file"],
+.button > input[type="submit"] {
+	position: absolute;
+	display: block;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	cursor: pointer;
+	z-index: 2;
+}
+
+.js .button > select,
+.js .button > input[type="file"],
+.js .button > input[type="submit"] {
+	-webkit-appearance: none;
+	opacity: 0;
+}
+
+.menu_button,
+.tab_button {
+	padding-left: 0.8333em;
+	padding-right: 0.8333em;
+	
+	/* Remove default border and shadow */
+	
+	-webkit-box-shadow: none;
+	   -moz-box-shadow: none;
+	        box-shadow: none;
+	
+	-webkit-border-radius: 0;
+	   -moz-border-radius: 0;
+	        border-radius: 0;
+}
+
+.tab_button {
+	/* Set up z-index to interact with tabs below the tab_buttons.
+	   Tab buttons in the off state go under active tabs. */
+	z-index: 1;
+}
+
+.tab_button.on,
+.tab_button:active {
+	/* Tab buttons in the on state appear over active tabs, and
+	   they should display all their text. */
+	z-index: 3;
+	overflow: visible;
+}
+
+.menu_button {
+	text-align: left;
+}
+
+.close_button {
+	width: 32px;
+	width: 2rem;
+	height: 0;
+	padding-top: 28px;
+	padding-top: 1.75rem;
+
+	color: white;
+	background: #444444;
+	border: 2px solid white;
+
+	-webkit-border-radius: 1rem;
+	   -moz-border-radius: 1rem;
+	        border-radius: 1rem;
+}
+
+.close_button:hover {
+	color: white;
+}
+
+.close_button:after {
+	content: '✖';
+	display: block;
+	position: absolute;
+	font-size: 18px;
+	font-size: 1.125rem;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	line-height: 28px;
+	line-height: 1.75rem;
+}
+
+.select_button {
+	padding-right: 2.25em;
+	text-align: left;
+}
+
+.select_button:after {
+  content: '▼';
+  display: block;
+  position: absolute;
+  font-size: inherit;
+  line-height: inherit;
+  top: 0;
+  right: 0.5em;
+  opacity: 0.25;
+  z-index: 1;
+}
+
+
+/* .tab, .slide */
+
+.tab,
+.slide {
+	display: inline-block;
+	vertical-align: top;
+	position: relative;
+	width: 100%;
+	/* Give tabs and slides the same origin despite being inline-blocks. */
+	margin-right: -100%;
+}
+
+
+/* .popdown, .dropdown */
+
+.popdown,
+.dropdown {
+	display: block;
+	/* Hiding overflow causes problems in IE7 when the dropdown's container
+	   is narrower than the dropdown's content. I'm not sure we have any real
+	   reason to hide it. Probably if you're animating height to reveal you
+	   want this. */
+	/*overflow: hidden;*/
+	position: absolute;
+	/* They should appear over the top of following content. */
+	z-index: 3;
+}
+
+
+/* Transitions */
+
+.js .tab,
+.js .slide,
+.js .layer,
+.js .popdown,
+.js .dropdown {
+	/* A nice bit of hardware acceleration should help the transitions run
+	   smoothly. */
+	-webkit-transform: translate3d(0,0,0);
+	   -moz-transform: translate3d(0,0,0);
+	    -ms-transform: translate3d(0,0,0);
+	     -o-transform: translate3d(0,0,0);
+	        transform: translate3d(0,0,0);
+}
+
+.js .tab,
+.js .dialog_layer,
+.js .loading_layer {
+	visibility: hidden;
+	opacity: 0;
+	z-index: 1;
+	
+	-webkit-transition-property: opacity, visibility;
+	   -moz-transition-property: opacity, visibility;
+	    -ms-transition-property: opacity, visibility;
+	     -o-transition-property: opacity, visibility;
+	        transition-property: opacity, visibility;
+
+	-webkit-transition-duration: 120ms;
+	   -moz-transition-duration: 120ms;
+	    -ms-transition-duration: 120ms;
+	     -o-transition-duration: 120ms;
+	        transition-duration: 120ms;
+
+	-webkit-transition-timing-function: ease-in;
+	   -moz-transition-timing-function: ease-in;
+	    -ms-transition-timing-function: ease-in;
+	     -o-transition-timing-function: ease-in;
+	        transition-timing-function: ease-in;
+}
+
+.js .tab.active,
+.js .dialog_layer.active,
+.js .loading .loading_layer {
+	visibility: visible;
+	opacity: 1;
+	z-index: 2;
+	
+	-webkit-transition-timing-function: ease-out;
+	   -moz-transition-timing-function: ease-out;
+	    -ms-transition-timing-function: ease-out;
+	     -o-transition-timing-function: ease-out;
+	        transition-timing-function: ease-out;
+}
+
+.js .slide {
+	/* By default all slides are positioned off to the left. */ 
+	left: -100%;
+	
+	/* Slides have no height by default to stop them influencing
+	   scrollbars when they are not active. */
+	height: 0;
+	overflow: hidden;
+	z-index: 1;
+
+	-webkit-touch-callout: none;
+	  -webkit-user-select: none;
+	     -moz-user-select: none;
+	      -ms-user-select: none;
+	          user-select: none;
+	
+	-webkit-transition-property: left, height;
+	   -moz-transition-property: left, height;
+	    -ms-transition-property: left, height;
+	     -o-transition-property: left, height;
+	        transition-property: left, height;
+
+	-webkit-transition-duration: 333ms;
+	   -moz-transition-duration: 333ms;
+	    -ms-transition-duration: 333ms;
+	     -o-transition-duration: 333ms;
+	        transition-duration: 333ms;
+	
+	-webkit-transition-timing-function: cubic-bezier(0.1, 0.7, 0.7, 1);
+	   -moz-transition-timing-function: cubic-bezier(0.1, 0.7, 0.7, 1);
+	    -ms-transition-timing-function: cubic-bezier(0.1, 0.7, 0.7, 1);
+	     -o-transition-timing-function: cubic-bezier(0.1, 0.7, 0.7, 1);
+	        transition-timing-function: cubic-bezier(0.1, 0.7, 0.7, 1);
+}
+
+.js .slide.active {
+	/* The .active slide is positioned in the centre. */
+	left: 0;
+	height: auto;
+	overflow: visible;
+	z-index: 2;
+}
+
+.js .slide.active ~ .slide {
+	/* All slides after the .active slide are positioned off to
+	   the right. */
+	left: 100%;
+}
+
+.js .slide.active ~ .slide.active {
+	/* Except, of course, any that are still active. */
+	left: 0;
+}
+
+.js .stacked_slide {
+	left: 0;
+}
+
+@media print {
+	.js .slide {
+		position: static;
+		left: 0;
+		width: 34%;
+		height: auto;
+		margin-right: 3%;
+	}
+
+	.js .slide:nth-child(3n) {
+		margin-right: 0;
+	}
+}
+
+/* Transitions - .popdown, .dropdown */
+
+.popdown,
+.dropdown {
+	top: 2em;
+	opacity: 0;
+	visibility: hidden;
+	
+	-webkit-transition-property: opacity, top, visibility;
+	   -moz-transition-property: opacity, top, visibility;
+	    -ms-transition-property: opacity, top, visibility;
+	     -o-transition-property: opacity, top, visibility;
+	        transition-property: opacity, top, visibility;
+
+	-webkit-transition-duration: 180ms;
+	   -moz-transition-duration: 180ms;
+	    -ms-transition-duration: 180ms;
+	     -o-transition-duration: 180ms;
+	        transition-duration: 180ms;
+
+	-webkit-transition-timing-function: ease-out;
+	   -moz-transition-timing-function: ease-out;
+	    -ms-transition-timing-function: ease-out;
+	     -o-transition-timing-function: ease-out;
+	        transition-timing-function: ease-out;
+}
+
+.popdown.active,
+.dropdown.active {
+	top: 2.3333em;
+	opacity: 1;
+	visibility: visible;
+	
+	-webkit-transition-duration: 60ms;
+	   -moz-transition-duration: 60ms;
+	    -ms-transition-duration: 60ms;
+	     -o-transition-duration: 60ms;
+	        transition-duration: 60ms;
+
+	-webkit-transition-timing-function: ease-in;
+	   -moz-transition-timing-function: ease-in;
+	    -ms-transition-timing-function: ease-in;
+	     -o-transition-timing-function: ease-in;
+	        transition-timing-function: ease-in;
+}
+
+
+/* .tip */
+
+.js .tip {
+	position: absolute;
+	
+	padding-top: 0.33em;
+	padding-bottom: 0.33em;
+	padding-left: 0.75em;
+	padding-right: 0.75em;
+	max-width: 20em;
+	
+	visibility: hidden;
+	opacity: 0;
+	margin-top: 0;
+	z-index: 1;
+	
+	-webkit-transition-property: opacity, visibility, margin-top;
+	   -moz-transition-property: opacity, visibility, margin-top;
+	    -ms-transition-property: opacity, visibility, margin-top;
+	     -o-transition-property: opacity, visibility, margin-top;
+	        transition-property: opacity, visibility, margin-top;
+
+	-webkit-transition-duration: 120ms;
+	   -moz-transition-duration: 120ms;
+	    -ms-transition-duration: 120ms;
+	     -o-transition-duration: 120ms;
+	        transition-duration: 120ms;
+
+	-webkit-transition-timing-function: ease-in;
+	   -moz-transition-timing-function: ease-in;
+	    -ms-transition-timing-function: ease-in;
+	     -o-transition-timing-function: ease-in;
+	        transition-timing-function: ease-in;
+}
+
+.js .tip.active {
+	/* The inline-block technique overlays tabs on top of one another
+	   but still allows the height of the blocks to stay in the flow.
+	   It's better than using position: absolute. It rocks. */
+	
+	visibility: visible;
+	opacity: 1;
+	margin-top: -0.2667em;
+	z-index: 2;
+	
+	-webkit-transition-timing-function: ease-out;
+	   -moz-transition-timing-function: ease-out;
+	    -ms-transition-timing-function: ease-out;
+	     -o-transition-timing-function: ease-out;
+	        transition-timing-function: ease-out;
+
+	-webkit-transition-delay: 540ms;
+	   -moz-transition-delay: 540ms;
+	    -ms-transition-delay: 540ms;
+	        transition-delay: 540ms;
+}
+
+@media all and (max-width: 30em) {
+	.js .tip {
+		/* Override offset given to it by JS when the
+		   screen is too small. */
+		left: 4% !important;
+		margin-left: 0 !important;
+		width: 92% !important;
+		max-width: 92% !important;
+	}
+}
+
+/* Transitions - cancel transitions. */
+
+.notransition,
+.notransition .slide,
+.notransition .tab,
+.notransition .popdown,
+.notransition .dropdown,
+.notransition .layer,
+.notransition .tip {
+	/* Potential source of bugs: -moz- must have units even with a 0 value,
+	   or it doesn't read the rule. */
+	-webkit-transition-duration: 0 !important;
+	   -moz-transition-duration: 0ms !important;
+	    -ms-transition-duration: 0 !important;
+	        transition-duration: 0 !important;
+
+	-webkit-transition-delay: 0 !important;
+	   -moz-transition-delay: 0ms !important;
+	    -ms-transition-delay: 0 !important;
+	        transition-delay: 0 !important;
+}
+
+
+/* Utilities */
+
+.hidden {
+	display: none;
+}
+
+.js .disabled {
+	opacity: 0.4;
+}
+
+.clear:after {
+	visibility: hidden;
+	display: block;
+	font-size: 0;
+	content: " ";
+	clear: both;
+	height: 0;
+}
+
+.tl, .tr, .bl, .br { position: absolute; }
+.tl, .tr { top: 0; }
+.bl, .br { bottom: 0; }
+.tl, .bl { left: 0; }
+.tr, .br { right: 0; }
+
+.left { float: left; }
+.right { float: right; }
+
+.scroll {
+	overflow: auto;
+	/* Enable momentum scrolling. Unfortunately this is buggy. It doesn't
+	   update the custom scrollbar during the momentum ease-out. Also, some
+	   children get rendered improperly.
+	   
+	   Actually, it seems to have improved in iOS 6. */
+	-webkit-overflow-scrolling: touch;
+}
+
+.scroll > * {
+	/* Fixes iOS child rendering scrolling bug. Maybe.
+	   http://stackoverflow.com/questions/7808110/css3-property-webkit-overflow-scrollingtouch-error */
+	-webkit-transform: translateZ(0px);
+}
+
+.scroll::-webkit-scrollbar {
+	/* Force scrollbars to display in mobile WebKit devices. For a demo
+	   of scrollbar configurations:
+	   http://trac.webkit.org/export/41842/trunk/LayoutTests/scrollbars/overflow-scrollbar-combinations.html
+	*/
+	width: 9px;
+	height: 9px;
+	background-color: transparent;
+	-webkit-border-radius: 12px;
+	        border-radius: 12px;
+}
+
+.scroll::-webkit-scrollbar-thumb:vertical,
+.scroll::-webkit-scrollbar-thumb:horizontal {
+	/* Approximate the style of the iPad's default scrollbars. (Can
+	   probably do better, but this is quick). */
+	background-color: #888888;
+	border: 2px solid white;
+	
+	-webkit-border-radius: 12px;
+	        border-radius: 12px;
+}
+
+.scroll::-webkit-scrollbar-thumb:vertical {
+	min-height: 20px;
+}
+
+.scroll::-webkit-scrollbar-thumb:horizontal {
+	min-width: 20px;
+}
+
+.scroll::-webkit-scrollbar-track-piece:disabled,
+.scroll::-webkit-scrollbar-button:disabled {
+	display: none !important;
+}
+
+.x_scroll {
+	overflow-y: hidden;
+}
+
+.y_scroll {
+	overflow-x: hidden;
+}
+
+.x_scroll.y_scroll {
+	overflow: scroll;
+}
+
+.no_scroll {
+	overflow: hidden;
+}
+
+
+/* table */
+
+/* Orientate a table vertically, so that the <tr>s appear as columns, and
+   <td>s appear on new rows. Use with caution. */
+
+.v_table thead,
+.v_table tbody,
+.v_table tr {
+	display: inline-block;
+	display: inline !IE7;
+}
+
+.v_table {
+	width: auto;
+}
+
+.v_table td {
+	display: block;
+}
+
+/* Stripes tables and indexes. */
+
+.striped_index > li:nth-child(even),
+.striped_table > tbody > tr:nth-child(odd) > td,
+.striped_table > tbody > tr:nth-child(odd) > th {
+	background-color: rgba(15,15,15,0.08);
+}
+
+.striped_index > li,
+.striped_table > thead > tr > td,
+.striped_table > thead > tr > th,
+.striped_table > tbody > tr > td,
+.striped_table > tbody > tr > th {
+	background-color: rgba(240,240,240,0.1);
+}
+
+.striped_table > tbody > tr:hover > td,
+.striped_table > tbody > tr:hover > th {
+	background-color: rgba(15,15,15,0.15);
+}
+
+
+
+/* hcard microformat (for reference)
+	 http://microformats.org/wiki/hcard
+*/
+
+/*.vcard
+	
+	/* name - use .url for anything that is a link to this person's	 */
+/*	.fn.n
+/*		.nickname
+/*		.given-name
+/*		.additional-name
+/*		.family-name
+	
+	/* name organisation - if the hcard is for an organisation .fn should also be set */
+/*	.org
+/*		.organization-name
+/*		.organization-unit
+	
+	/* email (usually a link) */
+/*	.email
+/*		.type /* home, office, work, blah, blah */
+	
+/*	.photo
+	
+	/* address */
+/*	.adr
+/*		.street-address
+/*		.locality
+/*		.region
+/*		.postal-code
+/*		.country-name
+	
+/*	.tel
+/*		.type /* home, work, etc. */
+
+	/* use url for display of addresses of resources about this person - including instant messenger */
+/*	.url */

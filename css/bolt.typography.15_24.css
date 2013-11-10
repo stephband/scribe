@@ -1,0 +1,91 @@
+/* template.typography.12_20.css
+ * 
+ * Developed using ideas from:
+ * www.blueprintcss.org
+ * www.webtypography.net
+ * www.html5boilerplate.com
+ * 
+ */
+
+html {
+    font-size:100.01%;
+}
+
+body{
+	/* 15px */
+	font-size: 93.75%;
+}
+
+body,
+.index > li {
+	/* 24px */
+	line-height: 1.6;
+}
+
+/* Block elements */
+
+h1                { word-spacing: -0.0833em; font-size: 1.6em;    line-height: 1em;      margin-bottom: 1em; }
+h2                { word-spacing: -0.0833em; font-size: 1.3333em; line-height: 1.2em;    margin-bottom: 0.6em; }
+h3                { word-spacing: -0.0833em; font-size: 1.2em;    line-height: 1.3333em; margin-bottom: 0.6667em; }
+h4                { word-spacing: -0.0833em; font-size: 1.0667em; line-height: 1.5em; }
+h5                { word-spacing: -0.0833em; font-size: 1em; }
+h6                { word-spacing: -0.0833em; font-size: 1em; }
+
+p                 { margin-bottom: 0.8em; }
+
+fieldset          { margin-bottom: 1.6em; }
+
+ul,
+ol,
+dl                { margin: 1.6em 0 1.6em 0; }
+li                { margin-bottom: 0; }
+dd                { margin: 0; }
+
+blockquote        { margin: 0 0 1.6em 0; }
+blockquote:before { font-size: 3em; line-height: 0.84em; margin-left: -0.6em; }
+pre,
+address           { margin: 1.6em 0; }
+
+/* Inline elements */
+
+sup,
+sub               { font-size: 0.6em; line-height: 0; }
+
+abbr              { letter-spacing: 0.1em; }
+pre,
+code,
+tt                { font-size: 1em; }
+
+/* Tables */
+
+table             { margin-bottom: 1.6em; }
+th,
+td,
+caption           { padding: 4px 10px 4px 5px; }
+
+/* Forms */
+
+input,
+select            { height: 1.6em; }
+legend            { word-spacing: -0.0833em; font-size: 1.2em;    line-height: 1.3333em; margin-bottom: 0.6667em; }
+
+label,
+input,
+select            { height: 1.6em; }
+
+label,
+input,
+select,
+textarea          { line-height: 1.6em; }
+
+/* Indentation */
+
+ul,
+ol,
+blockquote        { margin-left: 3.2em; }
+
+/* Classes */
+
+.left             { margin: 0.8em 1.2em 0.8em 0; }
+.right            { margin: 0.8em 0 0.8em 1.2em; }
+.note             { font-size: 0.8em; line-height: 1.5em; }
