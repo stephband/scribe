@@ -1,7 +1,14 @@
 (function() {
+	"use strict";
+	
 	var debug = window.console && window.console.log;
 	var xmlns = "http://www.w3.org/2000/svg";
 	var find = document.getElementById.bind(document);
+	
+	// ♯ ♭ ♮
+	var SHARP = 'sharp',
+	    FLAT = 'flat',
+	    NATURAL = 'natural';
 	
 	var attributes = {
 		'class': setAttr,
@@ -44,16 +51,16 @@
 	var noteMap = [
 		// Key of C
 		{ y: 0 },
-		{ y: 0, accidental: 'sharp' },
+		{ y: 0, accidental: SHARP },
 		{ y: 1 },
-		{ y: 2, accidental: 'flat' },
+		{ y: 2, accidental: FLAT },
 		{ y: 2 },
 		{ y: 3 },
-		{ y: 3, accidental: 'sharp' },
+		{ y: 3, accidental: SHARP },
 		{ y: 4 },
-		{ y: 5, accidental: 'flat' },
+		{ y: 5, accidental: FLAT },
 		{ y: 5 },
-		{ y: 6, accidental: 'flat' },
+		{ y: 6, accidental: FLAT },
 		{ y: 6 }
 	];
 	
@@ -203,7 +210,6 @@
 				]
 			});
 			
-			n = node;
 			svg.appendChild(node);
 			svg.appendChild(barNode)
 			
@@ -222,7 +228,7 @@
 
 var scribe = Scribe('sheet');
 
-scribe.note(6, 60);
+scribe.note(6, 48);
 scribe.note(6, 67);
 scribe.note(6, 70);
 scribe.note(6, 74);
