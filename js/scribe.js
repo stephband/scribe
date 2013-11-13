@@ -29,6 +29,18 @@
 		'rotate': 'SVG_TRANSFORM_ROTATE'
 	};
 	
+	var test = {
+		number: function(n, name) {
+			if (typeof n !== 'number')
+				throw new Error(name + ' is not a number (it\'s a ' + (typeof n) + ')');
+		},
+		
+		notNaN: function(n, name) {
+			if (Number.isNaN(n))
+				throw new Error(name + ' is NaN');
+		}
+	};
+	
 	function getWidth(obj) {
 		return obj.width;
 	}
@@ -113,45 +125,6 @@
 			duration: duration
 		};
 	}
-
-	function createSymbol(svg, data) {
-		var node = createNode(svg, 'g');
-		var minwidth = 0;
-		var width = 0;
-		
-		var head = createNode(svg, 'use', {
-			'href': '#head',
-			'class': 'black'
-		});
-		
-		minwidth += 2.8;
-		width += 4.2;
-		
-		node.appendChild(head);
-		
-		var accidentalType = numberToAccidental(data.number);
-		var accidental;
-		
-		if (accidentalType) {
-			accidental = createNode(svg, 'use', {
-				'href': '#' + accidentalType,
-				'class': 'black',
-				'translate': [-3, 0]
-			});
-			
-			minwidth += 1.6;
-			width += 2;
-			
-			node.appendChild(accidental);
-		}
-		
-		return {
-			minwidth: minwidth,
-			width: width,
-			node: node,
-			data: data
-		};
-	}
 	
 	var noteMap = [
 		// Key of C
@@ -174,6 +147,11 @@
 	}
 	
 	function numberToNote(n) {
+		if (debug) {
+			test.number(n, 'n');
+			test.notNaN(n, 'n');
+		}
+		
 		return noteMap[n % 12].y + Math.floor(n / 12) * 7;
 	}
 	
@@ -181,35 +159,89 @@
 		return staveY + (staveNoteY - noteY);
 	}
 	
+	var symbolCreators = {
+		note: function(svg, data) {
+			var node = createNode(svg, 'g');
+			var minwidth = 0;
+			var width = 0;
+			
+			var head = createNode(svg, 'use', {
+				'href': '#head',
+				'class': 'black'
+			});
+			
+			minwidth += 2.8;
+			width += 4.2;
+			
+			node.appendChild(head);
+			
+			var accidentalType = numberToAccidental(data.number);
+			var accidental;
+			
+			if (accidentalType) {
+				accidental = createNode(svg, 'use', {
+					'href': '#' + accidentalType,
+					'class': 'black',
+					'translate': [-3, 0]
+				});
+				
+				minwidth += 1.6;
+				width += 2;
+				
+				node.appendChild(accidental);
+			}
+			
+			return {
+				minwidth: minwidth,
+				width: width,
+				node: node,
+				data: data
+			};
+		}
+	};
+	
 	function updateSymbolsX(svg, scribe, symbols) {
 		var length = symbols.length,
-		    n = 0,
+		    n = -1,
 		    x = 0,
 		    w = 0,
-		    t = 0,
-		    b = 0,
-		    y = 0,
-		    symbol, group = [];
+		    xGroup = [],
+		    yGroup = [],
+		    noteY, symbol;
 		
 		symbols.sort(greaterBeat);
 		
-		group.push(symbols[0]);
-		
-		while (n++ < length) {
+		while (++n < length) {
 			symbol = symbols[n];
 			
-			if (!symbol || symbol.data.beat !== group[0].data.beat) {
-				w = group.map(getWidth).reduce(greater, 0);
-				group.reduce(setX, x + w / 2);
-				group.length = 0;
+			// Handle y positioning
+			noteY = numberToNote(symbol.data.number + scribe.transpose);
+			symbol.y = noteToY(noteY, scribe.staveNoteY, scribe.staveY);
+			
+			// Handle x positioning
+			xGroup.push(symbol);
+			
+			if (!symbols[n + 1] || symbol.data.beat !== symbols[n + 1].data.beat) {
+				w = xGroup.map(getWidth).reduce(greater, 0);
+				xGroup.reduce(setX, x + w / 2);
+				xGroup.length = 0;
 				x += w;
 			}
-
-			group.push(symbol);
 		}
-		
-		n = -1;
-		x = 0;
+	}
+	
+	function updateSymbolsY() {
+		console.log(data.number);
+		var noteY = numberToNote(data.number + this.transpose);
+		symbol.y = noteToY(noteY, this.staveNoteY, this.staveY);
+	}
+	
+	function renderSymbols(svg, scribe, symbols) {
+		var length = symbols.length,
+		    n = -1,
+		    x = 0,
+		    y = 0,
+		    symbol;
 		
 		scribe.staveNode1.removeChild(scribe.staveNode2);
 		scribe.staveNode2 = createNode(svg, 'g', {});
@@ -222,6 +254,8 @@
 				scribe.paddingLeft + symbol.x,
 				scribe.paddingTop + symbol.y
 			]);
+			
+			svg.appendChild(symbol.node);
 			
 			if (symbol.y > scribe.staveY + 5) {
 				y = symbol.y - scribe.staveY + 1;
@@ -259,19 +293,46 @@
 		}
 	}
 	
+	function createSymbol(data) {
+		var svg = this;
+		return symbolCreators[data.type](svg, data);
+	}
+	
+	function renderScribe(scribe, svg) {
+		var symbols = scribe.data.map(createSymbol, svg);
+		
+		updateSymbolsX(svg, scribe, symbols);
+		renderSymbols(svg, scribe, symbols);
+	}
+	
 	function Scribe(id, options) {
 		if (!(this instanceof Scribe)) {
 			return new Scribe(id);
 		}
 
 		var svg = find(id);
+		var scribe = this;
+		var flag;
+
+		function update() {
+			flag = false;
+			renderScribe(scribe, svg);
+		}
+	
+		function queueRender() {
+			if (flag) { return; }
+			flag = true;
+			window.requestAnimationFrame(update);
+		}
+		
+		this.render = queueRender;
 
 		this.transpose = 0;
 		this.staveY = 4;
 		// 71 is mid note of treble clef
 		this.staveNoteY = numberToNote(71 + this.transpose);
 		this.symbols = [];
-		this.data = {};
+		this.data = [];
 
 		this.svg = svg;
 
@@ -293,18 +354,9 @@
 		note: function(number, beat, duration) {
 			var svg = this.svg;
 			var data = createData('note', number, beat, duration);
-			var symbol = createSymbol(svg, data);
 			
-			this.symbols.push(symbol);
-			
-			var noteY = numberToNote(data.number + this.transpose);
-			var y = noteToY(noteY, this.staveNoteY, this.staveY);
-			
-			symbol.y = y;
-			
-			updateSymbolsX(svg, this, this.symbols);
-			
-			svg.appendChild(symbol.node);
+			this.data.push(data);
+			this.render();
 			
 			return this;
 		},
@@ -363,12 +415,8 @@ scribe.note(63, 0, 1);
 scribe.note(67, 0, 1);
 
 scribe.note(59, 1, 1);
-scribe.note(65, 1, 1);
-scribe.note(69, 1, 1);
 
 scribe.note(62, 2, 1);
-scribe.note(68, 2, 1);
-scribe.note(72, 2, 1);
 
 scribe.note(65, 3, 1);
 scribe.note(70, 4, 1);
