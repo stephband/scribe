@@ -13,8 +13,8 @@
 	var attributes = {
 		'class': setAttr,
 		'href': setAttrBaseVal,
-		'translate': setTranslate,
-		'scale': setTranslate
+		'translate': setTransform,
+		'scale': setTransform
 	};
 	
 	var transforms = {
@@ -22,6 +22,45 @@
 		'scale': 'setScale',
 		'rotate': 'setRotate'
 	};
+
+	var transformTypes = {
+		'translate': 'SVG_TRANSFORM_TRANSLATE',
+		'scale': 'SVG_TRANSFORM_SCALE',
+		'rotate': 'SVG_TRANSFORM_ROTATE'
+	};
+	
+	function getWidth(obj) {
+		return obj.width;
+	}
+	
+	function getY(obj) {
+		return obj.y;
+	}
+	
+	function setX(x, obj) {
+		obj.x = x;
+		return x;
+	}
+
+	function getMinWidth(obj) {
+		return obj.minwidth;
+	}
+	
+	function sum(total, n) {
+		return total + n;
+	}
+	
+	function greaterBeat(a, b) {
+		return a.data.beat > b.data.beat ? 1 : -1 ;
+	}
+
+	function lesser(total, n) {
+		return n < total ? n : total ;
+	}
+	
+	function greater(total, n) {
+		return n > total ? n : total ;
+	}
 	
 	function setAttrBaseVal(svg, node, attr, value) {
 		node[attr].baseVal = value;
@@ -31,10 +70,28 @@
 		node.setAttributeNS(null, attr, value);
 	}
 	
-	function setTranslate(svg, node, attr, value) {
-		var transform = svg.createSVGTransform();
+	function getTransform(node, attr) {
+		var l = node.transform.baseVal.numberOfItems;
+		var transform;
+		
+		while (l--) {
+			transform = node.transform.baseVal.getItem(l);
+			
+			if (transform.type === transform[transformTypes[attr]]) {
+				return transform;
+			}
+		}
+	}
+	
+	function setTransform(svg, node, attr, value) {
+		var transform = getTransform(node, attr);
+		
+		if (!transform) {
+			transform = svg.createSVGTransform();
+			node.transform.baseVal.appendItem(transform);
+		}
+		
 		transform[transforms[attr]].apply(transform, value);
-		node.transform.baseVal.appendItem(transform);
 	}
 	
 	function createNode(svg, tag, obj) {
@@ -46,6 +103,54 @@
 		}
 		
 		return node;
+	}
+	
+	function createData(type, number, beat, duration) {
+		return {
+			type: type,
+			number: number,
+			beat: beat,
+			duration: duration
+		};
+	}
+
+	function createSymbol(svg, data) {
+		var node = createNode(svg, 'g');
+		var minwidth = 0;
+		var width = 0;
+		
+		var head = createNode(svg, 'use', {
+			'href': '#head',
+			'class': 'black'
+		});
+		
+		minwidth += 2.8;
+		width += 4.2;
+		
+		node.appendChild(head);
+		
+		var accidentalType = numberToAccidental(data.number);
+		var accidental;
+		
+		if (accidentalType) {
+			accidental = createNode(svg, 'use', {
+				'href': '#' + accidentalType,
+				'class': 'black',
+				'translate': [-3, 0]
+			});
+			
+			minwidth += 1.6;
+			width += 2;
+			
+			node.appendChild(accidental);
+		}
+		
+		return {
+			minwidth: minwidth,
+			width: width,
+			node: node,
+			data: data
+		};
 	}
 	
 	var noteMap = [
@@ -76,20 +181,100 @@
 		return staveY + (staveNoteY - noteY);
 	}
 	
+	function updateSymbolsX(svg, scribe, symbols) {
+		var length = symbols.length,
+		    n = 0,
+		    x = 0,
+		    w = 0,
+		    t = 0,
+		    b = 0,
+		    y = 0,
+		    symbol, group = [];
+		
+		symbols.sort(greaterBeat);
+		
+		group.push(symbols[0]);
+		
+		while (n++ < length) {
+			symbol = symbols[n];
+			
+			if (!symbol || symbol.data.beat !== group[0].data.beat) {
+				w = group.map(getWidth).reduce(greater, 0);
+				group.reduce(setX, x + w / 2);
+				group.length = 0;
+				x += w;
+			}
+
+			group.push(symbol);
+		}
+		
+		n = -1;
+		x = 0;
+		
+		scribe.staveNode1.removeChild(scribe.staveNode2);
+		scribe.staveNode2 = createNode(svg, 'g', {});
+		scribe.staveNode1.appendChild(scribe.staveNode2);
+		
+		while (++n < length) {
+			symbol = symbols[n];
+			
+			setTransform(svg, symbol.node, 'translate', [
+				scribe.paddingLeft + symbol.x,
+				scribe.paddingTop + symbol.y
+			]);
+			
+			if (symbol.y > scribe.staveY + 5) {
+				y = symbol.y - scribe.staveY + 1;
+				
+				while (--y > 5) {
+					if (y % 2) { continue; }
+					
+					scribe.staveNode2.appendChild(
+						createNode(svg, 'use', {
+							'href': '#line',
+							'class': 'lines',
+							'translate': [symbol.x - 2, y],
+							'scale': [4, 1]
+						})
+					);
+				}
+			}
+
+			if (symbol.y < scribe.staveY - 5) {
+				y = symbol.y - scribe.staveY - 1;
+				
+				while (++y < -5) {
+					if (y % 2) { continue; }
+					
+					scribe.staveNode2.appendChild(
+						createNode(svg, 'use', {
+							'href': '#line',
+							'class': 'lines',
+							'translate': [symbol.x - 2, y],
+							'scale': [4, 1]
+						})
+					);
+				}
+			}
+		}
+	}
+	
 	function Scribe(id, options) {
 		if (!(this instanceof Scribe)) {
 			return new Scribe(id);
 		}
-		
+
 		var svg = find(id);
-		
+
 		this.transpose = 0;
 		this.staveY = 4;
 		// 71 is mid note of treble clef
 		this.staveNoteY = numberToNote(71 + this.transpose);
-		
+		this.symbols = [];
+		this.data = {};
+
 		this.svg = svg;
-		
+
 		this.width = svg.viewBox.baseVal.width;
 		this.height = svg.viewBox.baseVal.height;
 		this.paddingTop = 12;
@@ -105,113 +290,58 @@
 	}
 	
 	Scribe.prototype = {
-		note: function(x, n) {
+		note: function(number, beat, duration) {
 			var svg = this.svg;
-			var noteY = numberToNote(n + this.transpose);
+			var data = createData('note', number, beat, duration);
+			var symbol = createSymbol(svg, data);
+			
+			this.symbols.push(symbol);
+			
+			var noteY = numberToNote(data.number + this.transpose);
 			var y = noteToY(noteY, this.staveNoteY, this.staveY);
-			var lineY = noteY - this.staveNoteY;
 			
-			//console.log(lineY);
+			symbol.y = y;
 			
-			if (lineY > 5) {
-				var l = lineY + 1;
-				
-				while (--l > 5) {
-					if (l % 2) { continue; }
-					
-					svg.appendChild(
-						createNode(svg, 'use', {
-							'href': '#line',
-							'class': 'lines',
-							'translate': [
-								this.paddingLeft + x - 2,
-								this.paddingTop + this.staveY - l
-							],
-							'scale': [4, 1]
-						})
-					);
-				}
-			}
-
-			if (lineY < 5) {
-				var l = lineY - 1;
-				
-				while (++l < -5) {
-					if (l % 2) { continue; }
-					
-					svg.appendChild(
-						createNode(svg, 'use', {
-							'href': '#line',
-							'class': 'lines',
-							'translate': [
-								this.paddingLeft + x - 2,
-								this.paddingTop + this.staveY - l
-							],
-							'scale': [4, 1]
-						})
-					);
-				}
-			}
+			updateSymbolsX(svg, this, this.symbols);
 			
-			
-			
-			
-			var node = createNode(svg, 'use', {
-				'href': '#head',
-				'class': 'black',
-				'translate': [
-					this.paddingLeft + x,
-					this.paddingTop + y
-				]
-			});
-			var accidental = numberToAccidental(n);
-			var nodeAccidental;
-			
-			n = node;
-			svg.appendChild(node)
-			
-			if (accidental) {
-				nodeAccidental = createNode(svg, 'use', {
-					'href': '#' + accidental,
-					'class': 'black',
-					'translate': [
-						this.paddingLeft + x - 3,
-						this.paddingTop + y
-					]
-				});
-				
-				svg.appendChild(nodeAccidental);
-			}
+			svg.appendChild(symbol.node);
 			
 			return this;
 		},
 
 		stave: function(x, y, w) {
 			var svg = this.svg;
-			var node = createNode(svg, 'use', {
-				'href': '#stave',
-				'class': 'lines',
+			var node1 = createNode(svg, 'g', {
 				'translate': [
 					this.paddingLeft + (x || 0),
 					this.paddingTop + (y || 0)
-				],
+				]
+			});
+
+			var node2 = createNode(svg, 'g', {});
+			
+			var lines = createNode(svg, 'use', {
+				'href': '#stave',
+				'class': 'lines',
 				'scale': [
 					w || this.width - this.paddingLeft - this.paddingRight,
 					1
 				]
 			});
 
-			var barNode = createNode(svg, 'use', {
+			var bar = createNode(svg, 'use', {
 				'href': '#bar',
-				'class': 'lines',
-				'translate': [
-					this.paddingLeft + (x || 0),
-					this.paddingTop + (y || 0)
-				]
+				'class': 'lines'
 			});
 			
-			svg.appendChild(node);
-			svg.appendChild(barNode)
+			node1.appendChild(lines);
+			node1.appendChild(bar);
+			node1.appendChild(node2);
+			
+			svg.appendChild(node1);
+			
+			this.staveNode1 = node1; 
+			this.staveNode2 = node2; 
 			
 			return this;
 		},
@@ -228,9 +358,24 @@
 
 var scribe = Scribe('sheet');
 
-scribe.note(6, 48);
-scribe.note(6, 67);
-scribe.note(6, 70);
-scribe.note(6, 74);
-scribe.note(6, 78);
-scribe.note(6, 84);
+scribe.note(60, 0, 1);
+scribe.note(63, 0, 1);
+scribe.note(67, 0, 1);
+
+scribe.note(59, 1, 1);
+scribe.note(65, 1, 1);
+scribe.note(69, 1, 1);
+
+scribe.note(62, 2, 1);
+scribe.note(68, 2, 1);
+scribe.note(72, 2, 1);
+
+scribe.note(65, 3, 1);
+scribe.note(70, 4, 1);
+scribe.note(75, 5, 1);
+
+scribe.note(78, 6, 1);
+scribe.note(83, 7, 1);
+scribe.note(82, 8, 1);
+scribe.note(85, 9, 1);
+
