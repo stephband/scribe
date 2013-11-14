@@ -188,7 +188,7 @@
 		var node = createNode(svg, 'g');
 		var minwidth = 0;
 		var width = 0;
-		console.log('---', data.duration);
+		
 		var head = createNode(svg, 'use', {
 			'href': '#head[' + (data.duration < 1 ? 1 : data.duration > 2 ? 2 : data.duration) + ']',
 			'class': 'black'
@@ -302,8 +302,6 @@
 			}
 			
 			xGroup.push(symbol);
-			
-			console.log(symbol.beat, symbols[n + 1].beat);
 			
 			if (!symbols[n + 1] || symbols[n + 1].type !== 'note' || symbol.beat !== symbols[n + 1].beat) {
 				d = xGroup.map(getDuration).reduce(greater, 0);
