@@ -168,50 +168,65 @@
 		return staveY + (staveNoteY - noteY);
 	}
 	
-	var symbolCreators = {
-		note: function(svg, data) {
-			var node = createNode(svg, 'g');
-			var minwidth = 0;
-			var width = 0;
-			
-			var head = createNode(svg, 'use', {
-				'href': '#head',
-				'class': 'black'
+	function createClefSymbol(svg, data) {
+		var node = createNode(svg, 'use', {
+			'href': '#treble',
+			'class': 'black'
+		});
+		
+		return {
+			type: 'clef',
+			minwidth: 8,
+			width: 10,
+			node: node,
+			beat: 0,
+			duration: 0
+		}
+	}
+	
+	function createNoteSymbol(svg, data) {
+		var node = createNode(svg, 'g');
+		var minwidth = 0;
+		var width = 0;
+		console.log('---', data.duration);
+		var head = createNode(svg, 'use', {
+			'href': '#head[' + (data.duration < 1 ? 1 : data.duration > 2 ? 2 : data.duration) + ']',
+			'class': 'black'
+		});
+		
+		minwidth += 2.8;
+		width += 4.3 + (data.duration > 1 ? data.duration : 0);
+		
+		node.appendChild(head);
+		
+		var accidentalType = numberToAccidental(data.number);
+		var accidental;
+		
+		if (accidentalType) {
+			accidental = createNode(svg, 'use', {
+				'href': '#' + accidentalType,
+				'class': 'black',
+				'translate': [-3, 0]
 			});
 			
-			minwidth += 2.8;
-			width += 4.2;
+			minwidth += 1.6;
+			width += 3.2;
 			
-			node.appendChild(head);
-			
-			var accidentalType = numberToAccidental(data.number);
-			var accidental;
-			
-			if (accidentalType) {
-				accidental = createNode(svg, 'use', {
-					'href': '#' + accidentalType,
-					'class': 'black',
-					'translate': [-3, 0]
-				});
-				
-				minwidth += 1.6;
-				width += 2;
-				
-				node.appendChild(accidental);
-			}
-			
-			return {
-				type: 'note',
-				minwidth: minwidth,
-				width: width,
-				node: node,
-				data: data,
-				duration: data.duration
-			};
+			node.appendChild(accidental);
 		}
-	};
+		
+		return {
+			type: 'note',
+			minwidth: minwidth,
+			width: width,
+			node: node,
+			data: data,
+			beat: data.beat,
+			duration: data.duration
+		};
+	}
 	
-	function createBarSymbol(svg) {
+	function createBarSymbol(svg, data) {
 		var node = createNode(svg, 'use', {
 			'href': '#bar',
 			'class': 'lines'
@@ -222,23 +237,32 @@
 			minwidth: 1,
 			width: 2,
 			node: node,
+			beat: data.beat,
 			duration: 0
 		}
 	}
 
-	function createRestSymbol(svg, duration) {
+	function createRestSymbol(svg, data) {
 		var node = createNode(svg, 'use', {
-			'href': '#rest',
-			'class': 'lines'
+			'href': '#rest[' + data.duration + ']',
+			'class': 'black'
 		});
 		
 		return {
-			type: 'bar',
-			minwidth: 1,
-			width: 2,
+			type: 'rest',
+			minwidth: data.duration * 2,
+			width: data.duration * 4,
+			y: 0,
 			node: node,
-			duration: 0
+			beat: data.beat,
+			duration: data.duration
 		}
+	}
+	
+	function insertClefSymbol(svg, scribe, symbols) {
+		symbols.splice(0, 0, createClefSymbol(svg, {
+			beat: 0
+		}));
 	}
 	
 	function insertBarSymbols(svg, scribe, symbols) {
@@ -249,20 +273,24 @@
 
 		while (++n < symbols.length) {
 			symbol = symbols[n];
-			if (symbol.data.beat / scribe.beatsPerBar >= b) {
+			if (symbol.beat / scribe.beatsPerBar >= b) {
+				symbols.splice(n, 0, createBarSymbol(svg, {
+					beat: b * scribe.beatsPerBar
+				}));
 				b++;
-				symbols.splice(n, 0, createBarSymbol(svg));
 			}
 		}
 		
-		symbols.push(createBarSymbol(svg));
+		symbols.push(createBarSymbol(svg, {
+			beat: b * scribe.beatsPerBar
+		}));
 	}
 	
 	function insertRestSymbols(svg, scribe, symbols) {
 		var n = -1,
 		    d = 0,
 		    beat = 0,
-		    nextBeat = 0,
+		    next = 0,
 		    xGroup = [],
 		    symbol;
 		
@@ -274,8 +302,10 @@
 			}
 			
 			xGroup.push(symbol);
-				
-			if (!symbols[n + 1] || symbols[n + 1].type !== 'note' || symbol.data.beat !== symbols[n + 1].data.beat) {
+			
+			console.log(symbol.beat, symbols[n + 1].beat);
+			
+			if (!symbols[n + 1] || symbols[n + 1].type !== 'note' || symbol.beat !== symbols[n + 1].beat) {
 				d = xGroup.map(getDuration).reduce(greater, 0);
 				beat = xGroup[0].beat;
 				next = symbols[n + 1].beat;
@@ -286,7 +316,10 @@
 				}
 				else if (beat + d < next) {
 					// Insert rest
-					symbols.splice(n + 1, 0, createRestSymbol(svg, next - (beat + d)));
+					symbols.splice(n + 1, 0, createRestSymbol(svg, {
+						beat: beat + d,
+						duration: next - (beat + d)
+					}));
 				}
 				
 				xGroup.length = 0;
@@ -323,8 +356,7 @@
 					x += w;
 				}
 			}
-			
-			if (symbol.type === 'bar') {
+			else {
 				// Handle x positioning
 				symbol.x = x + symbol.width / 2;
 				x += symbol.width;
@@ -346,7 +378,7 @@
 		while (++n < length) {
 			symbol = symbols[n];
 			
-			if (symbol.type === 'bar') {
+			if (symbol.type !== 'note') {
 				setTransform(svg, symbol.node, 'translate', [symbol.x, 0]);
 				scribe.staveNode2.appendChild(symbol.node);
 				continue;
@@ -404,7 +436,9 @@
 		var symbols = scribe.data.map(createSymbol, svg);
 		symbols.sort(greaterBeat);
 		
+		insertClefSymbol(svg, scribe, symbols);
 		insertBarSymbols(svg, scribe, symbols);
+		insertRestSymbols(svg, scribe, symbols);
 		updateSymbolsX(svg, scribe, symbols);
 		renderSymbols(svg, scribe, symbols);
 	}
@@ -435,7 +469,7 @@
 		this.staveY = 4;
 		// 71 is mid note of treble clef
 		this.staveNoteY = numberToNote(71 + this.transpose);
-		this.symbols = [];
+
 		this.data = [];
 		this.beatsPerBar = 4;
 		this.barsPerStave = 4;
@@ -516,18 +550,24 @@
 
 var scribe = Scribe('sheet');
 
-scribe.note(60, 0, 1);
-scribe.note(63, 0, 1);
-scribe.note(67, 0, 1);
+scribe.note(60, 0, 2);
+scribe.note(63, 0, 2);
+scribe.note(67, 0, 2);
 
-scribe.note(59, 1, 1);
-scribe.note(62, 2, 1);
-scribe.note(65, 3, 1);
+scribe.note(59, 4, 0.5);
+scribe.note(65, 4, 1);
 scribe.note(71, 4, 1);
-scribe.note(75, 5, 1);
+scribe.note(62, 4.5, 0.5);
 
-scribe.note(78, 6, 1);
-scribe.note(83, 7, 1);
-scribe.note(82, 8, 1);
-scribe.note(85, 9, 1);
+scribe.note(63, 5, 1);
+scribe.note(67, 5, 1);
+scribe.note(74, 5, 1);
+
+scribe.note(78, 7, 0.5);
+scribe.note(81, 7.5, 0.5);
+
+scribe.note(79, 8, 4);
+
+scribe.note(59, 12, 0.5);
+scribe.note(60, 13, 2)
 
