@@ -44,6 +44,10 @@
 	function getWidth(obj) {
 		return obj.width;
 	}
+
+	function getDuration(obj) {
+		return obj.duration;
+	}
 	
 	function getY(obj) {
 		return obj.y;
@@ -51,6 +55,11 @@
 	
 	function setX(x, obj) {
 		obj.x = x;
+		return x;
+	}
+
+	function setDuration(x, obj) {
+		obj.duration = x;
 		return x;
 	}
 
@@ -192,48 +201,135 @@
 			}
 			
 			return {
+				type: 'note',
 				minwidth: minwidth,
 				width: width,
 				node: node,
-				data: data
+				data: data,
+				duration: data.duration
 			};
 		}
 	};
+	
+	function createBarSymbol(svg) {
+		var node = createNode(svg, 'use', {
+			'href': '#bar',
+			'class': 'lines'
+		});
+		
+		return {
+			type: 'bar',
+			minwidth: 1,
+			width: 2,
+			node: node,
+			duration: 0
+		}
+	}
+
+	function createRestSymbol(svg, duration) {
+		var node = createNode(svg, 'use', {
+			'href': '#rest',
+			'class': 'lines'
+		});
+		
+		return {
+			type: 'bar',
+			minwidth: 1,
+			width: 2,
+			node: node,
+			duration: 0
+		}
+	}
+	
+	function insertBarSymbols(svg, scribe, symbols) {
+		var length = symbols.length,
+		    n = -1,
+		    b = 1,
+		    symbol;
+
+		while (++n < symbols.length) {
+			symbol = symbols[n];
+			if (symbol.data.beat / scribe.beatsPerBar >= b) {
+				b++;
+				symbols.splice(n, 0, createBarSymbol(svg));
+			}
+		}
+		
+		symbols.push(createBarSymbol(svg));
+	}
+	
+	function insertRestSymbols(svg, scribe, symbols) {
+		var n = -1,
+		    d = 0,
+		    beat = 0,
+		    nextBeat = 0,
+		    xGroup = [],
+		    symbol;
+		
+		while (++n < symbols.length) {
+			symbol = symbols[n];
+				
+			if (!symbols[n + 1]) {
+				return;
+			}
+			
+			xGroup.push(symbol);
+				
+			if (!symbols[n + 1] || symbols[n + 1].type !== 'note' || symbol.data.beat !== symbols[n + 1].data.beat) {
+				d = xGroup.map(getDuration).reduce(greater, 0);
+				beat = xGroup[0].beat;
+				next = symbols[n + 1].beat;
+				
+				if (beat + d > next) {
+					// Reduce duration of all notes
+					xGroup.reduce(setDuration, beat + d);
+				}
+				else if (beat + d < next) {
+					// Insert rest
+					symbols.splice(n + 1, 0, createRestSymbol(svg, next - (beat + d)));
+				}
+				
+				xGroup.length = 0;
+			}
+		}
+	}
 	
 	function updateSymbolsX(svg, scribe, symbols) {
 		var length = symbols.length,
 		    n = -1,
 		    x = 0,
 		    w = 0,
+		    d = 0,
 		    xGroup = [],
 		    yGroup = [],
 		    noteY, symbol;
 		
-		symbols.sort(greaterBeat);
-		
 		while (++n < length) {
 			symbol = symbols[n];
 			
-			// Handle y positioning
-			noteY = numberToNote(symbol.data.number + scribe.transpose);
-			symbol.y = noteToY(noteY, scribe.staveNoteY, scribe.staveY);
+			if (symbol.type === 'note') {
+				// Handle y positioning
+				noteY = numberToNote(symbol.data.number + scribe.transpose);
+				symbol.y = noteToY(noteY, scribe.staveNoteY, scribe.staveY);
+				
+				// Handle x positioning
+				xGroup.push(symbol);
+				
+				if (!symbols[n + 1] || symbols[n + 1].type !== 'note' || symbol.data.beat !== symbols[n + 1].data.beat) {
+					w = xGroup.map(getWidth).reduce(greater, 0);
+					d = xGroup.map(getDuration).reduce(greater, 0);
+					xGroup.reduce(setX, x + w / 2);
+					xGroup.length = 0;
+					x += w;
+				}
+			}
 			
-			// Handle x positioning
-			xGroup.push(symbol);
-			
-			if (!symbols[n + 1] || symbol.data.beat !== symbols[n + 1].data.beat) {
-				w = xGroup.map(getWidth).reduce(greater, 0);
-				xGroup.reduce(setX, x + w / 2);
-				xGroup.length = 0;
-				x += w;
+			if (symbol.type === 'bar') {
+				// Handle x positioning
+				symbol.x = x + symbol.width / 2;
+				x += symbol.width;
 			}
 		}
-	}
-	
-	function updateSymbolsY() {
-		console.log(data.number);
-		var noteY = numberToNote(data.number + this.transpose);
-		symbol.y = noteToY(noteY, this.staveNoteY, this.staveY);
 	}
 	
 	function renderSymbols(svg, scribe, symbols) {
@@ -249,6 +345,12 @@
 		
 		while (++n < length) {
 			symbol = symbols[n];
+			
+			if (symbol.type === 'bar') {
+				setTransform(svg, symbol.node, 'translate', [symbol.x, 0]);
+				scribe.staveNode2.appendChild(symbol.node);
+				continue;
+			}
 			
 			setTransform(svg, symbol.node, 'translate', [
 				scribe.paddingLeft + symbol.x,
@@ -295,12 +397,14 @@
 	
 	function createSymbol(data) {
 		var svg = this;
-		return symbolCreators[data.type](svg, data);
+		return createNoteSymbol(svg, data);
 	}
 	
 	function renderScribe(scribe, svg) {
 		var symbols = scribe.data.map(createSymbol, svg);
+		symbols.sort(greaterBeat);
 		
+		insertBarSymbols(svg, scribe, symbols);
 		updateSymbolsX(svg, scribe, symbols);
 		renderSymbols(svg, scribe, symbols);
 	}
@@ -309,16 +413,16 @@
 		if (!(this instanceof Scribe)) {
 			return new Scribe(id);
 		}
-
+		
 		var svg = find(id);
 		var scribe = this;
 		var flag;
-
+		
 		function update() {
 			flag = false;
 			renderScribe(scribe, svg);
 		}
-	
+		
 		function queueRender() {
 			if (flag) { return; }
 			flag = true;
@@ -326,16 +430,18 @@
 		}
 		
 		this.render = queueRender;
-
+		
 		this.transpose = 0;
 		this.staveY = 4;
 		// 71 is mid note of treble clef
 		this.staveNoteY = numberToNote(71 + this.transpose);
 		this.symbols = [];
 		this.data = [];
-
+		this.beatsPerBar = 4;
+		this.barsPerStave = 4;
+		
 		this.svg = svg;
-
+		
 		this.width = svg.viewBox.baseVal.width;
 		this.height = svg.viewBox.baseVal.height;
 		this.paddingTop = 12;
@@ -415,11 +521,9 @@ scribe.note(63, 0, 1);
 scribe.note(67, 0, 1);
 
 scribe.note(59, 1, 1);
-
 scribe.note(62, 2, 1);
-
 scribe.note(65, 3, 1);
-scribe.note(70, 4, 1);
+scribe.note(71, 4, 1);
 scribe.note(75, 5, 1);
 
 scribe.note(78, 6, 1);
