@@ -329,20 +329,12 @@
 			}
 		}
 		
-		// Handle rests of 2 beats or longer.
-		if (barBeat % 1 === 0) {
-			if (duration >= 4) {
-				return createRestSymbol(svg, {
-					beat: beat,
-					duration: 4
-				});
-			}
-			if (duration >=2) {
-				return createRestSymbol(svg, {
-					beat: beat,
-					duration: 2
-				});
-			}
+		// Handle rests of 2 – 4 beats duration.
+		if (barBeat % 1 === 0 && duration >=2) {
+			return createRestSymbol(svg, {
+				beat: beat,
+				duration: duration > 4 ? 4 : Math.floor(duration)
+			});
 		}
 		
 		// Handle rests of a beat or less. No sane person wants to read rests
@@ -567,7 +559,7 @@
 		this.staveNoteY = numberToNote(71 + this.transpose);
 
 		this.data = [];
-		this.beatsPerBar = 4;
+		this.beatsPerBar = 5;
 		this.barsPerStave = 4;
 		
 		this.svg = svg;
