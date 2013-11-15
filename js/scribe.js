@@ -41,6 +41,15 @@
 		}
 	};
 	
+	var barBreaks = {
+		3: [1,2],
+		4: [2],
+		5: [4],
+		6: [3]
+	};
+	
+	// Pure functions
+	
 	function getWidth(obj) {
 		return obj.width;
 	}
@@ -82,6 +91,9 @@
 	function greater(total, n) {
 		return n > total ? n : total ;
 	}
+	
+	
+	// SVG DOM functions
 	
 	function setAttrBaseVal(svg, node, attr, value) {
 		node[attr].baseVal = value;
@@ -125,6 +137,23 @@
 		
 		return node;
 	}
+	
+	function append(parent, children) {
+		if (typeof children !== 'object') {
+			parent.appendChild(children);
+			return;
+		}
+		
+		var length = children.length;
+		var n = -1;
+		
+		while (++n < length) {
+			parent.appendChild(children[n]);
+		}
+	}
+	
+	
+	// Scribe logic
 	
 	function createData(type, number, beat, duration) {
 		return {
@@ -250,13 +279,86 @@
 		
 		return {
 			type: 'rest',
-			minwidth: data.duration * 2,
-			width: data.duration * 4,
+			minwidth: 2.5 + data.duration,
+			width: 3 + data.duration * 3,
 			y: 0,
 			node: node,
 			beat: data.beat,
 			duration: data.duration
 		}
+	}
+	
+	function beatOfBar(beat, beatsPerBar) {
+		// Placeholder function for when beatsPerBar becomes a map
+		return beat % beatsPerBar;
+	}
+	
+	function durationOfBar(beat, beatsPerBar) {
+		// Placeholder function for when beatsPerBar becomes a map
+		return beatsPerBar;
+	}
+	
+	function breaksOfBar(beat, beatsPerBar) {
+		// Placeholder function for when beatsPerBar becomes a map
+		return barBreaks[beatsPerBar];
+	}
+	
+	function fitRestSymbol(svg, scribe, beat, duration) {
+		var barBeat = beatOfBar(beat, scribe.beatsPerBar);
+		var barDuration = durationOfBar(beat, scribe.beatsPerBar);
+		var barBreaks = breaksOfBar(beat, scribe.beatsPerBar);
+		var barBreak;
+		var b = -1;
+		var d = 2;
+		
+		// Any whole bar of longer than two beat's rest gets a 4 beat rest symbol.
+		if (barBeat === 0 && barDuration > 2 && duration >= barDuration) {
+			return createRestSymbol(svg, {
+				beat: beat,
+				duration: 4
+			});
+		}
+		
+		// Reduce duration to the nearest bar breakpoint
+		while (++b < barBreaks.length) {
+			barBreak = barBreaks[b];
+			if (barBeat >= barBreak) { continue; }
+			if (barBeat + duration > barBreak) {
+				duration = barBreak - barBeat;
+				break;
+			}
+		}
+		
+		// Handle rests of 2 beats or longer.
+		if (barBeat % 1 === 0) {
+			if (duration >= 4) {
+				return createRestSymbol(svg, {
+					beat: beat,
+					duration: 4
+				});
+			}
+			if (duration >=2) {
+				return createRestSymbol(svg, {
+					beat: beat,
+					duration: 2
+				});
+			}
+		}
+		
+		// Handle rests of a beat or less. No sane person wants to read rests
+		// any shorter than an 1/32th note.
+		while ((d /= 2) >= 0.125) {
+			if (barBeat % d === 0 && duration >= d) {
+				return createRestSymbol(svg, {
+					beat: beat,
+					duration: d
+				});
+			}
+		}
+
+		if (debug) console.log('Scribe: not able to make rest for beat:', beat, 'duration:', duration);
+		
+		return;
 	}
 	
 	function insertClefSymbol(svg, scribe, symbols) {
@@ -307,17 +409,13 @@
 				d = xGroup.map(getDuration).reduce(greater, 0);
 				beat = xGroup[0].beat;
 				next = symbols[n + 1].beat;
-				
 				if (beat + d > next) {
 					// Reduce duration of all notes
 					xGroup.reduce(setDuration, beat + d);
 				}
 				else if (beat + d < next) {
 					// Insert rest
-					symbols.splice(n + 1, 0, createRestSymbol(svg, {
-						beat: beat + d,
-						duration: next - (beat + d)
-					}));
+					symbols.splice(n + 1, 0, fitRestSymbol(svg, scribe, beat + d, next - (beat + d)));
 				}
 				
 				xGroup.length = 0;
@@ -548,24 +646,28 @@
 
 var scribe = Scribe('sheet');
 
-scribe.note(60, 0, 2);
-scribe.note(63, 0, 2);
-scribe.note(67, 0, 2);
+scribe.note(60, 3, 1);
 
-scribe.note(59, 4, 0.5);
-scribe.note(65, 4, 1);
-scribe.note(71, 4, 1);
-scribe.note(62, 4.5, 0.5);
+scribe.note(60, 9.75, 0.25);
 
-scribe.note(63, 5, 1);
-scribe.note(67, 5, 1);
-scribe.note(74, 5, 1);
-
-scribe.note(78, 7, 0.5);
-scribe.note(81, 7.5, 0.5);
-
-scribe.note(79, 8, 4);
-
-scribe.note(59, 12, 0.5);
-scribe.note(60, 13, 2)
+//scribe.note(60, 0, 2);
+//scribe.note(63, 0, 2);
+//scribe.note(67, 0, 2);
+//
+//scribe.note(59, 4, 0.5);
+//scribe.note(65, 4, 1);
+//scribe.note(71, 4, 1);
+//scribe.note(62, 4.5, 0.5);
+//
+//scribe.note(63, 5, 1);
+//scribe.note(67, 5, 1);
+//scribe.note(74, 5, 1);
+//
+//scribe.note(78, 7, 0.5);
+//scribe.note(81, 7.5, 0.5);
+//
+//scribe.note(79, 8, 4);
+//
+//scribe.note(59, 12, 0.5);
+//scribe.note(60, 13, 2)
 
