@@ -44,7 +44,7 @@
 	var barBreaks = {
 		3: [1,2],
 		4: [2],
-		5: [4],
+		5: [3],
 		6: [3]
 	};
 	
@@ -303,6 +303,71 @@
 		return barBreaks[beatsPerBar];
 	}
 	
+	function fitToBar(svg, beat, duration, barBeat, barDuration, symbols) {
+		// Where a note is going to pass into the next bar, split it
+		if (barBeat + duration > barDuration) {
+			symbols.push(createNoteSymbol(svg, {
+				duration: duration - barDuration + barBeat,
+				beat: beat - barBeat + barDuration
+			}))
+		}
+	}
+	
+	function fitNoteSymbol(svg, scribe, symbol) {
+		var beat = symbol.beat;
+		var duration = symbol.duration;
+		var barBeat = beatOfBar(beat, scribe.beatsPerBar);
+		var barDuration = durationOfBar(beat, scribe.beatsPerBar);
+		var barBreaks = breaksOfBar(beat, scribe.beatsPerBar);
+		var symbols = [];
+		var d;
+		
+		// Any note of two beats or longer, starting on a beat, gets to display
+		// as is.
+		if (barBeat % 1 === 0 && duration >= 2) {
+			return symbols;
+		}
+
+		// Reduce duration to the nearest bar breakpoint, creating a new symbol
+		// to continue the note.
+		while (++b < barBreaks.length) {
+			barBreak = barBreaks[b];
+			if (barBeat >= barBreak) { continue; }
+			if (barBeat + duration > barBreak) {
+				d = barBreak - barBeat;
+				
+				symbol.duration = d;
+				symbol.tied = true;
+				
+				//symbols.push(createTieSymbol(svg, symbol));
+				symbols.push(createNoteSymbol(svg, {
+					beat: beat + d,
+					duration: duration - d,
+					number: symbol.number
+				}));
+				
+				break;
+			}
+		}
+
+		d = 2;
+
+		// Handle notes of a beat or less. 
+		while ((d /= 2) >= 0.125) {
+			if (barBeat % d === 0 && duration >= d) {
+				symbol.duration = d;
+				symbol.tied = true;
+				
+				//symbols.push(createTieSymbol(svg, symbol));
+				symbols.push(createNoteSymbol(svg, {
+					beat: beat + d,
+					duration: duration - d,
+					number: symbol.number
+				}));
+			}
+		}
+	}
+	
 	function fitRestSymbol(svg, scribe, beat, duration) {
 		var barBeat = beatOfBar(beat, scribe.beatsPerBar);
 		var barDuration = durationOfBar(beat, scribe.beatsPerBar);
@@ -559,7 +624,7 @@
 		this.staveNoteY = numberToNote(71 + this.transpose);
 
 		this.data = [];
-		this.beatsPerBar = 5;
+		this.beatsPerBar = 4;
 		this.barsPerStave = 4;
 		
 		this.svg = svg;
@@ -638,9 +703,11 @@
 
 var scribe = Scribe('sheet');
 
-scribe.note(60, 3, 1);
-
-scribe.note(60, 9.75, 0.25);
+scribe.note(60, 4, 1);
+scribe.note(72, 4.5, 1);
+scribe.note(65, 5.5, 0.5);
+scribe.note(60, 9.875, 0.125);
+scribe.note(60, 10, 0.125);
 
 //scribe.note(60, 0, 2);
 //scribe.note(63, 0, 2);
