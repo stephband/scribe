@@ -512,7 +512,7 @@
 		while (++n < length) {
 			symbol = symbols[n];
 			
-			console.log('Scribe: write ' + symbol.type, symbol);
+			if (debug) console.log('Scribe: write symbol', symbol);
 			
 			if (symbol.type !== 'note') {
 				node = nodeType[symbol.type](svg, symbol);
@@ -559,13 +559,23 @@
 		}
 	}
 	
-	function renderScribe(scribe, svg) {
-		var data = scribe.data.sort(byBeat);
-		var symbols = data.map(function(data) {
-			return symbolType.note(data.beat, data.duration, data.number);
-		});
+	function createSymbols(data) {
+		var symbols = [],
+		    n = -1;
 		
-		insertClefSymbol(svg, scribe, symbols);
+		data.sort(byBeat);
+		symbols.push(symbolType.clef());
+		
+		while(++n < data.length) {
+			symbols.push(symbolType.note(data[n].beat, data[n].duration, data[n].number));
+		}
+		
+		return symbols;
+	}
+	
+	function renderScribe(scribe, svg) {
+		var symbols = createSymbols(scribe.data);
+		
 		insertBarSymbols(svg, scribe, symbols);
 		insertRestSymbols(svg, scribe, symbols);
 		updateSymbolsX(svg, scribe, symbols);
@@ -679,7 +689,7 @@
 
 var scribe = Scribe('sheet');
 
-scribe.note(60, 4, 1);
+scribe.note(60, 4.25, 4);
 scribe.note(87, 4.5, 1);
 scribe.note(65, 5.5, 0.5);
 scribe.note(60, 9.875, 0.125);
