@@ -238,6 +238,15 @@
 				'translate': [symbol.x, 0]
 			});
 		},
+
+		tie: function tie(svg, symbol) {
+			return createNode(svg, 'use', {
+				'href': '#tie',
+				'class': 'scribe-tie',
+				'translate': [symbol.x, symbol.y],
+				'scale': [symbol.width, symbol.height]
+			});
+		},
 		
 		note: function note(svg, symbol) {
 			var minwidth = 0;
@@ -466,6 +475,7 @@
 		    symbol, node;
 		
 		scribe.staveNode1.removeChild(scribe.staveNode2);
+		scribe.staveNode1.removeChild(scribe.staveNode3);
 		scribe.staveNode2 = createNode(svg, 'g', {});
 		scribe.staveNode3 = createNode(svg, 'g', {});
 		append(scribe.staveNode1, [scribe.staveNode2, scribe.staveNode3]);
@@ -483,6 +493,17 @@
 			
 			node = nodeType[symbol.type](svg, symbol);
 			scribe.staveNode3.appendChild(node);
+			
+			if (symbol.to) {
+				node = nodeType.tie(svg, {
+					x: symbol.x + 1,
+					y: symbol.y + 1.25,
+					width: symbol.to.x - symbol.x - 2.25,
+					height: 0.375 * (symbol.to.x - symbol.x - 2.25)
+				});
+				
+				scribe.staveNode3.appendChild(node);
+			}
 			
 			if (symbol.y > 5) {
 				y = symbol.y + 1;
@@ -698,6 +719,7 @@
 			});
 
 			var node2 = createNode(svg, 'g', {});
+			var node3 = createNode(svg, 'g', {});
 			
 			var lines = createNode(svg, 'use', {
 				'href': '#stave',
@@ -716,11 +738,13 @@
 			node1.appendChild(lines);
 			node1.appendChild(bar);
 			node1.appendChild(node2);
+			node1.appendChild(node3);
 			
 			svg.appendChild(node1);
 			
 			this.staveNode1 = node1; 
-			this.staveNode2 = node2; 
+			this.staveNode2 = node2;
+			this.staveNode3 = node3; 
 			
 			return this;
 		},
