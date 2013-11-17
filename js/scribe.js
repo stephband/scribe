@@ -255,7 +255,7 @@
 				'translate': [symbol.x, symbol.y]
 			});
 			var head = createNode(svg, 'use', {
-				'href': '#head[' + (symbol.duration < 1 ? 1 : symbol.duration > 2 ? 2 : symbol.duration) + ']',
+				'href': '#head[' + (symbol.duration < 1 ? 1 : symbol.duration > 4 ? 4 : symbol.duration) + ']',
 				'class': 'scribe-note'
 			});
 			
