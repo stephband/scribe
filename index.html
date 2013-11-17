@@ -34,29 +34,16 @@
 
 <body>
 		<style>
-			.black {
+			.scribe-note,
+			.scribe-clef,
+			.scribe-rest,
+			.scribe-tie,
+			.scribe-accidental {
 				fill: black;
 				stroke: none;
-			}
-	
-			.black-stroke {
-				fill: black;
-				stroke: none;
-				stroke-linecap: round;
-				stroke-linejoin: round;
-				stroke-miterlimit: 10;
 			}
 			
-			.black {
-				fill: black;
-				stroke: black;
-				stroke-width: 0.2;
-				stroke-linecap: round;
-				stroke-linejoin: round;
-				stroke-miterlimit: 10;
-			}
-	
-			.lines {
+			.scribe-stave {
 				fill: none;
 				stroke: black;
 				stroke-width: 0.1;
@@ -64,7 +51,7 @@
 				stroke-miterlimit: 10;
 			}
 
-			.bar {
+			.scribe-bar {
 				fill: black;
 				stroke: black;
 				stroke-width: 0.15;
@@ -166,9 +153,11 @@
 			<path id="sharp" transform="translate(-1.15,1.85) scale(0.003, -0.003)" d="M716 1028q0 -58 -4.5 -100.5t-19.5 -69.5q-11 -23 -61 -56.5t-98 -65.5v-67q26 6 79.5 32.5t61.5 26.5q15 0 21.5 -32.5t6.5 -81.5q0 -43 -3 -75t-7 -37q-5 -28 -50 -63q-51 -34 -61 -42q-7 -17 -7 -60q0 -31 4 -85q9 -122 9 -140q0 -31 -6 -40q-8 -18 -35 -34.5 t-45 -16.5q-8 0 -10 5q-8 35 -20 127q-22 165 -26 172q-2 -2 -27 -19q-14 -10 -18.5 -18t-4.5 -30q0 -24 3 -78q7 -126 7 -168q0 -44 -3.5 -69t-12.5 -35q-18 -9 -33 -9q-9 0 -14.5 1t-31.5 8q-6 7 -21.5 152.5t-19.5 153.5q-5 0 -52 -27t-63 -27q-8 0 -10 6q-9 15 -18.5 52 t-9.5 53q16 50 28.5 68t90.5 109v80q-32 -25 -76 -51q-62 -37 -76 -29q-11 9 -16 34t-5 57q0 38 6 88q2 16 6 42q14 32 76 85t66 66.5t5 30.5t1 43q0 53 -6 116q0 65 -4 122t-8 122q0 34 2 46.5t10 37.5q14 49 29 99q23 67 44 67q17 0 28 -155q5 -74 14 -289q6 -155 14 -155 q12 0 32 13.5t38 25.5q3 5 3 32q0 44 -6 139q-13 206 -13 207q-7 138 -7 226q0 54 1 91t5 75q14 54 41 104q31 58 63 83q11 0 15.5 -40t4.5 -108q0 -58 -1.5 -118t-2.5 -95q0 -257 6.5 -382t16.5 -130q33 24 70 40.5t81 28.5q6 -12 15 -34t9 -35zM427 693l-71 -53v-90l71 53 v90z"/>
 			<path id="natural" transform="translate(-0.8,2.2) scale(0.003, -0.003)" d="M485 -410q-22 -15 -61 -23q-18 -4 -23 -7l-47 901q-12 -37 -66 -84q-67 -59 -135 -59q-18 0 -30 2t-28 10l-77 1476q8 4 21 4q15 0 35.5 -2.5t26.5 -1.5l36 -694q25 29 124 74q82 38 138 55zM341 728q-2 40 -4 84q-5 88 -7 96q-54 -15 -109 -54q-43 -30 -68 -59l9 -160 q57 10 99 30q53 25 80 63z" style="display: block;"></path>
 			-->
+
+			<path id="tie" d="M0.983457973,0.0109273455 C0.654881053,1.11799522 0.137713523,1.07925352 0.0096281251,0.0273381109 C0.00444753628,0.0144169901 0.00253387291,0.00218807553 0,0 C0.0977526897,1.29523004 0.656681642,1.37089992 1,2.43111793e-08 C0.991901367,2.43111798e-08 0.991987175,0.0109273448 0.983457973,0.0109273455 Z M0.983457973,0.0109273455"></path>
 		</defs>
 		
-		<!--use class="black" xlink:href="#rest[3]" transform="translate(3 16)"></use-->
+		<use class="scribe-tie" transform="scale(6 1.5)" xlink:href="#tie" transform="translate(3 16)"></use>
 	</svg>
 	
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
