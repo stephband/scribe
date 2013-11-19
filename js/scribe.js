@@ -12,9 +12,15 @@
 	
 	var attributes = {
 		'class': setAttr,
+		'x1': setAttr,
+		'y1': setAttr,
+		'x2': setAttr,
+		'y2': setAttr,
+		'd': setAttr,
 		'href': setAttrBaseVal,
 		'translate': setTransform,
-		'scale': setTransform
+		'scale': setTransform,
+		'rotate': setTransform
 	};
 	
 	var transforms = {
@@ -79,6 +85,14 @@
 	function sum(total, n) {
 		return total + n;
 	}
+
+	function max(total, n) {
+		return total > n ? total : n;
+	}
+
+	function min(total, n) {
+		return total < n ? total : n;
+	}
 	
 	function byBeat(a, b) {
 		return a.beat > b.beat ? 1 : -1 ;
@@ -90,6 +104,10 @@
 	
 	function greater(total, n) {
 		return n > total ? n : total ;
+	}
+
+	function first(array) {
+		return array[0];
 	}
 
 	function last(array) {
@@ -255,7 +273,7 @@
 				'translate': [symbol.x, symbol.y]
 			});
 			var head = createNode(svg, 'use', {
-				'href': '#head[' + (symbol.duration < 1 ? 1 : symbol.duration > 4 ? 4 : symbol.duration) + ']',
+				'href': '#head[' + symbol.duration + ']',
 				'class': 'scribe-note'
 			});
 			
@@ -278,6 +296,34 @@
 			}
 			
 			return node;
+		},
+		
+		stalkup: function stalkup(svg, symbol) {
+			return createNode(svg, 'use', {
+				'href': '#stalkup',
+				'class': 'scribe-stalk'
+			});
+		},
+	
+		stalkdown: function stalkdown(svg, symbol) {
+			return createNode(svg, 'use', {
+				'href': '#stalkdown',
+				'class': 'scribe-stalk'
+			});
+		},
+		
+		tailup: function tail(svg, symbol) {
+			return createNode(svg, 'use', {
+				'class': 'scribe-tail',
+				'href': '#tailup[' + symbol.duration +']'
+			});
+		},
+		
+		taildown: function tail(svg, symbol) {
+			return createNode(svg, 'use', {
+				'class': 'scribe-tail',
+				'href': '#taildown[' + symbol.duration +']'
+			});
 		}
 	};
 	
@@ -319,7 +365,7 @@
 			return {
 				type: 'note',
 				minwidth: 2.8,
-				width: 4.3 + (duration > 1 ? duration : 0),
+				width: 5.3 + (duration > 1 ? duration : 0),
 				beat: beat,
 				duration: duration,
 				number: number,
@@ -467,11 +513,99 @@
 		}
 	}
 	
+	function renderNote(svg, layer, symbol) {
+		var node = nodeType[symbol.type](svg, symbol);
+		
+		if (symbol.duration && symbol.duration < 4) {
+			if (symbol.y > 0) {
+				// Stalks down
+				node.appendChild(nodeType.stalkup(svg, symbol));
+				if (symbol.duration < 1) {
+					node.appendChild(nodeType.tailup(svg, symbol));
+				}
+			}
+			else {
+				// Stalks up
+				node.appendChild(nodeType.stalkdown(svg, symbol));
+				if (symbol.duration < 1) {
+					node.appendChild(nodeType.taildown(svg, symbol));
+				}
+			}
+		}
+		
+		layer.appendChild(node);
+	}
+	
+	function renderGroup(svg, layer, symbols) {
+		var length = symbols.length;
+		var n = -1;
+		var symbol;
+		var yArray = symbols.map(getY);
+		var avgY = yArray.reduce(sum) / length;
+		var minY = yArray.reduce(min);
+		var maxY = yArray.reduce(max);
+		var node;
+		
+		while (++n < length) {
+			symbol = symbols[n];
+			node = nodeType[symbol.type](svg, symbol);
+			
+			if (avgY < 0) {
+				// down
+				node.appendChild(createNode(svg, 'line', {
+					'class': 'scribe-stalk',
+					x1: -1.125,
+					y1: 0.5,
+					x2: -1.125,
+					y2: 6.75 + maxY - symbol.y
+				}));
+			}
+			else {
+				// up
+				node.appendChild(createNode(svg, 'line', {
+					'class': 'scribe-stalk',
+					x1: 1.25,
+					y1: -0.5,
+					x2: 1.25,
+					y2: -6.75 - symbol.y + minY
+				}));
+			}
+			
+			layer.appendChild(node);
+		}
+		
+		if (avgY < 0) {
+			layer.appendChild(createNode(svg, 'path', {
+				'class': 'scribe-beam',
+				'd': [
+					'M', first(symbols).x - 1.125, ' ', 5.75 + maxY,
+					'L', last(symbols).x - 1.125, ' ', 5.75 + maxY,
+					'L', last(symbols).x - 1.125, ' ', 6.75 + maxY,
+					'L', first(symbols).x - 1.125, ' ', 6.75 + maxY,
+					'Z'
+				].join('')
+			}));
+		}
+		else {
+			layer.appendChild(createNode(svg, 'path', {
+				'class': 'scribe-beam',
+				'd': [
+					'M', first(symbols).x + 1.25, ' ', -5.75 + minY,
+					'L', last(symbols).x + 1.25,  ' ', -5.75 + minY,
+					'L', last(symbols).x + 1.25,  ' ', -6.75 + minY,
+					'L', first(symbols).x + 1.25, ' ', -6.75 + minY,
+					'Z'
+				].join('')
+			}));
+		}
+	}
+	
 	function renderSymbols(svg, scribe, symbols) {
 		var length = symbols.length,
 		    n = -1,
 		    x = 0,
 		    y = 0,
+		    yGroup = [],
 		    symbol, node;
 		
 		scribe.staveNode1.removeChild(scribe.staveNode2);
@@ -482,29 +616,51 @@
 		
 		while (++n < length) {
 			symbol = symbols[n];
-			
+
 			if (debug) console.log('Scribe: write symbol', symbol);
 			
 			if (symbol.type !== 'note') {
+				if (yGroup.length > 1) {
+					renderGroup(svg, scribe.staveNode3, yGroup);
+				}
+				else if (yGroup.length === 1) {
+					renderNote(svg, scribe.staveNode3, yGroup[0]);
+				}
+				
+				yGroup.length = 0;
+				
 				node = nodeType[symbol.type](svg, symbol);
 				scribe.staveNode2.appendChild(node);
 				continue;
 			}
-			
-			node = nodeType[symbol.type](svg, symbol);
-			scribe.staveNode3.appendChild(node);
-			
+
+			if (symbol.duration < 1) {
+				yGroup.push(symbol);
+			}
+			else {
+				if (yGroup.length > 1) {
+					renderGroup(svg, scribe.staveNode3, yGroup);
+				}
+				else if (yGroup.length === 1) {
+					renderNote(svg, scribe.staveNode3, yGroup[0]);
+				}
+				
+				yGroup.length = 0;
+				
+				renderNote(svg, scribe.staveNode3, symbol);
+			}
+
+			// Render tie
 			if (symbol.to) {
-				node = nodeType.tie(svg, {
+				scribe.staveNode3.appendChild(nodeType.tie(svg, {
 					x: symbol.x + 1,
 					y: symbol.y + 1.25,
 					width: symbol.to.x - symbol.x - 2.25,
 					height: 0.375 * (symbol.to.x - symbol.x - 2.25)
-				});
-				
-				scribe.staveNode3.appendChild(node);
+				}));
 			}
-			
+
+			// Render ledger lines
 			if (symbol.y > 5) {
 				y = symbol.y + 1;
 				
@@ -761,30 +917,13 @@
 
 var scribe = Scribe('sheet');
 
-scribe.note(60, 0, 3);
-scribe.note(87, 4.5, 1);
-scribe.note(65, 5.5, 1.5);
+scribe.note(62, 2.0, 0.5);
+scribe.note(64, 2.5, 0.5);
+scribe.note(66, 3.0, 0.5);
+scribe.note(72, 3.5, 0.25);
+
+scribe.note(60, 4, 0.75);
+scribe.note(72, 5.75, 1.25);
+scribe.note(65, 7.75, 0.75);
 scribe.note(60, 9.875, 0.125);
 scribe.note(60, 10, 0.125);
-
-//scribe.note(60, 0, 2);
-//scribe.note(63, 0, 2);
-//scribe.note(67, 0, 2);
-//
-//scribe.note(59, 4, 0.5);
-//scribe.note(65, 4, 1);
-//scribe.note(71, 4, 1);
-//scribe.note(62, 4.5, 0.5);
-//
-//scribe.note(63, 5, 1);
-//scribe.note(67, 5, 1);
-//scribe.note(74, 5, 1);
-//
-//scribe.note(78, 7, 0.5);
-//scribe.note(81, 7.5, 0.5);
-//
-//scribe.note(79, 8, 4);
-//
-//scribe.note(59, 12, 0.5);
-//scribe.note(60, 13, 2)
-
