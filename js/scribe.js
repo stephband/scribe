@@ -354,7 +354,7 @@
 			return {
 				type: 'rest',
 				minwidth: 2.5 + duration,
-				width: 3 + duration * 3,
+				width: 3 + duration * 4,
 				y: 0,
 				beat: beat,
 				duration: duration
@@ -365,7 +365,7 @@
 			return {
 				type: 'note',
 				minwidth: 2.8,
-				width: 5.3 + (duration > 1 ? duration : 0),
+				width: 6.3 + (duration > 1 ? duration : 0),
 				beat: beat,
 				duration: duration,
 				number: number,
@@ -513,6 +513,56 @@
 		}
 	}
 	
+	function renderLedgers(svg, layer, symbol) {
+		var y = 0;
+
+		// Render ledger lines
+		if (symbol.y > 5) {
+			y = symbol.y + 1;
+			
+			while (--y > 5) {
+				if (y % 2) { continue; }
+				
+				layer.appendChild(
+					createNode(svg, 'use', {
+						'href': '#line',
+						'class': 'scribe-stave',
+						'translate': [symbol.x - 2, y],
+						'scale': [4, 1]
+					})
+				);
+			}
+		}
+
+		if (symbol.y < -5) {
+			y = symbol.y - 1;
+			
+			while (++y < -5) {
+				if (y % 2) { continue; }
+				
+				layer.appendChild(
+					createNode(svg, 'use', {
+						'href': '#line',
+						'class': 'scribe-stave',
+						'translate': [symbol.x - 2, y],
+						'scale': [4, 1]
+					})
+				);
+			}
+		}
+	}
+	
+	function renderTie(svg, layer, symbol) {
+		if (!symbol.to) { return; }
+		
+		layer.appendChild(nodeType.tie(svg, {
+			x: symbol.x + 1,
+			y: symbol.y + 1.25,
+			width: symbol.to.x - symbol.x - 2.25,
+			height: 0.375 * (symbol.to.x - symbol.x - 2.25)
+		}));
+	}
+	
 	function renderNote(svg, layer, symbol) {
 		var node = nodeType[symbol.type](svg, symbol);
 		
@@ -536,7 +586,7 @@
 		layer.appendChild(node);
 	}
 	
-	function renderGroup(svg, layer, symbols) {
+	function renderNotes(svg, layer, symbols) {
 		var length = symbols.length;
 		var n = -1;
 		var symbol;
@@ -600,11 +650,20 @@
 		}
 	}
 	
+	function renderGroup(svg, layer, group) {
+		if (group.length > 1) {
+			renderNotes(svg, layer, group);
+		}
+		else if (group.length === 1) {
+			renderNote(svg, layer, group[0]);
+		}
+	}
+
+	
 	function renderSymbols(svg, scribe, symbols) {
 		var length = symbols.length,
 		    n = -1,
 		    x = 0,
-		    y = 0,
 		    yGroup = [],
 		    symbol, node;
 		
@@ -620,13 +679,7 @@
 			if (debug) console.log('Scribe: write symbol', symbol);
 			
 			if (symbol.type !== 'note') {
-				if (yGroup.length > 1) {
-					renderGroup(svg, scribe.staveNode3, yGroup);
-				}
-				else if (yGroup.length === 1) {
-					renderNote(svg, scribe.staveNode3, yGroup[0]);
-				}
-				
+				renderGroup(svg, scribe.staveNode3, yGroup);
 				yGroup.length = 0;
 				
 				node = nodeType[symbol.type](svg, symbol);
@@ -638,63 +691,16 @@
 				yGroup.push(symbol);
 			}
 			else {
-				if (yGroup.length > 1) {
-					renderGroup(svg, scribe.staveNode3, yGroup);
-				}
-				else if (yGroup.length === 1) {
-					renderNote(svg, scribe.staveNode3, yGroup[0]);
-				}
-				
+				renderGroup(svg, scribe.staveNode3, yGroup);
 				yGroup.length = 0;
-				
 				renderNote(svg, scribe.staveNode3, symbol);
 			}
 
-			// Render tie
-			if (symbol.to) {
-				scribe.staveNode3.appendChild(nodeType.tie(svg, {
-					x: symbol.x + 1,
-					y: symbol.y + 1.25,
-					width: symbol.to.x - symbol.x - 2.25,
-					height: 0.375 * (symbol.to.x - symbol.x - 2.25)
-				}));
-			}
-
-			// Render ledger lines
-			if (symbol.y > 5) {
-				y = symbol.y + 1;
-				
-				while (--y > 5) {
-					if (y % 2) { continue; }
-					
-					scribe.staveNode2.appendChild(
-						createNode(svg, 'use', {
-							'href': '#line',
-							'class': 'scribe-stave',
-							'translate': [symbol.x - 2, y],
-							'scale': [4, 1]
-						})
-					);
-				}
-			}
-
-			if (symbol.y < -5) {
-				y = symbol.y - 1;
-				
-				while (++y < -5) {
-					if (y % 2) { continue; }
-					
-					scribe.staveNode2.appendChild(
-						createNode(svg, 'use', {
-							'href': '#line',
-							'class': 'scribe-stave',
-							'translate': [symbol.x - 2, y],
-							'scale': [4, 1]
-						})
-					);
-				}
-			}
+			renderTie(svg, scribe.staveNode3, symbol);
+			renderLedgers(svg, scribe.staveNode2, symbol);
 		}
+
+		renderGroup(svg, scribe.staveNode3, yGroup);
 	}
 	
 	function nextBreakpoint(bar, beat) {
@@ -920,10 +926,9 @@ var scribe = Scribe('sheet');
 scribe.note(62, 2.0, 0.5);
 scribe.note(64, 2.5, 0.5);
 scribe.note(66, 3.0, 0.5);
-scribe.note(72, 3.5, 0.25);
+scribe.note(72, 3.5, 0.5);
 
 scribe.note(60, 4, 0.75);
-scribe.note(72, 5.75, 1.25);
+scribe.note(72, 5, 1);
 scribe.note(65, 7.75, 0.75);
-scribe.note(60, 9.875, 0.125);
-scribe.note(60, 10, 0.125);
+scribe.note(60, 9, 0.5);
