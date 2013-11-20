@@ -923,12 +923,18 @@
 
 var scribe = Scribe('sheet');
 
-scribe.note(62, 2.0, 0.5);
-scribe.note(64, 2.5, 0.5);
-scribe.note(66, 3.0, 0.5);
-scribe.note(72, 3.5, 0.5);
+scribe.note(72, 2, 0.5);
+scribe.note(74, 2.5, 1);
+scribe.note(76, 3.5, 0.5);
 
-scribe.note(60, 4, 0.75);
-scribe.note(72, 5, 1);
-scribe.note(65, 7.75, 0.75);
-scribe.note(60, 9, 0.5);
+scribe.note(71, 4, 0.5);
+scribe.note(71, 5, 2);
+scribe.note(69, 7, 1);
+
+scribe.note(68, 8, 1.5);
+scribe.note(75, 9.5, 1.5);
+
+scribe.note(78, 12, 0.5);
+scribe.note(76, 12.5, 0.5);
+scribe.note(77, 13, 0.5);
+scribe.note(79, 13.5, 2.5);
