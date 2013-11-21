@@ -54,6 +54,12 @@
 		6: [3]
 	};
 	
+	var options = {
+		beamsBreakAtRests: true,
+		beamsMaxGradient: 0.25
+	};
+	
+	
 	// Pure functions
 	
 	function getWidth(obj) {
@@ -104,6 +110,10 @@
 	
 	function greater(total, n) {
 		return n > total ? n : total ;
+	}
+
+	function limit(value, min, max) {
+		return value < min ? min : value > max ? max : value ;
 	}
 
 	function first(array) {
@@ -389,53 +399,6 @@
 		return barBreaks[beatsPerBar];
 	}
 	
-	function fitNoteSymbol(svg, scribe, symbol) {
-		var beat = symbol.beat;
-		var duration = symbol.duration;
-		var barBeat = beatOfBar(beat, scribe.beatsPerBar);
-		var barDuration = durationOfBar(beat, scribe.beatsPerBar);
-		var barBreaks = breaksOfBar(beat, scribe.beatsPerBar);
-		var symbols = [];
-		var d;
-		
-		// Any note of two beats or longer, starting on a beat, gets to display
-		// as is.
-		if (barBeat % 1 === 0 && duration >= 2) {
-			return symbols;
-		}
-
-		// Reduce duration to the nearest bar breakpoint, creating a new symbol
-		// to continue the note.
-		while (++b < barBreaks.length) {
-			barBreak = barBreaks[b];
-			if (barBeat >= barBreak) { continue; }
-			if (barBeat + duration > barBreak) {
-				d = barBreak - barBeat;
-				
-				symbol.duration = d;
-				symbol.tied = true;
-				
-				//symbols.push(createTieSymbol(svg, symbol));
-				symbols.push(symbolType.note(beat + d, duration - d, symbol.number));
-				
-				break;
-			}
-		}
-
-		d = 2;
-
-		// Handle notes of a beat or less. 
-		while ((d /= 2) >= 0.125) {
-			if (barBeat % d === 0 && duration >= d) {
-				symbol.duration = d;
-				symbol.tied = true;
-				
-				//symbols.push(createTieSymbol(svg, symbol));
-				symbols.push(symbolType.note(beat + d, duration - d, symbol.number));
-			}
-		}
-	}
-	
 	function fitRestSymbol(bar, beat, duration) {
 		var barBreak;
 		var b = -1;
@@ -566,7 +529,7 @@
 	function renderNote(svg, layer, symbol) {
 		var node = nodeType[symbol.type](svg, symbol);
 		
-		if (symbol.duration && symbol.duration < 4) {
+		if (!symbol.beam && symbol.duration && symbol.duration < 4) {
 			if (symbol.y > 0) {
 				// Stalks down
 				node.appendChild(nodeType.stalkup(svg, symbol));
@@ -586,7 +549,19 @@
 		layer.appendChild(node);
 	}
 	
-	function renderNotes(svg, layer, symbols) {
+	function beamYAtX(symbols, x) {
+		var symbol1 = first(symbols);
+		var symbol2 = last(symbols);
+		var gradient = limit(
+		        0.75 * (symbol2.y - symbol1.y) / (symbol2.x - symbol1.x),
+		        -options.beamsMaxGradient,
+		        options.beamsMaxGradient
+		    );
+		
+		return (x - symbol1.x) * gradient;
+	}
+	
+	function renderBeam(svg, layer, symbols) {
 		var length = symbols.length;
 		var n = -1;
 		var symbol;
@@ -594,44 +569,41 @@
 		var avgY = yArray.reduce(sum) / length;
 		var minY = yArray.reduce(min);
 		var maxY = yArray.reduce(max);
-		var node;
+		var node = createNode(svg, 'g');
 		
 		while (++n < length) {
 			symbol = symbols[n];
-			node = nodeType[symbol.type](svg, symbol);
 			
 			if (avgY < 0) {
 				// down
 				node.appendChild(createNode(svg, 'line', {
 					'class': 'scribe-stalk',
-					x1: -1.125,
-					y1: 0.5,
-					x2: -1.125,
-					y2: 6.75 + maxY - symbol.y
+					x1: -1.125 + symbol.x,
+					y1: 0.5    + symbol.y,
+					x2: -1.125 + symbol.x,
+					y2: 6.75   + beamYAtX(symbols, symbol.x)
 				}));
 			}
 			else {
 				// up
 				node.appendChild(createNode(svg, 'line', {
 					'class': 'scribe-stalk',
-					x1: 1.25,
-					y1: -0.5,
-					x2: 1.25,
-					y2: -6.75 - symbol.y + minY
+					x1: 1.25  + symbol.x,
+					y1: -0.5  + symbol.y,
+					x2: 1.25  + symbol.x,
+					y2: -6.75 + beamYAtX(symbols, symbol.x)
 				}));
 			}
-			
-			layer.appendChild(node);
 		}
 		
 		if (avgY < 0) {
 			layer.appendChild(createNode(svg, 'path', {
 				'class': 'scribe-beam',
 				'd': [
-					'M', first(symbols).x - 1.125, ' ', 5.75 + maxY,
-					'L', last(symbols).x - 1.125, ' ', 5.75 + maxY,
-					'L', last(symbols).x - 1.125, ' ', 6.75 + maxY,
-					'L', first(symbols).x - 1.125, ' ', 6.75 + maxY,
+					'M', first(symbols).x - 1.125, ' ', 5.75 + beamYAtX(symbols, first(symbols).x),
+					'L', last(symbols).x - 1.125,  ' ', 5.75 + beamYAtX(symbols, last(symbols).x),
+					'L', last(symbols).x - 1.125,  ' ', 6.75 + beamYAtX(symbols, last(symbols).x),
+					'L', first(symbols).x - 1.125, ' ', 6.75 + beamYAtX(symbols, first(symbols).x),
 					'Z'
 				].join('')
 			}));
@@ -640,19 +612,21 @@
 			layer.appendChild(createNode(svg, 'path', {
 				'class': 'scribe-beam',
 				'd': [
-					'M', first(symbols).x + 1.25, ' ', -5.75 + minY,
-					'L', last(symbols).x + 1.25,  ' ', -5.75 + minY,
-					'L', last(symbols).x + 1.25,  ' ', -6.75 + minY,
-					'L', first(symbols).x + 1.25, ' ', -6.75 + minY,
+					'M', first(symbols).x + 1.25, ' ', -5.75 + beamYAtX(symbols, first(symbols).x),
+					'L', last(symbols).x + 1.25,  ' ', -5.75 + beamYAtX(symbols, last(symbols).x),
+					'L', last(symbols).x + 1.25,  ' ', -6.75 + beamYAtX(symbols, last(symbols).x),
+					'L', first(symbols).x + 1.25, ' ', -6.75 + beamYAtX(symbols, first(symbols).x),
 					'Z'
 				].join('')
 			}));
 		}
+		
+		layer.appendChild(node);
 	}
 	
 	function renderGroup(svg, layer, group) {
 		if (group.length > 1) {
-			renderNotes(svg, layer, group);
+			renderBeam(svg, layer, group);
 		}
 		else if (group.length === 1) {
 			renderNote(svg, layer, group[0]);
@@ -664,8 +638,7 @@
 		var length = symbols.length,
 		    n = -1,
 		    x = 0,
-		    yGroup = [],
-		    symbol, node;
+		    symbol, node, beam;
 		
 		scribe.staveNode1.removeChild(scribe.staveNode2);
 		scribe.staveNode1.removeChild(scribe.staveNode3);
@@ -679,28 +652,20 @@
 			if (debug) console.log('Scribe: write symbol', symbol);
 			
 			if (symbol.type !== 'note') {
-				renderGroup(svg, scribe.staveNode3, yGroup);
-				yGroup.length = 0;
-				
 				node = nodeType[symbol.type](svg, symbol);
 				scribe.staveNode2.appendChild(node);
 				continue;
 			}
 
-			if (symbol.duration < 1) {
-				yGroup.push(symbol);
-			}
-			else {
-				renderGroup(svg, scribe.staveNode3, yGroup);
-				yGroup.length = 0;
-				renderNote(svg, scribe.staveNode3, symbol);
+			if (symbol.beam && symbol.beam !== beam) {
+				beam = symbol.beam;
+				renderGroup(svg, scribe.staveNode3, symbol.beam);
 			}
 
+			renderNote(svg, scribe.staveNode3, symbol);
 			renderTie(svg, scribe.staveNode3, symbol);
 			renderLedgers(svg, scribe.staveNode2, symbol);
 		}
-
-		renderGroup(svg, scribe.staveNode3, yGroup);
 	}
 	
 	function nextBreakpoint(bar, beat) {
@@ -718,9 +683,20 @@
 		return bar.beat + bar.duration;
 	}
 	
+	function newBeam(beam) {
+		if (!beam) { return []; }
+		if (beam.length === 0) { return beam; }
+		if (beam.length === 1) {
+			// Remove the beam from the only symbol that carries it.
+			delete beam[0].beam;
+		}
+		return [];
+	}
+	
 	function createSymbols(data) {
 		var symbols = [];
 		var n = 0;
+		var beam = newBeam();
 		var beat, duration, bar, symbol, note, breakpoint;
 		
 		data.sort(byBeat);
@@ -728,7 +704,7 @@
 		
 		console.group('Scribe: createSymbols');
 		
-		while(n < data.length) {
+		while(n <= data.length) {
 			symbol = last(symbols);
 			bar = scribe.barOfBeat(symbol.beat);
 			note = data[n];
@@ -737,15 +713,33 @@
 			duration = symbol.duration;
 			
 			console.groupEnd();
-			console.group('Scribe: last symbol', symbol.type, symbol.beat, symbol.duration, note.beat);
+			console.group('Scribe: last symbol', symbol.type, symbol.beat, symbol.duration);
 			
 			// Where the last symbol overlaps the next note, shorten it.
-			if (symbol.beat + symbol.duration > note.beat) {
+			if (note && symbol.beat + symbol.duration > note.beat) {
 				console.log('shorten');
 				symbol.duration = note.beat - symbol.beat;
 			}
 			
+			if (symbol.type === 'bar') {
+				beam = newBeam(beam);
+			}
+			
+			if (symbol.type === 'rest' && options.beamsBreakAtRests) {
+				beam = newBeam(beam);
+			}
+			
 			if (symbol.type === 'note') {
+				// Where the last symbol is less than 1 beat duration, add it to
+				// beam.
+				if (symbol.duration < 1) {
+					beam.push(symbol);
+					symbol.beam = beam;
+				}
+				else if (beam.length) {
+					beam = newBeam(beam);
+				}
+				
 				// Where the last symbol overlaps a bar, shorten it, insert a
 				// bar, and push a new symbol with a link to the existing one.
 				if (symbol.beat + symbol.duration > bar.beat + bar.duration) {
@@ -756,20 +750,29 @@
 					
 					symbol.to = last(symbols);
 					last(symbols).from = symbol;
+					
+					beam = newBeam(beam);
 					continue;
 				}
 	
 				// Where the last symbol is a note of less than 2 beats duration
 				// that overlaps a breakpoint, shorten it and push a new symbol with
 				// a link to the existing one.
-				if (symbol.type === 'note' && symbol.duration < 2 && symbol.beat + symbol.duration > breakpoint) {
+				if (symbol.duration < 2 && symbol.beat + symbol.duration > breakpoint) {
 					console.log('shorten to breakpoint');
 					symbols.push(symbolType.note(breakpoint, symbol.beat + symbol.duration - breakpoint, symbol.number, symbol))
 					symbol.duration = breakpoint - symbol.beat;
 					
 					symbol.to = last(symbols);
 					last(symbols).from = symbol;
+					
+					beam = newBeam(beam);
 					continue;
+				}
+
+				// Where the symbol arrives at a breakpoint, start a new beam.
+				if (symbol.beat + symbol.duration === breakpoint) {
+					beam = newBeam(beam);
 				}
 			}
 			
@@ -782,11 +785,13 @@
 
 			// Where the last symbol doesn't make it as far as the next note,
 			// insert a rest.
-			if (symbol.beat + symbol.duration < note.beat) {
+			if (note && symbol.beat + symbol.duration < note.beat) {
 				console.log('insert rest');
 				symbols.push(fitRestSymbol(bar, symbol.beat + symbol.duration, note.beat - symbol.beat - symbol.duration));
 				continue;
 			}
+			
+			if (!note) { break; }
 			
 			// Insert a note and increment n
 			symbols.push(symbolType.note(note.beat, note.duration, note.number));
@@ -923,18 +928,14 @@
 
 var scribe = Scribe('sheet');
 
+scribe.note(68, 0.5, 0.5);
+scribe.note(56, 1, 0.5);
+scribe.note(70, 1.5, 0.5);
 scribe.note(72, 2, 0.5);
 scribe.note(74, 2.5, 1);
 scribe.note(76, 3.5, 0.5);
 
-scribe.note(71, 4, 0.5);
-scribe.note(71, 5, 2);
-scribe.note(69, 7, 1);
-
-scribe.note(68, 8, 1.5);
-scribe.note(75, 9.5, 1.5);
-
-scribe.note(78, 12, 0.5);
-scribe.note(76, 12.5, 0.5);
-scribe.note(77, 13, 0.5);
-scribe.note(79, 13.5, 2.5);
+scribe.note(78, 8, 0.5);
+scribe.note(76, 8.5, 0.5);
+scribe.note(84, 9, 0.5);
+scribe.note(85, 9.5, 0.5);
