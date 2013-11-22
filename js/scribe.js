@@ -82,7 +82,7 @@
 	var options = {
 		beamBreaksAtRest: true,
 		beamGradientMax: 0.25,
-		beamGradientFactor: 0.625
+		beamGradientFactor: 0.25
 	};
 	
 	
@@ -405,7 +405,7 @@
 			return {
 				type: 'note',
 				minwidth: 2.8,
-				width: 6.3 + (duration > 1 ? duration : 0),
+				width: 4 + 4 * duration,
 				beat: beat,
 				duration: duration,
 				number: number,
@@ -520,8 +520,8 @@
 					createNode(svg, 'use', {
 						'href': '#line',
 						'class': 'scribe-stave',
-						'translate': [symbol.x - 2, y],
-						'scale': [4, 1]
+						'translate': [symbol.x - 2.2, y],
+						'scale': [4.4, 1]
 					})
 				);
 			}
@@ -537,8 +537,8 @@
 					createNode(svg, 'use', {
 						'href': '#line',
 						'class': 'scribe-stave',
-						'translate': [symbol.x - 2, y],
-						'scale': [4, 1]
+						'translate': [symbol.x - 2.2, y],
+						'scale': [4.4, 1]
 					})
 				);
 			}
@@ -580,24 +580,27 @@
 	}
 	
 	function createBeamY(symbols, options) {
-		var symbol1  = first(symbols);
-		var symbol2  = last(symbols);
-		var factor   = options.beamGradientFactor || 0.75;
-		var max      = isDefined(options.beamGradientMax) ? options.beamGradientMax : 1 ;
-		var gradient = limit(factor * (symbol2.y - symbol1.y) / (symbol2.x - symbol1.x), -max, max);
-		var xMid     = 0.5 * (symbol2.x - symbol1.x) + symbol1.x;
+		var symbol1   = first(symbols);
+		var symbol2   = last(symbols);
+		var symbolsY  = symbols.map(getY);
+		var avgY      = symbolsY.reduce(sum) / symbols.length;
+		var factorG   = options.beamGradientFactor || 0.75;
+		var maxG      = isDefined(options.beamGradientMax) ? options.beamGradientMax : 1 ;
+		var gradient  = limit(factorG * (symbol2.y - symbol1.y) / (symbol2.x - symbol1.x), -maxG, maxG);
+		var xMid      = symbol1.x + 0.5 * (symbol2.x - symbol1.x);
+		var offsetY   = avgY > 0 ? symbolsY.reduce(min) : symbolsY.reduce(max);
 		
 		return function beamY(x) {
-			return (x - xMid) * gradient;
+			return (x - xMid) * gradient + offsetY;
 		}
 	}
 	
 	function renderGroup(svg, layer, symbols) {
 		var length = symbols.length;
-		var avgY = symbols.map(getY).reduce(sum) / length;
-		var beamY = createBeamY(symbols, options);
-		var stalk = avgY < 0 ? defaults.stalkDown : defaults.stalkUp ;
-		var node = createNode(svg, 'g');
+		var avgY   = symbols.map(getY).reduce(sum) / length;
+		var beamY  = createBeamY(symbols, options);
+		var stalk  = avgY < 0 ? defaults.stalkDown : defaults.stalkUp ;
+		var node   = createNode(svg, 'g');
 
 		renderStalks(svg, node, symbols, stalk, beamY);
 		renderBeams(svg, node, symbols, stalk.x2, stalk.y2, beamY, 1);
@@ -967,21 +970,21 @@
 
 var scribe = Scribe('sheet');
 
-scribe.note(69, 0,    0.25);
-scribe.note(71, 0.25, 0.25);
+scribe.note(69, 0,    0.125);
+scribe.note(50, 0.125,0.375);
 scribe.note(72, 0.5,  0.5);
 
-scribe.note(76, 2, 0.5);
-scribe.note(74, 2.5, 0.25);
+scribe.note(86, 2, 0.5);
+scribe.note(84, 2.5, 0.25);
 scribe.note(72, 2.75, 0.25);
 
-scribe.note(71, 4, 0.5);
-scribe.note(71, 4.5, 0.25);
-scribe.note(71, 4.75, 0.25);
-scribe.note(71, 5, 0.5);
+scribe.note(93, 4, 0.5);
+scribe.note(83, 4.5, 0.25);
+scribe.note(83, 4.75, 0.25);
+scribe.note(81, 5, 0.5);
 
-scribe.note(60, 6, 0.75);
-scribe.note(64, 6.75, 0.25);
+scribe.note(50, 6, 0.75);
+scribe.note(54, 6.75, 0.25);
 
 scribe.note(60, 8, 0.25);
 scribe.note(64, 8.25, 0.75);
