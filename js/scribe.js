@@ -1,15 +1,15 @@
 (function() {
 	"use strict";
-	
+
 	var debug = window.console && window.console.log;
 	var xmlns = "http://www.w3.org/2000/svg";
 	var find = document.getElementById.bind(document);
-	
+
 	// ♯ ♭ ♮
 	var SHARP = 'sharp',
 	    FLAT = 'flat',
 	    NATURAL = 'natural';
-	
+
 	var attributes = {
 		'class': setAttr,
 		'x1': setAttr,
@@ -22,7 +22,7 @@
 		'scale': setTransform,
 		'rotate': setTransform
 	};
-	
+
 	var transforms = {
 		'translate': 'setTranslate',
 		'scale': 'setScale',
@@ -34,7 +34,7 @@
 		'scale': 'SVG_TRANSFORM_SCALE',
 		'rotate': 'SVG_TRANSFORM_ROTATE'
 	};
-	
+
 	var test = {
 		number: function(n, name) {
 			if (typeof n !== 'number')
@@ -50,14 +50,14 @@
 			}
 		})()
 	};
-	
+
 	var barBreaks = {
 		3: [1,2],
 		4: [2],
 		5: [3],
 		6: [3]
 	};
-	
+
 	var defaults = {
 	    	stalkUp: {
 	    		x1: 1.25,
@@ -78,20 +78,28 @@
 	    		spacing: 1.5
 	    	}
 	    };
-	
+
 	var options = {
 		beamBreaksAtRest: true,
 		beamGradientMax: 0.25,
 		beamGradientFactor: 0.25
 	};
-	
-	
+
+
 	// Pure functions
-	
+
 	function isDefined(val) {
 		return val !== undefined && val !== null;
 	}
-	
+
+	function mod(n, m) {
+		return ((n % m) + m) % m ;
+	}
+
+	function mod(n, m) {
+		return ((n % m) + m) % m;
+	}
+
 	function getWidth(obj) {
 		return obj.width;
 	}
@@ -99,11 +107,11 @@
 	function getDuration(obj) {
 		return obj.duration;
 	}
-	
+
 	function getY(obj) {
 		return obj.y;
 	}
-	
+
 	function setX(x, obj) {
 		obj.x = x;
 		return x;
@@ -129,7 +137,7 @@
 	function min(total, n) {
 		return total < n ? total : n;
 	}
-	
+
 	function byBeat(a, b) {
 		return a.beat > b.beat ? 1 : -1 ;
 	}
@@ -137,7 +145,7 @@
 	function lesser(total, n) {
 		return n < total ? n : total ;
 	}
-	
+
 	function greater(total, n) {
 		return n > total ? n : total ;
 	}
@@ -166,8 +174,8 @@
 		
 		return target;
 	}
-	
-	
+
+
 	// SVG DOM functions
 	
 	function setAttrBaseVal(svg, node, attr, value) {
@@ -254,7 +262,25 @@
 		{ y: 6, accidental: FLAT },
 		{ y: 6 }
 	];
-	
+
+	function mod(n, m) {
+		return ((n % m) + m) % m ;
+	}
+
+	function createNoteMap(n) {
+		var map = [0,0,0,0,0,0,0];
+		var m = n > 0 ? -1 : 1 ;
+		var i;
+
+		while (n) {
+			i = mod(((n < 0 ? n + 1 : n) * 4), 7);
+			map[i] = map[i] - m;
+			n = n + m;
+		}
+
+		return map;
+	}
+
 	function numberToAccidental(n) {
 		return noteMap[n % 12].accidental;
 	}
