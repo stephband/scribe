@@ -41,10 +41,14 @@
 				throw new Error(name + ' is not a number (it\'s a ' + (typeof n) + ')');
 		},
 		
-		notNaN: function(n, name) {
-			if (Number.isNaN(n))
-				throw new Error(name + ' is NaN');
-		}
+		notNaN: (function(){
+			var isNaN = Number.isNaN || window.isNaN;
+			
+			return function(n, name) {
+				if (isNaN(n))
+					throw new Error(name + ' is NaN');
+			}
+		})()
 	};
 	
 	var barBreaks = {
@@ -54,13 +58,39 @@
 		6: [3]
 	};
 	
+	var defaults = {
+	    	stalkUp: {
+	    		x1: 1.25,
+	    		y1: -0.5,
+	    		x2: 1.25,
+	    		y2: -6.75
+	    	},
+	    	
+	    	stalkDown: {
+	    		x1: -1.125,
+	    		y1: 0.5,
+	    		x2: -1.125,
+	    		y2: 6.75
+	    	},
+	    	
+	    	beam: {
+	    		width: 1,
+	    		spacing: 1.5
+	    	}
+	    };
+	
 	var options = {
-		beamsBreakAtRests: true,
-		beamsMaxGradient: 0.25
+		beamBreaksAtRest: true,
+		beamGradientMax: 0.25,
+		beamGradientFactor: 0.625
 	};
 	
 	
 	// Pure functions
+	
+	function isDefined(val) {
+		return val !== undefined && val !== null;
+	}
 	
 	function getWidth(obj) {
 		return obj.width;
@@ -549,90 +579,99 @@
 		layer.appendChild(node);
 	}
 	
-	function beamYAtX(symbols, x) {
-		var symbol1 = first(symbols);
-		var symbol2 = last(symbols);
-		var gradient = limit(
-		        0.75 * (symbol2.y - symbol1.y) / (symbol2.x - symbol1.x),
-		        -options.beamsMaxGradient,
-		        options.beamsMaxGradient
-		    );
+	function createBeamY(symbols, options) {
+		var symbol1  = first(symbols);
+		var symbol2  = last(symbols);
+		var factor   = options.beamGradientFactor || 0.75;
+		var max      = isDefined(options.beamGradientMax) ? options.beamGradientMax : 1 ;
+		var gradient = limit(factor * (symbol2.y - symbol1.y) / (symbol2.x - symbol1.x), -max, max);
+		var xMid     = 0.5 * (symbol2.x - symbol1.x) + symbol1.x;
 		
-		return (x - symbol1.x) * gradient;
+		return function beamY(x) {
+			return (x - xMid) * gradient;
+		}
 	}
 	
-	function renderBeam(svg, layer, symbols) {
+	function renderGroup(svg, layer, symbols) {
 		var length = symbols.length;
-		var n = -1;
-		var symbol;
-		var yArray = symbols.map(getY);
-		var avgY = yArray.reduce(sum) / length;
-		var minY = yArray.reduce(min);
-		var maxY = yArray.reduce(max);
+		var avgY = symbols.map(getY).reduce(sum) / length;
+		var beamY = createBeamY(symbols, options);
+		var stalk = avgY < 0 ? defaults.stalkDown : defaults.stalkUp ;
 		var node = createNode(svg, 'g');
-		
-		while (++n < length) {
-			symbol = symbols[n];
-			
-			if (avgY < 0) {
-				// down
-				node.appendChild(createNode(svg, 'line', {
-					'class': 'scribe-stalk',
-					x1: -1.125 + symbol.x,
-					y1: 0.5    + symbol.y,
-					x2: -1.125 + symbol.x,
-					y2: 6.75   + beamYAtX(symbols, symbol.x)
-				}));
-			}
-			else {
-				// up
-				node.appendChild(createNode(svg, 'line', {
-					'class': 'scribe-stalk',
-					x1: 1.25  + symbol.x,
-					y1: -0.5  + symbol.y,
-					x2: 1.25  + symbol.x,
-					y2: -6.75 + beamYAtX(symbols, symbol.x)
-				}));
-			}
-		}
-		
-		if (avgY < 0) {
-			layer.appendChild(createNode(svg, 'path', {
-				'class': 'scribe-beam',
-				'd': [
-					'M', first(symbols).x - 1.125, ' ', 5.75 + beamYAtX(symbols, first(symbols).x),
-					'L', last(symbols).x - 1.125,  ' ', 5.75 + beamYAtX(symbols, last(symbols).x),
-					'L', last(symbols).x - 1.125,  ' ', 6.75 + beamYAtX(symbols, last(symbols).x),
-					'L', first(symbols).x - 1.125, ' ', 6.75 + beamYAtX(symbols, first(symbols).x),
-					'Z'
-				].join('')
-			}));
-		}
-		else {
-			layer.appendChild(createNode(svg, 'path', {
-				'class': 'scribe-beam',
-				'd': [
-					'M', first(symbols).x + 1.25, ' ', -5.75 + beamYAtX(symbols, first(symbols).x),
-					'L', last(symbols).x + 1.25,  ' ', -5.75 + beamYAtX(symbols, last(symbols).x),
-					'L', last(symbols).x + 1.25,  ' ', -6.75 + beamYAtX(symbols, last(symbols).x),
-					'L', first(symbols).x + 1.25, ' ', -6.75 + beamYAtX(symbols, first(symbols).x),
-					'Z'
-				].join('')
-			}));
-		}
+
+		renderStalks(svg, node, symbols, stalk, beamY);
+		renderBeams(svg, node, symbols, stalk.x2, stalk.y2, beamY, 1);
 		
 		layer.appendChild(node);
 	}
 	
-	function renderGroup(svg, layer, group) {
-		if (group.length > 1) {
-			renderBeam(svg, layer, group);
-		}
-		else if (group.length === 1) {
-			renderNote(svg, layer, group[0]);
+	function renderStalks(svg, node, symbols, offsets, beamY) {
+		var length = symbols.length;
+		var n = -1;
+		var symbol;
+		
+		// Render the stalks
+		while (++n < length) {
+			symbol = symbols[n];
+			
+			node.appendChild(createNode(svg, 'line', {
+				'class': 'scribe-stalk',
+				x1: offsets.x1 + symbol.x,
+				y1: offsets.y1 + symbol.y,
+				x2: offsets.x2 + symbol.x,
+				y2: offsets.y2 + beamY(symbol.x)
+			}));
 		}
 	}
+	
+	function renderBeam(svg, node, xStart, xEnd, xOffset, yOffset, beamY) {
+		var beamWidth = (yOffset < 0 ? 1 : -1) * defaults.beam.width;
+		
+		// Render the beam
+		node.appendChild(createNode(svg, 'path', {
+			'class': 'scribe-beam',
+			'd': [
+				'M', xOffset + xStart, ' ', yOffset + beamY(xStart) + beamWidth,
+				'L', xOffset + xEnd,   ' ', yOffset + beamY(xEnd) + beamWidth,
+				'L', xOffset + xEnd,   ' ', yOffset + beamY(xEnd),
+				'L', xOffset + xStart, ' ', yOffset + beamY(xStart),
+				'Z'
+			].join('')
+		}));
+	}
 
+	function renderBeams(svg, node, symbols, xOffset, yOffset, beamY, duration) {
+		var length = symbols.length;
+		var n = -1;
+		var beam = [];
+		var symbol, xStart, xEnd;
+		
+		// Render the stalks
+		while (++n < length) {
+			symbol = symbols[n];
+			
+			if (symbol.duration <= duration * 0.75) {
+				beam.push(symbol);
+				if (n < length - 1) {
+					continue;
+				}
+			}
+			
+			if (beam.length) {
+				xStart = first(beam).x;
+				xEnd = beam.length === 1 ?
+					first(beam) === first(symbols) ? xStart + 2.5 :
+					first(beam) === last(symbols) ? xStart - 2.5 :
+					first(beam).beat % duration === 0 ? xStart - 2.5 :
+					xStart + 2.5 : last(beam).x ;
+				
+				renderBeam(svg, node, xStart, xEnd, xOffset, yOffset, beamY);
+				renderBeams(svg, node, beam, xOffset, yOffset + (yOffset < 0 ? 1 : -1) * defaults.beam.spacing, beamY, duration * 0.5);
+			}
+			
+			beam.length = 0;
+		}
+	}
 	
 	function renderSymbols(svg, scribe, symbols) {
 		var length = symbols.length,
@@ -649,7 +688,7 @@
 		while (++n < length) {
 			symbol = symbols[n];
 
-			if (debug) console.log('Scribe: write symbol', symbol);
+			//if (debug) console.log('Scribe: write symbol', symbol);
 			
 			if (symbol.type !== 'note') {
 				node = nodeType[symbol.type](svg, symbol);
@@ -725,7 +764,7 @@
 				beam = newBeam(beam);
 			}
 			
-			if (symbol.type === 'rest' && options.beamsBreakAtRests) {
+			if (symbol.type === 'rest' && options.beamBreaksAtRest) {
 				beam = newBeam(beam);
 			}
 			
@@ -928,14 +967,21 @@
 
 var scribe = Scribe('sheet');
 
-scribe.note(68, 0.5, 0.5);
-scribe.note(56, 1, 0.5);
-scribe.note(70, 1.5, 0.5);
-scribe.note(72, 2, 0.5);
-scribe.note(74, 2.5, 1);
-scribe.note(76, 3.5, 0.5);
+scribe.note(69, 0,    0.25);
+scribe.note(71, 0.25, 0.25);
+scribe.note(72, 0.5,  0.5);
 
-scribe.note(78, 8, 0.5);
-scribe.note(76, 8.5, 0.5);
-scribe.note(84, 9, 0.5);
-scribe.note(85, 9.5, 0.5);
+scribe.note(76, 2, 0.5);
+scribe.note(74, 2.5, 0.25);
+scribe.note(72, 2.75, 0.25);
+
+scribe.note(71, 4, 0.5);
+scribe.note(71, 4.5, 0.25);
+scribe.note(71, 4.75, 0.25);
+scribe.note(71, 5, 0.5);
+
+scribe.note(60, 6, 0.75);
+scribe.note(64, 6.75, 0.25);
+
+scribe.note(60, 8, 0.25);
+scribe.note(64, 8.25, 0.75);
