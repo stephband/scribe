@@ -250,16 +250,16 @@
 	var noteMap = [
 		// Key of C
 		{ y: 0 },
-		{ y: 0, accidental: SHARP },
+		{ y: 0, accidental: 1 },
 		{ y: 1 },
-		{ y: 2, accidental: FLAT },
+		{ y: 2, accidental: -1 },
 		{ y: 2 },
 		{ y: 3 },
-		{ y: 3, accidental: SHARP },
+		{ y: 3, accidental: 1 },
 		{ y: 4 },
-		{ y: 5, accidental: FLAT },
+		{ y: 5, accidental: -1 },
 		{ y: 5 },
-		{ y: 6, accidental: FLAT },
+		{ y: 6, accidental: -1 },
 		{ y: 6 }
 	];
 
@@ -267,15 +267,17 @@
 		return ((n % m) + m) % m ;
 	}
 
-	function createNoteMap(n) {
+	function pushKey(scribe, symbols, beat, n) {
 		var map = [0,0,0,0,0,0,0];
 		var m = n > 0 ? -1 : 1 ;
 		var i;
 
 		while (n) {
-			i = mod(((n < 0 ? n + 1 : n) * 4), 7);
+			i = mod(((n < 0 ? n + 1 : n) * 4 - 1), 7);
 			map[i] = map[i] - m;
 			n = n + m;
+
+			symbols.push(symbolType.accidental(beat, i, -m, scribe));
 		}
 
 		return map;
@@ -284,7 +286,7 @@
 	function numberToAccidental(n) {
 		return noteMap[n % 12].accidental;
 	}
-	
+
 	function numberToNote(n) {
 		if (debug) {
 			test.number(n, 'n');
@@ -293,11 +295,11 @@
 		
 		return noteMap[n % 12].y + Math.floor(n / 12) * 7;
 	}
-	
+
 	function noteToY(noteY, staveNoteY, key) {
 		return staveNoteY - noteY;
 	}
-	
+
 	var nodeType = {
 		bar: function bar(svg, symbol) {
 			return createNode(svg, 'use', {
@@ -314,7 +316,7 @@
 				'translate': [symbol.x, 0]
 			});
 		},
-		
+
 		rest: function rest(svg, symbol) {
 			return createNode(svg, 'use', {
 				'href': '#rest[' + symbol.duration + ']',
@@ -331,7 +333,15 @@
 				'scale': [symbol.width, symbol.height]
 			});
 		},
-		
+
+		accidental: function accidental(svg, symbol) {
+			return createNode(svg, 'use', {
+				'href': '#accidental[' + symbol.accidental + ']',
+				'class': 'scribe-accidental',
+				'translate': [symbol.x, symbol.y]
+			});
+		},
+
 		note: function note(svg, symbol) {
 			var minwidth = 0;
 			var width = 0;
@@ -350,7 +360,7 @@
 			
 			if (accidentalType) {
 				accidental = createNode(svg, 'use', {
-					'href': '#' + accidentalType,
+					'href': '#accidental[' + accidentalType + ']',
 					'class': 'scribe-accidental',
 					'translate': [-3, 0]
 				});
@@ -436,6 +446,23 @@
 				duration: duration,
 				number: number,
 				from: from
+			};
+		},
+		
+		accidental: function accidental(beat, number, accidental, scribe) {
+			// Handle y positioning
+			//var noteY = numberToNote(number + scribe.transpose);
+			var y = noteToY(number + 39, scribe.staveNoteY);
+			
+			return {
+				type: 'accidental',
+				accidental: accidental,
+				minwidth: 1,
+				width: 2,
+				beat: beat,
+				duration: 0,
+				number: number,
+				y: y
 			};
 		}
 	};
@@ -769,6 +796,7 @@
 		
 		data.sort(byBeat);
 		symbols.push(symbolType.clef());
+		pushKey(scribe, symbols, 0, 3);
 		
 		console.group('Scribe: createSymbols');
 		
