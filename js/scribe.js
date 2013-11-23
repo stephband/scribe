@@ -88,17 +88,53 @@
 
 	// Pure functions
 
-	function isDefined(val) {
-		return val !== undefined && val !== null;
-	}
-
 	function mod(n, m) {
 		return ((n % m) + m) % m ;
 	}
 
-	function mod(n, m) {
-		return ((n % m) + m) % m;
+	function limit(value, min, max) {
+		return value < min ? min : value > max ? max : value ;
 	}
+
+	// Sort functions
+
+	function byBeat(a, b) {
+		return a.beat > b.beat ? 1 : -1 ;
+	}
+
+	// Reduce functions
+
+	function sum(total, n) {
+		return total + n;
+	}
+
+	function max(total, n) {
+		return total > n ? total : n;
+	}
+
+	function min(total, n) {
+		return total < n ? total : n;
+	}
+
+	function lesser(total, n) {
+		return n < total ? n : total ;
+	}
+
+	function greater(total, n) {
+		return n > total ? n : total ;
+	}
+
+	function setX(x, obj) {
+		obj.x = x;
+		return x;
+	}
+
+	function setDuration(x, obj) {
+		obj.duration = x;
+		return x;
+	}
+
+	// Map functions
 
 	function getWidth(obj) {
 		return obj.width;
@@ -112,54 +148,14 @@
 		return obj.y;
 	}
 
-	function setX(x, obj) {
-		obj.x = x;
-		return x;
-	}
-
-	function setDuration(x, obj) {
-		obj.duration = x;
-		return x;
-	}
-
 	function getMinWidth(obj) {
 		return obj.minwidth;
 	}
 	
-	function sum(total, n) {
-		return total + n;
-	}
-
-	function max(total, n) {
-		return total > n ? total : n;
-	}
-
-	function min(total, n) {
-		return total < n ? total : n;
-	}
-
-	function byBeat(a, b) {
-		return a.beat > b.beat ? 1 : -1 ;
-	}
-
-	function lesser(total, n) {
-		return n < total ? n : total ;
-	}
-
-	function greater(total, n) {
-		return n > total ? n : total ;
-	}
-
-	function limit(value, min, max) {
-		return value < min ? min : value > max ? max : value ;
-	}
-
-	function first(array) {
-		return array[0];
-	}
-
-	function last(array) {
-		return array[array.length - 1];
+	// Object functions
+	
+	function isDefined(val) {
+		return val !== undefined && val !== null;
 	}
 
 	function clone(obj) {
@@ -175,6 +171,23 @@
 		return target;
 	}
 
+	function deleteProperties(obj) {
+		var key;
+		
+		for (key in obj) {
+			if (obj.hasOwnProperty(key)) {
+				delete obj[key];
+			}
+		}
+	}
+
+	function first(array) {
+		return array[0];
+	}
+
+	function last(array) {
+		return array[array.length - 1];
+	}
 
 	// SVG DOM functions
 	
@@ -247,6 +260,46 @@
 		};
 	}
 	
+	var cKey = [0, 2, 4, 5, 7, 9, 11];
+
+	var keyMap = {
+		'F#': 6,
+		'B':  5,
+		'E':  4,
+		'A':  3,
+		'D':  2,
+		'G':  1,
+		'C':  0,
+		'F':  -1,
+		'Bb': -2,
+		'Eb': -3,
+		'Ab': -4,
+		'Db': -5
+	};
+
+	function changeKey(map, n) {
+		var m = n > 0 ? -1 : 1 ;
+		var i;
+
+		map = map.slice();
+
+		while (n) {
+			i = mod(((n < 0 ? n + 1 : n) * 4 - 1), 7);
+			map[i] = map[i] - m;
+			n = n + m;
+		}
+
+		return map;
+	}
+
+	function createKey(n) {
+		if (typeof n === 'string') {
+			n = keyMap[n];
+		}
+		
+		return changeKey(cKey, n);
+	}
+
 	var noteMap = [
 		// Key of C
 		{ y: 0 },
@@ -262,10 +315,6 @@
 		{ y: 6, accidental: -1 },
 		{ y: 6 }
 	];
-
-	function mod(n, m) {
-		return ((n % m) + m) % m ;
-	}
 
 	function pushKey(scribe, symbols, beat, n) {
 		var map = [0,0,0,0,0,0,0];
@@ -480,6 +529,11 @@
 	function breaksOfBar(beat, beatsPerBar) {
 		// Placeholder function for when beatsPerBar becomes a map
 		return barBreaks[beatsPerBar];
+	}
+	
+	function keyOfBar(beat, keyChanges) {
+		// keyChanges will become some kind of map
+		return createKey(keyChanges[0]);
 	}
 	
 	function fitRestSymbol(bar, beat, duration) {
@@ -792,6 +846,7 @@
 		var symbols = [];
 		var n = 0;
 		var beam = newBeam();
+		var accidentals = {};
 		var beat, duration, bar, symbol, note, breakpoint;
 		
 		data.sort(byBeat);
@@ -841,13 +896,15 @@
 				if (symbol.beat + symbol.duration > bar.beat + bar.duration) {
 					console.log('shorten to bar');
 					symbols.push(symbolType.bar(bar.beat + bar.duration));
+					deleteProperties(accidentals);
+					beam = newBeam(beam);
+					
 					symbols.push(symbolType.note(bar.beat + bar.duration, symbol.beat + symbol.duration - bar.beat - bar.duration, symbol.number))
 					symbol.duration = bar.beat + bar.duration - symbol.beat;
 					
 					symbol.to = last(symbols);
 					last(symbols).from = symbol;
 					
-					beam = newBeam(beam);
 					continue;
 				}
 	
@@ -876,6 +933,7 @@
 			if (symbol.beat + symbol.duration === bar.beat + bar.duration) {
 				console.log('insert bar');
 				symbols.push(symbolType.bar(bar.beat + bar.duration));
+				deleteProperties(accidentals);
 				continue;
 			}
 
@@ -936,6 +994,9 @@
 		this.data = [];
 		this.beatsPerBar = 4;
 		this.barsPerStave = 4;
+		this.keyChanges = {
+			0: 'D'
+		};
 		
 		this.svg = svg;
 		
@@ -958,7 +1019,8 @@
 			return this._bar[beat] || (this._bar[beat] = {
 				beat: beat - (beat % this.beatsPerBar),
 				duration: durationOfBar(beat, this.beatsPerBar),
-				breaks: breaksOfBar(beat, this.beatsPerBar)
+				breaks: breaksOfBar(beat, this.beatsPerBar),
+				key: keyOfBar(beat, this.keyChanges)
 			});
 		},
 		
@@ -1024,9 +1086,9 @@
 
 var scribe = Scribe('sheet');
 
-scribe.note(69, 0,    0.125);
+scribe.note(69, 0, 0.125);
 scribe.note(50, 0.125,0.375);
-scribe.note(72, 0.5,  0.5);
+scribe.note(72, 0.5, 0.5);
 
 scribe.note(86, 2, 0.5);
 scribe.note(84, 2.5, 0.25);
