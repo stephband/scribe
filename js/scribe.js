@@ -816,8 +816,8 @@
 		    symbol, width, diff;
 		
 		var staveWidth = scribe.width - scribe.paddingLeft - scribe.paddingRight;
-		var symbolsMin = symbols.map(getMinWidth).reduce(sum);
-		var symbolsWidth = symbols.map(getWidth).reduce(sum);
+		var symbolsMin = symbols.map(getMinWidth).reduce(sum) - last(symbols).minwidth / 2;
+		var symbolsWidth = symbols.map(getWidth).reduce(sum) - last(symbols).width / 2;
 		var diffWidth = staveWidth - symbolsWidth;
 		var diffRatio = diffWidth / (symbolsWidth - symbolsMin);
 		
@@ -825,7 +825,7 @@
 			console.log('Scribe: too many symbols for the stave.');
 		}
 		
-		console.log(staveWidth, symbolsMin, symbolsWidth, diffWidth, diffRatio);
+		console.log('Scribe: stave width', staveWidth, 'ideal width', symbolsWidth, 'min width', symbolsMin);
 		
 		while (++n < length) {
 			symbol = symbols[n];
