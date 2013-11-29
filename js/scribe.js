@@ -688,7 +688,7 @@
 		var n = 0;
 		var beam = newBeam();
 		var accMap = {};
-		var beat, duration, bar, symbol, note, breakpoint, yNote;
+		var beat, duration, bar, symbol, note, breakpoint, nextBeat;
 		
 		data.sort(byBeat);
 		
@@ -700,12 +700,12 @@
 			pushKeySig(symbols, scribe.key);
 		}
 		
-		while(n <= data.length) {
+		while ((symbol = last(symbols)).beat < end) {
 			console.groupEnd();
 			
-			symbol = last(symbols);
 			bar = scribe.barOfBeat(symbol.beat);
 			note = data[n];
+			nextBeat = note && note.beat || end;
 			breakpoint = nextBreakpoint(bar, symbol.beat);
 			beat = symbol.beat;
 			duration = symbol.duration;
@@ -713,9 +713,9 @@
 			console.group('Scribe: last symbol', symbol.type, symbol.beat, symbol.duration);
 			
 			// Where the last symbol overlaps the next note, shorten it.
-			if (note && symbol.beat + symbol.duration > note.beat) {
+			if (note && symbol.beat + symbol.duration > nextBeat) {
 				console.log('shorten');
-				symbol.duration = note.beat - symbol.beat;
+				symbol.duration = nextBeat - symbol.beat;
 			}
 			
 			if (symbol.type === 'bar') {
@@ -785,9 +785,9 @@
 
 			// Where the last symbol doesn't make it as far as the next note,
 			// insert a rest.
-			if (note && symbol.beat + symbol.duration < note.beat) {
+			if (symbol.beat + symbol.duration < nextBeat) {
 				console.log('insert rest');
-				symbols.push(fitRestSymbol(bar, symbol.beat + symbol.duration, note.beat - symbol.beat - symbol.duration));
+				symbols.push(fitRestSymbol(bar, symbol.beat + symbol.duration, nextBeat - symbol.beat - symbol.duration));
 				continue;
 			}
 			
@@ -808,61 +808,30 @@
 		
 		return symbols;
 	}
-	
-//	function updateSymbolsX(svg, scribe, symbols) {
-//		var length = symbols.length,
-//		    n = -1,
-//		    x = 0,
-//		    w = 0,
-//		    d = 0,
-//		    xGroup = [],
-//		    yGroup = [],
-//		    noteY, symbol;
-//		
-//		while (++n < length) {
-//			symbol = symbols[n];
-//			
-//			if (symbol.type === 'note') {
-//				// Handle x positioning
-//				xGroup.push(symbol);
-//				
-//				if (!symbols[n + 1] || symbols[n + 1].type !== 'note' || symbol.beat !== symbols[n + 1].beat) {
-//					w = xGroup.map(getWidth).reduce(greater, 0);
-//					d = xGroup.map(getDuration).reduce(greater, 0);
-//					xGroup.reduce(setX, x + w / 2);
-//					xGroup.length = 0;
-//					x += w;
-//				}
-//			}
-//			else {
-//				// Handle x positioning
-//				symbol.x = x + symbol.width / 2;
-//				x += symbol.width;
-//			}
-//		}
-//	}
 
 	function updateSymbolsX(svg, scribe, symbols) {
 		var length = symbols.length,
 		    n = -1,
 		    x = 0,
-		    w = 0,
-		    d = 0,
-		    noteY, symbol;
+		    symbol, width, diff;
 		
 		var staveWidth = scribe.width - scribe.paddingLeft - scribe.paddingRight;
 		var symbolsMin = symbols.map(getMinWidth).reduce(sum);
 		var symbolsWidth = symbols.map(getWidth).reduce(sum);
 		var diffWidth = staveWidth - symbolsWidth;
 		var diffRatio = diffWidth / (symbolsWidth - symbolsMin);
-		var width;
+		
+		if (symbolsMin > staveWidth) {
+			console.log('Scribe: too many symbols for the stave.');
+		}
 		
 		console.log(staveWidth, symbolsMin, symbolsWidth, diffWidth, diffRatio);
 		
 		while (++n < length) {
 			symbol = symbols[n];
 			
-			width = symbol.width + diffRatio * (symbol.width - symbol.minwidth);
+			diff = symbol.width - symbol.minwidth;
+			width = limit(symbol.width + diffRatio * diff, symbol.minwidth, symbol.width * symbol.width / symbol.minwidth);
 			
 			// Handle x positioning
 			symbol.x = x + width / 2;
@@ -1247,11 +1216,11 @@ scribe.note(86, 2, 0.5);
 scribe.note(84, 2.5, 0.25);
 scribe.note(72, 2.75, 0.25);
 
-scribe.note(93, 4, 0.5);
-scribe.note(83, 4.5, 0.25);
-scribe.note(83, 4.75, 0.25);
-scribe.note(81, 5, 0.5);
-
+//scribe.note(93, 4, 0.5);
+//scribe.note(83, 4.5, 0.25);
+//scribe.note(83, 4.75, 0.25);
+//scribe.note(81, 5, 0.5);
+//
 scribe.note(50, 6, 0.75);
 scribe.note(54, 6.75, 0.25);
 
