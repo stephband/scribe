@@ -36,6 +36,11 @@
 	};
 
 	var test = {
+		equals: function(a, b) {
+			if (a !== b)
+				throw new Error(a + ' is not equal to ' + b);
+		},
+		
 		number: function(n, name) {
 			if (typeof n !== 'number')
 				throw new Error(name + ' is not a number (it\'s a ' + (typeof n) + ')');
@@ -75,25 +80,34 @@
 	    	
 	    	beam: {
 	    		width: 1,
-	    		spacing: 1.5
-	    	}
-	    };
+	    		spacing: 1.4
+	    	},
 
-	var options = {
-		beamBreaksAtRest: true,
-		beamGradientMax: 0.25,
-		beamGradientFactor: 0.25
-	};
+	    	beamBreaksAtRest: true,
+	    	beamGradientMax: 0.25,
+	    	beamGradientFactor: 0.25
+	    };
 
 
 	// Pure functions
 
 	function mod(n, m) {
+		// Return the modulus while handling negative numbers sensibly.
 		return ((n % m) + m) % m ;
 	}
+	
+	function mag(n) {
+		// Return the magnitude.
+		return n < 0 ? -n : n ;
+	}
 
-	function limit(value, min, max) {
-		return value < min ? min : value > max ? max : value ;
+	function limit(n, min, max) {
+		// Return n limited to min and max values.
+		return n < min ? min : n > max ? max : n ;
+	}
+	
+	function wrap(n, max, offset) {
+		return ((n + offset) % max) - offset;
 	}
 
 	// Sort functions
@@ -124,6 +138,11 @@
 		return n > total ? n : total ;
 	}
 
+	function add(value, n, i, array) {
+		array[i] += value;
+		return value;
+	}
+
 	function setX(x, obj) {
 		obj.x = x;
 		return x;
@@ -150,6 +169,14 @@
 
 	function getMinWidth(obj) {
 		return obj.minwidth;
+	}
+	
+	function mod7(n) {
+		return mod(n, 7);
+	}
+
+	function mod12(n) {
+		return mod(n, 12);
 	}
 	
 	// Object functions
@@ -187,6 +214,24 @@
 
 	function last(array) {
 		return array[array.length - 1];
+	}
+	
+	function extend(obj) {
+		var i = 0,
+		    length = arguments.length,
+		    obj2, key;
+		
+		while (++i < length) {
+			obj2 = arguments[i];
+			
+			for (key in obj2) {
+				if (obj2.hasOwnProperty(key)) {
+					obj[key] = obj2[key];
+				}
+			}
+		}
+		
+		return obj;
 	}
 
 	// SVG DOM functions
@@ -248,7 +293,6 @@
 		}
 	}
 	
-	
 	// Scribe logic
 	
 	function createData(type, number, beat, duration) {
@@ -260,93 +304,139 @@
 		};
 	}
 	
-	var cKey = [0, 2, 4, 5, 7, 9, 11];
-
-	var keyMap = {
-		'F#': 6,
-		'B':  5,
-		'E':  4,
-		'A':  3,
-		'D':  2,
-		'G':  1,
-		'C':  0,
-		'F':  -1,
-		'Bb': -2,
-		'Eb': -3,
-		'Ab': -4,
-		'Db': -5
-	};
-
-	function changeKey(map, n) {
-		var m = n > 0 ? -1 : 1 ;
-		var i;
-
-		map = map.slice();
-
-		while (n) {
-			i = mod(((n < 0 ? n + 1 : n) * 4 - 1), 7);
-			map[i] = map[i] - m;
-			n = n + m;
-		}
-
-		return map;
-	}
-
-	function createKey(n) {
-		if (typeof n === 'string') {
-			n = keyMap[n];
-		}
-		
-		return changeKey(cKey, n);
-	}
-
-	var noteMap = [
-		// Key of C
-		{ y: 0 },
-		{ y: 0, accidental: 1 },
-		{ y: 1 },
-		{ y: 2, accidental: -1 },
-		{ y: 2 },
-		{ y: 3 },
-		{ y: 3, accidental: 1 },
-		{ y: 4 },
-		{ y: 5, accidental: -1 },
-		{ y: 5 },
-		{ y: 6, accidental: -1 },
-		{ y: 6 }
+	var noteNameMap = [
+		'C',
+		'C♯',
+		'D',
+		'E♭',
+		'E',
+		'F',
+		'F♯',
+		'G',
+		'A♭',
+		'A',
+		'B♭',
+		'B'
 	];
 
-	function pushKey(scribe, symbols, beat, n) {
-		var map = [0,0,0,0,0,0,0];
+	var nameNoteMap = {
+		'C':   0,
+		'C#':  1,
+		'C♯': 1,
+		'Db':  1,
+		'D♭': 1,
+		'D':   2,
+		'D#':  3,
+		'D♯': 3,
+		'Eb':  3,
+		'E♭': 3,
+		'E':   4,
+		'F':   5,
+		'F#':  6,
+		'F♯': 6,
+		'Gb':  6,
+		'G♭': 6,
+		'G':   7,
+		'G#':  8,
+		'G♯': 8,
+		'Ab':  8,
+		'A♭': 8,
+		'A':   9,
+		'A#':  10,
+		'A♯': 10,
+		'Bb':  10,
+		'B♭': 10,
+		'B':   11
+	};
+	
+	var noteKeyMap = [0,-5, 2,-3, 4,-1, 6, 1,-4, 3,-2, 5];
+
+	var scaleMap = [0,2,4,5,7,9,11];
+	var staveMap = [0,0,1,2,2,3,3,4,5,5,6,6];
+	var keyCache = {};
+
+	function keyToMap(n) {
 		var m = n > 0 ? -1 : 1 ;
 		var i;
+		var map = [0,0,0,0,0,0,0];
 
 		while (n) {
 			i = mod(((n < 0 ? n + 1 : n) * 4 - 1), 7);
 			map[i] = map[i] - m;
 			n = n + m;
-
-			symbols.push(symbolType.accidental(beat, i, -m, scribe));
 		}
 
 		return map;
 	}
-
-	function numberToAccidental(n) {
-		return noteMap[n % 12].accidental;
-	}
-
-	function numberToNote(n) {
-		if (debug) {
-			test.number(n, 'n');
-			test.notNaN(n, 'n');
-		}
+	
+	function createKeyMap(key, offset) {
+		var keyMap = keyToMap(key);
 		
-		return noteMap[n % 12].y + Math.floor(n / 12) * 7;
+		return !offset ? 
+			keyMap :
+			keyMap.map(function(n, i, array) {
+				return array[(i + offset) % 7];
+			}) ;
+	}
+	
+	function noteToKey(n) {
+		return noteKeyMap[n];
+	}
+	
+	function nameToKey(name) {
+		return noteToKey(nameNoteMap[name]);
+	}
+	
+	function toKey(n) {
+		return typeof n === 'string' ?
+			nameToKey(n) :
+			noteToKey(n) ;
 	}
 
-	function noteToY(noteY, staveNoteY, key) {
-		return staveNoteY - noteY;
+	function numberToName(n) {
+		return noteNameMap[numberToNote(n)];
+	}
+
+	function numberToOctave(n) {
+		return Math.floor(n / 12);
+	}
+	
+	function numberToNote(n) {
+		return n % 12;
+	}
+	
+	function numberToOffset(n) {
+		return staveMap[numberToNote(n)];
+	}
+	
+	function numberToPosition(n) {
+		return 7 * numberToOctave(n) + numberToOffset(n);
+	}
+	
+	function numberToAccidental(n) {
+		var note = numberToNote(n);
+		var pos = staveMap[note];
+		
+		return note - scaleMap[pos];
+	}
+	
+	function mapToStave(symbols, symbol, keyMap, accMap, staveY, transpose) {
+		var number = symbol.number + transpose;
+		var offset = numberToOffset(number);
+		var position = numberToPosition(number);
+		var accidental = numberToAccidental(number);
+		var staveAcc = isDefined(accMap[position]) ?
+		    	accMap[position] :
+		    	keyMap[offset] ;
+		
+		symbol.y = staveY - position;
+		
+		if (accidental !== staveAcc) {
+			// We need an accidental.
+			console.log('insert accidental', numberToName(number) + numberToOctave(number), accidental, staveAcc);
+			accMap[position] = accidental;
+			symbols.push(symbolType.accidental(symbol.beat, accidental, symbol.y));
+		}
 	}
 
 	var nodeType = {
@@ -385,7 +475,7 @@
 
 		accidental: function accidental(svg, symbol) {
 			return createNode(svg, 'use', {
-				'href': '#accidental[' + symbol.accidental + ']',
+				'href': '#accidental[' + symbol.value + ']',
 				'class': 'scribe-accidental',
 				'translate': [symbol.x, symbol.y]
 			});
@@ -403,22 +493,6 @@
 			});
 			
 			node.appendChild(head);
-			
-			var accidentalType = numberToAccidental(symbol.number);
-			var accidental;
-			
-			if (accidentalType) {
-				accidental = createNode(svg, 'use', {
-					'href': '#accidental[' + accidentalType + ']',
-					'class': 'scribe-accidental',
-					'translate': [-3, 0]
-				});
-				
-				minwidth += 1.6;
-				width += 3.2;
-				
-				node.appendChild(accidental);
-			}
 			
 			return node;
 		},
@@ -485,34 +559,39 @@
 				duration: duration
 			};
 		},
-		
-		note: function note(beat, duration, number, from) {
+
+		note: function note(beat, duration, number, from, y) {
 			return {
 				type: 'note',
 				minwidth: 2.8,
-				width: 4 + 4 * duration,
+				width: 4 + 3 * duration,
 				beat: beat,
 				duration: duration,
 				number: number,
-				from: from
+				from: from,
+				y: y
 			};
 		},
 		
-		accidental: function accidental(beat, number, accidental, scribe) {
-			// Handle y positioning
-			//var noteY = numberToNote(number + scribe.transpose);
-			var y = noteToY(number + 39, scribe.staveNoteY);
-			
+		accidental: function accidental(beat, value, y) {
 			return {
 				type: 'accidental',
-				accidental: accidental,
-				minwidth: 1,
-				width: 2,
+				value: value,
+				minwidth: 1.6,
+				width: 2.4,
 				beat: beat,
 				duration: 0,
-				number: number,
 				y: y
 			};
+		},
+		
+		space: function space(beat, width) {
+			return {
+				type: 'space',
+				beat: beat,
+				minwidth: 3,
+				width: width || 4
+			}
 		}
 	};
 	
@@ -529,11 +608,6 @@
 	function breaksOfBar(beat, beatsPerBar) {
 		// Placeholder function for when beatsPerBar becomes a map
 		return barBreaks[beatsPerBar];
-	}
-	
-	function keyOfBar(beat, keyChanges) {
-		// keyChanges will become some kind of map
-		return createKey(keyChanges[0]);
 	}
 	
 	function fitRestSymbol(bar, beat, duration) {
@@ -590,10 +664,6 @@
 			symbol = symbols[n];
 			
 			if (symbol.type === 'note') {
-				// Handle y positioning
-				noteY = numberToNote(symbol.number + scribe.transpose);
-				symbol.y = noteToY(noteY, scribe.staveNoteY);
-				
 				// Handle x positioning
 				xGroup.push(symbol);
 				
@@ -702,7 +772,7 @@
 		}
 	}
 	
-	function renderGroup(svg, layer, symbols) {
+	function renderGroup(svg, layer, symbols, options) {
 		var length = symbols.length;
 		var avgY   = symbols.map(getY).reduce(sum) / length;
 		var beamY  = createBeamY(symbols, options);
@@ -714,7 +784,7 @@
 		
 		layer.appendChild(node);
 	}
-	
+
 	function renderStalks(svg, node, symbols, offsets, beamY) {
 		var length = symbols.length;
 		var n = -1;
@@ -733,7 +803,17 @@
 			}));
 		}
 	}
-	
+
+	function newBeam(beam) {
+		if (!beam) { return []; }
+		if (beam.length === 0) { return beam; }
+		if (beam.length === 1) {
+			// Remove the beam from the only symbol that carries it.
+			delete beam[0].beam;
+		}
+		return [];
+	}
+
 	function renderBeam(svg, node, xStart, xEnd, xOffset, yOffset, beamY) {
 		var beamWidth = (yOffset < 0 ? 1 : -1) * defaults.beam.width;
 		
@@ -782,24 +862,26 @@
 			beam.length = 0;
 		}
 	}
-	
-	function renderSymbols(svg, scribe, symbols) {
+
+	function renderSymbols(svg, scribe, symbols, options) {
 		var length = symbols.length,
 		    n = -1,
 		    x = 0,
 		    symbol, node, beam;
-		
+
 		scribe.staveNode1.removeChild(scribe.staveNode2);
 		scribe.staveNode1.removeChild(scribe.staveNode3);
 		scribe.staveNode2 = createNode(svg, 'g', {});
 		scribe.staveNode3 = createNode(svg, 'g', {});
 		append(scribe.staveNode1, [scribe.staveNode2, scribe.staveNode3]);
-		
+
 		while (++n < length) {
 			symbol = symbols[n];
 
 			//if (debug) console.log('Scribe: write symbol', symbol);
-			
+
+			if (symbol.type === 'space') { continue; }
+
 			if (symbol.type !== 'note') {
 				node = nodeType[symbol.type](svg, symbol);
 				scribe.staveNode2.appendChild(node);
@@ -808,7 +890,7 @@
 
 			if (symbol.beam && symbol.beam !== beam) {
 				beam = symbol.beam;
-				renderGroup(svg, scribe.staveNode3, symbol.beam);
+				renderGroup(svg, scribe.staveNode3, symbol.beam, options);
 			}
 
 			renderNote(svg, scribe.staveNode3, symbol);
@@ -816,7 +898,7 @@
 			renderLedgers(svg, scribe.staveNode2, symbol);
 		}
 	}
-	
+
 	function nextBreakpoint(bar, beat) {
 		var b = -1;
 		var breakpoint;
@@ -831,31 +913,40 @@
 		
 		return bar.beat + bar.duration;
 	}
-	
-	function newBeam(beam) {
-		if (!beam) { return []; }
-		if (beam.length === 0) { return beam; }
-		if (beam.length === 1) {
-			// Remove the beam from the only symbol that carries it.
-			delete beam[0].beam;
+
+	function pushKeySig(symbols, key) {
+		var n = 0;
+		
+		if (key === 0) { return; }
+		
+		if (key > 0) {
+			while(n++ < key) {
+				symbols.push(symbolType.accidental(0, 1, mod7(n * 3 + 5) - 5));
+			}
 		}
-		return [];
+		else {
+			while(n-- > key) {
+				symbols.push(symbolType.accidental(0, -1, mod7(n * 3) - 4));
+			}
+		}
+		
+		symbols.push(symbolType.space(0));
 	}
-	
-	function createSymbols(data) {
+
+	function createSymbols(scribe, data, options) {
 		var symbols = [];
 		var n = 0;
 		var beam = newBeam();
-		var accidentals = {};
-		var beat, duration, bar, symbol, note, breakpoint;
+		var accMap = {};
+		var beat, duration, bar, symbol, note, breakpoint, yNote;
 		
 		data.sort(byBeat);
 		symbols.push(symbolType.clef());
-		pushKey(scribe, symbols, 0, 3);
-		
-		console.group('Scribe: createSymbols');
+		pushKeySig(symbols, scribe.key);
 		
 		while(n <= data.length) {
+			console.groupEnd();
+			
 			symbol = last(symbols);
 			bar = scribe.barOfBeat(symbol.beat);
 			note = data[n];
@@ -863,7 +954,6 @@
 			beat = symbol.beat;
 			duration = symbol.duration;
 			
-			console.groupEnd();
 			console.group('Scribe: last symbol', symbol.type, symbol.beat, symbol.duration);
 			
 			// Where the last symbol overlaps the next note, shorten it.
@@ -896,7 +986,7 @@
 				if (symbol.beat + symbol.duration > bar.beat + bar.duration) {
 					console.log('shorten to bar');
 					symbols.push(symbolType.bar(bar.beat + bar.duration));
-					deleteProperties(accidentals);
+					deleteProperties(accMap);
 					beam = newBeam(beam);
 					
 					symbols.push(symbolType.note(bar.beat + bar.duration, symbol.beat + symbol.duration - bar.beat - bar.duration, symbol.number))
@@ -933,7 +1023,7 @@
 			if (symbol.beat + symbol.duration === bar.beat + bar.duration) {
 				console.log('insert bar');
 				symbols.push(symbolType.bar(bar.beat + bar.duration));
-				deleteProperties(accidentals);
+				deleteProperties(accMap);
 				continue;
 			}
 
@@ -948,7 +1038,13 @@
 			if (!note) { break; }
 			
 			// Insert a note and increment n
-			symbols.push(symbolType.note(note.beat, note.duration, note.number));
+			symbol = symbolType.note(note.beat, note.duration, note.number);
+			
+			// Handle y positioning
+			
+			mapToStave(symbols, symbol, bar.keyMap, accMap, bar.center, scribe.transpose);
+			
+			symbols.push(symbol);
 			n++;
 		}
 		
@@ -957,11 +1053,11 @@
 		return symbols;
 	}
 	
-	function renderScribe(scribe, svg) {
-		var symbols = createSymbols(scribe.data);
+	function renderScribe(scribe, svg, options) {
+		var symbols = createSymbols(scribe, scribe.data, options);
 
 		updateSymbolsX(svg, scribe, symbols);
-		renderSymbols(svg, scribe, symbols);
+		renderSymbols(svg, scribe, symbols, options);
 	}
 	
 	function Scribe(id, options) {
@@ -969,13 +1065,14 @@
 			return new Scribe(id);
 		}
 		
+		var settings = extend({}, defaults, options);
 		var svg = find(id);
 		var scribe = this;
 		var flag;
 		
 		function update() {
 			flag = false;
-			renderScribe(scribe, svg);
+			renderScribe(scribe, svg, settings);
 		}
 		
 		function queueRender() {
@@ -985,17 +1082,21 @@
 		}
 		
 		this.render = queueRender;
-		
 		this.transpose = 0;
 		this.staveY = 4;
-		// 71 is mid note of treble clef
-		this.staveNoteY = numberToNote(71 + this.transpose);
+		// 71 is B, the mid-note of the treble clef
+		this.staveNoteY = numberToPosition(71);
 		this._bar = {};
 		this.data = [];
 		this.beatsPerBar = 4;
 		this.barsPerStave = 4;
-		this.keyChanges = {
-			0: 'D'
+		
+		this.key = toKey(settings.key || 'Db');
+		
+		console.log('key:', this.key, createKeyMap(this.key, this.staveNoteY));
+		
+		this.keyMap = {
+			0: createKeyMap(this.key)
 		};
 		
 		this.svg = svg;
@@ -1016,11 +1117,24 @@
 	
 	Scribe.prototype = {
 		barOfBeat: function(beat) {
-			return this._bar[beat] || (this._bar[beat] = {
-				beat: beat - (beat % this.beatsPerBar),
+			var beatStart;
+			
+			if (this._bar[beat]) {
+				return this._bar[beat];
+			}
+			
+			beatStart = beat - (beat % this.beatsPerBar);
+			
+			if (this._bar[beatStart]) {
+				return (this._bar[beat] = this._bar[beatStart]);
+			}
+			
+			return (this._bar[beat] = this._bar[beatStart] = {
+				beat:     beatStart,
 				duration: durationOfBar(beat, this.beatsPerBar),
-				breaks: breaksOfBar(beat, this.beatsPerBar),
-				key: keyOfBar(beat, this.keyChanges)
+				breaks:   breaksOfBar(beat, this.beatsPerBar),
+				keyMap:   this.keyMap[0],
+				center:   this.staveNoteY
 			});
 		},
 		
@@ -1077,6 +1191,8 @@
 		createNode: createNode
 	}
 	
+	Scribe.defaults = defaults;
+	
 	window.Scribe = Scribe;
 })();
 
@@ -1087,7 +1203,7 @@
 var scribe = Scribe('sheet');
 
 scribe.note(69, 0, 0.125);
-scribe.note(50, 0.125,0.375);
+scribe.note(61, 0.125,0.375);
 scribe.note(72, 0.5, 0.5);
 
 scribe.note(86, 2, 0.5);
