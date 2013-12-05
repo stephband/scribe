@@ -96,8 +96,10 @@
 	    	paddingRight: 3,
 	    	paddingBottom: 6,
 	    	
-	    	staveSpacing: 18,
+	    	staveSpacing: 24,
 	    	
+	    	start: 0,
+	    	end: 48,
 	    	transpose: 0
 	    };
 
@@ -562,14 +564,13 @@
 			
 			node.appendChild(lines);
 			node.appendChild(bar);
-			svg.appendChild(node);
 			
 			return node;
 		}
 	};
 	
 	var symbolType = {
-		bar: function bar(beat, duration) {
+		bar: function bar(beat) {
 			return {
 				type: 'bar',
 				minwidth: 1,
@@ -749,7 +750,7 @@
 			beat = symbol.beat;
 			duration = symbol.duration;
 			
-			console.group('Scribe: last symbol', symbol.type, symbol.beat, symbol.duration);
+			console.groupCollapsed('Scribe: symbol', symbol.type, symbol.beat, symbol.duration);
 			
 			// Where the last symbol overlaps the next note, shorten it.
 			if (note && symbol.beat + symbol.duration > nextBeat) {
@@ -848,26 +849,51 @@
 		return symbols;
 	}
 
+	function sliceByBeat(array, start, end) {
+		var output = [],
+		    length = array.length,
+		    n = -1;
+		
+		// We'll assume the array is already sorted.
+		while (++n < length) {
+			if (array[n].beat >= end) {
+				return output;
+			}
+			
+			if (array[n].beat < start) {
+				continue;
+			}
+			
+			if (array[n].beat === start && array[n].type === 'bar') {
+				continue;
+			}
+			
+			output.push(array[n]);
+		}
+		
+		return output;
+	}
+
 	function updateSymbolsX(symbols, width, options) {
-		var length = symbols.length,
-		    n = -1,
+		var n = -1,
 		    x = 0,
 		    symbol, width, diff;
 		
-		var symbolsMin = symbols.map(getMinWidth).reduce(sum) - last(symbols).minwidth / 2;
-		var symbolsWidth = symbols.map(getWidth).reduce(sum) - last(symbols).width / 2;
-		var diffWidth = width - symbolsWidth;
-		var diffRatio = diffWidth / (symbolsWidth - symbolsMin);
+		var length = symbols.length;
+		var lastSymbol = last(symbols);
+		var symbolsMin   = symbols.map(getMinWidth).reduce(sum) - lastSymbol.minwidth / 2;
+		var symbolsWidth = symbols.map(getWidth).reduce(sum) - lastSymbol.width / 2;
+		var diffWidth    = width - symbolsWidth;
+		var diffRatio    = diffWidth / (symbolsWidth - symbolsMin);
 		
 		if (symbolsMin > width) {
 			console.log('Scribe: too many symbols for the stave.');
 		}
 		
-		console.log('Scribe: stave width', width, 'ideal width', symbolsWidth, 'min width', symbolsMin);
+		console.log('Width', width, 'ideal width', symbolsWidth, 'min width', symbolsMin);
 		
 		while (++n < length) {
 			symbol = symbols[n];
-			
 			diff = symbol.width - symbol.minwidth;
 			width = limit(symbol.width + diffRatio * diff, symbol.minwidth, symbol.width * symbol.width / symbol.minwidth);
 			
@@ -875,8 +901,6 @@
 			symbol.x = x + width / 2;
 			x += width;
 		}
-		
-		return symbols.splice(0, n);
 	}
 	
 	// Renderer
@@ -1092,26 +1116,33 @@
 	}
 	
 	function renderStave(svg, symbols, y, options) {
-		var end = 16;
 		var width = options.width - options.paddingLeft - options.paddingRight;
-		var staveSymbols = updateSymbolsX(symbols, width, end, options);
 		var node = nodeType.stave(svg, options.paddingLeft, options.paddingTop + y, width);
 		var layers = [svg, svg].map(createGroupNode);
-		
+
+		// Add a bar line at the end of the stave.
+		symbols.push(symbolType.bar());
+
+		updateSymbolsX(symbols, width, options);
 		append(node, layers);
-		
-		renderSymbols(svg, staveSymbols, layers, options);
+		renderSymbols(svg, symbols, layers, options);
+		svg.appendChild(node);
 	}
-	
+
 	function renderScribe(scribe, svg, options) {
-		var start = 0;
-		var end = 16;
+		var start = options.start;
+		var end = options.end;
+		var beat = start;
 		var symbols = createSymbols(scribe, scribe.data, start, end, options);
+		var lastSymbol = last(symbols);
 		var n = 0, y;
 		
-		while (symbols.length) {
+		while (beat < lastSymbol.beat) {
+			console.groupCollapsed('Scribe: rendering stave. Beats:', beat, '–', beat + 16);
 			y = options.paddingTop + 4 + options.staveSpacing * n++;
-			renderStave(svg, symbols, y, options);
+			renderStave(svg, sliceByBeat(symbols, beat, beat + 16), y, options);
+			beat = beat + 16;
+			console.groupEnd();
 		}
 	}
 	
@@ -1226,3 +1257,6 @@ scribe.note(54, 6.75, 0.25);
 
 scribe.note(60, 8, 0.25);
 scribe.note(64, 8.25, 0.75);
+
+scribe.note(64, 18, 2);
+scribe.note(64, 20, 2);
