@@ -464,7 +464,13 @@
 		bar: function bar(svg, symbol) {
 			return createNode(svg, 'use', {
 				'href': '#bar',
-				'class': 'scribe-bar',
+				'translate': [symbol.x, 0]
+			});
+		},
+
+		endline: function endline(svg, symbol) {
+			return createNode(svg, 'use', {
+				'href': '#endline',
 				'translate': [symbol.x, 0]
 			});
 		},
@@ -472,7 +478,6 @@
 		clef: function clef(svg, symbol) {
 			return createNode(svg, 'use', {
 				'href': '#treble',
-				'class': 'scribe-clef',
 				'translate': [symbol.x, 0]
 			});
 		},
@@ -480,7 +485,6 @@
 		rest: function rest(svg, symbol) {
 			return createNode(svg, 'use', {
 				'href': '#rest[' + symbol.duration + ']',
-				'class': 'scribe-rest',
 				'translate': [symbol.x, 0]
 			});
 		},
@@ -488,7 +492,6 @@
 		tie: function tie(svg, symbol) {
 			return createNode(svg, 'use', {
 				'href': '#tie',
-				'class': 'scribe-tie',
 				'translate': [symbol.x, symbol.y],
 				'scale': [symbol.width, symbol.height]
 			});
@@ -497,7 +500,6 @@
 		accidental: function accidental(svg, symbol) {
 			return createNode(svg, 'use', {
 				'href': '#accidental[' + symbol.value + ']',
-				'class': 'scribe-accidental',
 				'translate': [symbol.x, symbol.y]
 			});
 		},
@@ -509,8 +511,7 @@
 				'translate': [symbol.x, symbol.y]
 			});
 			var head = createNode(svg, 'use', {
-				'href': '#head[' + symbol.duration + ']',
-				'class': 'scribe-note'
+				'href': '#head[' + symbol.duration + ']'
 			});
 			
 			node.appendChild(head);
@@ -520,28 +521,24 @@
 		
 		stalkup: function stalkup(svg, symbol) {
 			return createNode(svg, 'use', {
-				'href': '#stalkup',
-				'class': 'scribe-stalk'
+				'href': '#stalkup'
 			});
 		},
 	
 		stalkdown: function stalkdown(svg, symbol) {
 			return createNode(svg, 'use', {
-				'href': '#stalkdown',
-				'class': 'scribe-stalk'
+				'href': '#stalkdown'
 			});
 		},
 		
 		tailup: function tail(svg, symbol) {
 			return createNode(svg, 'use', {
-				'class': 'scribe-tail',
 				'href': '#tailup[' + symbol.duration +']'
 			});
 		},
 		
 		taildown: function tail(svg, symbol) {
 			return createNode(svg, 'use', {
-				'class': 'scribe-tail',
 				'href': '#taildown[' + symbol.duration +']'
 			});
 		},
@@ -553,7 +550,6 @@
 
 			var lines = createNode(svg, 'use', {
 				'href': '#stave',
-				'class': 'scribe-stave',
 				'scale': [w, 1]
 			});
 			
@@ -570,6 +566,16 @@
 				minwidth: 1,
 				width: 2,
 				beat: beat,
+				duration: 0,
+				y: 0
+			};
+		},
+
+		endline: function endline() {
+			return {
+				type: 'endline',
+				minwidth: 3.6,
+				width: 5.2,
 				duration: 0,
 				y: 0
 			};
@@ -874,9 +880,10 @@
 		    symbol, width, diff;
 		
 		var length = symbols.length;
-		var lastSymbol = last(symbols);
-		var symbolsMin   = symbols.map(getMinWidth).reduce(sum) - lastSymbol.minwidth;
-		var symbolsWidth = symbols.map(getWidth).reduce(sum) - lastSymbol.width;
+		var firstSymbol  = first(symbols);
+		var lastSymbol   = last(symbols);
+		var symbolsMin   = symbols.map(getMinWidth).reduce(sum) - firstSymbol.minwidth / 2 - lastSymbol.minwidth / 2;
+		var symbolsWidth = symbols.map(getWidth).reduce(sum) - firstSymbol.width / 2 - lastSymbol.width / 2;
 		var diffWidth    = width - symbolsWidth;
 		var diffRatio    = diffWidth / (symbolsWidth - symbolsMin);
 		
@@ -1113,12 +1120,13 @@
 	function renderStave(svg, symbols, y, width, options) {
 		var node, layers;
 
-		// Add a bar line at the start and end of the stave.
+		// Add a bar line at the start and end of the stave. If width is not
+		// given, assume this to be the last line and add an end bar line.
 		symbols.unshift(symbolType.bar());
-		symbols.push(symbolType.bar());
+		symbols.push(width ? symbolType.bar() : symbolType.endline());
 
 		// Determine the width of the stave and draw it.
-		width = width || symbols.map(getWidth).reduce(sum) - last(symbols).width;
+		width = width || symbols.map(getWidth).reduce(sum) - first(symbols).width / 2 - last(symbols).width / 2;
 		node = nodeType.stave(svg, options.paddingLeft, options.paddingTop + y, width);
 		layers = [svg, svg].map(createGroupNode);
 		updateSymbolsX(symbols, width, options);
@@ -1270,3 +1278,4 @@ scribe.note(60, 22.5, 0.5);
 scribe.note(66, 23.5, 0.5);
 scribe.note(68, 24, 0.5);
 scribe.note(70, 24.5, 0.5);
+scribe.note(78, 26, 1);
