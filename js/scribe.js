@@ -556,14 +556,8 @@
 				'class': 'scribe-stave',
 				'scale': [w, 1]
 			});
-
-			var bar = createNode(svg, 'use', {
-				'href': '#bar',
-				'class': 'scribe-bar'
-			});
 			
 			node.appendChild(lines);
-			node.appendChild(bar);
 			
 			return node;
 		}
@@ -881,8 +875,8 @@
 		
 		var length = symbols.length;
 		var lastSymbol = last(symbols);
-		var symbolsMin   = symbols.map(getMinWidth).reduce(sum) - lastSymbol.minwidth / 2;
-		var symbolsWidth = symbols.map(getWidth).reduce(sum) - lastSymbol.width / 2;
+		var symbolsMin   = symbols.map(getMinWidth).reduce(sum) - lastSymbol.minwidth;
+		var symbolsWidth = symbols.map(getWidth).reduce(sum) - lastSymbol.width;
 		var diffWidth    = width - symbolsWidth;
 		var diffRatio    = diffWidth / (symbolsWidth - symbolsMin);
 		
@@ -898,8 +892,9 @@
 			width = limit(symbol.width + diffRatio * diff, symbol.minwidth, symbol.width * symbol.width / symbol.minwidth);
 			
 			// Handle x positioning
-			symbol.x = x + width / 2;
-			x += width;
+			if (n) { x += width / 2; }
+			symbol.x = x;
+			x += width / 2;
 		}
 	}
 	
@@ -1115,33 +1110,45 @@
 		}
 	}
 	
-	function renderStave(svg, symbols, y, options) {
-		var width = options.width - options.paddingLeft - options.paddingRight;
-		var node = nodeType.stave(svg, options.paddingLeft, options.paddingTop + y, width);
-		var layers = [svg, svg].map(createGroupNode);
+	function renderStave(svg, symbols, y, width, options) {
+		var node, layers;
 
-		// Add a bar line at the end of the stave.
+		// Add a bar line at the start and end of the stave.
+		symbols.unshift(symbolType.bar());
 		symbols.push(symbolType.bar());
 
+		// Determine the width of the stave and draw it.
+		width = width || symbols.map(getWidth).reduce(sum) - last(symbols).width;
+		node = nodeType.stave(svg, options.paddingLeft, options.paddingTop + y, width);
+		layers = [svg, svg].map(createGroupNode);
 		updateSymbolsX(symbols, width, options);
-		append(node, layers);
 		renderSymbols(svg, symbols, layers, options);
+		append(node, layers);
 		svg.appendChild(node);
 	}
 
 	function renderScribe(scribe, svg, options) {
+		var width = options.width - options.paddingLeft - options.paddingRight;
 		var beat = options.start;
 		var symbols = createSymbols(scribe, scribe.data, options.start, options.end, options);
 		var lastSymbol = last(symbols);
 		var n = 0, y, beatEnd;
 		
 		while (beat < lastSymbol.beat) {
-			beatEnd = beat + 16 > options.end ? options.end : beat + 16 ;
+			if (beat + 16 >= options.end) {
+				beatEnd = options.end;
+				width = false;
+			}
+			else {
+				beatEnd = beat + 16;
+			}
+			
 			console.groupCollapsed('Scribe: rendering stave. Beats:', beat, '–', beatEnd);
 			y = options.paddingTop + 4 + options.staveSpacing * n++;
-			renderStave(svg, sliceByBeat(symbols, beat, beatEnd), y, options);
-			beat = beatEnd;
+			renderStave(svg, sliceByBeat(symbols, beat, beatEnd), y, width, options);
 			console.groupEnd();
+			
+			beat = beatEnd;
 		}
 	}
 	
