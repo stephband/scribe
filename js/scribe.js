@@ -99,7 +99,7 @@
 	    	staveSpacing: 24,
 	    	
 	    	start: 0,
-	    	end: 48,
+	    	end: 28,
 	    	transpose: 0
 	    };
 
@@ -1130,18 +1130,17 @@
 	}
 
 	function renderScribe(scribe, svg, options) {
-		var start = options.start;
-		var end = options.end;
-		var beat = start;
-		var symbols = createSymbols(scribe, scribe.data, start, end, options);
+		var beat = options.start;
+		var symbols = createSymbols(scribe, scribe.data, options.start, options.end, options);
 		var lastSymbol = last(symbols);
-		var n = 0, y;
+		var n = 0, y, beatEnd;
 		
 		while (beat < lastSymbol.beat) {
-			console.groupCollapsed('Scribe: rendering stave. Beats:', beat, '–', beat + 16);
+			beatEnd = beat + 16 > options.end ? options.end : beat + 16 ;
+			console.groupCollapsed('Scribe: rendering stave. Beats:', beat, '–', beatEnd);
 			y = options.paddingTop + 4 + options.staveSpacing * n++;
-			renderStave(svg, sliceByBeat(symbols, beat, beat + 16), y, options);
-			beat = beat + 16;
+			renderStave(svg, sliceByBeat(symbols, beat, beatEnd), y, options);
+			beat = beatEnd;
 			console.groupEnd();
 		}
 	}
@@ -1260,3 +1259,7 @@ scribe.note(64, 8.25, 0.75);
 
 scribe.note(64, 18, 2);
 scribe.note(64, 20, 2);
+scribe.note(60, 22.5, 0.5);
+scribe.note(66, 23.5, 0.5);
+scribe.note(68, 24, 0.5);
+scribe.note(70, 24.5, 0.5);
