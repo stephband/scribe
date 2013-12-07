@@ -24,7 +24,7 @@ An array of notes. For example:
 
 will render as:
 
-<img src="http://labs.cruncher.ch/scribe/example.png" />
+![Dum-de-de-duuum](example.png)
 
 That's right. You only need to give it the notes. Scribe does the rest.
 
