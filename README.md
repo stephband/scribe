@@ -28,6 +28,8 @@ will render as:
 
 That's right. You only need to give it the notes. Scribe does the rest.
 
+Scribe is not ready yet for production, and this data format will likely change. Suggestions are welcome.
+
 
 ### options
 
@@ -55,8 +57,3 @@ Scribe's rendered output can be modified with these optional options:
         key: 'C',
         transpose: 0
     }
-
-
-## History
-
-It's early days, and Scribe will change.
