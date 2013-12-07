@@ -1251,8 +1251,6 @@
 		}
 		
 		this.render = queueRender;
-		
-		// 71 is B, the mid-note of the treble clef
 		this.staveNoteY = numberToPosition(clefs[options.clef]);
 		this._bar = {};
 		this.data = data = data || [];
@@ -1265,8 +1263,6 @@
 		this.keyMap = {
 			0: createKeyMap(this.key)
 		};
-		
-		this.find = svg.querySelectorAll.bind(svg);
 		
 		if (debug) { console.log('Scribe: ready to write on svg#' + svg.id); }
 		

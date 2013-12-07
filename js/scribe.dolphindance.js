@@ -102,5 +102,9 @@ var melody = [
 var scribe = Scribe('sheet', melody, {
 	key: 'C',
 	staveSpacing: 19,
-	paddingTop: 4
+	paddingTop: 4,
+	symbols: {
+		16: 'repeat-start',
+		152: 'repeat-end'
+	}
 });

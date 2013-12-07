@@ -1,7 +1,56 @@
-.scribe-title {
+.scribe-header,
+.scribe-svg {
+	width: 800px;
+	margin-left: auto;
+	margin-right: auto;
+	padding-top: 1.5rem;
+}
+
+.scribe-header > .scribe-title,
+.scribe-header > .scribe-composer,
+.scribe-header > .scribe-part {
+	display: inline-block;
+	position: relative;
+}
+
+.scribe-header > .scribe-title {
+	left: 20%;
+	width: 60%;
+	margin-right: -60%;
+}
+
+.scribe-header > .scribe-composer,
+.scribe-header > .scribe-part {
+	width: 15%;
+	margin-right: -15%;
+}
+
+.scribe-header > .scribe-composer {
+	left: 3%;
+}
+
+.scribe-header > .scribe-part {
+	left: 82%;
+	text-align: right;
+}
+
+.scribe-title,
+.scribe-composer,
+.scribe-part {
 	font-family: 'jazztextregular', cursive;
+}
+
+.scribe-title {
 	font-size: 2.5rem;
 	text-align: center;
+}
+
+.scribe-composer {
+	font-size: 1rem;
+}
+
+.scribe-part {
+	font-size: 1rem;
 }
 
 .scribe-note,
