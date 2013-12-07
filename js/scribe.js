@@ -63,6 +63,11 @@
 		6: [3]
 	};
 
+	var clefs = {
+	    	treble: 71,
+	    	bass: 50
+	    };
+
 	var defaults = {
 	    	stalkUp: {
 	    		x1: 1.25,
@@ -87,8 +92,8 @@
 	    	beamGradientMax: 0.25,
 	    	beamGradientFactor: 0.25,
 	    	
+	    	clef: 'treble',
 	    	clefOnEveryStave: false,
-	    	keyOnEveryStave: false,
 	    	barsPerStave: 4,
 
 	    	paddingTop: 12,
@@ -99,7 +104,9 @@
 	    	staveSpacing: 24,
 	    	
 	    	start: 0,
-	    	end: 28,
+	    	//end: 48,
+	    	
+	    	key: 'D',
 	    	transpose: 0
 	    };
 
@@ -161,6 +168,16 @@
 	function setX(x, obj) {
 		obj.x = x;
 		return x;
+	}
+
+	function setXFromWidth(x, symbol, i) {
+		if (!i) {
+			symbol.x = 0;
+			return x + symbol.width / 2;
+		}
+		
+		symbol.x = x + symbol.width / 2;
+		return x + symbol.width;
 	}
 
 	function setDuration(x, obj) {
@@ -477,7 +494,7 @@
 
 		clef: function clef(svg, symbol) {
 			return createNode(svg, 'use', {
-				'href': '#treble',
+				'href': '#clef[' + symbol.value + ']',
 				'translate': [symbol.x, 0]
 			});
 		},
@@ -581,10 +598,11 @@
 			};
 		},
 
-		clef: function clef(beat, duration) {
+		clef: function clef(value) {
 			return {
 				type: 'clef',
-				minwidth: 8,
+				value: value,
+				minwidth: 10,
 				width: 10,
 				beat: 0,
 				duration: 0,
@@ -606,7 +624,7 @@
 		note: function note(beat, duration, number, from, y) {
 			return {
 				type: 'note',
-				minwidth: 2.8,
+				minwidth: 3,
 				width: 4 + 3 * duration,
 				beat: beat,
 				duration: duration,
@@ -641,6 +659,17 @@
 	function beatOfBar(beat, beatsPerBar) {
 		// Placeholder function for when beatsPerBar becomes a map
 		return beat % beatsPerBar;
+	}
+
+	function beatOfBarN(scribe, beat, n) {
+		// Find the beat of the nth bar in the future.
+		beat = scribe.barOfBeat(beat).beat;
+		
+		while (n--) {
+			beat += scribe.barOfBeat(beat).duration;
+		}
+		
+		return beat;
 	}
 	
 	function durationOfBar(beat, beatsPerBar) {
@@ -704,10 +733,11 @@
 		return;
 	}
 
-	function pushKeySig(symbols, key) {
-		var n = 0;
+	function createKeySymbols(key) {
+		var n = 0,
+		    symbols = [];
 		
-		if (key === 0) { return; }
+		if (key === 0) { return symbols; }
 		
 		if (key > 0) {
 			while(n++ < key) {
@@ -721,6 +751,8 @@
 		}
 		
 		symbols.push(symbolType.space(0));
+		
+		return symbols;
 	}
 	
 	function createSymbols(scribe, data, start, end, options) {
@@ -729,43 +761,35 @@
 		var beam = newBeam();
 		var accMap = {};
 		var beat, duration, bar, symbol, note, breakpoint, nextBeat;
-		
-		data.sort(byBeat);
-		
-		if (!options.clefOnEveryStave || start === 0) {
-			symbols.push(symbolType.clef());
-		}
 
-		if (!options.keyOnEveryStave || start === 0) {
-			pushKeySig(symbols, scribe.key);
-		}
-		
+		symbols.push(symbolType.bar(start));
+
 		while ((symbol = last(symbols)).beat < end) {
 			console.groupEnd();
-			
+
 			bar = scribe.barOfBeat(symbol.beat);
 			note = data[n];
-			nextBeat = note && note.beat || end;
+			nextBeat = isDefined(note) && isDefined(note.beat) ? note.beat : end;
 			breakpoint = nextBreakpoint(bar, symbol.beat);
 			beat = symbol.beat;
 			duration = symbol.duration;
-			
+
 			console.groupCollapsed('Scribe: symbol', symbol.type, symbol.beat, symbol.duration);
-			
+
 			// Where the last symbol overlaps the next note, shorten it.
 			if (note && symbol.beat + symbol.duration > nextBeat) {
 				console.log('shorten');
 				symbol.duration = nextBeat - symbol.beat;
 			}
-			
+
 			if (symbol.type === 'bar') {
 				beam = newBeam(beam);
 			}
-			
+
 			if (symbol.type === 'rest' && options.beamBreaksAtRest) {
 				beam = newBeam(beam);
 			}
-			
+
 			if (symbol.type === 'note') {
 				// Where the last symbol is less than 1 beat duration, add it to
 				// beam.
@@ -817,7 +841,7 @@
 			
 			// Where the symbol arrives at a bar end, insert a bar line.
 			if (symbol.beat + symbol.duration === bar.beat + bar.duration) {
-				console.log('insert bar');
+				console.log('insert bar', bar.beat + bar.duration);
 				symbols.push(symbolType.bar(bar.beat + bar.duration));
 				deleteProperties(accMap);
 				continue;
@@ -826,7 +850,7 @@
 			// Where the last symbol doesn't make it as far as the next note,
 			// insert a rest.
 			if (symbol.beat + symbol.duration < nextBeat) {
-				console.log('insert rest');
+				console.log('insert rest', nextBeat);
 				symbols.push(fitRestSymbol(bar, symbol.beat + symbol.duration, nextBeat - symbol.beat - symbol.duration));
 				continue;
 			}
@@ -872,37 +896,6 @@
 		}
 		
 		return output;
-	}
-
-	function updateSymbolsX(symbols, width, options) {
-		var n = -1,
-		    x = 0,
-		    symbol, width, diff;
-		
-		var length = symbols.length;
-		var firstSymbol  = first(symbols);
-		var lastSymbol   = last(symbols);
-		var symbolsMin   = symbols.map(getMinWidth).reduce(sum) - firstSymbol.minwidth / 2 - lastSymbol.minwidth / 2;
-		var symbolsWidth = symbols.map(getWidth).reduce(sum) - firstSymbol.width / 2 - lastSymbol.width / 2;
-		var diffWidth    = width - symbolsWidth;
-		var diffRatio    = diffWidth / (symbolsWidth - symbolsMin);
-		
-		if (symbolsMin > width) {
-			console.log('Scribe: too many symbols for the stave.');
-		}
-		
-		console.log('Width', width, 'ideal width', symbolsWidth, 'min width', symbolsMin);
-		
-		while (++n < length) {
-			symbol = symbols[n];
-			diff = symbol.width - symbol.minwidth;
-			width = limit(symbol.width + diffRatio * diff, symbol.minwidth, symbol.width * symbol.width / symbol.minwidth);
-			
-			// Handle x positioning
-			if (n) { x += width / 2; }
-			symbol.x = x;
-			x += width / 2;
-		}
 	}
 	
 	// Renderer
@@ -1116,68 +1109,133 @@
 			renderLedgers(svg, layers[0], symbol);
 		}
 	}
-	
-	function renderStave(svg, symbols, y, width, options) {
-		var node, layers;
 
-		// Add a bar line at the start and end of the stave. If width is not
-		// given, assume this to be the last line and add an end bar line.
-		symbols.unshift(symbolType.bar());
-		symbols.push(width ? symbolType.bar() : symbolType.endline());
+	function symbolsXFromRatio(symbols, ratio) {
+		var length = symbols.length;
+		var n = -1;
+		var x = 0;
+		var symbol, symbolwidth;
+		
+		while (++n < length) {
+			symbol = symbols[n];
+			symbolwidth = symbol.width + ratio * (symbol.width - symbol.minwidth);
 
-		// Determine the width of the stave and draw it.
-		width = width || symbols.map(getWidth).reduce(sum) - first(symbols).width / 2 - last(symbols).width / 2;
+			if (n) { x += symbolwidth / 2; }
+			symbol.x = x;
+			x += symbolwidth / 2;
+		}
+	}
+
+	function renderStave(scribe, svg, symbols, start, end, width, y, bars, options) {
+		var first = symbolType.bar(start);
+		var last = end >= options.end ?
+		    	symbolType.endline(end) :
+		    	symbolType.bar(end) ;
+		
+		var minwidth, idealwidth, node, layers;
+		
+		if (options.clefOnEveryStave || start === 0) {
+			symbols.splice.apply(symbols, [0,0].concat(createKeySymbols(scribe.key)));
+			symbols.unshift(symbolType.clef(options.clef));
+		}
+
+		// Add a bar line at the start and end of the stave.
+		symbols.unshift(first);
+		symbols.push(last);
+		
+		// Find the minwidth of all the symbols, and if it's too wide render a
+		// stave with fewer bars.
+		minwidth = symbols.map(getMinWidth).reduce(sum) - first.minwidth / 2 - last.minwidth / 2;
+		
+		if (minwidth > width) {
+			bars--;
+			end = beatOfBarN(scribe, start, bars);
+			symbols = sliceByBeat(symbols, start, end);
+			
+			console.log('Too many symbols for stave. Trying beats', start, '–', end, '(', bars, 'bars ).');
+			
+			return renderStave(scribe, svg, symbols, start, end, width, y, bars, options);
+		}
+		
+		// If we are at the end and there is enough width, set the x positions
+		// to their ideals, creating a shorter last stave, otherwise fit the
+		// symbols to the width of the stave.
+		idealwidth = symbols.map(getWidth).reduce(sum) - first.width / 2 - last.width / 2;
+
+		if (end >= options.end && idealwidth <= width) {
+			symbols.reduce(setXFromWidth, 0);
+			width = idealwidth;
+		}
+		else {
+			symbolsXFromRatio(symbols, (width - idealwidth) / (idealwidth - minwidth));
+		}
+		
+		console.log('Rendering symbols to stave width:', width);
+		
+		// Create the nodes and plonk them in the DOM.
 		node = nodeType.stave(svg, options.paddingLeft, options.paddingTop + y, width);
 		layers = [svg, svg].map(createGroupNode);
-		updateSymbolsX(symbols, width, options);
 		renderSymbols(svg, symbols, layers, options);
 		append(node, layers);
 		svg.appendChild(node);
+		
+		return end;
 	}
 
 	function renderScribe(scribe, svg, options) {
-		var width = options.width - options.paddingLeft - options.paddingRight;
-		var beat = options.start;
 		var symbols = createSymbols(scribe, scribe.data, options.start, options.end, options);
-		var lastSymbol = last(symbols);
-		var n = 0, y, beatEnd;
+		var width = options.width - options.paddingLeft - options.paddingRight;
+		var start = options.start;
+		var y = options.paddingTop + 4;
+		var end;
 		
-		while (beat < lastSymbol.beat) {
-			if (beat + 16 >= options.end) {
-				beatEnd = options.end;
-				width = false;
-			}
-			else {
-				beatEnd = beat + 16;
+		while (start < options.end) {
+			end = beatOfBarN(scribe, start, options.barsPerStave);
+			
+			if (end > options.end) {
+				end = options.end;
 			}
 			
-			console.groupCollapsed('Scribe: rendering stave. Beats:', beat, '–', beatEnd);
-			y = options.paddingTop + 4 + options.staveSpacing * n++;
-			renderStave(svg, sliceByBeat(symbols, beat, beatEnd), y, width, options);
+			if (end === start) {
+				throw new Error('No. That cant be.');
+			}
+			
+			console.group('Scribe: rendering stave. Beats:', start, '–', end, '(', options.barsPerStave, 'bars ).');
+			start = renderStave(scribe, svg, sliceByBeat(symbols, start, end), start, end, width, y, options.barsPerStave, options);
 			console.groupEnd();
 			
-			beat = beatEnd;
+			y += options.staveSpacing;
 		}
 	}
 	
-	function Scribe(id, options) {
+	function Scribe(svg, data, user) {
 		// Make 'new' keyword optional.
 		if (!(this instanceof Scribe)) {
-			return new Scribe(id, options);
+			return new Scribe(svg, data, options);
 		}
 		
-		var svg = find(id);
 		var scribe = this;
-		var settings = extend({
+		
+		svg = typeof svg === 'string' ? find(svg) : svg ;
+		
+		var settings = extend({}, defaults, user);
+		var options = extend({
 			width: svg.viewBox.baseVal.width,
 			height: svg.viewBox.baseVal.height
-		}, defaults, options);
+		}, settings);
 		
 		var flag;
 		
 		function update() {
 			flag = false;
-			renderScribe(scribe, svg, settings);
+			
+			data.sort(byBeat);
+
+			if (!isDefined(settings.end)) {
+				options.end = beatOfBarN(scribe, last(data).beat, 1);
+			}
+			
+			renderScribe(scribe, svg, options);
 		}
 		
 		function queueRender() {
@@ -1187,13 +1245,14 @@
 		}
 		
 		this.render = queueRender;
+		
 		// 71 is B, the mid-note of the treble clef
-		this.staveNoteY = numberToPosition(71);
+		this.staveNoteY = numberToPosition(clefs[options.clef]);
 		this._bar = {};
-		this.data = [];
+		this.data = data = [];
 		this.beatsPerBar = 4;
 		
-		this.key = toKey(settings.key || 'D');
+		this.key = toKey(options.key || 'C');
 		
 		console.log('key:', this.key, createKeyMap(this.key, this.staveNoteY));
 		
@@ -1271,6 +1330,10 @@ scribe.note(54, 6.75, 0.25);
 
 scribe.note(60, 8, 0.25);
 scribe.note(64, 8.25, 0.75);
+scribe.note(64, 8.5, 0.75);
+scribe.note(64, 8.75, 0.75);
+scribe.note(64, 9, 0.75);
+scribe.note(64, 9.25, 0.25);
 
 scribe.note(64, 18, 2);
 scribe.note(64, 20, 2);
