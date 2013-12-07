@@ -333,11 +333,10 @@
 	
 	// Scribe logic
 	
-	function createData(type, number, beat, duration) {
+	function createData(beat, number, duration) {
 		return {
-			type: type,
-			number: number,
 			beat: beat,
+			number: number,
 			duration: duration
 		};
 	}
@@ -510,7 +509,7 @@
 			return createNode(svg, 'use', {
 				'href': '#tie',
 				'translate': [symbol.x, symbol.y],
-				'scale': [symbol.width, symbol.height]
+				'scale': [symbol.width, 1 + 0.1 * symbol.width]
 			});
 		},
 
@@ -625,7 +624,7 @@
 			return {
 				type: 'note',
 				minwidth: 3,
-				width: 4 + 3 * duration,
+				width: 4 + 3 * limit(duration, 0.25, 4),
 				beat: beat,
 				duration: duration,
 				number: number,
@@ -780,6 +779,10 @@
 			if (note && symbol.beat + symbol.duration > nextBeat) {
 				console.log('shorten');
 				symbol.duration = nextBeat - symbol.beat;
+
+				if (symbol.type === 'note') {
+					symbol.width = 4 + 3 * limit(symbol.duration, 0.25, 4);
+				}
 			}
 
 			if (symbol.type === 'bar') {
@@ -809,8 +812,9 @@
 					deleteProperties(accMap);
 					beam = newBeam(beam);
 					
-					symbols.push(symbolType.note(bar.beat + bar.duration, symbol.beat + symbol.duration - bar.beat - bar.duration, symbol.number))
+					symbols.push(symbolType.note(bar.beat + bar.duration, symbol.beat + symbol.duration - bar.beat - bar.duration, symbol.number, symbol, symbol.y));
 					symbol.duration = bar.beat + bar.duration - symbol.beat;
+					symbol.width = 4 + 3 * limit(symbol.duration, 0.25, 4);
 					
 					symbol.to = last(symbols);
 					last(symbols).from = symbol;
@@ -823,8 +827,9 @@
 				// a link to the existing one.
 				if (symbol.duration < 2 && symbol.beat + symbol.duration > breakpoint) {
 					console.log('shorten to breakpoint');
-					symbols.push(symbolType.note(breakpoint, symbol.beat + symbol.duration - breakpoint, symbol.number, symbol))
+					symbols.push(symbolType.note(breakpoint, symbol.beat + symbol.duration - breakpoint, symbol.number, symbol, symbol.y));
 					symbol.duration = breakpoint - symbol.beat;
+					symbol.width = 4 + 3 * limit(symbol.duration, 0.25, 4);
 					
 					symbol.to = last(symbols);
 					last(symbols).from = symbol;
@@ -1211,7 +1216,7 @@
 	function Scribe(svg, data, user) {
 		// Make 'new' keyword optional.
 		if (!(this instanceof Scribe)) {
-			return new Scribe(svg, data, options);
+			return new Scribe(svg, data, user);
 		}
 		
 		var scribe = this;
@@ -1219,6 +1224,7 @@
 		svg = typeof svg === 'string' ? find(svg) : svg ;
 		
 		var settings = extend({}, defaults, user);
+		
 		var options = extend({
 			width: svg.viewBox.baseVal.width,
 			height: svg.viewBox.baseVal.height
@@ -1232,7 +1238,7 @@
 			data.sort(byBeat);
 
 			if (!isDefined(settings.end)) {
-				options.end = beatOfBarN(scribe, last(data).beat, 1);
+				options.end = beatOfBarN(scribe, last(data).beat + last(data).duration, 1);
 			}
 			
 			renderScribe(scribe, svg, options);
@@ -1249,7 +1255,7 @@
 		// 71 is B, the mid-note of the treble clef
 		this.staveNoteY = numberToPosition(clefs[options.clef]);
 		this._bar = {};
-		this.data = data = [];
+		this.data = data = data || [];
 		this.beatsPerBar = 4;
 		
 		this.key = toKey(options.key || 'C');
@@ -1263,6 +1269,10 @@
 		this.find = svg.querySelectorAll.bind(svg);
 		
 		if (debug) { console.log('Scribe: ready to write on svg#' + svg.id); }
+		
+		if (data) {
+			queueRender();
+		}
 	}
 	
 	Scribe.prototype = {
@@ -1288,9 +1298,9 @@
 			});
 		},
 		
-		note: function(number, beat, duration) {
+		note: function(beat, number, duration) {
 			var svg = this.svg;
-			var data = createData('note', number, beat, duration);
+			var data = createData(beat, number, duration);
 			
 			this.data.push(data);
 			this.render();
@@ -1305,40 +1315,3 @@
 	
 	window.Scribe = Scribe;
 })();
-
-
-
-// -------------- TEST
-
-var scribe = Scribe('sheet');
-
-scribe.note(69, 0, 0.125);
-scribe.note(61, 0.125,0.375);
-scribe.note(72, 0.5, 0.5);
-
-scribe.note(86, 2, 0.5);
-scribe.note(84, 2.5, 0.25);
-scribe.note(72, 2.75, 0.25);
-
-//scribe.note(93, 4, 0.5);
-//scribe.note(83, 4.5, 0.25);
-//scribe.note(83, 4.75, 0.25);
-//scribe.note(81, 5, 0.5);
-//
-scribe.note(50, 6, 0.75);
-scribe.note(54, 6.75, 0.25);
-
-scribe.note(60, 8, 0.25);
-scribe.note(64, 8.25, 0.75);
-scribe.note(64, 8.5, 0.75);
-scribe.note(64, 8.75, 0.75);
-scribe.note(64, 9, 0.75);
-scribe.note(64, 9.25, 0.25);
-
-scribe.note(64, 18, 2);
-scribe.note(64, 20, 2);
-scribe.note(60, 22.5, 0.5);
-scribe.note(66, 23.5, 0.5);
-scribe.note(68, 24, 0.5);
-scribe.note(70, 24.5, 0.5);
-scribe.note(78, 26, 1);
