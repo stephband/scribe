@@ -948,9 +948,9 @@
 		if (!symbol.to) { return; }
 		
 		layer.appendChild(nodeType.tie(svg, {
-			x: symbol.x + 1,
+			x: symbol.x + 1.25,
 			y: symbol.y,
-			width: symbol.to.x - symbol.x - 2.25
+			width: symbol.to.x - symbol.x - 2.75
 		}));
 	}
 	
