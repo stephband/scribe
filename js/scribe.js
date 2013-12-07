@@ -794,9 +794,9 @@
 			}
 
 			if (symbol.type === 'note') {
-				// Where the last symbol is less than 1 beat duration, add it to
-				// beam.
-				if (symbol.duration < 1) {
+				// Where the last symbol is less than 1 beat duration, or within
+				// 1 beat of a breakpoint, add it to the beam.
+				if (symbol.duration < 1 || breakpoint - symbol.beat < 1) {
 					beam.push(symbol);
 					symbol.beam = beam;
 				}
@@ -825,7 +825,7 @@
 				// Where the last symbol is a note of less than 2 beats duration
 				// that overlaps a breakpoint, shorten it and push a new symbol with
 				// a link to the existing one.
-				if (symbol.duration < 2 && symbol.beat + symbol.duration > breakpoint) {
+				if ((symbol.duration < 2 || symbol.duration % 1) && symbol.beat + symbol.duration > breakpoint) {
 					console.log('shorten to breakpoint');
 					symbols.push(symbolType.note(breakpoint, symbol.beat + symbol.duration - breakpoint, symbol.number, symbol, symbol.y));
 					symbol.duration = breakpoint - symbol.beat;
