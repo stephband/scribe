@@ -22,13 +22,13 @@ An array of notes. For example:
         { beat: 3.5, number: 74,  duration: 3.5 }
     ]
 
-will render as:
+Renders as:
 
 ![Dum-de-de-duuum](example.png)
 
-That's right. You only need to give it the notes. Scribe does the rest.
-
-Scribe is not ready yet for production, and this data format will likely change. Suggestions are welcome.
+That's right. You only need to give it the notes.
+Scribe interprets the notes and writes out the notation.
+Scribe is not ready yet for production, and the format of this note data may change.
 
 
 ### options
