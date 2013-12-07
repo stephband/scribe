@@ -100,7 +100,7 @@ var melody = [
 ];
 
 var chords = [
-	{ beat: 0, chord: 'C-', duration: 4 }
+	{ beat: 0, duration: 4, type: 'mode', value: ['C', '-'] }
 ];
 
 var scribe = Scribe('sheet', melody, {
