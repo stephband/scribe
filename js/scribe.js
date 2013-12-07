@@ -509,7 +509,7 @@
 			return createNode(svg, 'use', {
 				'href': '#tie',
 				'translate': [symbol.x, symbol.y],
-				'scale': [symbol.width, 1 + 0.1 * symbol.width]
+				'scale': [symbol.width, (symbol.y > 0 ? 1 : -1) * (1 + 0.1 * symbol.width)]
 			});
 		},
 
@@ -949,9 +949,8 @@
 		
 		layer.appendChild(nodeType.tie(svg, {
 			x: symbol.x + 1,
-			y: symbol.y + 1.25,
-			width: symbol.to.x - symbol.x - 2.25,
-			height: 0.375 * (symbol.to.x - symbol.x - 2.25)
+			y: symbol.y,
+			width: symbol.to.x - symbol.x - 2.25
 		}));
 	}
 	

@@ -97,7 +97,11 @@ var melody = [
 	{ beat: 146.5, number: 77,  duration: 0.5 },
 	{ beat: 147,   number: 79,  duration: 0.5 },
 	{ beat: 147.5, number: 74,  duration: 3.5 }
-]
+];
+
+var chords = [
+	{ beat: 0, chord: 'C-', duration: 4 }
+];
 
 var scribe = Scribe('sheet', melody, {
 	key: 'C',
