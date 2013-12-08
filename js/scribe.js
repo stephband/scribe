@@ -12,6 +12,8 @@
 
 	var attributes = {
 		'class': setAttr,
+		'x': setAttr,
+		'y': setAttr,
 		'x1': setAttr,
 		'y1': setAttr,
 		'x2': setAttr,
@@ -20,7 +22,8 @@
 		'href': setAttrBaseVal,
 		'translate': setTransform,
 		'scale': setTransform,
-		'rotate': setTransform
+		'rotate': setTransform,
+		'text': textContent
 	};
 
 	var transforms = {
@@ -233,7 +236,19 @@
 		return mod(n, 12);
 	}
 	
+	function toChordSymbol(data) {
+		return symbolType.chord(data);
+	}
+	
 	// filter functions
+	
+	function isNote(obj) {
+		return isDefined(obj.number);
+	}
+	
+	function isMode(obj) {
+		return obj.type === 'mode';
+	}
 	
 	function isStaveSymbol(obj) {
 		return obj.type !== 'chord';
@@ -306,6 +321,10 @@
 	
 	function setAttr(svg, node, attr, value) {
 		node.setAttributeNS(null, attr, value);
+	}
+	
+	function textContent(svg, node, attr, value) {
+		node.textContent = value;
 	}
 	
 	function getTransform(node, attr) {
@@ -604,6 +623,16 @@
 			node.appendChild(lines);
 			
 			return node;
+		},
+		
+		chord: function chord(svg, symbol) {
+			console.log(symbol);
+			return createNode(svg, 'text', {
+				'class': 'scribe-chord',
+				'x': symbol.x,
+				'y': symbol.y,
+				'text': symbol.text
+			});
 		}
 	};
 	
@@ -684,6 +713,14 @@
 				minwidth: 3,
 				width: width || 4
 			}
+		},
+		
+		chord: function chord(data) {
+			return {
+				type: 'chord',
+				beat: data.beat,
+				text: data.value
+			};
 		}
 	};
 	
@@ -786,7 +823,11 @@
 		return symbols;
 	}
 	
-	function createSymbols(scribe, data, start, end, options) {
+	function createChordSymbols(scribe, data, start, end, options) {
+		return data.map(toChordSymbol);
+	}
+	
+	function createMusicSymbols(scribe, data, start, end, options) {
 		var symbols = [];
 		var n = 0;
 		var beam = newBeam();
@@ -908,6 +949,13 @@
 		console.groupEnd();
 		
 		return symbols;
+	}
+	
+	function createSymbols(scribe, data, start, end, options) {
+		var musicSymbols = createMusicSymbols(scribe, data.filter(isNote), start, end, options);
+		var chordSymbols = createChordSymbols(scribe, data.filter(isMode), start, end, options);
+		
+		return [musicSymbols, chordSymbols];
 	}
 
 	function sliceByBeat(array, start, end) {
@@ -1150,31 +1198,48 @@
 		var length = symbols.length;
 		var n = -1;
 		var x = 0;
-		var symbol, symbolwidth;
+		var symbol, renderwidth;
 		
 		while (++n < length) {
 			symbol = symbols[n];
-			symbolwidth = symbol.width + ratio * (symbol.width - symbol.minwidth);
+			renderwidth = symbol.width + ratio * (symbol.width - symbol.minwidth);
 
-			if (n) { x += symbolwidth / 2; }
+			if (n) { x += renderwidth / 2; }
 			symbol.x = x;
-			x += symbolwidth / 2;
+			symbol.renderwidth = renderwidth;
+			x += renderwidth / 2;
+		}
+	}
+	
+	function symbolsXFromRefSymbols(symbols, refSymbols) {
+		// This is a bit nasty but it's a stop-gap measure until we work out how to reliably
+		// render multi-staves with events that still line up.
+		var length = symbols.length;
+		var n = -1;
+		var m = -1;
+		var x = 0;
+		var symbol, refSymbol, prevSymbol, xRatio, xMin, xMax, xDistance;
+		
+		while (++n < length) {
+			symbol = symbols[n];
+			
+			while (refSymbol = refSymbols[++m], refSymbol && refSymbol.beat < symbol.beat) {
+				prevSymbol = refSymbol;
+			}
+			
+			if (refSymbol.beat === symbol.beat) {
+				symbol.x = refSymbol.x;// - refSymbol.renderwidth / 2 ;
+			}
+			else {
+				xRatio = (symbol.beat - prevSymbol.beat) / (refSymbol.beat - prevSymbol.beat);
+				xMin = prevSymbol.x - prevSymbol.renderwidth / 2;
+				xMax = refSymbol.x - refSymbol.renderwidth / 2;
+				symbol.x = xMin + xRatio * (xMax - xMin);
+			}
 		}
 	}
 
-	function renderStave(svg, symbols, x, y, width, options) {
-		console.log('Rendering symbols to stave width:', width);
-		
-		// Create the nodes and plonk them in the DOM.
-		var node = nodeType.stave(svg, x, y, width);
-		var layers = [svg, svg].map(createGroupNode);
-		
-		renderSymbols(svg, symbols, layers, options);
-		append(node, layers);
-		svg.appendChild(node);
-	}
-
-	function createStaveSymbols(symbols, start, end, options) {
+	function prepareStaveSymbols(symbols, start, end, options) {
 		var clef, key;
 		
 		if (options.clefOnEveryStave || start === options.start) {
@@ -1192,15 +1257,35 @@
 			.concat([end >= options.end ? symbolType.endline(end) : symbolType.bar(end)]);
 	}
 
-	function createChordSymbols(symbols, start, end, options) {
+	function prepareChordSymbols(symbols, start, end, options) {
 		return symbols;
 	}
 
-	function renderStaves(scribe, svg, symbols, start, end, width, y, bars, options) {
-		var symbols1 = createStaveSymbols(symbols.filter(isStaveSymbol), start, end, options);
-		var symbols2 = createChordSymbols(symbols.filter(isChordSymbol), start, end, options);
+	function renderChords(svg, symbols, x, y, width, options) {
+		var node = createNode(svg, 'g', {
+			translate: [x, y]
+		});
 		
-		console.log('HEE', symbols1, symbols2);
+		renderSymbols(svg, symbols, [node], options);
+		
+		svg.appendChild(node);
+	}
+
+	function renderStave(svg, symbols, x, y, width, options) {
+		console.log('Rendering symbols to stave width:', width);
+		
+		// Create the nodes and plonk them in the DOM.
+		var node = nodeType.stave(svg, x, y, width);
+		var layers = [svg, svg].map(createGroupNode);
+		
+		renderSymbols(svg, symbols, layers, options);
+		append(node, layers);
+		svg.appendChild(node);
+	}
+
+	function renderStaves(scribe, svg, tracks, start, end, width, y, bars, options) {
+		var symbols1 = prepareStaveSymbols(tracks[0], start, end, options);
+		var symbols2 = prepareChordSymbols(tracks[1], start, end, options);
 		
 		// Find the minwidth of all the symbols, and if it's too wide render a
 		// stave with fewer bars.
@@ -1209,11 +1294,13 @@
 		if (minwidth > width) {
 			bars--;
 			end = beatOfBarN(scribe, start, bars);
-			symbols = sliceByBeat(symbols, start, end);
+			tracks = tracks.map(function(symbols) {
+				return sliceByBeat(symbols, start, end);
+			});
 			
 			console.log('Too many symbols for stave. Trying beats', start, '–', end, '(', bars, 'bars ).');
 			
-			return renderStaves(scribe, svg, symbols, start, end, width, y, bars, options);
+			return renderStaves(scribe, svg, tracks, start, end, width, y, bars, options);
 		}
 		
 		// If we are at the end and there is enough width, set the x positions
@@ -1229,17 +1316,25 @@
 			symbolsXFromRatio(symbols1, (width - idealwidth) / (idealwidth - minwidth));
 		}
 		
+		// A bit of a fudge, but it'll do for now.
+		symbolsXFromRefSymbols(symbols2, symbols1);
+
+		renderChords(svg, symbols2, options.paddingLeft, y - 7.5, width, options);
 		renderStave(svg, symbols1, options.paddingLeft, y, width, options);
 		
 		return end;
 	}
 
 	function renderScribe(scribe, svg, options) {
-		var symbols = createSymbols(scribe, scribe.data, options.start, options.end, options);
+		var tracks = createSymbols(scribe, scribe.data, options.start, options.end, options);
 		var width = options.width - options.paddingLeft - options.paddingRight;
 		var start = options.start;
 		var y = options.paddingTop + 4;
 		var end;
+		
+		function slice(symbols) {
+			return sliceByBeat(symbols, start, end);
+		}
 		
 		while (start < options.end) {
 			end = beatOfBarN(scribe, start, options.barsPerStave);
@@ -1253,7 +1348,7 @@
 			}
 			
 			console.group('Scribe: rendering stave. Beats:', start, '–', end, '(', options.barsPerStave, 'bars ).');
-			start = renderStaves(scribe, svg, sliceByBeat(symbols, start, end), start, end, width, y, options.barsPerStave, options);
+			start = renderStaves(scribe, svg, tracks.map(slice), start, end, width, y, options.barsPerStave, options);
 			console.groupEnd();
 			
 			y += options.staveSpacing;

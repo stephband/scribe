@@ -110,3 +110,8 @@
 	stroke-width: 0.3;
 	stroke-linecap: butt;
 }
+
+.scribe-chord {
+	font-family: 'chords', cursive;
+	font-size: 33%;
+}

@@ -1,4 +1,58 @@
 var melody = [
+	{ beat: 0,  type: 'mode', value: 'C∆' },
+	{ beat: 4,  type: 'mode', value: 'G' },
+	{ beat: 8,  type: 'mode', value: 'C♯∆' },
+	{ beat: 12, type: 'mode', value: 'Bø' },
+	{ beat: 14, type: 'mode', value: 'E♭7' },
+	{ beat: 16, type: 'mode', value: 'A-' },
+	{ beat: 20, type: 'mode', value: 'F7' },
+	{ beat: 24, type: 'mode', value: 'A-' },
+	{ beat: 28, type: 'mode', value: 'F♯-7' },
+	{ beat: 30, type: 'mode', value: 'B7' },
+	
+	{ beat: 32, type: 'mode', value: 'E∆' },
+	{ beat: 36, type: 'mode', value: 'F-7' },
+	{ beat: 38, type: 'mode', value: 'B♭7' },
+	{ beat: 40, type: 'mode', value: 'D-7' },
+	{ beat: 44, type: 'mode', value: 'G7' },
+	
+	{ beat: 48, type: 'mode', value: 'A-7' },
+	{ beat: 52, type: 'mode', value: 'A-7/g' },
+	{ beat: 56, type: 'mode', value: 'F♯-7' },
+	{ beat: 60, type: 'mode', value: 'B7' },
+	
+	{ beat: 64, type: 'mode', value: 'E∆' },
+	{ beat: 68, type: 'mode', value: 'E7sus' },
+	{ beat: 72, type: 'mode', value: 'E∆♯11' },
+	{ beat: 76, type: 'mode', value: 'E7sus' },
+
+	{ beat: 80, type: 'mode', value: 'D7sus' },
+	{ beat: 84, type: 'mode', value: 'D∆♯11' },
+	{ beat: 88, type: 'mode', value: 'D7sus' },
+	{ beat: 92, type: 'mode', value: 'C♯-7' },
+	{ beat: 94, type: 'mode', value: 'F♯7' },
+
+	{ beat: 96,  type: 'mode', value: 'C7♯11' },
+	{ beat: 100, type: 'mode', value: 'F♯-7' },
+	{ beat: 102, type: 'mode', value: 'B7' },
+	{ beat: 104, type: 'mode', value: 'G♯-7' },
+	{ beat: 108, type: 'mode', value: 'C♯7' },
+	{ beat: 110, type: 'mode', value: 'B-7' },
+	
+	{ beat: 112, type: 'mode', value: 'B♭-7' },
+	{ beat: 116, type: 'mode', value: 'E♭7' },
+
+	{ beat: 120, type: 'mode', value: 'G♯-' },
+	{ beat: 124, type: 'mode', value: 'F♯-7/G♯' },
+	{ beat: 128, type: 'mode', value: 'G♯-' },
+	{ beat: 132, type: 'mode', value: 'F♯-7/G♯' },
+
+	{ beat: 136, type: 'mode', value: 'G-' },
+	{ beat: 140, type: 'mode', value: 'G7♭9' },
+	{ beat: 144, type: 'mode', value: 'G7sus♭9' },
+	//{ beat: 158, type: 'mode', value: 'Bø' },
+	//{ beat: 160, type: 'mode', value: 'G7♭9' },
+
 	{ beat: 2,   number: 76,  duration: 0.5 },
 	{ beat: 2.5, number: 77,  duration: 0.5 },
 	{ beat: 3,   number: 79,  duration: 0.5 },
@@ -99,14 +153,10 @@ var melody = [
 	{ beat: 147.5, number: 74,  duration: 3.5 }
 ];
 
-var chords = [
-	{ beat: 0, duration: 4, type: 'mode', value: ['C', '-'] }
-];
-
 var scribe = Scribe('sheet', melody, {
 	key: 'C',
-	staveSpacing: 19,
-	paddingTop: 4,
+	staveSpacing: 19.8,
+	paddingTop: 8,
 	symbols: {
 		16: 'repeat-start',
 		152: 'repeat-end'
