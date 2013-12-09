@@ -32,8 +32,14 @@ Renders as:
 That's right. You only need to give it the notes.
 Scribe interprets the notes and writes out the notation.
 
-It's early days, and the required format of this note data will change.
-One possibility is to loosely follow the OSC data spec.
+A note array contains four values:
+the type string <code>'note'</code>,
+the beat, note number and duration.
+The beat is the time the note starts expressed in quarter notes.
+The note number is an integer 0-127 that corresponds to MIDI note number.
+The duration is time the note is held expressed in quarter notes.
+
+Note that it's early days, and the required format of this note data may change.
 
 
 ### options
