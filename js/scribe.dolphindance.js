@@ -134,7 +134,7 @@ var options = {
 	
 	clef: 'treble',
 	staveSpacing: 22,
-	chordsOffset: -8,
+	chordsOffset: -9,
 	paddingTop: 9,
 
 	symbols: {
