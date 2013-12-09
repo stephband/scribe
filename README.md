@@ -3,7 +3,6 @@
 Scribe makes it easy to write music on the web.
 
 Scribe turns an array of notes and chords into music notation that is rendered in SVG.
-Writing a tune is as simple as 
 
 
 ## Scribe(svg, data, options)
