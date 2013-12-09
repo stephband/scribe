@@ -69,6 +69,9 @@ Scribe's rendered output can be modified with these optionally optional options:
         beamGradientFactor: 0.25
     }
 
+The units are kind of arbitrary.
+1 unit is the distance from a stave line to the center of a stave space.
+In other words, a stave is 8 units high.
 
 ## Features
 
