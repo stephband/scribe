@@ -67,6 +67,7 @@
 	};
 
 	var clefs = {
+	    	// Centre notes for the stave depend on the clef.
 	    	treble: 71,
 	    	bass: 50
 	    };
@@ -114,27 +115,67 @@
 	    };
 
 	var modes = {
-		// Here we treat major and melodic minor as if they were the same
-		// key centre. This may be wise, it may not.
-		'∆':      0,
-		'∆7':     0,
-		'-∆':     0,
-		'-7':     2,
-		'susb9':  4,
-		'7susb9': 4,
-		'#11':    5,
-		'∆#11':   5,
-		'7#11':   5,
-		'7':      7,
-		'sus':    7,
-		'7sus':   7,
-		'7b9':    7,
-		'7#9':    7,
-		'-':      9,
-		'-b6':    9,
-		'ø':      11,
-		'7alt':   11
+		'∆': 0,
+		'∆7': 0,
+		'-': 2,
+		'-7': 2,
+		'sus♭9': 4,
+		'7sus♭9': 4,
+		'∆♯11': 5,
+		'∆(♯11)': 5,
+		'7': 7,
+		'13': 7,
+		'sus': 7,
+		'7sus': 7,
+		'-♭6': 9,
+		'ø': 11,
+		
+		// Here we treat melodic minor as though it were the fourth degree of a
+		// major scale, making the spellings work out nicely, or so it is hoped,
+		// but also because it is strongly related. Think E7alt -> Am.
+		'-∆': 5,
+		'∆+': 8,
+		'∆♯5': 8,
+		'7♯11': 10,
+		'7♭13': 0,
+		'ø(9)': 2,
+		'7alt': 4
 	};
+	
+	var spellingsMap = [
+		//C              D               E       F               G               A               B      
+		[[0, 0], [0, 1], [1, 0], [2,-1], [2, 0], [3, 0], [3, 1], [4, 0], [5,-1], [5, 0], [6,-1], [6, 0], 'C'],   // C
+		[[0, 0], [1,-1], [1, 0], [2,-1], [3,-1], [3, 0], [4,-1], [4, 0], [5,-1], [5, 0], [6,-1], [7,-1], 'D♭'], // D♭
+		[[0, 0], [0, 1], [1, 0], [1, 1], [2, 0], [3, 0], [3, 1], [4, 0], [4, 1], [5, 0], [6,-1], [6, 0], 'D'],   // D
+		[[0, 0], [1,-1], [1, 0], [2,-1], [2, 0], [3, 0], [4,-1], [4, 0], [5,-1], [5, 0], [6,-1], [7,-1], 'E♭'], // E♭
+		[[0, 0], [0, 1], [1, 0], [1, 1], [2, 0], [2, 1], [3, 1], [4, 0], [4, 1], [5, 0], [5, 1], [6, 0], 'E'],   // E
+		[[0, 0], [1,-1], [1, 0], [2,-1], [2, 0], [3, 0], [3, 1], [4, 0], [5,-1], [5, 0], [6,-1], [6, 0], 'F'],   // F
+	  //[[-1,1], [0, 1], [1, 0], [1, 1], [2, 0], [2, 1], [3, 1], [4, 0], [4, 1], [5, 0], [5, 1], [6, 0], 'F♯'], // F♯ (Should have G##. Nobody wants to read that kind of bollocks.)
+		[[0, 0], [1,-1], [1, 0], [2,-1], [3,-1], [3, 0], [4,-1], [4, 0], [5,-1], [5, 0], [6,-1], [7,-1], 'G♭'], // G♭ (Should have Ebb. Nobody wants to read that kind of bollocks.)
+		[[0, 0], [0, 1], [1, 0], [2,-1], [2, 0], [3, 0], [3, 1], [4, 0], [4, 1], [5, 0], [6,-1], [6, 0], 'G'],   // G
+		[[0, 0], [1,-1], [1, 0], [2,-1], [3,-1], [3, 0], [4,-1], [4, 0], [5,-1], [5, 0], [6,-1], [7,-1], 'A♭'], // A♭
+		[[0, 0], [0, 1], [1, 0], [1, 1], [2, 0], [3, 0], [3, 1], [4, 0], [4, 1], [5, 0], [5, 1], [6, 0], 'A'],   // A
+		[[0, 0], [1,-1], [1, 0], [2,-1], [2, 0], [3, 0], [4,-1], [4, 0], [5,-1], [5, 0], [6,-1], [6, 0], 'B♭'], // B♭
+		[[-1,1], [0, 1], [1, 0], [1, 1], [2, 0], [2, 1], [3, 1], [4, 0], [4, 1], [5, 0], [5, 1], [6, 0], 'B']    // B
+	];
+
+	var rchord = /([ABCDEFG][♭♯]?)([^\/]*)(?:\/([ABCDEFG]))?/,
+	    empty = [];
+
+	function toRoot(str) {
+		var name = (rchord.exec(str) || empty)[1];
+		return nameNoteMap[name];
+	}
+
+	function toMode(str) {
+		var name = (rchord.exec(str) || empty)[2];
+		return modes[name];
+	}
+
+	function toBass(str) {
+		var result = rchord.exec(str) || empty;
+		return result[3] || result[1];
+	}
 
 	// Pure functions
 
@@ -160,7 +201,7 @@
 	// Sort functions
 
 	function byBeat(a, b) {
-		return a.beat > b.beat ? 1 : -1 ;
+		return a[1] > b[1] ? 1 : -1 ;
 	}
 
 	// Reduce functions
@@ -243,11 +284,11 @@
 	// filter functions
 	
 	function isNote(obj) {
-		return isDefined(obj.number);
+		return obj[0] === 'note';
 	}
 	
-	function isMode(obj) {
-		return obj.type === 'mode';
+	function isChord(obj) {
+		return obj[0] === 'chord';
 	}
 	
 	function isStaveSymbol(obj) {
@@ -440,7 +481,7 @@
 	var noteKeyMap = [0,-5, 2,-3, 4,-1, 6, 1,-4, 3,-2, 5];
 
 	var scaleMap = [0,2,4,5,7,9,11];
-	var staveMap = [0,0,1,2,2,3,3,4,5,5,6,6];
+//	var staveMap = [0,0,1,2,2,3,3,4,5,5,6,6];
 	var keyCache = {};
 
 	function keyToMap(n) {
@@ -493,26 +534,22 @@
 		return n % 12;
 	}
 	
-	function numberToOffset(n) {
-		return staveMap[numberToNote(n)];
+	function numberToOffset(n, spellings) {
+		return spellings[numberToNote(n)][0];
 	}
 	
-	function numberToPosition(n) {
-		return 7 * numberToOctave(n) + numberToOffset(n);
+	function numberToPosition(n, spellings) {
+		return 7 * numberToOctave(n) + numberToOffset(n, spellings);
 	}
-	
-	function numberToAccidental(n) {
-		var note = numberToNote(n);
-		var pos = staveMap[note];
-		
-		return note - scaleMap[pos];
-	}
-	
-	function mapToStave(symbols, symbol, keyMap, accMap, staveY, transpose) {
+
+	function mapToStave(symbols, symbol, keyMap, accMap, staveY, transpose, spellings) {
 		var number = symbol.number + transpose;
-		var offset = numberToOffset(number);
-		var position = numberToPosition(number);
-		var accidental = numberToAccidental(number);
+		var octave = numberToOctave(number);
+		var note = numberToNote(number);
+		var spelling = spellings[note];
+		var offset = spelling[0];
+		var accidental = spelling[1];
+		var position = 7 * octave + offset;
 		var staveAcc = isDefined(accMap[position]) ?
 		    	accMap[position] :
 		    	keyMap[offset] ;
@@ -718,8 +755,8 @@
 		chord: function chord(data) {
 			return {
 				type: 'chord',
-				beat: data.beat,
-				text: data.value
+				beat: data[1],
+				text: data[2]
 			};
 		}
 	};
@@ -824,15 +861,18 @@
 	}
 	
 	function createChordSymbols(scribe, data, start, end, options) {
-		return data.map(toChordSymbol);
+		return data.filter(isChord).map(toChordSymbol);
 	}
 	
 	function createMusicSymbols(scribe, data, start, end, options) {
+		var noteData = data.filter(isNote);
 		var symbols = [];
 		var n = 0;
 		var beam = newBeam();
 		var accMap = {};
-		var beat, duration, bar, symbol, note, breakpoint, nextBeat;
+		var beat, duration, bar, symbol, note, breakpoint, nextBeat, spellings;
+
+		console.log('createMusicSymbols', start, end);
 
 		symbols.push(symbolType.bar(start));
 
@@ -840,8 +880,8 @@
 			console.groupEnd();
 
 			bar = scribe.barOfBeat(symbol.beat);
-			note = data[n];
-			nextBeat = isDefined(note) && isDefined(note.beat) ? note.beat : end;
+			note = noteData[n];
+			nextBeat = isDefined(note) ? note[1] : end;
 			breakpoint = nextBreakpoint(bar, symbol.beat);
 			beat = symbol.beat;
 			duration = symbol.duration;
@@ -936,11 +976,12 @@
 			if (!note) { break; }
 			
 			// Insert a note and increment n
-			symbol = symbolType.note(note.beat, note.duration, note.number);
+			symbol = symbolType.note(note[1], note[3], note[2]);
+			console.log(symbol);
+			spellings = scribe.spellingsOfBeat(note[1]);
 			
 			// Handle y positioning
-			
-			mapToStave(symbols, symbol, bar.keyMap, accMap, bar.center, options.transpose);
+			mapToStave(symbols, symbol, bar.keyMap, accMap, bar.center, options.transpose, spellings);
 			
 			symbols.push(symbol);
 			n++;
@@ -952,8 +993,8 @@
 	}
 	
 	function createSymbols(scribe, data, start, end, options) {
-		var musicSymbols = createMusicSymbols(scribe, data.filter(isNote), start, end, options);
-		var chordSymbols = createChordSymbols(scribe, data.filter(isMode), start, end, options);
+		var musicSymbols = createMusicSymbols(scribe, data, start, end, options);
+		var chordSymbols = createChordSymbols(scribe, data, start, end, options);
 		
 		return [musicSymbols, chordSymbols];
 	}
@@ -1319,14 +1360,14 @@
 		// A bit of a fudge, but it'll do for now.
 		symbolsXFromRefSymbols(symbols2, symbols1);
 
-		renderChords(svg, symbols2, options.paddingLeft, y - 7.5, width, options);
+		renderChords(svg, symbols2, options.paddingLeft, y - 8, width, options);
 		renderStave(svg, symbols1, options.paddingLeft, y, width, options);
 		
 		return end;
 	}
 
-	function renderScribe(scribe, svg, options) {
-		var tracks = createSymbols(scribe, scribe.data, options.start, options.end, options);
+	function renderScribe(scribe, svg, data, options) {
+		var tracks = createSymbols(scribe, data, options.start, options.end, options);
 		var width = options.width - options.paddingLeft - options.paddingRight;
 		var start = options.start;
 		var y = options.paddingTop + 4;
@@ -1347,7 +1388,7 @@
 				throw new Error('No. That cant be.');
 			}
 			
-			console.group('Scribe: rendering stave. Beats:', start, '–', end, '(', options.barsPerStave, 'bars ).');
+			console.groupCollapsed('Scribe: rendering stave. Beats:', start, '–', end, '(', options.barsPerStave, 'bars ).');
 			start = renderStaves(scribe, svg, tracks.map(slice), start, end, width, y, options.barsPerStave, options);
 			console.groupEnd();
 			
@@ -1360,41 +1401,93 @@
 		if (!(this instanceof Scribe)) {
 			return new Scribe(svg, data, user);
 		}
-		
+
 		var scribe = this;
-		
+
 		svg = typeof svg === 'string' ? find(svg) : svg ;
-		
+
 		var settings = extend({}, defaults, user);
-		
+
 		var options = extend({
 			width: svg.viewBox.baseVal.width,
 			height: svg.viewBox.baseVal.height
 		}, settings);
-		
+
 		var flag;
-		
+		var _spellings = {};
+		var _bars = {};
+
 		function update() {
 			flag = false;
 			
 			data.sort(byBeat);
 
 			if (!isDefined(settings.end)) {
-				options.end = beatOfBarN(scribe, last(data).beat + last(data).duration, 1);
+				options.end = beatOfBarN(scribe, last(data)[1] + last(data)[3], 1);
 			}
 			
-			renderScribe(scribe, svg, options);
+			renderScribe(scribe, svg, data, options);
 		}
-		
+
 		function queueRender() {
 			if (flag) { return; }
 			flag = true;
 			window.requestAnimationFrame(update);
 		}
+
+		function spellingsOfBeat(beat) {
+			var chords, chord, mode, root;
+			
+			if (_spellings[beat]) {
+				return _spellings[beat];
+			}
+			
+			chords = this.data.filter(isChord);
+			chord = last(chords.filter(function(chord) {
+				return chord[1] <= beat;
+			}));
+			
+			if (!chord) {
+				console.log('Chord not found. Using C spelling.');
+				return spellingsMap[0];
+			}
+			
+			root = mod12(toRoot(chord[2]) + options.transpose);
+			mode = toMode(chord[2]);
+			
+			console.log(beat, chord[2], 'root:', root, 'mode:', mode, mod12(root - mode), spellingsMap[mod12(root - mode)]);
+			
+			return (_spellings[beat] = spellingsMap[mod12(root - mode)]);
+		}
+
+		function barOfBeat(beat) {
+			var beatStart;
+			
+			if (_bars[beat]) {
+				return _bars[beat];
+			}
+			
+			beatStart = beat - (beat % this.beatsPerBar);
+			
+			if (_bars[beatStart]) {
+				return (_bars[beat] = _bars[beatStart]);
+			}
+			
+			return (_bars[beat] = _bars[beatStart] = {
+				beat:     beatStart,
+				duration: durationOfBar(beat, this.beatsPerBar),
+				breaks:   breaksOfBar(beat, this.beatsPerBar),
+				keyMap:   this.keyMap[0],
+				center:   this.staveNoteY
+			});
+		}
+
+		this.spellingsOfBeat = spellingsOfBeat;
+		this.barOfBeat = barOfBeat;
 		
 		this.render = queueRender;
-		this.staveNoteY = numberToPosition(clefs[options.clef]);
-		this._bar = {};
+		this.staveNoteY = numberToPosition(clefs[options.clef], spellingsMap[0]);
+
 		this.data = data = data || [];
 		this.beatsPerBar = 4;
 		
@@ -1414,28 +1507,6 @@
 	}
 	
 	Scribe.prototype = {
-		barOfBeat: function(beat) {
-			var beatStart;
-			
-			if (this._bar[beat]) {
-				return this._bar[beat];
-			}
-			
-			beatStart = beat - (beat % this.beatsPerBar);
-			
-			if (this._bar[beatStart]) {
-				return (this._bar[beat] = this._bar[beatStart]);
-			}
-			
-			return (this._bar[beat] = this._bar[beatStart] = {
-				beat:     beatStart,
-				duration: durationOfBar(beat, this.beatsPerBar),
-				breaks:   breaksOfBar(beat, this.beatsPerBar),
-				keyMap:   this.keyMap[0],
-				center:   this.staveNoteY
-			});
-		},
-		
 		note: function(beat, number, duration) {
 			var svg = this.svg;
 			var data = createData(beat, number, duration);
