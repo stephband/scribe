@@ -4,19 +4,18 @@ var melody = [
 	['chord', 4,   'G-'],
 	['chord', 8,   'C∆'],
 	['chord', 12,  'Bø'],
-	['chord', 14,  'E♭7'],
+	['chord', 14,  'E7alt'],
 	['chord', 16,  'A-'],
-	['chord', 20,  'F7'],
+	['chord', 20,  'F∆(♯11)'],
+	['chord', 22,  'E7alt'],
 	['chord', 24,  'A-'],
 	['chord', 28,  'F♯-7'],
 	['chord', 30,  'B7'],
 	['chord', 32,  'E∆'],
 	['chord', 36,  'F-7'],
-	['chord', 38,  'B♭7'],
 	['chord', 40,  'D-7'],
-	['chord', 44,  'G7'],
+	['chord', 46,  'E7alt'],
 	['chord', 48,  'A-7'],
-	['chord', 52,  'A-7/G'],
 	['chord', 56,  'F♯-7'],
 	['chord', 60,  'B7'],
 	['chord', 64,  'E∆'],
@@ -36,15 +35,14 @@ var melody = [
 	['chord', 110, 'B-7'],
 	['chord', 112, 'B♭-7'],
 	['chord', 116, 'E♭7'],
-	['chord', 120, 'G♯-'],
-	['chord', 124, 'F♯-7/G♯'],
-	['chord', 128, 'G♯-'],
-	['chord', 132, 'F♯-7/G♯'],
-	['chord', 136, 'G-'],
-	['chord', 140, 'G7♭9'],
-	['chord', 144, 'G7sus♭9'],
-	//['chord', 158, 'Bø'],
-	//['chord', 160, 'G7♭9'],
+	['chord', 120, 'C♯-7'],
+	['chord', 124, 'C♯-♭6'],
+	['chord', 128, 'C♯-7'],
+	['chord', 132, 'C♯-♭6'],
+	['chord', 136, 'C7sus'],
+	['chord', 140, 'C∆♭6'],
+	['chord', 144, 'C7sus♭9'],
+	//['chord', 148, 'E7alt'],
 
 	['note',  2,      76,  0.5],
 	['note',  2.5,    77,  0.5],
@@ -131,14 +129,25 @@ var melody = [
 	['note',  147.5,  74,  3.5]
 ];
 
-var scribe = Scribe('sheet', melody, {
+var options = {
 	key: 'C',
 	
 	clef: 'treble',
 	staveSpacing: 22,
-	paddingTop: 8,
+	chordsOffset: -8,
+	paddingTop: 9,
+
 	symbols: {
 		16: 'repeat-start',
 		152: 'repeat-end'
-	}
-});
+	},
+
+	barsPerStave: {
+		0: 4,
+		112: 6
+	},
+	
+	transpose: 0
+}
+
+var scribe = Scribe('sheet', melody, options);
