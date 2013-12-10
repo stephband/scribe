@@ -10,34 +10,6 @@
 	    FLAT = 'flat',
 	    NATURAL = 'natural';
 
-	var attributes = {
-		'class': setAttr,
-		'x': setAttr,
-		'y': setAttr,
-		'x1': setAttr,
-		'y1': setAttr,
-		'x2': setAttr,
-		'y2': setAttr,
-		'd': setAttr,
-		'href': setAttrBaseVal,
-		'translate': setTransform,
-		'scale': setTransform,
-		'rotate': setTransform,
-		'text': textContent
-	};
-
-	var transforms = {
-		'translate': 'setTranslate',
-		'scale': 'setScale',
-		'rotate': 'setRotate'
-	};
-
-	var transformTypes = {
-		'translate': 'SVG_TRANSFORM_TRANSLATE',
-		'scale': 'SVG_TRANSFORM_SCALE',
-		'rotate': 'SVG_TRANSFORM_ROTATE'
-	};
-
 	var test = {
 		equals: function(a, b) {
 			if (a !== b)
@@ -372,55 +344,8 @@
 
 	// SVG DOM functions
 	
-	function setAttrBaseVal(svg, node, attr, value) {
-		node[attr].baseVal = value;
-	}
-	
-	function setAttr(svg, node, attr, value) {
-		node.setAttributeNS(null, attr, value);
-	}
-	
-	function textContent(svg, node, attr, value) {
-		node.textContent = value;
-	}
-	
-	function getTransform(node, attr) {
-		var l = node.transform.baseVal.numberOfItems;
-		var transform;
-		
-		while (l--) {
-			transform = node.transform.baseVal.getItem(l);
-			
-			if (transform.type === transform[transformTypes[attr]]) {
-				return transform;
-			}
-		}
-	}
-	
-	function setTransform(svg, node, attr, value) {
-		var transform = getTransform(node, attr);
-		
-		if (!transform) {
-			transform = svg.createSVGTransform();
-			node.transform.baseVal.appendItem(transform);
-		}
-		
-		transform[transforms[attr]].apply(transform, value);
-	}
-	
-	function createNode(svg, tag, obj) {
-		var node = document.createElementNS(xmlns, tag);
-		var attr;
-		
-		for (attr in obj) {
-			attributes[attr](svg, node, attr, obj[attr]);
-		}
-		
-		return node;
-	}
-	
 	function createGroupNode(svg) {
-		return createNode(svg, 'g', {});
+		return Scribe.Node(svg, 'g');
 	}
 	
 	function append(parent, children) {
@@ -567,35 +492,35 @@
 
 	var nodeType = {
 		bar: function bar(svg, symbol) {
-			return createNode(svg, 'use', {
+			return Scribe.Node(svg, 'use', {
 				'href': '#bar',
 				'translate': [symbol.x, 0]
 			});
 		},
 
 		endline: function endline(svg, symbol) {
-			return createNode(svg, 'use', {
+			return Scribe.Node(svg, 'use', {
 				'href': '#endline',
 				'translate': [symbol.x, 0]
 			});
 		},
 
 		clef: function clef(svg, symbol) {
-			return createNode(svg, 'use', {
+			return Scribe.Node(svg, 'use', {
 				'href': '#clef[' + symbol.value + ']',
 				'translate': [symbol.x, 0]
 			});
 		},
 
 		rest: function rest(svg, symbol) {
-			return createNode(svg, 'use', {
+			return Scribe.Node(svg, 'use', {
 				'href': '#rest[' + symbol.duration + ']',
 				'translate': [symbol.x, 0]
 			});
 		},
 
 		tie: function tie(svg, symbol) {
-			return createNode(svg, 'use', {
+			return Scribe.Node(svg, 'use', {
 				'href': '#tie',
 				'translate': [symbol.x, symbol.y],
 				'scale': [symbol.width, (symbol.y > 0 ? 1 : -1) * (1 + 0.08 * symbol.width)]
@@ -603,7 +528,7 @@
 		},
 
 		accidental: function accidental(svg, symbol) {
-			return createNode(svg, 'use', {
+			return Scribe.Node(svg, 'use', {
 				'href': '#accidental[' + symbol.value + ']',
 				'translate': [symbol.x, symbol.y]
 			});
@@ -612,10 +537,10 @@
 		note: function note(svg, symbol) {
 			var minwidth = 0;
 			var width = 0;
-			var node = createNode(svg, 'g', {
+			var node = Scribe.Node(svg, 'g', {
 				'translate': [symbol.x, symbol.y]
 			});
-			var head = createNode(svg, 'use', {
+			var head = Scribe.Node(svg, 'use', {
 				'href': '#head[' + symbol.duration + ']'
 			});
 			
@@ -625,35 +550,35 @@
 		},
 		
 		stalkup: function stalkup(svg, symbol) {
-			return createNode(svg, 'use', {
+			return Scribe.Node(svg, 'use', {
 				'href': '#stalkup'
 			});
 		},
 	
 		stalkdown: function stalkdown(svg, symbol) {
-			return createNode(svg, 'use', {
+			return Scribe.Node(svg, 'use', {
 				'href': '#stalkdown'
 			});
 		},
 		
 		tailup: function tail(svg, symbol) {
-			return createNode(svg, 'use', {
+			return Scribe.Node(svg, 'use', {
 				'href': '#tailup[' + symbol.duration +']'
 			});
 		},
 		
 		taildown: function tail(svg, symbol) {
-			return createNode(svg, 'use', {
+			return Scribe.Node(svg, 'use', {
 				'href': '#taildown[' + symbol.duration +']'
 			});
 		},
 		
 		stave: function stave(svg, x, y, w) {
-			var node = createNode(svg, 'g', {
+			var node = Scribe.Node(svg, 'g', {
 				'translate': [x, y]
 			});
 
-			var lines = createNode(svg, 'use', {
+			var lines = Scribe.Node(svg, 'use', {
 				'href': '#stave',
 				'scale': [w, 1]
 			});
@@ -665,7 +590,7 @@
 		
 		chord: function chord(svg, symbol) {
 			console.log(symbol);
-			return createNode(svg, 'text', {
+			return Scribe.Node(svg, 'text', {
 				'class': 'scribe-chord',
 				'x': symbol.x,
 				'y': symbol.y,
@@ -1059,7 +984,7 @@
 				if (y % 2) { continue; }
 				
 				layer.appendChild(
-					createNode(svg, 'use', {
+					Scribe.Node(svg, 'use', {
 						'href': '#line',
 						'class': 'scribe-stave',
 						'translate': [symbol.x - 2.2, y],
@@ -1076,7 +1001,7 @@
 				if (y % 2) { continue; }
 				
 				layer.appendChild(
-					createNode(svg, 'use', {
+					Scribe.Node(svg, 'use', {
 						'href': '#line',
 						'class': 'scribe-stave',
 						'translate': [symbol.x - 2.2, y],
@@ -1141,7 +1066,7 @@
 		var avgY   = symbols.map(getY).reduce(sum) / length;
 		var beamY  = createBeamY(symbols, options);
 		var stalk  = avgY < 0 ? defaults.stalkDown : defaults.stalkUp ;
-		var node   = createNode(svg, 'g');
+		var node   = Scribe.Node(svg, 'g');
 
 		renderStalks(svg, node, symbols, stalk, beamY);
 		renderBeams(svg, node, symbols, stalk.x2, stalk.y2, beamY, 1);
@@ -1158,7 +1083,7 @@
 		while (++n < length) {
 			symbol = symbols[n];
 			
-			node.appendChild(createNode(svg, 'line', {
+			node.appendChild(Scribe.Node(svg, 'line', {
 				'class': 'scribe-stalk',
 				x1: offsets.x1 + symbol.x,
 				y1: offsets.y1 + symbol.y,
@@ -1182,7 +1107,7 @@
 		var beamWidth = (yOffset < 0 ? 1 : -1) * defaults.beam.width;
 		
 		// Render the beam
-		node.appendChild(createNode(svg, 'path', {
+		node.appendChild(Scribe.Node(svg, 'path', {
 			'class': 'scribe-beam',
 			'd': [
 				'M', xOffset + xStart, ' ', yOffset + beamY(xStart) + beamWidth,
@@ -1325,7 +1250,7 @@
 	}
 
 	function renderChords(svg, symbols, x, y, width, options) {
-		var node = createNode(svg, 'g', {
+		var node = Scribe.Node(svg, 'g', {
 			translate: [x, y]
 		});
 		
@@ -1581,9 +1506,7 @@
 			this.render();
 			
 			return this;
-		},
-		
-		createNode: createNode
+		}
 	}
 	
 	Scribe.debug = debug;
