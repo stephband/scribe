@@ -1,4 +1,4 @@
-(function() {
+(function(context) {
 	"use strict";
 
 	var debug = window.console && window.console.log;
@@ -1586,7 +1586,10 @@
 		createNode: createNode
 	}
 	
+	Scribe.debug = debug;
 	Scribe.defaults = defaults;
+	Scribe.extend = extend;
+	Scribe.mixin = {};
 	
-	window.Scribe = Scribe;
-})();
+	context.Scribe = Scribe;
+})((window || module.exports));

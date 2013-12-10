@@ -29,7 +29,7 @@ Renders as:
 ![Dum-de-de-duuum](example.png)
 
 That's right. You only need to give it the notes.
-Scribe interprets the notes and writes out the notation.
+Scribe interprets the notes and writes out the notation with rests and ties in place.
 
 A note array contains four values:
 the type string <code>'note'</code>,
