@@ -1,5 +1,6 @@
 (function(Scribe) {
 	var debug = Scribe.debug;
+	var arrayMixin = Scribe.mixin.array;
 	var eventsMixin = Scribe.mixin.events;
 	
 	// Map functions
@@ -81,15 +82,9 @@
 			return this;
 		},
 		
-		filter: Array.prototype.filter,
-		
 		find: function(id) {
 			return findById(this, id);
 		},
-		
-		map: Array.prototype.map,
-		reduce: Array.prototype.reduce,
-		splice: Array.prototype.map,
 		
 		toJSON: function() {
 			return toJSON(this);
@@ -99,6 +94,7 @@
 	Scribe.Data = function(data) {
 		var collection = Object.create(prototype);
 		
+		extend(collection, arrayMixin);
 		extend(collection, eventsMixin);
 		
 		if (!(data instanceof Array)) {
