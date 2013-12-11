@@ -1,14 +1,14 @@
 (function(Scribe) {
+	"use strict";
+	
 	var debug = Scribe.debug;
 	var n = 0;
 	var extend = Scribe.extend;
-	var eventsMixin = Scribe.mixin.events;
 	
 	// Create ids
 	function createId() {
 		return n++;
 	}
-		
 	
 	// Reduce functions
 	
@@ -18,41 +18,56 @@
 	}
 	
 	// Object functions
-
+	
 	
 	// Object constructor
 	
-	var prototype = {
-		type: function() { return this[0]; },
-		
-		beat: function() { return this[1]; },
-		
-		destroy: function() {
-			this.off();
-		}
-	};
-	
-	var mixins = {
-		note: {
-			
+	var prototype = Object.defineProperties({}, {
+		type: {
+			get: function() {
+				return this[0];
+			},
+			set: function(n) {
+				this.trigger('type');
+				return this;
+			},
+			enumerable: true
 		},
-		
-		chord: {
-			
+
+		beat: {
+			get: function() {
+				return this[1];
+			},
+			set: function(n) {
+				this.trigger('beat');
+				return this;
+			},
+			enumerable: true
+		},
+
+		destroy: {
+			value: function() {
+				this.trigger('destroy');
+				this.off();
+			}
 		}
+	});
+
+	var prototypes = {
+		chord: Object.defineProperties(Object.create(prototype), Scribe.mixin.chord),
+		note:  Object.defineProperties(Object.create(prototype), Scribe.mixin.note)
 	};
-	
+
+	extend(prototype, Scribe.mixin.events);
+
 	Scribe.Event = function(data) {
-		var model = Object.create(prototype);
-		
+		var model = Object.create(prototypes[data[0]]);
+
 		data.reduce(setIndex, model);
-		
+
 		model.length = data.length;
 		model.id = createId();
-		
-		extend(model, eventsMixin);
-		extend(model, mixins[model.type()]);
-		
+
 		return model;
 	};
 })(Scribe);

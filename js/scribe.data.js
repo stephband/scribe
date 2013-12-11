@@ -1,7 +1,7 @@
 (function(Scribe) {
 	var debug = Scribe.debug;
-	var arrayMixin = Scribe.mixin.array;
-	var eventsMixin = Scribe.mixin.events;
+	var extend = Scribe.extend;
+	var isDefined = Scribe.isDefined;
 	
 	// Map functions
 	
@@ -20,12 +20,14 @@
 		sub
 		.on('change', pub.trigger)
 		.on('destroy', pub.remove);
+		
+		return sub;
 	}
 
 	// Sort functions
 	
 	function byBeat(a, b) {
-		return a.beat() > b.beat() ? 1 : -1 ;
+		return a.beat > b.beat ? 1 : -1 ;
 	}
 	
 	// Object functions
@@ -54,7 +56,7 @@
 		var i = collection.indexOf(item);
 		
 		if (i === -1) {
-			console.log('Scribe: data.remove - item doesnt exist.');
+			console.log('Scribe: Data.remove - item doesnt exist.');
 			return;
 		}
 		
@@ -65,7 +67,7 @@
 		return data.map(toArray);
 	}
 	
-	// Object contructor
+	// Object constructor
 	
 	var prototype = {
 		add: function(item) {
@@ -86,16 +88,28 @@
 			return findById(this, id);
 		},
 		
+		keyAtBeat: function(beat) {
+			// Get the key at the given beat by looking at the latest chord
+			// to see what key it has. Crude and only semi-effective. We
+			// really need a proper key centre analyser.
+			var chords = this.filter(Scribe.isChord);
+			var l = chords.length;
+
+			while (l-- && chords[l].beat > beat || !isDefined(chords[l].key));
+
+			return chords[l].key;
+		},
+		
 		toJSON: function() {
 			return toJSON(this);
 		}
 	};
 	
+	extend(prototype, Scribe.mixin.array);
+	extend(prototype, Scribe.mixin.events);
+	
 	Scribe.Data = function(data) {
 		var collection = Object.create(prototype);
-		
-		extend(collection, arrayMixin);
-		extend(collection, eventsMixin);
 		
 		if (!(data instanceof Array)) {
 			if (debug) console.log('Scribe: data not an array. Scribe cant do that yet.');

@@ -7,7 +7,7 @@
 			if (!fn) { return this; }
 	
 			types = types.split(/\s+/);
-			events = this._events || (this._events = {});
+			events = this.events || (this.events = {});
 			args = Array.prototype.slice.call(arguments, 1);
 			args[0] = this;
 	
@@ -30,14 +30,14 @@
 			var type, calls, list, i;
 	
 			// No events, or removing *all* events.
-			if (!this._events) { return this; }
+			if (!this.events) { return this; }
 		
 			if (!(types || fn)) {
-				for (type in this._events) {
-					this._events[type].length = 0;
+				for (type in this.events) {
+					this.events[type].length = 0;
 				}
 				
-				delete this._events;
+				delete this.events;
 				return this;
 			}
 	
@@ -46,14 +46,14 @@
 				Object.keys(this.events) ;
 	
 			while (type = types.shift()) {
-				listeners = this._events[type];
+				listeners = this.events[type];
 				
 				if (!listeners) {
 					continue;
 				}
 				
 				if (!fn) {
-					delete this._events[type];
+					delete this.events[type];
 					continue;
 				}
 				
@@ -70,11 +70,11 @@
 		trigger: function(type) {
 			var listeners, i, l, args;
 
-			if (!this._events || !this._events[type]) { return this; }
+			if (!this.events || !this.events[type]) { return this; }
 	
 			// Use a copy of the event list in case it gets mutated while we're
 			// triggering the callbacks.
-			listeners = this._events[type].slice();
+			listeners = this.events[type].slice();
 	
 			// Execute event callbacks.
 			i = -1;

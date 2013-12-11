@@ -2,13 +2,8 @@
 	"use strict";
 
 	var debug = window.console && window.console.log;
-	var xmlns = "http://www.w3.org/2000/svg";
-	var find = document.getElementById.bind(document);
 
-	// ♯ ♭ ♮
-	var SHARP = 'sharp',
-	    FLAT = 'flat',
-	    NATURAL = 'natural';
+	var find = document.getElementById.bind(document);
 
 	var test = {
 		equals: function(a, b) {
@@ -88,38 +83,36 @@
 
 	var names = ['C','C♯','D','E♭','E','F','F♯','G','A♭','A','B♭','B'];
 	var lines = ['C','D','E','F','G','A','B'];
-	var accidentals = {
-		'-1': '♭',
-		'0': '',
-		'1': '♯'
-	};
+	var accidentals = { '-1': '♭', '0': '', '1': '♯' };
 
-	var modes = {
-		'∆': 0,
-		'∆7': 0,
-		'-7': 2,
-		'sus♭9': 4,
-		'7sus♭9': 4,
-		'∆♯11': 5,
-		'∆(♯11)': 5,
-		'7': 7,
-		'13': 7,
-		'sus': 7,
-		'7sus': 7,
-		'-♭6': 9,
-		'ø': 11,
-		
-		// Here we treat melodic minor as though it were the fourth degree of a
-		// major scale, making the spellings work out nicely, or so it is hoped,
-		// but also because it is strongly related. Think E7alt -> Am.
-		'-∆': 5,
-		'13sus♭9': 7,
-		'∆+': 8,
-		'∆♯5': 8,
-		'7♯11': 10,
-		'7♭13': 0,
-		'ø(9)': 2,
-		'7alt': 4
+	var notes = {
+		'C':   0,
+		'C#':  1,
+		'C♯': 1,
+		'Db':  1,
+		'D♭': 1,
+		'D':   2,
+		'D#':  3,
+		'D♯': 3,
+		'Eb':  3,
+		'E♭': 3,
+		'E':   4,
+		'F':   5,
+		'F#':  6,
+		'F♯': 6,
+		'Gb':  6,
+		'G♭': 6,
+		'G':   7,
+		'G#':  8,
+		'G♯': 8,
+		'Ab':  8,
+		'A♭': 8,
+		'A':   9,
+		'A#':  10,
+		'A♯': 10,
+		'Bb':  10,
+		'B♭': 10,
+		'B':   11
 	};
 	
 	var spellingsMap = [
@@ -139,27 +132,6 @@
 		[[-1,1], [0, 1], [1, 0], [1, 1], [2, 0], [2, 1], [3, 1], [4, 0], [4, 1], [5, 0], [5, 1], [6, 0], 'B']    // B
 	];
 
-	var rchord = /([ABCDEFG][♭♯]?)([^\/]*)(?:\/([ABCDEFG]))?/,
-	    empty = [];
-
-	function toRoot(str) {
-		var name = (rchord.exec(str) || empty)[1];
-		return nameNoteMap[name];
-	}
-
-	function toExtension(str) {
-		return (rchord.exec(str) || empty)[2];
-	}
-
-	function toMode(str) {
-		var name = toExtension(str);
-		return modes[name];
-	}
-
-	function toBass(str) {
-		var result = rchord.exec(str) || empty;
-		return result[3] || result[1];
-	}
 
 	// Pure functions
 
@@ -180,12 +152,6 @@
 	
 	function wrap(n, max, offset) {
 		return ((n + offset) % max) - offset;
-	}
-
-	// Sort functions
-
-	function byBeat(a, b) {
-		return a[1] > b[1] ? 1 : -1 ;
 	}
 
 	// Reduce functions
@@ -265,18 +231,14 @@
 		return parseFloat(str, 10);
 	}
 	
-	function toChordSymbol(data) {
-		return symbolType.chord(data);
-	}
-	
 	// filter functions
 	
 	function isNote(obj) {
-		return obj[0] === 'note';
+		return obj.type === 'note';
 	}
 	
 	function isChord(obj) {
-		return obj[0] === 'chord';
+		return obj.type === 'chord';
 	}
 	
 	function isStaveSymbol(obj) {
@@ -290,7 +252,8 @@
 	// Object functions
 	
 	function isDefined(val) {
-		return val !== undefined && val !== null;
+		// Test for undefined, null and NaN values (NaN !== NaN)
+		return val !== undefined && val !== null && val === val;
 	}
 
 	function clone(obj) {
@@ -373,41 +336,9 @@
 			duration: duration
 		};
 	}
-
-	var nameNoteMap = {
-		'C':   0,
-		'C#':  1,
-		'C♯': 1,
-		'Db':  1,
-		'D♭': 1,
-		'D':   2,
-		'D#':  3,
-		'D♯': 3,
-		'Eb':  3,
-		'E♭': 3,
-		'E':   4,
-		'F':   5,
-		'F#':  6,
-		'F♯': 6,
-		'Gb':  6,
-		'G♭': 6,
-		'G':   7,
-		'G#':  8,
-		'G♯': 8,
-		'Ab':  8,
-		'A♭': 8,
-		'A':   9,
-		'A#':  10,
-		'A♯': 10,
-		'Bb':  10,
-		'B♭': 10,
-		'B':   11
-	};
 	
 	var noteKeyMap = [0,-5, 2,-3, 4,-1, 6, 1,-4, 3,-2, 5];
 
-	var scaleMap = [0,2,4,5,7,9,11];
-//	var staveMap = [0,0,1,2,2,3,3,4,5,5,6,6];
 	var keyCache = {};
 
 	function keyToMap(n) {
@@ -439,7 +370,7 @@
 	}
 	
 	function nameToKey(name) {
-		return noteToKey(nameNoteMap[name]);
+		return noteToKey(notes[name]);
 	}
 	
 	function toKey(n) {
@@ -678,11 +609,15 @@
 			}
 		},
 		
-		chord: function chord(beat, text) {
+		chord: function chord(scribe, data, options) {
+			var root = mod12(data.root + options.transpose);
+			var spelling = scribe.spellingsOfBeat(data.beat)[root];
+
 			return {
 				type: 'chord',
-				beat: beat,
-				text: text
+				data: data,
+				beat: data.beat,
+				text: spellingToName(spelling) + data.extension
 			};
 		}
 	};
@@ -792,20 +727,13 @@
 	
 	function createChordSymbols(scribe, data, start, end, options) {
 		console.log('createChordSymbols');
-		var chordsData = data.filter(isChord);
-		var l = chordsData.length;
+		var chords = data.filter(isChord);
+		var l = chords.length;
 		var n = -1;
 		var output = [];
-		var chord, beat, root, extension, spelling, name;
 		
 		while (++n < l) {
-			chord = chordsData[n];
-			beat = chord[1];
-			root = mod12(toRoot(chord[2]) + options.transpose);
-			extension = toExtension(chord[2]);
-			spelling = scribe.spellingsOfBeat(chord[1])[root];
-			name = spellingToName(spelling) + extension;
-			output.push(symbolType.chord(beat, name));
+			output.push(symbolType.chord(scribe, chords[n], options));
 		}
 		
 		return output;
@@ -925,7 +853,7 @@
 			// Insert a note and increment n
 			symbol = symbolType.note(note[1], note[3], note[2]);
 			console.log(symbol);
-			spellings = scribe.spellingsOfBeat(note[1]);
+			spellings = scribe.spellingsOfBeat(note.beat);
 			
 			// Handle y positioning
 			mapToStave(symbols, symbol, bar.keyMap, accMap, bar.center, options.transpose, spellings);
@@ -1386,8 +1314,6 @@
 
 		function update() {
 			flag = false;
-			
-			data.sort(byBeat);
 
 			if (!isDefined(settings.end)) {
 				options.end = beatOfBarN(scribe, last(data)[1] + last(data)[3], 1);
@@ -1404,32 +1330,18 @@
 		}
 
 		function spellingsOfBeat(beat) {
-			var chords, chord, mode, root, l;
-			
 			if (_spellings[beat]) {
 				return _spellings[beat];
 			}
 			
-			chords = this.data.filter(isChord).filter(function(chord) {
-				return chord[1] <= beat;
-			});
+			var key = data.keyAtBeat(beat);
 			
-			// Find the latest chord that has some useful information about
-			// the key centre.
-			l = chords.length;
-			
-			while ((!isDefined(root) || !isDefined(mode)) && l--) {
-				chord = chords[l];
-				root  = mod12(toRoot(chord[2]) + options.transpose);
-				mode  = toMode(chord[2]);
-			}
-			
-			if (l === -1) {
+			if (!isDefined(key)) {
 				console.log('Chord not found. Using C spelling.');
 				return spellingsMap[0];
 			}
 			
-			return (_spellings[beat] = spellingsMap[mod12(root - mode)]);
+			return (_spellings[beat] = spellingsMap[mod12(key + options.transpose)]);
 		}
 
 		function barOfBeat(beat) {
@@ -1468,8 +1380,13 @@
 		
 		function transpose(n) {
 			options.transpose = n;
+			deleteProperties(_spellings);
 			this.render();
 		}
+
+		data = Scribe.Data(data);
+		
+		this.data = data;
 
 		this.spellingsOfBeat = spellingsOfBeat;
 		this.barOfBeat = barOfBeat;
@@ -1479,7 +1396,6 @@
 		this.transpose = transpose;
 		this.staveNoteY = numberToPosition(clefs[options.clef], spellingsMap[0]);
 
-		this.data = data = data || [];
 		this.beatsPerBar = 4;
 		
 		this.key = toKey(options.key || 'C');
@@ -1507,12 +1423,18 @@
 			
 			return this;
 		}
-	}
+	};
 	
 	Scribe.debug = debug;
 	Scribe.defaults = defaults;
+	Scribe.names = names;
 	Scribe.extend = extend;
 	Scribe.mixin = {};
+	Scribe.notes = notes;
+	
+	Scribe.isNote = isNote;
+	Scribe.isChord = isChord;
+	Scribe.isDefined = isDefined;
 	
 	context.Scribe = Scribe;
 })((window || module.exports));

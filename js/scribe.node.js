@@ -2,8 +2,8 @@
 	"use strict";
 
 	var debug = Scribe.debug;
+	
 	var xmlns = "http://www.w3.org/2000/svg";
-	var find = document.getElementById.bind(document);
 
 	var attributes = {
 		'class': setAttr,
