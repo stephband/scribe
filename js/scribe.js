@@ -1233,6 +1233,14 @@
 			return isDefined(_keys[beat]) && _keys[beat] || (_keys[beat] = data.keyAtBeat(beat));
 		};
 		
+		scribe.staveAtBeat = function(beat) {
+			
+		};
+		
+		scribe.linesAtBeat = function(beat) {
+			
+		};
+		
 		scribe.barAtBeat = function(beat) {
 			var beatStart;
 			
@@ -1258,6 +1266,11 @@
 		scribe.transpose = function(n) {
 			options.transpose = n;
 			deleteProperties(_keys);
+
+			this.keyMap = {
+				0: createKeyMap(options.key + options.transpose)
+			};
+
 			this.render();
 		};
 		
@@ -1268,8 +1281,10 @@
 		
 		console.log('key:', options.key, createKeyMap(options.key, scribe.staveNoteY));
 		
+		console.log(options.key + options.transpose);
+		
 		scribe.keyMap = {
-			0: createKeyMap(options.key)
+			0: createKeyMap(options.key + options.transpose)
 		};
 		
 		if (debug) { console.log('Scribe: ready to write on svg#' + svg.id); }
