@@ -1,4 +1,6 @@
 (function(Scribe) {
+	"use strict";
+	
 	Scribe.mixin.array = {
 		filter: Array.prototype.filter,
 		map:    Array.prototype.map,

@@ -2,8 +2,8 @@
 	"use strict";
 	
 	var debug = Scribe.debug;
-	var n = 0;
 	var extend = Scribe.extend;
+	var n = 0;
 	
 	// Create ids
 	function createId() {

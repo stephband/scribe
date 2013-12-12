@@ -2,7 +2,7 @@
 	"use strict";
 	
 	var debug = Scribe.debug;
-	
+	var mod12 = Scribe.mod12;
 	var notes = Scribe.notes;
 	
 	var modes = {
@@ -38,7 +38,7 @@
 
 	function toRoot(str) {
 		var name = (rchord.exec(str) || empty)[1];
-		return notes[name];
+		return Scribe.number(name);
 	}
 
 	function toExtension(str) {
@@ -56,7 +56,7 @@
 	}
 
 	function toKey(str) {
-		return toRoot(str) - toMode(str);
+		return mod12(toRoot(str) - toMode(str));
 	}
 	
 	function createProperty(name, set, get) {
@@ -76,30 +76,42 @@
 	}
 	
 	Scribe.mixin.chord = {
-		root: createProperty('root', function(n) {
+		root: createProperty('root',
+			function(n) {
 				
-			}, function() {
+			},
+			
+			function() {
 				return toRoot(this[2]);
 			}
 		),
 		
-		extension: createProperty('extension', function(n) {
+		extension: createProperty('extension',
+			function(n) {
 				
-			}, function() {
+			},
+			
+			function() {
 				return toExtension(this[2]);
 			}
 		),
 		
-		bass: createProperty('bass', function(n) {
+		bass: createProperty('bass',
+			function(n) {
 				
-			}, function() {
+			},
+			
+			function() {
 				return toBass(this[2]);
 			}
 		),
 		
-		key: createProperty('key', function(n) {
+		key: createProperty('key',
+			function(n) {
 				
-			}, function() {
+			},
+			
+			function() {
 				return toKey(this[2]);
 			}
 		)

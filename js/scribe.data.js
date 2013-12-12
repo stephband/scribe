@@ -1,4 +1,6 @@
 (function(Scribe) {
+	"use strict";
+	
 	var debug = Scribe.debug;
 	var extend = Scribe.extend;
 	var isDefined = Scribe.isDefined;
@@ -97,7 +99,7 @@
 
 			while (l-- && chords[l].beat > beat || !isDefined(chords[l].key));
 
-			return chords[l].key;
+			return chords[l].key || 0;
 		},
 		
 		toJSON: function() {

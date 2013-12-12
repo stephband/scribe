@@ -2,19 +2,32 @@
 	"use strict";
 	
 	var debug = Scribe.debug;
-	
-	Scribe.mixin.note = {
-		number: {
-			set: function(v) {
-				this.trigger('number');
+
+	function createProperty(name, set, get) {
+		return {
+			set: function(n) {
+				if (n === this[name]) { return this; }
+				if (debug) console.log('set:', name, n);
+				set(n);
+				this.trigger(name);
 				return this;
 			},
 			
-			get: function() {
-				return toRoot(this[2]);
-			},
+			get: get,
 			
 			enumerable: true
-		}
+		};
+	}
+	
+	Scribe.mixin.note = {
+		number: createProperty('number',
+			function(n) {
+				
+			},
+			
+			function() {
+				return this[2];
+			}
+		)
 	};
 })(Scribe);

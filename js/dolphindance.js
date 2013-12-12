@@ -130,7 +130,7 @@ var melody = [
 ];
 
 var options = {
-	key: 'D',
+	key: 'C',
 	
 	clef: 'treble',
 	staveSpacing: 22,

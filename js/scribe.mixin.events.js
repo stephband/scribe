@@ -1,4 +1,6 @@
 (function(Scribe) {
+	"use strict";
+	
 	Scribe.mixin.events = {
 		// Events
 		on: function(types, fn) {
