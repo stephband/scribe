@@ -119,11 +119,11 @@
 	function setXFromWidth(x, symbol, i) {
 		if (!i) {
 			symbol.x = 0;
-			return x + symbol.width / 2;
+			return x + symbol.r;
 		}
 		
-		symbol.x = x + symbol.width / 2;
-		return x + symbol.width;
+		symbol.x = x + symbol.l;
+		return x + symbol.l + symbol.r;
 	}
 
 	function setDuration(x, obj) {
@@ -134,11 +134,11 @@
 	// Map functions
 
 	function getWidth(obj) {
-		return obj.width;
+		return obj.l + obj.r;
 	}
 
 	function getMinWidth(obj) {
-		return obj.minwidth;
+		return obj.lmin + obj.rmin;
 	}
 
 	function getDuration(obj) {
@@ -353,11 +353,10 @@
 		},
 
 		note: function note(svg, symbol) {
-			var minwidth = 0;
-			var width = 0;
 			var node = Scribe.Node(svg, 'g', {
 				'translate': [symbol.x, symbol.y]
 			});
+			
 			var head = Scribe.Node(svg, 'use', {
 				'href': '#head[' + symbol.duration + ']'
 			});
@@ -407,7 +406,6 @@
 		},
 		
 		chord: function chord(svg, symbol) {
-			console.log(symbol);
 			return Scribe.Node(svg, 'text', {
 				'class': 'scribe-chord',
 				'x': symbol.x,
@@ -421,8 +419,10 @@
 		bar: function bar(beat) {
 			return {
 				type: 'bar',
-				minwidth: 1,
-				width: 2,
+				lmin: 0.5,
+				rmin: 0.5,
+				l: 1,
+				r: 2,
 				beat: beat,
 				duration: 0,
 				y: 0
@@ -432,8 +432,10 @@
 		endline: function endline() {
 			return {
 				type: 'endline',
-				minwidth: 3.6,
-				width: 5.2,
+				lmin: 1.8,
+				rmin: 0,
+				l: 2.6,
+				r: 0,
 				duration: 0,
 				y: 0
 			};
@@ -442,9 +444,11 @@
 		clef: function clef(value) {
 			return {
 				type: 'clef',
+				lmin: 5,
+				rmin: 5,
+				l: 5,
+				r: 5,
 				value: value,
-				minwidth: 10,
-				width: 10,
 				beat: 0,
 				duration: 0,
 				y: 0
@@ -454,33 +458,60 @@
 		rest: function rest(beat, duration) {
 			return {
 				type: 'rest',
-				minwidth: 2.5 + duration,
-				width: 3 + duration * 4,
+				lmin: 1.25 + duration / 2,
+				rmin: 1.25 + duration / 2,
+				l: 1.5 + duration * 2,
+				r: 1.5 + duration * 2,
 				y: 0,
 				beat: beat,
 				duration: duration
 			};
 		},
 
-		note: function note(beat, duration, number, from, y) {
-			return {
+		note: (function() {
+			var prototype = Object.defineProperties({
 				type: 'note',
-				minwidth: 3,
-				width: 4 + 3 * limit(duration, 0.25, 4),
-				beat: beat,
-				duration: duration,
-				number: number,
-				from: from,
-				y: y
+				lmin: 1.5,
+				l: 2
+			}, {
+				rmin: {
+					get: function() {
+						var duration = this.duration;
+						var dotted = !(duration % (1.5 / 16));
+						return dotted ? 4 : 2 ;
+					}
+				},
+				
+				r: {
+					get: function() {
+						var duration = this.duration;
+						var dotted = !(duration % (1.5 / 16));
+						return (dotted ? 4 : 2) + 2 * duration;
+					}
+				}
+			});
+			
+			return function note(beat, duration, number, from, y) {
+				var symbol = Object.create(prototype);
+				
+				symbol.beat = beat;
+				symbol.duration = duration;
+				symbol.number = number;
+				symbol.from = from;
+				symbol.y = y;
+				
+				return symbol;
 			};
-		},
+		})(),
 		
 		accidental: function accidental(beat, value, y) {
 			return {
 				type: 'accidental',
+				lmin: 1,
+				rmin: 1,
+				l: 1,
+				r: 1,
 				value: value,
-				minwidth: 2,
-				width: 2.5,
 				beat: beat,
 				duration: 0,
 				y: y
@@ -490,9 +521,11 @@
 		space: function space(beat, width) {
 			return {
 				type: 'space',
-				beat: beat,
-				minwidth: 3,
-				width: width || 4
+				lmin: 1.5,
+				rmin: 1.5,
+				l: width ? width / 2 : 2,
+				r: width ? width / 2 : 2,
+				beat: beat
 			}
 		},
 		
@@ -650,10 +683,6 @@
 			if (note && symbol.beat + symbol.duration > nextBeat) {
 				console.log('shorten');
 				symbol.duration = nextBeat - symbol.beat;
-
-				if (symbol.type === 'note') {
-					symbol.width = 4 + 3 * limit(symbol.duration, 0.25, 4);
-				}
 			}
 
 			if (symbol.type === 'bar') {
@@ -685,8 +714,7 @@
 					
 					symbols.push(symbolType.note(bar.beat + bar.duration, symbol.beat + symbol.duration - bar.beat - bar.duration, symbol.number, symbol, symbol.y));
 					symbol.duration = bar.beat + bar.duration - symbol.beat;
-					symbol.width = 4 + 3 * limit(symbol.duration, 0.25, 4);
-					
+
 					symbol.to = last(symbols);
 					last(symbols).from = symbol;
 					
@@ -700,8 +728,7 @@
 					console.log('shorten to breakpoint');
 					symbols.push(symbolType.note(breakpoint, symbol.beat + symbol.duration - breakpoint, symbol.number, symbol, symbol.y));
 					symbol.duration = breakpoint - symbol.beat;
-					symbol.width = 4 + 3 * limit(symbol.duration, 0.25, 4);
-					
+
 					symbol.to = last(symbols);
 					last(symbols).from = symbol;
 					
@@ -998,22 +1025,25 @@
 		var length = symbols.length;
 		var n = -1;
 		var x = 0;
-		var symbol, renderwidth;
+		var symbol, lRender, rRender;
 		
 		while (++n < length) {
 			symbol = symbols[n];
-			renderwidth = symbol.width + ratio * (symbol.width - symbol.minwidth);
+			lRender = symbol.l + ratio * (symbol.l - symbol.lmin);
+			rRender = symbol.r + ratio * (symbol.r - symbol.rmin);
 
-			if (n) { x += renderwidth / 2; }
+			if (n) { x += lRender; }
+			
 			symbol.x = x;
-			symbol.renderwidth = renderwidth;
-			x += renderwidth / 2;
+			symbol.lRender = lRender;
+			symbol.rRender = rRender;
+			x += rRender;
 		}
 	}
 	
 	function symbolsXFromRefSymbols(symbols, refSymbols) {
 		// This is a bit nasty but it's a stop-gap measure until we work out how to reliably
-		// render multi-staves with events that still line up.
+		// render multi-staves with events that line up.
 		var length = symbols.length;
 		var n = -1;
 		var m = -1;
@@ -1028,12 +1058,13 @@
 			}
 			
 			if (refSymbol.beat === symbol.beat) {
-				symbol.x = refSymbol.x;// - refSymbol.renderwidth / 2 ;
+				symbol.x = refSymbol.x;
 			}
 			else {
 				xRatio = (symbol.beat - prevSymbol.beat) / (refSymbol.beat - prevSymbol.beat);
-				xMin = prevSymbol.x - prevSymbol.renderwidth / 2;
-				xMax = refSymbol.x - refSymbol.renderwidth / 2;
+				xMin = prevSymbol.x - prevSymbol.lRender;
+				xMax = refSymbol.x - refSymbol.lRender;
+				console.log(prevSymbol.lRender, xMin, xMax);
 				symbol.x = xMin + xRatio * (xMax - xMin);
 			}
 		}
@@ -1089,7 +1120,7 @@
 		
 		// Find the minwidth of all the symbols, and if it's too wide render a
 		// stave with fewer bars.
-		var minwidth = symbols1.map(getMinWidth).reduce(sum) - first(symbols1).minwidth / 2 - last(symbols1).minwidth / 2;
+		var minwidth = symbols1.map(getMinWidth).reduce(sum) - first(symbols1).l - last(symbols1).r;
 		
 		if (minwidth > width) {
 			bars--;
@@ -1106,7 +1137,7 @@
 		// If we are at the end and there is enough width, set the x positions
 		// to their ideals, creating a shorter last stave, otherwise fit the
 		// symbols to the width of the stave.
-		var idealwidth = symbols1.map(getWidth).reduce(sum) - first(symbols1).width / 2 - last(symbols1).width / 2;
+		var idealwidth = symbols1.map(getWidth).reduce(sum) - first(symbols1).l - last(symbols1).r;
 
 		if (end >= options.end && idealwidth <= width) {
 			symbols1.reduce(setXFromWidth, 0);
