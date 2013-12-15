@@ -416,18 +416,25 @@
 	};
 	
 	var symbolType = {
-		bar: function bar(beat) {
-			return {
+		bar: (function() {
+			var prototype = {
 				type: 'bar',
 				lmin: 0.5,
 				rmin: 0.5,
 				l: 1,
-				r: 2,
-				beat: beat,
+				r: 1,
 				duration: 0,
 				y: 0
 			};
-		},
+			
+			return function bar(beat) {
+				var symbol = Object.create(prototype);
+				
+				symbol.beat = beat;
+				
+				return symbol;
+			};
+		})(),
 
 		endline: function endline() {
 			return {
