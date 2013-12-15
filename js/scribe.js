@@ -465,10 +465,10 @@
 		rest: function rest(beat, duration) {
 			return {
 				type: 'rest',
-				lmin: 1.25 + duration / 2,
-				rmin: 1.25 + duration / 2,
-				l: 1.5 + duration * 2,
-				r: 1.5 + duration * 2,
+				lmin: 2 + duration,
+				rmin: 2 + duration,
+				l: 2 + duration * 1.5,
+				r: 2 + duration * 1.5,
 				y: 0,
 				beat: beat,
 				duration: duration
@@ -477,26 +477,27 @@
 
 		note: (function() {
 			var prototype = Object.defineProperties({
-				type: 'note',
-				lmin: 1.5,
-				l: 2
-			}, {
-				rmin: {
-					get: function() {
-						var duration = this.duration;
-						var dotted = !(duration % (1.5 / 16));
-						return dotted ? 4 : 2 ;
-					}
-				},
-				
-				r: {
-					get: function() {
-						var duration = this.duration;
-						var dotted = !(duration % (1.5 / 16));
-						return (dotted ? 4 : 2) + 2 * duration;
+					type: 'note',
+					lmin: 1.5,
+					l: 2
+				}, {
+					rmin: {
+						get: function() {
+							var duration = this.duration;
+							var dotted = !(duration % (1.5 / 16));
+							return dotted ? 4 : 2 ;
+						}
+					},
+					
+					r: {
+						get: function() {
+							var duration = this.duration;
+							var dotted = !(duration % (1.5 / 16));
+							return (dotted ? 4 : 2) + 2.25 * duration;
+						}
 					}
 				}
-			});
+			);
 			
 			return function note(beat, duration, number, from, y) {
 				var symbol = Object.create(prototype);
@@ -1127,7 +1128,7 @@
 		
 		// Find the minwidth of all the symbols, and if it's too wide render a
 		// stave with fewer bars.
-		var minwidth = symbols1.map(getMinWidth).reduce(sum) - first(symbols1).l - last(symbols1).r;
+		var minwidth = symbols1.map(getMinWidth).reduce(sum) - first(symbols1).lmin - last(symbols1).rmin;
 		
 		if (minwidth > width) {
 			bars--;
