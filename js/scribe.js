@@ -667,20 +667,24 @@
 		var noteData = data.filter(isNote);
 		var symbols = [];
 		var n = 0;
+		var i = 0;
 		var beam = newBeam();
 		var accMap = {};
 		var beat, duration, bar, symbol, note, breakpoint, nextBeat, key, spelling;
 
-		console.log('createMusicSymbols', start, end);
+		console.log('Scribe: createMusicSymbols start:', start, 'end:', end);
 
 		symbols.push(symbolType.bar(start));
 
 		while ((symbol = last(symbols)).beat < end) {
+			// Guard against infinite loops
+			if (debug && i++ > 200) { break; }
+			
 			console.groupEnd();
 
 			bar = scribe.barAtBeat(symbol.beat);
 			note = noteData[n];
-			nextBeat = isDefined(note) ? note[1] : end;
+			nextBeat = isDefined(note) ? note.beat : end;
 			breakpoint = nextBreakpoint(bar, symbol.beat);
 			beat = symbol.beat;
 			duration = symbol.duration;
@@ -769,7 +773,7 @@
 			if (!note) { break; }
 			
 			// Insert a note and increment n
-			symbol = symbolType.note(note[1], note[3], note[2]);
+			symbol = symbolType.note(note.beat, note.duration, note.number);
 			console.log(symbol);
 			key = data.keyAtBeat(note.beat);
 			spelling = Scribe.spelling(note.number, key);
@@ -1065,6 +1069,8 @@
 				prevSymbol = refSymbol;
 			}
 			
+			if (!refSymbol) { continue; }
+			
 			if (refSymbol.beat === symbol.beat) {
 				symbol.x = refSymbol.x;
 			}
@@ -1132,6 +1138,7 @@
 		
 		if (minwidth > width) {
 			bars--;
+			cursor.bars++;
 			end = beatOfBarN(scribe, start, bars);
 			tracks = tracks.map(function(symbols) {
 				return sliceByBeat(symbols, start, end);
@@ -1175,17 +1182,26 @@
 		var width = options.width - options.paddingLeft - options.paddingRight;
 		var start = options.start;
 		var end;
+		var i = 0;
 		var cursor = {
 			beat: start,
-			y: options.paddingTop + 4
+			y: options.paddingTop + 4,
+			bars: 0
 		};
+		var bars = 0;
 		
 		function slice(symbols) {
 			return sliceByBeat(symbols, start, end);
 		}
 		
 		while (start < options.end) {
-			end = beatOfBarN(scribe, start, scribe.staveBarsAtBeat(start));
+			// Catch infinite loops
+			if (debug && i++ > 24) { break; }
+
+			bars = scribe.staveBarsAtBeat(start) + cursor.bars;
+			end = beatOfBarN(scribe, start, bars);
+			
+			cursor.bars = 0;
 			
 			if (end > options.end) {
 				end = options.end;
@@ -1195,8 +1211,8 @@
 				throw new Error('No. That cant be.');
 			}
 			
-			console.groupCollapsed('Scribe: rendering stave. Beats:', start, '–', end, '(', options.barsPerStave, 'bars ).');
-			renderStaves(scribe, svg, tracks.map(slice), start, end, width, options.barsPerStave, cursor, options);
+			console.groupCollapsed('Scribe: rendering stave. Beats:', start, '–', end, '(', bars, 'bars ).');
+			renderStaves(scribe, svg, tracks.map(slice), start, end, width, bars, cursor, options);
 			start = cursor.beat;
 			console.groupEnd();
 			
@@ -1224,6 +1240,7 @@
 		var scribe = Object.create(prototype);
 
 		svg = typeof svg === 'string' ? find(svg) : svg ;
+		data = Scribe.Data(data);
 
 		var options = extend({}, defaults, user, {
 			width: svg.viewBox.baseVal.width,
@@ -1239,7 +1256,9 @@
 			flag = false;
 
 			if (!isDefined(options.end)) {
-				options.end = beatOfBarN(scribe, last(data)[1] + last(data)[3], 1);
+				console.log(last(data).beat, last(data).duration);
+				options.end = beatOfBarN(scribe, last(data).beat + last(data).duration, 1);
+				console.log(options.end);
 			}
 			
 			clearSVG(svg);
@@ -1263,8 +1282,6 @@
 			
 			return options.barsPerStave[last(keys)];
 		}
-
-		data = Scribe.Data(data);
 		
 		scribe.data = data;
 

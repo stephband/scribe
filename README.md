@@ -18,10 +18,10 @@ Either an id (string) of an SVG node, or an SVG node.
 An array of notes and chords. For example:
 
     [
-        ['note',  2,   76,  0.5],
-        ['note',  2.5, 77,  0.5],
-        ['note',  3,   79,  0.5],
-        ['note',  3.5, 74,  3.5]
+        [2,   0.5, 'note', 76],
+        [2.5, 0.5, 'note', 77],
+        [3,   0.5, 'note', 79],
+        [3.5, 3.5, 'note', 74]
     ]
 
 Renders as:
@@ -43,7 +43,7 @@ Note that it's early days, and the required format of this note data may change.
 
 ### options
 
-Scribe's rendered output can be modified with these optionally optional options:
+Scribe's rendered notation can be modified with these optionally optional options:
 
     {
         clef: 'treble',

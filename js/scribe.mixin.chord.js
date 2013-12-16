@@ -82,7 +82,7 @@
 			},
 			
 			function() {
-				return toRoot(this[2]);
+				return toRoot(this[3]);
 			}
 		),
 		
@@ -92,7 +92,7 @@
 			},
 			
 			function() {
-				return toExtension(this[2]);
+				return toExtension(this[3]);
 			}
 		),
 		
@@ -102,7 +102,7 @@
 			},
 			
 			function() {
-				return toBass(this[2]);
+				return toBass(this[3]);
 			}
 		),
 		
@@ -112,7 +112,7 @@
 			},
 			
 			function() {
-				return toKey(this[2]);
+				return toKey(this[3]);
 			}
 		)
 	};

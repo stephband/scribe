@@ -26,7 +26,7 @@
 			},
 			
 			function() {
-				return this[2];
+				return this[3];
 			}
 		)
 	};

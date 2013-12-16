@@ -23,23 +23,34 @@
 	// Object constructor
 	
 	var prototype = Object.defineProperties({}, {
-		type: {
+		beat: {
 			get: function() {
 				return this[0];
 			},
 			set: function(n) {
-				this.trigger('type');
+				this.trigger('beat');
 				return this;
 			},
 			enumerable: true
 		},
-
-		beat: {
+	
+		duration: {
 			get: function() {
 				return this[1];
 			},
 			set: function(n) {
 				this.trigger('beat');
+				return this;
+			},
+			enumerable: true
+		},
+		
+		type: {
+			get: function() {
+				return this[2];
+			},
+			set: function(n) {
+				this.trigger('type');
 				return this;
 			},
 			enumerable: true
@@ -61,7 +72,7 @@
 	extend(prototype, Scribe.mixin.events);
 
 	Scribe.Event = function(data) {
-		var model = Object.create(prototypes[data[0]]);
+		var model = Object.create(prototypes[data[2]]);
 
 		data.reduce(setIndex, model);
 
