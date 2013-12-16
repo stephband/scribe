@@ -132,9 +132,7 @@ var data = [
 	[46,    0.5,  'note', 60],
 	[46.5,  1,    'note', 58],
 	[47.5,  0.5,  'note', 55],
-	[48,    4,    'note', 62],
-
-	[92,    1,    'note', 72]
+	[48,    4,    'note', 62]
 ];
 
 var options = {
@@ -159,3 +157,21 @@ var options = {
 }
 
 var scribe = Scribe('sheet', data, options);
+
+
+//{
+//	name: 'Goodbye Pork Pie Hat',
+//	description: '',
+//	composer: ['Charles Mingus'],
+//	arranger: [''],
+//	transcriber: [''],
+//	tags: ['jazz'],
+//	
+//	data: [
+//	
+//	],
+//	
+//	format: {
+//		
+//	}
+//}
