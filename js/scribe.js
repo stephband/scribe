@@ -149,6 +149,10 @@
 		return obj.y;
 	}
 	
+	function getType(obj) {
+		return obj.type;
+	}
+	
 	function toFloat(str) {
 		return parseFloat(str, 10);
 	}
@@ -430,7 +434,7 @@
 			return function bar(beat) {
 				var symbol = Object.create(prototype);
 				
-				symbol.beat = beat;
+				//symbol.beat = beat;
 				
 				return symbol;
 			};
@@ -456,7 +460,6 @@
 				l: 5,
 				r: 5,
 				value: value,
-				beat: 0,
 				duration: 0,
 				y: 0
 			};
@@ -670,35 +673,40 @@
 		var i = 0;
 		var beam = newBeam();
 		var accMap = {};
-		var beat, duration, bar, symbol, note, breakpoint, nextBeat, key, spelling;
+		var beat = start; 
+		var duration, bar, symbol, note, breakpoint, nextBeat, key, spelling;
 
 		console.log('Scribe: createMusicSymbols start:', start, 'end:', end);
 
 		symbols.push(symbolType.bar(start));
 
-		while ((symbol = last(symbols)).beat < end) {
-			// Guard against infinite loops
+		while (beat < end) {
+			// Guard against infinite loops for debugging
 			if (debug && i++ > 200) { break; }
 			
 			console.groupEnd();
 
-			bar = scribe.barAtBeat(symbol.beat);
+			symbol = last(symbols);
+			beat = symbol && isDefined(symbol.beat) ? symbol.beat : beat ;
+			bar = scribe.barAtBeat(beat);
 			note = noteData[n];
 			nextBeat = isDefined(note) ? note.beat : end;
-			breakpoint = nextBreakpoint(bar, symbol.beat);
-			beat = symbol.beat;
-			duration = symbol.duration;
+			breakpoint = nextBreakpoint(bar, beat);
 
-			console.groupCollapsed('Scribe: symbol', symbol.type, symbol.beat, symbol.duration);
+			console.group('Scribe: symbol', symbol.type, symbol.beat, symbol.duration);
+
+			if (symbol.type === 'bar') {
+				beam = newBeam(beam);
+			}
+
+			//if (!isDefined(symbol.beat)) {
+			//	continue;
+			//}
 
 			// Where the last symbol overlaps the next note, shorten it.
 			if (note && symbol.beat + symbol.duration > nextBeat) {
 				console.log('shorten');
 				symbol.duration = nextBeat - symbol.beat;
-			}
-
-			if (symbol.type === 'bar') {
-				beam = newBeam(beam);
 			}
 
 			if (symbol.type === 'rest' && options.beamBreaksAtRest) {
@@ -787,6 +795,8 @@
 		
 		console.groupEnd();
 		
+		if (debug) { console.log(symbols.map(getType).join(' ')); }
+		
 		return symbols;
 	}
 	
@@ -802,21 +812,30 @@
 		    length = array.length,
 		    n = -1;
 		
+		while (++n < length) {
+			// Start when we come across our first symbol with a beat later than
+			// the start. 
+			if (isDefined(array[n].beat) && array[n].beat >= start) {
+				break;
+			}
+		}
+		
+		--n;
+		
 		// We'll assume the array is already sorted.
 		while (++n < length) {
-			if (array[n].beat >= end) {
-				return output;
+			if (isDefined(array[n].beat)) {
+				if (array[n].beat <= end) {
+					output.push(array[n]);
+				}
+				
+				if (array[n].beat + array[n].duration >= end) {
+					return output;
+				}
 			}
-			
-			if (array[n].beat < start) {
-				continue;
+			else {
+				output.push(array[n]);
 			}
-			
-			if (array[n].beat === start && array[n].type === 'bar') {
-				continue;
-			}
-			
-			output.push(array[n]);
 		}
 		
 		return output;
@@ -1065,7 +1084,7 @@
 		while (++n < length) {
 			symbol = symbols[n];
 			
-			while (refSymbol = refSymbols[++m], refSymbol && refSymbol.beat < symbol.beat) {
+			while (refSymbol = refSymbols[++m], refSymbol && isDefined(refSymbol.beat) && refSymbol.beat < symbol.beat) {
 				prevSymbol = refSymbol;
 			}
 			
@@ -1163,12 +1182,12 @@
 		}
 		
 		// A bit of a fudge, but it'll do for now.
-		symbolsXFromRefSymbols(symbols2, symbols1);
+		//symbolsXFromRefSymbols(symbols2, symbols1);
 
 		// Find the offset of the highest symbol
 		var minY = symbols1.map(getY).reduce(min);
 
-		renderChords(svg, symbols2, options.paddingLeft, cursor.y + options.chordsOffset, width, options);
+		//renderChords(svg, symbols2, options.paddingLeft, cursor.y + options.chordsOffset, width, options);
 		
 		cursor.y += minY > -5 ? 0 : -(minY + 5) ;
 		
@@ -1361,6 +1380,7 @@
 	Scribe.isChord = isChord;
 	Scribe.isDefined = isDefined;
 	Scribe.mod12 = mod12;
+	Scribe.sum = sum;
 	
 	context.Scribe = Scribe;
 })((window || module.exports));

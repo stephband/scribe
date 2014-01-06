@@ -22,7 +22,7 @@
 	Scribe.mixin.note = {
 		number: createProperty('number',
 			function(n) {
-				
+				// Set logic
 			},
 			
 			function() {
