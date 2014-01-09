@@ -53,8 +53,8 @@
 		return Array.prototype.slice.call(event, 0);
 	}
 	
-	function toNote(event) {
-		return mod12(event.number);
+	function toDegree(event) {
+		return event.degree;
 	}
 	
 	function toName(note) {
@@ -292,7 +292,7 @@
 			while (++n < length) {
 				beat = beats[n];
 				events = this.eventsAtBeat(beat);
-				notes.push(events.filter(isNote).map(toNote));
+				notes.push(events.filter(isNote).map(toDegree));
 			}
 			
 			var keys = viterbi(notes, initialProb, transitionMatrix, emissionMatrix);
@@ -317,7 +317,7 @@
 	extend(prototype, Scribe.mixin.array);
 	extend(prototype, Scribe.mixin.events);
 	
-	Scribe.Data = function(data) {
+	Scribe.Sequence = function(data) {
 		var collection = Object.create(prototype);
 		
 		if (!(data instanceof Array)) {
@@ -341,6 +341,4 @@
 		window.collection = collection;
 		return collection;
 	};
-	
-	Scribe.toNote = toNote;
 })(Scribe);

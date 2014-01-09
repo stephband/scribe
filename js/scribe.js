@@ -1259,7 +1259,7 @@
 		var scribe = Object.create(prototype);
 
 		svg = typeof svg === 'string' ? find(svg) : svg ;
-		data = Scribe.Data(data);
+		data = Scribe.Sequence(data);
 
 		var options = extend({}, defaults, user, {
 			width: svg.viewBox.baseVal.width,
@@ -1302,7 +1302,7 @@
 			return options.barsPerStave[last(keys)];
 		}
 		
-		scribe.data = data;
+		scribe.sequence = data;
 
 		scribe.keyAtBeat = function(beat) {
 			return isDefined(_keys[beat]) && _keys[beat] || (_keys[beat] = data.keyAtBeat(beat));

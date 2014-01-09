@@ -78,6 +78,10 @@
 		
 		octave: function(n) {
 			return Math.floor(n / 12);
+		},
+		
+		degree: function(n) {
+			return n % 12;
 		}
 	};
 	
