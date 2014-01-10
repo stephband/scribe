@@ -84,6 +84,11 @@
 			},
 			
 			function()  { return this.number % 12; }
+		),
+		
+		scale: createProperty('number',
+			function(n) {},
+			function()  { return [this.degree]; }
 		)
 	};
 })(Scribe);

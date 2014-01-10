@@ -9,41 +9,26 @@
 	var mod12 = Scribe.mod12;
 	var sum = Scribe.sum;
 	
-	var r1 = 0.1;
-	var r2 = (1 - r1) / 11;
-	
-	console.log('r1, r2:', r1, r2);
-	
 	var names = ['C','C♯','D','E♭','E','F','F♯','G','A♭','A','B♭','B'];
 	
-	var transitionMatrix = [
-		[r1,r2,r2,r2,r2,r2,r2,r2,r2,r2,r2,r2],
-		[r2,r1,r2,r2,r2,r2,r2,r2,r2,r2,r2,r2],
-		[r2,r2,r1,r2,r2,r2,r2,r2,r2,r2,r2,r2],
-		[r2,r2,r2,r1,r2,r2,r2,r2,r2,r2,r2,r2],
-		[r2,r2,r2,r2,r1,r2,r2,r2,r2,r2,r2,r2],
-		[r2,r2,r2,r2,r2,r1,r2,r2,r2,r2,r2,r2],
-		[r2,r2,r2,r2,r2,r2,r1,r2,r2,r2,r2,r2],
-		[r2,r2,r2,r2,r2,r2,r2,r1,r2,r2,r2,r2],
-		[r2,r2,r2,r2,r2,r2,r2,r2,r1,r2,r2,r2],
-		[r2,r2,r2,r2,r2,r2,r2,r2,r2,r1,r2,r2],
-		[r2,r2,r2,r2,r2,r2,r2,r2,r2,r2,r1,r2],
-		[r2,r2,r2,r2,r2,r2,r2,r2,r2,r2,r2,r1]
-	];
+	var transitionProbs = [10, 5, 8, 10, 6, 10, 8, 10, 7, 10, 8, 4];
 	
-	var scaleEmissionProb = [0.1, 0.04, 0.1, 0.04, 0.1, 0.1, 0.04, 0.1, 0.04, 0.1, 0.04, 0.1];
+	var transitionSum =
+	    	transitionProbs
+	    	.reduce(sum);
 	
-	// Make the matrix
-	var emissionMatrix = [];
-	var l = 12;
-	while (l--) {
-		emissionMatrix[l] = scaleEmissionProb.slice(12 - l).concat(scaleEmissionProb.slice(0, 12 - l));
-	}
+	var transitionMatrix =
+	    	transitionProbs
+	    	.map(function(n) { return n / transitionSum; })
+	    	.map(toMatrix);
 	
-	console.log(emissionMatrix);
+	var emissionMatrix =
+	    	[0.1, 0.04, 0.1, 0.04, 0.1, 0.1, 0.04, 0.1, 0.04, 0.1, 0.04, 0.1]
+	    	.map(toMatrix);
 	
 	// Test
-	console.log(scaleEmissionProb.filter(Scribe.sum));
+	//console.log(scaleEmissionProb.filter(Scribe.sum));
+	console.log(transitionMatrix);
 	
 	var initialProb = [1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12];
 	
@@ -53,12 +38,21 @@
 		return Array.prototype.slice.call(event, 0);
 	}
 	
-	function toDegree(event) {
-		return event.degree;
+	function toScale(event) {
+		return event.scale;
 	}
 	
 	function toName(note) {
 		return names[note];
+	}
+
+	function divide78(n) {
+		console.log(n / 78);
+		return n / 78 ;
+	}
+
+	function toMatrix(v, i, arr) {
+		return arr.slice(12 - i).concat(arr.slice(0, 12 - i));
 	}
 
 	// Reduce functions
@@ -75,6 +69,10 @@
 		
 		return sub;
 	}
+	
+	function concat(arr1, arr2) {
+		return arr1.concat(arr2);
+	}
 
 	// Sort functions
 	
@@ -87,10 +85,10 @@
 	}
 	
 	function computeEmissions(notes, emissionMatrixRow) {
-		var p = 1;
+		var p = 0;
 		
 		for( var i = 0; i < notes.length; ++i ) {
-			p = p * emissionMatrixRow[ notes[i] ];
+			p += Math.log(emissionMatrixRow[ notes[i] ]);
 		}
 		
 		return p;
@@ -108,48 +106,47 @@
 		
 		// Initialize base cases (t == 0)
 		for(var i=0; i < 12; i++) {
-			console.log(data[0], emissionMatrix[i], computeEmissions(data[0], emissionMatrix[i]));
-			V[0][i] = initialProb[i] * computeEmissions(data[0], emissionMatrix[i]);
+			V[0][i] = Math.log(initialProb[i]) + computeEmissions(data[0], emissionMatrix[i]);
 			path[i] = [i];
 		}
 		
 		// Run Viterbi for t > 0
-		for(var t=1; t < data.length; t++) {
+		for(var t = 1; t < data.length; t++) {
 			V.push([]);
 			var newpath = [];
 			
 			for (var j = 0; j < 12; j++) {
-				var max = [0, null];
+				var max = [-Infinity];
 				
 				for (var i=0; i < 12; i++) {
 					// Calculate the probablity
 					var calc = V[t - 1][i]
-						* transitionMatrix[i][j]
-						//* emissionMatrix[j][data[t]];
-						* computeEmissions(data[t], emissionMatrix[j]);
+						+ Math.log(transitionMatrix[i][j])
+						+ computeEmissions(data[t], emissionMatrix[j]);
 					
 					if(calc > max[0]) {
-						max = [calc, i];
+						max[0] = calc;
+						max[1] = i;
 					}
 				}
 				
 				V[t][j] = max[0];
+				
 				newpath[j] = path[max[1]].concat(j);
 			}
 			path = newpath;
 		}
 	
-		var max = [0,null];
+		var max = [-Infinity];
 		
 		for (var i = 0; i < 12; i++) {
 			var calc = V[data.length - 1][i];
 			
 			if (calc > max[0]) {
-				max = [calc, i];
+				max[0] = calc;
+				max[1] = i;
 			}
 		}
-		
-		console.log(max[0]);
 	
 		return path[max[1]];
 	}
@@ -212,7 +209,7 @@
 			}
 		}
 		
-		return beats;
+		return beats.sort(byGreater);
 	}
 	
 	// Object constructor
@@ -292,7 +289,7 @@
 			while (++n < length) {
 				beat = beats[n];
 				events = this.eventsAtBeat(beat);
-				notes.push(events.filter(isNote).map(toDegree));
+				notes.push(events.map(toScale).reduce(concat));
 			}
 			
 			var keys = viterbi(notes, initialProb, transitionMatrix, emissionMatrix);
@@ -303,12 +300,6 @@
 			while (n--) {
 				this._keys[n] = keys[n];
 			}
-			
-			console.log(this._keys);
-			
-			console.log(keys.map(function(v, i) {
-				return notes[i] + ' ' + toName(v);
-			}));
 			
 			return keys;
 		}
