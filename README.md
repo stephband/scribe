@@ -89,3 +89,5 @@ Rich Sigler of Sigler Music Fonts (http://www.jazzfont.com/).
 
 Very kindly granted permission to use JazzFont shapes as SVG paths.
 If you use Scribe a lot, please consider buying a JazzFont license (http://www.jazzfont.com/order.html).
+
+Gavin Band (@gavmotron) implemented probabalistic key centre analysis using a Hidden Markov Model.
