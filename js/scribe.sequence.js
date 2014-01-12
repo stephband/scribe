@@ -84,6 +84,8 @@
 		return a > b ? 1 : -1 ;
 	}
 	
+	// Viterbi algorithm for probabalistically determining key centre.
+	
 	function computeEmissions(notes, emissionMatrixRow) {
 		var p = 0;
 		
@@ -94,59 +96,70 @@
 		return p;
 	}
 	
-	function returnArg1(ting) {
-		return ting;
-	}
-	
-	
-	// Viterbi algorithm for finding hidden relationships
 	function viterbi(data, initialProb, transitionMatrix, emissionMatrix) {
-		var V = [[]];
+		var probs = [];
+		var matrix = [];
 		var path = [];
+		var max = [];
+		var t = 0;
+		var i = -1;
+		var j, newpath, prob;
 		
-		// Initialize base cases (t == 0)
-		for(var i=0; i < 12; i++) {
-			V[0][i] = Math.log(initialProb[i]) + computeEmissions(data[0], emissionMatrix[i]);
+		// Calculate base probabilities for t = 0
+		matrix[t] = probs;
+		
+		while (++i < 12) {
+			probs[i] = Math.log(initialProb[i]) + computeEmissions(data[0], emissionMatrix[i]);
 			path[i] = [i];
 		}
 		
-		// Run Viterbi for t > 0
-		for(var t = 1; t < data.length; t++) {
-			V.push([]);
-			var newpath = [];
+		// Calculate probable paths
+		while (++t < data.length) {
+			probs = [];
+			newpath = [];
+			matrix[t] = probs;
+			j = -1;
 			
-			for (var j = 0; j < 12; j++) {
-				var max = [-Infinity];
+			while (++j < 12) {
+				// Initialise max array
+				max.length = 0;
+				max[0] = -Infinity;
+				i = -1;
 				
-				for (var i=0; i < 12; i++) {
+				while (++i < 12) {
 					// Calculate the probablity
-					var calc = V[t - 1][i]
+					prob = matrix[t - 1][i]
 						+ Math.log(transitionMatrix[i][j])
 						+ computeEmissions(data[t], emissionMatrix[j]);
 					
-					if(calc > max[0]) {
-						max[0] = calc;
+					if (prob > max[0]) {
+						max[0] = prob;
 						max[1] = i;
 					}
 				}
 				
-				V[t][j] = max[0];
-				
+				probs[j] = max[0];
 				newpath[j] = path[max[1]].concat(j);
 			}
+			
 			path = newpath;
 		}
-	
-		var max = [-Infinity];
 		
-		for (var i = 0; i < 12; i++) {
-			var calc = V[data.length - 1][i];
+		// Initialise max array
+		max.length = 0;
+		max[0] = -Infinity;
+		i = -1;
+		
+		while (++i < 12) {
+			prob = matrix[data.length - 1][i];
 			
-			if (calc > max[0]) {
-				max[0] = calc;
+			if (prob > max[0]) {
+				max[0] = prob;
 				max[1] = i;
 			}
 		}
+	
+		if (debug) { console.log(matrix); }
 	
 		return path[max[1]];
 	}
