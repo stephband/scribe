@@ -83,6 +83,10 @@
 		// Return n limited to min and max values.
 		return n < min ? min : n > max ? max : n ;
 	}
+	
+	function return0() {
+		return 0;
+	}
 
 	// Reduce functions
 
@@ -155,6 +159,10 @@
 	
 	function toFloat(str) {
 		return parseFloat(str, 10);
+	}
+	
+	function getLength(obj) {
+		return obj.length;
 	}
 	
 	// filter functions
@@ -548,7 +556,11 @@
 				type: 'chord',
 				data: event,
 				beat: event.beat,
-				text: Scribe.spell(root, key) + event.extension
+				text: Scribe.spell(root, key) + event.extension,
+				l: 0,
+				r: 0,
+				lmin: 0,
+				rmin: 0
 			};
 		}
 	};
@@ -667,6 +679,7 @@
 	}
 	
 	function createMusicSymbols(scribe, data, start, end, options) {
+		console.log('createMusicSymbols');
 		var noteData = data.filter(isNote);
 		var symbols = [];
 		var n = 0;
@@ -693,9 +706,13 @@
 			nextBeat = isDefined(note) ? note.beat : end;
 			breakpoint = nextBreakpoint(bar, beat);
 
-			console.group('Scribe: symbol', symbol.type, symbol.beat, symbol.duration);
+			console.groupCollapsed('Scribe: symbol', symbol.type, symbol.beat, symbol.duration);
 
 			if (symbol.type === 'bar') {
+				beam = newBeam(beam);
+			}
+
+			if (symbol.type === 'rest' && options.beamBreaksAtRest) {
 				beam = newBeam(beam);
 			}
 
@@ -705,12 +722,8 @@
 
 			// Where the last symbol overlaps the next note, shorten it.
 			if (note && symbol.beat + symbol.duration > nextBeat) {
-				console.log('shorten');
+				console.log('Shorten' + symbol.type, 'beat:', symbol.beat, 'duration:', nextBeat - symbol.beat);
 				symbol.duration = nextBeat - symbol.beat;
-			}
-
-			if (symbol.type === 'rest' && options.beamBreaksAtRest) {
-				beam = newBeam(beam);
 			}
 
 			if (symbol.type === 'note') {
@@ -764,18 +777,29 @@
 			
 			// Where the symbol arrives at a bar end, insert a bar line.
 			if (symbol.beat + symbol.duration === bar.beat + bar.duration) {
-				console.log('insert bar', bar.beat + bar.duration);
+				console.log('Insert bar', bar.beat + bar.duration);
 				symbols.push(symbolType.bar(bar.beat + bar.duration));
+				// Manually update beat, as bar does not have beat or duration.
+				beat = bar.beat + bar.duration;
 				deleteProperties(accMap);
 				continue;
 			}
 
 			// Where the last symbol doesn't make it as far as the next note,
 			// insert a rest.
-			if (symbol.beat + symbol.duration < nextBeat) {
-				console.log('insert rest', nextBeat);
-				symbols.push(fitRestSymbol(bar, symbol.beat + symbol.duration, nextBeat - symbol.beat - symbol.duration));
-				continue;
+			if (isDefined(symbol.beat)) {
+				if (symbol.beat + symbol.duration < nextBeat) {
+					console.log('Insert rest. beat:', symbol.beat, 'duration:', nextBeat - symbol.beat - symbol.duration);
+					symbols.push(fitRestSymbol(bar, symbol.beat + symbol.duration, nextBeat - symbol.beat - symbol.duration));
+					continue;
+				}
+			}
+			else {
+				if (beat < nextBeat) {
+					console.log('Insert rest. beat:', beat, 'duration:', nextBeat - beat);
+					symbols.push(fitRestSymbol(bar, beat, nextBeat - beat));
+					continue;
+				}
 			}
 			
 			if (!note) { break; }
@@ -813,8 +837,8 @@
 		    n = -1;
 		
 		while (++n < length) {
-			// Start when we come across our first symbol with a beat later than
-			// the start. 
+			// Start when we come across our first symbol on or later than
+			// start beat. 
 			if (isDefined(array[n].beat) && array[n].beat >= start) {
 				break;
 			}
@@ -825,11 +849,12 @@
 		// We'll assume the array is already sorted.
 		while (++n < length) {
 			if (isDefined(array[n].beat)) {
-				if (array[n].beat <= end) {
+				if (array[n].beat < end) {
 					output.push(array[n]);
 				}
 				
 				if (array[n].beat + array[n].duration >= end) {
+					console.log('start:', start, 'end:', end, 'symbols:', output.length);
 					return output;
 				}
 			}
@@ -837,6 +862,8 @@
 				output.push(array[n]);
 			}
 		}
+		
+		console.log('start:', start, 'end:', end, 'symbols:', output.length);
 		
 		return output;
 	}
@@ -1052,59 +1079,10 @@
 		}
 	}
 
-	function symbolsXFromRatio(symbols, ratio) {
-		var length = symbols.length;
-		var n = -1;
-		var x = 0;
-		var symbol, lRender, rRender;
-		
-		while (++n < length) {
-			symbol = symbols[n];
-			lRender = symbol.l + ratio * (symbol.l - symbol.lmin);
-			rRender = symbol.r + ratio * (symbol.r - symbol.rmin);
-
-			if (n) { x += lRender; }
-			
-			symbol.x = x;
-			symbol.lRender = lRender;
-			symbol.rRender = rRender;
-			x += rRender;
-		}
-	}
-	
-	function symbolsXFromRefSymbols(symbols, refSymbols) {
-		// This is a bit nasty but it's a stop-gap measure until we work out how to reliably
-		// render multi-staves with events that line up.
-		var length = symbols.length;
-		var n = -1;
-		var m = -1;
-		var x = 0;
-		var symbol, refSymbol, prevSymbol, xRatio, xMin, xMax, xDistance;
-		
-		while (++n < length) {
-			symbol = symbols[n];
-			
-			while (refSymbol = refSymbols[++m], refSymbol && isDefined(refSymbol.beat) && refSymbol.beat < symbol.beat) {
-				prevSymbol = refSymbol;
-			}
-			
-			if (!refSymbol) { continue; }
-			
-			if (refSymbol.beat === symbol.beat) {
-				symbol.x = refSymbol.x;
-			}
-			else {
-				xRatio = (symbol.beat - prevSymbol.beat) / (refSymbol.beat - prevSymbol.beat);
-				xMin = prevSymbol.x - prevSymbol.lRender;
-				xMax = refSymbol.x - refSymbol.lRender;
-				console.log(prevSymbol.lRender, xMin, xMax);
-				symbol.x = xMin + xRatio * (xMax - xMin);
-			}
-		}
-	}
-
 	function prepareStaveSymbols(symbols, start, end, options) {
 		var clefSymbols, keySymbols;
+		
+		console.log(symbols.map(getType).join(' '));
 		
 		if (options.clefOnEveryStave || start === options.start) {
 			clefSymbols = [symbolType.clef(options.clef)];
@@ -1147,13 +1125,125 @@
 		svg.appendChild(node);
 	}
 
+	function stretch(normal, min, factor) {
+		return normal + (normal - min) * factor;
+	}
+
+	function distributeX(tracks, factor) {
+		var length = tracks.map(getLength).reduce(sum);
+		var indexes = tracks.map(return0);
+		var x = 0, x1, x2, x3, beat, beat1, beat2, n, symbol, symbol0, symbol1;
+		
+		factor = factor || 0;
+		
+		console.log('Distribute x, factor:', factor);
+		
+		while (indexes.reduce(sum) < length) {
+			// Find the next beat in any of the tracks.
+			beat = Infinity;
+			n = tracks.length;
+			x2 = x;
+		
+			while (n--) {
+				symbol = tracks[n][indexes[n]];
+				x1 = x;
+				
+				// No more symbols in this track?
+				if (!symbol) { continue; }
+				
+				// Where symbol does not have a beat, jump ahead to the first
+				// symbol that does, setting x on the unbeated symbols as we go.
+				while (symbol && symbol.beat === undefined) {
+					// If it's the first bar line on the stave, ignore the
+					// left margin.
+					if (indexes[n] === 0 && symbol.type === 'bar') {
+						symbol.x = x1;
+						x1 += stretch(symbol.r, symbol.rmin, factor);
+					}
+					
+					// If it's the last bar line on the stave, ignore the
+					// right margin.
+					else if (indexes[n] === tracks[n].length - 1 && symbol.type === 'bar') {
+						symbol.x = x1 + stretch(symbol.l, symbol.lmin, factor);
+						x1 += stretch(symbol.l, symbol.lmin, factor);
+					}
+					
+					// Anything else, count both margins.
+					else {
+						symbol.x = x1 + stretch(symbol.l, symbol.lmin, factor);
+						x1 += stretch(symbol.l, symbol.lmin, factor) +
+						      stretch(symbol.r, symbol.rmin, factor) ;
+					}
+					
+					console.log('beat: - ', 'x:', x, 'type:', symbol.type);
+					
+					symbol = tracks[n][++indexes[n]];
+				}
+				
+				x2 = x1 > x2 ? x1 : x2;
+				
+				if (symbol && symbol.beat < beat) {
+					beat = symbol.beat;
+				}
+			}
+			
+			// Push x forward to accomodate unbeated symbols.
+			x = x2;
+			
+			// Push symbols into symbols array.
+			n = tracks.length;
+	
+			while (n--) {
+				symbol = tracks[n][indexes[n]];
+				x1 = x;
+	
+				// No more symbols in this track?
+				if (!symbol) { continue; }
+				
+				if (symbol.beat === beat) {
+					if (beat < beat2) {
+						// Where x has already gone passed this symbol, because
+						// the previous symbol we applied x to had a long
+						// duration, divide the space that previous symbol
+						// occupies to position this symbol.
+						// TODO: This is a little crude, and will break.
+						symbol.x = x3 + (x1 - x3) * (beat - beat1) / (beat2 - beat1);
+					}
+					else {
+						x1 += stretch(symbol.l, symbol.lmin, factor);
+						symbol.x = x1;
+						x1 += stretch(symbol.r, symbol.rmin, factor);
+						
+						if (x1 > x2) {
+							x2 = x1;
+							x3 = x;
+							beat1 = symbol.beat;
+							beat2 = symbol.beat + symbol.duration;
+						}
+					}
+					
+					console.log('beat:', beat, 'x:', x, 'type:', symbol.type);
+					
+					indexes[n]++;
+				}
+			}
+	
+			// Push x forward to accomodate biggest right margin.
+			x = x2;
+		}
+		
+		return x;
+	}
+
 	function renderStaves(scribe, svg, tracks, start, end, width, bars, cursor, options) {
 		var symbols1 = prepareStaveSymbols(tracks[0], start, end, options);
 		var symbols2 = prepareChordSymbols(tracks[1], start, end, options);
 		
 		// Find the minwidth of all the symbols, and if it's too wide render a
 		// stave with fewer bars.
-		var minwidth = symbols1.map(getMinWidth).reduce(sum) - first(symbols1).lmin - last(symbols1).rmin;
+		//var minwidth = symbols1.map(getMinWidth).reduce(sum) - first(symbols1).lmin - last(symbols1).rmin;
+		
+		var minwidth = distributeX([symbols1, symbols2], -1);
 		
 		if (minwidth > width) {
 			bars--;
@@ -1171,24 +1261,24 @@
 		// If we are at the end and there is enough width, set the x positions
 		// to their ideals, creating a shorter last stave, otherwise fit the
 		// symbols to the width of the stave.
-		var idealwidth = symbols1.map(getWidth).reduce(sum) - first(symbols1).l - last(symbols1).r;
+		//var idealwidth = symbols1.map(getWidth).reduce(sum) - first(symbols1).l - last(symbols1).r;
+
+
+		var idealwidth = distributeX([symbols1, symbols2], 0);
 
 		if (end >= options.end && idealwidth <= width) {
 			symbols1.reduce(setXFromWidth, 0);
 			width = idealwidth;
 		}
 		else {
-			symbolsXFromRatio(symbols1, (width - idealwidth) / (idealwidth - minwidth));
+			distributeX([symbols1, symbols2], (width - idealwidth) / (idealwidth - minwidth));
 		}
-		
-		// A bit of a fudge, but it'll do for now.
-		//symbolsXFromRefSymbols(symbols2, symbols1);
+
+		renderChords(svg, symbols2, options.paddingLeft, cursor.y + options.chordsOffset, width, options);
 
 		// Find the offset of the highest symbol
 		var minY = symbols1.map(getY).reduce(min);
 
-		//renderChords(svg, symbols2, options.paddingLeft, cursor.y + options.chordsOffset, width, options);
-		
 		cursor.y += minY > -5 ? 0 : -(minY + 5) ;
 		
 		renderStave(svg, symbols1, options.paddingLeft, cursor.y, width, options);
@@ -1230,7 +1320,7 @@
 				throw new Error('No. That cant be.');
 			}
 			
-			console.groupCollapsed('Scribe: rendering stave. Beats:', start, '–', end, '(', bars, 'bars ).');
+			console.group('Scribe: rendering stave. Beats:', start, '–', end, '(', bars, 'bars ).');
 			renderStaves(scribe, svg, tracks.map(slice), start, end, width, bars, cursor, options);
 			start = cursor.beat;
 			console.groupEnd();
@@ -1238,7 +1328,7 @@
 			cursor.y += options.staveSpacing;
 		}
 	}
-	
+
 	function clearSVG(svg) {
 		var groups = svg.querySelectorAll('svg > g');
 		var l = groups.length;
@@ -1248,13 +1338,13 @@
 			svg.removeChild(groups[l]);
 		}
 	}
-	
+
 	// Define Scribe
-	
+
 	var prototype = {
 		
 	};
-	
+
 	function Scribe(svg, data, user) {
 		var scribe = Object.create(prototype);
 
@@ -1370,17 +1460,17 @@
 		
 		return scribe;
 	}
-	
+
 	Scribe.debug = debug;
 	Scribe.defaults = defaults;
 	Scribe.extend = extend;
 	Scribe.mixin = {};
-	
+
 	Scribe.isNote = isNote;
 	Scribe.isChord = isChord;
 	Scribe.isDefined = isDefined;
 	Scribe.mod12 = mod12;
 	Scribe.sum = sum;
-	
+
 	context.Scribe = Scribe;
 })((window || module.exports));

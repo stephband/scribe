@@ -42,7 +42,7 @@ var melody = [
 	[136, 4, 'chord', 'C7sus'],
 	[140, 4, 'chord', 'C∆♭6'],
 	[144, 4, 'chord', 'C7sus♭9'],
-	//[148, 4, 'chord', 'E7alt'],
+	[148, 3, 'chord', 'E7alt'],
 
 	[2,      0.5,  'note', 76],
 	[2.5,    0.5,  'note', 77],

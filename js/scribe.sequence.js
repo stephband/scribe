@@ -28,7 +28,7 @@
 	
 	// Test
 	//console.log(scaleEmissionProb.filter(Scribe.sum));
-	console.log(transitionMatrix);
+	//console.log(transitionMatrix);
 	
 	var initialProb = [1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12];
 	
