@@ -564,11 +564,6 @@
 			};
 		}
 	};
-	
-	function beatOfBar(beat, beatsPerBar) {
-		// Placeholder function for when beatsPerBar becomes a map
-		return beat % beatsPerBar;
-	}
 
 	function beatOfBarN(scribe, beat, n) {
 		// Find the beat of the nth bar in the future.
@@ -665,11 +660,12 @@
 	}
 	
 	function createChordSymbols(scribe, data, start, end, options) {
-		console.log('createChordSymbols');
 		var chords = data.filter(isChord);
 		var l = chords.length;
 		var n = -1;
 		var output = [];
+		
+		if (debug) { console.log('createChordSymbols() start:', start, 'end:', end); }
 		
 		while (++n < l) {
 			output.push(symbolType.chord(scribe, chords[n], options));
@@ -679,7 +675,6 @@
 	}
 	
 	function createMusicSymbols(scribe, data, start, end, options) {
-		console.log('createMusicSymbols');
 		var noteData = data.filter(isNote);
 		var symbols = [];
 		var n = 0;
@@ -689,7 +684,7 @@
 		var beat = start; 
 		var duration, bar, symbol, note, breakpoint, nextBeat, key, spelling;
 
-		console.log('Scribe: createMusicSymbols start:', start, 'end:', end);
+		if (debug) { console.log('createMusicSymbols() start:', start, 'end:', end); }
 
 		symbols.push(symbolType.bar(start));
 
@@ -818,8 +813,6 @@
 		}
 		
 		console.groupEnd();
-		
-		if (debug) { console.log(symbols.map(getType).join(' ')); }
 		
 		return symbols;
 	}
@@ -1082,8 +1075,6 @@
 	function prepareStaveSymbols(symbols, start, end, options) {
 		var clefSymbols, keySymbols;
 		
-		console.log(symbols.map(getType).join(' '));
-		
 		if (options.clefOnEveryStave || start === options.start) {
 			clefSymbols = [symbolType.clef(options.clef)];
 			keySymbols = createKeySymbols(options.key);
@@ -1132,11 +1123,11 @@
 	function distributeX(tracks, factor) {
 		var length = tracks.map(getLength).reduce(sum);
 		var indexes = tracks.map(return0);
-		var x = 0, x1, x2, x3, beat, beat1, beat2, n, symbol, symbol0, symbol1;
+		var x = 0, x1, x2, x3, beat, beat1, beat2, n, symbol;
 		
 		factor = factor || 0;
 		
-		console.log('Distribute x, factor:', factor);
+		console.log('distributeX() factor:', factor);
 		
 		while (indexes.reduce(sum) < length) {
 			// Find the next beat in any of the tracks.
@@ -1320,7 +1311,7 @@
 				throw new Error('No. That cant be.');
 			}
 			
-			console.group('Scribe: rendering stave. Beats:', start, '–', end, '(', bars, 'bars ).');
+			console.groupCollapsed('Scribe: rendering stave. Beats:', start, '–', end, '(', bars, 'bars ).');
 			renderStaves(scribe, svg, tracks.map(slice), start, end, width, bars, cursor, options);
 			start = cursor.beat;
 			console.groupEnd();
@@ -1362,12 +1353,19 @@
 		var _keys = {};
 
 		function update() {
+			var barEnd;
+			var beatEnd;
+			
 			flag = false;
 
 			if (!isDefined(options.end)) {
-				console.log(last(data).beat, last(data).duration);
-				options.end = beatOfBarN(scribe, last(data).beat + last(data).duration, 1);
-				console.log(options.end);
+				beatEnd = last(data).beat + last(data).duration;
+				barEnd = scribe.barAtBeat(beatEnd);
+				options.end = beatEnd === barEnd.beat ?
+					beatEnd :
+					barEnd.beat + barEnd.duration ;
+				
+				if (debug) { console.log('Scribe: end set automatically:', options.end); }
 			}
 			
 			clearSVG(svg);
@@ -1444,9 +1442,8 @@
 		scribe.staveNoteY = numberToLine(clefs[options.clef], 0);
 		scribe.beatsPerBar = 4;
 		
-		console.log('key:', options.key, createKeyMap(options.key, scribe.staveNoteY));
-		
-		console.log(options.key + options.transpose);
+		console.log('Scribe: key:', options.key, createKeyMap(options.key, scribe.staveNoteY));
+		console.log('Scribe: transpose:', options.transpose);
 		
 		scribe.keyMap = {
 			0: createKeyMap(options.key + options.transpose)
