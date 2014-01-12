@@ -342,6 +342,7 @@
 			_beats: { value: [] },
 			_keys:  { value: [] }
 		});
+		
 		window.collection = collection;
 		return collection;
 	};
