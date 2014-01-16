@@ -282,9 +282,7 @@
 	}
 
 	function yToPosition(y) {
-		var bar = this;
-		
-		return bar.center - y;
+		return this.center - y;
 	}
 
 	function arrayToY(obj, i) {
@@ -875,9 +873,9 @@
 		var y = 0;
 
 		// Render ledger lines
-		if (symbol.y > 5) {
-			y = symbol.y + 1;
-			
+		y = symbol.y.reduce(max) + 1;
+		
+		if (y > 6) {
 			while (--y > 5) {
 				if (y % 2) { continue; }
 				
@@ -892,9 +890,9 @@
 			}
 		}
 
-		if (symbol.y < -5) {
-			y = symbol.y - 1;
-			
+		y = symbol.y.reduce(min) - 1;
+
+		if (y < -6) {
 			while (++y < -5) {
 				if (y % 2) { continue; }
 				
@@ -917,9 +915,9 @@
 		
 		while (n--) {
 			layer.appendChild(nodeType.tie(svg, {
-				x: symbol.x + 1.25,
+				x: symbol.x + 1.75,
 				y: symbol.y[n],
-				width: symbol.to.x - symbol.x - 2.75
+				width: symbol.to.x - symbol.x - 3.5
 			}));
 		}
 	}
@@ -972,20 +970,21 @@
 		}
 	}
 
-	function createBeamY(symbols, options, symbolsY) {
+	function createBeamY(symbols, options, symbolsY, direction) {
+		// direction true: stalks down, false: stalks up
 		var firstX    = first(symbols).x;
 		var lastX     = last(symbols).x;
 		var firstY    = first(symbolsY);
 		var lastY     = last(symbolsY);
-		var avgY      = symbolsY.reduce(sum) / symbols.length;
 		var factorG   = options.beamGradientFactor || 0.75;
 		var maxG      = isDefined(options.beamGradientMax) ? options.beamGradientMax : 1 ;
 		var gradient  = limit(factorG * (lastY - firstY) / (lastX - firstX), -maxG, maxG);
-		var xMid      = firstX + 0.5 * (lastX - firstX);
-		var offsetY   = avgY < 0 ? symbolsY.reduce(max) - 2 : symbolsY.reduce(min) + 2;
+		var offsetY   = direction ? symbolsY.reduce(max) : symbolsY.reduce(min);
+		var index     = symbolsY.indexOf(offsetY);
+		var xOffsetY  = firstX + ((index + 1) / symbolsY.length) * (lastX - firstX);
 		
 		return function beamY(x) {
-			return (x - xMid) * gradient + offsetY;
+			return (x - xOffsetY) * gradient + offsetY;
 		}
 	}
 
@@ -993,12 +992,12 @@
 		var length  = symbols.length;
 		var minY    = symbols.map(getY).map(toMin);
 		var maxY    = symbols.map(getY).map(toMax);
-		var avgY    = symbols.map(getY).map(toAvg);
-		var beamY   = createBeamY(symbols, options, avgY < 0 ? minY : maxY);
-		var stalk   = avgY < 0 ? defaults.stalkUp : defaults.stalkDown ;
+		var avgY    = symbols.map(getY).map(toAvg).reduce(sum) / length;
+		var beamY   = createBeamY(symbols, options, avgY < 0 ? maxY : minY, avgY < 0);
+		var stalk   = avgY < 0 ? defaults.stalkDown : defaults.stalkUp ;
 		var node    = Scribe.Node(svg, 'g');
 
-		renderStalks(svg, node, symbols, stalk, beamY, avgY < 0 ? maxY : minY);
+		renderStalks(svg, node, symbols, stalk, beamY, avgY < 0 ? minY : maxY);
 		renderBeams(svg, node, symbols, stalk.x2, stalk.y2, beamY, 1);
 		
 		layer.appendChild(node);
