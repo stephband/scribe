@@ -66,18 +66,9 @@
 		return ((n % m) + m) % m ;
 	}
 
-	function mod7(n) {
-		return mod(n, 7);
-	}
-
-	function mod12(n) {
-		return mod(n, 12);
-	}
-	
-	function mag(n) {
-		// Return the magnitude.
-		return n < 0 ? -n : n ;
-	}
+	function mod7(n)  { return mod(n, 7); }
+	function mod12(n) { return mod(n, 12); }
+	function mag(n)   { return n < 0 ? -n : n ; }
 
 	function limit(n, min, max) {
 		// Return n limited to min and max values.
@@ -90,25 +81,9 @@
 
 	// Reduce functions
 
-	function sum(total, n) {
-		return total + n;
-	}
-
-	function max(total, n) {
-		return total > n ? total : n;
-	}
-
-	function min(total, n) {
-		return total < n ? total : n;
-	}
-
-	function lesser(total, n) {
-		return n < total ? n : total ;
-	}
-
-	function greater(total, n) {
-		return n > total ? n : total ;
-	}
+	function sum(total, n)    { return total + n; }
+	function max(total, n)    { return total > n ? total : n; }
+	function min(total, n)    { return total < n ? total : n; }
 
 	function add(value, n, i, array) {
 		array[i] += value;
@@ -137,51 +112,23 @@
 
 	// Map functions
 
-	function getWidth(obj) {
-		return obj.l + obj.r;
-	}
-
-	function getMinWidth(obj) {
-		return obj.lmin + obj.rmin;
-	}
-
-	function getDuration(obj) {
-		return obj.duration;
-	}
-
-	function getY(obj) {
-		return obj.y;
-	}
+	function getNumber(obj)   { return obj.number; }
+	function getDuration(obj) { return obj.duration; }
+	function getY(obj)        { return obj.y; }
+	function getType(obj)     { return obj.type; }
+	function getLength(obj)   { return obj.length; }
 	
-	function getType(obj) {
-		return obj.type;
-	}
-	
-	function toFloat(str) {
-		return parseFloat(str, 10);
-	}
-	
-	function getLength(obj) {
-		return obj.length;
-	}
+	function toFloat(str)     { return parseFloat(str, 10); }
+	function toMin(array)     { return array.reduce(min); }
+	function toMax(array)     { return array.reduce(max); }
+	function toAvg(array)     { return array.reduce(sum) / array.length; }
 	
 	// filter functions
 	
-	function isNote(obj) {
-		return obj.type === 'note';
-	}
-	
-	function isChord(obj) {
-		return obj.type === 'chord';
-	}
-	
-	function isStaveSymbol(obj) {
-		return obj.type !== 'chord';
-	}
-	
-	function isChordSymbol(obj) {
-		return obj.type === 'chord';
-	}
+	function isNote(obj)      { return obj.type === 'note'; }
+	function isChord(obj)     { return obj.type === 'chord'; }
+	function isStaveSymbol(obj) { return obj.type !== 'chord'; }
+	function isChordSymbol(obj) { return obj.type === 'chord'; }
 	
 	// Object functions
 	
@@ -299,10 +246,14 @@
 		return 7 * Scribe.octave(n) + Scribe.spelling(n, key)[0];
 	}
 
-	function mapToStave(symbols, symbol, keyMap, accMap, staveY, transpose, spelling) {
-		var number = symbol.number + transpose;
+	function noteToAccidental(symbols, symbol, keyMap, accMap, staveY, transpose) {
+		var scribe = this;
+		var key = scribe.keyAtBeat(note.beat);
+		var number = note.number + scribe.transpose;
+		var spelling = Scribe.spelling(number, key);
+		
 		var octave = Scribe.octave(number);
-		var note = mod12(number);
+		var degree = mod12(number);
 		var offset = spelling[0];
 		var accidental = spelling[1];
 		var position = 7 * octave + offset;
@@ -310,14 +261,38 @@
 		    	accMap[position] :
 		    	keyMap[offset] ;
 		
-		symbol.y = staveY - position;
-		
 		if (accidental !== staveAcc) {
 			// We need an accidental.
 			console.log('insert accidental', Scribe.spell(number) + Scribe.octave(number), accidental, staveAcc);
 			accMap[position] = accidental;
 			symbols.push(symbolType.accidental(symbol.beat, accidental, symbol.y));
 		}
+	}
+
+	function noteToY(note) {
+		var scribe = this;
+		var key = scribe.keyAtBeat(note.beat);
+		var number = note.number + scribe.transpose;
+		var octave = Scribe.octave(number);
+		var spelling = Scribe.spelling(number, key);
+		var offset = spelling[0];
+		var position = 7 * octave + offset;
+		
+		return position;
+	}
+
+	function yToPosition(y) {
+		var bar = this;
+		
+		return bar.center - y;
+	}
+
+	function arrayToY(obj, i) {
+		obj.y = this[i];
+	}
+	
+	function push(obj) {
+		this.push(obj);
 	}
 
 	var nodeType = {
@@ -364,9 +339,9 @@
 			});
 		},
 
-		note: function note(svg, symbol) {
+		note: function note(svg, symbol, x, y, event) {
 			var node = Scribe.Node(svg, 'g', {
-				'translate': [symbol.x, symbol.y]
+				'translate': [x, y]
 			});
 			
 			var head = Scribe.Node(svg, 'use', {
@@ -378,27 +353,31 @@
 			return node;
 		},
 		
-		stalkup: function stalkup(svg, symbol) {
+		stalkup: function stalkup(svg, x, y) {
 			return Scribe.Node(svg, 'use', {
-				'href': '#stalkup'
+				'href': '#stalkup',
+				'translate': [x, y]
 			});
 		},
 	
-		stalkdown: function stalkdown(svg, symbol) {
+		stalkdown: function stalkdown(svg, x, y) {
 			return Scribe.Node(svg, 'use', {
-				'href': '#stalkdown'
+				'href': '#stalkdown',
+				'translate': [x, y]
 			});
 		},
 		
-		tailup: function tail(svg, symbol) {
+		tailup: function tail(svg, symbol, x, y) {
 			return Scribe.Node(svg, 'use', {
-				'href': '#tailup[' + symbol.duration +']'
+				'href': '#tailup[' + symbol.duration +']',
+				'translate': [x, y]
 			});
 		},
 		
-		taildown: function tail(svg, symbol) {
+		taildown: function tail(svg, symbol, x, y) {
 			return Scribe.Node(svg, 'use', {
-				'href': '#taildown[' + symbol.duration +']'
+				'href': '#taildown[' + symbol.duration +']',
+				'translate': [x, y]
 			});
 		},
 		
@@ -680,6 +659,7 @@
 		var n = 0;
 		var i = 0;
 		var beam = newBeam();
+		var group = [];
 		var accMap = {};
 		var beat = start; 
 		var duration, bar, symbol, note, breakpoint, nextBeat, key, spelling;
@@ -690,7 +670,10 @@
 
 		while (beat < end) {
 			// Guard against infinite loops for debugging
-			if (debug && i++ > 200) { break; }
+			if (debug && i++ > 1200) { 
+				console.log('Uh-oh. Infinite loop.');
+				break;
+			}
 			
 			console.groupEnd();
 
@@ -701,7 +684,7 @@
 			nextBeat = isDefined(note) ? note.beat : end;
 			breakpoint = nextBreakpoint(bar, beat);
 
-			console.groupCollapsed('Scribe: symbol', symbol.type, symbol.beat, symbol.duration);
+			console.group('Scribe: symbol', symbol.type, symbol.beat, symbol.duration);
 
 			if (symbol.type === 'bar') {
 				beam = newBeam(beam);
@@ -710,10 +693,6 @@
 			if (symbol.type === 'rest' && options.beamBreaksAtRest) {
 				beam = newBeam(beam);
 			}
-
-			//if (!isDefined(symbol.beat)) {
-			//	continue;
-			//}
 
 			// Where the last symbol overlaps the next note, shorten it.
 			if (note && symbol.beat + symbol.duration > nextBeat) {
@@ -800,16 +779,45 @@
 			if (!note) { break; }
 			
 			// Insert a note and increment n
-			symbol = symbolType.note(note.beat, note.duration, note.number);
-			console.log(symbol);
-			key = data.keyAtBeat(note.beat);
-			spelling = Scribe.spelling(note.number, key);
+			group.push(note);
 			
-			// Handle y positioning
-			mapToStave(symbols, symbol, bar.keyMap, accMap, bar.center, options.transpose, spelling);
+			while (noteData[++n] && noteData[n].beat === note.beat) {
+				console.log(noteData[n].beat);
+				group.push(noteData[n]);
+			}
+			
+			symbol = symbolType.note(note.beat);
+			symbol.duration = group.map(getDuration).reduce(max);
+			symbol.number   = group.map(getNumber);
+			symbol.y        = group.map(noteToY, scribe).map(yToPosition, bar);
+			
+			var l = group.length;
+			
+			while (l--) {
+				var keyMap = bar.keyMap;
+				var key = scribe.keyAtBeat(note.beat);
+				var number = group[l].number + scribe.transpose;
+				var spelling = Scribe.spelling(number, key);
+				var octave = Scribe.octave(number);
+				var offset = spelling[0];
+				var accidental = spelling[1];
+				var position = 7 * octave + offset;
+				var staveAcc = isDefined(accMap[position]) ?
+				    	accMap[position] :
+				    	keyMap[offset] ;
+				
+				if (accidental !== staveAcc) {
+					// We need an accidental.
+					console.log('insert accidental', Scribe.spell(number) + Scribe.octave(number), accidental, staveAcc);
+					accMap[position] = accidental;
+					symbols.push(symbolType.accidental(symbol.beat, accidental, symbol.y));
+				}
+			}
+			
+			console.log(symbol);
 			
 			symbols.push(symbol);
-			n++;
+			group.length = 0;
 		}
 		
 		console.groupEnd();
@@ -860,9 +868,9 @@
 		
 		return output;
 	}
-	
+
 	// Renderer
-	
+
 	function renderLedgers(svg, layer, symbol) {
 		var y = 0;
 
@@ -901,82 +909,115 @@
 			}
 		}
 	}
-	
+
 	function renderTie(svg, layer, symbol) {
 		if (!symbol.to) { return; }
 		
-		layer.appendChild(nodeType.tie(svg, {
-			x: symbol.x + 1.25,
-			y: symbol.y,
-			width: symbol.to.x - symbol.x - 2.75
-		}));
+		var n = symbol.y.length;
+		
+		while (n--) {
+			layer.appendChild(nodeType.tie(svg, {
+				x: symbol.x + 1.25,
+				y: symbol.y[n],
+				width: symbol.to.x - symbol.x - 2.75
+			}));
+		}
 	}
-	
+
 	function renderNote(svg, layer, symbol) {
-		var node = nodeType[symbol.type](svg, symbol);
+		var nodes = [];
+		var minY = symbol.y.reduce(min);
+		var maxY = symbol.y.reduce(max);
+		var centerY = minY + (maxY - minY) / 2;
+		var offsets, startY, endY, tail, n;
+		
+		if (centerY < 0) {
+			offsets = defaults.stalkDown;
+			startY = minY;
+			endY = maxY;
+			tail = 'taildown';
+		}
+		else {
+			offsets = defaults.stalkUp;
+			startY = maxY;
+			endY = minY;
+			tail = 'tailup'
+		}
+		
+		n = symbol.y.length;
+		
+		while (n--) {
+			nodes.push(nodeType[symbol.type](svg, symbol, symbol.x, symbol.y[n]));
+		}
 		
 		if (!symbol.beam && symbol.duration && symbol.duration < 4) {
-			if (symbol.y > 0) {
-				// Stalks down
-				node.appendChild(nodeType.stalkup(svg, symbol));
-				if (symbol.duration < 1) {
-					node.appendChild(nodeType.tailup(svg, symbol));
-				}
-			}
-			else {
-				// Stalks up
-				node.appendChild(nodeType.stalkdown(svg, symbol));
-				if (symbol.duration < 1) {
-					node.appendChild(nodeType.taildown(svg, symbol));
-				}
+			// Stalks down
+			nodes.push(Scribe.Node(svg, 'line', {
+				'class': 'scribe-stalk',
+				x1: offsets.x1 + symbol.x,
+				y1: offsets.y1 + startY,
+				x2: offsets.x2 + symbol.x,
+				y2: offsets.y2 + endY
+			}));
+
+			if (symbol.duration < 1) {
+				nodes.push(nodeType[tail](svg, symbol, symbol.x, endY));
 			}
 		}
 		
-		layer.appendChild(node);
+		n = nodes.length;
+		
+		while (n--) {
+			layer.appendChild(nodes[n]);
+		}
 	}
-	
-	function createBeamY(symbols, options) {
-		var symbol1   = first(symbols);
-		var symbol2   = last(symbols);
-		var symbolsY  = symbols.map(getY);
+
+	function createBeamY(symbols, options, symbolsY) {
+		var firstX    = first(symbols).x;
+		var lastX     = last(symbols).x;
+		var firstY    = first(symbolsY);
+		var lastY     = last(symbolsY);
 		var avgY      = symbolsY.reduce(sum) / symbols.length;
 		var factorG   = options.beamGradientFactor || 0.75;
 		var maxG      = isDefined(options.beamGradientMax) ? options.beamGradientMax : 1 ;
-		var gradient  = limit(factorG * (symbol2.y - symbol1.y) / (symbol2.x - symbol1.x), -maxG, maxG);
-		var xMid      = symbol1.x + 0.5 * (symbol2.x - symbol1.x);
-		var offsetY   = avgY > 0 ? symbolsY.reduce(min) : symbolsY.reduce(max);
+		var gradient  = limit(factorG * (lastY - firstY) / (lastX - firstX), -maxG, maxG);
+		var xMid      = firstX + 0.5 * (lastX - firstX);
+		var offsetY   = avgY < 0 ? symbolsY.reduce(max) - 2 : symbolsY.reduce(min) + 2;
 		
 		return function beamY(x) {
 			return (x - xMid) * gradient + offsetY;
 		}
 	}
-	
-	function renderGroup(svg, layer, symbols, options) {
-		var length = symbols.length;
-		var avgY   = symbols.map(getY).reduce(sum) / length;
-		var beamY  = createBeamY(symbols, options);
-		var stalk  = avgY < 0 ? defaults.stalkDown : defaults.stalkUp ;
-		var node   = Scribe.Node(svg, 'g');
 
-		renderStalks(svg, node, symbols, stalk, beamY);
+	function renderGroup(svg, layer, symbols, options) {
+		var length  = symbols.length;
+		var minY    = symbols.map(getY).map(toMin);
+		var maxY    = symbols.map(getY).map(toMax);
+		var avgY    = symbols.map(getY).map(toAvg);
+		var beamY   = createBeamY(symbols, options, avgY < 0 ? minY : maxY);
+		var stalk   = avgY < 0 ? defaults.stalkUp : defaults.stalkDown ;
+		var node    = Scribe.Node(svg, 'g');
+
+		renderStalks(svg, node, symbols, stalk, beamY, avgY < 0 ? maxY : minY);
 		renderBeams(svg, node, symbols, stalk.x2, stalk.y2, beamY, 1);
 		
 		layer.appendChild(node);
 	}
 
-	function renderStalks(svg, node, symbols, offsets, beamY) {
+	function renderStalks(svg, node, symbols, offsets, beamY, symbolsY) {
 		var length = symbols.length;
 		var n = -1;
-		var symbol;
+		var symbol, symbolY;
 		
 		// Render the stalks
 		while (++n < length) {
 			symbol = symbols[n];
+			symbolY = symbolsY[n];
 			
 			node.appendChild(Scribe.Node(svg, 'line', {
 				'class': 'scribe-stalk',
 				x1: offsets.x1 + symbol.x,
-				y1: offsets.y1 + symbol.y,
+				y1: offsets.y1 + symbolY,
 				x2: offsets.x2 + symbol.x,
 				y2: offsets.y2 + beamY(symbol.x)
 			}));
@@ -1046,7 +1087,7 @@
 		var length = symbols.length,
 		    n = -1,
 		    x = 0,
-		    symbol, node, beam;
+		    symbol, node, beam, l;
 
 		while (++n < length) {
 			symbol = symbols[n];
@@ -1232,8 +1273,6 @@
 		
 		// Find the minwidth of all the symbols, and if it's too wide render a
 		// stave with fewer bars.
-		//var minwidth = symbols1.map(getMinWidth).reduce(sum) - first(symbols1).lmin - last(symbols1).rmin;
-		
 		var minwidth = distributeX([symbols1, symbols2], -1);
 		
 		if (minwidth > width) {
@@ -1252,9 +1291,6 @@
 		// If we are at the end and there is enough width, set the x positions
 		// to their ideals, creating a shorter last stave, otherwise fit the
 		// symbols to the width of the stave.
-		//var idealwidth = symbols1.map(getWidth).reduce(sum) - first(symbols1).l - last(symbols1).r;
-
-
 		var idealwidth = distributeX([symbols1, symbols2], 0);
 
 		if (end >= options.end && idealwidth <= width) {
@@ -1296,7 +1332,7 @@
 		
 		while (start < options.end) {
 			// Catch infinite loops
-			if (debug && i++ > 24) { break; }
+			if (debug && i++ > 48) { break; }
 
 			bars = scribe.staveBarsAtBeat(start) + cursor.bars;
 			end = beatOfBarN(scribe, start, bars);
@@ -1426,16 +1462,24 @@
 			});
 		};
 		
-		scribe.transpose = function(n) {
-			options.transpose = n;
-			deleteProperties(_keys);
+		Object.defineProperties(scribe, {
+			transpose: {
+				set: function(n) {
+					options.transpose = n;
+					deleteProperties(_keys);
 
-			this.keyMap = {
-				0: createKeyMap(options.key + options.transpose)
-			};
+					this.keyMap = {
+						0: createKeyMap(options.key + options.transpose)
+					};
 
-			this.render();
-		};
+					this.render();
+				},
+				
+				get: function() {
+					return options.transpose;
+				}
+			}
+		});
 		
 		scribe.staveBarsAtBeat = staveBarsAtBeat;
 		scribe.render = queueRender;
