@@ -119,7 +119,7 @@
 	function getLength(obj)   { return obj.length; }
 	
 	function toFloat(str)     { return parseFloat(str, 10); }
-	function toMin(array)     { return array.reduce(min); }
+	function toMin(array)     { return typeof array === 'number' ? array : array.reduce(min); }
 	function toMax(array)     { return array.reduce(max); }
 	function toAvg(array)     { return array.reduce(sum) / array.length; }
 	
@@ -1303,7 +1303,7 @@
 		renderChords(svg, symbols2, options.paddingLeft, cursor.y + options.chordsOffset, width, options);
 
 		// Find the offset of the highest symbol
-		var minY = symbols1.map(getY).reduce(min);
+		var minY = symbols1.map(getY).map(toMin).reduce(min);
 
 		cursor.y += minY > -5 ? 0 : -(minY + 5) ;
 		
