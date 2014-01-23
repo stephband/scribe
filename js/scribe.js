@@ -69,15 +69,8 @@
 	function mod7(n)  { return mod(n, 7); }
 	function mod12(n) { return mod(n, 12); }
 	function mag(n)   { return n < 0 ? -n : n ; }
-
-	function limit(n, min, max) {
-		// Return n limited to min and max values.
-		return n < min ? min : n > max ? max : n ;
-	}
-	
-	function return0() {
-		return 0;
-	}
+	function limit(n, min, max) { return n < min ? min : n > max ? max : n ; }
+	function return0() { return 0; }
 
 	// Reduce functions
 
