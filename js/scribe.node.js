@@ -6,6 +6,7 @@
 	var xmlns = "http://www.w3.org/2000/svg";
 
 	var attributes = {
+		'viewBox': setAttr,
 		'class': setAttr,
 		'x': setAttr,
 		'y': setAttr,
@@ -14,6 +15,8 @@
 		'x2': setAttr,
 		'y2': setAttr,
 		'd': setAttr,
+		'width': setAttr,
+		'height': setAttr,
 		'href': setAttrBaseVal,
 		'translate': setTransform,
 		'scale': setTransform,
@@ -82,7 +85,21 @@
 		return node;
 	}
 	
+	function SVG(obj) {
+		var svg = document.createElementNS(xmlns, 'svg');
+		var attr;
+		var viewBox = '0 0 ' + obj.size + ' ' + Math.floor(obj.size * obj.height / obj.width);
+		
+		for (attr in obj) {
+			if (attr === 'size') { continue; }
+			attributes[attr](svg, node, attr, obj[attr]);
+		}
+		
+		return svg;
+	}
+	
 	// Object constructor
 	
 	Scribe.Node = Node;
+	Scribe.SVG = SVG;
 })(Scribe);

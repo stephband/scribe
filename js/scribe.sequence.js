@@ -322,7 +322,7 @@
 	extend(prototype, Scribe.mixin.events);
 	
 	Scribe.Sequence = function(data) {
-		var collection = Object.create(prototype);
+		var sequence = Object.create(prototype);
 		
 		if (!(data instanceof Array)) {
 			if (debug) console.log('Scribe: data not an array. Scribe cant do that yet.');
@@ -332,18 +332,18 @@
 		data
 		.map(Scribe.Event)
 		.sort(byBeat)
-		.reduce(setIndex, collection)
+		.reduce(setIndex, sequence)
 		.length = data.length;
 		
-		collection.reduce(addListener, collection)
+		sequence.reduce(addListener, sequence)
 		
 		// Define caches
-		Object.defineProperties(collection, {
+		Object.defineProperties(sequence, {
 			_beats: { value: [] },
 			_keys:  { value: [] }
 		});
 		
-		window.collection = collection;
-		return collection;
+		window.sequence = sequence;
+		return sequence;
 	};
 })(Scribe);
