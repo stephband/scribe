@@ -37,8 +37,10 @@
 		'rotate': 'SVG_TRANSFORM_ROTATE'
 	};
 
-	var defs = document.createDocumentFragment(
-		'<svg width="800" height="1200" viewBox="0 0 0 0" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
+	var frag = document.createDocumentFragment();
+	var div = document.createElement("div");
+	
+	div.innerHTML = '<svg width="800" height="1200" viewBox="0 0 0 0" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
 		'	<defs>' +
 		'		<line class="scribe-stave" x1="0" y1="0" x2="1" y2="0" id="line" />' +
 		'		<line class="scribe-barline" x1="0" y1="-4" x2="0" y2="4" id="bar" />' +
@@ -116,8 +118,11 @@
 		'		<path id="dim"    class="scribe-symbol" transform="translate(0   -40)   scale(0.1111)" d="M544.3301,512.2617c-2.7363,0-4.0322-2.0156-4.0322-6.0469c0-0.9375,1.6562-1.4414,4.9678-1.4414c2.0889,0,5.2568,0,9.4336,0c4.1758,0,7.3438,0,9.4326,0c42.8438,0,87.8477-1.5117,134.9395-4.5352l42.4834-2.8086c-13.7529-0.5762-34.4189-1.5117-61.9971-2.8086c-5.833-0.2891-14.4736-0.6484-26.1387-1.0801c-45.0039-1.2246-75.6777-1.873-92.0234-1.873c-1.584,0-3.8887,0.0723-7.0566,0.2168s-5.5449,0.1445-7.1289,0.1445c-2.0156,0-3.5283-0.0723-4.3926-0.3613c-1.7275-0.4316-2.5195-1.5117-2.5195-3.0957c0-2.5195,0.9355-3.8164,2.8799-3.8164l27.7227,0.8652l66.3174,1.9434l95.4805,2.0156c8.4248,0.1445,21.0254,0.3613,37.9473,0.793c1.2236,0.0723,3.2402,0.1445,6.1201,0.2148c2.377,0.1445,3.7451,0.2891,4.249,0.4336c1.9443,0.4316,2.8799,1.2949,2.8076,2.5918v1.0078c-0.0713,3.7441-0.5039,6.0488-1.2959,6.8398c-0.792,0.793-3.0957,1.2969-6.9121,1.5137l-10.2256,0.7188c-4.5361,0.3613-17.7852,0.9355-39.6748,1.6562l-167.0547,6.4082C549.4424,512.1191,544.6895,512.2617,544.3301,512.2617z"/>' +
 		'		<path id="tie" class="scribe-symbol" transform="translate(0 0.8)" d="M0.979174733,0.0124875307 C0.650597814,1.1195554 0.135029714,1.00095361 0.0165376402,0.026468657 C0.0113570514,0.0135475362 0.00253387291,0.00218807553 0,0 C0.0977526897,1.29523004 0.656681642,1.37089992 1,2.43111793e-08 C0.991901367,2.43111797e-08 0.987703936,0.01248753 0.979174733,0.0124875307 Z M0.979174733,0.0124875307"></path>' +
 		'	</defs>' +
-		'</svg>'
-	).querySelector('defs');
+		'</svg>';
+	
+	frag.appendChild(div);
+	
+	var defs = frag.querySelector('defs');
 	
 	// SVG functions
 	
@@ -171,14 +176,14 @@
 	function SVG(options) {
 		var svg = document.createElementNS(xmlns, 'svg');
 		var obj = {
-			id: options.id,
+			id: options.id || '',
 			width: options.width,
 			height: options.height,
 			version: '1.1',
 			xmlns: xmlns,
 			xlink: xlink,
 			class: 'scribe-svg',
-			viewBox: '0 0 ' + obj.size + ' ' + Math.floor(obj.size * obj.height / obj.width)
+			viewBox: '0 0 ' + options.size + ' ' + Math.floor(options.size * options.height / options.width)
 		};
 		var attr;
 		

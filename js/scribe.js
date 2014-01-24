@@ -514,7 +514,8 @@
 				rmin: 1.5,
 				l: width ? width / 2 : 2,
 				r: width ? width / 2 : 2,
-				beat: beat
+				beat: beat,
+				y: 0
 			}
 		},
 		
@@ -1373,7 +1374,7 @@
 		var options = extend({}, defaults, user, {
 			width: svg.viewBox.baseVal.width,
 			height: svg.viewBox.baseVal.height,
-			key: Scribe.number(user.key || defaults.key || 'C')
+			key: Scribe.number(user && user.key || defaults.key || 'C')
 		});
 
 		var flag;
