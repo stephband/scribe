@@ -4,6 +4,7 @@
 	var debug = Scribe.debug;
 	
 	var xmlns = "http://www.w3.org/2000/svg";
+	var xlink = "http://www.w3.org/1999/xlink";
 
 	var attributes = {
 		'viewBox': setAttr,
@@ -85,14 +86,22 @@
 		return node;
 	}
 	
-	function SVG(obj) {
+	function SVG(options) {
 		var svg = document.createElementNS(xmlns, 'svg');
+		var obj = {
+			id: options.id,
+			width: options.width,
+			height: options.height,
+			version: '1.1',
+			xmlns: xmlns,
+			xlink: xlink,
+			class: 'scribe-svg',
+			viewBox: '0 0 ' + obj.size + ' ' + Math.floor(obj.size * obj.height / obj.width)
+		};
 		var attr;
-		var viewBox = '0 0 ' + obj.size + ' ' + Math.floor(obj.size * obj.height / obj.width);
 		
 		for (attr in obj) {
-			if (attr === 'size') { continue; }
-			attributes[attr](svg, node, attr, obj[attr]);
+			svg.setAttribute(attr, obj[attr]);
 		}
 		
 		return svg;
