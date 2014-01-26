@@ -177,15 +177,17 @@
 		var svg = document.createElementNS(xmlns, 'svg');
 		var obj = {
 			id: options.id || '',
-			width: options.width,
-			height: options.height,
+			width:   options.width,
+			height:  options.height,
 			version: '1.1',
-			xmlns: xmlns,
-			xlink: xlink,
-			class: 'scribe-svg',
+			xmlns:   xmlns,
+			xlink:   xlink,
+			class:   options.class || 'scribe-svg',
 			viewBox: '0 0 ' + options.size + ' ' + Math.floor(options.size * options.height / options.width)
 		};
 		var attr;
+		
+		console.log(options.size, options.height, options.width, Math.floor(options.size * options.height / options.width));
 		
 		for (attr in obj) {
 			svg.setAttribute(attr, obj[attr]);
