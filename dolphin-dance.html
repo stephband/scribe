@@ -1,39 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8" />
-	<meta name="author" content="" />
-	<meta name="description" content="" />
+	{% include includes/meta.html %}
 	
 	<title>Scribe</title>
-	
 	<script>document.documentElement.className = 'js';</script>
 	
-	<meta name="viewport" content="initial-scale=1.0" />
-	<!-- Force latest IE rendering engine & Chrome Frame -->
-	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-	<!-- Make IE recognise HTML5 elements for styling -->
-	<!--[if lte IE 8]>
-	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-	<noscript>
-		<strong>Warning!</strong>
-		Your browser does not support HTML5 so some elements on this page are simulated using JScript. Unfortunately your browser has JScript disabled. Please enable it in order to display this page.
-	</noscript>
-	<![endif]-->
-	<!-- Disable image toolbar in IE6 -->
-	<!--[if lte IE 6]><meta http-equiv="imagetoolbar" content="no" /><![endif]-->
-	
-	<link rel="icon" type="image/png" href="images/favicon.png" />
-	<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-	
-	<link rel="stylesheet" href="css/bolt.normalise.css" />
-	<link rel="stylesheet" href="css/bolt.typography.css" />
-	<link rel="stylesheet" href="css/bolt.typography.15_24.css" />
-	<link rel="stylesheet" href="css/bolt.classes.css" />
-	<link rel="stylesheet" href="fonts/jazztext/stylesheet.css" />
-	<link rel="stylesheet" href="fonts/chords/stylesheet.css" />
-	<link rel="stylesheet" href="css/scribe.css" />
-	<link rel="stylesheet" href="css/leadsheet.css" />
+	{% include includes/link.html %}
 </head>
 
 <body>
@@ -51,21 +24,7 @@
 	</script>
 
 	{% include includes/footer.html %}
-
-	<script src="js/jquery.js"></script>
-	<script src="js/bolt.js"></script>
-	<script src="js/bolt.a.js"></script>
-	<script src="js/bolt.input.js"></script>
-	
-	<script src="js/scribe.js"></script>
-	<script src="js/scribe.notation.js"></script>
-	<script src="js/scribe.mixin.note.js"></script>
-	<script src="js/scribe.mixin.chord.js"></script>
-	<script src="js/scribe.mixin.array.js"></script>
-	<script src="js/scribe.mixin.events.js"></script>
-	<script src="js/scribe.node.js"></script>
-	<script src="js/scribe.sequence.js"></script>
-	<script src="js/scribe.event.js"></script>
+	{% include includes/scripts.html %}
 	
 	<script>
 	(function() {
