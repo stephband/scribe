@@ -120,8 +120,6 @@
 	
 	function isNote(obj)      { return obj.type === 'note'; }
 	function isChord(obj)     { return obj.type === 'chord'; }
-	function isStaveSymbol(obj) { return obj.type !== 'chord'; }
-	function isChordSymbol(obj) { return obj.type === 'chord'; }
 	
 	// Object functions
 	
@@ -514,7 +512,8 @@
 				rmin: 1.5,
 				l: width ? width / 2 : 2,
 				r: width ? width / 2 : 2,
-				beat: beat
+				beat: beat,
+				y: 0
 			}
 		},
 		
@@ -1346,6 +1345,11 @@
 			
 			cursor.y += options.staveSpacing;
 		}
+		
+		// Automatically adjust the height of the SVG to accomodate the length of the music
+		options.height = Math.ceil(cursor.y);
+		svg.setAttribute('viewBox', '0 0 ' + options.width + ' ' + options.height);
+		svg.setAttribute('height', Math.ceil(svg.clientWidth * options.height / options.width));
 	}
 
 	function clearSVG(svg) {
@@ -1373,7 +1377,7 @@
 		var options = extend({}, defaults, user, {
 			width: svg.viewBox.baseVal.width,
 			height: svg.viewBox.baseVal.height,
-			key: Scribe.number(user.key || defaults.key || 'C')
+			key: Scribe.number(user && user.key || defaults.key || 'C')
 		});
 
 		var flag;

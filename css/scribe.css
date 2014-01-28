@@ -4,12 +4,12 @@
 	width: 800px;
 	margin-left: auto;
 	margin-right: auto;
-	padding-top: 1.5rem;
 }
 
 .scribe-header,
 .scribe-footer {
 	font-family: 'jazztextregular', cursive;
+	padding-top: 1.5rem;
 }
 
 .scribe-header a,
