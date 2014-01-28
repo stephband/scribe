@@ -1,44 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	{% include includes/meta.html %}
-	
-	<title>Scribe</title>
-	<script>document.documentElement.className = 'js';</script>
-	
-	{% include includes/link.html %}
-</head>
-
-<body>
-	<header class="scribe-header">
-		<h1 class="scribe-title">Dolphin dance</h1>
-		<p class="scribe-composer">Herbie Hancock</p>
-		<p class="scribe-part">
-			Transpose:
-			{% include includes/transpose-button.html %}
-		</p>
-	</header>
-
-	<script type="application/json" data-scribe="x">
-		{% include json/dolphin-dance.json %}
-	</script>
-
-	{% include includes/footer.html %}
-	{% include includes/scripts.html %}
-	
-	<script>
-	(function() {
-		var scribe;
-		
-		var options = {
-			clef: 'treble',
+---
+layout: site
+json: "json/dolphin-dance.json"
+title: "Dolphin Dance"
+composer: "Herbie Hancock"
+options: '{
+			key: "C",
+			clef: "treble",
 			staveSpacing: 22,
 			chordsOffset: -9,
 			paddingTop: 9,
 		
 			symbols: {
-				16: 'repeat-start',
-				152: 'repeat-end'
+				16: "repeat-start",
+				152: "repeat-end"
 			},
 		
 			barsPerStave: {
@@ -47,30 +21,5 @@
 			},
 			
 			transpose: 0
-		};
-		
-		jQuery(document)
-		.on('change', '#select-transpose', function(e) {
-			scribe.transpose = parseInt(e.target.value, 10);
-		})
-		.ready(function() {
-			jQuery('[data-scribe]').each(function(i, node) {
-				console.log(this, this.textContent);
-				var data = JSON.parse(this.textContent);
-				var name = this.getAttribute('data-scribe');
-	
-				var svg = Scribe.SVG({
-					width: 800,
-					height: 1200,
-					size: 144
-				});
-				
-				jQuery(this).before(svg);
-	
-				scribe = Scribe(svg, data, options);
-			});
-		});
-	})();
-	</script>
-</body>
-</html>
+		}'
+---
