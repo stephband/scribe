@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="author" content="" />
+	<meta name="description" content="" />
+	
+	<title>Scribe</title>
+	
+	<script>document.documentElement.className = 'js';</script>
+	
+	<meta name="viewport" content="initial-scale=1.0" />
+	<!-- Force latest IE rendering engine & Chrome Frame -->
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<!-- Make IE recognise HTML5 elements for styling -->
+	<!--[if lte IE 8]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<noscript>
+		<strong>Warning!</strong>
+		Your browser does not support HTML5 so some elements on this page are simulated using JScript. Unfortunately your browser has JScript disabled. Please enable it in order to display this page.
+	</noscript>
+	<![endif]-->
+	<!-- Disable image toolbar in IE6 -->
+	<!--[if lte IE 6]><meta http-equiv="imagetoolbar" content="no" /><![endif]-->
+	
+	<link rel="icon" type="image/png" href="images/favicon.png" />
+	<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+	
+	<link rel="stylesheet" href="css/bolt.normalise.css" />
+	<link rel="stylesheet" href="css/bolt.typography.css" />
+	<link rel="stylesheet" href="css/bolt.typography.15_24.css" />
+	<link rel="stylesheet" href="css/bolt.classes.css" />
+	<link rel="stylesheet" href="fonts/jazztext/stylesheet.css" />
+	<link rel="stylesheet" href="fonts/chords/stylesheet.css" />
+	<link rel="stylesheet" href="css/scribe.css" />
+	<link rel="stylesheet" href="css/leadsheet.css" />
+</head>
+
+<body>
+	<header class="scribe-header">
+		<h1 class="scribe-title">Dolphin dance</h1>
+		<p class="scribe-composer">Herbie Hancock</p>
+		<p class="scribe-part">
+			Transpose:
+			{% include includes/transpose-button.html %}
+		</p>
+	</header>
+
+	<script type="application/json" data-scribe="x">
+		{% include json/dolphin-dance.json %}
+	</script>
+
+	{% include includes/footer.html %}
+
+	<script src="js/jquery.js"></script>
+	<script src="js/bolt.js"></script>
+	<script src="js/bolt.a.js"></script>
+	<script src="js/bolt.input.js"></script>
+	
+	<script src="js/scribe.js"></script>
+	<script src="js/scribe.notation.js"></script>
+	<script src="js/scribe.mixin.note.js"></script>
+	<script src="js/scribe.mixin.chord.js"></script>
+	<script src="js/scribe.mixin.array.js"></script>
+	<script src="js/scribe.mixin.events.js"></script>
+	<script src="js/scribe.node.js"></script>
+	<script src="js/scribe.sequence.js"></script>
+	<script src="js/scribe.event.js"></script>
+	
+	<script>
+	(function() {
+		var scribe;
+		
+		var options = {
+			clef: 'treble',
+			staveSpacing: 22,
+			chordsOffset: -9,
+			paddingTop: 9,
+		
+			symbols: {
+				16: 'repeat-start',
+				152: 'repeat-end'
+			},
+		
+			barsPerStave: {
+				0: 4,
+				112: 6
+			},
+			
+			transpose: 0
+		};
+		
+		jQuery(document)
+		.on('change', '#select-transpose', function(e) {
+			scribe.transpose = parseInt(e.target.value, 10);
+		})
+		.ready(function() {
+			jQuery('[data-scribe]').each(function(i, node) {
+				console.log(this, this.textContent);
+				var data = JSON.parse(this.textContent);
+				var name = this.getAttribute('data-scribe');
+	
+				var svg = Scribe.SVG({
+					width: 800,
+					height: 1200,
+					size: 144
+				});
+				
+				jQuery(this).before(svg);
+	
+				scribe = Scribe(svg, data, options);
+			});
+		});
+	})();
+	</script>
+</body>
+</html>

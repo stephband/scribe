@@ -1,0 +1,17 @@
+svg {
+	display: block;
+	/*border: 1px solid #e0e0e0;*/
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.transpose-button {
+	height: auto;
+	line-height: inherit;
+	vertical-align: middle;
+}
+
+.transpose-button:hover {
+	color: white;
+	background-color: black;
+}
