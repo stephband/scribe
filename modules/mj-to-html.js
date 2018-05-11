@@ -1,6 +1,7 @@
 import { by, get, limit, isDefined, overload } from '../../fn/fn.js';
-import { numberToNote } from '../../soundstage/modules/music.js';
 import { clone } from '../../dom/dom.js';
+// Todo: modularise music repo and publish and use that
+import { numberToNote } from './music.js';
 import symbols from './symbols.js';
 
 // <svg class="stave-svg" viewbox="0 0 1 4" preserveAspectRatio="none"><use x="0" y="0" href="#stave"/></svg>
