@@ -361,7 +361,7 @@
         nodes.forEach(append(node));
 
         var editor = get('editor');
-        editor.value = JSON.stringify(data);
+        editor.value = JSON.stringify(data).replace(/]]/g, ']\n]').replace(/\[\[/g, '[\n[').replace(/],/g, '],\n');
 
         events('change', editor).each(function(e) {
             try {
