@@ -1,10 +1,12 @@
-import { by, compose, get, is, limit, isDefined, overload } from '../../fn/fn.js';
-import { clone } from '../../dom/dom.js';
+import { by, compose, get, is, last, limit, isDefined, overload } from '../../fn/fn.js';
+import { append, clone } from '../../dom/dom.js';
 // Todo: modularise music repo and publish and use that
 import { numberToNote } from './music.js';
 import symbols from './symbols.js';
 
-const isNote = compose(is('note'), get(1));
+function isNoteOrStop(e) {
+    return e[1] === 'note' || e[1] === 'stop';
+}
 
 // Avoid float imprecision by comparing rough values
 
@@ -64,6 +66,11 @@ function beatToEventRest(noteStarts, beat) {
     return i >= l ? 0 : noteStarts[i] - beat ;
 }
 
+function beatToBar(meterStart, meterBeats, beat) {
+    const elapsedBeats = beat - meterStart;
+    return Math.floor(elapsedBeats / meterBeats);
+}
+
 function beatToBarBeat(meterStart, meterDuration, beat) {
     const elapsedBeats = beat - meterStart;
     return elapsedBeats % meterDuration;
@@ -114,7 +121,7 @@ function createRests(meterStart, meterBreaks, meterDuration, noteStarts, eventRe
 }
 
 function createRestSymbols(meterStart, meterBreaks, meterDuration, events, beat) {
-    const notes      = events.filter(isNote);
+    const notes      = events.filter(isNoteOrStop);
     const noteStarts = notes.map(get(0));
 
     // Duration until the next event
@@ -155,7 +162,7 @@ function numberToRow(number) {
     .replace('♭', 'b')
 }
 
-function eventToSpan(duration) {
+function durationToSpan(duration) {
     return floor(duration * ticks);
 }
 
@@ -165,7 +172,8 @@ function getEventType(data, events) {
 
 const populateNodes = overload(getEventType, {
     note: function(data, event) {
-        var node   = symbol('note-head');
+console.log('NOTE', event, data.lastNoteStop);
+
         var column = beatToColumnName(event[0]);
         var row    = numberToRow(event[2]);
         var start = (event[0] - data.meterStart) % data.meter;
@@ -177,6 +185,17 @@ const populateNodes = overload(getEventType, {
             console.log('Insert rests!');
             var restValues = createRestSymbols(data.meterStart, data.meterBreaks, data.meter, [event], data.lastNoteStop);
             console.log(restValues);
+
+            data.nodes.push.apply(data.nodes, restValues.map(function(duration) {
+                var column = beatToColumnName(data.lastNoteStop);
+                var row    = 'line-middle';
+                var span   = durationToSpan(duration);
+                var node   = symbol('rest-' + duration);
+console.log(row + '/beat-' + data.lastNoteStop + '/span 1/span ' + durationToSpan(duration))
+                node.style.gridArea = row + '/beat-' + data.lastNoteStop + '/span 1/span ' + durationToSpan(duration);
+                data.lastNoteStop += duration;
+                return node;
+            }));
         }
 
         // Check whether symbol crosses a bar line
@@ -184,12 +203,13 @@ const populateNodes = overload(getEventType, {
             data.meter - start :
             end - start ;
 
-        var span = eventToSpan(duration);
+        var span = durationToSpan(duration);
+        var node = symbol('head-' + duration);
 
         node.style.gridArea = row + '/' + column + '/span 1/span ' + span;
         data.nodes.push(node);
         data.lastNoteStop = event[0] + event[4];
-
+/*
         while (end > data.meter) {
             lastColumn = column;
             lastSpan   = span;
@@ -200,7 +220,7 @@ const populateNodes = overload(getEventType, {
             beat   = data.meterStart + (floor((event[0] - data.meterStart) / data.meter) + 1) * data.meter;
             column = beatToColumnName(beat);
             duration = limit(0, data.meter, end);
-            span   = eventToSpan(duration);
+            span   = durationToSpan(duration);
 
             node.style.gridArea = row + '/' + column + '/span 1/span ' + span;
             data.nodes.push(node);
@@ -214,7 +234,7 @@ const populateNodes = overload(getEventType, {
 
             end -= data.meter;
         }
-
+*/
         return data;
     },
 
@@ -222,28 +242,108 @@ const populateNodes = overload(getEventType, {
         var node   = symbol('chord');
         var column = beatToColumnName(event[0]);
         var row    = 'chords';
-        var span   = eventToSpan(event[3]);
+        var span   = durationToSpan(event[3]);
 
         node.style.gridArea = row + '/' + column + '/span 1/span ' + span;
         node.innerHTML = event[2];
 
         data.nodes.push(node);
         return data;
+    },
+
+    stop: function(data, event) {
+        if (data.lastNoteStop < event[0]) {
+            console.log('Insert rests', data.lastNoteStop, event);
+            var restValues = createRestSymbols(data.meterStart, data.meterBreaks, data.meter, [event], data.lastNoteStop);
+            console.log(restValues);
+
+            data.nodes.push.apply(data.nodes, restValues.map(function(duration) {
+                var column = beatToColumnName(data.lastNoteStop);
+                var row    = 'line-middle';
+                var span   = durationToSpan(duration);
+                var node   = symbol('rest-' + duration);
+console.log(row + '/beat-' + data.lastNoteStop + '/span 1/span ' + durationToSpan(duration))
+                node.style.gridArea = row + '/beat-' + data.lastNoteStop + '/span 1/span ' + durationToSpan(duration);
+                data.lastNoteStop += duration;
+                return node;
+            }));
+        }
+
+        return data;
     }
 });
+
+function createBar(events) {
+
+}
+
+function splitBars(data, event) {
+    const bar = beatToBar(data.meterStart, data.meter, event[0]);
+
+    if (data.bar < bar) {
+        const barNode = last(data.barNodes);
+        data.nodes    = [];
+
+console.log('BAR ', data.bar, '--------------------------');
+
+        // Populate and append the previous bar
+        const events = data.events
+        .map(function(event) {
+            var e = event.slice();
+            e[0] = beatToBarBeat(data.meterStart, data.meter, event[0]);
+            return e;
+        });
+
+        events.push([data.meter, 'stop']);
+
+        events
+        .reduce(populateNodes, data)
+        .nodes
+        .forEach(append(barNode));
+
+        if (event[1] === 'stop') {
+            return data;
+        }
+
+        data.lastNoteStop = 0;
+        data.events = [];
+console.log(data.bar, bar);
+        // Create new bars
+        while (data.bar < bar) {
+            data.bar++;
+            data.barNodes.push(symbol('4/4-treble-bar'));
+
+            if (data.bar < bar) {
+console.log('REST', row + '/beat-' + data.lastNoteStop + '/span 1/span ' + durationToSpan(data.meterDuration))
+                const barRest = symbol('rest-' + data.meterDuration);
+                barRest.style.gridArea = row + '/beat-' + data.lastNoteStop + '/span 1/span ' + durationToSpan(data.meterDuration);
+                append(last(data.barNodes), barRest);
+            }
+        }
+    }
+
+    data.events.push(event);
+    return data;
+}
 
 export default function mjToHTML(json) {
     var data = typeof json === 'string' ? JSON.parse(json) : json ;
     var events = data.events;
 
-    return events
+    events
     .sort(by(get(0)))
-    .reduce(populateNodes, {
+    .push([16, "stop"]);
+
+    return events
+    .reduce(splitBars, {
         meterStart: 0,
         meter: 4,
         meterBreaks: [2],
+        bar: 0,
+        barNodes: [symbol('4/4-treble-bar')],
         lastNoteStop: 0,
-        nodes: []
+        nodes: [],
+        events: []
     })
-    .nodes;
+    .barNodes;
 };
