@@ -28,8 +28,18 @@ const svg    = create('svg');
 // <svg class="head-svg" style="grid-column: beat-0  / span 24; grid-row: F3;" viewbox="0 0 1 1"><use x="0" y="0" href="#cross-head"/></svg>
 // <abbr  class="chord-abbr" style="grid-column: beat-0 / span 96;">Symbol</abbr>
 
-function symbol(type) {
-    return clone(symbols[type]);
+function createNode(type, column, row, span) {
+    const node = clone(symbols[type]);
+
+    if (column) {
+        node.style.gridColumn = column + '/span ' + span;
+    }
+
+    if (row) {
+        node.style.gridRow = row + '/span 1';
+    }
+
+    return node;
 }
 
 function beatToBar(meterStart, meterBeats, beat) {
@@ -65,31 +75,44 @@ function getEventType(data, events) {
     return events[1];
 }
 
-const populateNodes = overload(getEventType, {
-    note: function(data, event) {
-console.log('NOTE', event, data.lastNoteStop);
+function beatToEventRest(noteStarts, beat) {
+    const l = noteStarts.length;
+    let i = -1;
+    while (++i < l && noteStarts[i] < beat);
+    return i >= l ? 0 : noteStarts[i] - beat ;
+}
 
+
+const populateNodes = overload(getEventType, {
+    meter: function(data, event) {
+        // beat, type, num, den [, breaks]
+        data.meterStart = event[0];
+        data.meter = event[2];
+        // Todo: lookup table for common num/den breaks
+        data.meterBreaks = event[4] || [2];
+        return data;
+    },
+
+    note: function(data, event) {
         var column = beatToColumnName(event[0]);
         var row    = numberToRow(event[2]);
-        var start = (event[0] - data.meterStart) % data.meter;
-        var end   = start + event[4];
+        var start  = (event[0] - data.meterStart) % data.meter;
+        var end    = start + event[4];
         var beat, lastColumn, lastSpan;
         var restLength;
 
         if (data.lastNoteStop < event[0]) {
-            console.log('Insert rests!');
-            var restValues = makeRests(data.meterStart, data.meterBreaks, data.meter, [event], data.lastNoteStop);
-            console.log(restValues);
+            var rests = makeRests(data.meterBreaks, data.meter, data.meterStart, data.lastNoteStop, event[0] - data.lastNoteStop);
 
-            data.nodes.push.apply(data.nodes, restValues.map(function(duration) {
-                var column = beatToColumnName(data.lastNoteStop);
+            data.symbols.push.apply(data.symbols, rests.map(function(symbol) {
                 var row    = 'line-middle';
-                var span   = durationToSpan(duration);
-                var node   = symbol('rest-' + duration);
-console.log(row + '/beat-' + data.lastNoteStop + '/span 1/span ' + durationToSpan(duration))
-                node.style.gridArea = row + '/beat-' + data.lastNoteStop + '/span 1/span ' + durationToSpan(duration);
-                data.lastNoteStop += duration;
-                return node;
+                var column = beatToColumnName(symbol.beat);
+                var span   = durationToSpan(symbol.duration);
+
+                symbol.node = createNode('rest-' + symbol.duration, column, row, span);
+                data.lastNoteStop = symbol.beat + symbol.duration;
+
+                return symbol;
             }));
         }
 
@@ -99,18 +122,30 @@ console.log(row + '/beat-' + data.lastNoteStop + '/span 1/span ' + durationToSpa
             end - start ;
 
         var span = durationToSpan(duration);
-        var node = symbol('head-' + duration);
 
-        node.style.gridArea = row + '/' + column + '/span 1/span ' + span;
-        data.nodes.push(node);
-        data.lastNoteStop = event[0] + event[4];
+        var symbol = {
+            type:  'head',
+            event: event,
+            node:  createNode('head-' + duration, column, row, span),
+            beat:  event[0],
+            duration: duration
+        };
+
+        data.symbols.push(symbol);
+
+        var eventStop = event[0] + event[4];
+
+        if (data.lastNoteStop < eventStop) {
+            data.lastNoteStop = eventStop;
+        }
+
 /*
         while (end > data.meter) {
             lastColumn = column;
             lastSpan   = span;
 
             // Create note head
-            node   = symbol('note-head');
+            node   = createNode('note-head');
             // First beat of next bar
             beat   = data.meterStart + (floor((event[0] - data.meterStart) / data.meter) + 1) * data.meter;
             column = beatToColumnName(beat);
@@ -118,14 +153,16 @@ console.log(row + '/beat-' + data.lastNoteStop + '/span 1/span ' + durationToSpa
             span   = durationToSpan(duration);
 
             node.style.gridArea = row + '/' + column + '/span 1/span ' + span;
-            data.nodes.push(node);
+            data.symbols.push(symbol);
+    data.nodes.push(node);
 
             // Create tie mark
             console.log('Insert tie!');
-            node   = symbol('up-tie');
+            node   = createNode('up-tie');
 
             node.style.gridArea = row + '/' + lastColumn + '/span 1/span ' + (lastSpan + 2);
-            data.nodes.push(node);
+            data.symbols.push(symbol);
+    data.nodes.push(node);
 
             end -= data.meter;
         }
@@ -134,33 +171,35 @@ console.log(row + '/beat-' + data.lastNoteStop + '/span 1/span ' + durationToSpa
     },
 
     mode: function(data, event) {
-        var node   = symbol('chord');
         var column = beatToColumnName(event[0]);
-        var row    = 'chords';
         var span   = durationToSpan(event[3]);
 
-        node.style.gridArea = row + '/' + column + '/span 1/span ' + span;
-        node.innerHTML = event[2];
+        const symbol = {
+            type: 'chord',
+            node: createNode('chord', column, 'chords', span),
+            beat: event[0],
+            duration: event[3]
+        };
 
-        data.nodes.push(node);
+        symbol.node.innerHTML = event[2];
+        data.symbols.push(symbol);
+
         return data;
     },
 
     stop: function(data, event) {
         if (data.lastNoteStop < event[0]) {
-            console.log('Insert rests', data.lastNoteStop, event);
-            var restValues = makeRests(data.meterStart, data.meterBreaks, data.meter, [event], data.lastNoteStop);
-            console.log(restValues);
+            var rests = makeRests(data.meterBreaks, data.meter, data.meterStart, data.lastNoteStop, event[0] - data.lastNoteStop);
 
-            data.nodes.push.apply(data.nodes, restValues.map(function(duration) {
-                var column = beatToColumnName(data.lastNoteStop);
+            data.symbols.push.apply(data.symbols, rests.map(function(symbol) {
+                var column = beatToColumnName(symbol.beat);
                 var row    = 'line-middle';
-                var span   = durationToSpan(duration);
-                var node   = symbol('rest-' + duration);
-console.log(row + '/beat-' + data.lastNoteStop + '/span 1/span ' + durationToSpan(duration))
-                node.style.gridArea = row + '/beat-' + data.lastNoteStop + '/span 1/span ' + durationToSpan(duration);
-                data.lastNoteStop += duration;
-                return node;
+                var span   = durationToSpan(symbol.duration);
+                symbol.node = createNode('rest-' + symbol.duration, column, row, span);
+
+                data.lastNoteStop = symbol.beat + symbol.duration;
+
+                return symbol;
             }));
         }
 
@@ -177,9 +216,9 @@ function splitBars(data, event) {
 
     if (data.bar < bar) {
         const barNode = last(data.barNodes);
-        data.nodes    = [];
+        data.symbols  = [];
 
-console.log('BAR ', data.bar, '--------------------------');
+console.log('BAR ', data.bar);
 
         // Populate and append the previous bar
         const events = data.events
@@ -193,7 +232,8 @@ console.log('BAR ', data.bar, '--------------------------');
 
         events
         .reduce(populateNodes, data)
-        .nodes
+        .symbols
+        .map(get('node'))
         .forEach(append(barNode));
 
         if (event[1] === 'stop') {
@@ -202,16 +242,15 @@ console.log('BAR ', data.bar, '--------------------------');
 
         data.lastNoteStop = 0;
         data.events = [];
-console.log(data.bar, bar);
+
         // Create new bars
         while (data.bar < bar) {
             data.bar++;
-            data.barNodes.push(symbol('4/4-treble-bar'));
+            data.barNodes.push(createNode('4/4-treble-bar'));
 
             if (data.bar < bar) {
-console.log('REST', row + '/beat-' + data.lastNoteStop + '/span 1/span ' + durationToSpan(data.meterDuration))
-                const barRest = symbol('rest-' + data.meterDuration);
-                barRest.style.gridArea = row + '/beat-' + data.lastNoteStop + '/span 1/span ' + durationToSpan(data.meterDuration);
+                console.log('REST', row + '/beat-' + data.lastNoteStop + '/span 1/span ' + durationToSpan(data.meterDuration))
+                const barRest = createNode('rest-' + data.meterDuration, beatToColumnName(data.lastNoteStop), row, durationToSpan(data.meterDuration));
                 append(last(data.barNodes), barRest);
             }
         }
@@ -235,10 +274,25 @@ export default function mjToHTML(json) {
         meter: 4,
         meterBreaks: [2],
         bar: 0,
-        barNodes: [symbol('4/4-treble-bar')],
+        barNodes: [createNode('4/4-treble-bar')],
         lastNoteStop: 0,
-        nodes: [],
+        symbols: [],
         events: []
     })
     .barNodes;
+
+    var bar = 0;
+    while (++bar <= 60) {
+
+    }
+
+    events.reduce(function(array, event) {
+        const bar = beatToBar(data.meterStart, data.meter, event[0]);
+
+        var previousBar = array.length && array[array.length - 1].bar;
+
+        if (bar === previousBar) {
+            array[array.length - 1].push(event);
+        }
+    }, [])
 };

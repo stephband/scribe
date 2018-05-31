@@ -69,7 +69,10 @@
             font-family: 'Roboto Mono', 'Fira Mono', 'Andale Mono', courier, monospace !important;
         }
 
-        .scribe-glyph {
+        .scribe-clef,
+        .scribe-rest,
+        .scribe-head,
+        .scribe-acc {
             display: block;
             position: relative;
             font-family: 'Jazz';
@@ -81,24 +84,11 @@
             margin-top: -0.763157895em;
         }
 
-        .scribe-clef {
-            min-width: 0.736842105em;
-            margin-left: 0.15em;
-            margin-right: 0.3em;
-            grid-row: G4;
-            grid-column: bar-start;
-            vertical-align: baseline;
-        }
-
-        .scribe-rest {
-            text-align: center;
-        }
-
         /* Hide clef in bars that follow bars of the same clef. */
         .scribe-treble-grid + .scribe-treble-grid > .scribe-clef { display: none; }
 
         /* Show baseline over glyph */
-        /*.scribe-glyph::after {
+        /*.::after {
             content: '';
             display: inline-block;
             font-family: 'Roboto Mono', courier, monospace;
@@ -357,7 +347,7 @@
             <svg class="bar-svg bar-svg-1" viewbox="0 0 0.4 4"><use x="0.4" y="0" href="#bar"/></svg>
 
             <!-- Treble clef -->
-            <span class="scribe-clef scribe-glyph">&#61478;</span>
+            <span class="scribe-clef">&#61478;</span>
 
             <!-- Cross notes -->
             <!--svg class="head-svg" style="grid-column: beat-0  / span 24; grid-row: line-bottom;" viewbox="0 0 1 1"><use x="0" y="0" href="#cross-head"/></svg>
@@ -369,32 +359,32 @@
         <svg id="scribe-stave" class="stave-svg" viewbox="0 0 1 4" preserveAspectRatio="none"><use x="0" y="0" href="#stave"/></svg>
         <svg id="scribe-bar" class="bar-svg bar-svg-0" viewbox="0 0 0.4 4"><use x="0" y="0" href="#bar"/></svg>
 
-        <span id="scribe-rest-1" class="scribe-glyph">&#61646;</span>
-        <span id="scribe-rest-0.125" class="scribe-rest-0-125 scribe-rest scribe-glyph">&#61608;</span>
-        <span id="scribe-rest-0.25"  class="scribe-rest-0-25 scribe-rest scribe-glyph">&#61637;</span>
-        <span id="scribe-rest-0.5" class="scribe-rest-0-5 scribe-rest scribe-glyph">&#61668;</span>
-        <span id="scribe-rest-1" class="scribe-rest-1 scribe-rest scribe-glyph">&#61646;</span>
-        <span id="scribe-rest-1.5" class="scribe-rest-1-5 scribe-rest scribe-glyph">&#61646;&#61486;</span>
-        <span id="scribe-rest-2" class="scribe-rest-2 scribe-rest scribe-glyph">&#61678;</span>
-        <span id="scribe-rest-3" class="scribe-rest-3 scribe-rest scribe-glyph">&#61678;&#61486;</span>
-        <span id="scribe-rest-4" class="scribe-rest-4 scribe-rest scribe-glyph">&#61623;</span>
-        <span id="scribe-rest-6" class="scribe-rest-6 scribe-rest scribe-glyph">&#61623;&#61486;</span>
-        <span id="scribe-rest-bars" class="scribe-rest-bars scribe-rest scribe-glyph">&#61685;</span>
-        <span id="scribe-flat" class="scribe-glyph">&#61538;</span>
-        <span id="scribe-sharp" class="scribe-glyph">&#61475;</span>
-        <span id="scribe-head-0.125" class="scribe-head-0-125 scribe-head scribe-glyph">&#61647;</span>
-        <span id="scribe-head-0.1875" class="scribe-head-0-1875 scribe-head scribe-glyph">&#61647;&#61486;</span>
-        <span id="scribe-head-0.25" class="scribe-head-0-25 scribe-head scribe-glyph">&#61647;</span>
-        <span id="scribe-head-0.375" class="scribe-head-0-375 scribe-head scribe-glyph">&#61647;&#61486;</span>
-        <span id="scribe-head-0.5" class="scribe-head-0-5 scribe-head scribe-glyph">&#61647;</span>
-        <span id="scribe-head-0.75" class="scribe-head-0-75 scribe-head scribe-glyph">&#61647;&#61486;</span>
-        <span id="scribe-head-1" class="scribe-head-1 scribe-head scribe-glyph">&#61647;</span>
-        <span id="scribe-head-1.5" class="scribe-head-1-5 scribe-head scribe-glyph">&#61647;&#61486;</span>
-        <span id="scribe-head-2" class="scribe-head-2 scribe-head scribe-glyph">&#61690;</span>
-        <span id="scribe-head-3" class="scribe-head-3 scribe-head scribe-glyph">&#61690;&#61486;</span>
-        <span id="scribe-head-4" class="scribe-head-4 scribe-head scribe-glyph">&#61559;</span>
-        <span id="scribe-head-6" class="scribe-head-4 scribe-head scribe-glyph">&#61559;&#61486;</span>
-        <span id="scribe-head-cross" class="scribe-head-0-125 scribe-head scribe-glyph">&#61632;</span>
+        <span id="scribe-rest-1" class="">&#61646;</span>
+        <span id="scribe-rest-0.125" class="scribe-rest-0-125 scribe-rest">&#61608;</span>
+        <span id="scribe-rest-0.25"  class="scribe-rest-0-25 scribe-rest">&#61637;</span>
+        <span id="scribe-rest-0.5" class="scribe-rest-0-5 scribe-rest">&#61668;</span>
+        <span id="scribe-rest-1" class="scribe-rest-1 scribe-rest">&#61646;</span>
+        <span id="scribe-rest-1.5" class="scribe-rest-1-5 scribe-rest">&#61646;&#61486;</span>
+        <span id="scribe-rest-2" class="scribe-rest-2 scribe-rest">&#61678;</span>
+        <span id="scribe-rest-3" class="scribe-rest-3 scribe-rest">&#61678;&#61486;</span>
+        <span id="scribe-rest-4" class="scribe-rest-4 scribe-rest">&#61623;</span>
+        <span id="scribe-rest-6" class="scribe-rest-6 scribe-rest">&#61623;&#61486;</span>
+        <span id="scribe-rest-bars" class="scribe-rest-bars scribe-rest">&#61685;</span>
+        <span id="scribe-flat" class="scribe-acc-flat scribe-acc">&#61538;</span>
+        <span id="scribe-sharp" class="scribe-acc-sharp scribe-acc">&#61475;</span>
+        <span id="scribe-head-0.125" class="scribe-head-0-125 scribe-head">&#61647;</span>
+        <span id="scribe-head-0.1875" class="scribe-head-0-1875 scribe-head">&#61647;&#61486;</span>
+        <span id="scribe-head-0.25" class="scribe-head-0-25 scribe-head">&#61647;</span>
+        <span id="scribe-head-0.375" class="scribe-head-0-375 scribe-head">&#61647;&#61486;</span>
+        <span id="scribe-head-0.5" class="scribe-head-0-5 scribe-head">&#61647;</span>
+        <span id="scribe-head-0.75" class="scribe-head-0-75 scribe-head">&#61647;&#61486;</span>
+        <span id="scribe-head-1" class="scribe-head-1 scribe-head">&#61647;</span>
+        <span id="scribe-head-1.5" class="scribe-head-1-5 scribe-head">&#61647;&#61486;</span>
+        <span id="scribe-head-2" class="scribe-head-2 scribe-head">&#61690;</span>
+        <span id="scribe-head-3" class="scribe-head-3 scribe-head">&#61690;&#61486;</span>
+        <span id="scribe-head-4" class="scribe-head-4 scribe-head">&#61559;</span>
+        <span id="scribe-head-6" class="scribe-head-4 scribe-head">&#61559;&#61486;</span>
+        <span id="scribe-head-cross" class="scribe-head-0-125 scribe-head">&#61632;</span>
 
         <span id="up-tie" class="tie-span">
             <svg class="tie-svg" viewbox="0 0 1 0.4" preserveAspectRatio="none"><use x="0" y="0" href="#up-tie"/></svg>
@@ -440,7 +430,8 @@
             name: 'dolphin-dance',
             title: 'Dolphin Dance',
             events: [
-            	[0,  "mode", "C-7", 1],
+                [0,  "meter", 4, 4, [2]],
+                [0,  "mode", "C-7", 1],
             	[2,  "mode", "A♭∆(♯11)", 1],
             	[4,  "mode", "D♭∆(♯11)", 1],
             	[6,  "mode", "G♭∆(♯11)", 1],

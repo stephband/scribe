@@ -59,13 +59,6 @@ function createGroupRests(pos, duration, rests) {
         createGroupRests(pos + rest, duration - rest, rests);
 }
 
-function beatToEventRest(noteStarts, beat) {
-    const l = noteStarts.length;
-    let i = -1;
-    while (++i < l && noteStarts[i] < beat);
-    return i >= l ? 0 : noteStarts[i] - beat ;
-}
-
 function beatToBar(meterStart, meterBeats, beat) {
     const elapsedBeats = beat - meterStart;
     return Math.floor(elapsedBeats / meterBeats);
@@ -89,9 +82,9 @@ function barBeatToGroupRest(meterBreaks, meterDuration, barBeat) {
     return i >= l ? meterDuration - barBeat : meterBreaks[i] - barBeat ;
 }
 
-function createRests(meterStart, meterBreaks, meterDuration, noteStarts, eventRest, beat, values) {
+function createRests(meterBreaks, meterDuration, meterStart, beat, eventRest, values) {
     // Position relative to the start of the bar
-    const barBeat   = beatToBarBeat(meterStart, meterDuration, beat);
+    const barBeat = beatToBarBeat(meterStart, meterDuration, beat);
 
     // If we are at the start of the bar and there is more than a bar of resting
     // to fill, just push a bar's rest value
@@ -99,7 +92,7 @@ function createRests(meterStart, meterBreaks, meterDuration, noteStarts, eventRe
         values.push(meterDuration);
         return eventRest === meterDuration ?
             values :
-            createRests(meterStart, meterBreaks, meterDuration, noteStarts, eventRest - meterDuration, beat + meterDuration, values);
+            createRests(meterBreaks, meterDuration, meterStart, beat + meterDuration, eventRest - meterDuration, values);
     }
 
     // Duration to the end of the group
@@ -117,15 +110,19 @@ function createRests(meterStart, meterBreaks, meterDuration, noteStarts, eventRe
     // If there is rest left to fill, recurse
     return eventRest === duration ?
         values :
-        createRests(meterStart, meterBreaks, meterDuration, noteStarts, eventRest - duration, beat + duration, values);
+        createRests(meterBreaks, meterDuration, meterStart, beat + duration, eventRest - duration, values);
 }
 
-export default function createRestSymbols(meterStart, meterBreaks, meterDuration, events, beat) {
-    const notes      = events.filter(isNoteOrStop);
-    const noteStarts = notes.map(get(0));
+export default function makeRests(meterBreaks, meterDuration, meterStart, beat, duration) {
+    return createRests(meterBreaks, meterDuration, meterStart, beat, duration, [])
+    .map(function(duration) {
+        var b = beat;
+        beat += duration;
 
-    // Duration until the next event
-    const eventRest = beatToEventRest(noteStarts, beat);
-
-    return createRests(meterStart, meterBreaks, meterDuration, noteStarts, eventRest, beat, []);
+        return {
+            type:     'rest',
+            beat:     b,
+            duration: duration
+        };
+    });
 };

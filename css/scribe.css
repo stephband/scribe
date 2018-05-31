@@ -113,8 +113,20 @@
 }
 */
 
+.scribe-clef {
+	min-width: 0.736842105em;
+	margin-left: 0.15em;
+	margin-right: 0.3em;
+	grid-row: G4;
+	grid-column: bar-start;
+	vertical-align: baseline;
+}
 
+.scribe-rest {
+	text-align: center;
+}
 
+.scribe-rest { grid-row: line-middle/span 1; }
 
 
 
@@ -268,8 +280,8 @@
 		[B\#6 B6 Bb6] 0.3125em
 		[A\#6 A6 Ab6] 0.3125em
 		[G\#6 G6 Gb6] 0.3125em
-		[F\#6 F6 Fb6] 0.3125em
-		[E\#6 E6 Eb6 chords] 0.3125em
+		[F\#6 F6 Fb6 chords] 0.3125em
+		[E\#6 E6 Eb6] 0.3125em
 		[D\#6 D6 Db6] 0.3125em
 		[C\#6 C6 Cb6] 0.3125em
 		[B\#5 B5 Bb5] 0.3125em
