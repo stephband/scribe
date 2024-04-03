@@ -1,4 +1,4 @@
-import { children, get } from '../../dom/dom.js';
+import { children, get } from '../../dom/module.js';
 
 var template = get('scribe-symbols');
 var symbols = children(template.content).reduce(function(symbols, node) {

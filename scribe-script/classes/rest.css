@@ -1,0 +1,40 @@
+.rest {
+    width: calc(2.6 * var(--y-size));
+    height: calc(8 * var(--y-size));
+    /*background: orange;*/
+}
+
+.rest[duration="0.125"] { width: calc(3   * var(--y-size)); }
+.rest[duration="0.25"]  { width: calc(2.8 * var(--y-size)); }
+.rest[duration="0.375"] { width: calc(3.8 * var(--y-size)); }
+.rest[duration="0.5"]   { width: calc(2.6 * var(--y-size)); }
+.rest[duration="0.75"]  { width: calc(3.6 * var(--y-size)); }
+.rest[duration="1"]     { width: calc(2.6 * var(--y-size)); }
+.rest[duration="1.5"]   { width: calc(3   * var(--y-size)); }
+
+.rest[duration="2"] {
+    width: calc(2.5 * var(--y-size));
+    height: calc(4 * var(--y-size));
+}
+
+.rest[duration="3"] {
+    width: calc(4 * var(--y-size));
+    height: calc(4 * var(--y-size));
+}
+
+.rest[duration="4"] {
+    width: calc(2.5 * var(--y-size));
+    height: calc(4 * var(--y-size));
+}
+
+
+.rest[duration="0.125"] { grid-column-end: span 1; }
+.rest[duration="0.25"]  { grid-column-end: span 1; }
+.rest[duration="0.375"] { grid-column-end: span 1; }
+.rest[duration="0.5"]   { grid-column-end: span 1; }
+.rest[duration="0.75"]  { grid-column-end: span 1; }
+.rest[duration="1"]     { grid-column-end: span 1; }
+.rest[duration="1.5"]   { grid-column-end: span 1; }
+.rest[duration="2"]     { grid-column-end: span 48; }
+.rest[duration="3"]     { grid-column-end: span 72; }
+.rest[duration="4"]     { grid-column-end: span 96; }

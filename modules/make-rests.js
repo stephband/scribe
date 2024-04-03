@@ -1,12 +1,3 @@
-import { by, compose, get, is, last, limit, isDefined, overload } from '../../fn/fn.js';
-import { append, clone } from '../../dom/dom.js';
-// Todo: modularise music repo and publish and use that
-import { numberToNote } from './music.js';
-import symbols from './symbols.js';
-
-function isNoteOrStop(e) {
-    return e[1] === 'note' || e[1] === 'stop';
-}
 
 // Avoid float imprecision by comparing rough values
 

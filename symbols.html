@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head sparky-fn="import:package.json" class="{[name]}">
+<head fn="import:package.json" class="{[name]}">
     <meta charset="utf-8" />
     <meta name="author" content="@{[author.twitter]}" />
     <meta name="description" content="Documentation for {[title]}. {[description]}" />
@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:100,300,400,500,700" />
     <link rel="stylesheet" href="../bolt/dist/bolt.css" />
     <link rel="stylesheet" href="../dom/css/dom.css" />
-    <link rel="stylesheet" href="../fn/css/prism.cruncher.css" />
+    <link rel="stylesheet" href="../fn/css/prism-cruncher.css" />
     <link rel="stylesheet" href="../fn/css/docs.css" />
 	<link rel="stylesheet" href="./fonts/jazz/font.css" />
     <!--link rel="stylesheet" href="fonts/jazztext/stylesheet.css" /-->
@@ -104,7 +104,7 @@
 </head>
 
 <body class="">
-    <header sparky-fn="import:package.json" class="l-grid grid" id="header">
+    <header fn="import:package.json" class="l-grid grid" id="header">
         <div class="grid-header bottom-align">
             <h2>MusicJSON to HTML converter</h2>
         </div>
@@ -338,7 +338,7 @@
     </div>
 
     <template id="scribe-symbols">
-        <div id="4/4-treble-bar" class="scribe-4/4-grid scribe-treble-grid grid">
+        <div id="4/4-treble-bar" class="scribe-4/4-grid scribe-treble-grid scribe-grid">
             <!-- Stave -->
             <svg class="stave-svg" viewbox="0 0 1 4" preserveAspectRatio="none"><use x="0" y="0" href="#stave"/></svg>
 
@@ -421,7 +421,7 @@
     <textarea id="editor"></textarea>
 
     <script type="module">
-        import { events, get, append, remove } from '../dom/dom.js';
+        import { events, get, append, remove } from '../dom/module.js';
         import mjToHTML from './modules/mj-to-html.js';
 
         var node = get('test-1');

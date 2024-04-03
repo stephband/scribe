@@ -1,0 +1,185 @@
+.stave {
+    --y-size: 0.3125em;
+    display: grid;
+    grid-auto-rows: var(--y-size);
+    row-gap: 0;
+}
+
+.stave::before {
+    content: '';
+
+    background-repeat: repeat-x;
+    background-size: 100% 100%;
+
+    /* FF won't stretch SVG */
+    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -4.5 1 9" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
+        <style>line{vector-effect:non-scaling-stroke;stroke:currentcolor;stroke-width:0.0625em;stroke-linejoin:round;stroke-linecap:round;fill:none;}</style>\
+        <line x1="0" x2="1" y1="4" y2="4"></line>\
+        <line x1="0" x2="1" y1="2" y2="2"></line>\
+        <line x1="0" x2="1" y1="0" y2="0"></line>\
+        <line x1="0" x2="1" y1="-2" y2="-2"></line>\
+        <line x1="0" x2="1" y1="-4" y2="-4"></line>\
+        <line x1="0" x2="0" y1="-4" y2="4"></line>\
+        <line x1="1" x2="1" y1="-4" y2="4"></line>\
+    </svg>');
+
+    grid-column: 1 / bar-end;
+    grid-row: stave-top / stave-bottom;
+}
+
+.stave > svg {
+    grid-column: 1 / span -1;
+    grid-row: stave-top / stave-bottom;
+    overflow: visible;
+}
+
+.stave > .head {
+    justify-self: end;
+    align-self: center;
+}
+
+.stave > .acci {
+    justify-self: start;
+    align-self: center;
+    /* Create space for following note head, which is justified to end */
+    margin-right: 1.1em;
+}
+
+.stave > .rest {
+    grid-row: stave-center;
+    justify-self: center;
+    align-self: center;
+}
+
+.stave > [pitch^="B"][pitch$="8"] { grid-row: B8; }
+.stave > [pitch^="A"][pitch$="8"] { grid-row: A8; }
+.stave > [pitch^="G"][pitch$="8"] { grid-row: G8; }
+.stave > [pitch^="F"][pitch$="8"] { grid-row: F8; }
+.stave > [pitch^="E"][pitch$="8"] { grid-row: E8; }
+.stave > [pitch^="D"][pitch$="8"] { grid-row: D8; }
+.stave > [pitch^="C"][pitch$="8"] { grid-row: C8; }
+.stave > [pitch^="B"][pitch$="7"] { grid-row: B7; }
+.stave > [pitch^="A"][pitch$="7"] { grid-row: A7; }
+.stave > [pitch^="G"][pitch$="7"] { grid-row: G7; }
+.stave > [pitch^="F"][pitch$="7"] { grid-row: F7; }
+.stave > [pitch^="E"][pitch$="7"] { grid-row: E7; }
+.stave > [pitch^="D"][pitch$="7"] { grid-row: D7; }
+.stave > [pitch^="C"][pitch$="7"] { grid-row: C7; }
+.stave > [pitch^="B"][pitch$="6"] { grid-row: B6; }
+.stave > [pitch^="A"][pitch$="6"] { grid-row: A6; }
+.stave > [pitch^="G"][pitch$="6"] { grid-row: G6; }
+.stave > [pitch^="F"][pitch$="6"] { grid-row: F6; }
+.stave > [pitch^="E"][pitch$="6"] { grid-row: E6; }
+.stave > [pitch^="D"][pitch$="6"] { grid-row: D6; }
+.stave > [pitch^="C"][pitch$="6"] { grid-row: C6; }
+.stave > [pitch^="B"][pitch$="5"] { grid-row: B5; }
+.stave > [pitch^="A"][pitch$="5"] { grid-row: A5; }
+.stave > [pitch^="G"][pitch$="5"] { grid-row: G5; }
+.stave > [pitch^="F"][pitch$="5"] { grid-row: F5; }
+.stave > [pitch^="E"][pitch$="5"] { grid-row: E5; }
+.stave > [pitch^="D"][pitch$="5"] { grid-row: D5; }
+.stave > [pitch^="C"][pitch$="5"] { grid-row: C5; }
+.stave > [pitch^="B"][pitch$="4"] { grid-row: B4; }
+.stave > [pitch^="A"][pitch$="4"] { grid-row: A4; }
+.stave > [pitch^="G"][pitch$="4"] { grid-row: G4; }
+.stave > [pitch^="F"][pitch$="4"] { grid-row: F4; }
+.stave > [pitch^="E"][pitch$="4"] { grid-row: E4; }
+.stave > [pitch^="D"][pitch$="4"] { grid-row: D4; }
+.stave > [pitch^="C"][pitch$="4"] { grid-row: C4; }
+.stave > [pitch^="B"][pitch$="3"] { grid-row: B3; }
+.stave > [pitch^="A"][pitch$="3"] { grid-row: A3; }
+.stave > [pitch^="G"][pitch$="3"] { grid-row: G3; }
+.stave > [pitch^="F"][pitch$="3"] { grid-row: F3; }
+.stave > [pitch^="E"][pitch$="3"] { grid-row: E3; }
+.stave > [pitch^="D"][pitch$="3"] { grid-row: D3; }
+.stave > [pitch^="C"][pitch$="3"] { grid-row: C3; }
+.stave > [pitch^="B"][pitch$="2"] { grid-row: B2; }
+.stave > [pitch^="A"][pitch$="2"] { grid-row: A2; }
+.stave > [pitch^="G"][pitch$="2"] { grid-row: G2; }
+.stave > [pitch^="F"][pitch$="2"] { grid-row: F2; }
+.stave > [pitch^="E"][pitch$="2"] { grid-row: E2; }
+.stave > [pitch^="D"][pitch$="2"] { grid-row: D2; }
+.stave > [pitch^="C"][pitch$="2"] { grid-row: C2; }
+.stave > [pitch^="B"][pitch$="1"] { grid-row: B1; }
+.stave > [pitch^="A"][pitch$="1"] { grid-row: A1; }
+.stave > [pitch^="G"][pitch$="1"] { grid-row: G1; }
+.stave > [pitch^="F"][pitch$="1"] { grid-row: F1; }
+.stave > [pitch^="E"][pitch$="1"] { grid-row: E1; }
+.stave > [pitch^="D"][pitch$="1"] { grid-row: D1; }
+.stave > [pitch^="C"][pitch$="1"] { grid-row: C1; }
+.stave > [pitch^="B"][pitch$="0"] { grid-row: B0; }
+.stave > [pitch^="A"][pitch$="0"] { grid-row: A0; }
+.stave > [pitch^="G"][pitch$="0"] { grid-row: G0; }
+.stave > [pitch^="F"][pitch$="0"] { grid-row: F0; }
+.stave > [pitch^="E"][pitch$="0"] { grid-row: E0; }
+.stave > [pitch^="D"][pitch$="0"] { grid-row: D0; }
+.stave > [pitch^="C"][pitch$="0"] { grid-row: C0; }
+
+
+.treble-stave,
+:host([stave="treble"]) > .stave {
+    grid-template-rows:
+        [C\#6 C6 Cb6] var(--y-size)
+        [B\#6 B6 Bb6] var(--y-size)
+        [A\#6 A6 Ab6] var(--y-size)
+        [G\#6 G6 Gb6] var(--y-size)
+        [F\#6 F6 Fb6 chords] var(--y-size)
+        [E\#6 E6 Eb6] var(--y-size)
+        [D\#6 D6 Db6] var(--y-size)
+        [C\#6 C6 Cb6] var(--y-size)
+        [B\#5 B5 Bb5] var(--y-size)
+        [A\#5 A5 Ab5] var(--y-size)
+        [G\#5 G5 Gb5] var(--y-size)
+        [F\#5 F5 Fb5 stave-top] var(--y-size)
+        [E\#5 E5 Eb5] var(--y-size)
+        [D\#5 D5 Db5] var(--y-size)
+        [C\#5 C5 Cb5] var(--y-size)
+        [B\#4 B4 Bb4 stave-center] var(--y-size)
+        [A\#4 A4 Ab4] var(--y-size)
+        [G\#4 G4 Gb4] var(--y-size)
+        [F\#4 F4 Fb4] var(--y-size)
+        [E\#4 E4 Eb4] var(--y-size)
+        [D\#4 D4 Db4 stave-bottom] var(--y-size)
+        [C\#4 C4 Cb4] var(--y-size)
+        [B\#3 B3 Bb3] var(--y-size)
+        [A\#3 A3 Ab3] var(--y-size)
+        [G\#3 G3 Gb3] var(--y-size)
+        [F\#3 F3 Fb3] var(--y-size)
+        [E\#3 E3 Eb3] var(--y-size)
+        [D\#3 D3 Db3] var(--y-size)
+        [C\#3 C3 Cb3] var(--y-size);
+}
+
+.bass-stave,
+:host([stave="bass"]) > .stave {
+    grid-template-rows:
+        [E\#5 E5 Eb5] var(--y-size)
+        [D\#5 D5 Db5] var(--y-size)
+        [C\#5 C5 Cb5] var(--y-size)
+        [B\#4 B4 Bb4] var(--y-size)
+        [A\#4 A4 Ab4 chords] var(--y-size)
+        [G\#4 G4 Gb4] var(--y-size)
+        [F\#4 F4 Fb4] var(--y-size)
+        [E\#4 E4 Eb4] var(--y-size)
+        [D\#4 D4 Db4] var(--y-size)
+        [C\#4 C4 Cb4] var(--y-size)
+        [B\#3 B3 Bb3] var(--y-size)
+        [A\#3 A3 Ab3 stave-top] var(--y-size)
+        [G\#3 G3 Gb3] var(--y-size)
+        [F\#3 F3 Fb3] var(--y-size)
+        [E\#3 E3 Eb3] var(--y-size)
+        [D\#3 D3 Db3 stave-center] var(--y-size)
+        [C\#3 C2 Cb2] var(--y-size)
+        [B\#2 B2 Bb2] var(--y-size)
+        [A\#2 A2 Ab2] var(--y-size)
+        [G\#2 G2 Gb2] var(--y-size)
+        [F\#2 F2 Fb2 stave-bottom] var(--y-size)
+        [E\#2 E2 Eb2] var(--y-size)
+        [D\#2 D2 Db2] var(--y-size)
+        [C\#1 C1 Cb1] var(--y-size)
+        [B\#1 B1 Bb1] var(--y-size)
+        [A\#1 A1 Ab1] var(--y-size)
+        [G\#1 G1 Gb1] var(--y-size)
+        [F\#1 F1 Fb1] var(--y-size)
+        [E\#1 E1 Eb1] var(--y-size);
+}

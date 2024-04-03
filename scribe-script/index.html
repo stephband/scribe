@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>&lt;scribe-script&gt;</title>
+
+    <meta charset="utf-8" />
+    <meta name="author" content="Stephen Band" />
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width" />
+
+    <!--meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@stephband">
+    <meta property="og:title" content="scribe" />
+    <meta property="og:description" content="The accessible, scroll-snapping, styleable, horizontal carousel custom element. No dependencies, about 12kB minified and gzipped." />
+    <meta property="og:image" content="https://stephen.band/scribe/docs/images/card.jpg" />
+    <meta property="og:url" content="https://stephen.band/scribe/" /-->
+
+    <script title="load">
+        document.documentElement.className += ' js loading';
+        // window.addEventListener('DOMContentLoaded', () => document.documentElement.classList.remove('content-loading'));
+        // Wait for other load handlers to run first - Bolt does a few things on
+        // load (eg. targetable scrolls) and we want them to run before the loading
+        // class is removed
+        window.addEventListener('load', () => window.requestAnimationFrame(() => document.documentElement.classList.remove('loading')));
+    </script>
+
+    <script title="debug">
+        window.DEBUG = true;
+    </script>
+
+    <link rel="stylesheet" href="./module.css">
+</head>
+<body>
+    <div style="width: 1em; height: 1em; background: orange;"></div>
+    <p>Normal text size</p>
+
+    <scribe-script stave="treble"></scribe-script>
+
+    <script type="module">
+        import ScribeScript from './module.js';
+    </script>
+</body>
+</html>

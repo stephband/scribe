@@ -237,7 +237,7 @@
 	flex: auto;
 }
 
-.scribe-flex > .grid {
+.scribe-flex > .scribe-bar {
 	/* Basis should be the min-content width of a bar. However, the
 	   min-content keyword is not supported as of May 2018. Auto SHOULD
 	   do the same thing for min-content, and in FireFox it does, but
@@ -258,7 +258,16 @@
 
 /* Bars */
 
-.scribe-4\/4-grid {
+
+.scribe-bar {
+	display: grid;
+	align-content: stretch;
+	align-items: stretch;
+	justify-content: stretch;
+	justify-items: stretch;
+}
+
+.scribe-4\/4-bar {
 	/* Ideally we'd make each division minmax(auto, 2%), where auto should
 	   evaluate to min-content. But it doesn't do min-content that spans
 	   multiple columns, so we can't do that, and it is good to gaurantee
@@ -273,7 +282,7 @@
 		[bar-end] minmax(0.375rem, 2%);
 }
 
-.scribe-treble-grid {
+.scribe-treble-bar {
 	min-height: 2.5em;
 	grid-template-rows:
 		[C\#6 C6 Cb6] 0.3125em
@@ -308,7 +317,7 @@
 }
 
 /*
-.scribe-Eb-treble-grid {
+.scribe-Eb-treble-bar {
 	min-height: 2.5em;
 	grid-template-rows:
 		[F\#6 F6 Fb6] 0.3125em

@@ -1,7 +1,7 @@
-import { by, compose, get, is, last, limit, isDefined, overload } from '../../fn/fn.js';
-import { append, clone, create } from '../../dom/dom.js';
+import { by, compose, get, is, last, limit, isDefined, overload } from '../../fn/module.js';
+import { append, clone, create } from '../../dom/module.js';
 // Todo: modularise music repo and publish and use that
-import { numberToNote } from './music.js';
+import { toNoteName } from '../../midi/module.js';
 import makeRests from './make-rests.js';
 //import makeHeads from './make-heads.js';
 import symbols from './symbols.js';
@@ -62,7 +62,7 @@ function beatToColumnName(beat) {
 }
 
 function numberToRow(number) {
-    return (typeof number === 'number' ? numberToNote(number) : number)
+    return (typeof number === 'number' ? toNoteName(number) : number)
     .replace('♯', '#')
     .replace('♭', 'b')
 }

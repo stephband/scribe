@@ -1,0 +1,13 @@
+.head {
+    stroke: none;
+    stroke-width: 0;
+    width:  calc(2.7 * var(--y-size));
+    height: calc(2 * var(--y-size));
+}
+
+div.head {
+    background-color: currentcolor;
+    border-radius: 50%;
+    transform: rotateZ(-26deg);
+    color: brown;
+}

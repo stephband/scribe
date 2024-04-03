@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--${ include("../bolt/templates/head.literal", "./package.json") }-->
+
+    <script title="debug">
+        window.DEBUG = true;
+    </script>
+
+    <template is="literal-element" tag="scribe-music" stylesheets="shadow.css">
+        <div class="treble-bar 4/4-bar bar">
+            <svg viewbox="0 0 1 8" preserveAspectRatio="none">
+                <use href="symbols.svg#stave-5-line" stroke="black"></use>
+            </svg>
+
+            <svg viewbox="0 0 1 8" style="justify-self: start; grid-column: 1; background-color: orange;">
+                <use href="symbols.svg#clef[treble]"></use>
+            </svg>
+
+            <svg viewbox="0 0 1 8" style="grid-column: beat-end / bar-end;">
+                <use href="symbols.svg#bar-line" stroke="black"></use>
+            </svg>
+
+            <svg viewbox="0 0 1 1" style="grid-column: beat-0; grid-row: C4; line-height: 0;">
+                <circle cx="0" cy="0" r="1"></circle>
+            </svg>
+
+            <!--svg viewbox="0 0 1 1" style="grid-column: beat-1-5; grid-row: C4; line-height: 0;">
+                <circle cx="0" cy="0" r="1"></circle>
+            </svg>
+
+            <svg viewbox="0 0 1 1" style="grid-column: beat-1-75; grid-row: C4; line-height: 0;">
+                <circle cx="0" cy="0" r="1"></circle>
+            </svg-->
+        </div>
+    </template>
+</head>
+
+<body class="docs-grid @0-grid @0-3x-grid @1-6x-grid @2-9x-grid">
+    <header class="@0-x3" style="grid-column-end: span 4;">
+        ${ include("../bolt/templates/header.literal", "./package.json") }
+    </header>
+
+    <scribe-music>
+
+    </scribe-music>
+
+    <script type="module">
+        import '../literal/elements/literal-element.js';
+    </script>
+</body>

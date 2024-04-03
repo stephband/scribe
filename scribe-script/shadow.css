@@ -1,0 +1,34 @@
+
+@import './classes/accidental.css';
+@import './classes/head.css';
+@import './classes/rest.css';
+@import './classes/bar.css';
+@import './classes/stave.css';
+
+:host {
+    display: block;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    column-gap: 0;
+}
+
+:host > .bar {
+    flex: 1 1;
+
+    /* Overcome bar to bar rounding errors causing 1px white gap between bars
+       in Safari */
+    margin-left: -1px;
+}
+
+:host > *:last-child {
+    flex: 0 0 25%;
+}
+
+svg {
+    fill: currentcolor;
+}
+
+svg > path {
+    fill: inherit;
+}
