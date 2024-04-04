@@ -18,8 +18,10 @@
 .acci[pitch*="#"] { width: calc(2.3 * var(--y-size)); }
 
 /* An accidental does not need to be displayed twice in one bar. */
+/*
 .acci[pitch*="b"] ~ .acci[pitch*="b"],
 .acci[pitch*="#"] ~ .acci[pitch*="#"],
 .acci:not([pitch*="b"], [pitch*="#"]) ~ .acci:not([pitch*="b"], [pitch*="#"]) {
     display: none;
 }
+*/

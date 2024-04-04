@@ -1,4 +1,97 @@
-import element from '../../dom/modules/element.js';
+
+import overload from '../../fn/modules/overload.js';
+import create   from '../../dom/modules/create.js';
+import element  from '../../dom/modules/element.js';
+
+const assign = Object.assign;
+
+const defaults = {
+    cursor:  0,
+    key:     'C',
+    timesig: '4/4',
+    stave:   'treble'
+};
+
+
+function parseEvents(source) {
+    return [];
+}
+
+function toSymbols(source) {
+    return [
+        [0,   'note', 'G4',  0.8, 2],
+        [2,   'note', 'C#5', 0.8, 0.5],
+        [2.5, 'rest', 'C5',  0.8, 0.5],
+        [3,   'note', 'Db5', 0.8, 1]
+    ];
+}
+
+
+const createSymbols = overload((nodes, event) => event[1], {
+    note: (nodes, event) => {
+        const acci = event[2].includes('#') ? 'sharp' :
+            event[2].includes('b') ? 'flat' :
+            'natural' ;
+
+        // Create accidental
+        nodes.push(create('svg', {
+            class:   "acci",
+            viewBox: acci === 'sharp' ? "0 -4 2.3 4" :
+                acci === 'flat' ? "0 -4 2 4" :
+                "0 -4 1.8 4" ,
+            preserveAspectRatio: "xMidYMid slice",
+            data: { beat: event[0] + 1, pitch: event[2], duration: event[4] },
+            html: '<use href="#acci-' + acci + '"></use>'
+        }));
+
+        // Create note head
+        nodes.push(create('svg', {
+            class:   "head",
+            viewBox: "0 -1 2.7 2",
+            preserveAspectRatio: "xMidYMid slice",
+            data: { beat: event[0] + 1, pitch: event[2], duration: event[4] },
+            html: '<use href="#head[' + event[4] + ']"></use>'
+        }));
+
+        return nodes;
+    },
+
+    rest: (nodes, event) => {
+        // Create note head
+        nodes.push(create('svg', {
+            class:   "rest",
+            viewBox:
+                event[4] === 0.125 ? "0 -4 3.0 8" :
+                event[4] === 0.25  ? "0 -4 2.8 8" :
+                event[4] === 0.375 ? "0 -4 3.8 8" :
+                event[4] === 0.5   ? "0 -4 2.6 8" :
+                event[4] === 0.75  ? "-0.2 -4 3.6 8" :
+                event[4] === 1     ? "0 -4 2.6 8" :
+                event[4] === 1.5   ? "0 -4 3.5 8" :
+                event[4] === 2     ? "0 -4 2.6 8" :
+                event[4] === 3     ? "0 -4 2.6 8" :
+                event[4] === 4     ? "0 -4 2.6 8" :
+                event[4] === 6     ? "0 -4 2.6 8" :
+                "0 -4 2.6 8" ,
+            preserveAspectRatio: "xMidYMid slice",
+            data: { beat: event[0] + 1, pitch: event[2], duration: event[4] },
+            html: '<use href="#rest[' + event[4] + ']"></use>'
+        }));
+
+        return nodes;
+    }
+});
+
+function renderBar(data) {
+    return create('div', {
+        class: 'stave 4/4-bar bar',
+        children: data.reduce(createSymbols, [])
+    });
+}
+
+function renderBars(data) {
+    return [renderBar(data)];
+}
 
 export default element('scribe-script', {
     shadow: `
@@ -35,9 +128,12 @@ export default element('scribe-script', {
                 <path id="acci-flat"    class="acci-path" transform="scale(0.054) translate(-607.4 -191)" d="M629.4297,136.6357c1.4404,0,2.5928,0.8643,3.3848,2.5923c0.5039,1.2959,0.792,2.8081,0.792,4.5366c0,5.04-1.9443,10.6567-5.7607,16.8491c-2.9521,4.8247-6.624,9.5771-11.1611,14.1855l0.5762-60.1255c1.0078-1.1519,2.0879-1.8003,3.2402-1.8003c0.2881,0,0.4326,0.0723,0.5762,0.0723l-0.2881,29.2344C622.877,138.5078,625.7578,136.6357,629.4297,136.6357z M625.9014,145.6367c-1.0801,0-2.376,1.0801-3.7441,3.168c-1.2959,1.9443-1.9443,3.3843-2.0156,4.3208l-0.1445,8.2085c4.9688-4.6802,7.4883-9.2168,7.4883-13.6094C627.4854,146.3564,626.9102,145.6367,625.9014,145.6367z"/>
                 <path id="acci-natural" class="acci-path" transform="scale(0.054) translate(-646 -191)"   d="M669.0293,136.9961l-2.9521,56.6685c-1.0088,0.7202-1.585,1.0801-1.873,1.0801c-0.792,0-1.1514,0-1.0801-0.0718l1.6562-30.8906c-0.5039,1.1519-1.7998,2.2319-3.7441,3.312s-3.5283,1.5845-4.8242,1.5845c-0.7197,0-1.4404-0.144-1.9443-0.4321l2.8799-54.5806c0.7207-0.4321,1.2969-0.6484,1.7285-0.6484c0.9365,0,1.2959,0,1.1523,0l-1.0078,28.4429c0.4316-0.8643,1.9434-1.8726,4.5361-2.9526C666.0049,137.5,667.8047,136.9961,669.0293,136.9961z M664.9961,148.4448c-2.6641,0.7202-4.8242,2.0161-6.4805,3.8882l-0.2158,5.4727c2.7363-0.4321,4.8242-1.4399,6.3369-3.1685C664.7803,153.4854,664.9248,151.4692,664.9961,148.4448z"/>
                 <path id="acci-sharp"   class="acci-path" transform="scale(0.054) translate(-623.5 -191)" d="M655.709,134.8354c0.1445,0.4321,0.2168,1.1523,0.2168,2.3042c0,1.2964-0.1445,2.5923-0.2881,4.0327c0,0.5757-0.1445,1.4399-0.4326,2.52c-0.5039,1.0083-2.3037,2.3042-5.3281,3.7446l-0.2881,6.6963c1.6562-1.2241,3.0967-1.8721,4.1768-1.8721c0.2871,0,0.5752,1.584,0.7197,4.7524c0.0723,1.0078,0.0723,1.728,0.0723,2.3042c0,1.728-0.0723,2.7363-0.3604,3.168c-0.0723,0.2163-1.8721,1.4404-5.3281,3.6724c0,3.3125-0.1445,6.6968-0.3604,10.2969c-0.0723,1.4404-0.1445,2.8804-0.2158,4.2485c-0.2881,2.3042-0.7207,3.4565-1.3682,3.4565c-0.0723,0.0718-0.1445,0.0718-0.1445,0.0718c-0.792,0-1.1514-1.9443-1.1514-5.8325c0-0.936,0-2.376,0.1436-4.3203c0.0723-1.9443,0.1436-3.3843,0.1436-4.3926c0-1.0078-0.0713-1.6558-0.2158-2.0161c-1.0078,0.144-1.7275,0.5039-2.2314,1.0083c-0.0723,1.9438-0.2168,4.8242-0.4326,8.5688c-0.0723,2.0161-0.1436,3.96-0.2158,5.8325c-0.1445,3.3843-0.4326,5.2563-0.6484,5.6162c-0.2158,0.2163-0.4316,0.2881-0.7197,0.2881c-1.0078,0-1.5117-1.5122-1.5117-4.6802c0-2.3047,0.3594-7.1289,0.9355-14.6177c-1.4404,0.5044-2.8799,1.0083-4.3926,1.4404c-0.7197,0-1.0078-1.9443-1.0078-5.9048c0-0.2881,0-0.792,0.0723-1.5122c0-0.7197,0.0713-1.2241,0.0713-1.5117c0.1445-0.4321,1.0088-1.0083,2.4482-1.8003c1.0088-0.4321,1.9443-0.936,2.9531-1.5122c0.2871-1.4399,0.3594-3.3843,0.2871-5.6885l-0.0713-0.8643c-1.2959,0.7202-2.8809,1.3682-4.7529,2.0161c-0.3594-0.1436-0.5039-0.792-0.5039-1.9438c0-0.8643,0.0723-2.3765,0.3604-4.4644c0.2158-2.0884,0.4316-3.4565,0.7197-4.1045c1.0078-0.8643,2.6641-1.9443,5.1123-3.3125c0-1.7998,0.1445-4.5361,0.3604-8.2803c0.2881-4.9688,0.792-7.4888,1.5117-7.4888c0.8643,0,1.2969,2.3042,1.2969,6.7686c0,1.728-0.1445,4.1763-0.4326,7.4165c0.792,0,1.7285-0.3599,2.8086-1.1519c0.2881-0.4321,0.5762-4.8965,0.8643-13.4653c0.2881-7.8486,1.1514-11.8091,2.5918-11.8091c0.5762,1.1523,0.8643,2.5205,0.8643,4.1045c0,4.4644-0.4326,11.0889-1.1523,20.0176C653.0449,135.4839,654.7012,134.8354,655.709,134.8354z M647.501,148.7329c-1.0801,0.5039-2.3047,1.2241-3.8887,2.2319c-0.1436,2.3042-0.2158,4.1045-0.2158,5.4009c0,0.5757,0,1.0078,0,1.2959c1.0801-0.4321,2.3037-1.0801,3.7441-2.0884C647.1406,154.0615,647.2842,151.7573,647.501,148.7329z"/>
-                <path id="head[1]" class="head-path" transform="translate(-18.9   -36.28) scale(0.1111)" d="M177.2754,335.8613c-2.0884,0-3.8164-0.3594-5.2568-1.1514c-1.728-1.0088-2.5918-2.4482-2.5918-4.3926c0-3.0244,1.7998-6.1201,5.5444-9.4326c3.6001-3.168,6.9126-4.752,9.9365-4.752c5.7607,0,8.6411,2.2314,8.6411,6.6953c0,3.0254-1.9443,6.0488-5.9766,8.9297C183.8999,334.4941,180.4434,335.8613,177.2754,335.8613z"/>
-                <path id="head[2]" class="head-path" transform="translate(-17.25  -36.28) scale(0.1111)" d="M169.5732,322.1094c0,1.6553-0.3599,3.168-1.1523,4.4639c-1.5117,2.6641-4.4644,5.1846-8.8564,7.6318c-4.4644,2.4492-8.2808,3.6729-11.521,3.6729c-1.8721,0-3.4565-0.6475-4.6807-2.0166c-1.1519-1.3672-1.728-2.9512-1.728-4.8242c0-4.0312,2.2324-7.9199,6.8408-11.5928c4.4644-3.5283,8.9287-5.3281,13.3931-5.3281C166.981,314.1162,169.5732,316.7803,169.5732,322.1094z M160.5005,325.4209c0-1.1514-0.2163-2.376-0.7202-3.8164c-0.7202-1.7275-1.584-2.5918-2.5923-2.5918c-2.3042,0-4.0322,1.1514-5.3281,3.3115c-1.0083,1.7285-1.4404,3.8164-1.4404,6.1211c0,3.0957,0.8643,4.6084,2.5923,4.6084c2.0161,0,3.7441-0.792,5.2563-2.376S160.5005,327.3652,160.5005,325.4209z"/>
-                <path id="head[4]" class="head-path" transform="translate(-13.9   -36.28) scale(0.1111)" d="M118.0923,336.0781c-6.0488,0-9.001-2.1602-9.001-6.4805c0-3.8887,2.6641-7.2734,8.1367-10.1533c4.7524-2.5205,9.5049-3.8154,14.3291-3.8154c2.7363,0,5.0405,0.5752,6.9126,1.6553c2.1602,1.2236,3.2402,2.9521,3.2402,5.1846c0,2.9521-1.0801,5.3281-3.168,7.2012c-2.1602,1.8711-5.2568,3.4551-9.5049,4.6797C125.2207,335.502,121.5483,336.0781,118.0923,336.0781z M131.269,326.2129c0-4.4648-1.7998-6.7686-5.4004-6.7686c-2.0161,0-3.6724,0.9365-5.0405,2.8086s-2.0161,3.6729-2.0161,5.4717c0,3.0967,1.8721,4.6094,5.6167,4.6094c2.0161,0,3.6001-0.5762,4.8965-1.7285C130.6211,329.4531,131.269,327.9414,131.269,326.2129z"/>
+                <use xlink:href="#head[1]" id="head[0.125]"></use>
+                <use xlink:href="#head[1]" id="head[0.25]"></use>
+                <use xlink:href="#head[1]" id="head[0.5]"></use>
+                <path id="head[1]" class="head-path" transform="translate(-18.9 -36.28) scale(0.1111)" d="M177.2754,335.8613c-2.0884,0-3.8164-0.3594-5.2568-1.1514c-1.728-1.0088-2.5918-2.4482-2.5918-4.3926c0-3.0244,1.7998-6.1201,5.5444-9.4326c3.6001-3.168,6.9126-4.752,9.9365-4.752c5.7607,0,8.6411,2.2314,8.6411,6.6953c0,3.0254-1.9443,6.0488-5.9766,8.9297C183.8999,334.4941,180.4434,335.8613,177.2754,335.8613z"/>
+                <path id="head[2]" class="head-path" transform="translate(-16   -36.28) scale(0.1111)" d="M169.5732,322.1094c0,1.6553-0.3599,3.168-1.1523,4.4639c-1.5117,2.6641-4.4644,5.1846-8.8564,7.6318c-4.4644,2.4492-8.2808,3.6729-11.521,3.6729c-1.8721,0-3.4565-0.6475-4.6807-2.0166c-1.1519-1.3672-1.728-2.9512-1.728-4.8242c0-4.0312,2.2324-7.9199,6.8408-11.5928c4.4644-3.5283,8.9287-5.3281,13.3931-5.3281C166.981,314.1162,169.5732,316.7803,169.5732,322.1094z M160.5005,325.4209c0-1.1514-0.2163-2.376-0.7202-3.8164c-0.7202-1.7275-1.584-2.5918-2.5923-2.5918c-2.3042,0-4.0322,1.1514-5.3281,3.3115c-1.0083,1.7285-1.4404,3.8164-1.4404,6.1211c0,3.0957,0.8643,4.6084,2.5923,4.6084c2.0161,0,3.7441-0.792,5.2563-2.376S160.5005,327.3652,160.5005,325.4209z"/>
+                <path id="head[4]" class="head-path" transform="translate(-13.9 -36.28) scale(0.1111)" d="M118.0923,336.0781c-6.0488,0-9.001-2.1602-9.001-6.4805c0-3.8887,2.6641-7.2734,8.1367-10.1533c4.7524-2.5205,9.5049-3.8154,14.3291-3.8154c2.7363,0,5.0405,0.5752,6.9126,1.6553c2.1602,1.2236,3.2402,2.9521,3.2402,5.1846c0,2.9521-1.0801,5.3281-3.168,7.2012c-2.1602,1.8711-5.2568,3.4551-9.5049,4.6797C125.2207,335.502,121.5483,336.0781,118.0923,336.0781z M131.269,326.2129c0-4.4648-1.7998-6.7686-5.4004-6.7686c-2.0161,0-3.6724,0.9365-5.0405,2.8086s-2.0161,3.6729-2.0161,5.4717c0,3.0967,1.8721,4.6094,5.6167,4.6094c2.0161,0,3.6001-0.5762,4.8965-1.7285C130.6211,329.4531,131.269,327.9414,131.269,326.2129z"/>
                 <g id="head[1.5]">
                     <use xlink:href="#head[1]"></use>
                     <use xlink:href="#dot" transform="translate(0 0)"></use>
@@ -45,101 +141,111 @@ export default element('scribe-script', {
             </defs>
         </svg>
         <div class="stave 4/4-bar bar">
-            <svg class="head" beat="1"      pitch="E4"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="acci" beat="1.5"    pitch="G#4" viewbox="0 -4 2.3 4" preserveAspectRatio="xMidYMid slice"><use href="#acci-sharp"></use></svg>
-            <svg class="head" beat="1.5"    pitch="G#4" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="acci" beat="2"      pitch="B4"  viewbox="0 -4 1.8 4" preserveAspectRatio="xMidYMid slice"><use href="#acci-natural"></use></svg>
-            <svg class="head" beat="2"      pitch="B4"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="head" beat="2.5"    pitch="D5"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="acci" beat="3"      pitch="Eb5" viewbox="0 -4 2 4"   preserveAspectRatio="xMidYMid slice"><use href="#acci-flat"></use></svg>
-            <svg class="head" beat="3"      pitch="Eb5" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="head" beat="3.3333" pitch="F#5" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="head" beat="3.6666" pitch="C#5" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="head" beat="4"      pitch="A#4" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="acci" beat="4.3333" pitch="G#4" viewbox="0 -4 2.3 4" preserveAspectRatio="xMidYMid slice"><use href="#acci-sharp"></use></svg>
-            <svg class="head" beat="4.3333" pitch="G#4" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="acci" beat="4.6666" pitch="B4"  viewbox="0 -4 1.8 4" preserveAspectRatio="xMidYMid slice"><use href="#acci-natural"></use></svg>
-            <svg class="head" beat="4.6666" pitch="B4"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></div>
+            <svg class="head" data-beat="1"      data-pitch="E4"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
+            <svg class="acci" data-beat="1.5"    data-pitch="G#4" viewbox="0 -4 2.3 4" preserveAspectRatio="xMidYMid slice"><use href="#acci-sharp"></use></svg>
+            <svg class="head" data-beat="1.5"    data-pitch="G#4" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
+            <svg class="acci" data-beat="2"      data-pitch="B4"  viewbox="0 -4 1.8 4" preserveAspectRatio="xMidYMid slice"><use href="#acci-natural"></use></svg>
+            <svg class="head" data-beat="2"      data-pitch="B4"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
+            <svg class="head" data-beat="2.5"    data-pitch="D5"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
+            <svg class="acci" data-beat="3"      data-pitch="Eb5" viewbox="0 -4 2 4"   preserveAspectRatio="xMidYMid slice"><use href="#acci-flat"></use></svg>
+            <svg class="head" data-beat="3"      data-pitch="Eb5" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
+            <svg class="head" data-beat="3.3333" data-pitch="F#5" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
+            <svg class="head" data-beat="3.6666" data-pitch="C#5" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
+            <svg class="head" data-beat="4"      data-pitch="A#4" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
+            <svg class="acci" data-beat="4.3333" data-pitch="G#4" viewbox="0 -4 2.3 4" preserveAspectRatio="xMidYMid slice"><use href="#acci-sharp"></use></svg>
+            <svg class="head" data-beat="4.3333" data-pitch="G#4" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
+            <svg class="acci" data-beat="4.6666" data-pitch="B4"  viewbox="0 -4 1.8 4" preserveAspectRatio="xMidYMid slice"><use href="#acci-natural"></use></svg>
+            <svg class="head" data-beat="4.6666" data-pitch="B4"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></div>
         </div>
         <div class="stave 4/4-bar bar">
-            <svg class="head" beat="1"      pitch="E4"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="acci" beat="1.5"    pitch="G#4" viewbox="0 -4 2.3 4" preserveAspectRatio="xMidYMid slice"><use href="#acci-sharp"></use></svg>
-            <svg class="head" beat="1.5"    pitch="G#4" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="acci" beat="2"      pitch="B4"  viewbox="0 -4 1.8 4" preserveAspectRatio="xMidYMid slice"><use href="#acci-natural"></use></svg>
-            <svg class="head" beat="2"      pitch="B4"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="head" beat="2.5"    pitch="D5"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="acci" beat="3"      pitch="Eb5" viewbox="0 -4 2 4" preserveAspectRatio="xMidYMid slice"><use href="#acci-flat"></use></svg>
-            <svg class="head" beat="3"      pitch="Eb5" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="rest" beat="4"      duration="1" viewbox="0 -4 2.6 8" preserveAspectRatio="xMidYMid meet"><use href="#rest[1]"></use></svg>
+            <svg class="head" data-beat="1"      data-pitch="E4"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
+            <svg class="acci" data-beat="1.5"    data-pitch="G#4" viewbox="0 -4 2.3 4" preserveAspectRatio="xMidYMid slice"><use href="#acci-sharp"></use></svg>
+            <svg class="head" data-beat="1.5"    data-pitch="G#4" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
+            <svg class="acci" data-beat="2"      data-pitch="B4"  viewbox="0 -4 1.8 4" preserveAspectRatio="xMidYMid slice"><use href="#acci-natural"></use></svg>
+            <svg class="head" data-beat="2"      data-pitch="B4"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
+            <svg class="head" data-beat="2.5"    data-pitch="D5"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
+            <svg class="acci" data-beat="3"      data-pitch="Eb5" viewbox="0 -4 2 4" preserveAspectRatio="xMidYMid slice"><use href="#acci-flat"></use></svg>
+            <svg class="head" data-beat="3"      data-pitch="Eb5" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
+            <svg class="rest" data-beat="4"      data-duration="1" viewbox="0 -4 2.6 8" preserveAspectRatio="xMidYMid meet"><use href="#rest[1]"></use></svg>
         </div>
         <div class="stave 4/4-bar bar">
-            <svg class="head" beat="1"      pitch="E4"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="head" beat="2"      pitch="B4"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="head" beat="3"      pitch="Eb5" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="head" beat="4"      pitch="A#4" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
+            <svg class="head" data-beat="1"      data-pitch="E4"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
+            <svg class="head" data-beat="2"      data-pitch="B4"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
+            <svg class="head" data-beat="3"      data-pitch="Eb5" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
+            <svg class="head" data-beat="4"      data-pitch="A#4" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
         </div>
         <div class="stave 4/4-bar bar">
-            <div class="head" pitch="E4"  beat="1"></div>
-            <div class="head" pitch="G#4" beat="1.5"></div>
-            <div class="head" pitch="B4"  beat="2"></div>
-            <div class="head" pitch="D5"  beat="2.5"></div>
-            <svg class="rest" beat="2.75" duration="0.25" viewbox="0 -4 2.6 8" preserveAspectRatio="xMidYMid meet"><use href="#rest[0.25]"></use></svg>
-            <div class="head" pitch="E5"  beat="3"></div>
-            <div class="head" pitch="F#5" beat="3.3333"></div>
-            <div class="head" pitch="C#5" beat="3.6666"></div>
-            <div class="head" pitch="A#4" beat="4"></div>
+            <div class="head" data-pitch="E4"  data-beat="1"></div>
+            <div class="head" data-pitch="G#4" data-beat="1.5"></div>
+            <div class="head" data-pitch="B4"  data-beat="2"></div>
+            <div class="head" data-pitch="D5"  data-beat="2.5"></div>
+            <svg class="rest" data-beat="2.75" data-duration="0.25" viewbox="0 -4 2.6 8" preserveAspectRatio="xMidYMid meet"><use href="#rest[0.25]"></use></svg>
+            <div class="head" data-pitch="E5"  data-beat="3"></div>
+            <div class="head" data-pitch="F#5" data-beat="3.3333"></div>
+            <div class="head" data-pitch="C#5" data-beat="3.6666"></div>
+            <div class="head" data-pitch="A#4" data-beat="4"></div>
         </div>
         <div class="stave 4/4-bar bar">
-            <div class="head" pitch="E4"  beat="1"></div>
-            <svg class="rest" beat="1.5" duration="0.5" viewbox="0 -4 2.6 8" preserveAspectRatio="xMidYMid meet"><use href="#rest[0.5]"></use></svg>
-            <div class="head" pitch="B4"  beat="2"></div>
-            <div class="head" pitch="D5"  beat="2.5"></div>
-            <svg class="rest" beat="3" duration="1" viewbox="0 -4 2.6 8" preserveAspectRatio="xMidYMid meet"><use href="#rest[1]"></use></svg>
-            <div class="head" pitch="A#4" beat="4"></div>
-            <div class="head" pitch="G#4" beat="4.3333"></div>
-            <div class="head" pitch="F#4" beat="4.6666"></div>
+            <div class="head" data-pitch="E4"  data-beat="1"></div>
+            <svg class="rest" data-beat="1.5" data-duration="0.5" viewbox="0 -4 2.6 8" preserveAspectRatio="xMidYMid meet"><use href="#rest[0.5]"></use></svg>
+            <div class="head" data-pitch="B4"  data-beat="2"></div>
+            <div class="head" data-pitch="D5"  data-beat="2.5"></div>
+            <svg class="rest" data-beat="3" data-duration="1" viewbox="0 -4 2.6 8" preserveAspectRatio="xMidYMid meet"><use href="#rest[1]"></use></svg>
+            <div class="head" data-pitch="A#4" data-beat="4"></div>
+            <div class="head" data-pitch="G#4" data-beat="4.3333"></div>
+            <div class="head" data-pitch="F#4" data-beat="4.6666"></div>
         </div>
         <div class="stave 4/4-bar bar">
-            <svg class="rest" beat="1" duration="4" viewbox="0 -4 2.6 8" preserveAspectRatio="xMidYMid"><use href="#rest[4]"></use></svg>
+            <svg class="rest" data-beat="1" data-duration="4" viewbox="0 -4 2.6 8" preserveAspectRatio="xMidYMid"><use href="#rest[4]"></use></svg>
         </div>
         <div class="stave 4/4-bar bar">
-            <div class="head" beat="1"   pitch="E4"></div>
-            <div class="head" beat="1.5" pitch="G#4"></div>
-            <div class="head" beat="2"   pitch="B4"></div>
-            <div class="head" beat="2.5" pitch="D5"></div>
-            <svg class="rest" beat="3"   duration="2" viewbox="0 -4 2.6 8" preserveAspectRatio="xMidYMid meet"><use href="#rest[2]"></use></svg>
+            <div class="head" data-beat="1"   data-pitch="E4"></div>
+            <div class="head" data-beat="1.5" data-pitch="G#4"></div>
+            <div class="head" data-beat="2"   data-pitch="B4"></div>
+            <div class="head" data-beat="2.5" data-pitch="D5"></div>
+            <svg class="rest" data-beat="3"   data-duration="2" viewbox="0 -4 2.6 8" preserveAspectRatio="xMidYMid meet"><use href="#rest[2]"></use></svg>
         </div>
         <div class="stave 4/4-bar bar">
-            <div class="head" pitch="E4"  beat="1"></div>
-            <div class="head" pitch="G#4" beat="1.5"></div>
-            <div class="head" pitch="B4"  beat="2"></div>
-            <div class="head" pitch="D5"  beat="2.5"></div>
-            <div class="head" pitch="E5"  beat="3"></div>
-            <div class="head" pitch="F#5" beat="3.3333"></div>
-            <div class="head" pitch="C#5" beat="3.6666"></div>
-            <div class="head" pitch="A#4" beat="4"></div>
-            <div class="head" pitch="G#4" beat="4.3333"></div>
-            <div class="head" pitch="F#4" beat="4.6666"></div>
+            <div class="head" data-pitch="E4"  data-beat="1"></div>
+            <div class="head" data-pitch="G#4" data-beat="1.5"></div>
+            <div class="head" data-pitch="B4"  data-beat="2"></div>
+            <div class="head" data-pitch="D5"  data-beat="2.5"></div>
+            <div class="head" data-pitch="E5"  data-beat="3"></div>
+            <div class="head" data-pitch="F#5" data-beat="3.3333"></div>
+            <div class="head" data-pitch="C#5" data-beat="3.6666"></div>
+            <div class="head" data-pitch="A#4" data-beat="4"></div>
+            <div class="head" data-pitch="G#4" data-beat="4.3333"></div>
+            <div class="head" data-pitch="F#4" data-beat="4.6666"></div>
         </div>
         <div class="stave 4/4-bar bar">
-            <div class="head" pitch="E4"  beat="1"></div>
-            <div class="head" pitch="G#4" beat="1.5"></div>
-            <svg class="rest" beat="2" duration="3" viewbox="0 -4 2.6 8" preserveAspectRatio="xMidYMid meet"><use href="#rest[3]"></use></svg>
+            <div class="head" data-pitch="E4"  data-beat="1"></div>
+            <div class="head" data-pitch="G#4" data-beat="1.5"></div>
+            <svg class="rest" data-beat="2"    data-duration="3" viewbox="0 -4 2.6 8" preserveAspectRatio="xMidYMid meet"><use href="#rest[3]"></use></svg>
         </div>
         <div class="stave 4/4-bar bar">
-            <svg class="rest" beat="1"     duration="0.75"  viewbox="-0.2 -4 3.6 8" preserveAspectRatio="xMidYMid"><use href="#rest[0.75]"></use></svg>
-            <svg class="rest" beat="1.75"  duration="0.25"  viewbox="0 -4 2.8 8" preserveAspectRatio="xMidYMid"><use href="#rest[0.25]"></use></svg>
-            <svg class="rest" beat="2"     duration="0.125" viewbox="0 -4 3.0 8" preserveAspectRatio="xMidYMid"><use href="#rest[0.125]"></use></svg>
-            <svg class="rest" beat="2.125" duration="0.375" viewbox="0 -4 3.8 8" preserveAspectRatio="xMidYMid"><use href="#rest[0.375]"></use></svg>
-            <svg class="rest" beat="3"     duration="1.5"   viewbox="0 -4 3.5 8" preserveAspectRatio="xMidYMid"><use href="#rest[1.5]"></use></svg>
-            <svg class="rest" beat="4.5"   duration="0.5"   viewbox="0 -4 2.6 8" preserveAspectRatio="xMidYMid"><use href="#rest[0.5]"></use></svg>
-        </div>
-        <div class="stave 4/4-bar bar">
+            <svg class="rest" data-beat="1"     data-duration="0.75"  viewbox="-0.2 -4 3.6 8" preserveAspectRatio="xMidYMid"><use href="#rest[0.75]"></use></svg>
+            <svg class="rest" data-beat="1.75"  data-duration="0.25"  viewbox="0 -4 2.8 8"    preserveAspectRatio="xMidYMid"><use href="#rest[0.25]"></use></svg>
+            <svg class="rest" data-beat="2"     data-duration="0.125" viewbox="0 -4 3.0 8"    preserveAspectRatio="xMidYMid"><use href="#rest[0.125]"></use></svg>
+            <svg class="rest" data-beat="2.125" data-duration="0.375" viewbox="0 -4 3.8 8"    preserveAspectRatio="xMidYMid"><use href="#rest[0.375]"></use></svg>
+            <svg class="rest" data-beat="3"     data-duration="1.5"   viewbox="0 -4 3.5 8"    preserveAspectRatio="xMidYMid"><use href="#rest[1.5]"></use></svg>
+            <svg class="rest" data-beat="4.5"   data-duration="0.5"   viewbox="0 -4 2.6 8"    preserveAspectRatio="xMidYMid"><use href="#rest[0.5]"></use></svg>
         </div>
     `,
 
     construct: function(shadow, internals) {
-        const bar = shadow.querySelector('.bar');
+        const bar   = shadow.querySelector('.bar');
+        internals.state = assign({}, defaults);
+    },
+
+    connect: function(shadow, internals) {
+        const source  = this.innerHTML;
+        const type    = internals.type;
+        const data    = parseEvents(source);
+        const symbols = toSymbols(data);
+        const bars    = renderBars(symbols, internals.state);
+
+        // Put bars in the DOM
+        shadow.append.apply(shadow, bars);
     }
 }, {
 

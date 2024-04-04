@@ -20,11 +20,11 @@
        in Safari */
     margin-left: -1px;
 }
-
+/*
 :host > *:last-child {
     flex: 0 0 25%;
 }
-
+*/
 svg {
     fill: currentcolor;
 }
