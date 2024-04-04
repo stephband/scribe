@@ -45,6 +45,16 @@
     margin-right: 1.1em;
 }
 
+.stave > .stem {
+    justify-self: end;
+    align-self: center;
+}
+
+.stave > .tail {
+    justify-self: end;
+    align-self: center;
+}
+
 .stave > .rest {
     grid-row: stave-center;
     justify-self: center;

@@ -1,0 +1,5 @@
+.stem {
+    stroke: black;
+    stroke-width: 0.4;
+    width:  calc(2.7 * var(--y-size));
+}

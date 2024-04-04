@@ -1,9 +1,11 @@
 
 @import './classes/accidental.css';
+@import './classes/stave.css';
+@import './classes/bar.css';
 @import './classes/head.css';
 @import './classes/rest.css';
-@import './classes/bar.css';
-@import './classes/stave.css';
+@import './classes/stem.css';
+@import './classes/tail.css';
 
 :host {
     display: block;
