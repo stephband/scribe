@@ -129,8 +129,6 @@
 .treble-stave,
 :host([stave="treble"]) > .stave {
     grid-template-rows:
-        [C\#6 C6 Cb6] var(--y-size)
-        [B\#6 B6 Bb6] var(--y-size)
         [A\#6 A6 Ab6] var(--y-size)
         [G\#6 G6 Gb6] var(--y-size)
         [F\#6 F6 Fb6 chords] var(--y-size)
@@ -163,8 +161,6 @@
 .bass-stave,
 :host([stave="bass"]) > .stave {
     grid-template-rows:
-        [E\#5 E5 Eb5] var(--y-size)
-        [D\#5 D5 Db5] var(--y-size)
         [C\#5 C5 Cb5] var(--y-size)
         [B\#4 B4 Bb4] var(--y-size)
         [A\#4 A4 Ab4 chords] var(--y-size)

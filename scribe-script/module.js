@@ -1,8 +1,9 @@
 
+import get      from '../../fn/modules/get.js';
 import overload from '../../fn/modules/overload.js';
 import create   from '../../dom/modules/create.js';
 import element  from '../../dom/modules/element.js';
-import { toNoteNumber } from '../../midi/modules/note.js';
+import { toNoteNumber, toNoteName } from '../../midi/modules/note.js';
 
 const assign = Object.assign;
 
@@ -13,12 +14,86 @@ const defaults = {
     stave:   'treble'
 };
 
+const bar4 = { duration: 4, division: 1, label: '4/4' };
+const rflat  = /b|♭/;
+const rsharp = /#|♯/;
 
 function parseEvents(source) {
     return [
-        [0.5,  'note', 'G4',  0.8, 1.5],
-        [2,    'note', 'C#5', 0.8, 0.5],
-        [3.5,  'note', 'Db5', 0.8, 0.25]
+        [0,     "note", 72, 0.25, 0.5],
+        [0.5,   "note", 75, 0.25, 0.5],
+        [1,     "note", 72, 0.25, 0.5],
+        [1.5,   "note", 75, 0.25, 0.5],
+        [2,     "note", 77, 0.25, 0.5],
+        [2.5,   "note", 75, 0.25, 1],
+        [3.5,   "note", 72, 0.25, 0.25],
+        [3.75,  "note", 70, 0.25, 0.25],
+        [4,     "note", 72, 0.25, 0.5],
+        [4.5,   "note", 75, 0.25, 1],
+        [5.5,   "note", 72, 0.25, 0.25],
+        [5.75,  "note", 70, 0.25, 0.25],
+        [6,     "note", 72, 0.25, 1],
+        [7.75,  "note", 67, 0.25, 0.25],
+        [8,     "note", 72, 0.25, 0.5],
+        [8.5,   "note", 75, 0.25, 0.5],
+        [9,     "note", 72, 0.25, 0.5],
+        [9.5,   "note", 75, 0.25, 0.5],
+        [10,    "note", 78, 0.25, 0.5],
+        [10.5,  "note", 77, 0.25, 1],
+        [11.5,  "note", 72, 0.25, 0.25],
+        [11.75, "note", 70, 0.25, 0.25],
+        [12,    "note", 72, 0.25, 0.5],
+        [12.5,  "note", 75, 0.25, 1],
+        [13.5,  "note", 72, 0.25, 0.25],
+        [13.75, "note", 70, 0.25, 0.25],
+        [14,    "note", 72, 0.25, 1],
+        [15.5,  "note", 60, 0.25, 0.5],
+        [16,    "note", 67, 0.25, 0.5],
+        [16.5,  "note", 70, 0.25, 0.5],
+        [17,    "note", 60, 0.25, 0.5],
+        [17.5,  "note", 63, 0.25, 0.5],
+        [18,    "note", 65, 0.25, 0.5],
+        [18.5,  "note", 63, 0.25, 1],
+        [19.5,  "note", 60, 0.25, 0.25],
+        [19.75, "note", 63, 0.25, 0.25],
+        [20,    "note", 67, 0.25, 0.5],
+        [20.5,  "note", 72, 0.25, 0.5],
+        [21,    "note", 63, 0.25, 0.5],
+        [21.5,  "note", 67, 0.25, 0.5],
+        [22,    "note", 70, 0.25, 0.5],
+        [22.5,  "note", 67, 0.25, 0.5],
+        [23,    "note", 63, 0.25, 0.5],
+        [23.5,  "note", 59, 0.25, 0.25],
+        [23.75, "note", 57, 0.25, 0.25],
+        [24,    "note", 63, 0.25, 0.5],
+        [24.5,  "note", 66, 0.25, 1],
+        [25.5,  "note", 61, 0.25, 0.5],
+        [26,    "note", 59, 0.25, 0.5],
+        [26.5,  "note", 66, 0.25, 1],
+        [27.5,  "note", 62, 0.25, 0.5],
+        [28,    "note", 63, 0.25, 2],
+        [30,    "note", 60, 0.25, 1],
+        [31.5,  "note", 66, 0.25, 0.25],
+        [31.75, "note", 65, 0.25, 0.25],
+        [32,    "note", 63, 0.25, 2],
+        [34,    "note", 60, 0.25, 2],
+        [36,    "note", 65, 0.25, 0.5],
+        [36.5,  "note", 63, 0.25, 0.5],
+        [37,    "note", 60, 0.25, 0.5],
+        [37.5,  "note", 58, 0.25, 0.5],
+        [38,    "note", 66, 0.25, 0.5],
+        [38.5,  "note", 65, 0.25, 0.5],
+        [39,    "note", 63, 0.25, 0.5],
+        [39.5,  "note", 60, 0.25, 0.5],
+        [40,    "note", 63, 0.25, 2],
+        [42,    "note", 60, 0.25, 2],
+        [44,    "note", 67, 0.25, 0.5],
+        [44.5,  "note", 65, 0.25, 1],
+        [45.5,  "note", 63, 0.25, 0.5],
+        [46,    "note", 60, 0.25, 0.5],
+        [46.5,  "note", 58, 0.25, 1],
+        [47.5,  "note", 55, 0.25, 0.5],
+        [48,    "note", 62, 0.25, 4]
     ];
 }
 
@@ -28,22 +103,27 @@ function getStemDirection(note, event2) {
         'up' ;
 }
 
-function insertSymbols(events, stopBeat, stemNote) {
+function insertSymbols(symbols, stopBeat, stemNote) {
     const accidentals = {};
     let beat = 0;
     let n = -1;
-    let event;
+    let head;
     let endBeat;
 
-    while (event = events[++n]) {
-        endBeat = event[0] + event[4];
+    while (head = symbols[++n]) {
+        endBeat = head.beat + head.duration;
 
         // Rest
 
-        // Insert rest if event beat is greater than beat
-        if (event[0] > beat) {
+        // Insert rest if head beat is greater than beat
+        if (head.beat > beat) {
             // [beat, 'rest', pitch (currently unused), duration]
-            events.splice(n++, 0, [beat, 'rest', 0, event[0] - beat]);
+            symbols.splice(n++, 0, {
+                beat,
+                type:     'rest',
+                pitch:    '',
+                duration: head.beat - beat
+            });
         }
 
         // Update beat
@@ -54,150 +134,269 @@ function insertSymbols(events, stopBeat, stemNote) {
         // Accidental
 
         // Determine accidental
-        const acci = event[2].includes('#') ? 1 :
-            event[2].includes('b') ? -1 :
+        const acci = rsharp.test(head.pitch) ? 1 :
+            rflat.test(head.pitch) ? -1 :
             undefined ;
 
         // Line name is note name + octave (no # or b)
-        const line = event[2][0] + event[2].slice(-1);
+        const line = head.pitch[0] + head.pitch.slice(-1);
 
-        if (acci !== accidentals[line]) {
+        if (
+            // If head is not a tied head from a previous bar - they
+            // don't require accidentals,
+            !(head.beat === 0 && head.tie && head.tie !== 'begin')
+            // and if it has changed from the bars current accidentals
+            && acci !== accidentals[line]
+        ) {
             accidentals[line] = acci;
-            // [time, 'acci', pitch, 1 or 0 or -1]
-            events.splice(n++, 0, [event[0], 'acci', event[2], acci || 0]);
+            symbols.splice(n++, 0, assign({}, head, {
+                type: 'acci',
+                value: acci || 0
+            }));
         }
 
         // Stem
-        if (event[4] < 4) {
-            // [time, 'stem', pitch, 1 or -1]
-            events.splice(n++, 0, [event[0], 'stem', event[2], getStemDirection(stemNote, event[2]), event[4]]);
-        }
+        if (head.duration < 4) {
+            symbols.splice(n++, 0, assign({}, head, {
+                type: 'stem',
+                value: getStemDirection(stemNote, head.pitch)
+            }));
 
-        // Tail
-        // This needs to be expanded to wait for tail groupings
-        if (event[4] < 1) {
-            // [time, 'tail', pitch, 1 or -1]
-            events.splice(n++, 0, [event[0], 'tail', event[2], getStemDirection(stemNote, event[2]), event[4]]);
+            // Tail
+            // This step needs to be expanded to wait for tail groupings
+            if (head.duration < 1) {
+                symbols.splice(n++, 0, assign({}, head, {
+                    type: 'tail',
+                    value: getStemDirection(stemNote, head.pitch)
+                }));
+            }
         }
     }
 
     // If last event has not taken us to the end of the bar, insert rest
     if (beat < stopBeat) {
-        // [beat, 'rest', pitch (currently unused), duration]
-        events.push([beat, 'rest', 0, stopBeat - beat]);
+        symbols.push({
+            beat,
+            type: 'rest',
+            pitch: '',
+            duration: stopBeat - beat
+        });
     }
 
-    return events;
+    return symbols;
 }
 
 function toSymbols(events) {
     const state = {
         clef: { name: 'treble', stemDirectionNote: 'B4' },
-        bar: { duration: 4, division: 1, label: '4/4' }
+        bar: bar4
     };
 
     return insertSymbols(events, state.bar.duration, state.clef.stemDirectionNote);
 }
 
+function createBarFromBuffer(barBeat, barDuration, buffer) {
+    const bar = [];
 
-const createSymbols = overload((nodes, event) => event[1], {
-    acci: (nodes, event) => {
-        // Create accidental
-        nodes.push(create('svg', {
-            class:   "acci",
-            viewBox: event[3] === 1 ? "0 -4 2.3 4" :
-                event[3] === -1 ? "0 -4 2 4" :
-                "0 -4 1.8 4" ,
-            preserveAspectRatio: "xMidYMid slice",
-            data: { beat: event[0] + 1, pitch: event[2] },
-            html: '<use href="#acci-'
-                + (event[3] === 1 ? 'sharp' : event[3] === -1 ? 'flat' : 'natural')
-                + '"></use>'
-        }));
+    let m = -1;
+    let tied;
+    while (buffer[++m] && buffer[m][0] < barBeat + barDuration) {
+        tied = buffer[m];
 
-        return nodes;
-    },
+        // Event ends after this bar
+        if (barBeat + barDuration < tied[0] + tied[4]) {
+            bar.push({
+                beat: 0,
+                type: 'head',
+                pitch: typeof tied[2] === 'number' ?
+                    toNoteName(tied[2]) :
+                    normaliseNoteName(tied[2]),
+                tie: 'middle',
+                duration: barDuration,
+                event: tied
+            });
+        }
 
-    note: (nodes, event) => {
-        // Create note head
-        nodes.push(create('svg', {
-            class:   "head",
-            viewBox: "0 -1 2.7 2",
-            preserveAspectRatio: "xMidYMid slice",
-            data: { beat: event[0] + 1, pitch: event[2], duration: event[4] },
-            html: '<use href="#head[' + event[4] + ']"></use>'
-        }));
+        // Event ends in this bar
+        else {
+            bar.push({
+                beat: 0,
+                type: 'head',
+                pitch: typeof tied[2] === 'number' ?
+                    toNoteName(tied[2]) :
+                    normaliseNoteName(tied[2]),
+                tie: 'end',
+                duration: tied[0] + tied[4] - barBeat,
+                event: tied
+            });
 
-        return nodes;
-    },
+            // Remove event from buffer, as it has ended
+            buffer.splice(m, 1);
+            --m;
+        }
+    }
 
-    stem: (nodes, event) => {
-        // Create note head
-        nodes.push(create('svg', {
-            class:   "stem",
-            viewBox: "0 -1 2.7 2",
-            preserveAspectRatio: "xMidYMid",
-            data: { beat: event[0] + 1, pitch: event[2], duration: event[4] },
-            html: '<use href="#stem' + event[3] + '"></use>'
-        }));
+    return bar;
+}
 
-        return nodes;
-    },
+function splitByBar(events, barDuration) {
+    const bars = [];
+    const buffer = [];
 
-    tail: (nodes, event) => {
-        // Create note head
-        nodes.push(create('svg', {
-            class:   "tail",
-            viewBox: "0 -1 2.7 2",
-            preserveAspectRatio: "xMidYMid",
-            data: { beat: event[0] + 1, pitch: event[2], duration: event[4] },
-            html: '<use href="#tail' + event[3] + '[' + event[4] + ']"></use>'
-        }));
+    let barBeat = 0;
+    let bar = [];
+    bars.push(bar);
 
-        return nodes;
-    },
+    let n = -1;
+    let event;
+    while (event = events[++n]) {
+        if (event[1] === 'timesig') {
+            if (event[0] !== barBeat) {
+                new TypeError('A "timesig" event may only occur at the start of a bar')
+            }
+            barDuration = event[2];
+            continue;
+        }
 
-    rest: (nodes, event) => {
-        // Create note head
-        nodes.push(create('svg', {
-            class:   "rest",
-            viewBox:
-                event[3] === 0.125 ? "0 -4 3.0 8" :
-                event[3] === 0.25  ? "0 -4 2.8 8" :
-                event[3] === 0.375 ? "0 -4 3.8 8" :
-                event[3] === 0.5   ? "0 -4 2.6 8" :
-                event[3] === 0.75  ? "-0.2 -4 3.6 8" :
-                event[3] === 1     ? "0 -4 2.6 8" :
-                event[3] === 1.5   ? "0 -4 3.5 8" :
-                event[3] === 2     ? "0 -4 2.6 8" :
-                event[3] === 3     ? "0 -4 2.6 8" :
-                event[3] === 4     ? "0 -4 2.6 8" :
-                event[3] === 6     ? "0 -4 2.6 8" :
-                "0 -4 2.6 8" ,
-            preserveAspectRatio: "xMidYMid slice",
-            data: { beat: event[0] + 1, pitch: event[2], duration: event[3] },
-            html: '<use href="#rest[' + event[3] + ']"></use>'
-        }));
+        if (event[1] !== 'note') {
+            console.log('Scribe: event type "' + event[1] + '" not rendered');
+            continue;
+        }
 
-        return nodes;
-    },
+        // Event is in a future bar
+        while (event[0] >= barBeat + barDuration) {
+            // Create the next bar
+            barBeat = barBeat + barDuration;
+            bar = createBarFromBuffer(barBeat, barDuration, buffer);
+            bars.push(bar);
+        }
 
-    default: function(nodes, event) {
-        console.error('Scribe: event type "' + event[1] + '" not rendered');
-        return nodes;
+        // Event ends after this bar
+        if (event[0] + event[4] > barBeat + barDuration) {
+            bar.push({
+                beat: event[0] - barBeat,
+                type: 'head',
+                pitch: typeof event[2] === 'number' ?
+                    toNoteName(event[2]) :
+                    normaliseNoteName(event[2]),
+                duration: barBeat + barDuration - event[0],
+                tie: 'begin',
+                event: event
+            });
+
+            // Stick it in the ties buffer
+            buffer.push(event);
+        }
+
+        // Event ends inside this bar
+        else {
+            bar.push({
+                beat: event[0] - barBeat,
+                type: 'head',
+                pitch: typeof event[2] === 'number' ?
+                    toNoteName(event[2]) :
+                    normaliseNoteName(event[2]),
+                duration: event[4],
+                event: event
+            });
+        }
+    }
+
+    // There are still hanging notes to render
+    while (buffer.length) {
+        // Create the next bar
+        barBeat = barBeat + barDuration;
+        bar = createBarFromBuffer(barBeat, barDuration, buffer);
+        bars.push(bar);
+    }
+
+    return bars;
+}
+
+const toElement = overload(get('type'), {
+    // Create accidental
+    acci: (symbol) => create('svg', {
+        class:   "acci",
+        viewBox: symbol.value === 1 ? "0 -4 2.3 4" :
+            symbol.value === -1 ? "0 -4 2 4" :
+            "0 -4 1.8 4" ,
+        preserveAspectRatio: "xMidYMid slice",
+        data: { beat: symbol.beat + 1, pitch: symbol.pitch },
+        html: '<use href="#acci-'
+            + (symbol.value === 1 ? 'sharp' : symbol.value === -1 ? 'flat' : 'natural')
+            + '"></use>'
+    }),
+
+    // Create note head
+    head: (symbol) => create('svg', {
+        class:   "head",
+        viewBox: "0 -1 2.7 2",
+        preserveAspectRatio: "xMidYMid slice",
+        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, tie: symbol.tie },
+        html: '<use href="#head[' + symbol.duration + ']"></use>'
+    }),
+
+    // Create note stem
+    stem: (symbol) => create('svg', {
+        class:   "stem",
+        viewBox: "0 -1 2.7 2",
+        preserveAspectRatio: "xMidYMid",
+        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration },
+        html: '<use href="#stem' + symbol.value + '"></use>'
+    }),
+
+    // Create note tail
+    tail: (symbol) => create('svg', {
+        class:   "tail",
+        viewBox: "0 -1 2.7 2",
+        preserveAspectRatio: "xMidYMid",
+        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration },
+        html: '<use href="#tail' + symbol.value + '[' + symbol.duration + ']"></use>'
+    }),
+
+    // Create rest
+    rest: (symbol) => create('svg', {
+        class:   "rest",
+        viewBox:
+            symbol.duration === 0.125 ? "0 -4 3.0 8" :
+            symbol.duration === 0.25  ? "0 -4 2.8 8" :
+            symbol.duration === 0.375 ? "0 -4 3.8 8" :
+            symbol.duration === 0.5   ? "0 -4 2.6 8" :
+            symbol.duration === 0.75  ? "-0.2 -4 3.6 8" :
+            symbol.duration === 1     ? "0 -4 2.6 8" :
+            symbol.duration === 1.5   ? "0 -4 3.5 8" :
+            symbol.duration === 2     ? "0 -4 2.6 8" :
+            symbol.duration === 3     ? "0 -4 2.6 8" :
+            symbol.duration === 4     ? "0 -4 2.6 8" :
+            symbol.duration === 6     ? "0 -4 2.6 8" :
+            "0 -4 2.6 8" ,
+        preserveAspectRatio: "xMidYMid slice",
+        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration },
+        html: '<use href="#rest[' + symbol.duration + ']"></use>'
+    }),
+
+    default: function(symbol) {
+        console.log(symbol);
+        console.error('Scribe: symbol type "' + symbol.type + '" not rendered');
     }
 });
 
-function renderBar(data) {
-    return create('div', {
-        class: 'stave 4/4-bar bar',
-        children: data.reduce(createSymbols, [])
-    });
+function toElements(nodes, symbol) {
+    const element = toElement(symbol);
+    if (element) { nodes.push(element); }
+    return nodes;
 }
 
-function renderBars(data) {
-    return [renderBar(data)];
+function toBarElements(elements, symbols) {
+    elements.push(create('div', {
+        class: 'stave 4/4-bar bar',
+        children: symbols.reduce(toElements, [])
+    }));
+
+    return elements;
 }
+
+
 
 export default element('scribe-script', {
     shadow: `
@@ -241,9 +440,9 @@ export default element('scribe-script', {
                 <line id="stemdown" class="stem-path" x1="0.1" y1="0.5" x2="0.1" y2="6.75"></line>
 
                 <!-- Tails -->
-                <path id="tailup[0.5]"    class="tail-path" transform="translate(-34.248  -41) scale(0.1111)" d="M335.6724,356.0957c-0.5039,0-0.936-0.1445-1.2959-0.5762c-0.4321-0.3594-0.5762-0.792-0.5762-1.2246c0-0.2148,0.0723-0.5039,0.2163-0.791c1.0078-2.3047,1.584-4.8965,1.584-7.7773c0-9.6484-5.8325-18.1455-17.3535-25.418v-16.3457c1.728,1.4404,4.2485,3.6006,7.5605,6.5527c8.6406,8.8574,12.9614,20.5215,12.9614,34.9238c0,1.7275-0.2163,3.6719-0.6484,5.9756C337.4727,354.584,336.6807,356.0957,335.6724,356.0957z"/>
+                <path id="tailup[0.5]"    class="tail-path" transform="translate(-33.14  -42) scale(0.1111)" d="M335.6724,356.0957c-0.5039,0-0.936-0.1445-1.2959-0.5762c-0.4321-0.3594-0.5762-0.792-0.5762-1.2246c0-0.2148,0.0723-0.5039,0.2163-0.791c1.0078-2.3047,1.584-4.8965,1.584-7.7773c0-9.6484-5.8325-18.1455-17.3535-25.418v-16.3457c1.728,1.4404,4.2485,3.6006,7.5605,6.5527c8.6406,8.8574,12.9614,20.5215,12.9614,34.9238c0,1.7275-0.2163,3.6719-0.6484,5.9756C337.4727,354.584,336.6807,356.0957,335.6724,356.0957z"/>
                 <path id="taildown[0.5]"  class="tail-path" transform="translate(-42.3  -30.5) scale(0.1111)" d="M404.5039,283.8735c1.1514,4.248,1.7275,8.6406,1.7275,13.105c0,8.9287-3.3125,19.3691-9.793,31.251c-4.6797,8.4971-10.2246,14.041-16.6328,16.7773v-11.2334c0-1.4395,1.6562-3.7441,4.9678-6.9844c3.3848-3.0244,6.6973-6.1211,10.0088-9.2168c3.8164-3.8887,6.1934-7.1289,7.0566-9.7207c1.2969-4.1758,2.0166-7.8486,2.0166-10.873l-0.2881-4.3921c-0.0723-0.7202-0.3604-1.9443-0.792-3.6724c-0.3604-1.5845-0.5762-2.7363-0.5762-3.6006C402.1992,284.3057,402.9912,283.8013,404.5039,283.8735z"/>
-                <path id="tailup[0.25]"   class="tail-path" transform="translate(-38.8  -41.2) scale(0.1111)" d="M371.5986,371.793c-0.5049,0-0.8643-0.7207-1.2246-2.2324c2.7363-3.2402,4.1045-6.2637,4.1045-9.1445c0-2.5195-0.792-5.3281-2.376-8.4961c-1.4404-2.5928-3.0967-5.041-5.1846-7.2012c-0.792-0.8643-2.0879-1.9443-3.8887-3.3848c-1.7275-1.4395-3.0244-2.5195-3.6719-3.2402v-31.8984c6.2646,2.5918,11.1611,7.416,14.7607,14.3291c3.2402,6.2646,4.8965,13.0332,4.8965,20.3779c0,1.8721-0.792,4.6084-2.2324,8.3525c0.5049,1.7285,0.793,3.5283,0.793,5.4014c0,7.1279-1.873,12.7441-5.4727,16.8486C371.958,371.7207,371.7422,371.793,371.5986,371.793z M376.4229,342.0547c0-3.3125-3.1689-8.6406-9.5049-15.9141c-1.2246-1.2236-3.0967-3.0957-5.5449-5.6162v4.3926c5.7607,4.4639,10.585,10.9443,14.6172,19.4424C376.2783,343.3506,376.4229,342.6309,376.4229,342.0547z"/>
+                <path id="tailup[0.25]"   class="tail-path" transform="translate(-37.7  -42) scale(0.1111)" d="M371.5986,371.793c-0.5049,0-0.8643-0.7207-1.2246-2.2324c2.7363-3.2402,4.1045-6.2637,4.1045-9.1445c0-2.5195-0.792-5.3281-2.376-8.4961c-1.4404-2.5928-3.0967-5.041-5.1846-7.2012c-0.792-0.8643-2.0879-1.9443-3.8887-3.3848c-1.7275-1.4395-3.0244-2.5195-3.6719-3.2402v-31.8984c6.2646,2.5918,11.1611,7.416,14.7607,14.3291c3.2402,6.2646,4.8965,13.0332,4.8965,20.3779c0,1.8721-0.792,4.6084-2.2324,8.3525c0.5049,1.7285,0.793,3.5283,0.793,5.4014c0,7.1279-1.873,12.7441-5.4727,16.8486C371.958,371.7207,371.7422,371.793,371.5986,371.793z M376.4229,342.0547c0-3.3125-3.1689-8.6406-9.5049-15.9141c-1.2246-1.2236-3.0967-3.0957-5.5449-5.6162v4.3926c5.7607,4.4639,10.585,10.9443,14.6172,19.4424C376.2783,343.3506,376.4229,342.6309,376.4229,342.0547z"/>
                 <path id="taildown[0.25]" class="tail-path" transform="translate(-51.24  -30.5) scale(0.1111)"  d="M460.2285,319.8047c0-1.0078,1.6562-2.6641,4.9678-5.041c3.3125-2.3037,6.625-4.6797,10.0088-6.9844c3.8164-2.8799,6.1934-5.2559,7.0566-7.2725c1.2969-3.0962,2.0166-5.7603,2.0166-7.9927c0-0.2881-0.1436-1.2959-0.3604-3.1685c0-0.2876-0.2158-0.792-0.5039-1.584s-0.4316-1.2241-0.4316-1.3682c0-0.2881,0.2158-0.5039,0.7197-0.7202c0.4326-0.2158,0.8643-0.3599,1.1523-0.3599s0.5039,0.0723,0.6484,0.0723c0.7197,2.4482,1.1514,4.896,1.1514,7.2007c0,2.5918-0.5039,5.2563-1.3682,7.9204c0.8643,2.5928,1.3682,5.3291,1.3682,8.208c0,3.8887-0.8643,7.5615-2.4482,10.9453c-1.584,3.457-2.7363,5.833-3.3838,7.1289c-1.3682,2.7363-2.7363,4.9688-4.0322,6.7686c-2.3047,3.3125-4.7529,5.9053-7.2012,7.7764c-2.4482,1.873-5.5439,3.6729-9.3604,5.2568V319.8047z M461.8125,334.0625c0.4316-0.4326,2.0156-1.585,4.6084-3.457c4.248-2.7363,7.1289-4.8242,8.7842-6.1211c3.8887-3.0234,6.1934-5.4717,7.0566-7.416c1.2969-3.168,2.0166-5.832,2.0166-7.9209c0-1.9443-0.2158-3.5283-0.5762-4.8242c-3.7441,7.417-6.5527,12.3857-8.4248,14.833c-3.3125,4.3203-7.7764,7.7051-13.4648,10.2969V334.0625z"/>
                 <use  id="tailup[0.375]"   href="#tailup[0.25]"></use>
                 <use  id="taildown[0.375]" href="#taildown[0.25]"></use>
@@ -273,7 +472,7 @@ export default element('scribe-script', {
                 </g>
             </defs>
         </svg>
-        <div class="stave 4/4-bar bar">
+        <!--div class="stave 4/4-bar bar">
             <svg class="head" data-beat="1"      data-pitch="E4"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
             <svg class="acci" data-beat="1.5"    data-pitch="G#4" viewbox="0 -4 2.3 4" preserveAspectRatio="xMidYMid slice"><use href="#acci-sharp"></use></svg>
             <svg class="head" data-beat="1.5"    data-pitch="G#4" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
@@ -291,78 +490,13 @@ export default element('scribe-script', {
             <svg class="head" data-beat="4.6666" data-pitch="B4"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></div>
         </div>
         <div class="stave 4/4-bar bar">
-            <svg class="head" data-beat="1"      data-pitch="E4"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="acci" data-beat="1.5"    data-pitch="G#4" viewbox="0 -4 2.3 4" preserveAspectRatio="xMidYMid slice"><use href="#acci-sharp"></use></svg>
-            <svg class="head" data-beat="1.5"    data-pitch="G#4" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="acci" data-beat="2"      data-pitch="B4"  viewbox="0 -4 1.8 4" preserveAspectRatio="xMidYMid slice"><use href="#acci-natural"></use></svg>
-            <svg class="head" data-beat="2"      data-pitch="B4"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="head" data-beat="2.5"    data-pitch="D5"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="acci" data-beat="3"      data-pitch="Eb5" viewbox="0 -4 2 4" preserveAspectRatio="xMidYMid slice"><use href="#acci-flat"></use></svg>
-            <svg class="head" data-beat="3"      data-pitch="Eb5" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="rest" data-beat="4"      data-duration="1" viewbox="0 -4 2.6 8" preserveAspectRatio="xMidYMid meet"><use href="#rest[1]"></use></svg>
-        </div>
-        <div class="stave 4/4-bar bar">
-            <svg class="head" data-beat="1"      data-pitch="E4"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="head" data-beat="2"      data-pitch="B4"  viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="head" data-beat="3"      data-pitch="Eb5" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-            <svg class="head" data-beat="4"      data-pitch="A#4" viewbox="0 -1 2.7 2" preserveAspectRatio="xMidYMid slice"><use href="#head[1]"></use></svg>
-        </div>
-        <div class="stave 4/4-bar bar">
-            <div class="head" data-pitch="E4"  data-beat="1"></div>
-            <div class="head" data-pitch="G#4" data-beat="1.5"></div>
-            <div class="head" data-pitch="B4"  data-beat="2"></div>
-            <div class="head" data-pitch="D5"  data-beat="2.5"></div>
-            <svg class="rest" data-beat="2.75" data-duration="0.25" viewbox="0 -4 2.6 8" preserveAspectRatio="xMidYMid meet"><use href="#rest[0.25]"></use></svg>
-            <div class="head" data-pitch="E5"  data-beat="3"></div>
-            <div class="head" data-pitch="F#5" data-beat="3.3333"></div>
-            <div class="head" data-pitch="C#5" data-beat="3.6666"></div>
-            <div class="head" data-pitch="A#4" data-beat="4"></div>
-        </div>
-        <div class="stave 4/4-bar bar">
-            <div class="head" data-pitch="E4"  data-beat="1"></div>
-            <svg class="rest" data-beat="1.5" data-duration="0.5" viewbox="0 -4 2.6 8" preserveAspectRatio="xMidYMid meet"><use href="#rest[0.5]"></use></svg>
-            <div class="head" data-pitch="B4"  data-beat="2"></div>
-            <div class="head" data-pitch="D5"  data-beat="2.5"></div>
-            <svg class="rest" data-beat="3" data-duration="1" viewbox="0 -4 2.6 8" preserveAspectRatio="xMidYMid meet"><use href="#rest[1]"></use></svg>
-            <div class="head" data-pitch="A#4" data-beat="4"></div>
-            <div class="head" data-pitch="G#4" data-beat="4.3333"></div>
-            <div class="head" data-pitch="F#4" data-beat="4.6666"></div>
-        </div>
-        <div class="stave 4/4-bar bar">
-            <svg class="rest" data-beat="1" data-duration="4" viewbox="0 -4 2.6 8" preserveAspectRatio="xMidYMid"><use href="#rest[4]"></use></svg>
-        </div>
-        <div class="stave 4/4-bar bar">
-            <div class="head" data-beat="1"   data-pitch="E4"></div>
-            <div class="head" data-beat="1.5" data-pitch="G#4"></div>
-            <div class="head" data-beat="2"   data-pitch="B4"></div>
-            <div class="head" data-beat="2.5" data-pitch="D5"></div>
-            <svg class="rest" data-beat="3"   data-duration="2" viewbox="0 -4 2.6 8" preserveAspectRatio="xMidYMid meet"><use href="#rest[2]"></use></svg>
-        </div>
-        <div class="stave 4/4-bar bar">
-            <div class="head" data-pitch="E4"  data-beat="1"></div>
-            <div class="head" data-pitch="G#4" data-beat="1.5"></div>
-            <div class="head" data-pitch="B4"  data-beat="2"></div>
-            <div class="head" data-pitch="D5"  data-beat="2.5"></div>
-            <div class="head" data-pitch="E5"  data-beat="3"></div>
-            <div class="head" data-pitch="F#5" data-beat="3.3333"></div>
-            <div class="head" data-pitch="C#5" data-beat="3.6666"></div>
-            <div class="head" data-pitch="A#4" data-beat="4"></div>
-            <div class="head" data-pitch="G#4" data-beat="4.3333"></div>
-            <div class="head" data-pitch="F#4" data-beat="4.6666"></div>
-        </div>
-        <div class="stave 4/4-bar bar">
-            <div class="head" data-pitch="E4"  data-beat="1"></div>
-            <div class="head" data-pitch="G#4" data-beat="1.5"></div>
-            <svg class="rest" data-beat="2"    data-duration="3" viewbox="0 -4 2.6 8" preserveAspectRatio="xMidYMid meet"><use href="#rest[3]"></use></svg>
-        </div>
-        <div class="stave 4/4-bar bar">
             <svg class="rest" data-beat="1"     data-duration="0.75"  viewbox="-0.2 -4 3.6 8" preserveAspectRatio="xMidYMid slice"><use href="#rest[0.75]"></use></svg>
             <svg class="rest" data-beat="1.75"  data-duration="0.25"  viewbox="0 -4 2.8 8"    preserveAspectRatio="xMidYMid slice"><use href="#rest[0.25]"></use></svg>
             <svg class="rest" data-beat="2"     data-duration="0.125" viewbox="0 -4 3.0 8"    preserveAspectRatio="xMidYMid slice"><use href="#rest[0.125]"></use></svg>
             <svg class="rest" data-beat="2.125" data-duration="0.375" viewbox="0 -4 3.8 8"    preserveAspectRatio="xMidYMid slice"><use href="#rest[0.375]"></use></svg>
             <svg class="rest" data-beat="3"     data-duration="1.5"   viewbox="0 -4 3.5 8"    preserveAspectRatio="xMidYMid slice"><use href="#rest[1.5]"></use></svg>
             <svg class="rest" data-beat="4.5"   data-duration="0.5"   viewbox="0 -4 2.6 8"    preserveAspectRatio="xMidYMid slice"><use href="#rest[0.5]"></use></svg>
-        </div>
+        </div-->
     `,
 
     construct: function(shadow, internals) {
@@ -373,15 +507,18 @@ export default element('scribe-script', {
     connect: function(shadow, internals) {
         const source  = this.innerHTML;
         const type    = internals.type;
-        const data    = parseEvents(source);
-        const symbols = toSymbols(data);
+        const events  = parseEvents(source);
+        const bars    = splitByBar(events, bar4.duration)
+            .map(toSymbols) ;
 
-        console.log(symbols);
+        console.log(bars);
 
-        const bars    = renderBars(symbols, internals.state);
+        const elements = bars.reduce(toBarElements, []);
+
+        //renderBars(bars, internals.state);
 
         // Put bars in the DOM
-        shadow.append.apply(shadow, bars);
+        shadow.append.apply(shadow, elements);
     }
 }, {
 
