@@ -14,9 +14,10 @@ const defaults = {
     stave:   'treble'
 };
 
-const bar4 = { duration: 4, division: 1, label: '4/4' };
+const bar4 = { duration: 4, division: 1, breaks: [2], label: '4/4' };
 const rflat  = /b|♭/;
 const rsharp = /#|♯/;
+const beamThickness = 1;
 
 function parseEvents(source) {
     return [
@@ -103,11 +104,147 @@ function getStemDirection(note, event2) {
         'up' ;
 }
 
-function insertSymbols(symbols, stopBeat, stemNote) {
+function isAfterBreak(breaks, b1, b2) {
+    let n = -1;
+    while (breaks[++n] && breaks[n] < b1);
+    // If breaks[n] is undefined, returns false, which is what we want
+    return b2 > breaks[n];
+}
+
+function insertTail(symbols, stemNote, i) {
+    const head = symbols[i];
+    const stemDirection = getStemDirection(stemNote, head.pitch);
+
+    // Splice stem and tail in before head
+    // TODO put tail before accidentals for CSS reasons
+    symbols.splice(i, 0, assign({}, head, {
+        type: 'stem',
+        value: stemDirection
+    }), assign({}, head, {
+        type: 'tail',
+        value: stemDirection
+    }));
+
+    // We just spliced two symbols in before index n
+    return 2;
+}
+
+const lines = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+
+function addStaveRows(n, row) {
+    if (n < 0) {
+        while (n++) {
+            const line   = row[0];
+            const octave = parseInt(row[row.length - 1], 10);
+
+            // Are we switching octave down the way ?
+            if (line === lines[0]) {
+                row = lines[lines.length - 1] + (octave - 1);
+            }
+            else {
+                const l = lines.indexOf(line);
+                row = lines[l - 1] + octave;
+            }
+        }
+
+        return row;
+    }
+
+    while (n--) {
+        const line = row[0];
+        const octave = parseInt(row[row.length - 1], 10);
+
+        // Are we switching octave up the way ?
+        if (line === lines[lines.length - 1]) {
+            row = lines[0] + (octave + 1);
+        }
+        else {
+            const l = lines.indexOf(line);
+            row = lines[l + 1] + octave;
+        }
+    }
+
+    return row;
+}
+
+function subtractStaveRows(r1, r2) {
+    const degree1 = r1[0];
+    // TODO Support -ve octave (and double figure octave?) numbers
+    const octave1 = parseInt(r1[r1.length - 1], 10);
+    const degree2 = r2[0];
+    const octave2 = parseInt(r2[r2.length - 1], 10);
+
+    let i1 = lines.indexOf(degree1);
+    let i2 = lines.indexOf(degree2);
+    let n  = i2 - i1;
+
+    return n + (octave2 - octave1) * 7;
+}
+
+function insertBeam(symbols, beam, stemNote, n) {
+    // Not enough stems for a beam, give it a tail
+    if (beam.length === 1) {
+        if (beam[0] >= n) {
+            throw new Error('Last beam index (' + i + ') cant be greater than n (' + n + ')');
+        }
+
+        return insertTail(symbols, stemNote, beam[0]);
+    }
+
+    // Render stems and beam
+    const stemDirection = 0.5 <= (beam
+        .map((i) => getStemDirection(stemNote, symbols[i].pitch) === 'up')
+        .reduce((t, u) => t + u, 0) / beam.length) ?
+        'up' :
+        'down' ;
+
+    const stems = [];
+
+    // TODO Here's where to precaclulate stem heights and change them
+    // ready for the beam
+
+    // Loop backwards through beam splicing in stem symbols before
+    // the heads, all with the winning stem direction
+    let b = beam.length;
+    let i, head;
+    while (b--) {
+        i = beam[b];
+        head = symbols[i];
+        stems[b] = assign({}, head, {
+            type: 'stem',
+            value: stemDirection
+        });
+        symbols.splice(i, 0, stems[b]);
+    }
+
+    // Calculate where to put beam exactly
+    let begin = stems[0];
+    let end   = stems[stems.length - 1];
+    let beamBeginRow = addStaveRows(stemDirection === 'up' ? 7 : -7, begin.pitch);
+    let beamEndRow   = addStaveRows(stemDirection === 'up' ? 7 : -7, end.pitch);
+console.log(beamBeginRow, beamEndRow);
+    // Put the beam in front of the first head (??)
+    symbols.splice(i, 0, assign({}, begin, {
+        type: 'beam',
+        // Push beam start into next grid column
+        beat: begin.beat + (1 / 24),
+        pitch: beamBeginRow,
+        duration: end.beat - begin.beat,
+        range: subtractStaveRows(beamBeginRow, beamEndRow),
+        updown: stemDirection,
+        stems: stems
+    }));
+
+    // We just spliced a bunch of symbols in before index n
+    return beam.length + 1;
+}
+
+function insertSymbols(symbols, bar, stemNote) {
     const accidentals = {};
     let beat = 0;
     let n = -1;
     let head;
+    let beam;
     let endBeat;
 
     while (head = symbols[++n]) {
@@ -155,31 +292,58 @@ function insertSymbols(symbols, stopBeat, stemNote) {
             }));
         }
 
+        // Beam
+        if (beam && beam.length) {
+            // If head is a quarter note or longer
+            if (head.duration >= 1
+                // or head is a triplet quarter note
+                || head.duration.toFixed(2) === '0.67'
+                // or head crosses a bar break
+                || isAfterBreak(bar.breaks, symbols[beam[beam.length - 1]].beat, head.beat)
+            ) {
+                // Close the current beam
+                n += insertBeam(symbols, beam, stemNote, n);
+                beam = undefined;
+            }
+        }
+
         // Stem
         if (head.duration < 4) {
-            symbols.splice(n++, 0, assign({}, head, {
-                type: 'stem',
-                value: getStemDirection(stemNote, head.pitch)
-            }));
-
-            // Tail
-            // This step needs to be expanded to wait for tail groupings
-            if (head.duration < 1) {
+            // Is this head less than 1 beat (and not 1 triplet beat) long? It
+            // may be beamed.
+            if (head.duration < 1 && head.duration.toFixed(2) !== '0.67') {
+                if (beam) {
+                    // Keep index of head
+                    beam.push(n);
+                }
+                else {
+                    // Create new beam
+                    beam = [n];
+                }
+            }
+            // Otherwise render the stem immediately
+            else {
                 symbols.splice(n++, 0, assign({}, head, {
-                    type: 'tail',
+                    type: 'stem',
                     value: getStemDirection(stemNote, head.pitch)
                 }));
             }
         }
     }
 
+    // Close the current beam
+    if (beam && beam.length) {
+        n += insertBeam(symbols, beam, stemNote, n);
+        beam = undefined;
+    }
+
     // If last event has not taken us to the end of the bar, insert rest
-    if (beat < stopBeat) {
+    if (beat < bar.duration) {
         symbols.push({
             beat,
             type: 'rest',
             pitch: '',
-            duration: stopBeat - beat
+            duration: bar.duration - beat
         });
     }
 
@@ -192,7 +356,7 @@ function toSymbols(events) {
         bar: bar4
     };
 
-    return insertSymbols(events, state.bar.duration, state.clef.stemDirectionNote);
+    return insertSymbols(events, state.bar, state.clef.stemDirectionNote);
 }
 
 function createBarFromBuffer(barBeat, barDuration, buffer) {
@@ -344,6 +508,25 @@ const toElement = overload(get('type'), {
         data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration },
         html: '<use href="#stem' + symbol.value + '"></use>'
     }),
+
+    // Create note beam
+    beam: (symbol) => (symbol.range < 0 ? create('svg', {
+        // Beam is sloped down
+        class:   `${ symbol.updown }-beam beam`,
+        viewBox: `0 0 4 ${ 1 - symbol.range }`,
+        preserveAspectRatio: "none",
+        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration },
+        style: 'grid-row-end: span ' + (1 - symbol.range),
+        html: `<path class="beam-path" d="M0,${ 0.5 - 0.5 * beamThickness } L4,${ 0.5 - symbol.range - 0.5 * beamThickness } L4,${ 0.5 - symbol.range + 0.5 * beamThickness } L0,${ 0.5 + 0.5 * beamThickness } Z"></line>`
+    }) : create('svg', {
+        // Beam is sloped up
+        class:   `${ symbol.updown }-beam beam`,
+        viewBox: `0 0 4 ${ 1 + symbol.range }`,
+        preserveAspectRatio: "none",
+        data: { beat: symbol.beat + 1, pitch: addStaveRows(symbol.range, symbol.pitch), duration: symbol.duration },
+        style: 'grid-row-end: span ' + (1 + symbol.range),
+        html: `<path class="beam-path" d="M0,${ 0.5 + symbol.range - 0.5 * beamThickness } L4,${ 0.5 - 0.5 * beamThickness } L4,${ 0.5 + 0.5 * beamThickness } L0,${ 0.5 + symbol.range + 0.5 * beamThickness } Z"></line>`
+    })),
 
     // Create note tail
     tail: (symbol) => create('svg', {

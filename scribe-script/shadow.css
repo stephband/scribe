@@ -5,7 +5,9 @@
 @import './classes/head.css';
 @import './classes/rest.css';
 @import './classes/stem.css';
+@import './classes/beam.css';
 @import './classes/tail.css';
+@import './classes/svg.css';
 
 :host {
     display: block;

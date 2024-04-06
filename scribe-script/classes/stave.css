@@ -55,6 +55,11 @@
     align-self: center;
 }
 
+.stave > .beam {
+    align-self: stretch;
+    width: auto;
+}
+
 .stave > .rest {
     grid-row: stave-center;
     justify-self: center;
@@ -125,7 +130,6 @@
 .stave > [data-pitch^="D"][data-pitch$="0"] { grid-row: D0; }
 .stave > [data-pitch^="C"][data-pitch$="0"] { grid-row: C0; }
 
-
 .treble-stave,
 :host([stave="treble"]) > .stave {
     grid-template-rows:
@@ -188,4 +192,36 @@
         [G\#1 G1 Gb1] var(--y-size)
         [F\#1 F1 Fb1] var(--y-size)
         [E\#1 E1 Eb1] var(--y-size);
+}
+
+.drumkit-stave,
+:host([stave="drumkit"]) > .stave {
+    grid-template-rows:
+        [] var(--y-size)
+        [] var(--y-size)
+        [chords] var(--y-size)
+        [] var(--y-size)
+        [] var(--y-size)
+        [] var(--y-size)
+        [C\#3] var(--y-size)               /* Crash */
+        [B3]   var(--y-size)               /* Ride 2 */
+        [Eb3 F3] var(--y-size)             /* Ride 1, Ride bell */
+        [F\#2 Bb2 stave-top] var(--y-size) /* Closed, open hi hats */
+        [D3] var(--y-size)                 /* High Tom */
+        [] var(--y-size)
+        [D2] var(--y-size)                 /* Acoustic Snare  */
+        [stave-center] var(--y-size)
+        [A2] var(--y-size)                 /* Low Tom */
+        [] var(--y-size)
+        [G2] var(--y-size)                 /* High Floor Tom */
+        [B1] var(--y-size)                 /* Acoustic Kick */
+        [Ab2 stave-bottom] var(--y-size)   /* Hi hat pedal */
+        [] var(--y-size)
+        [] var(--y-size)
+        [] var(--y-size)
+        [] var(--y-size)
+        [] var(--y-size)
+        [] var(--y-size)
+        [] var(--y-size)
+        [] var(--y-size);
 }
