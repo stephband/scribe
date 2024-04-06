@@ -222,7 +222,7 @@ function insertBeam(symbols, beam, stemNote, n) {
     let end   = stems[stems.length - 1];
     let beamBeginRow = addStaveRows(stemDirection === 'up' ? 7 : -7, begin.pitch);
     let beamEndRow   = addStaveRows(stemDirection === 'up' ? 7 : -7, end.pitch);
-console.log(beamBeginRow, beamEndRow);
+
     // Put the beam in front of the first head (??)
     symbols.splice(i, 0, assign({}, begin, {
         type: 'beam',
