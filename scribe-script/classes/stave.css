@@ -62,7 +62,6 @@
 
 .stave > .rest {
     grid-row: stave-center;
-    justify-self: center;
     align-self: center;
 }
 

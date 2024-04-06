@@ -8,6 +8,7 @@
 	--x-size: 0.03125em;
 	--x-gap:  0.033333333em;
 	--stem-thickness: 0.08em;
+
 	display: grid;
 	align-content: stretch;
 	align-items: stretch;
@@ -16,16 +17,20 @@
 	column-gap: var(--x-gap);
 }
 
-.bar > .rest[data-duration="0.125"] { margin: 0; }
-.bar > .rest[data-duration="0.25"]  { margin: 0; }
-.bar > .rest[data-duration="0.375"] { margin: 0; }
-.bar > .rest[data-duration="0.5"]   { margin: 0; }
-.bar > .rest[data-duration="0.75"]  { margin: 0; }
-.bar > .rest[data-duration="1"]     { margin: 0; }
-.bar > .rest[data-duration="1.5"]   { margin: 0; }
-.bar > .rest[data-duration="2"]     { margin: 0 1em; }
-.bar > .rest[data-duration="3"]     { margin: 0 1em; }
-.bar > .rest[data-duration="4"]     { margin: 0 1.25em; }
+.bar > .rest {
+	justify-self: center;
+}
+
+.bar > .rest[data-duration="0.125"] { grid-column-end: span 3; }
+.bar > .rest[data-duration="0.25"]  { grid-column-end: span 6; }
+.bar > .rest[data-duration="0.375"] { grid-column-end: span 9; }
+.bar > .rest[data-duration="0.5"]   { grid-column-end: span 12; }
+.bar > .rest[data-duration="0.75"]  { grid-column-end: span 18; }
+.bar > .rest[data-duration="1"]     { grid-column-end: span 24; }
+.bar > .rest[data-duration="1.5"]   { grid-column-end: span 36; }
+.bar > .rest[data-duration="2"]     { grid-column-end: span 48; }
+.bar > .rest[data-duration="3"]     { grid-column-end: span 72; }
+.bar > .rest[data-duration="4"]     { grid-column-end: span 96; }
 
 .bar > .beam {
 	justify-self: stretch;
@@ -42,12 +47,19 @@
 
 .bar > .beam[data-duration="0.125"] { grid-column-end: span 3; }
 .bar > .beam[data-duration="0.25"]  { grid-column-end: span 6; }
-.bar > .beam[data-duration="0.375"] { grid-column-end: span 8; }
+.bar > .beam[data-duration="0.375"] { grid-column-end: span 9; }
 .bar > .beam[data-duration="0.5"]   { grid-column-end: span 12; }
+.bar > .beam[data-duration="0.625"] { grid-column-end: span 15; }
 .bar > .beam[data-duration="0.75"]  { grid-column-end: span 18; }
+.bar > .beam[data-duration="0.875"] { grid-column-end: span 21; }
 .bar > .beam[data-duration="1"]     { grid-column-end: span 24; }
+.bar > .beam[data-duration="1.125"] { grid-column-end: span 27; }
 .bar > .beam[data-duration="1.25"]  { grid-column-end: span 30; }
+.bar > .beam[data-duration="1.375"] { grid-column-end: span 33; }
 .bar > .beam[data-duration="1.5"]   { grid-column-end: span 36; }
+.bar > .beam[data-duration="1.625"] { grid-column-end: span 39; }
+.bar > .beam[data-duration="1.75"]  { grid-column-end: span 42; }
+.bar > .beam[data-duration="1.875"] { grid-column-end: span 45; }
 .bar > .beam[data-duration="2"]     { grid-column-end: span 48; }
 .bar > .beam[data-duration="3"]     { grid-column-end: span 72; }
 .bar > .beam[data-duration="4"]     { grid-column-end: span 96; }
@@ -89,7 +101,6 @@
 .bar > [data-beat^="1.87"] { grid-column-start: 23; }
 .bar > [data-beat^="1.91"] { grid-column-start: 24; }
 .bar > [data-beat^="1.95"] { grid-column-start: 25; }
-
 .bar > [data-beat^="2"]    { grid-column-start: 26; }
 .bar > [data-beat^="2.04"] { grid-column-start: 27; }
 .bar > [data-beat^="2.08"] { grid-column-start: 28; }
@@ -114,7 +125,6 @@
 .bar > [data-beat^="2.87"] { grid-column-start: 47; }
 .bar > [data-beat^="2.91"] { grid-column-start: 48; }
 .bar > [data-beat^="2.95"] { grid-column-start: 49; }
-
 .bar > [data-beat^="3"]    { grid-column-start: 50; }
 .bar > [data-beat^="3.04"] { grid-column-start: 51; }
 .bar > [data-beat^="3.08"] { grid-column-start: 52; }
@@ -139,7 +149,6 @@
 .bar > [data-beat^="3.87"] { grid-column-start: 71; }
 .bar > [data-beat^="3.91"] { grid-column-start: 72; }
 .bar > [data-beat^="3.95"] { grid-column-start: 73; }
-
 .bar > [data-beat^="4"]    { grid-column-start: 74; }
 .bar > [data-beat^="4.04"] { grid-column-start: 75; }
 .bar > [data-beat^="4.08"] { grid-column-start: 76; }
@@ -164,7 +173,6 @@
 .bar > [data-beat^="4.87"] { grid-column-start: 95; }
 .bar > [data-beat^="4.91"] { grid-column-start: 96; }
 .bar > [data-beat^="4.95"] { grid-column-start: 97; }
-
 .bar > [data-beat^="5"]    { grid-column-start: 98; }
 .bar > [data-beat^="5.04"] { grid-column-start: 99; }
 .bar > [data-beat^="5.08"] { grid-column-start: 100; }
@@ -189,7 +197,6 @@
 .bar > [data-beat^="5.87"] { grid-column-start: 119; }
 .bar > [data-beat^="5.91"] { grid-column-start: 120; }
 .bar > [data-beat^="5.95"] { grid-column-start: 121; }
-
 .bar > [data-beat^="6"]    { grid-column-start: 122; }
 .bar > [data-beat^="6.04"] { grid-column-start: 123; }
 .bar > [data-beat^="6.08"] { grid-column-start: 124; }
@@ -239,12 +246,12 @@
 
 .\37 \/8-bar {
 	grid-template-columns:
-		[bar-start] calc(12 * var(--x-size))
+		[bar-start] 0.625em
 		[data-beat-1] minmax(var(--x-size), auto) [data-beat-1-0416] minmax(var(--x-size), auto) [data-beat-1-0833] minmax(var(--x-size), auto) [data-beat-1-125] minmax(var(--x-size), auto) [data-beat-1-1666] minmax(var(--x-size), auto) [data-beat-1-2083] minmax(var(--x-size), auto) [data-beat-1-25] minmax(var(--x-size), auto) [data-beat-1-2916] minmax(var(--x-size), auto) [data-beat-1-3333] minmax(var(--x-size), auto) [data-beat-1-375] minmax(var(--x-size), auto) [data-beat-1-4166] minmax(var(--x-size), auto) [data-beat-1-4583] minmax(var(--x-size), auto) [data-beat-1-5] minmax(var(--x-size), auto) [data-beat-1-5416] minmax(var(--x-size), auto) [data-beat-1-5833] minmax(var(--x-size), auto) [data-beat-1-625] minmax(var(--x-size), auto) [data-beat-1-6666] minmax(var(--x-size), auto) [data-beat-1-7083] minmax(var(--x-size), auto) [data-beat-1-75] minmax(var(--x-size), auto) [data-beat-1-7916] minmax(var(--x-size), auto) [data-beat-1-8333] minmax(var(--x-size), auto) [data-beat-1-875] minmax(var(--x-size), auto) [data-beat-1-9166] minmax(var(--x-size), auto) [data-beat-1-9583] minmax(var(--x-size), auto)
 		[data-beat-2] minmax(var(--x-size), auto) [data-beat-2-0416] minmax(var(--x-size), auto) [data-beat-2-0833] minmax(var(--x-size), auto) [data-beat-2-125] minmax(var(--x-size), auto) [data-beat-2-1666] minmax(var(--x-size), auto) [data-beat-2-2083] minmax(var(--x-size), auto) [data-beat-2-25] minmax(var(--x-size), auto) [data-beat-2-2916] minmax(var(--x-size), auto) [data-beat-2-3333] minmax(var(--x-size), auto) [data-beat-2-375] minmax(var(--x-size), auto) [data-beat-2-4166] minmax(var(--x-size), auto) [data-beat-2-4583] minmax(var(--x-size), auto) [data-beat-2-5] minmax(var(--x-size), auto) [data-beat-2-5416] minmax(var(--x-size), auto) [data-beat-2-5833] minmax(var(--x-size), auto) [data-beat-2-625] minmax(var(--x-size), auto) [data-beat-2-6666] minmax(var(--x-size), auto) [data-beat-2-7083] minmax(var(--x-size), auto) [data-beat-2-75] minmax(var(--x-size), auto) [data-beat-2-7916] minmax(var(--x-size), auto) [data-beat-2-8333] minmax(var(--x-size), auto) [data-beat-2-875] minmax(var(--x-size), auto) [data-beat-2-9166] minmax(var(--x-size), auto) [data-beat-2-9583] minmax(var(--x-size), auto)
 		[data-beat-3] minmax(var(--x-size), auto) [data-beat-3-0416] minmax(var(--x-size), auto) [data-beat-3-0833] minmax(var(--x-size), auto) [data-beat-3-125] minmax(var(--x-size), auto) [data-beat-3-1666] minmax(var(--x-size), auto) [data-beat-3-2083] minmax(var(--x-size), auto) [data-beat-3-25] minmax(var(--x-size), auto) [data-beat-3-2916] minmax(var(--x-size), auto) [data-beat-3-3333] minmax(var(--x-size), auto) [data-beat-3-375] minmax(var(--x-size), auto) [data-beat-3-4166] minmax(var(--x-size), auto) [data-beat-3-4583] minmax(var(--x-size), auto) [data-beat-3-5] minmax(var(--x-size), auto) [data-beat-3-5416] minmax(var(--x-size), auto) [data-beat-3-5833] minmax(var(--x-size), auto) [data-beat-3-625] minmax(var(--x-size), auto) [data-beat-3-6666] minmax(var(--x-size), auto) [data-beat-3-7083] minmax(var(--x-size), auto) [data-beat-3-75] minmax(var(--x-size), auto) [data-beat-3-7916] minmax(var(--x-size), auto) [data-beat-3-8333] minmax(var(--x-size), auto) [data-beat-3-875] minmax(var(--x-size), auto) [data-beat-3-9166] minmax(var(--x-size), auto) [data-beat-3-9583] minmax(var(--x-size), auto)
 		[data-beat-4] minmax(var(--x-size), auto) [data-beat-4-0416] minmax(var(--x-size), auto) [data-beat-4-0833] minmax(var(--x-size), auto) [data-beat-4-125] minmax(var(--x-size), auto) [data-beat-4-1666] minmax(var(--x-size), auto) [data-beat-4-2083] minmax(var(--x-size), auto) [data-beat-4-25] minmax(var(--x-size), auto) [data-beat-4-2916] minmax(var(--x-size), auto) [data-beat-4-3333] minmax(var(--x-size), auto) [data-beat-4-375] minmax(var(--x-size), auto) [data-beat-4-4166] minmax(var(--x-size), auto) [data-beat-4-4583] minmax(var(--x-size), auto)
-		[data-beat-end] minmax(auto, 0.3125em)
+		[data-beat-end] 0.3125em
 		[bar-end];
 }
 
@@ -252,9 +259,9 @@
 .\34 \/4-bar {
 	--breaks: 3;
 	grid-template-columns:
-		[bar-start] 0.5em
+		[bar-start] 0.625em
 		repeat(96, minmax(max-content, auto))
-		[data-beat-end] 0.3125em
+		[data-beat-end] 0.625em
 		[bar-end];
 }
 
