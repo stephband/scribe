@@ -18,3 +18,9 @@
     letter-spacing: 0;
     line-height: 1em;
 }
+
+.chord-brackets {
+    margin-left: 0.1em;
+    font-size: 0.8em;
+    vertical-align: 0.2em;
+}

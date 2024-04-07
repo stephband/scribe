@@ -639,11 +639,11 @@ function splitByBar(events, barDuration) {
 }
 
 const toElement = overload(get('type'), {
-    // Create note stem
+    // Create chord symbol
     chord: (symbol) => create('p', {
         class:   "chord",
         data: { beat: symbol.beat + 1, duration: symbol.duration },
-        html: symbol.value
+        html: symbol.value.replace('(♯11)', '<sup class="chord-brackets">(♯11)</sup>')
     }),
 
     // Create accidental
