@@ -8,6 +8,8 @@ import { toNoteNumber, toNoteName } from '../../midi/modules/note.js';
 
 const assign = Object.assign;
 
+const { abs, ceil, floor } = Math;
+
 const defaults = {
     cursor:  0,
     key:     'C',
@@ -49,8 +51,10 @@ function parseEvents(source) {
         [46,   "chord", "G♭∆(♯11)", 1],
         [47,   "chord", "G7alt", 1],
         [0,     "note", 72, 0.25, 0.5],
+        [0,     "note", 60, 0.25, 0.5],
         [0.5,   "note", 75, 0.25, 0.5],
         [1,     "note", 72, 0.25, 0.5],
+        [1,     "note", 60, 0.25, 0.5],
         [1.5,   "note", 75, 0.25, 0.5],
         [2,     "note", 77, 0.25, 0.5],
         [2.5,   "note", 75, 0.25, 1],
@@ -328,17 +332,11 @@ function insertBeam(symbols, beam, stemNote, n) {
         line = subtractStaveRows('B4', head.pitch);
 
         if (b < (beam.length - 1) / 2) {
-            avgBeginLine += line / (beam.length / 2);
-        }
-
-        else if (b === (beam.length - 1) / 2) {
-            // Add half of the centre weight to each average
-            avgBeginLine += line / beam.length;
-            avgEndLine   += line / beam.length;
+            avgBeginLine += line / Math.floor(beam.length / 2);
         }
 
         else if (b > (beam.length - 1) / 2) {
-            avgEndLine += line / (beam.length / 2);
+            avgEndLine += line / Math.floor(beam.length / 2);
         }
 
         stems[b] = assign({}, head, {
@@ -352,7 +350,9 @@ function insertBeam(symbols, beam, stemNote, n) {
     let begin = stems[0];
     let end   = stems[stems.length - 1];
     let beamBeginRow = addStaveRows(stemDirection === 'up' ? 7 : -7, begin.pitch);
-    let beamEndRow   = addStaveRows(stemDirection === 'up' ? 7 : -7, end.pitch);
+
+    let endRange = subtractStaveRows(begin.pitch, end.pitch);
+    let avgRange = avgEndLine - avgBeginLine;
 
     // Put the beam in front of the first head (??)
     symbols.splice(i, 0, assign({}, begin, {
@@ -360,8 +360,10 @@ function insertBeam(symbols, beam, stemNote, n) {
         // Push beam start into next grid column
         beat:   begin.beat + (1 / 24),
         duration: end.beat - begin.beat,
-        pitch:  beamBeginRow,
-        range:  subtractStaveRows(beamBeginRow, beamEndRow),
+        pitch:  begin.pitch,
+        range:  abs(avgRange) > abs(0.75 * endRange) ?
+            0.75 * endRange :
+            avgRange ,
         updown: stemDirection,
         stems:  stems
     }));
@@ -638,6 +640,50 @@ function splitByBar(events, barDuration) {
     return bars;
 }
 
+function create16thNoteBeams(stems, range) {
+    const durations = stems.map(get('duration'));
+    let html = '';
+    let n    = -1;
+    let beam;
+    while (durations[++n]) {
+        if (durations[n] < 0.5 && durations[n].toFixed(2) !== '0.33') {
+            if (beam) {
+                beam.push(n);
+            }
+            else {
+                beam = [n];
+            }
+        }
+        else if (beam) {
+            // Render beam
+            //if (beam.length === 1) {
+                html += `<path class="beam-path-16th beam-path" d="
+                    M${ beam[0] },              ${ (-range * beam[0] / (stems.length - 1)) - 0.5 * beamThickness }
+                    L${ beam[beam.length - 1] },${ (-range * beam[beam.length - 1] / (stems.length - 1)) - 0.5 * beamThickness }
+                    L${ beam[beam.length - 1] },${ (-range * beam[beam.length - 1] / (stems.length - 1)) + 0.5 * beamThickness }
+                    L${ beam[0] },              ${ (-range * beam[0] / (stems.length - 1)) + 0.5 * beamThickness }
+                Z"></path>`;
+            //}
+            //else {
+            //    html += `<path class="beam-path" d="M${ beam[0] },${ (-range * beam[0] / (stems.length - 1)) - 0.5 * beamThickness } L${ beam[beam.length - 1] },${ -range - 0.5 * beamThickness } L${ beam[beam.length - 1] },${ -range + 0.5 * beamThickness } L${ beam[0] },${ 0.5 * beamThickness } Z"></path>`;
+            //}
+        }
+    }
+
+    if (beam) {
+        // Render beam
+        html += `<path class="beam-path-16th beam-path" d="
+            M${ beam[0] },              ${ (-range * beam[0] / (stems.length - 1)) - 0.5 * beamThickness }
+            L${ beam[beam.length - 1] },${ (-range * beam[beam.length - 1] / (stems.length - 1)) - 0.5 * beamThickness }
+            L${ beam[beam.length - 1] },${ (-range * beam[beam.length - 1] / (stems.length - 1)) + 0.5 * beamThickness }
+            L${ beam[0] },              ${ (-range * beam[0] / (stems.length - 1)) + 0.5 * beamThickness }
+        Z"></path>`;
+    }
+
+    console.log(durations);
+    return html;
+}
+
 const toElement = overload(get('type'), {
     // Create chord symbol
     chord: (symbol) => create('p', {
@@ -678,23 +724,19 @@ const toElement = overload(get('type'), {
     }),
 
     // Create note beam
-    beam: (symbol) => (symbol.range < 0 ? create('svg', {
+    beam: (symbol) => create('svg', {
         // Beam is sloped down
         class:   `${ symbol.updown }-beam beam`,
-        viewBox: `0 0 4 ${ 1 - symbol.range }`,
+        viewBox: `0 ${ (symbol.range > 0 ? -symbol.range : 0) - 0.5 } ${ symbol.stems.length -1 } ${ abs(symbol.range) + 1 }`,
         preserveAspectRatio: "none",
         data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration },
-        style: 'grid-row-end: span ' + (1 - symbol.range),
-        html: `<path class="beam-path" d="M0,${ 0.5 - 0.5 * beamThickness } L4,${ 0.5 - symbol.range - 0.5 * beamThickness } L4,${ 0.5 - symbol.range + 0.5 * beamThickness } L0,${ 0.5 + 0.5 * beamThickness } Z"></line>`
-    }) : create('svg', {
-        // Beam is sloped up
-        class:   `${ symbol.updown }-beam beam`,
-        viewBox: `0 0 4 ${ 1 + symbol.range }`,
-        preserveAspectRatio: "none",
-        data: { beat: symbol.beat + 1, pitch: addStaveRows(symbol.range, symbol.pitch), duration: symbol.duration },
-        style: 'grid-row-end: span ' + (1 + symbol.range),
-        html: `<path class="beam-path" d="M0,${ 0.5 + symbol.range - 0.5 * beamThickness } L4,${ 0.5 - 0.5 * beamThickness } L4,${ 0.5 + 0.5 * beamThickness } L0,${ 0.5 + symbol.range + 0.5 * beamThickness } Z"></line>`
-    })),
+        /*style: 'grid-row-end: span ' + Math.ceil(1 - symbol.range),*/
+        style: `height: calc(${ abs(symbol.range) + 1 } * var(--y-size)); align-self: ${ symbol.range > 0 ? 'end' : 'start' };`,
+        html: `
+            <path class="beam-path" d="M0,${ -0.5 * beamThickness } L${ symbol.stems.length - 1 },${ -symbol.range - 0.5 * beamThickness } L${ symbol.stems.length - 1 },${ -symbol.range + 0.5 * beamThickness } L0,${ 0.5 * beamThickness } Z"></path>
+            ${ create16thNoteBeams(symbol.stems, symbol.range) }
+        `
+    }),
 
     // Create note tail
     tail: (symbol) => create('svg', {
@@ -782,9 +824,9 @@ export default element('scribe-script', {
                     <use xlink:href="#rest[2]" transform="translate(0 -1)"></use>
                 </g>
                 <path id="dot" class="scribe-symbol" transform="translate(-70     -36.28) scale(0.1111)" d="M661.3232,322.9727c0,1.0078-0.4316,2.4482-1.2959,4.248c-0.9365,2.0166-1.7998,3.1689-2.5918,3.3125c-0.3604,0.1445-1.7285,0.1445-4.249,0.1445h-1.2236c-1.1523,0-1.7285-0.5039-1.7285-1.5117c0-0.7207,0.4316-2.0176,1.3682-3.9609c1.0078-1.8721,1.7285-3.0957,2.3047-3.5283c0.2871-0.1436,1.584-0.2881,3.8877-0.2881c1.2959,0,2.0166,0.0723,2.2324,0.0723C660.8916,321.6768,661.3232,322.1807,661.3232,322.9727z"/>
-                <path id="acci-flat"    class="acci-path" transform="scale(0.054) translate(-607.4 -191)" d="M629.4297,136.6357c1.4404,0,2.5928,0.8643,3.3848,2.5923c0.5039,1.2959,0.792,2.8081,0.792,4.5366c0,5.04-1.9443,10.6567-5.7607,16.8491c-2.9521,4.8247-6.624,9.5771-11.1611,14.1855l0.5762-60.1255c1.0078-1.1519,2.0879-1.8003,3.2402-1.8003c0.2881,0,0.4326,0.0723,0.5762,0.0723l-0.2881,29.2344C622.877,138.5078,625.7578,136.6357,629.4297,136.6357z M625.9014,145.6367c-1.0801,0-2.376,1.0801-3.7441,3.168c-1.2959,1.9443-1.9443,3.3843-2.0156,4.3208l-0.1445,8.2085c4.9688-4.6802,7.4883-9.2168,7.4883-13.6094C627.4854,146.3564,626.9102,145.6367,625.9014,145.6367z"/>
-                <path id="acci-natural" class="acci-path" transform="scale(0.054) translate(-646 -191)"   d="M669.0293,136.9961l-2.9521,56.6685c-1.0088,0.7202-1.585,1.0801-1.873,1.0801c-0.792,0-1.1514,0-1.0801-0.0718l1.6562-30.8906c-0.5039,1.1519-1.7998,2.2319-3.7441,3.312s-3.5283,1.5845-4.8242,1.5845c-0.7197,0-1.4404-0.144-1.9443-0.4321l2.8799-54.5806c0.7207-0.4321,1.2969-0.6484,1.7285-0.6484c0.9365,0,1.2959,0,1.1523,0l-1.0078,28.4429c0.4316-0.8643,1.9434-1.8726,4.5361-2.9526C666.0049,137.5,667.8047,136.9961,669.0293,136.9961z M664.9961,148.4448c-2.6641,0.7202-4.8242,2.0161-6.4805,3.8882l-0.2158,5.4727c2.7363-0.4321,4.8242-1.4399,6.3369-3.1685C664.7803,153.4854,664.9248,151.4692,664.9961,148.4448z"/>
-                <path id="acci-sharp"   class="acci-path" transform="scale(0.054) translate(-623.5 -191)" d="M655.709,134.8354c0.1445,0.4321,0.2168,1.1523,0.2168,2.3042c0,1.2964-0.1445,2.5923-0.2881,4.0327c0,0.5757-0.1445,1.4399-0.4326,2.52c-0.5039,1.0083-2.3037,2.3042-5.3281,3.7446l-0.2881,6.6963c1.6562-1.2241,3.0967-1.8721,4.1768-1.8721c0.2871,0,0.5752,1.584,0.7197,4.7524c0.0723,1.0078,0.0723,1.728,0.0723,2.3042c0,1.728-0.0723,2.7363-0.3604,3.168c-0.0723,0.2163-1.8721,1.4404-5.3281,3.6724c0,3.3125-0.1445,6.6968-0.3604,10.2969c-0.0723,1.4404-0.1445,2.8804-0.2158,4.2485c-0.2881,2.3042-0.7207,3.4565-1.3682,3.4565c-0.0723,0.0718-0.1445,0.0718-0.1445,0.0718c-0.792,0-1.1514-1.9443-1.1514-5.8325c0-0.936,0-2.376,0.1436-4.3203c0.0723-1.9443,0.1436-3.3843,0.1436-4.3926c0-1.0078-0.0713-1.6558-0.2158-2.0161c-1.0078,0.144-1.7275,0.5039-2.2314,1.0083c-0.0723,1.9438-0.2168,4.8242-0.4326,8.5688c-0.0723,2.0161-0.1436,3.96-0.2158,5.8325c-0.1445,3.3843-0.4326,5.2563-0.6484,5.6162c-0.2158,0.2163-0.4316,0.2881-0.7197,0.2881c-1.0078,0-1.5117-1.5122-1.5117-4.6802c0-2.3047,0.3594-7.1289,0.9355-14.6177c-1.4404,0.5044-2.8799,1.0083-4.3926,1.4404c-0.7197,0-1.0078-1.9443-1.0078-5.9048c0-0.2881,0-0.792,0.0723-1.5122c0-0.7197,0.0713-1.2241,0.0713-1.5117c0.1445-0.4321,1.0088-1.0083,2.4482-1.8003c1.0088-0.4321,1.9443-0.936,2.9531-1.5122c0.2871-1.4399,0.3594-3.3843,0.2871-5.6885l-0.0713-0.8643c-1.2959,0.7202-2.8809,1.3682-4.7529,2.0161c-0.3594-0.1436-0.5039-0.792-0.5039-1.9438c0-0.8643,0.0723-2.3765,0.3604-4.4644c0.2158-2.0884,0.4316-3.4565,0.7197-4.1045c1.0078-0.8643,2.6641-1.9443,5.1123-3.3125c0-1.7998,0.1445-4.5361,0.3604-8.2803c0.2881-4.9688,0.792-7.4888,1.5117-7.4888c0.8643,0,1.2969,2.3042,1.2969,6.7686c0,1.728-0.1445,4.1763-0.4326,7.4165c0.792,0,1.7285-0.3599,2.8086-1.1519c0.2881-0.4321,0.5762-4.8965,0.8643-13.4653c0.2881-7.8486,1.1514-11.8091,2.5918-11.8091c0.5762,1.1523,0.8643,2.5205,0.8643,4.1045c0,4.4644-0.4326,11.0889-1.1523,20.0176C653.0449,135.4839,654.7012,134.8354,655.709,134.8354z M647.501,148.7329c-1.0801,0.5039-2.3047,1.2241-3.8887,2.2319c-0.1436,2.3042-0.2158,4.1045-0.2158,5.4009c0,0.5757,0,1.0078,0,1.2959c1.0801-0.4321,2.3037-1.0801,3.7441-2.0884C647.1406,154.0615,647.2842,151.7573,647.501,148.7329z"/>
+                <path id="acci-flat"    class="acci-path" transform="scale(0.054) translate(-606.4 -191)" d="M629.4297,136.6357c1.4404,0,2.5928,0.8643,3.3848,2.5923c0.5039,1.2959,0.792,2.8081,0.792,4.5366c0,5.04-1.9443,10.6567-5.7607,16.8491c-2.9521,4.8247-6.624,9.5771-11.1611,14.1855l0.5762-60.1255c1.0078-1.1519,2.0879-1.8003,3.2402-1.8003c0.2881,0,0.4326,0.0723,0.5762,0.0723l-0.2881,29.2344C622.877,138.5078,625.7578,136.6357,629.4297,136.6357z M625.9014,145.6367c-1.0801,0-2.376,1.0801-3.7441,3.168c-1.2959,1.9443-1.9443,3.3843-2.0156,4.3208l-0.1445,8.2085c4.9688-4.6802,7.4883-9.2168,7.4883-13.6094C627.4854,146.3564,626.9102,145.6367,625.9014,145.6367z"/>
+                <path id="acci-natural" class="acci-path" transform="scale(0.054) translate(-644 -191)"   d="M669.0293,136.9961l-2.9521,56.6685c-1.0088,0.7202-1.585,1.0801-1.873,1.0801c-0.792,0-1.1514,0-1.0801-0.0718l1.6562-30.8906c-0.5039,1.1519-1.7998,2.2319-3.7441,3.312s-3.5283,1.5845-4.8242,1.5845c-0.7197,0-1.4404-0.144-1.9443-0.4321l2.8799-54.5806c0.7207-0.4321,1.2969-0.6484,1.7285-0.6484c0.9365,0,1.2959,0,1.1523,0l-1.0078,28.4429c0.4316-0.8643,1.9434-1.8726,4.5361-2.9526C666.0049,137.5,667.8047,136.9961,669.0293,136.9961z M664.9961,148.4448c-2.6641,0.7202-4.8242,2.0161-6.4805,3.8882l-0.2158,5.4727c2.7363-0.4321,4.8242-1.4399,6.3369-3.1685C664.7803,153.4854,664.9248,151.4692,664.9961,148.4448z"/>
+                <path id="acci-sharp"   class="acci-path" transform="scale(0.054) translate(-624.5 -191)" d="M655.709,134.8354c0.1445,0.4321,0.2168,1.1523,0.2168,2.3042c0,1.2964-0.1445,2.5923-0.2881,4.0327c0,0.5757-0.1445,1.4399-0.4326,2.52c-0.5039,1.0083-2.3037,2.3042-5.3281,3.7446l-0.2881,6.6963c1.6562-1.2241,3.0967-1.8721,4.1768-1.8721c0.2871,0,0.5752,1.584,0.7197,4.7524c0.0723,1.0078,0.0723,1.728,0.0723,2.3042c0,1.728-0.0723,2.7363-0.3604,3.168c-0.0723,0.2163-1.8721,1.4404-5.3281,3.6724c0,3.3125-0.1445,6.6968-0.3604,10.2969c-0.0723,1.4404-0.1445,2.8804-0.2158,4.2485c-0.2881,2.3042-0.7207,3.4565-1.3682,3.4565c-0.0723,0.0718-0.1445,0.0718-0.1445,0.0718c-0.792,0-1.1514-1.9443-1.1514-5.8325c0-0.936,0-2.376,0.1436-4.3203c0.0723-1.9443,0.1436-3.3843,0.1436-4.3926c0-1.0078-0.0713-1.6558-0.2158-2.0161c-1.0078,0.144-1.7275,0.5039-2.2314,1.0083c-0.0723,1.9438-0.2168,4.8242-0.4326,8.5688c-0.0723,2.0161-0.1436,3.96-0.2158,5.8325c-0.1445,3.3843-0.4326,5.2563-0.6484,5.6162c-0.2158,0.2163-0.4316,0.2881-0.7197,0.2881c-1.0078,0-1.5117-1.5122-1.5117-4.6802c0-2.3047,0.3594-7.1289,0.9355-14.6177c-1.4404,0.5044-2.8799,1.0083-4.3926,1.4404c-0.7197,0-1.0078-1.9443-1.0078-5.9048c0-0.2881,0-0.792,0.0723-1.5122c0-0.7197,0.0713-1.2241,0.0713-1.5117c0.1445-0.4321,1.0088-1.0083,2.4482-1.8003c1.0088-0.4321,1.9443-0.936,2.9531-1.5122c0.2871-1.4399,0.3594-3.3843,0.2871-5.6885l-0.0713-0.8643c-1.2959,0.7202-2.8809,1.3682-4.7529,2.0161c-0.3594-0.1436-0.5039-0.792-0.5039-1.9438c0-0.8643,0.0723-2.3765,0.3604-4.4644c0.2158-2.0884,0.4316-3.4565,0.7197-4.1045c1.0078-0.8643,2.6641-1.9443,5.1123-3.3125c0-1.7998,0.1445-4.5361,0.3604-8.2803c0.2881-4.9688,0.792-7.4888,1.5117-7.4888c0.8643,0,1.2969,2.3042,1.2969,6.7686c0,1.728-0.1445,4.1763-0.4326,7.4165c0.792,0,1.7285-0.3599,2.8086-1.1519c0.2881-0.4321,0.5762-4.8965,0.8643-13.4653c0.2881-7.8486,1.1514-11.8091,2.5918-11.8091c0.5762,1.1523,0.8643,2.5205,0.8643,4.1045c0,4.4644-0.4326,11.0889-1.1523,20.0176C653.0449,135.4839,654.7012,134.8354,655.709,134.8354z M647.501,148.7329c-1.0801,0.5039-2.3047,1.2241-3.8887,2.2319c-0.1436,2.3042-0.2158,4.1045-0.2158,5.4009c0,0.5757,0,1.0078,0,1.2959c1.0801-0.4321,2.3037-1.0801,3.7441-2.0884C647.1406,154.0615,647.2842,151.7573,647.501,148.7329z"/>
 
                 <!-- Stems -->
                 <line id="stemup"   class="stem-path" x1="2.4" y1="-0.5" x2="2.4" y2="-6.75"></line>

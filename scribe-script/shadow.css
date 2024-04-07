@@ -32,6 +32,7 @@
 */
 svg {
     fill: currentcolor;
+    /*background-color: rgba(200, 180, 30, 0.5);*/
 }
 
 svg > path {

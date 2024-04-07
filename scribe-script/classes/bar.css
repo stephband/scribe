@@ -5,9 +5,9 @@
 
 .bar {
 	--breaks: none;
-	--x-size: 0.03125em;
-	--x-gap:  0.033333333em;
-	--stem-thickness: 0.08em;
+	--x-size: 0.025em;
+	--x-gap:  0.026666667em;
+	--stem-thickness: 0.064em;
 
 	display: grid;
 	align-content: stretch;
