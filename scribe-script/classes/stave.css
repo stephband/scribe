@@ -1,7 +1,7 @@
 .stave {
     /* 4px per row means 8px per line, 32px stave */
     --y-size: 0.25em;
-    --stem-length: 7;
+    --stem-size: 7;
 
     display: grid;
     grid-auto-rows: var(--y-size);
@@ -60,6 +60,16 @@
     align-self: center;
 }
 
+.stave > .up-stem {
+    align-self: end;
+    margin-bottom: calc(0.5 * var(--y-size));
+}
+
+.stave > .down-stem {
+    align-self: start;
+    margin-top: calc(0.5 * var(--y-size));
+}
+
 .stave > .tail {
     justify-self: end;
     align-self: center;
@@ -72,16 +82,12 @@
 
 .stave > .up-beam {
     position: relative;
-    top: calc(-1 * var(--stem-length) * var(--y-size));
+    top: calc(-1 * var(--stem-size) * var(--y-size));
 }
 
 .stave > .down-beam {
     position: relative;
-    top: calc(var(--stem-length) * var(--y-size));
-}
-
-.beam-path-16th {
-    transform: translateY(1.75px);
+    top: calc(var(--stem-size) * var(--y-size));
 }
 
 .stave > .rest {

@@ -12,3 +12,10 @@ div.head {
     transform: rotateZ(-26deg);
     color: brown;
 }
+
+.head::before {
+    content: 'AA';
+    width: 1em;
+    height: 1em;
+    background: red;
+}

@@ -6,3 +6,11 @@
     stroke-linecap: round;
     fill: black;
 }
+
+.up-beam > .beam-path-16th {
+    transform: translateY(1.6666667px);
+}
+
+.down-beam > .beam-path-16th {
+    transform: translateY(-1.6666667px);
+}

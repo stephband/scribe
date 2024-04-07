@@ -12,7 +12,7 @@
 }
 
 .chord {
-    font-family: 'chords', cursive;
+    font-family: 'chords', math;
     font-size: 1.4em;
     font-weight: 300;
     letter-spacing: 0;
@@ -23,4 +23,6 @@
     margin-left: 0.1em;
     font-size: 0.8em;
     vertical-align: 0.2em;
+
+    /*display: none;*/
 }

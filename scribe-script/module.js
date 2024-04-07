@@ -20,7 +20,7 @@ const defaults = {
 const bar4 = { duration: 4, division: 1, breaks: [2], label: '4/4' };
 const rflat  = /b|♭/;
 const rsharp = /#|♯/;
-const beamThickness = 1;
+const beamThickness = 0.8;
 
 function parseEvents(source) {
     return [
@@ -28,7 +28,7 @@ function parseEvents(source) {
         [2,    "chord", "A♭∆(♯11)", 1],
         [4,    "chord", "D♭∆(♯11)", 1],
         [6,    "chord", "G♭∆(♯11)", 1],
-        [8,    "chord", "B♭7sus", 1],
+        [8,    "chord", "B♭7sus", 1],
         [10,   "chord", "A♭7(♯11)", 1],
         [12,   "chord", "B♭7sus", 1],
         [14,   "chord", "C7", 1],
@@ -347,12 +347,19 @@ function insertBeam(symbols, beam, stemNote, n) {
     }
 
     // Calculate where to put beam exactly
-    let begin = stems[0];
-    let end   = stems[stems.length - 1];
-    let beamBeginRow = addStaveRows(stemDirection === 'up' ? 7 : -7, begin.pitch);
-
+    let begin    = stems[0];
+    let end      = stems[stems.length - 1];
     let endRange = subtractStaveRows(begin.pitch, end.pitch);
     let avgRange = avgEndLine - avgBeginLine;
+    let range    = abs(avgRange) > abs(0.75 * endRange) ?
+        0.75 * endRange :
+        avgRange ;
+
+    stems.forEach((stem, i) => {
+        stem.beamY = stemDirection === 'down' ?
+            range * i / (stems.length - 1) + subtractStaveRows(begin.pitch, stem.pitch) :
+            range * i / (stems.length - 1) - subtractStaveRows(begin.pitch, stem.pitch) ;
+    });
 
     // Put the beam in front of the first head (??)
     symbols.splice(i, 0, assign({}, begin, {
@@ -361,9 +368,7 @@ function insertBeam(symbols, beam, stemNote, n) {
         beat:   begin.beat + (1 / 24),
         duration: end.beat - begin.beat,
         pitch:  begin.pitch,
-        range:  abs(avgRange) > abs(0.75 * endRange) ?
-            0.75 * endRange :
-            avgRange ,
+        range:  range,
         updown: stemDirection,
         stems:  stems
     }));
@@ -716,10 +721,12 @@ const toElement = overload(get('type'), {
 
     // Create note stem
     stem: (symbol) => create('svg', {
-        class:   "stem",
-        viewBox: "0 -1 2.7 2",
-        preserveAspectRatio: "xMidYMid",
+        class:   `${ symbol.value }-stem stem`,
+        viewBox: "0 0 2.7 7",
+        // Stretch stems by height
+        preserveAspectRatio: "none",
         data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration },
+        style: `--beam-y: ${ symbol.beamY || 0 };`,
         html: '<use href="#stem' + symbol.value + '"></use>'
     }),
 
@@ -829,8 +836,8 @@ export default element('scribe-script', {
                 <path id="acci-sharp"   class="acci-path" transform="scale(0.054) translate(-624.5 -191)" d="M655.709,134.8354c0.1445,0.4321,0.2168,1.1523,0.2168,2.3042c0,1.2964-0.1445,2.5923-0.2881,4.0327c0,0.5757-0.1445,1.4399-0.4326,2.52c-0.5039,1.0083-2.3037,2.3042-5.3281,3.7446l-0.2881,6.6963c1.6562-1.2241,3.0967-1.8721,4.1768-1.8721c0.2871,0,0.5752,1.584,0.7197,4.7524c0.0723,1.0078,0.0723,1.728,0.0723,2.3042c0,1.728-0.0723,2.7363-0.3604,3.168c-0.0723,0.2163-1.8721,1.4404-5.3281,3.6724c0,3.3125-0.1445,6.6968-0.3604,10.2969c-0.0723,1.4404-0.1445,2.8804-0.2158,4.2485c-0.2881,2.3042-0.7207,3.4565-1.3682,3.4565c-0.0723,0.0718-0.1445,0.0718-0.1445,0.0718c-0.792,0-1.1514-1.9443-1.1514-5.8325c0-0.936,0-2.376,0.1436-4.3203c0.0723-1.9443,0.1436-3.3843,0.1436-4.3926c0-1.0078-0.0713-1.6558-0.2158-2.0161c-1.0078,0.144-1.7275,0.5039-2.2314,1.0083c-0.0723,1.9438-0.2168,4.8242-0.4326,8.5688c-0.0723,2.0161-0.1436,3.96-0.2158,5.8325c-0.1445,3.3843-0.4326,5.2563-0.6484,5.6162c-0.2158,0.2163-0.4316,0.2881-0.7197,0.2881c-1.0078,0-1.5117-1.5122-1.5117-4.6802c0-2.3047,0.3594-7.1289,0.9355-14.6177c-1.4404,0.5044-2.8799,1.0083-4.3926,1.4404c-0.7197,0-1.0078-1.9443-1.0078-5.9048c0-0.2881,0-0.792,0.0723-1.5122c0-0.7197,0.0713-1.2241,0.0713-1.5117c0.1445-0.4321,1.0088-1.0083,2.4482-1.8003c1.0088-0.4321,1.9443-0.936,2.9531-1.5122c0.2871-1.4399,0.3594-3.3843,0.2871-5.6885l-0.0713-0.8643c-1.2959,0.7202-2.8809,1.3682-4.7529,2.0161c-0.3594-0.1436-0.5039-0.792-0.5039-1.9438c0-0.8643,0.0723-2.3765,0.3604-4.4644c0.2158-2.0884,0.4316-3.4565,0.7197-4.1045c1.0078-0.8643,2.6641-1.9443,5.1123-3.3125c0-1.7998,0.1445-4.5361,0.3604-8.2803c0.2881-4.9688,0.792-7.4888,1.5117-7.4888c0.8643,0,1.2969,2.3042,1.2969,6.7686c0,1.728-0.1445,4.1763-0.4326,7.4165c0.792,0,1.7285-0.3599,2.8086-1.1519c0.2881-0.4321,0.5762-4.8965,0.8643-13.4653c0.2881-7.8486,1.1514-11.8091,2.5918-11.8091c0.5762,1.1523,0.8643,2.5205,0.8643,4.1045c0,4.4644-0.4326,11.0889-1.1523,20.0176C653.0449,135.4839,654.7012,134.8354,655.709,134.8354z M647.501,148.7329c-1.0801,0.5039-2.3047,1.2241-3.8887,2.2319c-0.1436,2.3042-0.2158,4.1045-0.2158,5.4009c0,0.5757,0,1.0078,0,1.2959c1.0801-0.4321,2.3037-1.0801,3.7441-2.0884C647.1406,154.0615,647.2842,151.7573,647.501,148.7329z"/>
 
                 <!-- Stems -->
-                <line id="stemup"   class="stem-path" x1="2.4" y1="-0.5" x2="2.4" y2="-6.75"></line>
-                <line id="stemdown" class="stem-path" x1="0.1" y1="0.5" x2="0.1" y2="6.75"></line>
+                <line id="stemup"   class="stem-path" x1="2.4" y1="0" x2="2.4" y2="7"></line>
+                <line id="stemdown" class="stem-path" x1="0.1" y1="0" x2="0.1" y2="7"></line>
 
                 <!-- Tails -->
                 <path id="tailup[0.5]"    class="tail-path" transform="translate(-33.14  -42) scale(0.1111)" d="M335.6724,356.0957c-0.5039,0-0.936-0.1445-1.2959-0.5762c-0.4321-0.3594-0.5762-0.792-0.5762-1.2246c0-0.2148,0.0723-0.5039,0.2163-0.791c1.0078-2.3047,1.584-4.8965,1.584-7.7773c0-9.6484-5.8325-18.1455-17.3535-25.418v-16.3457c1.728,1.4404,4.2485,3.6006,7.5605,6.5527c8.6406,8.8574,12.9614,20.5215,12.9614,34.9238c0,1.7275-0.2163,3.6719-0.6484,5.9756C337.4727,354.584,336.6807,356.0957,335.6724,356.0957z"/>
