@@ -1,4 +1,5 @@
 
+import by       from '../../fn/modules/by.js';
 import get      from '../../fn/modules/get.js';
 import overload from '../../fn/modules/overload.js';
 import create   from '../../dom/modules/create.js';
@@ -21,7 +22,33 @@ const beamThickness = 1;
 
 function parseEvents(source) {
     return [
-        /*[0,     "note", 72, 0.25, 0.5],
+        [0,    "chord", "C-7", 1],
+        [2,    "chord", "A♭∆(♯11)", 1],
+        [4,    "chord", "D♭∆(♯11)", 1],
+        [6,    "chord", "G♭∆(♯11)", 1],
+        [8,    "chord", "B♭7sus", 1],
+        [10,   "chord", "A♭7(♯11)", 1],
+        [12,   "chord", "B♭7sus", 1],
+        [14,   "chord", "C7", 1],
+        [16,   "chord", "F-7", 1],
+        [18,   "chord", "A♭∆(♯11)", 1],
+        [20,   "chord", "Dø", 1],
+        [22,   "chord", "G7alt", 1],
+        [24,   "chord", "Aø", 1],
+        [26,   "chord", "D7♭9", 1],
+        [28,   "chord", "A♭∆(♯11)", 1],
+        [30,   "chord", "D♭∆(♯11)", 1],
+        [32,   "chord", "G♭∆(♯11)", 1],
+        [34,   "chord", "F-7", 1],
+        [36,   "chord", "G7sus", 1],
+        [38,   "chord", "B♭7sus", 1],
+        [39,   "chord", "G7alt", 1],
+        [40,   "chord", "C-7", 1],
+        [42,   "chord", "A♭∆(♯11)", 1],
+        [44,   "chord", "D♭∆(♯11)", 1],
+        [46,   "chord", "G♭∆(♯11)", 1],
+        [47,   "chord", "G7alt", 1],
+        [0,     "note", 72, 0.25, 0.5],
         [0.5,   "note", 75, 0.25, 0.5],
         [1,     "note", 72, 0.25, 0.5],
         [1.5,   "note", 75, 0.25, 0.5],
@@ -94,9 +121,9 @@ function parseEvents(source) {
         [46,    "note", 60, 0.25, 0.5],
         [46.5,  "note", 58, 0.25, 1],
         [47.5,  "note", 55, 0.25, 0.5],
-        [48,    "note", 62, 0.25, 4]*/
+        [48,    "note", 62, 0.25, 4]
 
-
+/*
 
         [2,      "note", 76, 0.25, 0.5],
         [2.5,    "note", 77, 0.25, 0.5],
@@ -180,7 +207,7 @@ function parseEvents(source) {
         [146,    "note", 76, 0.25, 0.5],
         [146.5,  "note", 77, 0.25, 0.5],
         [147,    "note", 79, 0.25, 0.5],
-        [147.5,  "note", 74, 0.25, 3.5]
+        [147.5,  "note", 74, 0.25, 3.5] */
     ];
 }
 
@@ -192,7 +219,7 @@ function getStemDirection(note, event2) {
 
 function isAfterBreak(breaks, b1, b2) {
     let n = -1;
-    while (breaks[++n] && breaks[n] < b1);
+    while (breaks[++n] && breaks[n] <= b1);
     // If breaks[n] is undefined, returns false, which is what we want
     return b2 >= breaks[n];
 }
@@ -292,10 +319,28 @@ function insertBeam(symbols, beam, stemNote, n) {
     // Loop backwards through beam splicing in stem symbols before
     // the heads, all with the winning stem direction
     let b = beam.length;
-    let i, head;
+    let avgBeginLine = 0;
+    let avgEndLine   = 0;
+    let i, head, line;
     while (b--) {
         i = beam[b];
         head = symbols[i];
+        line = subtractStaveRows('B4', head.pitch);
+
+        if (b < (beam.length - 1) / 2) {
+            avgBeginLine += line / (beam.length / 2);
+        }
+
+        else if (b === (beam.length - 1) / 2) {
+            // Add half of the centre weight to each average
+            avgBeginLine += line / beam.length;
+            avgEndLine   += line / beam.length;
+        }
+
+        else if (b > (beam.length - 1) / 2) {
+            avgEndLine += line / (beam.length / 2);
+        }
+
         stems[b] = assign({}, head, {
             type: 'stem',
             value: stemDirection
@@ -311,14 +356,14 @@ function insertBeam(symbols, beam, stemNote, n) {
 
     // Put the beam in front of the first head (??)
     symbols.splice(i, 0, assign({}, begin, {
-        type: 'beam',
+        type:   'beam',
         // Push beam start into next grid column
-        beat: begin.beat + (1 / 24),
-        pitch: beamBeginRow,
+        beat:   begin.beat + (1 / 24),
         duration: end.beat - begin.beat,
-        range: subtractStaveRows(beamBeginRow, beamEndRow),
+        pitch:  beamBeginRow,
+        range:  subtractStaveRows(beamBeginRow, beamEndRow),
         updown: stemDirection,
-        stems: stems
+        stems:  stems
     }));
 
     // We just spliced a bunch of symbols in before index n
@@ -335,6 +380,12 @@ function insertSymbols(symbols, bar, stemNote) {
 
     while (head = symbols[++n]) {
         endBeat = head.beat + head.duration;
+
+        // Chord symbol
+
+        if (head.type === 'chord') {
+            continue;
+        }
 
         // Rest
 
@@ -395,8 +446,8 @@ function insertSymbols(symbols, bar, stemNote) {
 
         // Stem
         if (head.duration < 4) {
-            // Is this head less than 1 beat (and not 1 triplet beat) long? It
-            // may be beamed.
+            // Is this head less than 1 beat, and not 1 triplet beat, long?
+            // Wait for it to be beamed.
             if (head.duration < 1 && head.duration.toFixed(2) !== '0.67') {
                 if (beam) {
                     // Keep index of head
@@ -508,7 +559,7 @@ function splitByBar(events, barDuration) {
             continue;
         }
 
-        if (event[1] !== 'note') {
+        if (event[1] !== 'note' && event[1] !== 'chord') {
             console.log('Scribe: event type "' + event[1] + '" not rendered');
             continue;
         }
@@ -523,32 +574,56 @@ function splitByBar(events, barDuration) {
 
         // Event ends after this bar
         if (event[0] + event[4] > barBeat + barDuration) {
-            bar.push({
-                beat: event[0] - barBeat,
-                type: 'head',
-                pitch: typeof event[2] === 'number' ?
-                    toNoteName(event[2]) :
-                    normaliseNoteName(event[2]),
-                duration: barBeat + barDuration - event[0],
-                tie: 'begin',
-                event: event
-            });
+            if (event[1] === 'note') {
+                bar.push({
+                    beat: event[0] - barBeat,
+                    type: 'head',
+                    pitch: typeof event[2] === 'number' ?
+                        toNoteName(event[2]) :
+                        normaliseNoteName(event[2]),
+                    duration: barBeat + barDuration - event[0],
+                    tie: 'begin',
+                    event: event
+                });
 
-            // Stick it in the ties buffer
-            buffer.push(event);
+                // Stick it in the ties buffer
+                buffer.push(event);
+            }
+
+            if (event[1] === 'chord') {
+                bar.push({
+                    type: 'chord',
+                    beat: event[0] - barBeat,
+                    value: event[2],
+                    duration: barBeat + barDuration - event[0],
+                    event: event
+                });
+            }
         }
 
         // Event ends inside this bar
         else {
-            bar.push({
-                beat: event[0] - barBeat,
-                type: 'head',
-                pitch: typeof event[2] === 'number' ?
-                    toNoteName(event[2]) :
-                    normaliseNoteName(event[2]),
-                duration: event[4],
-                event: event
-            });
+            if (event[1] === 'note') {
+                bar.push({
+                    beat: event[0] - barBeat,
+                    type: 'head',
+                    pitch: typeof event[2] === 'number' ?
+                        toNoteName(event[2]) :
+                        normaliseNoteName(event[2]),
+                    duration: event[4],
+                    event: event
+                });
+            }
+
+            if (event[1] === 'chord') {
+                bar.push({
+                    type: 'chord',
+                    beat: event[0] - barBeat,
+                    value: event[2],
+                    duration: event[3],
+                    event: event
+                });
+            }
         }
     }
 
@@ -564,6 +639,13 @@ function splitByBar(events, barDuration) {
 }
 
 const toElement = overload(get('type'), {
+    // Create note stem
+    chord: (symbol) => create('p', {
+        class:   "chord",
+        data: { beat: symbol.beat + 1, duration: symbol.duration },
+        html: symbol.value
+    }),
+
     // Create accidental
     acci: (symbol) => create('svg', {
         class:   "acci",
@@ -729,12 +811,12 @@ export default element('scribe-script', {
                     <use xlink:href="#head[1]"></use>
                     <use xlink:href="#dot" transform="translate(0.8 0.5)"></use>
                 </g>
-                <path id="head[2]" class="head-path" transform="translate(-16 -36.28) scale(0.1111)" d="M169.5732,322.1094c0,1.6553-0.3599,3.168-1.1523,4.4639c-1.5117,2.6641-4.4644,5.1846-8.8564,7.6318c-4.4644,2.4492-8.2808,3.6729-11.521,3.6729c-1.8721,0-3.4565-0.6475-4.6807-2.0166c-1.1519-1.3672-1.728-2.9512-1.728-4.8242c0-4.0312,2.2324-7.9199,6.8408-11.5928c4.4644-3.5283,8.9287-5.3281,13.3931-5.3281C166.981,314.1162,169.5732,316.7803,169.5732,322.1094z M160.5005,325.4209c0-1.1514-0.2163-2.376-0.7202-3.8164c-0.7202-1.7275-1.584-2.5918-2.5923-2.5918c-2.3042,0-4.0322,1.1514-5.3281,3.3115c-1.0083,1.7285-1.4404,3.8164-1.4404,6.1211c0,3.0957,0.8643,4.6084,2.5923,4.6084c2.0161,0,3.7441-0.792,5.2563-2.376S160.5005,327.3652,160.5005,325.4209z"/>
+                <path id="head[2]" class="head-path" transform="translate(-16.3 -36.28) scale(0.1111)" d="M169.5732,322.1094c0,1.6553-0.3599,3.168-1.1523,4.4639c-1.5117,2.6641-4.4644,5.1846-8.8564,7.6318c-4.4644,2.4492-8.2808,3.6729-11.521,3.6729c-1.8721,0-3.4565-0.6475-4.6807-2.0166c-1.1519-1.3672-1.728-2.9512-1.728-4.8242c0-4.0312,2.2324-7.9199,6.8408-11.5928c4.4644-3.5283,8.9287-5.3281,13.3931-5.3281C166.981,314.1162,169.5732,316.7803,169.5732,322.1094z M160.5005,325.4209c0-1.1514-0.2163-2.376-0.7202-3.8164c-0.7202-1.7275-1.584-2.5918-2.5923-2.5918c-2.3042,0-4.0322,1.1514-5.3281,3.3115c-1.0083,1.7285-1.4404,3.8164-1.4404,6.1211c0,3.0957,0.8643,4.6084,2.5923,4.6084c2.0161,0,3.7441-0.792,5.2563-2.376S160.5005,327.3652,160.5005,325.4209z"/>
                 <g id="head[3]">
                     <use xlink:href="#head[2]"></use>
                     <use xlink:href="#dot" transform="translate(1 0.5)"></use>
                 </g>
-                <path id="head[4]" class="head-path" transform="translate(-13.9 -36.28) scale(0.1111)" d="M118.0923,336.0781c-6.0488,0-9.001-2.1602-9.001-6.4805c0-3.8887,2.6641-7.2734,8.1367-10.1533c4.7524-2.5205,9.5049-3.8154,14.3291-3.8154c2.7363,0,5.0405,0.5752,6.9126,1.6553c2.1602,1.2236,3.2402,2.9521,3.2402,5.1846c0,2.9521-1.0801,5.3281-3.168,7.2012c-2.1602,1.8711-5.2568,3.4551-9.5049,4.6797C125.2207,335.502,121.5483,336.0781,118.0923,336.0781z M131.269,326.2129c0-4.4648-1.7998-6.7686-5.4004-6.7686c-2.0161,0-3.6724,0.9365-5.0405,2.8086s-2.0161,3.6729-2.0161,5.4717c0,3.0967,1.8721,4.6094,5.6167,4.6094c2.0161,0,3.6001-0.5762,4.8965-1.7285C130.6211,329.4531,131.269,327.9414,131.269,326.2129z"/>
+                <path id="head[4]" class="head-path" transform="translate(-12.6 -36.28) scale(0.1111)" d="M118.0923,336.0781c-6.0488,0-9.001-2.1602-9.001-6.4805c0-3.8887,2.6641-7.2734,8.1367-10.1533c4.7524-2.5205,9.5049-3.8154,14.3291-3.8154c2.7363,0,5.0405,0.5752,6.9126,1.6553c2.1602,1.2236,3.2402,2.9521,3.2402,5.1846c0,2.9521-1.0801,5.3281-3.168,7.2012c-2.1602,1.8711-5.2568,3.4551-9.5049,4.6797C125.2207,335.502,121.5483,336.0781,118.0923,336.0781z M131.269,326.2129c0-4.4648-1.7998-6.7686-5.4004-6.7686c-2.0161,0-3.6724,0.9365-5.0405,2.8086s-2.0161,3.6729-2.0161,5.4717c0,3.0967,1.8721,4.6094,5.6167,4.6094c2.0161,0,3.6001-0.5762,4.8965-1.7285C130.6211,329.4531,131.269,327.9414,131.269,326.2129z"/>
                 <g id="head[6]">
                     <use xlink:href="#head[4]"></use>
                     <use xlink:href="#dot" transform="translate(0 0)"></use>
@@ -777,7 +859,7 @@ export default element('scribe-script', {
         const source  = this.innerHTML;
         const type    = internals.type;
         const events  = parseEvents(source);
-        const bars    = splitByBar(events, bar4.duration)
+        const bars    = splitByBar(events.sort(by(get(0))), bar4.duration)
             .map(toSymbols) ;
 
         console.log(bars);
