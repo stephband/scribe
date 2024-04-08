@@ -20,36 +20,123 @@ const defaults = {
 const bar4 = { duration: 4, division: 1, breaks: [2], label: '4/4' };
 const rflat  = /b|♭/;
 const rsharp = /#|♯/;
-const beamThickness = 0.8;
+const beamThickness = 1.1;
 
 function parseEvents(source) {
     return [
-        [0,    "chord", "C-7", 1],
-        [2,    "chord", "A♭∆(♯11)", 1],
-        [4,    "chord", "D♭∆(♯11)", 1],
-        [6,    "chord", "G♭∆(♯11)", 1],
-        [8,    "chord", "B♭7sus", 1],
-        [10,   "chord", "A♭7(♯11)", 1],
-        [12,   "chord", "B♭7sus", 1],
-        [14,   "chord", "C7", 1],
-        [16,   "chord", "F-7", 1],
-        [18,   "chord", "A♭∆(♯11)", 1],
-        [20,   "chord", "Dø", 1],
-        [22,   "chord", "G7alt", 1],
-        [24,   "chord", "Aø", 1],
-        [26,   "chord", "D7♭9", 1],
-        [28,   "chord", "A♭∆(♯11)", 1],
-        [30,   "chord", "D♭∆(♯11)", 1],
-        [32,   "chord", "G♭∆(♯11)", 1],
-        [34,   "chord", "F-7", 1],
-        [36,   "chord", "G7sus", 1],
-        [38,   "chord", "B♭7sus", 1],
-        [39,   "chord", "G7alt", 1],
-        [40,   "chord", "C-7", 1],
-        [42,   "chord", "A♭∆(♯11)", 1],
-        [44,   "chord", "D♭∆(♯11)", 1],
+        /* Test beams */
+/*
+        [0,    "note", 60, 0.5, 0.5],
+        [0.5,  "note", 62, 0.5, 0.5],
+        [1,    "note", 64, 0.5, 0.5],
+        [1.5,  "note", 67, 0.5, 0.5],
+        [2,    "note", 69, 0.5, 1],
+
+        [4,    "note", 69, 0.5, 0.5],
+        [4.5,  "note", 67, 0.5, 0.5],
+        [5,    "note", 64, 0.5, 0.5],
+        [5.5,  "note", 62, 0.5, 0.5],
+        [6,    "note", 60, 0.5, 1],
+
+        [8,    "note", 72, 0.5, 0.5],
+        [8.5,  "note", 74, 0.5, 0.5],
+        [9,    "note", 76, 0.5, 0.5],
+        [9.5,  "note", 79, 0.5, 0.5],
+        [10,   "note", 81, 0.5, 1],
+
+        [12,   "note", 81, 0.5, 0.5],
+        [12.5, "note", 79, 0.5, 0.5],
+        [13,   "note", 76, 0.5, 0.5],
+        [13.5, "note", 74, 0.5, 0.5],
+        [14,   "note", 72, 0.5, 1],
+
+        [16,    "note", 60, 0.5, 0.25],
+        [16.25, "note", 61, 0.5, 0.25],
+        [16.5,  "note", 62, 0.5, 0.5],
+        [17,    "note", 64, 0.5, 0.5],
+        [17.5,  "note", 67, 0.5, 0.5],
+        [18,    "note", 69, 0.5, 1],
+
+        [20,    "note", 69, 0.5, 0.5],
+        [20.5,  "note", 67, 0.5, 0.5],
+        [21,    "note", 64, 0.5, 0.5],
+        [21.5,  "note", 62, 0.5, 0.25],
+        [21.75, "note", 61, 0.5, 0.25],
+        [22,    "note", 60, 0.5, 1],
+
+        [24,    "note", 72, 0.5, 0.25],
+        [24.25, "note", 73, 0.5, 0.25],
+        [24.5,  "note", 74, 0.5, 0.5],
+        [25,    "note", 76, 0.5, 0.5],
+        [25.5,  "note", 79, 0.5, 0.5],
+        [26,    "note", 81, 0.5, 1],
+
+        [28,    "note", 81, 0.5, 0.5],
+        [28.5,  "note", 79, 0.5, 0.5],
+        [29,    "note", 76, 0.5, 0.5],
+        [29.5,  "note", 74, 0.5, 0.25],
+        [29.75, "note", 73, 0.5, 0.25],
+        [30,    "note", 72, 0.5, 1],
+
+        [32,    "note", 60, 0.5, 0.5],
+        [32.5,  "note", 61, 0.5, 0.25],
+        [32.75, "note", 62, 0.5, 0.25],
+        [33,    "note", 64, 0.5, 0.5],
+        [33.5,  "note", 67, 0.5, 0.25],
+        [33.75, "note", 68, 0.5, 0.25],
+        [34,    "note", 69, 0.5, 1],
+
+        [36,    "note", 69, 0.5, 0.25],
+        [36.25, "note", 68, 0.5, 0.25],
+        [36.5,  "note", 67, 0.5, 0.5],
+        [37,    "note", 64, 0.5, 0.5],
+        [37.5,  "note", 62, 0.5, 0.25],
+        [37.75, "note", 61, 0.5, 0.25],
+        [38,    "note", 60, 0.5, 1],
+
+        [40,    "note", 72, 0.5, 0.5],
+        [40.5,  "note", 73, 0.5, 0.25],
+        [40.75, "note", 74, 0.5, 0.25],
+        [41,    "note", 76, 0.5, 0.5],
+        [41.5,  "note", 79, 0.5, 0.25],
+        [41.75, "note", 80, 0.5, 0.25],
+        [42,    "note", 81, 0.5, 1],
+
+        [44,    "note", 81, 0.5, 0.25],
+        [44.25, "note", 80, 0.5, 0.25],
+        [44.5,  "note", 79, 0.5, 0.5],
+        [45,    "note", 76, 0.5, 0.5],
+        [45.5,  "note", 74, 0.5, 0.25],
+        [45.75, "note", 73, 0.5, 0.25],
+        [46,    "note", 72, 0.5, 1],
+*/
+        /*
+        [0,    "chord", "C-7",      2],
+        [2,    "chord", "A♭∆(♯11)", 2],
+        [4,    "chord", "D♭∆(♯11)", 2],
+        [6,    "chord", "G♭∆(♯11)", 2],
+        [8,    "chord", "B♭7sus",   2],
+        [10,   "chord", "A♭7(♯11)", 2],
+        [12,   "chord", "B♭7sus",   2],
+        [14,   "chord", "C7",       2],
+        [16,   "chord", "F-7",      2],
+        [18,   "chord", "A♭∆(♯11)", 2],
+        [20,   "chord", "Dø",       2],
+        [22,   "chord", "G7alt",    2],
+        [24,   "chord", "Aø",       2],
+        [26,   "chord", "D7♭9",     2],
+        [28,   "chord", "A♭∆(♯11)", 2],
+        [30,   "chord", "D♭∆(♯11)", 2],
+        [32,   "chord", "G♭∆(♯11)", 2],
+        [34,   "chord", "F-7",      2],
+        [36,   "chord", "G7sus",    2],
+        [38,   "chord", "B♭7sus",   1],
+        [39,   "chord", "G7alt",    1],
+        [40,   "chord", "C-7",      2],
+        [42,   "chord", "A♭∆(♯11)", 2],
+        [44,   "chord", "D♭∆(♯11)", 2],
         [46,   "chord", "G♭∆(♯11)", 1],
-        [47,   "chord", "G7alt", 1],
+        [47,   "chord", "G7alt",    1],
         [0,     "note", 72, 0.25, 0.5],
         [0,     "note", 60, 0.25, 0.5],
         [0.5,   "note", 75, 0.25, 0.5],
@@ -126,9 +213,52 @@ function parseEvents(source) {
         [46.5,  "note", 58, 0.25, 1],
         [47.5,  "note", 55, 0.25, 0.5],
         [48,    "note", 62, 0.25, 4]
+        */
 
-/*
 
+        [0,   "chord", "C∆", 4],
+        [4,   "chord", "G-", 4],
+        [8,   "chord", "C∆", 4],
+        [12,  "chord", "Bø", 2],
+        [14,  "chord", "E7alt", 2],
+        [16,  "chord", "A-", 4],
+        [20,  "chord", "F∆(♯11)", 2],
+        [22,  "chord", "E7alt", 2],
+        [24,  "chord", "A-", 4],
+        [28,  "chord", "F♯-7", 2],
+        [30,  "chord", "B7", 2],
+        [32,  "chord", "E∆", 4],
+        [36,  "chord", "F-7", 4],
+        [40,  "chord", "D-7", 6],
+        [46,  "chord", "E7alt", 2],
+        [48,  "chord", "A-7", 8],
+        [56,  "chord", "F♯-7", 4],
+        [60,  "chord", "B7", 4],
+        [64,  "chord", "E∆", 4],
+        [68,  "chord", "E7sus", 4],
+        [72,  "chord", "E∆♯11", 4],
+        [76,  "chord", "E7sus", 4],
+        [80,  "chord", "D7sus", 4],
+        [84,  "chord", "D∆♯11", 4],
+        [88,  "chord", "D7sus", 4],
+        [92,  "chord", "C♯-7", 2],
+        [94,  "chord", "F♯7", 2],
+        [96,  "chord", "C7♯11", 4],
+        [100, "chord", "F♯-7", 2],
+        [102, "chord", "B7", 2],
+        [104, "chord", "G♯-7", 2],
+        [108, "chord", "C♯7", 2],
+        [110, "chord", "B-7", 2],
+        [112, "chord", "B♭-7", 4],
+        [116, "chord", "E♭7", 4],
+        [120, "chord", "C♯-7", 4],
+        [124, "chord", "C♯-♭6", 4],
+        [128, "chord", "C♯-7", 4],
+        [132, "chord", "C♯-♭6", 4],
+        [136, "chord", "C7sus", 4],
+        [140, "chord", "C∆♭6", 4],
+        [144, "chord", "C7sus♭9", 4],
+        [148, "chord", "E7alt", 4],
         [2,      "note", 76, 0.25, 0.5],
         [2.5,    "note", 77, 0.25, 0.5],
         [3,      "note", 79, 0.25, 0.5],
@@ -211,7 +341,7 @@ function parseEvents(source) {
         [146,    "note", 76, 0.25, 0.5],
         [146.5,  "note", 77, 0.25, 0.5],
         [147,    "note", 79, 0.25, 0.5],
-        [147.5,  "note", 74, 0.25, 3.5] */
+        [147.5,  "note", 74, 0.25, 3.5]
     ];
 }
 
@@ -309,27 +439,24 @@ function insertBeam(symbols, beam, stemNote, n) {
     }
 
     // Render stems and beam
-    const stemDirection = 0.5 <= (beam
-        .map((i) => getStemDirection(stemNote, symbols[i].pitch) === 'up')
-        .reduce((t, u) => t + u, 0) / beam.length) ?
+    const stemDirection = (beam
+        .map((i) => subtractStaveRows(stemNote, symbols[i].pitch))
+        .reduce((t, u) => t + u, 0) / beam.length) < 0 ?
         'up' :
         'down' ;
 
     const stems = [];
 
-    // TODO Here's where to precaclulate stem heights and change them
-    // ready for the beam
-
     // Loop backwards through beam splicing in stem symbols before
     // the heads, all with the winning stem direction
-    let b = beam.length;
+    let b = -1;
     let avgBeginLine = 0;
     let avgEndLine   = 0;
-    let i, head, line;
-    while (b--) {
-        i = beam[b];
+    let i, head, line, stem;
+    while (beam[++b] !== undefined) {
+        i    = beam[b];
         head = symbols[i];
-        line = subtractStaveRows('B4', head.pitch);
+        line = subtractStaveRows(stemNote, head.pitch);
 
         if (b < (beam.length - 1) / 2) {
             avgBeginLine += line / Math.floor(beam.length / 2);
@@ -339,11 +466,22 @@ function insertBeam(symbols, beam, stemNote, n) {
             avgEndLine += line / Math.floor(beam.length / 2);
         }
 
-        stems[b] = assign({}, head, {
-            type: 'stem',
-            value: stemDirection
-        });
-        symbols.splice(i, 0, stems[b]);
+        if (stem && stem.beat === head.beat) {
+            //let stemLine = subtractStaveRows('B4', head.pitch)
+            //let range =
+            stem.range = subtractStaveRows(stem.pitch, head.pitch);
+            stem.pitch = stem.range < 0 ?
+                stem.value === 'up' ? stem.pitch : head.pitch :
+                stem.value === 'up' ? head.pitch : stem.pitch ;
+        }
+        else {
+            stem = assign({}, head, {
+                type: 'stem',
+                value: stemDirection
+            });
+
+            stems.push(stem);
+        }
     }
 
     // Calculate where to put beam exactly
@@ -357,9 +495,11 @@ function insertBeam(symbols, beam, stemNote, n) {
 
     stems.forEach((stem, i) => {
         stem.beamY = stemDirection === 'down' ?
-            range * i / (stems.length - 1) + subtractStaveRows(begin.pitch, stem.pitch) :
+            -range * i / (stems.length - 1) + subtractStaveRows(begin.pitch, stem.pitch) :
             range * i / (stems.length - 1) - subtractStaveRows(begin.pitch, stem.pitch) ;
     });
+
+    symbols.splice(i, 0, ...stems);
 
     // Put the beam in front of the first head (??)
     symbols.splice(i, 0, assign({}, begin, {
@@ -374,7 +514,7 @@ function insertBeam(symbols, beam, stemNote, n) {
     }));
 
     // We just spliced a bunch of symbols in before index n
-    return beam.length + 1;
+    return stems.length + 1;
 }
 
 function insertSymbols(symbols, bar, stemNote) {
@@ -645,47 +785,40 @@ function splitByBar(events, barDuration) {
     return bars;
 }
 
+function renderBeam(range, stems, beam) {
+    return `<path class="beam-path-16th beam-path" d="
+        M${ beam[0] },              ${ (-range * beam[0] / (stems.length - 1)) - 0.5 * beamThickness }
+        L${ beam[beam.length - 1] },${ (-range * beam[beam.length - 1] / (stems.length - 1)) - 0.5 * beamThickness }
+        L${ beam[beam.length - 1] },${ (-range * beam[beam.length - 1] / (stems.length - 1)) + 0.5 * beamThickness }
+        L${ beam[0] },              ${ (-range * beam[0] / (stems.length - 1)) + 0.5 * beamThickness }
+    Z"></path>`;
+}
+
 function create16thNoteBeams(stems, range) {
     const durations = stems.map(get('duration'));
     let html = '';
-    let n    = -1;
+    let n = -1;
     let beam;
+
     while (durations[++n]) {
         if (durations[n] < 0.5 && durations[n].toFixed(2) !== '0.33') {
-            if (beam) {
-                beam.push(n);
-            }
-            else {
-                beam = [n];
-            }
+            // Push to existing beam
+            if (beam) { beam.push(n); }
+            // Or start new beam
+            else { beam = [n]; }
         }
-        else if (beam) {
-            // Render beam
-            //if (beam.length === 1) {
-                html += `<path class="beam-path-16th beam-path" d="
-                    M${ beam[0] },              ${ (-range * beam[0] / (stems.length - 1)) - 0.5 * beamThickness }
-                    L${ beam[beam.length - 1] },${ (-range * beam[beam.length - 1] / (stems.length - 1)) - 0.5 * beamThickness }
-                    L${ beam[beam.length - 1] },${ (-range * beam[beam.length - 1] / (stems.length - 1)) + 0.5 * beamThickness }
-                    L${ beam[0] },              ${ (-range * beam[0] / (stems.length - 1)) + 0.5 * beamThickness }
-                Z"></path>`;
-            //}
-            //else {
-            //    html += `<path class="beam-path" d="M${ beam[0] },${ (-range * beam[0] / (stems.length - 1)) - 0.5 * beamThickness } L${ beam[beam.length - 1] },${ -range - 0.5 * beamThickness } L${ beam[beam.length - 1] },${ -range + 0.5 * beamThickness } L${ beam[0] },${ 0.5 * beamThickness } Z"></path>`;
-            //}
-        }
-    }
-
-    if (beam) {
         // Render beam
-        html += `<path class="beam-path-16th beam-path" d="
-            M${ beam[0] },              ${ (-range * beam[0] / (stems.length - 1)) - 0.5 * beamThickness }
-            L${ beam[beam.length - 1] },${ (-range * beam[beam.length - 1] / (stems.length - 1)) - 0.5 * beamThickness }
-            L${ beam[beam.length - 1] },${ (-range * beam[beam.length - 1] / (stems.length - 1)) + 0.5 * beamThickness }
-            L${ beam[0] },              ${ (-range * beam[0] / (stems.length - 1)) + 0.5 * beamThickness }
-        Z"></path>`;
+        else if (beam) {
+            html += renderBeam(range, stems, beam);
+            beam = undefined;
+        }
     }
 
-    console.log(durations);
+    // Render beam
+    if (beam) {
+        html += renderBeam(range, stems, beam);
+    }
+
     return html;
 }
 
@@ -726,7 +859,7 @@ const toElement = overload(get('type'), {
         // Stretch stems by height
         preserveAspectRatio: "none",
         data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration },
-        style: `--beam-y: ${ symbol.beamY || 0 };`,
+        style: `--beam-y: ${ symbol.beamY === undefined ? 0 : symbol.beamY };`,
         html: '<use href="#stem' + symbol.value + '"></use>'
     }),
 

@@ -42,7 +42,7 @@
 }
 
 .bar > .down-beam {
-	left: calc(-1 * var(--stem-thickness) - 2.7 * var(--y-size));
+	left: calc(-2.7 * var(--y-size));
 }
 
 .bar > .beam[data-duration="0.125"] { grid-column-end: span 3; }

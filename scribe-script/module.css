@@ -1,4 +1,5 @@
 
-scribe-script {
-
+scribe-script::after {
+    content: '';
+    flex: 6 1;
 }

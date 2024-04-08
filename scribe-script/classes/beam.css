@@ -1,7 +1,7 @@
 .beam {
     vector-effect: non-scaling-stroke;
     stroke: black;
-    stroke-width: 0.1;
+    stroke-width: 0;
     stroke-linejoin: round;
     stroke-linecap: round;
     fill: black;
