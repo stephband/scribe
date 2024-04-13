@@ -6,7 +6,7 @@ import create   from '../../dom/modules/create.js';
 import element  from '../../dom/modules/element.js';
 import parseABC from '../modules/parse-abc.js';
 import parseSequenceText from '../modules/parse-sequence-text.js';
-import { toNoteNumber, toNoteName } from '../../midi/modules/note.js';
+import { toNoteNumber, toNoteName, normaliseNoteName } from '../../midi/modules/note.js';
 import createElement from './modules/create-element.js';
 
 const assign = Object.assign;
@@ -23,7 +23,6 @@ const defaults = {
 const bar4 = { duration: 4, division: 1, breaks: [2], label: '4/4' };
 const rflat  = /b|♭/;
 const rsharp = /#|♯/;
-const beamThickness = 1.1;
 
 function getStemDirection(note, event2) {
     return toNoteNumber(note) < toNoteNumber(event2) ?
@@ -661,9 +660,8 @@ export default element('scribe-script', {
             sequence = music.sequences[0];
         }
         // Data is step sequence text
-        else if (this.type === 'text' || this.type === 'text/text') {
-            const music = parseSequenceText(source);
-            sequence = music.sequences[0];
+        else if (this.type === 'sequence') {
+            sequence = { events: parseSequenceText(source) };
         }
         // Data is JSON
         else {

@@ -1,6 +1,10 @@
-import get    from '../../../fn/modules/get.js';
-import create from '../../../dom/modules/create.js';
+import get      from '../../../fn/modules/get.js';
+import overload from '../../../fn/modules/overload.js';
+import create   from '../../../dom/modules/create.js';
 
+const abs = Math.abs;
+
+const beamThickness = 1.1;
 
 function renderBeam(range, stems, beam) {
     return `<path class="beam-path-16th beam-path" d="
