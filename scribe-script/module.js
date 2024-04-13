@@ -4,6 +4,7 @@ import get      from '../../fn/modules/get.js';
 import overload from '../../fn/modules/overload.js';
 import create   from '../../dom/modules/create.js';
 import element  from '../../dom/modules/element.js';
+import parseABC from '../modules/parse-abc.js';
 import { toNoteNumber, toNoteName } from '../../midi/modules/note.js';
 
 const assign = Object.assign;
@@ -22,329 +23,6 @@ const rflat  = /b|♭/;
 const rsharp = /#|♯/;
 const beamThickness = 1.1;
 
-function parseEvents(source) {
-    return [
-        /* Test beams */
-/*
-        [0,    "note", 60, 0.5, 0.5],
-        [0.5,  "note", 62, 0.5, 0.5],
-        [1,    "note", 64, 0.5, 0.5],
-        [1.5,  "note", 67, 0.5, 0.5],
-        [2,    "note", 69, 0.5, 1],
-
-        [4,    "note", 69, 0.5, 0.5],
-        [4.5,  "note", 67, 0.5, 0.5],
-        [5,    "note", 64, 0.5, 0.5],
-        [5.5,  "note", 62, 0.5, 0.5],
-        [6,    "note", 60, 0.5, 1],
-
-        [8,    "note", 72, 0.5, 0.5],
-        [8.5,  "note", 74, 0.5, 0.5],
-        [9,    "note", 76, 0.5, 0.5],
-        [9.5,  "note", 79, 0.5, 0.5],
-        [10,   "note", 81, 0.5, 1],
-
-        [12,   "note", 81, 0.5, 0.5],
-        [12.5, "note", 79, 0.5, 0.5],
-        [13,   "note", 76, 0.5, 0.5],
-        [13.5, "note", 74, 0.5, 0.5],
-        [14,   "note", 72, 0.5, 1],
-
-        [16,    "note", 60, 0.5, 0.25],
-        [16.25, "note", 61, 0.5, 0.25],
-        [16.5,  "note", 62, 0.5, 0.5],
-        [17,    "note", 64, 0.5, 0.5],
-        [17.5,  "note", 67, 0.5, 0.5],
-        [18,    "note", 69, 0.5, 1],
-
-        [20,    "note", 69, 0.5, 0.5],
-        [20.5,  "note", 67, 0.5, 0.5],
-        [21,    "note", 64, 0.5, 0.5],
-        [21.5,  "note", 62, 0.5, 0.25],
-        [21.75, "note", 61, 0.5, 0.25],
-        [22,    "note", 60, 0.5, 1],
-
-        [24,    "note", 72, 0.5, 0.25],
-        [24.25, "note", 73, 0.5, 0.25],
-        [24.5,  "note", 74, 0.5, 0.5],
-        [25,    "note", 76, 0.5, 0.5],
-        [25.5,  "note", 79, 0.5, 0.5],
-        [26,    "note", 81, 0.5, 1],
-
-        [28,    "note", 81, 0.5, 0.5],
-        [28.5,  "note", 79, 0.5, 0.5],
-        [29,    "note", 76, 0.5, 0.5],
-        [29.5,  "note", 74, 0.5, 0.25],
-        [29.75, "note", 73, 0.5, 0.25],
-        [30,    "note", 72, 0.5, 1],
-
-        [32,    "note", 60, 0.5, 0.5],
-        [32.5,  "note", 61, 0.5, 0.25],
-        [32.75, "note", 62, 0.5, 0.25],
-        [33,    "note", 64, 0.5, 0.5],
-        [33.5,  "note", 67, 0.5, 0.25],
-        [33.75, "note", 68, 0.5, 0.25],
-        [34,    "note", 69, 0.5, 1],
-
-        [36,    "note", 69, 0.5, 0.25],
-        [36.25, "note", 68, 0.5, 0.25],
-        [36.5,  "note", 67, 0.5, 0.5],
-        [37,    "note", 64, 0.5, 0.5],
-        [37.5,  "note", 62, 0.5, 0.25],
-        [37.75, "note", 61, 0.5, 0.25],
-        [38,    "note", 60, 0.5, 1],
-
-        [40,    "note", 72, 0.5, 0.5],
-        [40.5,  "note", 73, 0.5, 0.25],
-        [40.75, "note", 74, 0.5, 0.25],
-        [41,    "note", 76, 0.5, 0.5],
-        [41.5,  "note", 79, 0.5, 0.25],
-        [41.75, "note", 80, 0.5, 0.25],
-        [42,    "note", 81, 0.5, 1],
-
-        [44,    "note", 81, 0.5, 0.25],
-        [44.25, "note", 80, 0.5, 0.25],
-        [44.5,  "note", 79, 0.5, 0.5],
-        [45,    "note", 76, 0.5, 0.5],
-        [45.5,  "note", 74, 0.5, 0.25],
-        [45.75, "note", 73, 0.5, 0.25],
-        [46,    "note", 72, 0.5, 1],
-*/
-        /*
-        [0,    "chord", "C-7",      2],
-        [2,    "chord", "A♭∆(♯11)", 2],
-        [4,    "chord", "D♭∆(♯11)", 2],
-        [6,    "chord", "G♭∆(♯11)", 2],
-        [8,    "chord", "B♭7sus",   2],
-        [10,   "chord", "A♭7(♯11)", 2],
-        [12,   "chord", "B♭7sus",   2],
-        [14,   "chord", "C7",       2],
-        [16,   "chord", "F-7",      2],
-        [18,   "chord", "A♭∆(♯11)", 2],
-        [20,   "chord", "Dø",       2],
-        [22,   "chord", "G7alt",    2],
-        [24,   "chord", "Aø",       2],
-        [26,   "chord", "D7♭9",     2],
-        [28,   "chord", "A♭∆(♯11)", 2],
-        [30,   "chord", "D♭∆(♯11)", 2],
-        [32,   "chord", "G♭∆(♯11)", 2],
-        [34,   "chord", "F-7",      2],
-        [36,   "chord", "G7sus",    2],
-        [38,   "chord", "B♭7sus",   1],
-        [39,   "chord", "G7alt",    1],
-        [40,   "chord", "C-7",      2],
-        [42,   "chord", "A♭∆(♯11)", 2],
-        [44,   "chord", "D♭∆(♯11)", 2],
-        [46,   "chord", "G♭∆(♯11)", 1],
-        [47,   "chord", "G7alt",    1],
-        [0,     "note", 72, 0.25, 0.5],
-        [0,     "note", 60, 0.25, 0.5],
-        [0.5,   "note", 75, 0.25, 0.5],
-        [1,     "note", 72, 0.25, 0.5],
-        [1,     "note", 60, 0.25, 0.5],
-        [1.5,   "note", 75, 0.25, 0.5],
-        [2,     "note", 77, 0.25, 0.5],
-        [2.5,   "note", 75, 0.25, 1],
-        [3.5,   "note", 72, 0.25, 0.25],
-        [3.75,  "note", 70, 0.25, 0.25],
-        [4,     "note", 72, 0.25, 0.5],
-        [4.5,   "note", 75, 0.25, 1],
-        [5.5,   "note", 72, 0.25, 0.25],
-        [5.75,  "note", 70, 0.25, 0.25],
-        [6,     "note", 72, 0.25, 1],
-        [7.75,  "note", 67, 0.25, 0.25],
-        [8,     "note", 72, 0.25, 0.5],
-        [8.5,   "note", 75, 0.25, 0.5],
-        [9,     "note", 72, 0.25, 0.5],
-        [9.5,   "note", 75, 0.25, 0.5],
-        [10,    "note", 78, 0.25, 0.5],
-        [10.5,  "note", 77, 0.25, 1],
-        [11.5,  "note", 72, 0.25, 0.25],
-        [11.75, "note", 70, 0.25, 0.25],
-        [12,    "note", 72, 0.25, 0.5],
-        [12.5,  "note", 75, 0.25, 1],
-        [13.5,  "note", 72, 0.25, 0.25],
-        [13.75, "note", 70, 0.25, 0.25],
-        [14,    "note", 72, 0.25, 1],
-        [15.5,  "note", 60, 0.25, 0.5],
-        [16,    "note", 67, 0.25, 0.5],
-        [16.5,  "note", 70, 0.25, 0.5],
-        [17,    "note", 60, 0.25, 0.5],
-        [17.5,  "note", 63, 0.25, 0.5],
-        [18,    "note", 65, 0.25, 0.5],
-        [18.5,  "note", 63, 0.25, 1],
-        [19.5,  "note", 60, 0.25, 0.25],
-        [19.75, "note", 63, 0.25, 0.25],
-        [20,    "note", 67, 0.25, 0.5],
-        [20.5,  "note", 72, 0.25, 0.5],
-        [21,    "note", 63, 0.25, 0.5],
-        [21.5,  "note", 67, 0.25, 0.5],
-        [22,    "note", 70, 0.25, 0.5],
-        [22.5,  "note", 67, 0.25, 0.5],
-        [23,    "note", 63, 0.25, 0.5],
-        [23.5,  "note", 59, 0.25, 0.25],
-        [23.75, "note", 57, 0.25, 0.25],
-        [24,    "note", 63, 0.25, 0.5],
-        [24.5,  "note", 66, 0.25, 1],
-        [25.5,  "note", 61, 0.25, 0.5],
-        [26,    "note", 59, 0.25, 0.5],
-        [26.5,  "note", 66, 0.25, 1],
-        [27.5,  "note", 62, 0.25, 0.5],
-        [28,    "note", 63, 0.25, 2],
-        [30,    "note", 60, 0.25, 1],
-        [31.5,  "note", 66, 0.25, 0.25],
-        [31.75, "note", 65, 0.25, 0.25],
-        [32,    "note", 63, 0.25, 2],
-        [34,    "note", 60, 0.25, 2],
-        [36,    "note", 65, 0.25, 0.5],
-        [36.5,  "note", 63, 0.25, 0.5],
-        [37,    "note", 60, 0.25, 0.5],
-        [37.5,  "note", 58, 0.25, 0.5],
-        [38,    "note", 66, 0.25, 0.5],
-        [38.5,  "note", 65, 0.25, 0.5],
-        [39,    "note", 63, 0.25, 0.5],
-        [39.5,  "note", 60, 0.25, 0.5],
-        [40,    "note", 63, 0.25, 2],
-        [42,    "note", 60, 0.25, 2],
-        [44,    "note", 67, 0.25, 0.5],
-        [44.5,  "note", 65, 0.25, 1],
-        [45.5,  "note", 63, 0.25, 0.5],
-        [46,    "note", 60, 0.25, 0.5],
-        [46.5,  "note", 58, 0.25, 1],
-        [47.5,  "note", 55, 0.25, 0.5],
-        [48,    "note", 62, 0.25, 4]
-        */
-
-
-        [0,   "chord", "C∆", 4],
-        [4,   "chord", "G-", 4],
-        [8,   "chord", "C∆", 4],
-        [12,  "chord", "Bø", 2],
-        [14,  "chord", "E7alt", 2],
-        [16,  "chord", "A-", 4],
-        [20,  "chord", "F∆(♯11)", 2],
-        [22,  "chord", "E7alt", 2],
-        [24,  "chord", "A-", 4],
-        [28,  "chord", "F♯-7", 2],
-        [30,  "chord", "B7", 2],
-        [32,  "chord", "E∆", 4],
-        [36,  "chord", "F-7", 4],
-        [40,  "chord", "D-7", 6],
-        [46,  "chord", "E7alt", 2],
-        [48,  "chord", "A-7", 8],
-        [56,  "chord", "F♯-7", 4],
-        [60,  "chord", "B7", 4],
-        [64,  "chord", "E∆", 4],
-        [68,  "chord", "E7sus", 4],
-        [72,  "chord", "E∆♯11", 4],
-        [76,  "chord", "E7sus", 4],
-        [80,  "chord", "D7sus", 4],
-        [84,  "chord", "D∆♯11", 4],
-        [88,  "chord", "D7sus", 4],
-        [92,  "chord", "C♯-7", 2],
-        [94,  "chord", "F♯7", 2],
-        [96,  "chord", "C7♯11", 4],
-        [100, "chord", "F♯-7", 2],
-        [102, "chord", "B7", 2],
-        [104, "chord", "G♯-7", 2],
-        [108, "chord", "C♯7", 2],
-        [110, "chord", "B-7", 2],
-        [112, "chord", "B♭-7", 4],
-        [116, "chord", "E♭7", 4],
-        [120, "chord", "C♯-7", 4],
-        [124, "chord", "C♯-♭6", 4],
-        [128, "chord", "C♯-7", 4],
-        [132, "chord", "C♯-♭6", 4],
-        [136, "chord", "C7sus", 4],
-        [140, "chord", "C∆♭6", 4],
-        [144, "chord", "C7sus♭9", 4],
-        [148, "chord", "E7alt", 4],
-        [2,      "note", 76, 0.25, 0.5],
-        [2.5,    "note", 77, 0.25, 0.5],
-        [3,      "note", 79, 0.25, 0.5],
-        [3.5,    "note", 74, 0.25, 3.5],
-        [10,     "note", 76, 0.25, 0.5],
-        [10.5,   "note", 77, 0.25, 0.5],
-        [11,     "note", 79, 0.25, 0.5],
-        [11.5,   "note", 74, 0.25, 3.5],
-        [18,     "note", 72, 0.25, 0.5],
-        [18.5,   "note", 74, 0.25, 1],
-        [19.5,   "note", 76, 0.25, 0.5],
-        [20,     "note", 71, 0.25, 1],
-        [21,     "note", 71, 0.25, 2],
-        [26,     "note", 72, 0.25, 0.5],
-        [26.5,   "note", 74, 0.25, 0.5],
-        [27,     "note", 76, 0.25, 0.5],
-        [27.5,   "note", 71, 0.25, 3.5],
-        [31,     "note", 69, 0.25, 1],
-        [32,     "note", 68, 0.25, 1.5],
-        [33.5,   "note", 75, 0.25, 2.5],
-        [36,     "note", 75, 0.25, 1.5],
-        [37.5,   "note", 75, 0.25, 0.5],
-        [38,     "note", 77, 0.25, 0.5],
-        [38.5,   "note", 75, 0.25, 0.5],
-        [39,     "note", 77, 0.25, 0.5],
-        [39.5,   "note", 79, 0.25, 4.5],
-        [48,     "note", 76, 0.25, 1.5],
-        [49.5,   "note", 79, 0.25, 2.5],
-        [52,     "note", 79, 0.25, 1],
-        [53,     "note", 79, 0.25, 0.5],
-        [53.5,   "note", 79, 0.25, 0.5],
-        [54,     "note", 81, 0.25, 0.5],
-        [54.5,   "note", 79, 0.25, 0.5],
-        [55,     "note", 81, 0.25, 0.5],
-        [55.5,   "note", 83, 0.25, 4.5],
-        [66,     "note", 80, 0.25, 0.5],
-        [66.5,   "note", 81, 0.25, 0.5],
-        [67,     "note", 83, 0.25, 0.5],
-        [67.5,   "note", 78, 0.25, 3.5],
-        [74,     "note", 76, 0.25, 0.5],
-        [74.5,   "note", 78, 0.25, 0.5],
-        [75,     "note", 80, 0.25, 0.5],
-        [75.5,   "note", 74, 0.25, 3.5],
-        [82,     "note", 72, 0.25, 0.5],
-        [82.5,   "note", 74, 0.25, 1],
-        [83.5,   "note", 76, 0.25, 0.5],
-        [84,     "note", 71, 0.25, 1],
-        [85,     "note", 71, 0.25, 2],
-        [90,     "note", 72, 0.25, 0.5],
-        [90.5,   "note", 74, 0.25, 1],
-        [91,     "note", 76, 0.25, 0.5],
-        [91.5,   "note", 78, 0.25, 4.5],
-        [96,     "note", 78, 0.25, 0.5],
-        [96.5,   "note", 79, 0.25, 0.5],
-        [97.5,   "note", 78, 0.25, 0.25],
-        [97.75,  "note", 77, 0.25, 0.25],
-        [98,     "note", 78, 0.25, 1],
-        [99,     "note", 78, 0.25, 0.5],
-        [99.5,   "note", 83, 0.25, 0.5],
-        [100.5,  "note", 80, 0.25, 3.5],
-        [104,    "note", 80, 0.25, 0.5],
-        [104.5,  "note", 82, 0.25, 0.5],
-        [105.5,  "note", 80, 0.25, 0.25],
-        [105.75, "note", 78, 0.25, 0.25],
-        [106,    "note", 80, 0.25, 1],
-        [107,    "note", 80, 0.25, 0.5],
-        [107.5,  "note", 85, 0.25, 2.5],
-        [110,    "note", 86, 0.25, 2],
-        [112,    "note", 87, 0.25, 1.5],
-        [113.5,  "note", 85, 0.25, 1],
-        [114.5,  "note", 80, 0.25, 1],
-        [115.5,  "note", 77, 0.25, 0.5],
-        [116,    "note", 84, 0.25, 3],
-        [119,    "note", 75, 0.25, 0.5],
-        [119.5,  "note", 80, 0.25, 8.5],
-        [138,    "note", 81, 0.25, 0.5],
-        [138.5,  "note", 82, 0.25, 0.5],
-        [139,    "note", 84, 0.25, 0.5],
-        [139.5,  "note", 79, 0.25, 3.5],
-        [146,    "note", 76, 0.25, 0.5],
-        [146.5,  "note", 77, 0.25, 0.5],
-        [147,    "note", 79, 0.25, 0.5],
-        [147.5,  "note", 74, 0.25, 3.5]
-    ];
-}
-
 function getStemDirection(note, event2) {
     return toNoteNumber(note) < toNoteNumber(event2) ?
         'down' :
@@ -356,6 +34,11 @@ function isAfterBreak(breaks, b1, b2) {
     while (breaks[++n] && breaks[n] <= b1);
     // If breaks[n] is undefined, returns false, which is what we want
     return b2 >= breaks[n];
+}
+
+function getDuration(event) {
+    return event[1] === 'chord' ? event[3] :
+        event[4] ;
 }
 
 function insertTail(symbols, stemNote, i) {
@@ -446,6 +129,7 @@ function insertBeam(symbols, beam, stemNote, n) {
         'down' ;
 
     const stems = [];
+    const ties  = [];
 
     // Loop backwards through beam splicing in stem symbols before
     // the heads, all with the winning stem direction
@@ -457,6 +141,9 @@ function insertBeam(symbols, beam, stemNote, n) {
         i    = beam[b];
         head = symbols[i];
         line = subtractStaveRows(stemNote, head.pitch);
+
+        head.stemDirection = stemDirection;
+        head.tieDirection  = stemDirection === 'up' ? 'down' : 'up' ;
 
         if (b < (beam.length - 1) / 2) {
             avgBeginLine += line / Math.floor(beam.length / 2);
@@ -481,6 +168,15 @@ function insertBeam(symbols, beam, stemNote, n) {
             });
 
             stems.push(stem);
+        }
+
+        if (head.tie === 'begin') {
+            ties.push(assign({}, head, {
+                type: 'tie',
+                beat:   head.beat,
+                updown: head.tieDirection,
+                event:  head.event
+            }));
         }
     }
 
@@ -513,11 +209,14 @@ function insertBeam(symbols, beam, stemNote, n) {
         stems:  stems
     }));
 
+    symbols.splice(i, 0, ...ties);
+
     // We just spliced a bunch of symbols in before index n
-    return stems.length + 1;
+    return stems.length + ties.length + 1;
 }
 
-function insertSymbols(symbols, bar, stemNote) {
+function insertSymbols(bar, stemNote) {
+    const symbols = bar.symbols;
     const accidentals = {};
     let beat = 0;
     let n = -1;
@@ -591,7 +290,10 @@ function insertSymbols(symbols, bar, stemNote) {
             }
         }
 
-        // Stem
+
+
+        // Stem and ties. We must wait for stems to be decided before rendering
+        // ties as their up/down direction is dependent.
         if (head.duration < 4) {
             // Is this head less than 1 beat, and not 1 triplet beat, long?
             // Wait for it to be beamed.
@@ -607,9 +309,32 @@ function insertSymbols(symbols, bar, stemNote) {
             }
             // Otherwise render the stem immediately
             else {
+                let stemDirection = getStemDirection(stemNote, head.pitch);
                 symbols.splice(n++, 0, assign({}, head, {
                     type: 'stem',
-                    value: getStemDirection(stemNote, head.pitch)
+                    value: stemDirection
+                }));
+
+                if (head.tie === 'begin') {
+                    symbols.splice(n++, 0, assign({}, head, {
+                        type: 'tie',
+                        // Move tie into following grid column
+                        beat:   head.beat,
+                        updown: stemDirection === 'up' ? 'down' : 'up',
+                        event:  head.event
+                    }));
+                }
+            }
+        }
+        else {
+            if (head.tie === 'begin' || head.tie === 'middle') {
+                let stemDirection = getStemDirection(stemNote, head.pitch);
+                symbols.splice(n++, 0, assign({}, head, {
+                    type: 'tie',
+                    // Move tie into following grid column
+                    beat:   head.beat,
+                    updown: stemDirection === 'up' ? 'down' : 'up',
+                    event:  head.event
                 }));
             }
         }
@@ -631,20 +356,19 @@ function insertSymbols(symbols, bar, stemNote) {
         });
     }
 
-    return symbols;
+    return bar;
 }
 
-function toSymbols(events) {
+function toSymbols(bar) {
     const state = {
-        clef: { name: 'treble', stemDirectionNote: 'B4' },
-        bar: bar4
+        clef: { name: 'treble', stemDirectionNote: 'B4' }
     };
 
-    return insertSymbols(events, state.bar, state.clef.stemDirectionNote);
+    return insertSymbols(bar, state.clef.stemDirectionNote);
 }
 
 function createBarFromBuffer(barBeat, barDuration, buffer) {
-    const bar = [];
+    const bar = { beat: barBeat, duration: barDuration, breaks: [2], symbols: [] };
 
     let m = -1;
     let tied;
@@ -653,7 +377,7 @@ function createBarFromBuffer(barBeat, barDuration, buffer) {
 
         // Event ends after this bar
         if (barBeat + barDuration < tied[0] + tied[4]) {
-            bar.push({
+            bar.symbols.push({
                 beat: 0,
                 type: 'head',
                 pitch: typeof tied[2] === 'number' ?
@@ -667,7 +391,7 @@ function createBarFromBuffer(barBeat, barDuration, buffer) {
 
         // Event ends in this bar
         else {
-            bar.push({
+            bar.symbols.push({
                 beat: 0,
                 type: 'head',
                 pitch: typeof tied[2] === 'number' ?
@@ -692,17 +416,20 @@ function splitByBar(events, barDuration) {
     const buffer = [];
 
     let barBeat = 0;
-    let bar = [];
+    let bar = { beat: barBeat, duration: 4, breaks: [2], symbols: [] };
     bars.push(bar);
 
     let n = -1;
     let event;
     while (event = events[++n]) {
-        if (event[1] === 'timesig') {
+        if (event[1] === 'meter') {
             if (event[0] !== barBeat) {
-                new TypeError('A "timesig" event may only occur at the start of a bar')
+                new TypeError('A "meter" event may only occur at the start of a bar')
             }
-            barDuration = event[2];
+            bar.duration = barDuration = event[2];
+            bar.breaks   = bar.duration === 4 ? [2] :
+                bar.duration === 3 ? [1,2] :
+                [] ;
             continue;
         }
 
@@ -720,14 +447,18 @@ function splitByBar(events, barDuration) {
         }
 
         // Event ends after this bar
-        if (event[0] + event[4] > barBeat + barDuration) {
+        if (event[0] + getDuration(event) > barBeat + barDuration) {
+            let beat  = event[0] - barBeat;
+
             if (event[1] === 'note') {
-                bar.push({
-                    beat: event[0] - barBeat,
+                let pitch = typeof event[2] === 'number' ?
+                    toNoteName(event[2]) :
+                    normaliseNoteName(event[2]) ;
+
+                bar.symbols.push({
+                    beat: beat,
                     type: 'head',
-                    pitch: typeof event[2] === 'number' ?
-                        toNoteName(event[2]) :
-                        normaliseNoteName(event[2]),
+                    pitch: pitch,
                     duration: barBeat + barDuration - event[0],
                     tie: 'begin',
                     event: event
@@ -738,9 +469,9 @@ function splitByBar(events, barDuration) {
             }
 
             if (event[1] === 'chord') {
-                bar.push({
-                    type: 'chord',
-                    beat: event[0] - barBeat,
+                bar.symbols.push({
+                    type:  'chord',
+                    beat:  beat,
                     value: event[2],
                     duration: barBeat + barDuration - event[0],
                     event: event
@@ -751,7 +482,7 @@ function splitByBar(events, barDuration) {
         // Event ends inside this bar
         else {
             if (event[1] === 'note') {
-                bar.push({
+                bar.symbols.push({
                     beat: event[0] - barBeat,
                     type: 'head',
                     pitch: typeof event[2] === 'number' ?
@@ -763,7 +494,7 @@ function splitByBar(events, barDuration) {
             }
 
             if (event[1] === 'chord') {
-                bar.push({
+                bar.symbols.push({
                     type: 'chord',
                     beat: event[0] - barBeat,
                     value: event[2],
@@ -848,7 +579,7 @@ const toElement = overload(get('type'), {
         class:   "head",
         viewBox: "0 -1 2.7 2",
         preserveAspectRatio: "xMidYMid slice",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, tie: symbol.tie },
+        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration/*, tie: symbol.tie*/ },
         html: '<use href="#head[' + symbol.duration + ']"></use>'
     }),
 
@@ -876,6 +607,18 @@ const toElement = overload(get('type'), {
             <path class="beam-path" d="M0,${ -0.5 * beamThickness } L${ symbol.stems.length - 1 },${ -symbol.range - 0.5 * beamThickness } L${ symbol.stems.length - 1 },${ -symbol.range + 0.5 * beamThickness } L0,${ 0.5 * beamThickness } Z"></path>
             ${ create16thNoteBeams(symbol.stems, symbol.range) }
         `
+    }),
+
+    // Create note beam
+    tie: (symbol) => create('svg', {
+        // Beam is sloped down
+        class:   `${ symbol.updown }-tie tie`,
+        viewBox: `0 0 1 1`,
+        preserveAspectRatio: "none",
+        data:    { beat: symbol.beat + 1 + (1/ 24), pitch: symbol.pitch, duration: symbol.duration },
+        /*style: 'grid-row-end: span ' + symbol.duration / 24 + ';' */
+        style:   `height: calc(6 * var(--y-size)); align-self: ${ symbol.updown === 'up' ? 'end' : 'start' };`,
+        html:    `<use href="#tie"></use>`
     }),
 
     // Create note tail
@@ -920,10 +663,11 @@ function toElements(nodes, symbol) {
     return nodes;
 }
 
-function toBarElements(elements, symbols) {
+function toBarElements(elements, bar) {
     elements.push(create('div', {
-        class: 'stave 4/4-bar bar',
-        children: symbols.reduce(toElements, [])
+        class: 'stave bar',
+        data: { duration: bar.duration },
+        children: bar.symbols.reduce(toElements, [])
     }));
 
     return elements;
@@ -969,8 +713,11 @@ export default element('scribe-script', {
                 <path id="acci-sharp"   class="acci-path" transform="scale(0.054) translate(-624.5 -191)" d="M655.709,134.8354c0.1445,0.4321,0.2168,1.1523,0.2168,2.3042c0,1.2964-0.1445,2.5923-0.2881,4.0327c0,0.5757-0.1445,1.4399-0.4326,2.52c-0.5039,1.0083-2.3037,2.3042-5.3281,3.7446l-0.2881,6.6963c1.6562-1.2241,3.0967-1.8721,4.1768-1.8721c0.2871,0,0.5752,1.584,0.7197,4.7524c0.0723,1.0078,0.0723,1.728,0.0723,2.3042c0,1.728-0.0723,2.7363-0.3604,3.168c-0.0723,0.2163-1.8721,1.4404-5.3281,3.6724c0,3.3125-0.1445,6.6968-0.3604,10.2969c-0.0723,1.4404-0.1445,2.8804-0.2158,4.2485c-0.2881,2.3042-0.7207,3.4565-1.3682,3.4565c-0.0723,0.0718-0.1445,0.0718-0.1445,0.0718c-0.792,0-1.1514-1.9443-1.1514-5.8325c0-0.936,0-2.376,0.1436-4.3203c0.0723-1.9443,0.1436-3.3843,0.1436-4.3926c0-1.0078-0.0713-1.6558-0.2158-2.0161c-1.0078,0.144-1.7275,0.5039-2.2314,1.0083c-0.0723,1.9438-0.2168,4.8242-0.4326,8.5688c-0.0723,2.0161-0.1436,3.96-0.2158,5.8325c-0.1445,3.3843-0.4326,5.2563-0.6484,5.6162c-0.2158,0.2163-0.4316,0.2881-0.7197,0.2881c-1.0078,0-1.5117-1.5122-1.5117-4.6802c0-2.3047,0.3594-7.1289,0.9355-14.6177c-1.4404,0.5044-2.8799,1.0083-4.3926,1.4404c-0.7197,0-1.0078-1.9443-1.0078-5.9048c0-0.2881,0-0.792,0.0723-1.5122c0-0.7197,0.0713-1.2241,0.0713-1.5117c0.1445-0.4321,1.0088-1.0083,2.4482-1.8003c1.0088-0.4321,1.9443-0.936,2.9531-1.5122c0.2871-1.4399,0.3594-3.3843,0.2871-5.6885l-0.0713-0.8643c-1.2959,0.7202-2.8809,1.3682-4.7529,2.0161c-0.3594-0.1436-0.5039-0.792-0.5039-1.9438c0-0.8643,0.0723-2.3765,0.3604-4.4644c0.2158-2.0884,0.4316-3.4565,0.7197-4.1045c1.0078-0.8643,2.6641-1.9443,5.1123-3.3125c0-1.7998,0.1445-4.5361,0.3604-8.2803c0.2881-4.9688,0.792-7.4888,1.5117-7.4888c0.8643,0,1.2969,2.3042,1.2969,6.7686c0,1.728-0.1445,4.1763-0.4326,7.4165c0.792,0,1.7285-0.3599,2.8086-1.1519c0.2881-0.4321,0.5762-4.8965,0.8643-13.4653c0.2881-7.8486,1.1514-11.8091,2.5918-11.8091c0.5762,1.1523,0.8643,2.5205,0.8643,4.1045c0,4.4644-0.4326,11.0889-1.1523,20.0176C653.0449,135.4839,654.7012,134.8354,655.709,134.8354z M647.501,148.7329c-1.0801,0.5039-2.3047,1.2241-3.8887,2.2319c-0.1436,2.3042-0.2158,4.1045-0.2158,5.4009c0,0.5757,0,1.0078,0,1.2959c1.0801-0.4321,2.3037-1.0801,3.7441-2.0884C647.1406,154.0615,647.2842,151.7573,647.501,148.7329z"/>
 
                 <!-- Stems -->
-                <line id="stemup"   class="stem-path" x1="2.4" y1="0" x2="2.4" y2="7"></line>
-                <line id="stemdown" class="stem-path" x1="0.1" y1="0" x2="0.1" y2="7"></line>
+                <line id="stemup"   class="stem-path" x1="2.4" y1="0" x2="2.4" y2="6.7"></line>
+                <line id="stemdown" class="stem-path" x1="0.1" y1="0.3" x2="0.1" y2="7"></line>
+
+                <!-- Ties -->
+                <path id="tie" class="tie-path" transform="translate(0, 0.14) scale(1 0.6)" d="M0.979174733,0.0124875307 C0.650597814,1.1195554 0.135029714,1.00095361 0.0165376402,0.026468657 C0.0113570514,0.0135475362 0.00253387291,0.00218807553 0,0 C0.0977526897,1.29523004 0.656681642,1.37089992 1,2.43111793e-08 C0.991901367,2.43111797e-08 0.987703936,0.01248753 0.979174733,0.0124875307 Z M0.979174733,0.0124875307"></path>
 
                 <!-- Tails -->
                 <path id="tailup[0.5]"    class="tail-path" transform="translate(-33.14  -42) scale(0.1111)" d="M335.6724,356.0957c-0.5039,0-0.936-0.1445-1.2959-0.5762c-0.4321-0.3594-0.5762-0.792-0.5762-1.2246c0-0.2148,0.0723-0.5039,0.2163-0.791c1.0078-2.3047,1.584-4.8965,1.584-7.7773c0-9.6484-5.8325-18.1455-17.3535-25.418v-16.3457c1.728,1.4404,4.2485,3.6006,7.5605,6.5527c8.6406,8.8574,12.9614,20.5215,12.9614,34.9238c0,1.7275-0.2163,3.6719-0.6484,5.9756C337.4727,354.584,336.6807,356.0957,335.6724,356.0957z"/>
@@ -1038,21 +785,34 @@ export default element('scribe-script', {
     },
 
     connect: function(shadow, internals) {
-        const source  = this.innerHTML;
+        const source  = this.textContent;
         const type    = internals.type;
-        const events  = parseEvents(source);
-        const bars    = splitByBar(events.sort(by(get(0))), bar4.duration)
-            .map(toSymbols) ;
 
-        console.log(bars);
+        let sequence;
 
+        // Data is ABC
+        if (this.type === 'abc' || this.type === 'text/x-abc') {
+            // Strip leading and trailing space and space following line breaks
+            const music = parseABC(source.trim().replace(/\n\s+/g, '\n'));
+            sequence = music.sequences[0];
+        }
+        // Data is JSON
+        else {
+            const events = JSON.parse(source);
+            sequence = Array.isArray(events) ?
+                { id: 0, events } :
+                events ;
+        }
+
+        const bars = splitByBar(sequence.events.sort(by(get(0))), bar4.duration).map(toSymbols);
         const elements = bars.reduce(toBarElements, []);
-
-        //renderBars(bars, internals.state);
 
         // Put bars in the DOM
         shadow.append.apply(shadow, elements);
     }
 }, {
-
+    type: {
+        attribute: function(value) { this.type = value; },
+        writable: true
+    }
 }, './shadow.css');

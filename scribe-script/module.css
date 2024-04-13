@@ -3,3 +3,7 @@ scribe-script::after {
     content: '';
     flex: 6 1;
 }
+
+scribe-script:not(:defined) {
+    display: none !important;
+}

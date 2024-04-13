@@ -95,6 +95,17 @@
     align-self: center;
 }
 
+.stave > .tie,
+.stave > .down-tie {
+    align-self: start;
+    margin-top: calc(1.8 * var(--y-size));
+}
+
+.stave > .up-tie {
+    align-self: end;
+    margin-bottom: calc(1.8 * var(--y-size));
+}
+
 .stave > [data-pitch="127"],
 .stave > [data-pitch^="G"][data-pitch$="9"] { grid-row: G9; }
 .stave > [data-pitch="126"],

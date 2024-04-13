@@ -1,0 +1,12 @@
+.tie {
+    /*background: rgba(220, 180, 20, 0.4);*/
+    min-width: 2em;
+}
+
+.up-tie > use {
+    transform: scale(1, -1) translateY(-1px);
+}
+
+.down-tie {
+
+}

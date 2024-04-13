@@ -70,27 +70,51 @@
 	margin-right: 0;
 }
 
-.bar > .chord[data-duration="0.125"] { grid-column-end: span 3; }
-.bar > .chord[data-duration="0.25"]  { grid-column-end: span 6; }
-.bar > .chord[data-duration="0.375"] { grid-column-end: span 9; }
-.bar > .chord[data-duration="0.5"]   { grid-column-end: span 12; }
-.bar > .chord[data-duration="0.625"] { grid-column-end: span 15; }
-.bar > .chord[data-duration="0.75"]  { grid-column-end: span 18; }
-.bar > .chord[data-duration="0.875"] { grid-column-end: span 21; }
-.bar > .chord[data-duration="1"]     { grid-column-end: span 24; }
-.bar > .chord[data-duration="1.125"] { grid-column-end: span 27; }
-.bar > .chord[data-duration="1.25"]  { grid-column-end: span 30; }
-.bar > .chord[data-duration="1.375"] { grid-column-end: span 33; }
-.bar > .chord[data-duration="1.5"]   { grid-column-end: span 36; }
-.bar > .chord[data-duration="1.625"] { grid-column-end: span 39; }
-.bar > .chord[data-duration="1.75"]  { grid-column-end: span 42; }
-.bar > .chord[data-duration="1.875"] { grid-column-end: span 45; }
-.bar > .chord[data-duration="2"]     { grid-column-end: span 48; }
-.bar > .chord[data-duration="2.5"]   { grid-column-end: span 60; }
-.bar > .chord[data-duration="3"]     { grid-column-end: span 72; }
-.bar > .chord[data-duration="3.5"]   { grid-column-end: span 84; }
-.bar > .chord[data-duration="4"]     { grid-column-end: span 96; }
 
+
+
+
+
+.bar > [data-duration="0.125"] { grid-column-end: span 3; }
+.bar > [data-duration="0.25"]  { grid-column-end: span 6; }
+.bar > [data-duration="0.375"] { grid-column-end: span 9; }
+.bar > [data-duration="0.5"]   { grid-column-end: span 12; }
+.bar > [data-duration="0.625"] { grid-column-end: span 15; }
+.bar > [data-duration="0.75"]  { grid-column-end: span 18; }
+.bar > [data-duration="0.875"] { grid-column-end: span 21; }
+.bar > [data-duration="1"]     { grid-column-end: span 24; }
+.bar > [data-duration="1.125"] { grid-column-end: span 27; }
+.bar > [data-duration="1.25"]  { grid-column-end: span 30; }
+.bar > [data-duration="1.375"] { grid-column-end: span 33; }
+.bar > [data-duration="1.5"]   { grid-column-end: span 36; }
+.bar > [data-duration="1.625"] { grid-column-end: span 39; }
+.bar > [data-duration="1.75"]  { grid-column-end: span 42; }
+.bar > [data-duration="1.875"] { grid-column-end: span 45; }
+.bar > [data-duration="2"]     { grid-column-end: span 48; }
+.bar > [data-duration="2.5"]   { grid-column-end: span 60; }
+.bar > [data-duration="3"]     { grid-column-end: span 72; }
+.bar > [data-duration="3.5"]   { grid-column-end: span 84; }
+.bar > [data-duration="4"]     { grid-column-end: span 96; }
+.bar > [data-duration="6"]     { grid-column-end: span 144; }
+
+.bar > .head,
+.bar > .acci,
+.bar > .stem,
+.bar > .tail {
+	grid-column-end: span 1;
+}
+
+.bar > .tie {
+	justify-self: stretch;
+	/* Make tie span from centre of one head to centre of next. A tie to the
+	   next bar ends in the bar end column. */
+	/* - column gap - half of head width */
+	margin-left: calc(-1 * var(--x-gap));
+	/* - bar start gap - half of head width */
+	margin-right: calc(-2 * var(--y-size));
+
+	min-width: calc(4 * var(--y-size));
+}
 
 /*
 .bar::after {
@@ -259,21 +283,19 @@
 }
 
 .\33 \/4-bar,
-.\36 \/8-bar {
+.\36 \/8-bar,
+.bar[data-duration="3"] {
 	grid-template-columns:
-		[bar-start] calc(12 * var(--x-size))
-		repeat(72, minmax(var(--x-size), auto))
-		/*[data-beat-1] minmax(var(--x-size), auto) [data-beat-1-0416] minmax(var(--x-size), auto) [data-beat-1-0833] minmax(var(--x-size), auto) [data-beat-1-125] minmax(var(--x-size), auto) [data-beat-1-1666] minmax(var(--x-size), auto) [data-beat-1-2083] minmax(var(--x-size), auto) [data-beat-1-25] minmax(var(--x-size), auto) [data-beat-1-2916] minmax(var(--x-size), auto) [data-beat-1-3333] minmax(var(--x-size), auto) [data-beat-1-375] minmax(var(--x-size), auto) [data-beat-1-4166] minmax(var(--x-size), auto) [data-beat-1-4583] minmax(var(--x-size), auto) [data-beat-1-5] minmax(var(--x-size), auto) [data-beat-1-5416] minmax(var(--x-size), auto) [data-beat-1-5833] minmax(var(--x-size), auto) [data-beat-1-625] minmax(var(--x-size), auto) [data-beat-1-6666] minmax(var(--x-size), auto) [data-beat-1-7083] minmax(var(--x-size), auto) [data-beat-1-75] minmax(var(--x-size), auto) [data-beat-1-7916] minmax(var(--x-size), auto) [data-beat-1-8333] minmax(var(--x-size), auto) [data-beat-1-875] minmax(var(--x-size), auto) [data-beat-1-9166] minmax(var(--x-size), auto) [data-beat-1-9583] minmax(var(--x-size), auto)
-		[data-beat-2] minmax(var(--x-size), auto) [data-beat-2-0416] minmax(var(--x-size), auto) [data-beat-2-0833] minmax(var(--x-size), auto) [data-beat-2-125] minmax(var(--x-size), auto) [data-beat-2-1666] minmax(var(--x-size), auto) [data-beat-2-2083] minmax(var(--x-size), auto) [data-beat-2-25] minmax(var(--x-size), auto) [data-beat-2-2916] minmax(var(--x-size), auto) [data-beat-2-3333] minmax(var(--x-size), auto) [data-beat-2-375] minmax(var(--x-size), auto) [data-beat-2-4166] minmax(var(--x-size), auto) [data-beat-2-4583] minmax(var(--x-size), auto) [data-beat-2-5] minmax(var(--x-size), auto) [data-beat-2-5416] minmax(var(--x-size), auto) [data-beat-2-5833] minmax(var(--x-size), auto) [data-beat-2-625] minmax(var(--x-size), auto) [data-beat-2-6666] minmax(var(--x-size), auto) [data-beat-2-7083] minmax(var(--x-size), auto) [data-beat-2-75] minmax(var(--x-size), auto) [data-beat-2-7916] minmax(var(--x-size), auto) [data-beat-2-8333] minmax(var(--x-size), auto) [data-beat-2-875] minmax(var(--x-size), auto) [data-beat-2-9166] minmax(var(--x-size), auto) [data-beat-2-9583] minmax(var(--x-size), auto)
-		[data-beat-3] minmax(var(--x-size), auto) [data-beat-3-0416] minmax(var(--x-size), auto) [data-beat-3-0833] minmax(var(--x-size), auto) [data-beat-3-125] minmax(var(--x-size), auto) [data-beat-3-1666] minmax(var(--x-size), auto) [data-beat-3-2083] minmax(var(--x-size), auto) [data-beat-3-25] minmax(var(--x-size), auto) [data-beat-3-2916] minmax(var(--x-size), auto) [data-beat-3-3333] minmax(var(--x-size), auto) [data-beat-3-375] minmax(var(--x-size), auto) [data-beat-3-4166] minmax(var(--x-size), auto) [data-beat-3-4583] minmax(var(--x-size), auto) [data-beat-3-5] minmax(var(--x-size), auto) [data-beat-3-5416] minmax(var(--x-size), auto) [data-beat-3-5833] minmax(var(--x-size), auto) [data-beat-3-625] minmax(var(--x-size), auto) [data-beat-3-6666] minmax(var(--x-size), auto) [data-beat-3-7083] minmax(var(--x-size), auto) [data-beat-3-75] minmax(var(--x-size), auto) [data-beat-3-7916] minmax(var(--x-size), auto) [data-beat-3-8333] minmax(var(--x-size), auto) [data-beat-3-875] minmax(var(--x-size), auto) [data-beat-3-9166] minmax(var(--x-size), auto) [data-beat-3-9583] minmax(var(--x-size), auto)
-		*/
-		[data-beat-end] minmax(auto, 0.3125em)
+		[bar-begin]
+		calc(2 * var(--y-size))
+		repeat(72, minmax(max-content, auto))
+		calc(2 * var(--y-size))
 		[bar-end];
 }
 
-.\37 \/8-bar {
+.\37 \/8-bar, {
 	grid-template-columns:
-		[bar-start] 0.625em
+		[bar-begin] 0.625em
 		[data-beat-1] minmax(var(--x-size), auto) [data-beat-1-0416] minmax(var(--x-size), auto) [data-beat-1-0833] minmax(var(--x-size), auto) [data-beat-1-125] minmax(var(--x-size), auto) [data-beat-1-1666] minmax(var(--x-size), auto) [data-beat-1-2083] minmax(var(--x-size), auto) [data-beat-1-25] minmax(var(--x-size), auto) [data-beat-1-2916] minmax(var(--x-size), auto) [data-beat-1-3333] minmax(var(--x-size), auto) [data-beat-1-375] minmax(var(--x-size), auto) [data-beat-1-4166] minmax(var(--x-size), auto) [data-beat-1-4583] minmax(var(--x-size), auto) [data-beat-1-5] minmax(var(--x-size), auto) [data-beat-1-5416] minmax(var(--x-size), auto) [data-beat-1-5833] minmax(var(--x-size), auto) [data-beat-1-625] minmax(var(--x-size), auto) [data-beat-1-6666] minmax(var(--x-size), auto) [data-beat-1-7083] minmax(var(--x-size), auto) [data-beat-1-75] minmax(var(--x-size), auto) [data-beat-1-7916] minmax(var(--x-size), auto) [data-beat-1-8333] minmax(var(--x-size), auto) [data-beat-1-875] minmax(var(--x-size), auto) [data-beat-1-9166] minmax(var(--x-size), auto) [data-beat-1-9583] minmax(var(--x-size), auto)
 		[data-beat-2] minmax(var(--x-size), auto) [data-beat-2-0416] minmax(var(--x-size), auto) [data-beat-2-0833] minmax(var(--x-size), auto) [data-beat-2-125] minmax(var(--x-size), auto) [data-beat-2-1666] minmax(var(--x-size), auto) [data-beat-2-2083] minmax(var(--x-size), auto) [data-beat-2-25] minmax(var(--x-size), auto) [data-beat-2-2916] minmax(var(--x-size), auto) [data-beat-2-3333] minmax(var(--x-size), auto) [data-beat-2-375] minmax(var(--x-size), auto) [data-beat-2-4166] minmax(var(--x-size), auto) [data-beat-2-4583] minmax(var(--x-size), auto) [data-beat-2-5] minmax(var(--x-size), auto) [data-beat-2-5416] minmax(var(--x-size), auto) [data-beat-2-5833] minmax(var(--x-size), auto) [data-beat-2-625] minmax(var(--x-size), auto) [data-beat-2-6666] minmax(var(--x-size), auto) [data-beat-2-7083] minmax(var(--x-size), auto) [data-beat-2-75] minmax(var(--x-size), auto) [data-beat-2-7916] minmax(var(--x-size), auto) [data-beat-2-8333] minmax(var(--x-size), auto) [data-beat-2-875] minmax(var(--x-size), auto) [data-beat-2-9166] minmax(var(--x-size), auto) [data-beat-2-9583] minmax(var(--x-size), auto)
 		[data-beat-3] minmax(var(--x-size), auto) [data-beat-3-0416] minmax(var(--x-size), auto) [data-beat-3-0833] minmax(var(--x-size), auto) [data-beat-3-125] minmax(var(--x-size), auto) [data-beat-3-1666] minmax(var(--x-size), auto) [data-beat-3-2083] minmax(var(--x-size), auto) [data-beat-3-25] minmax(var(--x-size), auto) [data-beat-3-2916] minmax(var(--x-size), auto) [data-beat-3-3333] minmax(var(--x-size), auto) [data-beat-3-375] minmax(var(--x-size), auto) [data-beat-3-4166] minmax(var(--x-size), auto) [data-beat-3-4583] minmax(var(--x-size), auto) [data-beat-3-5] minmax(var(--x-size), auto) [data-beat-3-5416] minmax(var(--x-size), auto) [data-beat-3-5833] minmax(var(--x-size), auto) [data-beat-3-625] minmax(var(--x-size), auto) [data-beat-3-6666] minmax(var(--x-size), auto) [data-beat-3-7083] minmax(var(--x-size), auto) [data-beat-3-75] minmax(var(--x-size), auto) [data-beat-3-7916] minmax(var(--x-size), auto) [data-beat-3-8333] minmax(var(--x-size), auto) [data-beat-3-875] minmax(var(--x-size), auto) [data-beat-3-9166] minmax(var(--x-size), auto) [data-beat-3-9583] minmax(var(--x-size), auto)
@@ -283,12 +305,14 @@
 }
 
 .\32 \/2-bar,
-.\34 \/4-bar {
+.\34 \/4-bar,
+.bar[data-duration="4"] {
 	--breaks: 3;
 	grid-template-columns:
-		[bar-start] calc(2 * var(--y-size))
+		[bar-begin]
+		calc(2 * var(--y-size))
 		repeat(96, minmax(max-content, auto))
-		[data-beat-end] calc(2 * var(--y-size))
+		calc(2 * var(--y-size))
 		[bar-end];
 }
 
@@ -299,7 +323,7 @@
 
 .\39 \/8-bar {
 	grid-template-columns:
-		[bar-start] calc(12 * var(--x-size))
+		[bar-begin] calc(12 * var(--x-size))
 		[data-beat-1] minmax(var(--x-size), auto) [data-beat-1-0416] minmax(var(--x-size), auto) [data-beat-1-0833] minmax(var(--x-size), auto) [data-beat-1-125] minmax(var(--x-size), auto) [data-beat-1-1666] minmax(var(--x-size), auto) [data-beat-1-2083] minmax(var(--x-size), auto) [data-beat-1-25] minmax(var(--x-size), auto) [data-beat-1-2916] minmax(var(--x-size), auto) [data-beat-1-3333] minmax(var(--x-size), auto) [data-beat-1-375] minmax(var(--x-size), auto) [data-beat-1-4166] minmax(var(--x-size), auto) [data-beat-1-4583] minmax(var(--x-size), auto) [data-beat-1-5] minmax(var(--x-size), auto) [data-beat-1-5416] minmax(var(--x-size), auto) [data-beat-1-5833] minmax(var(--x-size), auto) [data-beat-1-625] minmax(var(--x-size), auto) [data-beat-1-6666] minmax(var(--x-size), auto) [data-beat-1-7083] minmax(var(--x-size), auto) [data-beat-1-75] minmax(var(--x-size), auto) [data-beat-1-7916] minmax(var(--x-size), auto) [data-beat-1-8333] minmax(var(--x-size), auto) [data-beat-1-875] minmax(var(--x-size), auto) [data-beat-1-9166] minmax(var(--x-size), auto) [data-beat-1-9583] minmax(var(--x-size), auto)
 		[data-beat-2] minmax(var(--x-size), auto) [data-beat-2-0416] minmax(var(--x-size), auto) [data-beat-2-0833] minmax(var(--x-size), auto) [data-beat-2-125] minmax(var(--x-size), auto) [data-beat-2-1666] minmax(var(--x-size), auto) [data-beat-2-2083] minmax(var(--x-size), auto) [data-beat-2-25] minmax(var(--x-size), auto) [data-beat-2-2916] minmax(var(--x-size), auto) [data-beat-2-3333] minmax(var(--x-size), auto) [data-beat-2-375] minmax(var(--x-size), auto) [data-beat-2-4166] minmax(var(--x-size), auto) [data-beat-2-4583] minmax(var(--x-size), auto) [data-beat-2-5] minmax(var(--x-size), auto) [data-beat-2-5416] minmax(var(--x-size), auto) [data-beat-2-5833] minmax(var(--x-size), auto) [data-beat-2-625] minmax(var(--x-size), auto) [data-beat-2-6666] minmax(var(--x-size), auto) [data-beat-2-7083] minmax(var(--x-size), auto) [data-beat-2-75] minmax(var(--x-size), auto) [data-beat-2-7916] minmax(var(--x-size), auto) [data-beat-2-8333] minmax(var(--x-size), auto) [data-beat-2-875] minmax(var(--x-size), auto) [data-beat-2-9166] minmax(var(--x-size), auto) [data-beat-2-9583] minmax(var(--x-size), auto)
 		[data-beat-3] minmax(var(--x-size), auto) [data-beat-3-0416] minmax(var(--x-size), auto) [data-beat-3-0833] minmax(var(--x-size), auto) [data-beat-3-125] minmax(var(--x-size), auto) [data-beat-3-1666] minmax(var(--x-size), auto) [data-beat-3-2083] minmax(var(--x-size), auto) [data-beat-3-25] minmax(var(--x-size), auto) [data-beat-3-2916] minmax(var(--x-size), auto) [data-beat-3-3333] minmax(var(--x-size), auto) [data-beat-3-375] minmax(var(--x-size), auto) [data-beat-3-4166] minmax(var(--x-size), auto) [data-beat-3-4583] minmax(var(--x-size), auto) [data-beat-3-5] minmax(var(--x-size), auto) [data-beat-3-5416] minmax(var(--x-size), auto) [data-beat-3-5833] minmax(var(--x-size), auto) [data-beat-3-625] minmax(var(--x-size), auto) [data-beat-3-6666] minmax(var(--x-size), auto) [data-beat-3-7083] minmax(var(--x-size), auto) [data-beat-3-75] minmax(var(--x-size), auto) [data-beat-3-7916] minmax(var(--x-size), auto) [data-beat-3-8333] minmax(var(--x-size), auto) [data-beat-3-875] minmax(var(--x-size), auto) [data-beat-3-9166] minmax(var(--x-size), auto) [data-beat-3-9583] minmax(var(--x-size), auto)
@@ -311,7 +335,7 @@
 
 .\35 \/4-bar {
 	grid-template-columns:
-		[bar-start] calc(12 * var(--x-size))
+		[bar-begin] calc(12 * var(--x-size))
 		[data-beat-1] minmax(var(--x-size), auto) [data-beat-1-0416] minmax(var(--x-size), auto) [data-beat-1-0833] minmax(var(--x-size), auto) [data-beat-1-125] minmax(var(--x-size), auto) [data-beat-1-1666] minmax(var(--x-size), auto) [data-beat-1-2083] minmax(var(--x-size), auto) [data-beat-1-25] minmax(var(--x-size), auto) [data-beat-1-2916] minmax(var(--x-size), auto) [data-beat-1-3333] minmax(var(--x-size), auto) [data-beat-1-375] minmax(var(--x-size), auto) [data-beat-1-4166] minmax(var(--x-size), auto) [data-beat-1-4583] minmax(var(--x-size), auto) [data-beat-1-5] minmax(var(--x-size), auto) [data-beat-1-5416] minmax(var(--x-size), auto) [data-beat-1-5833] minmax(var(--x-size), auto) [data-beat-1-625] minmax(var(--x-size), auto) [data-beat-1-6666] minmax(var(--x-size), auto) [data-beat-1-7083] minmax(var(--x-size), auto) [data-beat-1-75] minmax(var(--x-size), auto) [data-beat-1-7916] minmax(var(--x-size), auto) [data-beat-1-8333] minmax(var(--x-size), auto) [data-beat-1-875] minmax(var(--x-size), auto) [data-beat-1-9166] minmax(var(--x-size), auto) [data-beat-1-9583] minmax(var(--x-size), auto)
 		[data-beat-2] minmax(var(--x-size), auto) [data-beat-2-0416] minmax(var(--x-size), auto) [data-beat-2-0833] minmax(var(--x-size), auto) [data-beat-2-125] minmax(var(--x-size), auto) [data-beat-2-1666] minmax(var(--x-size), auto) [data-beat-2-2083] minmax(var(--x-size), auto) [data-beat-2-25] minmax(var(--x-size), auto) [data-beat-2-2916] minmax(var(--x-size), auto) [data-beat-2-3333] minmax(var(--x-size), auto) [data-beat-2-375] minmax(var(--x-size), auto) [data-beat-2-4166] minmax(var(--x-size), auto) [data-beat-2-4583] minmax(var(--x-size), auto) [data-beat-2-5] minmax(var(--x-size), auto) [data-beat-2-5416] minmax(var(--x-size), auto) [data-beat-2-5833] minmax(var(--x-size), auto) [data-beat-2-625] minmax(var(--x-size), auto) [data-beat-2-6666] minmax(var(--x-size), auto) [data-beat-2-7083] minmax(var(--x-size), auto) [data-beat-2-75] minmax(var(--x-size), auto) [data-beat-2-7916] minmax(var(--x-size), auto) [data-beat-2-8333] minmax(var(--x-size), auto) [data-beat-2-875] minmax(var(--x-size), auto) [data-beat-2-9166] minmax(var(--x-size), auto) [data-beat-2-9583] minmax(var(--x-size), auto)
 		[data-beat-3] minmax(var(--x-size), auto) [data-beat-3-0416] minmax(var(--x-size), auto) [data-beat-3-0833] minmax(var(--x-size), auto) [data-beat-3-125] minmax(var(--x-size), auto) [data-beat-3-1666] minmax(var(--x-size), auto) [data-beat-3-2083] minmax(var(--x-size), auto) [data-beat-3-25] minmax(var(--x-size), auto) [data-beat-3-2916] minmax(var(--x-size), auto) [data-beat-3-3333] minmax(var(--x-size), auto) [data-beat-3-375] minmax(var(--x-size), auto) [data-beat-3-4166] minmax(var(--x-size), auto) [data-beat-3-4583] minmax(var(--x-size), auto) [data-beat-3-5] minmax(var(--x-size), auto) [data-beat-3-5416] minmax(var(--x-size), auto) [data-beat-3-5833] minmax(var(--x-size), auto) [data-beat-3-625] minmax(var(--x-size), auto) [data-beat-3-6666] minmax(var(--x-size), auto) [data-beat-3-7083] minmax(var(--x-size), auto) [data-beat-3-75] minmax(var(--x-size), auto) [data-beat-3-7916] minmax(var(--x-size), auto) [data-beat-3-8333] minmax(var(--x-size), auto) [data-beat-3-875] minmax(var(--x-size), auto) [data-beat-3-9166] minmax(var(--x-size), auto) [data-beat-3-9583] minmax(var(--x-size), auto)
@@ -324,7 +348,7 @@
 .\36 \/4-bar,
 .\31 2\/8-bar {
 	grid-template-columns:
-		[bar-start] calc(12 * var(--x-size))
+		[bar-begin] calc(12 * var(--x-size))
 		[data-beat-1] minmax(var(--x-size), auto) [data-beat-1-0416] minmax(var(--x-size), auto) [data-beat-1-0833] minmax(var(--x-size), auto) [data-beat-1-125] minmax(var(--x-size), auto) [data-beat-1-1666] minmax(var(--x-size), auto) [data-beat-1-2083] minmax(var(--x-size), auto) [data-beat-1-25] minmax(var(--x-size), auto) [data-beat-1-2916] minmax(var(--x-size), auto) [data-beat-1-3333] minmax(var(--x-size), auto) [data-beat-1-375] minmax(var(--x-size), auto) [data-beat-1-4166] minmax(var(--x-size), auto) [data-beat-1-4583] minmax(var(--x-size), auto) [data-beat-1-5] minmax(var(--x-size), auto) [data-beat-1-5416] minmax(var(--x-size), auto) [data-beat-1-5833] minmax(var(--x-size), auto) [data-beat-1-625] minmax(var(--x-size), auto) [data-beat-1-6666] minmax(var(--x-size), auto) [data-beat-1-7083] minmax(var(--x-size), auto) [data-beat-1-75] minmax(var(--x-size), auto) [data-beat-1-7916] minmax(var(--x-size), auto) [data-beat-1-8333] minmax(var(--x-size), auto) [data-beat-1-875] minmax(var(--x-size), auto) [data-beat-1-9166] minmax(var(--x-size), auto) [data-beat-1-9583] minmax(var(--x-size), auto)
 		[data-beat-2] minmax(var(--x-size), auto) [data-beat-2-0416] minmax(var(--x-size), auto) [data-beat-2-0833] minmax(var(--x-size), auto) [data-beat-2-125] minmax(var(--x-size), auto) [data-beat-2-1666] minmax(var(--x-size), auto) [data-beat-2-2083] minmax(var(--x-size), auto) [data-beat-2-25] minmax(var(--x-size), auto) [data-beat-2-2916] minmax(var(--x-size), auto) [data-beat-2-3333] minmax(var(--x-size), auto) [data-beat-2-375] minmax(var(--x-size), auto) [data-beat-2-4166] minmax(var(--x-size), auto) [data-beat-2-4583] minmax(var(--x-size), auto) [data-beat-2-5] minmax(var(--x-size), auto) [data-beat-2-5416] minmax(var(--x-size), auto) [data-beat-2-5833] minmax(var(--x-size), auto) [data-beat-2-625] minmax(var(--x-size), auto) [data-beat-2-6666] minmax(var(--x-size), auto) [data-beat-2-7083] minmax(var(--x-size), auto) [data-beat-2-75] minmax(var(--x-size), auto) [data-beat-2-7916] minmax(var(--x-size), auto) [data-beat-2-8333] minmax(var(--x-size), auto) [data-beat-2-875] minmax(var(--x-size), auto) [data-beat-2-9166] minmax(var(--x-size), auto) [data-beat-2-9583] minmax(var(--x-size), auto)
 		[data-beat-3] minmax(var(--x-size), auto) [data-beat-3-0416] minmax(var(--x-size), auto) [data-beat-3-0833] minmax(var(--x-size), auto) [data-beat-3-125] minmax(var(--x-size), auto) [data-beat-3-1666] minmax(var(--x-size), auto) [data-beat-3-2083] minmax(var(--x-size), auto) [data-beat-3-25] minmax(var(--x-size), auto) [data-beat-3-2916] minmax(var(--x-size), auto) [data-beat-3-3333] minmax(var(--x-size), auto) [data-beat-3-375] minmax(var(--x-size), auto) [data-beat-3-4166] minmax(var(--x-size), auto) [data-beat-3-4583] minmax(var(--x-size), auto) [data-beat-3-5] minmax(var(--x-size), auto) [data-beat-3-5416] minmax(var(--x-size), auto) [data-beat-3-5833] minmax(var(--x-size), auto) [data-beat-3-625] minmax(var(--x-size), auto) [data-beat-3-6666] minmax(var(--x-size), auto) [data-beat-3-7083] minmax(var(--x-size), auto) [data-beat-3-75] minmax(var(--x-size), auto) [data-beat-3-7916] minmax(var(--x-size), auto) [data-beat-3-8333] minmax(var(--x-size), auto) [data-beat-3-875] minmax(var(--x-size), auto) [data-beat-3-9166] minmax(var(--x-size), auto) [data-beat-3-9583] minmax(var(--x-size), auto)
@@ -337,7 +361,7 @@
 
 .\37 \/4-bar {
 	grid-template-columns:
-		[bar-start] calc(12 * var(--x-size))
+		[bar-begin] calc(12 * var(--x-size))
 		[data-beat-1] minmax(var(--x-size), auto) [data-beat-1-0416] minmax(var(--x-size), auto) [data-beat-1-0833] minmax(var(--x-size), auto) [data-beat-1-125] minmax(var(--x-size), auto) [data-beat-1-1666] minmax(var(--x-size), auto) [data-beat-1-2083] minmax(var(--x-size), auto) [data-beat-1-25] minmax(var(--x-size), auto) [data-beat-1-2916] minmax(var(--x-size), auto) [data-beat-1-3333] minmax(var(--x-size), auto) [data-beat-1-375] minmax(var(--x-size), auto) [data-beat-1-4166] minmax(var(--x-size), auto) [data-beat-1-4583] minmax(var(--x-size), auto) [data-beat-1-5] minmax(var(--x-size), auto) [data-beat-1-5416] minmax(var(--x-size), auto) [data-beat-1-5833] minmax(var(--x-size), auto) [data-beat-1-625] minmax(var(--x-size), auto) [data-beat-1-6666] minmax(var(--x-size), auto) [data-beat-1-7083] minmax(var(--x-size), auto) [data-beat-1-75] minmax(var(--x-size), auto) [data-beat-1-7916] minmax(var(--x-size), auto) [data-beat-1-8333] minmax(var(--x-size), auto) [data-beat-1-875] minmax(var(--x-size), auto) [data-beat-1-9166] minmax(var(--x-size), auto) [data-beat-1-9583] minmax(var(--x-size), auto)
 		[data-beat-2] minmax(var(--x-size), auto) [data-beat-2-0416] minmax(var(--x-size), auto) [data-beat-2-0833] minmax(var(--x-size), auto) [data-beat-2-125] minmax(var(--x-size), auto) [data-beat-2-1666] minmax(var(--x-size), auto) [data-beat-2-2083] minmax(var(--x-size), auto) [data-beat-2-25] minmax(var(--x-size), auto) [data-beat-2-2916] minmax(var(--x-size), auto) [data-beat-2-3333] minmax(var(--x-size), auto) [data-beat-2-375] minmax(var(--x-size), auto) [data-beat-2-4166] minmax(var(--x-size), auto) [data-beat-2-4583] minmax(var(--x-size), auto) [data-beat-2-5] minmax(var(--x-size), auto) [data-beat-2-5416] minmax(var(--x-size), auto) [data-beat-2-5833] minmax(var(--x-size), auto) [data-beat-2-625] minmax(var(--x-size), auto) [data-beat-2-6666] minmax(var(--x-size), auto) [data-beat-2-7083] minmax(var(--x-size), auto) [data-beat-2-75] minmax(var(--x-size), auto) [data-beat-2-7916] minmax(var(--x-size), auto) [data-beat-2-8333] minmax(var(--x-size), auto) [data-beat-2-875] minmax(var(--x-size), auto) [data-beat-2-9166] minmax(var(--x-size), auto) [data-beat-2-9583] minmax(var(--x-size), auto)
 		[data-beat-3] minmax(var(--x-size), auto) [data-beat-3-0416] minmax(var(--x-size), auto) [data-beat-3-0833] minmax(var(--x-size), auto) [data-beat-3-125] minmax(var(--x-size), auto) [data-beat-3-1666] minmax(var(--x-size), auto) [data-beat-3-2083] minmax(var(--x-size), auto) [data-beat-3-25] minmax(var(--x-size), auto) [data-beat-3-2916] minmax(var(--x-size), auto) [data-beat-3-3333] minmax(var(--x-size), auto) [data-beat-3-375] minmax(var(--x-size), auto) [data-beat-3-4166] minmax(var(--x-size), auto) [data-beat-3-4583] minmax(var(--x-size), auto) [data-beat-3-5] minmax(var(--x-size), auto) [data-beat-3-5416] minmax(var(--x-size), auto) [data-beat-3-5833] minmax(var(--x-size), auto) [data-beat-3-625] minmax(var(--x-size), auto) [data-beat-3-6666] minmax(var(--x-size), auto) [data-beat-3-7083] minmax(var(--x-size), auto) [data-beat-3-75] minmax(var(--x-size), auto) [data-beat-3-7916] minmax(var(--x-size), auto) [data-beat-3-8333] minmax(var(--x-size), auto) [data-beat-3-875] minmax(var(--x-size), auto) [data-beat-3-9166] minmax(var(--x-size), auto) [data-beat-3-9583] minmax(var(--x-size), auto)
