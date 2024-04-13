@@ -26,6 +26,8 @@ function findLastOfType(type, events) {
 }
 
 function getAbsoluteFromDiatonicPitch(root, degree) {
+    // Not entirely sure how ABC decides where the 'root' of the melody is.
+    // We just add 60, but its arbitrary.
     return [0,
         0,  2,  4,  5,  7,  9,  11,
         12, 14, 16, 17, 19, 21, 23,
