@@ -104,7 +104,7 @@ export default function parseABC(abc) {
                         sequence.cursor += voice.duration * 4;
                     }
                     else {
-console.log('Voice ignored:', voice);
+console.log('ABC voice ignored:', voice);
                     }
 
                     return events;
