@@ -7,22 +7,15 @@ export const bass = {
 };
 
 export const piano = {
-    upper: {
-        centerRow: 'stave-upper'
-    },
-
-    lower: {
-        // Anything below C4
-        pitches: /[0123]$/,
-        centerRow: 'stave-lower'
-    },
-
-    getSplit: function(symbol) {
-        if (this.lower.pitches.test(symbol.pitch)) {
-            return this.lower;
-        }
-
-        return this.upper;
+    getPart: function(symbol) {
+        // A part is an object of properties assigned to a symbol.
+        // Render anything below C4 on the lower part.
+        return /[0123]$/.test(symbol.pitch) ? {
+            part:      'lower',
+            centerRow: 'stave-lower'
+        } : {
+            centerRow: 'stave-upper'
+        } ;
     }
 };
 
@@ -73,32 +66,42 @@ export const drums = {
         /*"B♭5":  "", /* Shaker */
     },
 
-    hands: {
-        name: 'hands',
-        pitches: "",
-        stemDirection: 'up',
-        row: 'stave-upper'
+    /** getHead(pitch, duration)
+    A stave may override symbols used as note heads. Returns an id of a symbol.
+    **/
+
+    getHead: function(pitch, duration) {
+        return this.heads[pitch];
     },
 
-    feet: {
-        name: 'feet',
-        // kick and hihatpedal
-        pitches: "B1 C1 A♭2 G♯2",
-        stemDirection: 'down',
-        row: 'stave-lower'
+    /** getPart(pitch)
+    Returns an object of properties assigned to symbols that belong to a part.
+    **/
+
+    getPart: function(pitch) {
+        // A part is an object of properties assigned to a symbol.
+        // Render kick and hihatpedal as part 'feet'.
+        return ("B1 C1 A♭2 G♯2").includes(pitch) ? {
+            part:          'feet',
+            stemDirection: 'down',
+            tieDirection:  'down',
+            centerRow:     'stave-lower'
+        } : {
+            // part: Leave part undefined to group with main render
+            stemDirection: 'up',
+            tieDirection:  'up',
+            centerRow:     'stave-upper'
+        } ;
     },
 
-    getSplit: function(pitch) {
-        return this.feet.pitches.includes(pitch) ?
-            this.feet :
-            this.hands ;
-    },
+    /** getRowDiff(p1, p2)
+    Given two pitches `p1` and `p2`, returns the difference in rows between
+    `p2 - p1`.
+    **/
 
-    getHead: function(pitch) {
-        console.log(pitch);
-        return this.heads[pitch] ?
-            this.heads[pitch] :
-            undefined ;
+    getRowDiff: function(p1, p2) {
+        // TODO: Not sure why this works. Be more robust.
+        return 0.1;
     }
 };
 

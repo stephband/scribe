@@ -66,7 +66,7 @@ export default overload(get('type'), {
             symbol.value === -1 ? "0 -4 2 4" :
             "0 -4 1.8 4" ,
         preserveAspectRatio: "xMidYMid slice",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch },
+        data: { beat: symbol.beat + 1, pitch: symbol.pitch, part: symbol.part || '' },
         html: '<use href="#acci-'
             + (symbol.value === 1 ? 'sharp' : symbol.value === -1 ? 'flat' : 'natural')
             + '"></use>'
@@ -77,7 +77,7 @@ export default overload(get('type'), {
         class:   "up-ledge ledge",
         viewBox: `0 ${ 0.5 - symbol.rows } 4.4 ${ symbol.rows }`,
         preserveAspectRatio: "xMidYMax",
-        data:    { beat: symbol.beat + 1, pitch: symbol.pitch },
+        data:    { beat: symbol.beat + 1, pitch: symbol.pitch, part: symbol.part || '' },
         style:   `height: calc(${ symbol.rows } * var(--y-size));`,
         html:    '<use x="0" y="-8" href="#ledges"></use>'
     }),
@@ -86,7 +86,7 @@ export default overload(get('type'), {
         class:   "down-ledge ledge",
         viewBox: `0 -0.5 4.4 ${ symbol.rows }`,
         preserveAspectRatio: "xMidYMin",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch },
+        data: { beat: symbol.beat + 1, pitch: symbol.pitch, part: symbol.part || '' },
         style:   `height: calc(${ symbol.rows } * var(--y-size));`,
         html: '<use x="0" y="-8" href="#ledges"></use>'
     }),
@@ -96,19 +96,19 @@ export default overload(get('type'), {
         class:   "head",
         viewBox: "0 -1 2.7 2",
         preserveAspectRatio: "xMidYMid slice",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration/*, tie: symbol.tie*/ },
+        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part || '' },
         html: `<use href="#${ symbol.head || `head[${ symbol.duration }]` }"></use>`
     }),
 
     // Create note stem
     stem: (symbol) => create('svg', {
-        class:   `${ symbol.value }-stem stem`,
+        class:   `${ symbol.stemDirection }-stem stem`,
         viewBox: "0 0 2.7 7",
         // Stretch stems by height
         preserveAspectRatio: "none",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration },
+        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part || '' },
         style: `--beam-y: ${ symbol.beamY === undefined ? 0 : symbol.beamY };`,
-        html: '<use href="#stem' + symbol.value + '"></use>'
+        html: '<use href="#stem' + symbol.stemDirection + '"></use>'
     }),
 
     // Create note beam
@@ -117,7 +117,7 @@ export default overload(get('type'), {
         class:   `${ symbol.updown }-beam beam`,
         viewBox: `0 ${ (symbol.range > 0 ? -symbol.range : 0) - 0.5 } ${ symbol.stems.length -1 } ${ abs(symbol.range) + 1 }`,
         preserveAspectRatio: "none",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration },
+        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part || '' },
         /*style: 'grid-row-end: span ' + Math.ceil(1 - symbol.range),*/
         style: `height: calc(${ abs(symbol.range) + 1 } * var(--y-size)); align-self: ${ symbol.range > 0 ? 'end' : 'start' };`,
         html: `
@@ -132,7 +132,7 @@ export default overload(get('type'), {
         class:   `${ symbol.updown }-tie tie`,
         viewBox: `0 0 1 1`,
         preserveAspectRatio: "none",
-        data:    { beat: symbol.beat + 1 + (1/ 24), pitch: symbol.pitch, duration: symbol.duration },
+        data:    { beat: symbol.beat + 1 + (1/ 24), pitch: symbol.pitch, duration: symbol.duration, part: symbol.part || '' },
         /*style: 'grid-row-end: span ' + symbol.duration / 24 + ';' */
         style:   `height: calc(6 * var(--y-size)); align-self: ${ symbol.updown === 'up' ? 'end' : 'start' };`,
         html:    `<use href="#tie"></use>`
@@ -140,16 +140,16 @@ export default overload(get('type'), {
 
     // Create note tail
     tail: (symbol) => create('svg', {
-        class:   "tail",
+        class: "tail",
         viewBox: "0 -1 2.7 2",
         preserveAspectRatio: "xMidYMid",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration },
-        html: '<use href="#tail' + symbol.value + '[' + symbol.duration + ']"></use>'
+        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part || '' },
+        html: '<use href="#tail' + symbol.stemDirection + '[' + symbol.duration + ']"></use>'
     }),
 
     // Create rest
     rest: (symbol) => create('svg', {
-        class:   "rest",
+        class: "rest",
         viewBox:
             symbol.duration === 0.125 ? "0 -4 3.0 8" :
             symbol.duration === 0.25  ? "0 -4 2.8 8" :
@@ -164,7 +164,7 @@ export default overload(get('type'), {
             symbol.duration === 6     ? "0 -4 2.6 8" :
             "0 -4 2.6 8" ,
         preserveAspectRatio: "xMidYMid slice",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration },
+        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part || '' },
         html: '<use href="#rest[' + symbol.duration + ']"></use>'
     }),
 

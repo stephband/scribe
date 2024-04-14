@@ -44,6 +44,16 @@ https://web.mit.edu/merolish/Public/drums.pdf
     display: none !important;
 }
 
+.drums-stave > .rest,
+:host([clef="drums"]) > .stave > .rest {
+    grid-row: stave-upper;
+}
+
+.drums-stave > .rest[data-part="feet"],
+:host([clef="drums"]) > .stave > .rest[data-part="feet"] {
+    grid-row: stave-lower;
+}
+
 :host([clef="drums"]) > .stave > [data-pitch="B1"] ,  .drums-stave > [data-pitch="B1"]  { grid-row: kick; }     /* Acoustic Bass Drum */
 :host([clef="drums"]) > .stave > [data-pitch="C2"] ,  .drums-stave > [data-pitch="C2"]  { grid-row: kick; }     /* Bass Drum 1 */
 :host([clef="drums"]) > .stave > [data-pitch="C♯2"],  .drums-stave > [data-pitch="C♯2"] { grid-row: snare; }    /* Side Stick */

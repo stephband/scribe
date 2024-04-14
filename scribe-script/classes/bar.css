@@ -6,7 +6,7 @@
 .bar {
 	--x-size: 0.025em;
 	--x-gap:  0.026666667em;
-	--stem-thickness: 0.064em;
+	--stem-thickness: 0.0625em;
 
 	display: grid;
 	align-content: stretch;

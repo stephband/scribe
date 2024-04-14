@@ -26,7 +26,7 @@ const defaults = {
 
 
 function getStemDirection(note, head) {
-    return head.part && head.part.stemDirection || (
+    return head && head.stemDirection || (
         toNoteNumber(note) < toNoteNumber(head.pitch) ?
             'down' :
             'up' );
@@ -52,10 +52,10 @@ function insertTail(symbols, stemNote, i) {
     // TODO put tail before accidentals for CSS reasons
     symbols.splice(i, 0, assign({}, head, {
         type: 'stem',
-        value: stemDirection
+        stemDirection
     }), assign({}, head, {
         type: 'tail',
-        value: stemDirection
+        stemDirection
     }));
 
     // We just spliced two symbols in before index n
@@ -100,7 +100,12 @@ function addStaveRows(n, row) {
     return row;
 }
 
-function subtractStaveRows(r1, r2) {
+function subtractStaveRows(stave, r1, r2) {
+    if (stave.getRowDiff) {
+        return stave.getRowDiff(r1, r2);
+    }
+
+    // Calculate diff for diatonic stave
     const degree1 = r1[0];
     // TODO Support -ve octave (and double figure octave?) numbers
     const octave1 = parseInt(r1[r1.length - 1], 10);
@@ -114,7 +119,9 @@ function subtractStaveRows(r1, r2) {
     return n + (octave2 - octave1) * 7;
 }
 
-function insertBeam(symbols, beam, stemNote, n) {
+function insertBeam(symbols, stave, beam, stemNote, n) {
+    const part = symbols[0].part;
+
     // Not enough stems for a beam, give it a tail
     if (beam.length === 1) {
         if (beam[0] >= n) {
@@ -125,10 +132,10 @@ function insertBeam(symbols, beam, stemNote, n) {
     }
 
     // Render stems and beam
-    const stemDirection = beam[0].part && beam[0].part.stemDirection ?
-            beam[0].part.stemDirection :
+    const stemDirection = symbols[beam[0]] && symbols[beam[0]].stemDirection ?
+            symbols[beam[0]].stemDirection :
         (beam
-        .map((i) => subtractStaveRows(stemNote, symbols[i].pitch))
+        .map((i) => subtractStaveRows(stave, stemNote, symbols[i].pitch))
         .reduce((t, u) => t + u, 0) / beam.length) < 0 ?
             'up' :
             'down' ;
@@ -145,7 +152,7 @@ function insertBeam(symbols, beam, stemNote, n) {
     while (beam[++b] !== undefined) {
         i    = beam[b];
         head = symbols[i];
-        line = subtractStaveRows(stemNote, head.pitch);
+        line = subtractStaveRows(stave, stemNote, head.pitch);
 
         head.stemDirection = stemDirection;
         head.tieDirection  = stemDirection === 'up' ? 'down' : 'up' ;
@@ -161,17 +168,15 @@ function insertBeam(symbols, beam, stemNote, n) {
         if (stem && stem.beat === head.beat) {
             //let stemLine = subtractStaveRows('B4', head.pitch)
             //let range =
-            stem.range = subtractStaveRows(stem.pitch, head.pitch);
+            stem.range = subtractStaveRows(stave, stem.pitch, head.pitch);
             stem.pitch = stem.range < 0 ?
-                stem.value === 'up' ? stem.pitch : head.pitch :
-                stem.value === 'up' ? head.pitch : stem.pitch ;
+                stem.stemDirection === 'up' ? stem.pitch : head.pitch :
+                stem.stemDirection === 'up' ? head.pitch : stem.pitch ;
         }
         else {
             stem = assign({}, head, {
-                type: 'stem',
-                value: stemDirection
+                type: 'stem'
             });
-
             stems.push(stem);
         }
 
@@ -188,7 +193,7 @@ function insertBeam(symbols, beam, stemNote, n) {
     // Calculate where to put beam exactly
     let begin    = stems[0];
     let end      = stems[stems.length - 1];
-    let endRange = subtractStaveRows(begin.pitch, end.pitch);
+    let endRange = subtractStaveRows(stave, begin.pitch, end.pitch);
     let avgRange = avgEndLine - avgBeginLine;
     let range    = abs(avgRange) > abs(0.75 * endRange) ?
         0.75 * endRange :
@@ -196,8 +201,8 @@ function insertBeam(symbols, beam, stemNote, n) {
 
     stems.forEach((stem, i) => {
         stem.beamY = stemDirection === 'down' ?
-            -range * i / (stems.length - 1) + subtractStaveRows(begin.pitch, stem.pitch) :
-            range * i / (stems.length - 1) - subtractStaveRows(begin.pitch, stem.pitch) ;
+            -range * i / (stems.length - 1) + subtractStaveRows(stave, begin.pitch, stem.pitch) :
+            range * i / (stems.length - 1) - subtractStaveRows(stave, begin.pitch, stem.pitch) ;
     });
 
     symbols.splice(i, 0, ...stems);
@@ -208,7 +213,7 @@ function insertBeam(symbols, beam, stemNote, n) {
         // Push beam start into next grid column
         beat:   begin.beat + (1 / 24),
         duration: end.beat - begin.beat,
-        pitch:  begin.pitch,
+        //pitch:  begin.pitch,
         range:  range,
         updown: stemDirection,
         stems:  stems
@@ -220,8 +225,9 @@ function insertBeam(symbols, beam, stemNote, n) {
     return stems.length + ties.length + 1;
 }
 
-function insertSymbols(bar, stemNote) {
-    const symbols = bar.symbols;
+function insertSymbols(symbols, bar, stemNote) {
+    // All events in symbols have the same part
+    const part  = symbols[0].part;
     const accidentals = {};
     let beat = 0;
     let n = -1;
@@ -247,6 +253,7 @@ function insertSymbols(bar, stemNote) {
                 beat,
                 type:     'rest',
                 pitch:    '',
+                part:     part,
                 duration: head.beat - beat
             });
         }
@@ -282,7 +289,7 @@ function insertSymbols(bar, stemNote) {
 
 
         // Up ledger lines
-        let ledgerrows = subtractStaveRows('G5', head.pitch);
+        let ledgerrows = subtractStaveRows(bar.stave, 'G5', head.pitch);
 
         if (ledgerrows > 0) {
             symbols.splice(n++, 0, assign({}, head, {
@@ -293,7 +300,7 @@ function insertSymbols(bar, stemNote) {
 
         // Down ledger lines
         else {
-            ledgerrows = subtractStaveRows(head.pitch, 'D4');
+            ledgerrows = subtractStaveRows(bar.stave, head.pitch, 'D4');
             if (ledgerrows > 0) {
                 symbols.splice(n++, 0, assign({}, head, {
                     type: 'downledger',
@@ -313,7 +320,7 @@ function insertSymbols(bar, stemNote) {
                 || isAfterBreak(bar.breaks, symbols[beam[beam.length - 1]].beat, head.beat)
             ) {
                 // Close the current beam
-                n += insertBeam(symbols, beam, stemNote, n);
+                n += insertBeam(symbols, bar.stave, beam, stemNote, n);
                 beam = undefined;
             }
         }
@@ -340,7 +347,7 @@ function insertSymbols(bar, stemNote) {
                 let stemDirection = getStemDirection(stemNote, head);
                 symbols.splice(n++, 0, assign({}, head, {
                     type: 'stem',
-                    value: stemDirection
+                    stemDirection
                 }));
 
                 if (head.tie === 'begin') {
@@ -370,7 +377,7 @@ function insertSymbols(bar, stemNote) {
 
     // Close the current beam
     if (beam && beam.length) {
-        n += insertBeam(symbols, beam, stemNote, n);
+        n += insertBeam(symbols, bar.stave, beam, stemNote, n);
         beam = undefined;
     }
 
@@ -378,13 +385,14 @@ function insertSymbols(bar, stemNote) {
     if (beat < bar.duration) {
         symbols.push({
             beat,
-            type: 'rest',
-            pitch: '',
-            duration: bar.duration - beat
+            type:     'rest',
+            pitch:    '',
+            duration: bar.duration - beat,
+            part:     part
         });
     }
 
-    return bar;
+    return symbols;
 }
 
 function toSymbols(bar) {
@@ -392,11 +400,36 @@ function toSymbols(bar) {
         clef: { name: 'treble', stemDirectionNote: 'B4' }
     };
 
-    return insertSymbols(bar, state.clef.stemDirectionNote);
+    // Split symbols by part
+    const parts = Object.values(
+        bar.symbols.reduce((parts, symbol) => {
+            if (!parts[symbol.part]) parts[symbol.part] = [];
+            parts[symbol.part].push(symbol);
+            return parts;
+        }, {})
+    );
+
+    // Fill each parts with accidentals, rests, beams, ties
+    parts.forEach((part) => insertSymbols(part, bar, state.clef.stemDirectionNote));
+
+    // Empty out bar.symbols and push in symbols from parts
+    bar.symbols.length = 0;
+    parts.reduce((symbols, part) => {
+        symbols.push.apply(symbols, part);
+        return symbols;
+    }, bar.symbols);
+
+    return bar;
 }
 
 function createBarFromBuffer(barBeat, barDuration, buffer, stave) {
-    const bar = { beat: barBeat, duration: barDuration, breaks: [2], symbols: [] };
+    const bar = {
+        beat: barBeat,
+        duration: barDuration,
+        breaks: [2],
+        symbols: [],
+        stave: stave
+    };
 
     let m = -1;
     let tied, pitch;
@@ -408,30 +441,29 @@ function createBarFromBuffer(barBeat, barDuration, buffer, stave) {
 
         // Event ends after this bar
         if (barBeat + barDuration < tied[0] + tied[4]) {
-            bar.symbols.push({
-                beat: 0,
+            bar.symbols.push(assign({
                 type: 'head',
+                beat: 0,
                 pitch,
-                tie: 'middle',
                 duration: barDuration,
-                head: stave.getHead ?  stave.getHead(pitch)  : undefined ,
-                part: stave.getSplit ? stave.getSplit(pitch) : undefined ,
+                head: stave.getHead && stave.getHead(pitch, barDuration),
+                tie: 'middle',
                 event: tied
-            });
+            }, stave.getPart && stave.getPart(pitch)));
         }
 
         // Event ends in this bar
         else {
-            bar.symbols.push({
-                beat: 0,
+            let duration = tied[0] + tied[4] - barBeat;
+            bar.symbols.push(assign({
                 type: 'head',
+                beat: 0,
                 pitch,
+                duration,
+                head: stave.getHead && stave.getHead(pitch, duration),
                 tie: 'end',
-                duration: tied[0] + tied[4] - barBeat,
-                head: stave.getHead ?  stave.getHead(pitch)  : undefined ,
-                part: stave.getSplit ? stave.getSplit(pitch) : undefined ,
                 event: tied
-            });
+            }, stave.getPart && stave.getPart(pitch)));
 
             // Remove event from buffer, as it has ended
             buffer.splice(m, 1);
@@ -454,7 +486,7 @@ function splitByBar(events, barDuration, stave) {
 
 
     let barBeat = 0;
-    let bar = { beat: barBeat, duration: 4, breaks: [2], symbols: [] };
+    let bar = createBarFromBuffer(barBeat, barDuration, buffer, stave);
     bars.push(bar);
 
     let n = -1;
@@ -493,16 +525,17 @@ function splitByBar(events, barDuration, stave) {
                     toNoteName(event[2]) :
                     normaliseNoteName(event[2]) ;
 
-                bar.symbols.push({
-                    beat: beat,
+                let duration = barBeat + barDuration - event[0];
+
+                bar.symbols.push(assign({
                     type: 'head',
+                    beat: beat,
                     pitch,
-                    duration: barBeat + barDuration - event[0],
-                    head: stave.getHead ?  stave.getHead(pitch)  : undefined ,
-                    part: stave.getSplit ? stave.getSplit(pitch) : undefined ,
+                    duration,
+                    head: stave.getHead && stave.getHead(pitch, duration),
                     tie: 'begin',
                     event: event
-                });
+                }, stave.getPart && stave.getPart(pitch)));
 
                 // Stick it in the ties buffer
                 buffer.push(event);
@@ -526,15 +559,14 @@ function splitByBar(events, barDuration, stave) {
                     toNoteName(event[2]) :
                     normaliseNoteName(event[2]) ;
 
-                bar.symbols.push({
-                    beat: event[0] - barBeat,
+                bar.symbols.push(assign({
                     type: 'head',
+                    beat: event[0] - barBeat,
                     pitch,
                     duration: event[4],
-                    head: stave.getHead ?  stave.getHead(pitch)  : undefined ,
-                    part: stave.getSplit ? stave.getSplit(pitch) : undefined ,
+                    head: stave.getHead && stave.getHead(pitch, event[4]),
                     event: event
-                });
+                }, stave.getPart && stave.getPart(pitch)));
             }
 
             if (event[1] === 'chord') {
@@ -566,6 +598,6 @@ export default function createSymbols(events, clef) {
     const stave = clef ?
         staves[clef] :
         staves.treble ;
-console.log('STAVE', clef, stave);
+
     return splitByBar(events, defaultMeter.duration, stave).map(toSymbols);
 }
