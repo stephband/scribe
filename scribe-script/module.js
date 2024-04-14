@@ -6,6 +6,7 @@ import parseSequenceText from '../modules/parse-sequence-text.js';
 import createSymbols     from '../modules/create-symbols.js';
 import createElement     from './modules/create-element.js';
 
+
 const assign = Object.assign;
 
 const defaults = {
@@ -14,7 +15,6 @@ const defaults = {
     timesig: '4/4',
     stave:   'treble'
 };
-
 
 
 function toElements(nodes, symbol) {

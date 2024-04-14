@@ -1,0 +1,31 @@
+.bass-stave,
+:host([clef="bass"]) > .stave {
+    grid-template-rows:
+        [C5] var(--y-size)
+        [B4] var(--y-size)
+        [A4 chords] var(--y-size)
+        [G4] var(--y-size)
+        [F4] var(--y-size)
+        [E4] var(--y-size)
+        [D4] var(--y-size)
+        [C4] var(--y-size)
+        [B3] var(--y-size)
+        [A3 stave-top] var(--y-size)
+        [G3] var(--y-size)
+        [F3] var(--y-size)
+        [E3] var(--y-size)
+        [D3 stave-center] var(--y-size)
+        [C2] var(--y-size)
+        [B2] var(--y-size)
+        [A2] var(--y-size)
+        [G2] var(--y-size)
+        [F2 stave-bottom] var(--y-size)
+        [E2] var(--y-size)
+        [D2] var(--y-size)
+        [C1] var(--y-size)
+        [B1] var(--y-size)
+        [A1] var(--y-size)
+        [G1] var(--y-size)
+        [F1] var(--y-size)
+        [E1] var(--y-size);
+}

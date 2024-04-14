@@ -1,0 +1,31 @@
+.treble-stave,
+:host([clef="treble"]) > .stave {
+    grid-template-rows:
+        [A6] var(--y-size)
+        [G6] var(--y-size)
+        [F6 chords] var(--y-size)
+        [E6] var(--y-size)
+        [D6] var(--y-size)
+        [C6] var(--y-size)
+        [B5] var(--y-size)
+        [A5] var(--y-size)
+        [G5] var(--y-size)
+        [F5 stave-top] var(--y-size)
+        [E5] var(--y-size)
+        [D5] var(--y-size)
+        [C5] var(--y-size)
+        [B4 stave-center] var(--y-size)
+        [A4] var(--y-size)
+        [G4] var(--y-size)
+        [F4] var(--y-size)
+        [E4] var(--y-size)
+        [D4 stave-bottom] var(--y-size)
+        [C4] var(--y-size)
+        [B3] var(--y-size)
+        [A3] var(--y-size)
+        [G3] var(--y-size)
+        [F3] var(--y-size)
+        [E3] var(--y-size)
+        [D3] var(--y-size)
+        [C3] var(--y-size);
+}
