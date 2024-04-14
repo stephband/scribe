@@ -1,0 +1,3 @@
+[submodule "fonts/petaluma"]
+	path = fonts/petaluma
+	url = https://github.com/steinbergmedia/petaluma

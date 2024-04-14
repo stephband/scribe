@@ -238,9 +238,8 @@ function insertSymbols(symbols, bar, stemNote) {
     while (head = symbols[++n]) {
         endBeat = head.beat + head.duration;
 
-        // Chord symbol
-
-        if (head.type === 'chord' || head.type === 'lyric') {
+        // We are only interested in notes
+        if (head.type !== 'head') {
             continue;
         }
 
@@ -496,10 +495,19 @@ function splitByBar(events, barDuration, stave) {
             if (event[0] !== barBeat) {
                 new TypeError('A "meter" event may only occur at the start of a bar')
             }
+
             bar.duration = barDuration = event[2];
             bar.breaks   = bar.duration === 4 ? [2] :
                 bar.duration === 3 ? [1,2] :
                 [] ;
+            bar.symbols.push({
+                type:        'timesig',
+                beat:        0,
+                numerator:   event[2] / event[3],
+                denominator: 4 / event[3],
+                event:       event
+            });
+
             continue;
         }
 

@@ -59,6 +59,12 @@ export default overload(get('type'), {
         html: symbol.value.replace('(♯11)', '<sup class="chord-brackets">(♯11)</sup>')
     }),
 
+    timesig: (symbol) => create('header', {
+        class: "timesig",
+        html: `<p>${ symbol.numerator }</p>
+            <p>${ symbol.denominator }</p>`
+    }),
+
     lyric: (symbol) => create('p', {
         class:   "lyric",
         data: { beat: symbol.beat + 1, duration: symbol.duration },

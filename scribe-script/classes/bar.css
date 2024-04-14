@@ -14,6 +14,9 @@
 	justify-content: stretch;
 	justify-items: stretch;
 	column-gap: var(--x-gap);
+
+	padding-left:  calc(2 * var(--y-size));
+	padding-right: calc(2 * var(--y-size));
 }
 
 .safari .bar,
@@ -26,63 +29,63 @@
 .bar[data-duration="1"] {
 	grid-template-columns:
 		[bar-begin]
-		calc(2 * var(--y-size))
+		max-content
 		repeat(24, minmax(max-content, auto))
-		calc(2 * var(--y-size))
+		max-content
 		[bar-end];
 }
 
 .bar[data-duration="1.5"] {
 	grid-template-columns:
 		[bar-begin]
-		calc(2 * var(--y-size))
+		max-content
 		repeat(36, minmax(max-content, auto))
-		calc(2 * var(--y-size))
+		max-content
 		[bar-end];
 }
 
 .bar[data-duration="2"] {
 	grid-template-columns:
 		[bar-begin]
-		calc(2 * var(--y-size))
+		max-content
 		repeat(48, minmax(max-content, auto))
-		calc(2 * var(--y-size))
+		max-content
 		[bar-end];
 }
 
 .bar[data-duration="2.5"] {
 	grid-template-columns:
 		[bar-begin]
-		calc(2 * var(--y-size))
+		max-content
 		repeat(60, minmax(max-content, auto))
-		calc(2 * var(--y-size))
+		max-content
 		[bar-end];
 }
 
 .bar[data-duration="3"] {
 	grid-template-columns:
 		[bar-begin]
-		calc(2 * var(--y-size))
+		max-content
 		repeat(72, minmax(max-content, auto))
-		calc(2 * var(--y-size))
+		max-content
 		[bar-end];
 }
 
 .bar[data-duration="3.5"] {
 	grid-template-columns:
 		[bar-begin]
-		calc(2 * var(--y-size))
+		max-content
 		repeat(84, minmax(max-content, auto))
-		calc(2 * var(--y-size))
+		max-content
 		[bar-end];
 }
 
 .bar[data-duration="4"] {
 	grid-template-columns:
 		[bar-begin]
-		calc(2 * var(--y-size))
+		max-content
 		repeat(96, minmax(max-content, auto))
-		calc(2 * var(--y-size))
+		max-content
 		[bar-end];
 }
 
@@ -90,63 +93,63 @@
 	--breaks: 3;
 	grid-template-columns:
 		[bar-begin]
-		calc(2 * var(--y-size))
+		max-content
 		repeat(108, minmax(max-content, auto))
-		calc(2 * var(--y-size))
+		max-content
 		[bar-end];
 }
 
 .bar[data-duration="5"] {
 	grid-template-columns:
 		[bar-begin]
-		calc(2 * var(--y-size))
+		max-content
 		repeat(120, minmax(max-content, auto))
-		calc(2 * var(--y-size))
+		max-content
 		[bar-end];
 }
 
 .bar[data-duration="5.5"] {
 	grid-template-columns:
 		[bar-begin]
-		calc(2 * var(--y-size))
+		max-content
 		repeat(132, minmax(max-content, auto))
-		calc(2 * var(--y-size))
+		max-content
 		[bar-end];
 }
 
 .bar[data-duration="6"] {
 	grid-template-columns:
 		[bar-begin]
-		calc(2 * var(--y-size))
+		max-content
 		repeat(144, minmax(max-content, auto))
-		calc(2 * var(--y-size))
+		max-content
 		[bar-end];
 }
 
 .bar[data-duration="6.5"] {
 	grid-template-columns:
 		[bar-begin]
-		calc(2 * var(--y-size))
+		max-content
 		repeat(156, minmax(max-content, auto))
-		calc(2 * var(--y-size))
+		max-content
 		[bar-end];
 }
 
 .bar[data-duration="7"] {
 	grid-template-columns:
 		[bar-begin]
-		calc(2 * var(--y-size))
+		max-content
 		repeat(168, minmax(max-content, auto))
-		calc(2 * var(--y-size))
+		max-content
 		[bar-end];
 }
 
 .bar[data-duration="7.5"] {
 	grid-template-columns:
 		[bar-begin]
-		calc(2 * var(--y-size))
+		max-content
 		repeat(180, minmax(max-content, auto))
-		calc(2 * var(--y-size))
+		max-content
 		[bar-end];
 }
 
@@ -164,11 +167,13 @@
 .bar::before {
 	grid-column: bar-begin;
 	justify-self: start;
+	margin-left: calc(-2 * var(--y-size));
 }
 
 .bar::after {
 	grid-column: bar-end;
 	justify-self: end;
+	margin-right: calc(-2 * var(--y-size));
 }
 
 .safari .bar::before,
@@ -190,7 +195,14 @@
 .safari .bar::after,
 :host(.safari) > .bar::after {
 	/* Overlap bar lines to disguise Safari rounding errors */
-	margin-right: calc(-1 * var(--bar-line-size, 1px));
+	margin-right: calc(-1 * var(--bar-line-size, 1px) - 2 * var(--y-size));
+}
+
+.bar > .timesig {
+	justify-self: start;
+	grid-column: 1 / span 1;
+	margin-left: 0;
+	margin-right: calc(2 * var(--y-size));
 }
 
 .bar > [data-beat^="1"]    { grid-column-start: 2; }

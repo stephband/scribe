@@ -33,6 +33,11 @@
     overflow: visible;
 }
 
+.bar > .timesig {
+    grid-row: stave-center;
+    align-self: center;
+}
+
 .stave > .head {
     justify-self: end;
     align-self: center;

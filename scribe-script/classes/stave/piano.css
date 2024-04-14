@@ -69,13 +69,17 @@
 }
 
 .piano-stave > .rest,
-:host([clef="piano"]) > .stave > .rest {
+:host([clef="piano"]) > .stave > .rest,
+.piano-stave > .timesig,
+:host([clef="piano"]) > .stave > .timesig {
     /* The default part is the upper part */
     grid-row: stave-upper;
 }
 
 .piano-stave > .rest[data-part="lower"],
-:host([clef="piano"]) > .stave > .rest[data-part="lower"] {
+:host([clef="piano"]) > .stave > .rest[data-part="lower"],
+.piano-stave > .timesig[data-part="lower"],
+:host([clef="piano"]) > .stave > .timesig[data-part="lower"] {
     /* The default part is the upper part */
     grid-row: stave-lower;
 }
