@@ -1,0 +1,37 @@
+
+.chord-stave,
+:host([clef="chord"]) > .stave {
+    grid-template-rows:
+        var(--y-size)
+        var(--y-size)
+        var(--y-size)
+        [stave-top] var(--y-size)
+        var(--y-size)
+        var(--y-size)
+        var(--y-size)
+        var(--y-size)
+        [stave-center stave-top] var(--y-size)
+        var(--y-size)
+        var(--y-size)
+        [chords] var(--y-size)
+        var(--y-size)
+        [stave-bottom] var(--y-size)
+        var(--y-size)
+        [lyrics] var(--y-size);
+
+    background-image: none;
+}
+
+/* TEMP */
+.chord-stave > .ledge,
+:host([clef="chord"]) > .stave > .ledge,
+/* Just a precaution. */
+.chord-stave > .acci,
+:host([clef="chord"]) > .stave > .acci {
+    display: none !important;
+}
+
+:host([clef="chord"]) > .stave > [data-pitch],
+.chord-stave > [data-pitch]  {
+    display: none !important;
+}

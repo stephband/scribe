@@ -44,6 +44,14 @@ function create16thNoteBeams(stems, range) {
 }
 
 export default overload(get('type'), {
+    // Create clef
+    clef: (symbol) => create('svg', {
+        class:   `${ symbol.clef }-clef clef`,
+        viewBox: "0 -8 8 16",
+        preserveAspectRatio: "none",
+        html: `<use href="#${ symbol.clef }-clef"></use>`
+    }),
+
     // Create chord symbol
     chord: (symbol) => create('p', {
         class:   "chord",

@@ -3,7 +3,7 @@ import by       from '../../fn/modules/by.js';
 import get      from '../../fn/modules/get.js';
 import overload from '../../fn/modules/overload.js';
 import { toNoteNumber, toNoteName, normaliseNoteName } from '../../midi/modules/note.js';
-
+import * as staves from './staves.js';
 
 const assign = Object.assign;
 const { abs, ceil, floor } = Math;
@@ -436,9 +436,16 @@ function createBarFromBuffer(barBeat, barDuration, buffer) {
     return bar;
 }
 
-function splitByBar(events, barDuration) {
-    const bars = [];
+function splitByBar(events, barDuration, stave) {
+    const bars   = [];
     const buffer = [];
+
+
+    // TODO: perform split by clef somewhere in here
+    /*if (stave.split) {
+        const { uppper, lower } = stave.split(events);
+    }*/
+
 
     let barBeat = 0;
     let bar = { beat: barBeat, duration: 4, breaks: [2], symbols: [] };
@@ -541,7 +548,12 @@ function splitByBar(events, barDuration) {
     return bars;
 }
 
-export default function createSymbols(events) {
+export default function createSymbols(events, clef) {
     events.sort(by(get(0)));
-    return splitByBar(events, defaultMeter.duration).map(toSymbols);
+
+    const stave = clef ?
+        staves[clef] :
+        staves.treble ;
+
+    return splitByBar(events, defaultMeter.duration, clef).map(toSymbols);
 }
