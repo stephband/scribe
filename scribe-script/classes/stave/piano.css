@@ -1,0 +1,71 @@
+
+.piano-stave,
+:host([clef="piano"]) > .stave {
+    grid-template-rows:
+        [A6] var(--y-size)
+        [G6] var(--y-size)
+        [F6 chords] var(--y-size)
+        [E6] var(--y-size)
+        [D6] var(--y-size)
+        [C6] var(--y-size)
+        [B5] var(--y-size)
+        [A5] var(--y-size)
+        [G5] var(--y-size)
+        [F5 stave-top] var(--y-size)
+        [E5] var(--y-size)
+        [D5] var(--y-size)
+        [C5] var(--y-size)
+        [B4] var(--y-size)
+        [A4] var(--y-size)
+        [G4] var(--y-size)
+        [F4] var(--y-size)
+        [E4] var(--y-size)
+        [D4] var(--y-size)
+        [C4] var(--y-size)
+
+        var(--y-size)
+        var(--y-size)
+        [stave-center lyrics] var(--y-size)
+        var(--y-size)
+        var(--y-size)
+
+        [B3] var(--y-size)
+        [A3] var(--y-size)
+        [G3] var(--y-size)
+        [F3] var(--y-size)
+        [E3] var(--y-size)
+        [D3] var(--y-size)
+        [C2] var(--y-size)
+        [B2] var(--y-size)
+        [A2] var(--y-size)
+        [G2] var(--y-size)
+        [F2 stave-bottom] var(--y-size)
+        [E2] var(--y-size)
+        [D2] var(--y-size)
+        [C1] var(--y-size)
+        [B1] var(--y-size)
+        [A1] var(--y-size)
+        [G1] var(--y-size)
+        [F1] var(--y-size)
+        [E1] var(--y-size);
+}
+
+.piano-stave::before,
+:host([clef="piano"]) > .stave::before {
+    /* FF won't stretch SVG */
+    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -13.5 1 27" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
+        <style>line{vector-effect:non-scaling-stroke;stroke:currentcolor;stroke-width:0.0625em;stroke-linejoin:round;stroke-linecap:round;fill:none;}</style>\
+        <line x1="0" x2="1" y1="-13" y2="-13"></line>\
+        <line x1="0" x2="1" y1="-11" y2="-11"></line>\
+        <line x1="0" x2="1" y1="-9"  y2="-9"></line>\
+        <line x1="0" x2="1" y1="-7"  y2="-7"></line>\
+        <line x1="0" x2="1" y1="-5"  y2="-5"></line>\
+        <line x1="0" x2="1" y1="5"   y2="5"></line>\
+        <line x1="0" x2="1" y1="7"   y2="7"></line>\
+        <line x1="0" x2="1" y1="9"   y2="9"></line>\
+        <line x1="0" x2="1" y1="11"  y2="11"></line>\
+        <line x1="0" x2="1" y1="13"  y2="13"></line>\
+        <line x1="0" x2="0" y1="-13" y2="13"></line>\
+        <line x1="1" x2="1" y1="-13" y2="13"></line>\
+    </svg>');
+}
