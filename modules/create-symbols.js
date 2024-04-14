@@ -240,7 +240,7 @@ function insertSymbols(symbols, bar, stemNote) {
 
         // Chord symbol
 
-        if (head.type === 'chord') {
+        if (head.type === 'chord' || head.type === 'lyric') {
             continue;
         }
 
@@ -503,7 +503,7 @@ function splitByBar(events, barDuration, stave) {
             continue;
         }
 
-        if (event[1] !== 'note' && event[1] !== 'chord') {
+        if (event[1] !== 'note' && event[1] !== 'chord' && event[1] !== 'lyric') {
             console.log('Scribe: event type "' + event[1] + '" not rendered');
             continue;
         }
@@ -541,9 +541,10 @@ function splitByBar(events, barDuration, stave) {
                 buffer.push(event);
             }
 
-            if (event[1] === 'chord') {
+            else {
+                // Truncate 'chord' or 'lyric' to bar end
                 bar.symbols.push({
-                    type:  'chord',
+                    type:  event[1],
                     beat:  beat,
                     value: event[2],
                     duration: barBeat + barDuration - event[0],
@@ -569,9 +570,10 @@ function splitByBar(events, barDuration, stave) {
                 }, stave.getPart && stave.getPart(pitch)));
             }
 
-            if (event[1] === 'chord') {
+            else {
+                // Type 'chord' or 'lyric'
                 bar.symbols.push({
-                    type: 'chord',
+                    type: event[1],
                     beat: event[0] - barBeat,
                     value: event[2],
                     duration: event[3],

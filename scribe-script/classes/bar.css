@@ -442,8 +442,12 @@
 
 .bar > .chord {
 	justify-self: start;
-	margin-left: 0;
-	margin-right: 0;
+	margin-right: 0.25em;
+}
+
+.bar > .lyric {
+	justify-self: start;
+	margin-right: 0.25em;
 }
 
 .bar > .tie {

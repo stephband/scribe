@@ -10,6 +10,7 @@
 @import './classes/beam.css';
 @import './classes/tail.css';
 @import './classes/tie.css';
+@import './classes/lyric.css';
 @import './classes/svg.css';
 
 :host {

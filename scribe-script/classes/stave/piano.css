@@ -15,27 +15,27 @@
         [E5] var(--y-size)
         [D5] var(--y-size)
         [C5] var(--y-size)
-        [B4] var(--y-size)
+        [B4 stave-upper] var(--y-size)
         [A4] var(--y-size)
         [G4] var(--y-size)
         [F4] var(--y-size)
         [E4] var(--y-size)
         [D4] var(--y-size)
         [C4] var(--y-size)
-
+        var(--y-size)
         var(--y-size)
         var(--y-size)
         [stave-center lyrics] var(--y-size)
         var(--y-size)
         var(--y-size)
-
+        var(--y-size)
         [B3] var(--y-size)
         [A3] var(--y-size)
         [G3] var(--y-size)
         [F3] var(--y-size)
         [E3] var(--y-size)
-        [D3] var(--y-size)
-        [C2] var(--y-size)
+        [D3 stave-lower] var(--y-size)
+        [C3] var(--y-size)
         [B2] var(--y-size)
         [A2] var(--y-size)
         [G2] var(--y-size)
@@ -43,7 +43,7 @@
         [F2 stave-bottom] var(--y-size)
         [E2] var(--y-size)
         [D2] var(--y-size)
-        [C1] var(--y-size)
+        [C2] var(--y-size)
         [A1] var(--y-size)
         [G1] var(--y-size)
         [F1] var(--y-size)
@@ -51,19 +51,36 @@
         [E1] var(--y-size);
 
     /* FF won't stretch SVG */
-    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -13.5 1 27" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
+    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -14.5 1 29" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
         <style>line{vector-effect:non-scaling-stroke;stroke:currentcolor;stroke-width:0.0625em;stroke-linejoin:round;stroke-linecap:round;fill:none;}</style>\
-        <line x1="0" x2="1" y1="-13" y2="-13"></line>\
-        <line x1="0" x2="1" y1="-11" y2="-11"></line>\
-        <line x1="0" x2="1" y1="-9"  y2="-9"></line>\
-        <line x1="0" x2="1" y1="-7"  y2="-7"></line>\
-        <line x1="0" x2="1" y1="-5"  y2="-5"></line>\
-        <line x1="0" x2="1" y1="5"   y2="5"></line>\
-        <line x1="0" x2="1" y1="7"   y2="7"></line>\
-        <line x1="0" x2="1" y1="9"   y2="9"></line>\
-        <line x1="0" x2="1" y1="11"  y2="11"></line>\
-        <line x1="0" x2="1" y1="13"  y2="13"></line>\
+        <line x1="0" x2="1" y1="-14" y2="-14"></line>\
+        <line x1="0" x2="1" y1="-12" y2="-12"></line>\
+        <line x1="0" x2="1" y1="-10" y2="-10"></line>\
+        <line x1="0" x2="1" y1="-8"  y2="-8"></line>\
+        <line x1="0" x2="1" y1="-6"  y2="-6"></line>\
+        <line x1="0" x2="1" y1="6"   y2="6"></line>\
+        <line x1="0" x2="1" y1="8"   y2="8"></line>\
+        <line x1="0" x2="1" y1="10"  y2="10"></line>\
+        <line x1="0" x2="1" y1="12"  y2="12"></line>\
+        <line x1="0" x2="1" y1="14"  y2="14"></line>\
     </svg>');
 
-    background-size: 100% calc(27 * var(--y-size));
+    background-size: 100% calc(29 * var(--y-size));
+}
+
+.piano-stave > .rest,
+:host([clef="piano"]) > .stave > .rest {
+    /* The default part is the upper part */
+    grid-row: stave-upper;
+}
+
+.piano-stave > .rest[data-part="lower"],
+:host([clef="piano"]) > .stave > .rest[data-part="lower"] {
+    /* The default part is the upper part */
+    grid-row: stave-lower;
+}
+
+.piano-stave > .lyric,
+:host([clef="piano"]) > .stave > .lyric {
+    align-self: center;
 }

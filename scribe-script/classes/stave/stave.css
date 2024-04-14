@@ -115,6 +115,11 @@
     margin-bottom: calc(1.8 * var(--y-size));
 }
 
+.stave > .lyric {
+    grid-row: lyrics;
+    align-self: end;
+}
+
 .stave > [data-pitch^="G"][data-pitch$="9"] { grid-row: G9; }
 .stave > [data-pitch^="F"][data-pitch$="9"] { grid-row: F9; }
 .stave > [data-pitch^="E"][data-pitch$="9"] { grid-row: E9; }

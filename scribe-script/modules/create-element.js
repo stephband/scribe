@@ -59,6 +59,12 @@ export default overload(get('type'), {
         html: symbol.value.replace('(♯11)', '<sup class="chord-brackets">(♯11)</sup>')
     }),
 
+    lyric: (symbol) => create('p', {
+        class:   "lyric",
+        data: { beat: symbol.beat + 1, duration: symbol.duration },
+        html: symbol.value
+    }),
+
     // Create accidental
     acci: (symbol) => create('svg', {
         class:   "acci",
