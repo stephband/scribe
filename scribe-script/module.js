@@ -153,9 +153,20 @@ export default element('scribe-script', {
     construct: function(shadow, internals) {
         const bar   = shadow.querySelector('.bar');
         internals.state = assign({}, defaults);
+
+        /* Safari has some rounding errors to overcome... */
+        internals.isSafari = navigator.userAgent.includes('AppleWebKit/')
+            && !navigator.userAgent.includes('Chrome/')
+            && !navigator.userAgent.includes('Edge/')
+            && !navigator.userAgent.includes('Gecko/');
     },
 
     connect: function(shadow, internals) {
+        // If Safari
+        if (internals.isSafari) {
+            this.classList.add('safari');
+        }
+
         // Use content as source, strip leading and trailing space
         const source  = this.textContent.trim();
         const type    = internals.type;

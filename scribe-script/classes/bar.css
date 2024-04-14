@@ -14,7 +14,10 @@
 	justify-content: stretch;
 	justify-items: stretch;
 	column-gap: var(--x-gap);
+}
 
+.safari .bar,
+:host(.safari) > .bar {
 	/* Background must remain transparent or ::before bar will
 	   not show through */
 	background-color: transparent !important;
@@ -156,25 +159,36 @@
 	align-self: stretch;
 	margin-top: calc(0.5 * var(--y-size));
 	margin-bottom: calc(0.5 * var(--y-size));
-	/* We must put it behind the background */
-	position: relative;
-	z-index: -1;
 }
 
 .bar::before {
 	grid-column: bar-begin;
 	justify-self: start;
-	/* Overlap bar lines to disguise Safari rounding errors */
-	margin-left: calc(-1 * var(--bar-line-size, 1px));
+}
+
+.bar::after {
+	grid-column: bar-end;
+	justify-self: end;
+}
+
+.safari .bar::before,
+.safari .bar::after,
+:host(.safari) > .bar::before,
+:host(.safari) > .bar::after {
+	position: relative;
+	z-index: -1;
+}
+
+.safari .bar::before,
+:host(.safari) > .bar::before {
 	/* This masks most Safari rounding errors where the previous bar's
 	   last bar line underlaps this one, but it's a bit annoying on a
 	   non-white background */
 	border-right: 1px solid white;
 }
 
-.bar::after {
-	grid-column: bar-end;
-	justify-self: end;
+.safari .bar::after,
+:host(.safari) > .bar::after {
 	/* Overlap bar lines to disguise Safari rounding errors */
 	margin-right: calc(-1 * var(--bar-line-size, 1px));
 }
