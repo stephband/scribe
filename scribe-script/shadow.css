@@ -13,6 +13,15 @@
 @import './classes/svg.css';
 
 :host {
+    --bar-line-size: 0.0625rem;
+
+    /* Bar lines, ::before and ::after on .bar, are placed outside of the bar
+       so that the overlap overcomes bar to bar rounding errors in Safari,
+       causing 1px white gap. But this means we need to pad the container by
+       the same amount. */
+    padding-left:  var(--bar-line-size, 1px);
+    padding-right: var(--bar-line-size, 1px);
+
     display: block;
     display: flex;
     flex-wrap: wrap;
@@ -25,7 +34,7 @@
 
     /* Overcome bar to bar rounding errors causing 1px white gap between bars
        in Safari */
-    margin-left: -1px;
+    /*margin-left: -1px;*/
 }
 /*
 :host > *:last-child {

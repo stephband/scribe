@@ -39,19 +39,17 @@
         [B2] var(--y-size)
         [A2] var(--y-size)
         [G2] var(--y-size)
+        [G2] var(--y-size)
         [F2 stave-bottom] var(--y-size)
         [E2] var(--y-size)
         [D2] var(--y-size)
         [C1] var(--y-size)
-        [B1] var(--y-size)
         [A1] var(--y-size)
         [G1] var(--y-size)
         [F1] var(--y-size)
+        [E1] var(--y-size)
         [E1] var(--y-size);
-}
 
-.piano-stave::before,
-:host([clef="piano"]) > .stave::before {
     /* FF won't stretch SVG */
     background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -13.5 1 27" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
         <style>line{vector-effect:non-scaling-stroke;stroke:currentcolor;stroke-width:0.0625em;stroke-linejoin:round;stroke-linecap:round;fill:none;}</style>\
@@ -65,7 +63,7 @@
         <line x1="0" x2="1" y1="9"   y2="9"></line>\
         <line x1="0" x2="1" y1="11"  y2="11"></line>\
         <line x1="0" x2="1" y1="13"  y2="13"></line>\
-        <line x1="0" x2="0" y1="-13" y2="13"></line>\
-        <line x1="1" x2="1" y1="-13" y2="13"></line>\
     </svg>');
+
+    background-size: 100% calc(27 * var(--y-size));
 }

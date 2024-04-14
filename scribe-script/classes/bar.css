@@ -14,6 +14,28 @@
 	justify-content: stretch;
 	justify-items: stretch;
 	column-gap: var(--x-gap);
+
+	/* Background must remain transparent or ::before bar will
+	   not show through */
+	background-color: transparent !important;
+}
+
+.bar[data-duration="1"] {
+	grid-template-columns:
+		[bar-begin]
+		calc(2 * var(--y-size))
+		repeat(24, minmax(max-content, auto))
+		calc(2 * var(--y-size))
+		[bar-end];
+}
+
+.bar[data-duration="1.5"] {
+	grid-template-columns:
+		[bar-begin]
+		calc(2 * var(--y-size))
+		repeat(36, minmax(max-content, auto))
+		calc(2 * var(--y-size))
+		[bar-end];
 }
 
 .bar[data-duration="2"] {
@@ -125,126 +147,38 @@
 		[bar-end];
 }
 
-.bar > .rest {
-	justify-self: center;
-}
-
-.bar > .rest[data-duration="0.125"] { grid-column-end: span 3; }
-.bar > .rest[data-duration="0.25"]  { grid-column-end: span 6; }
-.bar > .rest[data-duration="0.375"] { grid-column-end: span 9; }
-.bar > .rest[data-duration="0.5"]   { grid-column-end: span 12; }
-.bar > .rest[data-duration="0.75"]  { grid-column-end: span 18; }
-.bar > .rest[data-duration="1"]     { grid-column-end: span 24; }
-.bar > .rest[data-duration="1.5"]   { grid-column-end: span 36; }
-.bar > .rest[data-duration="2"]     { grid-column-end: span 48; }
-.bar > .rest[data-duration="3"]     { grid-column-end: span 72; }
-.bar > .rest[data-duration="4"]     { grid-column-end: span 96; }
-
-.bar > .beam {
-	justify-self: stretch;
-	margin-left: calc(-1 * var(--x-gap));
-	margin-right: 0;
-	width: auto;
-	position: relative;
-	left: calc(-1 * var(--stem-thickness));
-}
-
-.bar > .down-beam {
-	left: calc(-2.7 * var(--y-size));
-}
-
-.bar > .beam[data-duration="0.125"] { grid-column-end: span 3; }
-.bar > .beam[data-duration="0.25"]  { grid-column-end: span 6; }
-.bar > .beam[data-duration="0.375"] { grid-column-end: span 9; }
-.bar > .beam[data-duration="0.5"]   { grid-column-end: span 12; }
-.bar > .beam[data-duration="0.625"] { grid-column-end: span 15; }
-.bar > .beam[data-duration="0.75"]  { grid-column-end: span 18; }
-.bar > .beam[data-duration="0.875"] { grid-column-end: span 21; }
-.bar > .beam[data-duration="1"]     { grid-column-end: span 24; }
-.bar > .beam[data-duration="1.125"] { grid-column-end: span 27; }
-.bar > .beam[data-duration="1.25"]  { grid-column-end: span 30; }
-.bar > .beam[data-duration="1.375"] { grid-column-end: span 33; }
-.bar > .beam[data-duration="1.5"]   { grid-column-end: span 36; }
-.bar > .beam[data-duration="1.625"] { grid-column-end: span 39; }
-.bar > .beam[data-duration="1.75"]  { grid-column-end: span 42; }
-.bar > .beam[data-duration="1.875"] { grid-column-end: span 45; }
-.bar > .beam[data-duration="2"]     { grid-column-end: span 48; }
-.bar > .beam[data-duration="3"]     { grid-column-end: span 72; }
-.bar > .beam[data-duration="4"]     { grid-column-end: span 96; }
-
-.bar > .chord {
-	justify-self: start;
-	margin-left: 0;
-	margin-right: 0;
-}
-
-
-
-
-
-
-.bar > [data-duration="0.125"] { grid-column-end: span 3; }
-.bar > [data-duration="0.25"]  { grid-column-end: span 6; }
-.bar > [data-duration="0.375"] { grid-column-end: span 9; }
-.bar > [data-duration="0.5"]   { grid-column-end: span 12; }
-.bar > [data-duration="0.625"] { grid-column-end: span 15; }
-.bar > [data-duration="0.75"]  { grid-column-end: span 18; }
-.bar > [data-duration="0.875"] { grid-column-end: span 21; }
-.bar > [data-duration="1"]     { grid-column-end: span 24; }
-.bar > [data-duration="1.125"] { grid-column-end: span 27; }
-.bar > [data-duration="1.25"]  { grid-column-end: span 30; }
-.bar > [data-duration="1.375"] { grid-column-end: span 33; }
-.bar > [data-duration="1.5"]   { grid-column-end: span 36; }
-.bar > [data-duration="1.625"] { grid-column-end: span 39; }
-.bar > [data-duration="1.75"]  { grid-column-end: span 42; }
-.bar > [data-duration="1.875"] { grid-column-end: span 45; }
-.bar > [data-duration="2"]     { grid-column-end: span 48; }
-.bar > [data-duration="2.5"]   { grid-column-end: span 60; }
-.bar > [data-duration="3"]     { grid-column-end: span 72; }
-.bar > [data-duration="3.5"]   { grid-column-end: span 84; }
-.bar > [data-duration="4"]     { grid-column-end: span 96; }
-.bar > [data-duration="6"]     { grid-column-end: span 144; }
-
-.bar > .head,
-.bar > .acci,
-.bar > .stem,
-.bar > .tail,
-.bar > .ledge {
-	grid-column-end: span 1;
-}
-
-.bar > .tie {
-	justify-self: stretch;
-	/* Make tie span from centre of one head to centre of next. A tie to the
-	   next bar ends in the bar end column. */
-	/* - column gap - half of head width */
-	margin-left: calc(-1 * var(--x-gap));
-	/* - bar start gap - half of head width */
-	margin-right: calc(-2 * var(--y-size));
-
-	min-width: calc(4 * var(--y-size));
-}
-
-.bar > .ledge {
-	justify-self: end;
-	width: calc(4.4 * var(--y-size));
-	/* Make ledger take up same space as head */
-	margin-left:  calc(-0.65 * var(--y-size));
-	margin-right: calc(-0.65 * var(--y-size));
-}
-
-/*
+.bar::before,
 .bar::after {
 	content: '';
-	width: 0.0625em;
+	width: var(--bar-line-size, 1px);
+	background: currentcolor;
+	grid-row: stave-top / stave-bottom;
+	align-self: stretch;
 	margin-top: calc(0.5 * var(--y-size));
 	margin-bottom: calc(0.5 * var(--y-size));
-	justify-self: end;
-	grid-column: beat-end;
-	grid-row: stave-top / stave-bottom;
-	background-color: black;
+	/* We must put it behind the background */
+	position: relative;
+	z-index: -1;
 }
-*/
+
+.bar::before {
+	grid-column: bar-begin;
+	justify-self: start;
+	/* Overlap bar lines to disguise Safari rounding errors */
+	margin-left: calc(-1 * var(--bar-line-size, 1px));
+	/* This masks most Safari rounding errors where the previous bar's
+	   last bar line underlaps this one, but it's a bit annoying on a
+	   non-white background */
+	border-right: 1px solid white;
+}
+
+.bar::after {
+	grid-column: bar-end;
+	justify-self: end;
+	/* Overlap bar lines to disguise Safari rounding errors */
+	margin-right: calc(-1 * var(--bar-line-size, 1px));
+}
+
 .bar > [data-beat^="1"]    { grid-column-start: 2; }
 .bar > [data-beat^="1.04"] { grid-column-start: 3; }
 .bar > [data-beat^="1.08"] { grid-column-start: 4; }
@@ -389,4 +323,108 @@
 .bar > [data-beat^="6.87"] { grid-column-start: 141; }
 .bar > [data-beat^="6.91"] { grid-column-start: 142; }
 .bar > [data-beat^="6.95"] { grid-column-start: 143; }
+.bar > [data-beat^="7"]    { grid-column-start: 144; }
+.bar > [data-beat^="7.04"] { grid-column-start: 145; }
+.bar > [data-beat^="7.08"] { grid-column-start: 146; }
+.bar > [data-beat^="7.12"] { grid-column-start: 147; }
+.bar > [data-beat^="7.16"] { grid-column-start: 148; }
+.bar > [data-beat^="7.20"] { grid-column-start: 149; }
+.bar > [data-beat^="7.25"] { grid-column-start: 150; }
+.bar > [data-beat^="7.29"] { grid-column-start: 151; }
+.bar > [data-beat^="7.33"] { grid-column-start: 152; }
+.bar > [data-beat^="7.37"] { grid-column-start: 153; }
+.bar > [data-beat^="7.41"] { grid-column-start: 154; }
+.bar > [data-beat^="7.45"] { grid-column-start: 155; }
+.bar > [data-beat^="7.5"]  { grid-column-start: 156; }
+.bar > [data-beat^="7.54"] { grid-column-start: 157; }
+.bar > [data-beat^="7.58"] { grid-column-start: 158; }
+.bar > [data-beat^="7.62"] { grid-column-start: 159; }
+.bar > [data-beat^="7.66"] { grid-column-start: 160; }
+.bar > [data-beat^="7.70"] { grid-column-start: 161; }
+.bar > [data-beat^="7.75"] { grid-column-start: 162; }
+.bar > [data-beat^="7.79"] { grid-column-start: 163; }
+.bar > [data-beat^="7.83"] { grid-column-start: 164; }
+.bar > [data-beat^="7.87"] { grid-column-start: 165; }
+.bar > [data-beat^="7.91"] { grid-column-start: 166; }
+.bar > [data-beat^="7.95"] { grid-column-start: 167; }
+
+.bar > [data-duration="0.125"] { grid-column-end: span 3; }
+.bar > [data-duration="0.25"]  { grid-column-end: span 6; }
+.bar > [data-duration="0.375"] { grid-column-end: span 9; }
+.bar > [data-duration="0.5"]   { grid-column-end: span 12; }
+.bar > [data-duration="0.625"] { grid-column-end: span 15; }
+.bar > [data-duration="0.75"]  { grid-column-end: span 18; }
+.bar > [data-duration="0.875"] { grid-column-end: span 21; }
+.bar > [data-duration="1"]     { grid-column-end: span 24; }
+.bar > [data-duration="1.125"] { grid-column-end: span 27; }
+.bar > [data-duration="1.25"]  { grid-column-end: span 30; }
+.bar > [data-duration="1.375"] { grid-column-end: span 33; }
+.bar > [data-duration="1.5"]   { grid-column-end: span 36; }
+.bar > [data-duration="1.625"] { grid-column-end: span 39; }
+.bar > [data-duration="1.75"]  { grid-column-end: span 42; }
+.bar > [data-duration="1.875"] { grid-column-end: span 45; }
+.bar > [data-duration="2"]     { grid-column-end: span 48; }
+.bar > [data-duration="2.125"] { grid-column-end: span 51; }
+.bar > [data-duration="2.25"]  { grid-column-end: span 54; }
+.bar > [data-duration="2.375"] { grid-column-end: span 57; }
+.bar > [data-duration="2.5"]   { grid-column-end: span 60; }
+.bar > [data-duration="2.625"] { grid-column-end: span 63; }
+.bar > [data-duration="2.75"]  { grid-column-end: span 66; }
+.bar > [data-duration="2.875"] { grid-column-end: span 69; }
+.bar > [data-duration="3"]     { grid-column-end: span 72; }
+.bar > [data-duration="3.5"]   { grid-column-end: span 84; }
+.bar > [data-duration="4"]     { grid-column-end: span 96; }
+.bar > [data-duration="6"]     { grid-column-end: span 144; }
+.bar > [data-duration="8"]     { grid-column-end: span 192; }
+
+.bar > .head,
+.bar > .acci,
+.bar > .stem,
+.bar > .tail,
+.bar > .ledge {
+	grid-column-end: span 1;
+}
+
+.bar > .rest {
+	justify-self: center;
+}
+
+.bar > .beam {
+	justify-self: stretch;
+	margin-left: calc(-1 * var(--x-gap));
+	margin-right: 0;
+	width: auto;
+	position: relative;
+	left: calc(-1 * var(--stem-thickness));
+}
+
+.bar > .down-beam {
+	left: calc(-2.7 * var(--y-size));
+}
+
+.bar > .chord {
+	justify-self: start;
+	margin-left: 0;
+	margin-right: 0;
+}
+
+.bar > .tie {
+	justify-self: stretch;
+	/* Make tie span from centre of one head to centre of next. A tie to the
+	   next bar ends in the bar end column. */
+	/* - column gap - half of head width */
+	margin-left: calc(-1 * var(--x-gap));
+	/* - bar start gap - half of head width */
+	margin-right: calc(-2 * var(--y-size));
+
+	min-width: calc(4 * var(--y-size));
+}
+
+.bar > .ledge {
+	justify-self: end;
+	width: calc(4.4 * var(--y-size));
+	/* Make ledger take up same space as head */
+	margin-left:  calc(-0.65 * var(--y-size));
+	margin-right: calc(-0.65 * var(--y-size));
+}
 

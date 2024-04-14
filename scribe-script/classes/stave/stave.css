@@ -7,13 +7,10 @@
     display: grid;
     grid-auto-rows: var(--y-size);
     row-gap: 0;
-}
 
-.stave::before {
-    content: '';
-
-    background-repeat: repeat-x;
-    background-size: 100% 100%;
+    /* This helps mask rounding error gaps between bars in Safari, but we don't
+       really want to do this. */
+    /* background-color: white; */
 
     /* FF won't stretch SVG */
     background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -4.5 1 9" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
@@ -23,12 +20,11 @@
         <line x1="0" x2="1" y1="0" y2="0"></line>\
         <line x1="0" x2="1" y1="-2" y2="-2"></line>\
         <line x1="0" x2="1" y1="-4" y2="-4"></line>\
-        <line x1="0" x2="0" y1="-4" y2="4"></line>\
-        <line x1="1" x2="1" y1="-4" y2="4"></line>\
     </svg>');
 
-    grid-column: 1 / bar-end;
-    grid-row: stave-top / stave-bottom;
+    background-repeat: repeat-x;
+    background-size: 100% calc(9 * var(--y-size));
+    background-position: 0 50%;
 }
 
 .stave > svg {
