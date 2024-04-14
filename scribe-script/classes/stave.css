@@ -70,6 +70,18 @@
     margin-top: calc(0.5 * var(--y-size));
 }
 
+.stave > .ledge {
+    overflow: hidden;
+}
+
+.stave > .up-ledge {
+    align-self: start;
+}
+
+.stave > .down-ledge {
+    align-self: end;
+}
+
 .stave > .tail {
     justify-self: end;
     align-self: center;

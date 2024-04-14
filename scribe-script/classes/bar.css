@@ -208,7 +208,8 @@
 .bar > .head,
 .bar > .acci,
 .bar > .stem,
-.bar > .tail {
+.bar > .tail,
+.bar > .ledge {
 	grid-column-end: span 1;
 }
 
@@ -222,6 +223,14 @@
 	margin-right: calc(-2 * var(--y-size));
 
 	min-width: calc(4 * var(--y-size));
+}
+
+.bar > .ledge {
+	justify-self: end;
+	width: calc(4.4 * var(--y-size));
+	/* Make ledger take up same space as head */
+	margin-left:  calc(-0.65 * var(--y-size));
+	margin-right: calc(-0.65 * var(--y-size));
 }
 
 /*

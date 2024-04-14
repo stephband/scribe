@@ -65,6 +65,25 @@ export default overload(get('type'), {
     }),
 
     // Create note head
+    upledger: (symbol) => create('svg', {
+        class:   "up-ledge ledge",
+        viewBox: `0 ${ 0.5 - symbol.rows } 4.4 ${ symbol.rows }`,
+        preserveAspectRatio: "xMidYMax",
+        data:    { beat: symbol.beat + 1, pitch: symbol.pitch },
+        style:   `height: calc(${ symbol.rows } * var(--y-size));`,
+        html:    '<use x="0" y="-8" href="#ledges"></use>'
+    }),
+
+    downledger: (symbol) => create('svg', {
+        class:   "down-ledge ledge",
+        viewBox: `0 -0.5 4.4 ${ symbol.rows }`,
+        preserveAspectRatio: "xMidYMin",
+        data: { beat: symbol.beat + 1, pitch: symbol.pitch },
+        style:   `height: calc(${ symbol.rows } * var(--y-size));`,
+        html: '<use x="0" y="-8" href="#ledges"></use>'
+    }),
+
+    // Create note head
     head: (symbol) => create('svg', {
         class:   "head",
         viewBox: "0 -1 2.7 2",

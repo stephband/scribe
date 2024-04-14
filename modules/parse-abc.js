@@ -41,7 +41,6 @@ export default function parseABC(abc) {
     parser.parse(abc);
 
     const tune = parser.getTune();
-    console.log(tune);
     const data = tune.lines.reduce((data, line) => {
         line.staff.reduce((sequences, staff, i) => {
             const sequence    = getSequence(i, data);
@@ -105,6 +104,16 @@ export default function parseABC(abc) {
 
                         sequence.cursor += voice.duration * 4;
                     }
+                    else if (voice.el_type === 'bar') {
+                        // If cursor is not at bar start when a bar comes around...
+                        const meterEvent = findLastOfType('meter', events);
+                        if ((sequence.cursor - meterEvent[0]) % meterEvent[2] !== 0) {
+                            // ...advance cursor to next bar start
+                            const wholeBars  = Math.floor((sequence.cursor - meterEvent[0]) / meterEvent[2]);
+                            const beat = (wholeBars + 1) * meterEvent[2];
+                            sequence.cursor = beat;
+                        }
+                    }
                     else {
 console.log('ABC voice ignored:', voice);
                     }
@@ -130,6 +139,5 @@ console.log('ABC voice ignored:', voice);
 
     // Remove cursor property which was just for tracking start beats
     data.sequences.forEach((sequence) => delete sequence.cursor);
-console.log(data);
     return data;
 }
