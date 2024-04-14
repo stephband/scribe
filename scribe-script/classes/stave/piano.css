@@ -22,14 +22,15 @@
         [E4] var(--y-size)
         [D4] var(--y-size)
         [C4] var(--y-size)
-        var(--y-size)
+        [B3] var(--y-size)
         var(--y-size)
         var(--y-size)
         [stave-center lyrics] var(--y-size)
         var(--y-size)
         var(--y-size)
         var(--y-size)
-        [B3] var(--y-size)
+        var(--y-size)
+        var(--y-size)
         [A3] var(--y-size)
         [G3] var(--y-size)
         [F3] var(--y-size)
@@ -39,7 +40,6 @@
         [B2] var(--y-size)
         [A2] var(--y-size)
         [G2] var(--y-size)
-        [G2] var(--y-size)
         [F2 stave-bottom] var(--y-size)
         [E2] var(--y-size)
         [D2] var(--y-size)
@@ -48,7 +48,7 @@
         [G1] var(--y-size)
         [F1] var(--y-size)
         [E1] var(--y-size)
-        [E1] var(--y-size);
+        [E0] var(--y-size);
 
     /* FF won't stretch SVG */
     background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -14.5 1 29" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\

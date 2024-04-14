@@ -7,10 +7,10 @@ export const bass = {
 };
 
 export const piano = {
-    getPart: function(symbol) {
+    getPart: function(pitch) {
         // A part is an object of properties assigned to a symbol.
-        // Render anything below C4 on the lower part.
-        return /[0123]$/.test(symbol.pitch) ? {
+        // Render anything below Bb3 on the lower part.
+        return /[012]$|[AC-G][b#♭♯]*3$/.test(pitch) ? {
             part:      'lower',
             centerRow: 'stave-lower'
         } : {
