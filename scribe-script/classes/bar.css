@@ -400,6 +400,30 @@
 }
 
 .bar > .rest {
+	justify-self: end;
+}
+
+.bar > .rest[data-duration="0.125"],
+.bar > .rest[data-duration="0.25"],
+.bar > .rest[data-duration="0.375"],
+.bar > .rest[data-duration="0.5"],
+.bar > .rest[data-duration="0.75"],
+.bar > .rest[data-duration="0.875"],
+.bar > .rest[data-duration="1"],
+.bar > .rest[data-duration="1.5"],
+.bar > .rest[data-duration="1.75"] {
+	/* Short rests align with heads */
+	grid-column-end: span 1;
+}
+
+.bar > .rest[data-duration="2"],
+.bar > .rest[data-duration="3"],
+.bar > .rest[data-duration="3.5"],
+.bar > .rest[data-duration="4"],
+.bar > .rest[data-duration="6"],
+.bar > .rest[data-duration="7"],
+.bar > .rest[data-duration="8"] {
+	/* Longer rests span and are centered */
 	justify-self: center;
 }
 

@@ -3,7 +3,7 @@
     stroke-width: 0;
     width:  calc(2.7 * var(--y-size));
     height: calc(2 * var(--y-size));
-    margin-left: calc(0.66666667 * var(--y-size));
+    margin-left: calc(1 * var(--y-size));
 }
 
 div.head {
