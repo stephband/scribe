@@ -25,10 +25,11 @@ const defaults = {
 };
 
 
-function getStemDirection(note, event2) {
-    return toNoteNumber(note) < toNoteNumber(event2) ?
-        'down' :
-        'up' ;
+function getStemDirection(note, head) {
+    return head.part && head.part.stemDirection || (
+        toNoteNumber(note) < toNoteNumber(head.pitch) ?
+            'down' :
+            'up' );
 }
 
 function isAfterBreak(breaks, b1, b2) {
@@ -45,7 +46,7 @@ function getDuration(event) {
 
 function insertTail(symbols, stemNote, i) {
     const head = symbols[i];
-    const stemDirection = getStemDirection(stemNote, head.pitch);
+    const stemDirection = getStemDirection(stemNote, head) ;
 
     // Splice stem and tail in before head
     // TODO put tail before accidentals for CSS reasons
@@ -124,11 +125,13 @@ function insertBeam(symbols, beam, stemNote, n) {
     }
 
     // Render stems and beam
-    const stemDirection = (beam
+    const stemDirection = beam[0].part && beam[0].part.stemDirection ?
+            beam[0].part.stemDirection :
+        (beam
         .map((i) => subtractStaveRows(stemNote, symbols[i].pitch))
         .reduce((t, u) => t + u, 0) / beam.length) < 0 ?
-        'up' :
-        'down' ;
+            'up' :
+            'down' ;
 
     const stems = [];
     const ties  = [];
@@ -334,7 +337,7 @@ function insertSymbols(bar, stemNote) {
             }
             // Otherwise render the stem immediately
             else {
-                let stemDirection = getStemDirection(stemNote, head.pitch);
+                let stemDirection = getStemDirection(stemNote, head);
                 symbols.splice(n++, 0, assign({}, head, {
                     type: 'stem',
                     value: stemDirection
@@ -353,7 +356,7 @@ function insertSymbols(bar, stemNote) {
         }
         else {
             if (head.tie === 'begin' || head.tie === 'middle') {
-                let stemDirection = getStemDirection(stemNote, head.pitch);
+                let stemDirection = getStemDirection(stemNote, head);
                 symbols.splice(n++, 0, assign({}, head, {
                     type: 'tie',
                     // Move tie into following grid column
@@ -392,24 +395,27 @@ function toSymbols(bar) {
     return insertSymbols(bar, state.clef.stemDirectionNote);
 }
 
-function createBarFromBuffer(barBeat, barDuration, buffer) {
+function createBarFromBuffer(barBeat, barDuration, buffer, stave) {
     const bar = { beat: barBeat, duration: barDuration, breaks: [2], symbols: [] };
 
     let m = -1;
-    let tied;
+    let tied, pitch;
     while (buffer[++m] && buffer[m][0] < barBeat + barDuration) {
         tied = buffer[m];
+        pitch = typeof tied[2] === 'number' ?
+            toNoteName(tied[2]) :
+            normaliseNoteName(tied[2]);
 
         // Event ends after this bar
         if (barBeat + barDuration < tied[0] + tied[4]) {
             bar.symbols.push({
                 beat: 0,
                 type: 'head',
-                pitch: typeof tied[2] === 'number' ?
-                    toNoteName(tied[2]) :
-                    normaliseNoteName(tied[2]),
+                pitch,
                 tie: 'middle',
                 duration: barDuration,
+                head: stave.getHead ?  stave.getHead(pitch)  : undefined ,
+                part: stave.getSplit ? stave.getSplit(pitch) : undefined ,
                 event: tied
             });
         }
@@ -419,11 +425,11 @@ function createBarFromBuffer(barBeat, barDuration, buffer) {
             bar.symbols.push({
                 beat: 0,
                 type: 'head',
-                pitch: typeof tied[2] === 'number' ?
-                    toNoteName(tied[2]) :
-                    normaliseNoteName(tied[2]),
+                pitch,
                 tie: 'end',
                 duration: tied[0] + tied[4] - barBeat,
+                head: stave.getHead ?  stave.getHead(pitch)  : undefined ,
+                part: stave.getSplit ? stave.getSplit(pitch) : undefined ,
                 event: tied
             });
 
@@ -442,8 +448,8 @@ function splitByBar(events, barDuration, stave) {
 
 
     // TODO: perform split by clef somewhere in here
-    /*if (stave.split) {
-        const { uppper, lower } = stave.split(events);
+    /*if (stave.getSplit) {
+        const { uppper, lower } = stave.getSplit(events);
     }*/
 
 
@@ -474,7 +480,7 @@ function splitByBar(events, barDuration, stave) {
         while (event[0] >= barBeat + barDuration) {
             // Create the next bar
             barBeat = barBeat + barDuration;
-            bar = createBarFromBuffer(barBeat, barDuration, buffer);
+            bar = createBarFromBuffer(barBeat, barDuration, buffer, stave);
             bars.push(bar);
         }
 
@@ -490,8 +496,10 @@ function splitByBar(events, barDuration, stave) {
                 bar.symbols.push({
                     beat: beat,
                     type: 'head',
-                    pitch: pitch,
+                    pitch,
                     duration: barBeat + barDuration - event[0],
+                    head: stave.getHead ?  stave.getHead(pitch)  : undefined ,
+                    part: stave.getSplit ? stave.getSplit(pitch) : undefined ,
                     tie: 'begin',
                     event: event
                 });
@@ -514,13 +522,17 @@ function splitByBar(events, barDuration, stave) {
         // Event ends inside this bar
         else {
             if (event[1] === 'note') {
+                let pitch = typeof event[2] === 'number' ?
+                    toNoteName(event[2]) :
+                    normaliseNoteName(event[2]) ;
+
                 bar.symbols.push({
                     beat: event[0] - barBeat,
                     type: 'head',
-                    pitch: typeof event[2] === 'number' ?
-                        toNoteName(event[2]) :
-                        normaliseNoteName(event[2]),
+                    pitch,
                     duration: event[4],
+                    head: stave.getHead ?  stave.getHead(pitch)  : undefined ,
+                    part: stave.getSplit ? stave.getSplit(pitch) : undefined ,
                     event: event
                 });
             }
@@ -541,7 +553,7 @@ function splitByBar(events, barDuration, stave) {
     while (buffer.length) {
         // Create the next bar
         barBeat = barBeat + barDuration;
-        bar = createBarFromBuffer(barBeat, barDuration, buffer);
+        bar = createBarFromBuffer(barBeat, barDuration, buffer, stave);
         bars.push(bar);
     }
 
@@ -554,6 +566,6 @@ export default function createSymbols(events, clef) {
     const stave = clef ?
         staves[clef] :
         staves.treble ;
-
-    return splitByBar(events, defaultMeter.duration, clef).map(toSymbols);
+console.log('STAVE', clef, stave);
+    return splitByBar(events, defaultMeter.duration, stave).map(toSymbols);
 }

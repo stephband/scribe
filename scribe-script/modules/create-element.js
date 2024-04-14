@@ -97,7 +97,7 @@ export default overload(get('type'), {
         viewBox: "0 -1 2.7 2",
         preserveAspectRatio: "xMidYMid slice",
         data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration/*, tie: symbol.tie*/ },
-        html: '<use href="#head[' + symbol.duration + ']"></use>'
+        html: `<use href="#${ symbol.head || `head[${ symbol.duration }]` }"></use>`
     }),
 
     // Create note stem

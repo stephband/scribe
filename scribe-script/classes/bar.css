@@ -405,8 +405,8 @@
 
 .bar > .beam {
 	justify-self: stretch;
-	margin-left: calc(-1 * var(--x-gap));
-	margin-right: 0;
+	margin-left: calc(-1 * var(--x-gap) - 0.5px);
+	margin-right: -0.5px;
 	width: auto;
 	position: relative;
 	left: calc(-1 * var(--stem-thickness));
