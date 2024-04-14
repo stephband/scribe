@@ -1,4 +1,5 @@
 @import './stave/stave.css';
 @import './stave/treble.css';
 @import './stave/bass.css';
-@import './stave/drum.css';
+@import './stave/drums.css';
+@import './stave/percussion.css';

@@ -1,0 +1,53 @@
+
+/*
+Useful on drum notation:
+https://drumbeatsonline.com/blog/drum-notation-sheet-music-how-to-read-it
+https://web.mit.edu/merolish/Public/drums.pdf
+*/
+
+.percussion-stave,
+:host([clef="percussion"]) > .stave {
+    grid-template-rows:
+        var(--y-size)
+        var(--y-size)
+        [chords] var(--y-size)
+        var(--y-size)
+        var(--y-size)
+        var(--y-size)
+        var(--y-size)
+        [lowtom stave-center stave-top] var(--y-size)
+        [floortom stave-bottom]    var(--y-size)
+        var(--y-size)
+        var(--y-size)
+        var(--y-size)
+        var(--y-size)
+        var(--y-size)
+        [lyrics] var(--y-size);
+}
+
+.percussion-stave::before,
+:host([clef="percussion"]) > .stave::before {
+    /* FF won't stretch SVG */
+    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -0.5 1 1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
+        <style>line{vector-effect:non-scaling-stroke;stroke:currentcolor;stroke-width:0.0625em;stroke-linejoin:round;stroke-linecap:round;fill:none;}</style>\
+        <line x1="0" x2="1" y1="0" y2="0"></line>\
+        <line x1="0" x2="0" y1="-4" y2="4"></line>\
+        <line x1="1" x2="1" y1="-4" y2="4"></line>\
+    </svg>');
+}
+
+/* TEMP */
+.percussion-stave > .ledge,
+:host([clef="percussion"]) > .stave > .ledge,
+/* Just a precaution. */
+.percussion-stave > .acci,
+:host([clef="percussion"]) > .stave > .acci {
+    display: none !important;
+}
+
+
+
+:host([clef="percussion"]) > .stave > [data-pitch],
+.percussion-stave > [data-pitch]  {
+    grid-row: stave-center;
+}

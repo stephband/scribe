@@ -1,0 +1,94 @@
+
+/*
+Useful on drum notation:
+https://drumbeatsonline.com/blog/drum-notation-sheet-music-how-to-read-it
+https://web.mit.edu/merolish/Public/drums.pdf
+*/
+
+.drums-stave,
+:host([clef="drums"]) > .stave {
+    grid-template-rows:
+        var(--y-size)
+        var(--y-size)
+        [chords] var(--y-size)
+        var(--y-size)
+        [splash]      var(--y-size)
+        [crash2]      var(--y-size)
+        [crash]       var(--y-size)
+        [hihat]       var(--y-size)
+        [ride stave-top] var(--y-size)
+        [hightom]     var(--y-size)
+        [midtom]      var(--y-size)
+        [snare]       var(--y-size)
+        [lowtom stave-center] var(--y-size)
+        [floortom]    var(--y-size)
+        [lowfloortom] var(--y-size)
+        [kick2]       var(--y-size)
+        [kick]        var(--y-size)
+        [hihatpedal stave-bottom] var(--y-size)
+        [foot]        var(--y-size)
+        var(--y-size)
+        var(--y-size)
+        var(--y-size)
+        var(--y-size)
+        var(--y-size)
+        [lyrics] var(--y-size);
+}
+
+/* TEMP */
+.drums-stave > .ledge,
+:host([clef="drums"]) > .stave > .ledge,
+/* Just a precaution. */
+.drums-stave > .acci,
+:host([clef="drums"]) > .stave > .acci {
+    display: none !important;
+}
+
+:host([clef="drums"]) > .stave > [data-pitch="B1"] ,  .drums-stave > [data-pitch="B1"]  { grid-row: kick; }     /* Acoustic Bass Drum */
+:host([clef="drums"]) > .stave > [data-pitch="C2"] ,  .drums-stave > [data-pitch="C2"]  { grid-row: kick; }     /* Bass Drum 1 */
+:host([clef="drums"]) > .stave > [data-pitch="C♯2"],  .drums-stave > [data-pitch="C♯2"] { grid-row: snare; }    /* Side Stick */
+:host([clef="drums"]) > .stave > [data-pitch="D2"] ,  .drums-stave > [data-pitch="D2"]  { grid-row: snare; }    /* Acoustic Snare */
+:host([clef="drums"]) > .stave > [data-pitch="E♭2"],  .drums-stave > [data-pitch="E♭2"] { grid-row: snare; }    /* Hand Clap */
+:host([clef="drums"]) > .stave > [data-pitch="E2"] ,  .drums-stave > [data-pitch="E2"]  { grid-row: snare; }    /* Electric Snare */
+:host([clef="drums"]) > .stave > [data-pitch="F2"] ,  .drums-stave > [data-pitch="F2"]  { grid-row: lowfloortom; } /* Low Floor Tom */
+:host([clef="drums"]) > .stave > [data-pitch="F♯2"],  .drums-stave > [data-pitch="F♯2"] { grid-row: hihat; }    /* Closed Hi-Hat */
+:host([clef="drums"]) > .stave > [data-pitch="G2"] ,  .drums-stave > [data-pitch="G2"]  { grid-row: floortom; } /* High Floor Tom */
+:host([clef="drums"]) > .stave > [data-pitch="A♭2"],  .drums-stave > [data-pitch="A♭2"] { grid-row: hihatpedal; } /* Pedal Hi-Hat */
+:host([clef="drums"]) > .stave > [data-pitch="A2"] ,  .drums-stave > [data-pitch="A2"]  { grid-row: midtom; }   /* Low Tom */
+:host([clef="drums"]) > .stave > [data-pitch="B♭2"],  .drums-stave > [data-pitch="B♭2"] { grid-row: hihat; }    /* Open Hi-Hat */
+:host([clef="drums"]) > .stave > [data-pitch="B2"] ,  .drums-stave > [data-pitch="B2"]  { grid-row: midtom; }   /* Low-Mid Tom */
+:host([clef="drums"]) > .stave > [data-pitch="C3"] ,  .drums-stave > [data-pitch="C3"]  { grid-row: hightom; }  /* Hi-Mid Tom */
+:host([clef="drums"]) > .stave > [data-pitch="C♯3"],  .drums-stave > [data-pitch="C♯3"] { grid-row: crash; }    /* Crash Cymbal 1 */
+:host([clef="drums"]) > .stave > [data-pitch="D3"] ,  .drums-stave > [data-pitch="D3"]  { grid-row: hightom; }  /* High Tom */
+:host([clef="drums"]) > .stave > [data-pitch="E♭3"],  .drums-stave > [data-pitch="E♭3"] { grid-row: ride; }     /* Ride Cymbal 1 */
+:host([clef="drums"]) > .stave > [data-pitch="E3"] ,  .drums-stave > [data-pitch="E3"]  { grid-row: splash; }   /* Chinese Cymbal */
+:host([clef="drums"]) > .stave > [data-pitch="F3"] ,  .drums-stave > [data-pitch="F3"]  { grid-row: ride; }     /* Ride Bell */
+:host([clef="drums"]) > .stave > [data-pitch="F♯3"],  .drums-stave > [data-pitch="F♯3"] { grid-row: foot; }     /* Tambourine */
+:host([clef="drums"]) > .stave > [data-pitch="G3"] ,  .drums-stave > [data-pitch="G3"]  { grid-row: splash; }   /* Splash Cymbal */
+:host([clef="drums"]) > .stave > [data-pitch="A♭3"],  .drums-stave > [data-pitch="A♭3"] { grid-row: lowtom; }   /* Cowbell*/
+:host([clef="drums"]) > .stave > [data-pitch="A3"] ,  .drums-stave > [data-pitch="A3"]  { grid-row: crash2; }   /* Crash Symbol 2 */
+:host([clef="drums"]) > .stave > [data-pitch="B♭3"],  .drums-stave > [data-pitch="B♭3"] { grid-row: midtom; }   /* Vibraslap */
+:host([clef="drums"]) > .stave > [data-pitch="B3"] ,  .drums-stave > [data-pitch="B3"]  { grid-row: crash2; }   /* Ride Cymbal 2*/
+:host([clef="drums"]) > .stave > [data-pitch="C4"] ,  .drums-stave > [data-pitch="C4"]  { grid-row: midtom; }   /* Hi Bongo */
+:host([clef="drums"]) > .stave > [data-pitch="C♯4"],  .drums-stave > [data-pitch="C♯4"] { grid-row: lowtom; }   /* Low Bongo */
+:host([clef="drums"]) > .stave > [data-pitch="D4"] ,  .drums-stave > [data-pitch="D4"]  { grid-row: midtom; }   /* Mute Hi Conga */
+:host([clef="drums"]) > .stave > [data-pitch="E♭4"],  .drums-stave > [data-pitch="E♭4"] { grid-row: midtom; }   /* Open Hi Conga */
+:host([clef="drums"]) > .stave > [data-pitch="E4"] ,  .drums-stave > [data-pitch="E4"]  { grid-row: lowtom; }   /* Low Conga */
+:host([clef="drums"]) > .stave > [data-pitch="F4"] ,  .drums-stave > [data-pitch="F4"]  { grid-row: hightom; }  /* High Timbale */
+:host([clef="drums"]) > .stave > [data-pitch="F♯4"],  .drums-stave > [data-pitch="F♯4"] { grid-row: floortom; } /* Low Timbale */
+:host([clef="drums"]) > .stave > [data-pitch="G4"] ,  .drums-stave > [data-pitch="G4"]  { grid-row: splash; }   /* High Agogo */
+:host([clef="drums"]) > .stave > [data-pitch="A♭4"],  .drums-stave > [data-pitch="A♭4"] { grid-row: crash; }    /* Low Agogo */
+:host([clef="drums"]) > .stave > [data-pitch="A4"] ,  .drums-stave > [data-pitch="A4"]  { grid-row: hihat; }    /* Cabasa */
+:host([clef="drums"]) > .stave > [data-pitch="B♭4"],  .drums-stave > [data-pitch="B♭4"] { grid-row: hihat; }    /* Maracas */
+:host([clef="drums"]) > .stave > [data-pitch="B4"] ,  .drums-stave > [data-pitch="B4"]  { grid-row: lowtom; }   /* Short Whistle */
+:host([clef="drums"]) > .stave > [data-pitch="C5"] ,  .drums-stave > [data-pitch="C5"]  { grid-row: lowtom; }   /* Long Whistle */
+:host([clef="drums"]) > .stave > [data-pitch="C♯5"],  .drums-stave > [data-pitch="C♯5"] { grid-row: lowtom; }   /* Short Guiro */
+:host([clef="drums"]) > .stave > [data-pitch="D5"] ,  .drums-stave > [data-pitch="D5"]  { grid-row: lowtom; }   /* Long Guiro */
+:host([clef="drums"]) > .stave > [data-pitch="E♭5"],  .drums-stave > [data-pitch="E♭5"] { grid-row: midtom; }   /* Claves */
+:host([clef="drums"]) > .stave > [data-pitch="E5"] ,  .drums-stave > [data-pitch="E5"]  { grid-row: midtom; }   /* Hi Wood Block */
+:host([clef="drums"]) > .stave > [data-pitch="F5"] ,  .drums-stave > [data-pitch="F5"]  { grid-row: lowtom; }   /* Low Wood Block */
+:host([clef="drums"]) > .stave > [data-pitch="F♯5"],  .drums-stave > [data-pitch="F♯5"] { grid-row: ride;   }   /* Mute Cuica */
+:host([clef="drums"]) > .stave > [data-pitch="G5"] ,  .drums-stave > [data-pitch="G5"]  { grid-row: ride;   }   /* Open Cuica */
+:host([clef="drums"]) > .stave > [data-pitch="A♭5"],  .drums-stave > [data-pitch="A♭5"] { grid-row: crash;  }   /* Mute Triangle */
+:host([clef="drums"]) > .stave > [data-pitch="A5"] ,  .drums-stave > [data-pitch="A5"]  { grid-row: crash;  }   /* Open Triangle */
+:host([clef="drums"]) > .stave > [data-pitch="B♭5"],  .drums-stave > [data-pitch="B♭5"] { grid-row: hihat;  }   /* Shaker */
