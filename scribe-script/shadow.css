@@ -2,6 +2,7 @@
 @import './classes/accidental.css';
 @import './classes/stave.css';
 @import './classes/bar.css';
+@import './classes/clef.css';
 @import './classes/timesig.css';
 @import './classes/chord.css';
 @import './classes/head.css';

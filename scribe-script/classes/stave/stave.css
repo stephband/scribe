@@ -33,6 +33,11 @@
     overflow: visible;
 }
 
+.bar > .clef {
+    grid-row: stave-center;
+    align-self: center;
+}
+
 .bar > .timesig {
     grid-row: stave-center;
     align-self: center;

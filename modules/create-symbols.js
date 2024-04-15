@@ -488,6 +488,12 @@ function splitByBar(events, barDuration, stave) {
     let bar = createBarFromBuffer(barBeat, barDuration, buffer, stave);
     bars.push(bar);
 
+    bar.symbols.push({
+        type: 'clef',
+        beat: 0,
+        clef: stave.clef
+    });
+
     let n = -1;
     let event;
     while (event = events[++n]) {

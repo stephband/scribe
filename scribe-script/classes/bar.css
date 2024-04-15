@@ -198,11 +198,22 @@
 	margin-right: calc(-1 * var(--bar-line-size, 1px) - 2 * var(--y-size));
 }
 
+.bar > .clef {
+	justify-self: start;
+	grid-column: 1 / span 1;
+	margin-left: calc(-1 * var(--y-size));
+	margin-right: calc(2 * var(--y-size));
+}
+
 .bar > .timesig {
 	justify-self: start;
 	grid-column: 1 / span 1;
 	margin-left: 0;
-	margin-right: calc(2 * var(--y-size));
+	margin-right: calc(3 * var(--y-size));
+}
+
+.bar > .clef ~ .timesig {
+	margin-left: calc(6 * var(--y-size));
 }
 
 .bar > [data-beat^="1"]    { grid-column-start: 2; }

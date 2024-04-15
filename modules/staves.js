@@ -1,12 +1,14 @@
 export const treble = {
-
+    clef: 'treble'
 };
 
 export const bass = {
-
+    clef: 'bass'
 };
 
 export const piano = {
+    clef: 'piano',
+
     getPart: function(pitch) {
         // A part is an object of properties assigned to a symbol.
         // Render anything below Bb3 on the lower part.
@@ -20,10 +22,12 @@ export const piano = {
 };
 
 export const chords = {
-
+    clef: 'chords'
 };
 
 export const drums = {
+    clef: 'drums',
+
     heads: {
         /*"C♯2":  "head[1]", /* Side Stick */
         "E♭2":  "head[x]", /* Hand Clap */
@@ -106,5 +110,5 @@ export const drums = {
 };
 
 export const percussion = {
-
+    clef: 'percussion'
 };

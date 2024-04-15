@@ -1,0 +1,3 @@
+.clef {
+    width: calc(6 * var(--y-size));
+}

@@ -47,9 +47,9 @@ export default overload(get('type'), {
     // Create clef
     clef: (symbol) => create('svg', {
         class:   `${ symbol.clef }-clef clef`,
-        viewBox: "0 -8 8 16",
+        viewBox: "0 0.4 5.2 14.6",
         preserveAspectRatio: "none",
-        html: `<use href="#${ symbol.clef }-clef"></use>`
+        html: `<use x="3.2" y="1" width="8" href="#${ symbol.clef }-clef"></use>`
     }),
 
     // Create chord symbol
