@@ -29,3 +29,8 @@
         [D3] var(--y-size)
         [C3 lyrics] var(--y-size);
 }
+
+.treble-stave > .lyric,
+:host([clef="treble"]) > .stave > .lyric {
+    align-self: end;
+}

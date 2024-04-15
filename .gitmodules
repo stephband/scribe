@@ -1,3 +1,9 @@
 [submodule "fonts/petaluma"]
 	path = fonts/petaluma
 	url = https://github.com/steinbergmedia/petaluma
+[submodule "fonts/lilyjazz"]
+	path = fonts/lilyjazz
+	url = https://github.com/OpenLilyPondFonts/lilyjazz.git
+[submodule "fonts/Bravura"]
+	path = fonts/Bravura
+	url = https://github.com/steinbergmedia/bravura.git

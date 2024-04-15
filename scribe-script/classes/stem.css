@@ -3,7 +3,7 @@
     --beam-y: 0;
 
     stroke: black;
-    stroke-width: 0.3333;
+    stroke-width: 0.31;
     stroke-linecap: round;
     width:  calc(2.7 * var(--y-size));
     height: calc((var(--beam-y) + var(--stem-size)) * var(--y-size));

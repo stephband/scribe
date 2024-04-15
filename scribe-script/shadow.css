@@ -16,7 +16,7 @@
 @import './classes/svg.css';
 
 :host {
-    --bar-line-size: 0.0625rem;
+    --bar-line-size: 0.1rem;
 
     padding-left: var(--bar-line-size, 1px);
 

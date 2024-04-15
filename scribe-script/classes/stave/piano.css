@@ -2,6 +2,7 @@
 .piano-stave,
 :host([clef="piano"]) > .stave {
     grid-template-rows:
+        [B6] var(--y-size)
         [A6] var(--y-size)
         [G6] var(--y-size)
         [F6 chords] var(--y-size)
@@ -48,7 +49,8 @@
         [G1] var(--y-size)
         [F1] var(--y-size)
         [E1] var(--y-size)
-        [E0] var(--y-size);
+        [D1] var(--y-size)
+        [C1] var(--y-size);
 
     /* FF won't stretch SVG */
     background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -14.5 1 29" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
@@ -71,7 +73,9 @@
 .piano-stave > .rest,
 :host([clef="piano"]) > .stave > .rest,
 .piano-stave > .timesig,
-:host([clef="piano"]) > .stave > .timesig {
+:host([clef="piano"]) > .stave > .timesig,
+.piano-stave > .clef,
+:host([clef="piano"]) > .stave > .clef {
     /* The default part is the upper part */
     grid-row: stave-upper;
 }
@@ -79,8 +83,9 @@
 .piano-stave > .rest[data-part="lower"],
 :host([clef="piano"]) > .stave > .rest[data-part="lower"],
 .piano-stave > .timesig[data-part="lower"],
-:host([clef="piano"]) > .stave > .timesig[data-part="lower"] {
-    /* The default part is the upper part */
+:host([clef="piano"]) > .stave > .timesig[data-part="lower"],
+.piano-stave > .clef[data-part="lower"],
+:host([clef="piano"]) > .stave > .clef[data-part="lower"] {
     grid-row: stave-lower;
 }
 
