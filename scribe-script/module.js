@@ -1,15 +1,16 @@
 
+import Signal            from '../../fn/modules/signal.js';
 import create            from '../../dom/modules/create.js';
-import element           from '../../dom/modules/element.js';
+import element, { getInternals } from '../../dom/modules/element.js';
+import { toNoteNumber }  from '../../midi/modules/note.js';
 import parseABC          from '../modules/parse-abc.js';
 import parseSequenceText from '../modules/parse-sequence-text.js';
 import createSymbols     from '../modules/create-symbols.js';
+import requestData       from '../modules/request-data.js';
 import createElement     from './modules/create-element.js';
-import { toNoteNumber }  from '../../midi/modules/note.js';
 
 
 const assign = Object.assign;
-
 const defaults = {
     cursor:  0,
     key:     'C',
@@ -17,6 +18,55 @@ const defaults = {
     stave:   'treble'
 };
 
+
+/* Parse data
+  (TODO: Yeah, API requests need tidied up) */
+
+function fromGist(gist) {
+    // Get first file
+    const file = gist.files[Object.keys(gist.files)[0]];
+    return parseSource(file.type, file.content);
+}
+
+function fromTheSession(object) {
+    // Get first file
+    const song = object.settings.find(matches({ id: 13324 })) || object.settings[0];
+    return parseSource('abc', song.abc);
+}
+
+function parseSource(type, source) {
+    // source is an object
+    if (typeof source === 'object') {
+        // source is json from api.github.com/gists/
+        return source.files ? fromGist(source) :
+        // source is from thesession.org
+        source.settings ? fromTheSession() :
+        // source is an events array
+        Array.isArray(source) ? { id: 0, events: source } :
+        // source is a sequence object
+        source ;
+    }
+    // Data is ABC
+    else if (type === 'abc' || type === 'text/x-abc') {
+        // Strip space following line breaks
+        const music = parseABC(source.replace(/\n\s+/g, '\n'));
+        return music.sequences[0];
+    }
+    // Data is step sequence text
+    else if (type === 'sequence' || type === 'text/plain') {
+        return { events: parseSequenceText(source) };
+    }
+    // Data is JSON
+    else {
+        const events = JSON.parse(source);
+        return Array.isArray(events) ?
+            { id: 0, events } :
+            events ;
+    }
+}
+
+
+/* Generate DOM */
 
 function toElements(nodes, symbol) {
     const element = createElement(symbol);
@@ -33,6 +83,9 @@ function toBarElements(elements, bar) {
 
     return elements;
 }
+
+
+/* Register <scribe-script> */
 
 export default element('scribe-script', {
     shadow: `
@@ -142,6 +195,11 @@ export default element('scribe-script', {
         const bar   = shadow.querySelector('.bar');
         internals.state = assign({}, defaults);
 
+        internals.source = Signal.of();
+        internals.clef   = Signal.of('treble');
+        internals.key    = Signal.of('C');
+        internals.meter  = Signal.of({ duration: 4, division: 1, breaks: [2] });
+
         /* Safari has some rounding errors to overcome... */
         internals.isSafari = navigator.userAgent.includes('AppleWebKit/')
             && !navigator.userAgent.includes('Chrome/')
@@ -155,43 +213,88 @@ export default element('scribe-script', {
             this.classList.add('safari');
         }
 
-        // Use content as source, strip leading and trailing space
-        const source  = this.textContent.trim();
-        const type    = internals.type;
+        if (internals.src) {
+            const renderer = new Signal(() => {
+                // Evaluate
+                const source   = internals.source.value;
+                if (!source) { return; }
+                // Use content as source, strip leading and trailing space
+                const type     = internals.type;
+                const sequence = parseSource(this.type, source);
+                const elements = createSymbols(sequence.events, this.clef || 'treble')
+                    .reduce(toBarElements, []) ;
 
-        let sequence;
+                // Put bars in the DOM
+                shadow.append.apply(shadow, elements);
+            }, function() {
+                // Evaluate
+                renderer.value;
+            });
 
-        // Data is ABC
-        if (this.type === 'abc' || this.type === 'text/x-abc') {
-            // Strip space following line breaks
-            const music = parseABC(source.replace(/\n\s+/g, '\n'));
-            sequence = music.sequences[0];
+            renderer.value;
         }
-        // Data is step sequence text
-        else if (this.type === 'sequence') {
-            sequence = { events: parseSequenceText(source) };
-        }
-        // Data is JSON
         else {
-            const events = JSON.parse(source);
-            sequence = Array.isArray(events) ?
-                { id: 0, events } :
-                events ;
+            // Use content as source, strip leading and trailing space
+            const source   = this.textContent.trim();
+            const type     = internals.type;
+            const sequence = parseSource(this.type, source);
+            const elements = createSymbols(sequence.events, this.clef || 'treble')
+                .reduce(toBarElements, []) ;
+
+            // Put bars in the DOM
+            shadow.append.apply(shadow, elements);
         }
-
-        const elements = createSymbols(sequence.events, this.clef || 'treble').reduce(toBarElements, []);
-
-        // Put bars in the DOM
-        shadow.append.apply(shadow, elements);
     }
 }, {
+    /**
+    clef="treble"
+    Choose the default clef to render. Not that if the rendered sequence
+    contains clef events, they override this choice. Possible clefs are
+    `"treble"`, `"bass"`, `"piano"`, `"drums"`, `"percussion"`, `"chord"`.
+    **/
     clef: {
         attribute: function(value) { this.clef = value; },
-        writable: true
+        get: function() { return getInternals(this).clef.value; },
+        set: function(value) { getInternals(this).clef.value = value; }
     },
+
+    /**
+    key="C"
+    Choose the default key to render. Not that if the rendered sequence
+    contains key events, they override this choice. Possible keys are
+    `"A"`, `"B"`, `"C"`, `"D"`, `"E"`, `"F"`, `"G"`.
+    **/
+    key: {
+        attribute: function(value) { this.key = value; },
+        get: function() { return getInternals(this).key.value; },
+        set: function(value) { getInternals(this).key.value = value; }
+    },
+
+    /**
+    type="application/json"
+    Mimetype or type of data to fetch. Possible mimetypes:
+    - `"text/x-abc"`
+    - `"text/plain"`
+    - `"application/json"`
+    **/
 
     type: {
         attribute: function(value) { this.type = value; },
         writable: true
-    }
+    },
+
+    /**
+    src=""
+    A path to an ABC, JSON or SEQUENCE file
+    **/
+    src: {
+        attribute: function(src) { this.src = src; },
+        get: function() { return getInternals(this).src; },
+        set: function(src) {
+            const internals = getInternals(this);
+            internals.src = src;
+            requestData('source', getInternals(this), src);
+        },
+        default:   null
+    },
 }, './shadow.css');

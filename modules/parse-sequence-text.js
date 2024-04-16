@@ -13,7 +13,7 @@ const rchord = /^[ABCDEFG][b♭#♯]{0,1}/;
 
 
 export default function parseSequenceText(source) {
-    const data   = source.split(/\s+/);
+    const data   = source.trim().split(/\s+/);
     const events = [];
 
     let n = -1;
