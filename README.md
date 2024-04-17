@@ -93,8 +93,7 @@ To check things are working launch your server and navigate to
 ## Contributions
 
 Rich Sigler of Sigler Music Fonts (http://www.jazzfont.com/) very kindly granted
-permission to use JazzFont shapes as SVG paths. If you use Scribe a lot consider
-buying a JazzFont license.
+permission to use JazzFont shapes as SVG paths in this project. If you use
+Scribe a lot consider buying a JazzFont license.
 
-Gavin Band (@gavmotron) implemented probabalistic key centre analysis using a
-Hidden Markov Model.
+Gavin Band implemented probabalistic key centre analysis.
