@@ -175,23 +175,6 @@
 	justify-self: end;
 	margin-right: calc(-2 * var(--y-size));
 }
-/*
-.safari .bar::before,
-.safari .bar::after,
-:host(.safari) > .bar::before,
-:host(.safari) > .bar::after {
-	position: relative;
-	z-index: -1;
-}
-
-.safari .bar::before,
-:host(.safari) > .bar::before {
-	/* This masks most Safari rounding errors where the previous bar's
-	   last bar line underlaps this one, but it's a bit annoying on a
-	   non-white background */
-/*	border-right: 1px solid white;
-}
-*/
 
 .safari .bar::after,
 :host(.safari) > .bar::after {
