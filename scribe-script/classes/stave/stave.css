@@ -57,8 +57,6 @@
 
 .stave > .acci {
     align-self: center;
-    /* Create space for following note head, which is justified to end */
-    margin-right: calc(3.5 * var(--y-size));
 }
 
 .stave > .stem {

@@ -146,7 +146,7 @@ export default overload(get('type'), {
         class:   `${ symbol.updown }-tie tie`,
         viewBox: `0 0 1 1`,
         preserveAspectRatio: "none",
-        data:    { beat: symbol.beat + 1 + (1/ 24), pitch: symbol.pitch, duration: symbol.duration, part: symbol.part },
+        data:    { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part },
         /*style: 'grid-row-end: span ' + symbol.duration / 24 + ';' */
         style:   `height: calc(6 * var(--y-size)); align-self: ${ symbol.updown === 'up' ? 'end' : 'start' };`,
         html:    `<use href="#tie"></use>`
@@ -154,7 +154,7 @@ export default overload(get('type'), {
 
     // Create note tail
     tail: (symbol) => create('svg', {
-        class: "tail",
+        class: `${ symbol.stemDirection }-tail tail`,
         viewBox: "0 -1 2.7 2",
         preserveAspectRatio: "xMidYMid",
         data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part },

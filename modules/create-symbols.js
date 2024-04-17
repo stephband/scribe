@@ -211,7 +211,7 @@ function insertBeam(symbols, stave, beam, stemNote, n) {
     symbols.splice(i, 0, assign({}, begin, {
         type:   'beam',
         // Push beam start into next grid column
-        beat:   begin.beat + (1 / 24),
+        beat:   begin.beat,
         duration: end.beat - begin.beat,
         //pitch:  begin.pitch,
         range:  range,

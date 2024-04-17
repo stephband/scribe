@@ -84,6 +84,7 @@ Assuming you are inside a project repo, add the submodules:
 git submodule add git@github.com:stephband/fn path/to/fn
 git submodule add git@github.com:stephband/dom path/to/dom
 git submodule add git@github.com:stephband/abcjs path/to/abcjs
+git submodule add git@github.com:stephband/midi path/to/midi
 git submodule add git@github.com:stephband/scribe path/to/scribe
 ```
 
