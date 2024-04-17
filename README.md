@@ -1,91 +1,100 @@
 # Scribe
 
-Scribe makes it easy to write music on the web.
+Scribe notates music in HTML.
 
-Scribe turns an array of notes and chords into music notation that is rendered in SVG.
-
-
-## Scribe(svg, data, options)
+Scribe takes a sequence of events – notes, chords, meter changes and so on – and
+renders notation as symbols in a CSS grid.
 
 
-### svg
+## Download
 
-Either an id (string) of an SVG node, or an SVG node.
-
-
-### data
-
-An array of notes and chords. For example:
-
-    [
-        [2,   0.5, 'note', 76],
-        [2.5, 0.5, 'note', 77],
-        [3,   0.5, 'note', 79],
-        [3.5, 3.5, 'note', 74]
-    ]
-
-Renders as:
-
-![Dum-de-de-duuum](example.png)
-
-That's right. You only need to give it the notes.
-Scribe interprets the notes and writes out the notation with rests and ties in place.
-
-A note array contains four values:
-the type string <code>'note'</code>,
-the beat, note number and duration.
-The beat is the time the note starts expressed in quarter notes.
-The note number is an integer 0-127 that corresponds to MIDI note number.
-The duration is time the note is held expressed in quarter notes.
-
-Note that it's early days, and the required format of this note data may change.
+Scribe 0.3 is a rewrite, and does not yet have a build.
 
 
-### options
+## `<scribe-script>`
 
-Scribe's rendered notation can be modified with these optionally optional options:
+Scribe 0.3 is a rewrite, and this custom element is the test bed. To try out the
+development version of the element, import the css, register the element and
+set the path to the shadow DOM stylesheet.
 
-    {
-        clef: 'treble',
-        clefOnEveryStave: false,
-        barsPerStave: 4,
-        
-        paddingTop: 12,
-        paddingLeft: 3,
-        paddingRight: 3,
-        paddingBottom: 6,
-        staveSpacing: 24,
-        
-        start: 0,
-        end: undefined,
-        
-        key: 'C',
-        transpose: 0,
+```html
+<link rel="stylesheet" href="https://stephen.band/scribe/scribe-script/module.css" />
+<script type="module">
+    import ScribeScript from 'https://stephen.band/scribe/scribe-script/module.js';
+    ScribeScript.stylesheet = 'https://stephen.band/scribe/scribe-script/shadow.css';
+</script>
+```
 
-        beamBreaksAtRest: true,
-        beamGradientMax: 0.25,
-        beamGradientFactor: 0.25
-    }
+Now the `<scribe-script>` element renders music notation from data found in
+it's content:
 
-The units for padding and spacing are kind of arbitrary.
-1 unit is the distance from a stave line to the center of a stave space.
-In other words, a stave is 8 units high.
+```html
+<scribe-script type="sequence" clef="treble" meter="4/4">
+    0 chord Dmaj    4
+    0 note  F#5 0.2 1
+    0 note  A4  0.2 1
+    0 note  D4  0.2 1
+</scribe-script>
+```
 
-## Features
+Or imported from a file in its `src` attribute:
 
-Scribe is new.
-Some features I intend to implement:
+```html
+<scribe-script type="json" src="https://api.github.com/gists/739fa16055debb7972737835e4fa4623"></scribe-script>
+```
 
-* Key centre analysis, for identifying the key centre of individual phrases (very difficult).
-* Multi-stave rendering, for piano or multi-part scores (moderately challenging).
-* Live data binding, so that Scribe will automatically show changes in data (piece of piss).
+### Attributes
 
-If you like scribe and are interested in helping, please fork and let me know what you might work on.
+#### `type="json"`
 
+Scribe supports 3 types of data:
+
+- "application/json", or just "json"
+- "text/x-abc", or just "abc"
+- "text/x-sequence", or just "sequence"
+
+#### `src="url"`
+
+A URL of some sequence data in JSON, ABC or Scribe's own sequence text format.
+
+#### `clef="treble"`
+
+Sets the default stave. May be overridden by `"clef"` events in data.
+
+#### `meter="4/4"`
+
+Sets the default meter. May be overridden by `"meter"` events in data.
+
+### Properties
+#### `.type`
+#### `.src`
+#### `.data`
+
+Returns an observable proxy of Scribe's internal data object. Changes to this
+data are observed and cause Scribe to update.
+
+## Develop
+
+To install Scribe locally you need several repos served from one directory, as
+Scribe's modules import modules from these other repos using relative paths.
+
+Assuming you are inside a project repo, add the submodules:
+
+```
+git submodule add git@github.com:stephband/fn path/to/fn
+git submodule add git@github.com:stephband/dom path/to/dom
+git submodule add git@github.com:stephband/abcjs path/to/abcjs
+git submodule add git@github.com:stephband/scribe path/to/scribe
+```
+
+To check things are working launch your server and navigate to
+`path/to/scribe/scribe-script/index.html`.
 
 ## Contributions
 
-Rich Sigler of Sigler Music Fonts (http://www.jazzfont.com/) very kindly granted permission to use JazzFont shapes as SVG paths.
-If you use Scribe a lot, please consider buying a JazzFont license (http://www.jazzfont.com/order.html).
+Rich Sigler of Sigler Music Fonts (http://www.jazzfont.com/) very kindly granted
+permission to use JazzFont shapes as SVG paths. If you use Scribe a lot consider
+buying a JazzFont license.
 
-Gavin Band (@gavmotron) implemented probabalistic key centre analysis using a Hidden Markov Model.
+Gavin Band (@gavmotron) implemented probabalistic key centre analysis using a
+Hidden Markov Model.
