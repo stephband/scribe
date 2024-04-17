@@ -420,6 +420,7 @@
 .bar > .tail,
 .bar > .ledge {
 	grid-column-end: span 1;
+	justify-self: end;
 }
 
 .bar > .rest {

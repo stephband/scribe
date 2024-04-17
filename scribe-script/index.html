@@ -24,21 +24,16 @@
     <link rel="stylesheet" href="./module.css">
 </head>
 <body>
-    <h2>Piano stave</h2>
-
-    <scribe-script type="json" src="https://api.github.com/gists/39b8a36e4abc13baee57825fbc1b6004" clef="drums"></scribe-script>
-    <scribe-script type="json" src="https://api.github.com/gists/739fa16055debb7972737835e4fa4623" clef="treble"></scribe-script>
-
     <scribe-script type="sequence" clef="piano">
         0 meter 4 1
 
-        0    chord E♭maj     2
-        2    chord Dø        1
-        3    chord G7alt     1
-        4    chord Cm7       2
-        6    chord B♭-7      1
-        7    chord E♭7       1
-        8    chord A♭maj     2
+        0    chord A♭maj     2
+        2    chord A♭maj/G   1
+        3    chord C7alt     1
+        4    chord F-7       2
+        6    chord E♭-7      1
+        7    chord A♭7       1
+        8    chord D♭maj     2
 
         0    lyric In        1.5
         1.5  lyric the       0.5
@@ -46,30 +41,39 @@
         3    lyric mid-      1
         4    lyric win-      2
         6    lyric ter,      2
-        8    lyric Frost-    3
-        11   lyric y         1
+        8    lyric Frost-    1.5
+        9.5  lyric y         0.5
 
-        0    G4   0.2  1.5
-        1.5  Ab4  0.2  0.5
+        10   lyric wind      0.5
+        11   lyric made      0.5
+        12   lyric moan–     4
+
+        0    C5   0.2  1.5
+        0    Ab4  0.2  1.5
+        1.5  Db5  0.2  0.5
+        2    Eb5  0.2  1
         2    Bb4  0.2  1
-        3    G4   0.2  1
-        4    F4   0.2  2
-        6    Eb4  0.2  2
-        8    F4   0.2  1
-        9    Ab3  0.2  0.5
-        9.5  C4   0.2  0.5
-        10   D4   0.2  0.5
-        10.5 Eb4  0.2  0.5
+        2    F4   0.2  1
+        3    C5   0.2  1
+        4    Bb4   0.2  2
+        6    Ab4  0.2  2
+        8    Bb4   0.2  1.5
+        9.5  C5   0.2  0.5
+        10   Bb4  0.2  1
         11   F4   0.2  1
+        12   Ab4  0.2  2
+        14   G4   0.2  2
 
-        0    Eb2  0.2  2
-        2    D2   0.2  1
-        3    G2   0.2  1
-        4    C3   0.2  2
-        6    Bb2  0.2  1
-        7    Eb2  0.2  1
-        8    Ab2  0.2  2
-        10   Eb2  0.2  2
+        0    Ab2  0.2  2
+        2    G2   0.2  1
+        3    C3   0.2  1
+        4    F3   0.2  2
+        6    Eb2  0.2  1
+        7    Ab2  0.2  1
+        8    Db3  0.2  2
+        10   D3   0.2  2
+        12   Eb3  0.2  2
+        14   Eb2  0.2  2
     </scribe-script>
 
     <h2>Drums stave</h2>
@@ -415,6 +419,10 @@
         [147,    "note", 79, 0.25, 0.5],
         [147.5,  "note", 74, 0.25, 3.5]
     ]</scribe-script>
+
+    <scribe-script type="json" src="https://api.github.com/gists/39b8a36e4abc13baee57825fbc1b6004" clef="drums"></scribe-script>
+    <scribe-script type="json" src="https://api.github.com/gists/739fa16055debb7972737835e4fa4623" clef="treble"></scribe-script>
+
 
     <div style="width: 1em; height: 1em; background: orange;">1em</div>
     <p>Some default text for size comparison. Crunchum ipsum dolor text sit coder void, constructor function, sed do while loop python orientation semi colon incident. Duis aute irure indent tabs or spaces velit esse cilium buntum how crunchy duntum. Excepteur tranquilis syntax error memorandum qui officia nostrud operating system alertus. Hyper text linkus operari avec computatrum ad coniungere hominum. Standards code est pulchra on chromium et foxus sed souvent suckum in internet explorum.</p>

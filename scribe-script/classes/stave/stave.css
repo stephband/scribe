@@ -5,8 +5,9 @@
     --stem-size: 7;
 
     display: grid;
-    grid-auto-rows: var(--y-size);
     row-gap: 0;
+    /* Prevent stray content from breaking layout */
+    grid-auto-rows: 0;
 
     /* This helps mask rounding error gaps between bars in Safari, but we don't
        really want to do this. */
@@ -44,7 +45,6 @@
 }
 
 .stave > .head {
-    justify-self: end;
     align-self: center;
 }
 
@@ -56,14 +56,12 @@
 }
 
 .stave > .acci {
-    justify-self: start;
     align-self: center;
     /* Create space for following note head, which is justified to end */
     margin-right: calc(3.5 * var(--y-size));
 }
 
 .stave > .stem {
-    justify-self: end;
     align-self: center;
 }
 
@@ -90,7 +88,6 @@
 }
 
 .stave > .tail {
-    justify-self: end;
     align-self: center;
 }
 
