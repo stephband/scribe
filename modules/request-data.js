@@ -1,27 +1,28 @@
-/**
-requestData(url)
-**/
 
-import cache            from '../../fn/modules/cache-by-key.js';
-import overload         from '../../fn/modules/overload.js';
-import { requestGet }   from '../../dom/modules/request.js';
+import cache          from '../../fn/modules/cache-by-key.js';
+import overload       from '../../fn/modules/overload.js';
+import { requestGet } from '../../dom/modules/request.js';
+import parseSource    from './parse-source.js';
 
 const requestData = cache(requestGet);
 const rpath       = /^\.*\/|^https?:\/\//;
 
-export default overload((name, internals, value) => typeof value, {
-    string: function(name, internals, value) {
-        if (rpath.test(value)) {
-            requestData(value)
-            .then((data) => internals[name].value = data)
-            .catch((error) => console.error(error));
-            return;
+/**
+requestData(type, url)
+**/
+
+export default overload((type, value) => typeof value, {
+    string: function(type, url) {
+        if (window.DEBUG && !rpath.test(url)) {
+            throw new TypeError('URL not supported "' + url + '"');
         }
 
-        //internals[name].value = JSON.parse(value);
+        return requestData(url)
+        .then((source) => parseSource(type, source))
+        .catch((error) => console.error(error));
     },
 
-    default: function(name, internals, value) {
+    default: function(name, internals, type, value) {
         internals[name] = value;
     }
 });

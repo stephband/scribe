@@ -2,68 +2,15 @@
 import Signal            from '../../fn/modules/signal.js';
 import create            from '../../dom/modules/create.js';
 import element, { getInternals } from '../../dom/modules/element.js';
-import { toNoteNumber }  from '../../midi/modules/note.js';
-import parseABC          from '../modules/parse-abc.js';
-import parseSequenceText from '../modules/parse-sequence-text.js';
 import createSymbols     from '../modules/create-symbols.js';
 import requestData       from '../modules/request-data.js';
+import parseSource       from '../modules/parse-source.js';
 import createElement     from './modules/create-element.js';
 
 
-const assign = Object.assign;
-const defaults = {
-    cursor:  0,
-    key:     'C',
-    timesig: '4/4',
-    stave:   'treble'
-};
-
-
-/* Parse data
-  (TODO: Yeah, API requests need tidied up) */
-
-function fromGist(gist) {
-    // Get first file
-    const file = gist.files[Object.keys(gist.files)[0]];
-    return parseSource(file.type, file.content);
-}
-
-function fromTheSession(object) {
-    // Get first file
-    const song = object.settings.find(matches({ id: 13324 })) || object.settings[0];
-    return parseSource('abc', song.abc);
-}
-
-function parseSource(type, source) {
-    // source is an object
-    if (typeof source === 'object') {
-        // source is json from api.github.com/gists/
-        return source.files ? fromGist(source) :
-        // source is from thesession.org
-        source.settings ? fromTheSession() :
-        // source is an events array
-        Array.isArray(source) ? { id: 0, events: source } :
-        // source is a sequence object
-        source ;
-    }
-    // Data is ABC
-    else if (type === 'abc' || type === 'text/x-abc') {
-        // Strip space following line breaks
-        const music = parseABC(source.replace(/\n\s+/g, '\n'));
-        return music.sequences[0];
-    }
-    // Data is step sequence text
-    else if (type === 'sequence' || type === 'text/plain') {
-        return { events: parseSequenceText(source) };
-    }
-    // Data is JSON
-    else {
-        const events = JSON.parse(source);
-        return Array.isArray(events) ?
-            { id: 0, events } :
-            events ;
-    }
-}
+const assign     = Object.assign;
+const define     = Object.defineProperties;
+const stylesheet = Signal.of();
 
 
 /* Generate DOM */
@@ -87,11 +34,9 @@ function toBarElements(elements, bar) {
 
 /* Register <scribe-script> */
 
-export default element('scribe-script', {
+export default define(element('scribe-script', {
     shadow: `
-        <style>
-            @import './shadow.css';
-        </style>
+        <link rel="stylesheet" href="./shadow.css" />
         <svg width="0" height="0">
             <defs>
                 <!-- Rests -->
@@ -192,13 +137,16 @@ export default element('scribe-script', {
     `,
 
     construct: function(shadow, internals) {
-        const bar   = shadow.querySelector('.bar');
-        internals.state = assign({}, defaults);
+        const link = shadow.querySelector('link');
 
-        internals.source = Signal.of();
-        internals.clef   = Signal.of('treble');
-        internals.key    = Signal.of('C');
-        internals.meter  = Signal.of({ duration: 4, division: 1, breaks: [2] });
+        stylesheet.each((url) => {
+            console.log('URL', url);
+            link.href = url});
+
+        internals.data  = Signal.of();
+        internals.clef  = Signal.of('treble');
+        internals.key   = Signal.of('C');
+        internals.meter = Signal.of({ duration: 4, division: 1, breaks: [2] });
 
         /* Safari has some rounding errors to overcome... */
         internals.isSafari = navigator.userAgent.includes('AppleWebKit/')
@@ -213,36 +161,17 @@ export default element('scribe-script', {
             this.classList.add('safari');
         }
 
-        if (internals.src) {
-            const renderer = new Signal(() => {
-                // Evaluate
-                const source   = internals.source.value;
-                if (!source) { return; }
-                // Use content as source, strip leading and trailing space
-                const type     = internals.type;
-                const sequence = parseSource(this.type, source);
-                const elements = createSymbols(sequence.events, this.clef || 'treble')
-                    .reduce(toBarElements, []) ;
+        Signal.from(() => (internals.data.value
+            && createSymbols(internals.data.value.events, this.clef || 'treble')
+              .reduce(toBarElements, []))
+        )
+        // Put elements in the DOM
+        .each((elements) => shadow.append.apply(shadow, elements));
 
-                // Put bars in the DOM
-                shadow.append.apply(shadow, elements);
-            }, function() {
-                // Evaluate
-                renderer.value;
-            });
-
-            renderer.value;
-        }
-        else {
-            // Use content as source, strip leading and trailing space
-            const source   = this.textContent.trim();
-            const type     = internals.type;
-            const sequence = parseSource(this.type, source);
-            const elements = createSymbols(sequence.events, this.clef || 'treble')
-                .reduce(toBarElements, []) ;
-
-            // Put bars in the DOM
-            shadow.append.apply(shadow, elements);
+        // If there is no src use text content as data
+        if (!this.src) {
+            const source = this.textContent.trim();
+            internals.data.value = parseSource(this.type, source);
         }
     }
 }, {
@@ -284,7 +213,7 @@ export default element('scribe-script', {
     },
 
     /**
-    src=""
+    src="url"
     A path to an ABC, JSON or SEQUENCE file
     **/
     src: {
@@ -293,8 +222,22 @@ export default element('scribe-script', {
         set: function(src) {
             const internals = getInternals(this);
             internals.src = src;
-            requestData('source', getInternals(this), src);
+            requestData(this.type, src).then((data) => this.data = data);
         },
         default:   null
     },
-}, './shadow.css');
+
+    /**
+    .data
+    **/
+    data: {
+        get: function() { return getInternals(this).data.value; },
+        set: function(data) { getInternals(this).data.value = data; },
+        default: null
+    }
+}, './shadow.css'), {
+    stylesheet: {
+        set: (url) => stylesheet.value = url,
+        get: ()    => stylesheet.value
+    }
+});

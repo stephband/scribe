@@ -25,55 +25,74 @@
 </head>
 <body>
     <scribe-script type="sequence" clef="piano">
-        0 meter 4 1
-
-        0    chord A♭maj     2
-        2    chord A♭maj/G   1
-        3    chord C7alt     1
-        4    chord F-7       2
-        6    chord E♭-7      1
-        7    chord A♭7       1
-        8    chord D♭maj     2
+        0    meter 4 1
 
         0    lyric In        1.5
+        0    chord A♭maj     2
+        0    C5   0.2        1.5
+        0    Ab4  0.2        2
+        0    Ab2  0.2        2
+
         1.5  lyric the       0.5
+        1.5  Db5  0.2        0.5
+
         2    lyric bleak     1
+        2    chord A♭maj/G   1
+        2    Eb5  0.2        1
+        2    Bb4  0.2        1
+        2    F4   0.2        1
+        2    G2   0.2        1
+
         3    lyric mid-      1
+        3    chord C7alt     1
+        3    C5   0.2        1
+        3    C3   0.2        1
+
         4    lyric win-      2
+        4    chord F-7       2
+        4    Bb4  0.2        2
+        4    F3   0.2        2
+
         6    lyric ter,      2
+        6    chord E♭-7      1
+        6    Ab4  0.2        2
+        6    Eb2  0.2        1
+
+        7    chord A♭7       1
+        7    Ab2  0.2  1
+
         8    lyric Frost-    1.5
+        8    chord D♭maj     2
+        8    Bb4  0.2        1.5
+        8    F4   0.2        2
+        8    C4   0.2        2
+        8    Db3  0.2        2
+
         9.5  lyric y         0.5
+        9.5  C5   0.2        0.5
 
         10   lyric wind      0.5
+        10   chord B♭/D      2
+        10   Bb4  0.2        1
+        10   F4   0.2        1
+        10   C4   0.2        1
+        10   D3   0.2        2
+
         11   lyric made      0.5
+        11   F4   0.2        1
+
         12   lyric moan–     4
+        12   chord E♭7sus♭9  2
+        12   Ab4  0.2        2
+        12   E4   0.2        2
+        12   Db4  0.2        2
+        12   Eb3  0.2        2
 
-        0    C5   0.2  1.5
-        0    Ab4  0.2  1.5
-        1.5  Db5  0.2  0.5
-        2    Eb5  0.2  1
-        2    Bb4  0.2  1
-        2    F4   0.2  1
-        3    C5   0.2  1
-        4    Bb4   0.2  2
-        6    Ab4  0.2  2
-        8    Bb4   0.2  1.5
-        9.5  C5   0.2  0.5
-        10   Bb4  0.2  1
-        11   F4   0.2  1
-        12   Ab4  0.2  2
-        14   G4   0.2  2
-
-        0    Ab2  0.2  2
-        2    G2   0.2  1
-        3    C3   0.2  1
-        4    F3   0.2  2
-        6    Eb2  0.2  1
-        7    Ab2  0.2  1
-        8    Db3  0.2  2
-        10   D3   0.2  2
-        12   Eb3  0.2  2
-        14   Eb2  0.2  2
+        14   chord C/E♭      2
+        14   G4   0.2        2
+        14   E4   0.2        2
+        14   C4   0.2        2
+        14   Eb2  0.2        2
     </scribe-script>
 
     <h2>Drums stave</h2>
@@ -429,6 +448,7 @@
 
     <script type="module">
         import ScribeScript from './module.js';
+        ScribeScript.stylesheet = '/scribe/scribe-script/shadow.css';
     </script>
 </body>
 </html>
