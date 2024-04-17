@@ -24,7 +24,6 @@ https://web.mit.edu/merolish/Public/drums.pdf
         var(--y-size)
         [lyrics] var(--y-size);
 
-    /* FF won't stretch SVG */
     background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -2.5 1 5" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
         <style>line{vector-effect:non-scaling-stroke;stroke:currentcolor;stroke-width:0.0625em;stroke-linejoin:round;stroke-linecap:round;fill:none;}</style>\
         <line x1="0" x2="1" y1="0" y2="0"></line>\
