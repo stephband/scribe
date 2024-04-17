@@ -10,7 +10,12 @@ import createElement     from './modules/create-element.js';
 
 const assign     = Object.assign;
 const define     = Object.defineProperties;
+
+/* ScribeScript.stylesheet */
+
 const stylesheet = Signal.of();
+const stylefns   = [];
+stylesheet.each((url) => stylefns.forEach((fn) => fn(url)));
 
 
 /* Generate DOM */
@@ -137,12 +142,12 @@ export default define(element('scribe-script', {
     `,
 
     construct: function(shadow, internals) {
-        const link = shadow.querySelector('link');
+        // Listen to updates to ScribeScript.stylesheet and update the link
+        const stylelink = shadow.querySelector('link');
+        stylefns.push((url) => stylelink.href = url);
+        if (stylesheet.value) stylelink.href = stylesheet.value;
 
-        stylesheet.each((url) => {
-            console.log('URL', url);
-            link.href = url});
-
+        // Set up listeners for attribute/property changes
         internals.data  = Signal.of();
         internals.clef  = Signal.of('treble');
         internals.key   = Signal.of('C');
