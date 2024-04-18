@@ -1,7 +1,5 @@
 
-
 /* Bars */
-
 
 .bar {
 	--bar-column-gap:    0.04em;
@@ -442,6 +440,11 @@ Bars are divided into:
 	   before adding the proper margin, becuase they are aligned to the end of
 	   the column before their head. */
 	margin-right: calc(-1 * var(--bar-column-gap) - var(--head-margin-left) + var(--acci-margin-right));
+}
+
+.bar > .acci + .acci {
+	/* Attempt to space adjacent accidentals. */
+	margin-right: 0.4em;
 }
 
 /*  Map accidentals to the previous column */
