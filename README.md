@@ -1,3 +1,6 @@
+
+<img src="https://stephen.band/scribe/logo.png" />
+
 # Scribe
 
 Scribe notates music in HTML.
@@ -73,6 +76,7 @@ Sets the default meter. May be overridden by `"meter"` events in data.
 Returns an observable proxy of Scribe's internal data object. Changes to this
 data are observed and cause Scribe to update.
 
+
 ## Develop
 
 To install Scribe locally you need several repos served from one directory, as
@@ -91,6 +95,7 @@ git submodule add git@github.com:stephband/scribe path/to/scribe
 To check things are working launch your server and navigate to
 `path/to/scribe/scribe-script/index.html`.
 
+
 ## Contributions
 
 Rich Sigler of Sigler Music Fonts (http://www.jazzfont.com/) very kindly granted
@@ -98,3 +103,5 @@ permission to use JazzFont shapes as SVG paths in this project. If you use
 Scribe a lot consider buying a JazzFont license.
 
 Gavin Band implemented probabalistic key centre analysis.
+
+Scribe logo/mascot by Mariana Alt.

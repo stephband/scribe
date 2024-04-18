@@ -684,13 +684,15 @@ in their duration span. */
 
 .bar > .chord {
 	justify-self: start;
+	/* Nudge just ahead of heads */
+	margin-left: var(--head-margin-left);
 	margin-right: 0.25em;
 }
 
 .bar > .lyric {
 	justify-self: start;
-	/* Move them just ahead of heads */
-	margin-left: calc(var(--head-margin-left) - 1px);
+	/* Nudge just ahead of heads */
+	margin-left: var(--head-margin-left);
 	margin-right: 0.25em;
 }
 

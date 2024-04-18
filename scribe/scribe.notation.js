@@ -1,45 +1,45 @@
 (function(Scribe) {
 	"use strict";
-	
+
 	var debug = Scribe.debug;
 	var extend = Scribe.extend;
 	var mod12 = Scribe.mod12;
-	
+
 	//var names = ['C','C♯','D','E♭','E','F','F♯','G','A♭','A','B♭','B'];
 	var lines = ['C','D','E','F','G','A','B'];
 	var accidentals = { '-1': '♭', '0': '', '1': '♯' };
 	var notes = {
 		'C':   0,
 		'C#':  1,
-		'C♯': 1,
+		'C♯':  1,
 		'Db':  1,
-		'D♭': 1,
+		'D♭':  1,
 		'D':   2,
 		'D#':  3,
-		'D♯': 3,
+		'D♯':  3,
 		'Eb':  3,
-		'E♭': 3,
+		'E♭':  3,
 		'E':   4,
 		'F':   5,
 		'F#':  6,
-		'F♯': 6,
+		'F♯':  6,
 		'Gb':  6,
-		'G♭': 6,
+		'G♭':  6,
 		'G':   7,
 		'G#':  8,
-		'G♯': 8,
+		'G♯':  8,
 		'Ab':  8,
-		'A♭': 8,
+		'A♭':  8,
 		'A':   9,
 		'A#':  10,
-		'A♯': 10,
+		'A♯':  10,
 		'Bb':  10,
-		'B♭': 10,
+		'B♭':  10,
 		'B':   11
 	};
-	
+
 	var keys = [
-		//C              D               E       F               G               A               B      
+		//C              D               E       F               G               A               B
 		[[0, 0], [0, 1], [1, 0], [2,-1], [2, 0], [3, 0], [3, 1], [4, 0], [5,-1], [5, 0], [6,-1], [6, 0], 'C'],   // C
 		[[0, 0], [1,-1], [1, 0], [2,-1], [3,-1], [3, 0], [4,-1], [4, 0], [5,-1], [5, 0], [6,-1], [7,-1], 'D♭'], // D♭
 		[[0, 0], [0, 1], [1, 0], [1, 1], [2, 0], [3, 0], [3, 1], [4, 0], [4, 1], [5, 0], [6,-1], [6, 0], 'D'],   // D
@@ -54,36 +54,36 @@
 		[[0, 0], [1,-1], [1, 0], [2,-1], [2, 0], [3, 0], [4,-1], [4, 0], [5,-1], [5, 0], [6,-1], [6, 0], 'B♭'], // B♭
 		[[-1,1], [0, 1], [1, 0], [1, 1], [2, 0], [2, 1], [3, 1], [4, 0], [4, 1], [5, 0], [5, 1], [6, 0], 'B']    // B
 	];
-	
-	
+
+
 	// Expose functions
-	
+
 	var functions = {
 		number: function(name) {
 			return notes[name];
 		},
-		
+
 		key: function(k) {
 			return keys[k];
 		},
-		
+
 		spelling: function(n, key) {
 			return keys[key || 0][mod12(n)];
 		},
-		
+
 		spell: function(n, key) {
 			var spelling = this.spelling(n, key);
 			return lines[spelling[0]] + accidentals[spelling[1]];
 		},
-		
+
 		octave: function(n) {
 			return Math.floor(n / 12);
 		},
-		
+
 		degree: function(n) {
 			return n % 12;
 		}
 	};
-	
+
 	Scribe.extend(Scribe, functions);
 })(Scribe);
