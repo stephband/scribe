@@ -2,6 +2,8 @@
 /* Bars */
 
 .bar {
+	/*
+	--bar-line-size:     0.1rem;
 	--bar-column-gap:    0.04em;
 	--bar-padding-left:  0.6em;
 	--bar-padding-right: 0.3em;
@@ -11,6 +13,7 @@
 	--head-margin-left:  0.25em;
 	--head-margin-right: 0.1em;
 	--stem-thickness:    0.06em;
+	*/
 
 	display: grid;
 	grid-auto-columns: 0px;
@@ -700,6 +703,5 @@ in their duration span. */
 	margin-left: calc(var(--head-margin-left) + 2.7 * var(--y-size));
 	/* - bar start gap - half of head width */
 	margin-right: calc(-3 * var(--y-size));
-
 	min-width: calc(4 * var(--y-size));
 }

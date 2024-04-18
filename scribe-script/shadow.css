@@ -16,7 +16,17 @@
 @import './classes/svg.css';
 
 :host {
-    --bar-line-size: 0.1rem;
+    /* Metrics */
+    --bar-line-size:     0.1rem;
+    --bar-column-gap:    0.04em;
+    --bar-padding-left:  0.6em;
+    --bar-padding-right: 0.3em;
+    --acci-margin-left:  0;
+    --acci-margin-right: 0.25em;
+    --head-width:        calc(2.7 * var(--y-size));
+    --head-margin-left:  0.25em; /* Not included in --acci-margin-right spacing */
+    --head-margin-right: 0.1em;
+    --stem-thickness:    0.06em;
 
     padding-left: var(--bar-line-size, 1px);
 
