@@ -32,6 +32,8 @@
     --head-margin-right: 0.1em;
     --stem-thickness:    0.06em;
 
+    --safari-bar-mask-color: white;
+
     padding-left: var(--bar-line-size, 1px);
 
     display: block;
