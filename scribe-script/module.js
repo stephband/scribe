@@ -6,6 +6,7 @@ import createSymbols     from '../modules/create-symbols.js';
 import requestData       from '../modules/request-data.js';
 import parseSource       from '../modules/parse-source.js';
 import createElement     from './modules/create-element.js';
+import keyAtBeat         from '../modules/events/key-at-beat.js';
 
 
 const assign     = Object.assign;
@@ -202,6 +203,19 @@ export default define(element('scribe-script', {
         attribute: function(value) { this.key = value; },
         get: function() { return getInternals(this).key.value; },
         set: function(value) { getInternals(this).key.value = value; }
+    },
+
+    /**
+    keyAtBeat(beat)
+    Returns the probable key at a given beat. Not that this is not the key
+    defined in any data, this is the key centre as inferred from surrounding
+    notes.
+    **/
+    keyAtBeat: {
+        value: function(beat) {
+            console.log(1, this.data.events);
+            return keyAtBeat(this.data.events, beat);
+        }
     },
 
     /**
