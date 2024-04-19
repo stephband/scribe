@@ -1,8 +1,10 @@
 
-import by       from '../../fn/modules/by.js';
-import get      from '../../fn/modules/get.js';
-import overload from '../../fn/modules/overload.js';
+import by        from '../../fn/modules/by.js';
+import get       from '../../fn/modules/get.js';
+import overload  from '../../fn/modules/overload.js';
 import { toNoteNumber, toNoteName, normaliseNoteName } from '../../midi/modules/note.js';
+import toNoteSpelling from './event/to-spelling.js';
+import keyAtBeat from './sequence/key-at-beat.js';
 import * as staves from './staves.js';
 
 const assign = Object.assign;
@@ -423,11 +425,11 @@ function toSymbols(bar) {
 
 function createBarFromBuffer(barBeat, barDuration, buffer, stave) {
     const bar = {
-        beat: barBeat,
+        beat:     barBeat,
         duration: barDuration,
-        breaks: [2],
-        symbols: [],
-        stave: stave
+        breaks:   [2],
+        symbols:  [],
+        stave:    stave
     };
 
     let m = -1;
@@ -536,7 +538,8 @@ function splitByBar(events, barDuration, stave) {
 
             if (event[1] === 'note') {
                 let pitch = typeof event[2] === 'number' ?
-                    toNoteName(event[2]) :
+                    toNoteSpelling(keyAtBeat(events, event[0]), event[2]) :
+                    //toNoteName(event[2]) :
                     normaliseNoteName(event[2]) ;
 
                 let duration = barBeat + barDuration - event[0];
@@ -571,7 +574,8 @@ function splitByBar(events, barDuration, stave) {
         else {
             if (event[1] === 'note') {
                 let pitch = typeof event[2] === 'number' ?
-                    toNoteName(event[2]) :
+                    toNoteSpelling(keyAtBeat(events, event[0]), event[2]) :
+                    //toNoteName(event[2]) :
                     normaliseNoteName(event[2]) ;
 
                 bar.symbols.push(assign({

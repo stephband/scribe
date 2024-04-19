@@ -1,5 +1,5 @@
 
-import toDuration from './to-duration.js';
+import toDuration from '../event/to-duration.js';
 
 const output = [];
 

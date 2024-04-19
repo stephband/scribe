@@ -1,5 +1,5 @@
-import parseABC          from './parse-abc.js';
-import parseSequenceText from './parse-sequence-text.js';
+import parseABC          from './parse/parse-abc.js';
+import parseSequenceText from './parse/parse-sequence-text.js';
 
 
 /* Parse data

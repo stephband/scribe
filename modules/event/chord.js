@@ -1,19 +1,11 @@
 
-import nothing from '../../../fn/modules/nothing.js';
-import scales  from '../keys.js';
+import nothing         from '../../../fn/modules/nothing.js';
+import { noteNumbers } from '../../../midi/modules/note.js';
+import keys            from '../keys.js';
+import { mod12 }       from '../maths.js';
 
 
-const rchord = /([ABCDEFG][♭♯]?)([^\/]*)(?:\/([ABCDEFG]))?/;
-
-const numbers = {
-    'C': 0,
-    'D': 2,
-    'E': 4,
-    'F': 5,
-    'G': 7,
-    'A': 9,
-    'B': 11
-};
+const rchord = /([ABCDEFG][b#♭♯𝄫𝄪]?)([^\/]*)(?:\/([ABCDEFG]))?/;
 
 const modes = {
     '∆':       0,
@@ -84,7 +76,7 @@ export function normaliseChordName(str) {
 
 export function toRoot(str) {
     var name = (rchord.exec(str) || nothing)[1];
-    return numbers[name];
+    return noteNumbers[name];
 }
 
 export function toExtension(str) {
@@ -102,14 +94,14 @@ export function toBass(str) {
 }
 
 export function toKey(str) {
-    return scales[mod12(toRoot(str) - toMode(str))];
+    return keys[mod12(toRoot(str) - toMode(str))];
 }
 
 export function toChordNotes(str) {
-    var notes = chordNotes[toExtension(str)];
-    var root  = toRoot(str);
-    return notes ? notes
-        .map((n) => (n + root) % 12)
+    const root  = toRoot(str);
+    const ext   = toExtension(str);
+    return chordNotes[ext] ? chordNotes[ext]
+        .map((n) => mod12(n + root))
         .sort() :
         [] ;
 }

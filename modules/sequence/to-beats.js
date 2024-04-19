@@ -17,3 +17,9 @@ export default function toBeats(events) {
 
     return beats.sort();
 }
+
+// TODO This would be better...
+// events
+// .map(get(0))
+// .filter((v, i, array) => (array.indexOf(v) === i))
+// .sort();

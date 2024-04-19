@@ -1,8 +1,8 @@
 
 import sum          from '../../../fn/modules/sum.js';
+import toBeats      from '../sequence/to-beats.js';
+import toNotes      from '../event/to-notes.js';
 import eventsAtBeat from './events-at-beat.js';
-import toBeats      from './to-beats.js';
-import toScale      from './to-scale.js';
 
 
 /** toKeys(events)
@@ -10,18 +10,16 @@ import toScale      from './to-scale.js';
    array of events.
 **/
 
-const initialProb = [1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12];
-
-const transitionProbs = [10, 5, 8, 10, 6, 10, 8, 10, 7, 10, 8, 4];
-
-const transitionSum = transitionProbs
+const initialProb      = [1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12];
+const transitionProbs  = [10, 5, 8, 10, 6, 10, 8, 10, 7, 10, 8, 4];
+const transitionSum    = transitionProbs
 	.reduce(sum);
 
 const transitionMatrix = transitionProbs
-	.map(function(n) { return n / transitionSum; })
+	.map((n) => n / transitionSum)
 	.map(toMatrix);
 
-const emissionMatrix = [0.1, 0.04, 0.1, 0.04, 0.1, 0.1, 0.04, 0.1, 0.04, 0.1, 0.04, 0.1]
+const emissionMatrix   = [0.1, 0.04, 0.1, 0.04, 0.1, 0.1, 0.04, 0.1, 0.04, 0.1, 0.04, 0.1]
 	.map(toMatrix);
 
 
@@ -111,7 +109,8 @@ function pushAll(array1, array2) {
 }
 
 export default function toKeys(events) {
-	const beats  = toBeats(events);
+	// Get beats of harmony events
+	const beats  = toBeats(events.filter((event) => event[1] === 'note' || event[1] === 'chord'));
 	const length = beats.length;
 	const notes  = [];
 
@@ -122,9 +121,18 @@ export default function toKeys(events) {
 		// beatEvents must be used synchronously – it is a buffer that is
 		// overwritten on the next call to eventsAtBeat()
 		beatEvents = eventsAtBeat(beat, events);
+
+		var arraysOfNotes = beatEvents.map(toNotes);
+		if (arraysOfNotes.find((notes) => notes.find(Number.isNaN) !== undefined) !== undefined) {
+			console.log(beatEvents);
+			throw new Error('toNotes has returned NaN for beatEvents');
+		};
+
 		notes.push(
 			beatEvents
-			.map(toScale)
+			// Maps to arrays of note numbers, so a note event will be an array
+			// of one number, a chord may have many.
+			.map(toNotes)
 			.reduce(pushAll, [])
 		);
 	}
