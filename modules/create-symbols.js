@@ -503,8 +503,10 @@ function splitByBar(events, barDuration, stave) {
             }
 
             bar.duration = barDuration = event[2];
+            // TODO breaks should be defined in config somewhere - in CSS if possible?
             bar.breaks   = bar.duration === 4 ? [2] :
                 bar.duration === 3 ? [1,2] :
+                bar.duration === 2 ? [1] :
                 [] ;
             bar.symbols.push({
                 type:        'timesig',
