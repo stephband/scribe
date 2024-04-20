@@ -529,6 +529,7 @@ function splitByBar(events, beatkeys, stave, keysig, meter, transpose) {
             bar.duration = event[2];
             bar.breaks = meter.duration === 4 ? [2] :
                 bar.duration === 3 ? [1,2] :
+                bar.duration === 2 ? [1] :
                 [] ;
 
             // Push a time signature if there is a meter change
