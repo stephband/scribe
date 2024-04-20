@@ -38,6 +38,18 @@ function toBarElements(elements, bar) {
 }
 
 
+/* Parse attributes */
+
+const rtimesig = /^(\d+)\/(\d+)$/;
+
+function timesigToMeter(string) {
+    const groups = rtimesig.exec(string);
+    const num = parseInt(groups[1], 10);
+    const div = 4 / parseInt(groups[2], 10);
+    return [0, "meter", num * div, div];
+}
+
+
 /* Register <scribe-script> */
 
 export default define(element('scribe-script', {
@@ -149,10 +161,11 @@ export default define(element('scribe-script', {
         if (stylesheet.value) stylelink.href = stylesheet.value;
 
         // Set up listeners for attribute/property changes
-        internals.data  = Signal.of();
-        internals.clef  = Signal.of('treble');
-        internals.key   = Signal.of('C');
-        internals.meter = Signal.of({ duration: 4, division: 1, breaks: [2] });
+        internals.data      = Signal.of();
+        internals.clef      = Signal.of('treble');
+        internals.key       = Signal.of('C');
+        internals.meter     = Signal.of('4/4');
+        internals.transpose = Signal.of(0);
 
         /* Safari has some rounding errors to overcome... */
         internals.isSafari = navigator.userAgent.includes('AppleWebKit/')
@@ -168,11 +181,20 @@ export default define(element('scribe-script', {
         }
 
         Signal.from(() => (internals.data.value
-            && createSymbols(internals.data.value.events, this.clef || 'treble')
-              .reduce(toBarElements, []))
+            // events, clef, keysig, meter, transpose
+            && createSymbols(
+                internals.data.value.events,
+                internals.clef.value,
+                internals.key.value,
+                timesigToMeter(internals.meter.value),
+                internals.transpose.value
+            ).reduce(toBarElements, []))
         )
-        // Put elements in the DOM
-        .each((elements) => shadow.append.apply(shadow, elements));
+        .each((elements) => {
+            // Clear the shadow DOM and put new elements in it
+            shadow.querySelectorAll('.bar').forEach((element) => element.remove());
+            shadow.append.apply(shadow, elements);
+        });
 
         // If there is no src use text content as data
         if (!this.src) {
@@ -203,6 +225,37 @@ export default define(element('scribe-script', {
         attribute: function(value) { this.key = value; },
         get: function() { return getInternals(this).key.value; },
         set: function(value) { getInternals(this).key.value = value; }
+    },
+
+    /**
+    meter="4/4"
+    Sets the meter. Note that this is overridden by any `"meter"` event found at
+    beat `0` in the data.
+    **/
+    meter: {
+        attribute: function(value) { this.key = value; },
+        get: function() { return getInternals(this).meter.value; },
+        set: function(value) { getInternals(this).meter.value = value; }
+    },
+
+    /**
+    transpose="0"
+    Sets transposition value for display of notation.
+    **/
+
+    /**
+    .transpose = 0
+    Sets transposition value for display of notation.
+    **/
+    transpose: {
+        attribute: function(value) { this.transpose = value; },
+        get: function() { return getInternals(this).transpose.value; },
+        set: function(value) {
+            // Set integer from value
+            getInternals(this).transpose.value = typeof value === 'number' ?
+                Math.round(value) :
+                parseInt(value, 10) ;
+        }
     },
 
     /*

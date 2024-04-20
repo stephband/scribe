@@ -11,7 +11,7 @@ transposeEvent(event)
 const rroot = /^[A-G][b#♭♯𝄫𝄪]?/;
 
 export default overload(get(1), {
-    note:  (event, n) => {
+    note: (event, n) => {
         event[2] = toNoteNumber(event[2]) + n;
         return event;
     },

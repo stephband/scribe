@@ -5,14 +5,15 @@ import toBeats from './to-beats.js';
 import toKeys  from './to-keys.js';
 
 /**
-toBeatKeys(events)
+keysAtBeats(events)
 Returns an array of `[beat, key]` entries, with an entry for each
 unique beat found in events.
 **/
 
-export function toBeatKeys(events) {
-    const beats = toBeats(events);
-    const keys  = toKeys(events);
+export function keysAtBeats(events) {
+    const harmonies = events.filter((event) => /^note|chord$/.test(event[1]));
+    const beats = toBeats(harmonies);
+    const keys  = toKeys(harmonies);
     return beats.map((beat, i) => [beat, keys[i]]);
 }
 
@@ -38,12 +39,8 @@ Get the key at the given beat by looking at the latest event
 beat to see what it has.
 **/
 
-
 export default function keyAtBeat(events, beat) {
-    const notes = events
-        .filter((event) => /^note|chord$/.test(event[1]))
-        .sort(by(get(0)));
-
-    return keyFromBeatKeys(toBeatKeys(notes), beat);
+    const beatkeys = keysAtBeats(events.sort(by(get(0))));
+    return keyFromBeatKeys(beatkeys, beat);
 }
 

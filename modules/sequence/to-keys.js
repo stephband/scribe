@@ -120,7 +120,7 @@ export default function toKeys(events) {
 		beat = beats[n];
 		// beatEvents must be used synchronously – it is a buffer that is
 		// overwritten on the next call to eventsAtBeat()
-		beatEvents = eventsAtBeat(beat, events);
+		beatEvents = eventsAtBeat(events, beat);
 
 		var arraysOfNotes = beatEvents.map(toNotes);
 		if (arraysOfNotes.find((notes) => notes.find(Number.isNaN) !== undefined) !== undefined) {
