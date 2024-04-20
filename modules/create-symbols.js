@@ -1,10 +1,10 @@
 
-import by        from '../../fn/modules/by.js';
-import get       from '../../fn/modules/get.js';
-import overload  from '../../fn/modules/overload.js';
+import by          from '../../fn/modules/by.js';
+import get         from '../../fn/modules/get.js';
+import overload    from '../../fn/modules/overload.js';
 import { toNoteNumber, toNoteName, normaliseNoteName } from '../../midi/modules/note.js';
-import toNoteSpelling from './event/to-spelling.js';
-import keyAtBeat from './sequence/key-at-beat.js';
+import toKeys      from './sequence/to-keys.js';
+import keyAtBeat   from './sequence/key-at-beat.js';
 import * as staves from './staves.js';
 
 const assign = Object.assign;
@@ -423,7 +423,7 @@ function toSymbols(bar) {
     return bar;
 }
 
-function createBarFromBuffer(barBeat, barDuration, buffer, stave) {
+function createBarFromBuffer(events, keys, barBeat, barDuration, buffer, stave) {
     const bar = {
         beat:     barBeat,
         duration: barDuration,
@@ -433,12 +433,11 @@ function createBarFromBuffer(barBeat, barDuration, buffer, stave) {
     };
 
     let m = -1;
-    let tied, pitch;
+    let tied, key, pitch;
     while (buffer[++m] && buffer[m][0] < barBeat + barDuration) {
-        tied = buffer[m];
-        pitch = typeof tied[2] === 'number' ?
-            toNoteName(tied[2]) :
-            normaliseNoteName(tied[2]);
+        tied  = buffer[m];
+        key   = keyAtBeat(events, tied[0]);
+        pitch = stave.getSpelling(key, tied[2], tied[1]);
 
         // Event ends after this bar
         if (barBeat + barDuration < tied[0] + tied[4]) {
@@ -475,7 +474,7 @@ function createBarFromBuffer(barBeat, barDuration, buffer, stave) {
     return bar;
 }
 
-function splitByBar(events, barDuration, stave) {
+function splitByBar(events, keys, barDuration, stave) {
     const bars   = [];
     const buffer = [];
 
@@ -487,7 +486,7 @@ function splitByBar(events, barDuration, stave) {
 
 
     let barBeat = 0;
-    let bar = createBarFromBuffer(barBeat, barDuration, buffer, stave);
+    let bar = createBarFromBuffer(events, keys, barBeat, barDuration, buffer, stave);
     bars.push(bar);
 
     bar.symbols.push({
@@ -528,25 +527,22 @@ function splitByBar(events, barDuration, stave) {
         while (event[0] >= barBeat + barDuration) {
             // Create the next bar
             barBeat = barBeat + barDuration;
-            bar = createBarFromBuffer(barBeat, barDuration, buffer, stave);
+            bar = createBarFromBuffer(events, keys, barBeat, barDuration, buffer, stave);
             bars.push(bar);
         }
 
+        const beat = event[0] - barBeat;
+        const key  = keyAtBeat(events, event[0]);
+
         // Event ends after this bar
         if (event[0] + getDuration(event) > barBeat + barDuration) {
-            let beat  = event[0] - barBeat;
-
             if (event[1] === 'note') {
-                let pitch = typeof event[2] === 'number' ?
-                    toNoteSpelling(keyAtBeat(events, event[0]), event[2]) :
-                    //toNoteName(event[2]) :
-                    normaliseNoteName(event[2]) ;
-
+                let pitch    = stave.getSpelling(key, event[2], event[1]);
                 let duration = barBeat + barDuration - event[0];
 
                 bar.symbols.push(assign({
                     type: 'head',
-                    beat: beat,
+                    beat,
                     pitch,
                     duration,
                     head: stave.getHead && stave.getHead(pitch, duration),
@@ -558,11 +554,22 @@ function splitByBar(events, barDuration, stave) {
                 buffer.push(event);
             }
 
-            else {
-                // Truncate 'chord' or 'lyric' to bar end
+            else if (event[1] === 'chord') {
+                // Truncate 'chord' to bar end, spell according to current key
                 bar.symbols.push({
                     type:  event[1],
-                    beat:  beat,
+                    beat,
+                    value: stave.getSpelling(key, event[2], event[1]),
+                    duration: barBeat + barDuration - event[0],
+                    event: event
+                });
+            }
+
+            else {
+                // Truncate 'lyric' to bar end
+                bar.symbols.push({
+                    type:  event[1],
+                    beat,
                     value: event[2],
                     duration: barBeat + barDuration - event[0],
                     event: event
@@ -573,14 +580,10 @@ function splitByBar(events, barDuration, stave) {
         // Event ends inside this bar
         else {
             if (event[1] === 'note') {
-                let pitch = typeof event[2] === 'number' ?
-                    toNoteSpelling(keyAtBeat(events, event[0]), event[2]) :
-                    //toNoteName(event[2]) :
-                    normaliseNoteName(event[2]) ;
-
+                let pitch = stave.getSpelling(key, event[2], event[1]);
                 bar.symbols.push(assign({
                     type: 'head',
-                    beat: event[0] - barBeat,
+                    beat,
                     pitch,
                     duration: event[4],
                     head: stave.getHead && stave.getHead(pitch, event[4]),
@@ -588,11 +591,21 @@ function splitByBar(events, barDuration, stave) {
                 }, stave.getPart && stave.getPart(pitch)));
             }
 
-            else {
-                // Type 'chord' or 'lyric'
+            else if (event[1] === 'chord') {
                 bar.symbols.push({
                     type: event[1],
-                    beat: event[0] - barBeat,
+                    beat,
+                    value: stave.getSpelling(key, event[2], event[1]),
+                    duration: event[3],
+                    event: event
+                });
+            }
+
+            else {
+                // Type 'lyric'
+                bar.symbols.push({
+                    type: event[1],
+                    beat,
                     value: event[2],
                     duration: event[3],
                     event: event
@@ -605,7 +618,7 @@ function splitByBar(events, barDuration, stave) {
     while (buffer.length) {
         // Create the next bar
         barBeat = barBeat + barDuration;
-        bar = createBarFromBuffer(barBeat, barDuration, buffer, stave);
+        bar = createBarFromBuffer(events, keys, barBeat, barDuration, buffer, stave);
         bars.push(bar);
     }
 
@@ -619,5 +632,14 @@ export default function createSymbols(events, clef) {
         staves[clef] :
         staves.treble ;
 
-    return splitByBar(events, defaultMeter.duration, stave).map(toSymbols);
+    // TODO: Optimise keys by mapping events to keys HERE rather than every
+    // time we create a symbol
+    const keys = null;//toKeys(events);
+
+    /*if (window.DEBUG && keys.length !== events.length) {
+        console.log(events, keys);
+        throw new Error('events and keys are not the same length');
+    }*/
+
+    return splitByBar(events, keys, defaultMeter.duration, stave).map(toSymbols);
 }

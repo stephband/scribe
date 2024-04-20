@@ -1,5 +1,6 @@
 
-import { noteNames, toNoteNumber, toNoteOctave } from '../../../midi/modules/note.js';
+import nothing from '../../../fn/modules/nothing.js';
+import { noteNames, toRootNumber, toNoteOctave } from '../../../midi/modules/note.js';
 import { mod12 } from '../maths.js';
 import keys from '../keys.js';
 
@@ -11,21 +12,40 @@ const accidentals = {
     '2':  '𝄪'
 };
 
-export default function toSpelling(keyname, notename) {
-    const n      = toNoteNumber(notename) ;
-    const octave = toNoteOctave(notename) ;
-    const key    =
-        typeof keyname === 'number' ? keys[keyname] :
-        typeof keyname === 'string' ? keys.find((key) => key.name === keyname) :
-        keyname ;
+const rroot = /^[A-G][b#♭♯𝄫𝄪]?/;
 
-    const spelling = key.spellings[mod12(n)];
-    const name     = noteNames[mod12(n - spelling)];
+export default function toSpelling(key, note) {
+    // Make sure key is a key object
+    key = typeof key === 'number' ? keys[key] :
+        typeof key === 'string' ? keys.find((o) => o.name === key) :
+        key ;
 
-    if (window.DEBUG && name === undefined) {
-        throw new Error('Incorrect spelling for note number ' + n + ': ' + name)
+    let r, rest;
+
+    if (typeof note === 'string') {
+        const root = (rroot.exec(note) || nothing)[0];
+
+        if (window.DEBUG && !root) {
+            throw new Error('toSpelling(key, note) note string must start with valid note name "' + note + '"');
+        }
+
+        r    = toRootNumber(root);
+        rest = note.slice(root.length);
+    }
+    else {
+        r    = toRootNumber(note);
+        rest = toNoteOctave(note) || '' ;
     }
 
-console.log(name + accidentals[spelling] + octave);
-    return name + accidentals[spelling] + octave;
+    const spelling   = key.spellings[mod12(r)];
+    const name       = noteNames[mod12(r - spelling)];
+    const accidental = accidentals[spelling];
+
+    if (window.DEBUG && name === undefined) {
+        throw new Error('Incorrect spelling for note number ' + r + ': ' + name)
+    }
+
+/*console.log(note, name + accidental + rest + ' in the key of ' + key.name);*/
+
+    return name + accidental + rest;
 }

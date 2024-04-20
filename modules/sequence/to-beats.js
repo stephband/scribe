@@ -1,4 +1,7 @@
 
+import get from '../../../fn/modules/get.js';
+import { byGreater } from '../maths.js';
+
 const beats = [];
 
 export default function toBeats(events) {
@@ -15,7 +18,7 @@ export default function toBeats(events) {
         }
     }
 
-    return beats.sort();
+    return beats.sort(byGreater);
 }
 
 // TODO This would be better...

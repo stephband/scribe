@@ -1,18 +1,32 @@
+
+import toSpelling from './event/to-spelling.js';
+import { toNoteName, toNoteNumber } from '../../midi/modules/note.js';
+
+
+export const chords = {
+    clef: 'chords',
+    getSpelling: toSpelling
+};
+
 export const treble = {
-    clef: 'treble'
+    clef: 'treble',
+    getSpelling: toSpelling
 };
 
 export const bass = {
-    clef: 'bass'
+    clef: 'bass',
+    getSpelling: toSpelling
 };
 
 export const piano = {
     clef: 'piano',
 
+    getSpelling: toSpelling,
+
     getPart: function(pitch) {
         // A part is an object of properties assigned to a symbol.
         // Render anything below Bb3 on the lower part.
-        return /[012]$|[AC-G][b#♭♯]*3$/.test(pitch) ? {
+        return /[012]$|[AC-G][b#♭♯𝄫𝄪]*3$/.test(pitch) ? {
             part:      'lower',
             centerRow: 'stave-lower'
         } : {
@@ -21,12 +35,19 @@ export const piano = {
     }
 };
 
-export const chords = {
-    clef: 'chords'
-};
-
 export const drums = {
     clef: 'drums',
+
+    getSpelling: (key, name, type) => {
+        if (type === 'chord') {
+            return getSpelling(key, name);
+        }
+        else if (type === 'note') {
+            // Use standard MIDI note names. We don't want any spelling happening
+            // on drum parts.
+            return toNoteName(toNoteNumber(name));
+        }
+    },
 
     heads: {
         /*"C♯2":  "head[1]", /* Side Stick */
@@ -110,5 +131,16 @@ export const drums = {
 };
 
 export const percussion = {
-    clef: 'percussion'
+    clef: 'percussion',
+
+    getSpelling: (key, name, type) => {
+        if (type === 'chord') {
+            return getSpelling(key, name);
+        }
+        else if (type === 'note') {
+            // Use standard MIDI note names. We don't want any spelling happening
+            // on drum parts.
+            return toNoteName(toNoteNumber(name));
+        }
+    }
 };

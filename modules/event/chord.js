@@ -2,7 +2,7 @@
 import nothing         from '../../../fn/modules/nothing.js';
 import { noteNumbers } from '../../../midi/modules/note.js';
 import keys            from '../keys.js';
-import { mod12 }       from '../maths.js';
+import { mod12, byGreater } from '../maths.js';
 
 
 const rchord = /([ABCDEFG][b#♭♯𝄫𝄪]?)([^\/]*)(?:\/([ABCDEFG]))?/;
@@ -102,6 +102,6 @@ export function toChordNotes(str) {
     const ext   = toExtension(str);
     return chordNotes[ext] ? chordNotes[ext]
         .map((n) => mod12(n + root))
-        .sort() :
+        .sort(byGreater) :
         [] ;
 }

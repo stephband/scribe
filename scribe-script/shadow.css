@@ -15,6 +15,11 @@
 @import './classes/lyric.css';
 @import './classes/svg.css';
 
+*, ::before, ::after {
+    box-sizing: border-box;
+    background-repeat: no-repeat;
+}
+
 :host {
     /* Metrics */
     --bar-line-size:     0.1rem;

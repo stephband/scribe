@@ -7,3 +7,11 @@ euclidean division).
 */
 
 export function mod12(n) { return mod(12, n); }
+
+
+
+export function byGreater(a, b) {
+    return a > b ? 1 :
+        a < b ? -1 :
+        0 ;
+}

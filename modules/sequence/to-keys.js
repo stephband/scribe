@@ -2,6 +2,7 @@
 import sum          from '../../../fn/modules/sum.js';
 import toBeats      from '../sequence/to-beats.js';
 import toNotes      from '../event/to-notes.js';
+import keys         from '../keys.js';
 import eventsAtBeat from './events-at-beat.js';
 
 
@@ -110,7 +111,8 @@ function pushAll(array1, array2) {
 
 export default function toKeys(events) {
 	// Get beats of harmony events
-	const beats  = toBeats(events.filter((event) => event[1] === 'note' || event[1] === 'chord'));
+	// Don't filter events. The output array must be the same length as the input array.
+	const beats  = toBeats(events);
 	const length = beats.length;
 	const notes  = [];
 
