@@ -7,15 +7,13 @@ import eventsAtBeat from './events-at-beat.js';
 
 
 /** toKeys(events)
-   Uses the Viterbi algorithm to probabalistically determine key centres of an
+   Uses the Viterbi algorithm to determine key centres of an
    array of events.
 **/
 
 const initialProb      = [1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12, 1/12];
 const transitionProbs  = [10, 5, 8, 10, 6, 10, 8, 10, 7, 10, 8, 4];
-const transitionSum    = transitionProbs
-	.reduce(sum);
-
+const transitionSum    = transitionProbs.reduce(sum);
 const transitionMatrix = transitionProbs
 	.map((n) => n / transitionSum)
 	.map(toMatrix);
@@ -69,7 +67,7 @@ function viterbi(data, initialProb, transitionMatrix, emissionMatrix) {
 			i = -1;
 
 			while (++i < 12) {
-				// Calculate the probablity
+				// Calculate the probability
 				prob = matrix[t - 1][i]
 					+ Math.log(transitionMatrix[i][j])
 					+ computeEmissions(data[t], emissionMatrix[j]);
