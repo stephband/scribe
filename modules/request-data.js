@@ -2,7 +2,7 @@
 import cache          from '../../fn/modules/cache-by-key.js';
 import overload       from '../../fn/modules/overload.js';
 import { requestGet } from '../../dom/modules/request.js';
-import parseSource    from './parse-source.js';
+import parse          from './parse.js';
 
 const requestData = cache(requestGet);
 const rpath       = /^\.*\/|^https?:\/\//;
@@ -18,7 +18,7 @@ export default overload((type, value) => typeof value, {
         }
 
         return requestData(url)
-        .then((source) => parseSource(type, source))
+        .then((source) => parse(type, source))
         .catch((error) => console.error(error));
     },
 

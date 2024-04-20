@@ -1,4 +1,11 @@
 
+@font-face {
+    font-family: JazzText;
+    src: url('/scribe/fonts/FinaleJazzText/finalejazztext-webfont.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
 scribe-script::after {
     content: '';
     flex: 6 1;

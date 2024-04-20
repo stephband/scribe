@@ -11,14 +11,14 @@ renders notation as symbols in a CSS grid.
 
 ## Download
 
-Scribe 0.3 is a rewrite, and does not yet have a build.
+Scribe 0.3 is a recent rewrite, and does not yet have a build.
 
 
 ## `<scribe-script>`
 
 Scribe 0.3 is a rewrite, and this custom element is the test bed. To try out the
 development version of the element, import the css, register the element and
-set the path to the shadow DOM stylesheet.
+set the path to the shadow DOM stylesheet:
 
 ```html
 <link rel="stylesheet" href="https://stephen.band/scribe/scribe-script/module.css" />

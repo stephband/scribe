@@ -1,6 +1,11 @@
 
-import matches   from '../../fn/modules/matches.js';
-import ABCParser from '../../abcjs/modules/parse/abc_parse.js';
+/**
+parseABC()
+A quick-and-dirty interface with abcjs's parser. Please clean me up.
+**/
+
+import matches   from '../../../fn/modules/matches.js';
+import ABCParser from '../../../abcjs/modules/parse/abc_parse.js';
 
 const parser = new ABCParser();
 

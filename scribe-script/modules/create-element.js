@@ -58,7 +58,21 @@ export default overload(get('type'), {
     chord: (symbol) => create('p', {
         class:   "chord",
         data: { beat: symbol.beat + 1, duration: symbol.duration },
-        html: symbol.value.replace('(♯11)', '<sup class="chord-brackets">(♯11)</sup>')
+        html: (() => {
+            return symbol.value
+            .replace('(♯11)', '<sup class="chord-brackets">(♯11)</sup>')
+            .replace('6',   '<sup class="six">6</sup>')
+            .replace('7',   '<sup class="seven">7</sup>')
+            .replace('9',   '<sup class="nine">9</sup>')
+            .replace('maj', '<sub class="tag">maj</sub>')
+            .replace('min', '<sub class="tag">min</sub>')
+            .replace('alt', '<sub class="tag">alt</sub>')
+            .replace('sus', '<sub class="tag">sus</sub>')
+            .replace('ø',   '<sup class="halfdim">ø</sup>')
+            .replace('♯', '<span class="sharp">♯</span>')
+            .replace('♭', '<span class="flat">♭</span>')
+            .replace('♮', '<span class="natural">♮</span>');
+        })(symbol)
     }),
 
     timesig: (symbol) => create('header', {

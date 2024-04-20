@@ -164,17 +164,14 @@
     3.875 G4 1 0.125
     </scribe-script>
 
-    <!--style>
-    scribe-script::after { content: none !important; }
-    </style-->
     <scribe-script type="sequence" clef="piano">
         0    meter 4 1
 
         0    lyric In        1.5
-        0    chord A♭maj     2
+        0    chord A♭∆       2
         0    C5   0.2        1.5
-        0    F4   0.2        1.5
-        0    Eb4  0.2        1.5
+        0    F4   0.2        2
+        0    Eb4  0.2        2
         0    Ab2  0.2        2
 
         1.5  lyric the       0.5
@@ -183,32 +180,38 @@
         1.5  F4   0.2        0.5-->
 
         2    lyric bleak     1
-        2    chord A♭maj/G   1
+        2    chord E♭∆/G     2
         2    Eb5  0.2        1
         2    Bb4  0.2        1
         2    F4   0.2        1
-        2    G2   0.2        1
+        2    G2   0.2        2
 
         3    lyric mid-      1
-        3    chord C7alt     1
         3    C5   0.2        1
-        3    C3   0.2        1
+        3    F4   0.2        1
+        3    C4   0.2        1
 
         4    lyric win-      2
-        4    chord F-7       2
+        4    chord C7♭9      2
         4    Bb4  0.2        2
-        4    F3   0.2        2
+        4    E4   0.2        2
+        4    Db4  0.2        2
+        4    C3   0.2        2
 
         6    lyric ter,      2
-        6    chord E♭-7      1
+        6    chord F-7       1
         6    Ab4  0.2        2
-        6    Eb2  0.2        1
+        6    Eb4  0.2        1
+        6    C4   0.2        1
+        6    F2   0.2        1
 
-        7    chord A♭7       1
-        7    Ab2  0.2  1
+        7    chord A♭7sus    1
+        7    Gb4  0.2        1
+        7    Eb4  0.2        1
+        7    Ab2  0.2        1
 
         8    lyric Frost-    1.5
-        8    chord D♭maj     2
+        8    chord D♭∆     2
         8    Bb4  0.2        1.5
         8    F4   0.2        2
         8    C4   0.2        2
@@ -220,8 +223,8 @@
         10   lyric wind      0.5
         10   chord B♭/D      2
         10   Bb4  0.2        1
-        10   F4   0.2        1
-        10   C4   0.2        1
+        10   F4   0.2        2
+        10   C4   0.2        2
         10   D3   0.2        2
 
         11   lyric made      0.5
@@ -232,13 +235,12 @@
         12   Ab4  0.2        2
         12   E4   0.2        2
         12   Db4  0.2        2
-        12   Eb3  0.2        2
+        12   Eb3  0.2        4
 
         14   chord C/E♭      2
         14   G4   0.2        2
         14   E4   0.2        2
         14   C4   0.2        2
-        14   Eb2  0.2        2
     </scribe-script>
 
     <h2>Drums stave</h2>
@@ -429,7 +431,7 @@
         2   C4  0.5 1
 
         0   G-      2
-        2   Cmaj    2
+        2   C∆    2
     </scribe-script>
 
     <h2>ABC – Sí Bheag Sí Mhór</h2>
@@ -455,7 +457,6 @@
 
     <scribe-script type="application/json" clef="treble">[
         [0,   "meter", 4, 1],
-
         [0,   "chord", "C∆", 4],
         [4,   "chord", "G-", 4],
         [8,   "chord", "C∆", 4],
@@ -584,16 +585,21 @@
         [147.5,  "note", 74, 0.25, 3.5]
     ]</scribe-script>
 
-    <scribe-script type="json" src="https://api.github.com/gists/39b8a36e4abc13baee57825fbc1b6004" clef="drums"></scribe-script>
-    <scribe-script type="json" src="https://api.github.com/gists/739fa16055debb7972737835e4fa4623" clef="treble"></scribe-script>
-
+    <!--scribe-script type="json" src="https://api.github.com/gists/39b8a36e4abc13baee57825fbc1b6004" clef="drums"></scribe-script>
+    <scribe-script type="json" src="https://api.github.com/gists/739fa16055debb7972737835e4fa4623" clef="treble"></scribe-script-->
 
     <div style="width: 1em; height: 1em; background: orange;">1em</div>
-    <p>Some default text for size comparison. Crunchum ipsum dolor text sit coder void, constructor function, sed do while loop python orientation semi colon incident. Duis aute irure indent tabs or spaces velit esse cilium buntum how crunchy duntum. Excepteur tranquilis syntax error memorandum qui officia nostrud operating system alertus. Hyper text linkus operari avec computatrum ad coniungere hominum. Standards code est pulchra on chromium et foxus sed souvent suckum in internet explorum.</p>
+    <p>Some default text for size comparison. Crunchum ipsum dolor text sit
+    coder void, constructor function, sed do while loop python orientation semi
+    colon incident. Duis aute irure indent tabs or spaces velit esse cilium
+    buntum how crunchy duntum. Excepteur tranquilis syntax error memorandum qui
+    officia nostrud operating system alertus. Hyper text linkus operari avec
+    computatrum ad coniungere hominum. Standards code est pulchra on chromium et
+    foxus sed souvent suckum in internet explorum.</p>
 
     <script type="module">
         import ScribeScript from './module.js';
-        ScribeScript.stylesheet = '/scribe/scribe-script/shadow.css?cache=34';
+        ScribeScript.stylesheet = '/scribe/scribe-script/shadow.css';
     </script>
 </body>
 </html>
