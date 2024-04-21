@@ -1,12 +1,13 @@
 
-@font-face {
-    /* Warning: To use a font inside the shadow DOM in Chrome, @font-face must
-       be declared in the main DOM – ie. in module.css */
+/* Warning: To use a font inside the shadow DOM in Chrome, @font-face must
+   be declared in the main DOM – ie. in module.css */
+/* @font-face {
     font-family: JazzText;
     src: url('../../fonts/FinaleJazzText/finalejazztext-webfont.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
 }
+*/
 
 .chord {
     font-family: JazzText, math;
