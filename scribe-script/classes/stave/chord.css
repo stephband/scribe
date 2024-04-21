@@ -1,6 +1,5 @@
 
-.chord-stave,
-:host([clef="chord"]) > .stave {
+.chord-stave {
     grid-template-rows:
         var(--y-size)
         var(--y-size)
@@ -24,14 +23,11 @@
 
 /* TEMP */
 .chord-stave > .ledge,
-:host([clef="chord"]) > .stave > .ledge,
 /* Just a precaution. */
-.chord-stave > .acci,
-:host([clef="chord"]) > .stave > .acci {
+.chord-stave > .acci {
     display: none !important;
 }
 
-:host([clef="chord"]) > .stave > [data-pitch],
 .chord-stave > [data-pitch]  {
     display: none !important;
 }

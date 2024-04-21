@@ -1,6 +1,5 @@
 
-.piano-stave,
-:host([clef="piano"]) > .stave {
+.piano-stave {
     grid-template-rows:
         [B6] var(--y-size)
         [A6] var(--y-size)
@@ -70,25 +69,34 @@
 }
 
 .piano-stave > .rest,
-:host([clef="piano"]) > .stave > .rest,
 .piano-stave > .timesig,
-:host([clef="piano"]) > .stave > .timesig,
-.piano-stave > .clef,
-:host([clef="piano"]) > .stave > .clef {
+.piano-stave > .clef {
     /* The default part is the upper part */
     grid-row: stave-upper;
 }
 
 .piano-stave > .rest[data-part="lower"],
-:host([clef="piano"]) > .stave > .rest[data-part="lower"],
 .piano-stave > .timesig[data-part="lower"],
-:host([clef="piano"]) > .stave > .timesig[data-part="lower"],
-.piano-stave > .clef[data-part="lower"],
-:host([clef="piano"]) > .stave > .clef[data-part="lower"] {
+.piano-stave > .clef[data-part="lower"] {
     grid-row: stave-lower;
 }
 
-.piano-stave > .lyric,
-:host([clef="piano"]) > .stave > .lyric {
+.piano-stave > .lyric {
     align-self: center;
 }
+
+/* Map unoctaved pitches to stave lines for key signatures. */
+.piano-stave > [data-pitch="F♭"] { grid-row-start: F4; }
+.piano-stave > [data-pitch="C♭"] { grid-row-start: C5; }
+.piano-stave > [data-pitch="G♭"] { grid-row-start: G4; }
+.piano-stave > [data-pitch="D♭"] { grid-row-start: D5; }
+.piano-stave > [data-pitch="A♭"] { grid-row-start: A4; }
+.piano-stave > [data-pitch="E♭"] { grid-row-start: E5; }
+.piano-stave > [data-pitch="B♭"] { grid-row-start: B4; }
+.piano-stave > [data-pitch="F♯"] { grid-row-start: F5; }
+.piano-stave > [data-pitch="C♯"] { grid-row-start: C5; }
+.piano-stave > [data-pitch="G♯"] { grid-row-start: G5; }
+.piano-stave > [data-pitch="D♯"] { grid-row-start: D5; }
+.piano-stave > [data-pitch="A♯"] { grid-row-start: A4; }
+.piano-stave > [data-pitch="E♯"] { grid-row-start: E5; }
+.piano-stave > [data-pitch="B♯"] { grid-row-start: B4; }

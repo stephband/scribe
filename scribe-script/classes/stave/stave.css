@@ -32,12 +32,12 @@
     overflow: visible;
 }
 
-.bar > .clef {
+.stave > .clef {
     grid-row: stave-center;
     align-self: center;
 }
 
-.bar > .timesig {
+.stave > .timesig {
     grid-row: stave-center;
     align-self: center;
 }
@@ -54,6 +54,7 @@
 }
 
 .stave > .acci {
+    grid-row-end: span 1;
     align-self: center;
 }
 

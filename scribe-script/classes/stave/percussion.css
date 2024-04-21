@@ -5,8 +5,7 @@ https://drumbeatsonline.com/blog/drum-notation-sheet-music-how-to-read-it
 https://web.mit.edu/merolish/Public/drums.pdf
 */
 
-.percussion-stave,
-:host([clef="percussion"]) > .stave {
+.percussion-stave {
     grid-template-rows:
         var(--y-size)
         var(--y-size)
@@ -34,16 +33,13 @@ https://web.mit.edu/merolish/Public/drums.pdf
 
 /* TEMP */
 .percussion-stave > .ledge,
-:host([clef="percussion"]) > .stave > .ledge,
 /* Just a precaution. */
-.percussion-stave > .acci,
-:host([clef="percussion"]) > .stave > .acci {
+.percussion-stave > .acci {
     display: none !important;
 }
 
 
 
-:host([clef="percussion"]) > .stave > [data-pitch],
 .percussion-stave > [data-pitch]  {
     grid-row: stave-center;
 }

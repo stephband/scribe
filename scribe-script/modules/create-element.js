@@ -94,7 +94,9 @@ export default overload(get('type'), {
             symbol.value === -1 ? "0 -4 2 4" :
             "0 -4 1.8 4" ,
         preserveAspectRatio: "xMidYMid slice",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, part: symbol.part },
+        data: symbol.beat === undefined ?
+            { pitch: symbol.pitch } :
+            { beat: symbol.beat + 1, pitch: symbol.pitch, part: symbol.part } ,
         html: '<use href="#acci-'
             + (symbol.value === 1 ? 'sharp' : symbol.value === -1 ? 'flat' : 'natural')
             + '"></use>'

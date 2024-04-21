@@ -1,5 +1,4 @@
-.treble-stave,
-:host([clef="treble"]) > .stave {
+.treble-stave {
     grid-template-rows:
         [A6] var(--y-size)
         [G6] var(--y-size)
@@ -30,7 +29,22 @@
         [C3 lyrics] var(--y-size);
 }
 
-.treble-stave > .lyric,
-:host([clef="treble"]) > .stave > .lyric {
+.treble-stave > .lyric {
     align-self: end;
 }
+
+/* Map unoctaved pitches to stave lines for key signatures. */
+.treble-stave > [data-pitch="F♭"] { grid-row-start: F4; }
+.treble-stave > [data-pitch="C♭"] { grid-row-start: C5; }
+.treble-stave > [data-pitch="G♭"] { grid-row-start: G4; }
+.treble-stave > [data-pitch="D♭"] { grid-row-start: D5; }
+.treble-stave > [data-pitch="A♭"] { grid-row-start: A4; }
+.treble-stave > [data-pitch="E♭"] { grid-row-start: E5; }
+.treble-stave > [data-pitch="B♭"] { grid-row-start: B4; }
+.treble-stave > [data-pitch="F♯"] { grid-row-start: F5; }
+.treble-stave > [data-pitch="C♯"] { grid-row-start: C5; }
+.treble-stave > [data-pitch="G♯"] { grid-row-start: G5; }
+.treble-stave > [data-pitch="D♯"] { grid-row-start: D5; }
+.treble-stave > [data-pitch="A♯"] { grid-row-start: A4; }
+.treble-stave > [data-pitch="E♯"] { grid-row-start: E5; }
+.treble-stave > [data-pitch="B♯"] { grid-row-start: B4; }

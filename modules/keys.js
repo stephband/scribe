@@ -2,7 +2,7 @@
 import overload from '../../fn/modules/overload.js';
 
 export default [
-    //                        C      D       E  F      G      A       B
+    //                                       C      D       E  F      G      A       B
     { name: 'C',  symbol: 'C∆',  spellings: [0,  1, 0, -1,  0, 0,  1, 0, -1, 0, -1,  0] },
     { name: 'D♭', symbol: 'D♭∆', spellings: [0, -1, 0, -1, -1, 0, -1, 0, -1, 0, -1, -1] },
     { name: 'D',  symbol: 'D∆',  spellings: [0,  1, 0,  1,  0, 0,  1, 0,  1, 0, -1,  0] },

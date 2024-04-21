@@ -2,13 +2,13 @@
 import by           from '../../fn/modules/by.js';
 import get          from '../../fn/modules/get.js';
 import overload     from '../../fn/modules/overload.js';
-import { toNoteNumber } from '../../midi/modules/note.js';
+import { toNoteNumber, toRootName, toRootNumber } from '../../midi/modules/note.js';
 import toKeys       from './sequence/to-keys.js';
 import { keysAtBeats, keyFromBeatKeys } from './sequence/key-at-beat.js';
 import eventsAtBeat from './sequence/events-at-beat.js';
 import { transposeChord } from './event/chord.js';
 import * as staves  from './staves.js';
-import { mod12 }    from './maths.js';
+import { mod12, byGreater }    from './maths.js';
 
 const assign = Object.assign;
 const { abs, ceil, floor } = Math;
@@ -17,6 +17,8 @@ const rflat        = /b|♭/;
 const rsharp       = /#|♯/;
 const rdoubleflat  = /bb|𝄫/;
 const rdoublesharp = /##|𝄪/;
+
+const cscale = [0,2,4,5,7,9,11];
 
 const defaultMeter = {
     duration: 4,
@@ -52,6 +54,19 @@ function toChord(stave, key, transpose, string) {
         // type
         'chord'
     );
+}
+
+const fathercharles = [
+    // Father Charles Goes Down And Ends Battle,
+    'F♯', 'C♯', 'G♯', 'D♯', 'A♯', 'E♯', 'B♯',
+    // Battle Ends And Down Goes Charles' Father
+    'B♭', 'E♭', 'A♭', 'D♭', 'G♭', 'C♭', 'F♭'
+];
+
+function byFatherCharlesPitch(a, b) {
+    const ai = fathercharles.indexOf(a.pitch);
+    const bi = fathercharles.indexOf(b.pitch);
+    return ai > bi ? 1 : ai < bi ? -1 : 0 ;
 }
 
 function getStemDirection(note, head) {
@@ -449,7 +464,8 @@ function createBar(beat, stave, meter, tieheads) {
             meter[2] === 3 ? [1,2]
             : [2],
         symbols:  [],
-        stave:    stave
+        stave:    stave,
+        meter:    meter
     };
 
     // If meter change is on this beat push a timesig into symbols
@@ -500,8 +516,15 @@ function createBar(beat, stave, meter, tieheads) {
 }
 
 const eventNameLogs = {};
+const accidentals = {
+    '-2': '𝄫',
+    '-1': '♭',
+    '0':  '',
+    '1':  '♯',
+    '2':  '𝄪'
+};
 
-function createBars(events, beatkeys, stave, keysig, meter, transpose) {
+function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
     // A buffer of head symbols to be tied to symbols in the next bar
     const tieheads = [];
     // An array of bar objects
@@ -510,16 +533,21 @@ function createBars(events, beatkeys, stave, keysig, meter, transpose) {
     const events0 = eventsAtBeat(events, 0);
     meter = events0.find((event) => event[1] === 'meter') || meter ;
 
-    // First bar
+    // First bar. Where meter is at beat 0, also inserts a time signature.
     let bar = createBar(0, stave, meter, tieheads);
     bars.push(bar);
 
-    // TODO: Add key signature in front of timesig
-    bar.symbols.unshift({
-        type:   'keysig',
-        beat:   0,
-        keysig: keysig
-    });
+    // Add key signature accidentals in front of time signature
+    bar.symbols.unshift.apply(bar.symbols, keyscale
+        .map((n, i) => (n - cscale[i] && {
+            // No beat for key signature accidentals
+            type:  'acci',
+            pitch: toRootName(cscale[i]) + accidentals[n - cscale[i]],
+            value: n - cscale[i]
+        }))
+        .filter((o) => !!o)
+        .sort(byFatherCharlesPitch)
+    );
 
     // Add clef in front of keysig
     bar.symbols.unshift({
@@ -561,13 +589,14 @@ function createBars(events, beatkeys, stave, keysig, meter, transpose) {
                 }
             }
 
-            // Create the next bar
+            // Create the next bar. Where meter is at the new bar beat, also
+            // creates a time signature.
             bar = createBar(bar.beat + bar.duration, stave, meter, tieheads);
             bars.push(bar);
         }
 
-        const beat     = event[0] - bar.beat;
-        const key      = keyFromBeatKeys(beatkeys, event[0]);
+        const beat = event[0] - bar.beat;
+        const key  = keyFromBeatKeys(beatkeys, event[0]);
 
         // Truncate duration to bar end
         const duration = event[0] + getDuration(event) > bar.beat + bar.duration ?
@@ -626,7 +655,7 @@ function createBars(events, beatkeys, stave, keysig, meter, transpose) {
     return bars;
 }
 
-export default function createSymbols(events, clef, keysig, meter, transpose) {
+export default function createSymbols(events, clef, keyname, meter, transpose) {
     // Transpose events before generating keys??
     events.sort(by(get(0)));
 
@@ -640,6 +669,12 @@ export default function createSymbols(events, clef, keysig, meter, transpose) {
     // causes measurable delay.
     const beatkeys = keysAtBeats(events);
 
-    return createBars(events, beatkeys, stave, keysig, meter, transpose)
+    // Create a scale from C scale transposed by key. This scale is not a true
+    // 'scale' as it may not begin with a 0, but it maps naturals to accidentals
+    // when compared against C
+    const keynumber = toRootNumber(keyname);
+    const keyscale  = cscale.map((cn) => mod12(cn + keynumber)).sort(byGreater);
+console.log('SCALE', keyscale.join());
+    return createBars(events, beatkeys, stave, keyscale, meter, transpose)
     .map(toSymbols);
 }

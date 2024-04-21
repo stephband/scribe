@@ -2,6 +2,7 @@
 import Signal            from '../../fn/modules/signal.js';
 import create            from '../../dom/modules/create.js';
 import element, { getInternals } from '../../dom/modules/element.js';
+import { toRootNumber }  from '../../midi/modules/note.js';
 import createSymbols     from '../modules/create-symbols.js';
 import requestData       from '../modules/request-data.js';
 import parseSource       from '../modules/parse.js';
@@ -29,7 +30,7 @@ function toElements(nodes, symbol) {
 
 function toBarElements(elements, bar) {
     elements.push(create('div', {
-        class: 'stave bar',
+        class: `${ bar.stave.clef }-stave stave bar`,
         data: { duration: bar.duration },
         children: bar.symbols.reduce(toElements, [])
     }));
@@ -180,18 +181,22 @@ export default define(element('scribe-script', {
             this.classList.add('safari');
         }
 
-        Signal.from(() => (internals.data.value
-            // events, clef, keysig, meter, transpose
-            && createSymbols(
+        Signal.from(() => (
+            internals.data.value && createSymbols(
+                // Events from data
                 internals.data.value.events,
+                // Clef is a string
                 internals.clef.value,
+                // Key name
                 internals.key.value,
+                // Create an initial [0, "meter", ...] event
                 timesigToMeter(internals.meter.value),
+                // Transpose is a number
                 internals.transpose.value
             ).reduce(toBarElements, []))
         )
         .each((elements) => {
-            // Clear the shadow DOM and put new elements in it
+            // Clear the shadow DOM of bars and put new elements in it
             shadow.querySelectorAll('.bar').forEach((element) => element.remove());
             shadow.append.apply(shadow, elements);
         });

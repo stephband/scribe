@@ -11,16 +11,15 @@
 */
 
 .timesig {
-    font-family: JazzText, math;
-    font-size: 1.333333em;
-    font-weight: bold;
-
     display: grid;
     grid-template-rows: 1fr 1fr;
     grid-auto-flow: rows;
 }
 
 .timesig > * {
+    font-family: JazzText, math;
+    font-size: 1.333333em;
+    font-weight: bold;
     align-self: end;
     justify-self: center;
     margin: 0;

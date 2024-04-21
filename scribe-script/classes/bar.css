@@ -192,24 +192,6 @@ Bars are divided into:
 	margin-right: calc(-0.5 * var(--bar-line-size, 1px) - var(--bar-padding-right));
 }
 
-.bar > .clef {
-	justify-self: start;
-	grid-column: 1 / span 1;
-	margin-left: calc(-1 * var(--y-size));
-	margin-right: calc(2 * var(--y-size));
-}
-
-.bar > .timesig {
-	justify-self: start;
-	grid-column: 1 / span 1;
-	margin-left: 0;
-	margin-right: calc(3 * var(--y-size));
-}
-
-.bar > .clef ~ .timesig {
-	margin-left: calc(6 * var(--y-size));
-}
-
 /* Column 1 is clef/key/timesig */
 /* Column 2 is for anything that inhabits a previous column to a note head. */
 .bar > [data-beat^="1"]    { grid-column-start: 3; }
@@ -410,47 +392,86 @@ Bars are divided into:
 .bar > [data-duration="6"]     { grid-column-end: span 144; }
 .bar > [data-duration="8"]     { grid-column-end: span 192; }
 
-.bar > .head,
-.bar > .stem,
-.bar > .tail,
-.bar > .ledge {
-	grid-column-end: span 1;
-	justify-self: start;
-	margin-left:  var(--head-margin-left);
+.bar > .clef {
+    justify-self: start;
+    grid-column: 1 / span 1;
+    margin-left: calc(-1 * var(--y-size));
+    margin-right: calc(2 * var(--y-size));
 }
 
-.bar > .head {
-	margin-right: var(--head-margin-right);
-}
+.bar > .timesig {
+    justify-self: start;
+    grid-column: 1 / span 1;
+    margin-left: 0;
+    margin-right: 0.6em;
 
-.bar > .head:last-child {
-	margin-right: 0;
-}
-
-.bar > .up-tail {
-	margin-right: calc(2.5 * var(--y-size));
-}
-
-.bar > .down-tail {
-	margin-right: calc(0.75 * var(--y-size));
+    --timesig-gap: 1em;
 }
 
 .bar > .acci {
-	grid-column-end: span 1;
-	justify-self: end;
-	margin-left:  var(--acci-margin-left);
-	/* Accidentals must have column gap and head margin on their right negated
-	   before adding the proper margin, becuase they are aligned to the end of
-	   the column before their head. */
-	margin-right: calc(-1 * var(--bar-column-gap) - var(--head-margin-left) + var(--acci-margin-right));
+    grid-column-end: span 1;
+    justify-self: end;
+    margin-left:  var(--acci-margin-left);
+    /* Accidentals must have column gap and head margin on their right negated
+       before adding the proper margin, becuase they are aligned to the end of
+       the column before their head. */
+    margin-right: calc(-1 * var(--bar-column-gap) - var(--head-margin-left) + var(--acci-margin-right));
+}
+
+.bar > .acci:not([data-beat]) {
+    /* Accidental with no beat belongs to key signature in the first column */
+    grid-column-start: 1;
+    justify-self: start;
+
+    --acci-acci-gap: 0.6em;
 }
 
 .bar > .acci + .acci {
-	/* Attempt to space adjacent accidentals. */
-	margin-right: 0.4em;
+    /* Attempt to space adjacent accidentals. */
+    margin-right: 0.4em;
 }
 
-/*  Map accidentals to the previous column */
+
+/* Sort out ordering of clef / keysig / timesig */
+
+.bar > .clef ~ .acci:not([data-beat]) {
+    /* If they are preceded by a stave, move them right */
+    --clef-acci-gap: 1.9em;
+}
+
+.bar > .clef + .timesig {
+    --clef-timesig: 2em;
+    margin-left: var(--clef-timesig);
+}
+
+.bar > .acci:not([data-beat]) + .timesig {
+    /* If they are preceded by a stave, move them right */
+    --timesig-gap:   0.6em;
+    --clef-acci-gap: 1.9em;
+    --acci-acci-gap: 0.6em;
+}
+
+.bar > .acci:not([data-beat])                                                  { margin-left: var(--clef-acci-gap); }
+.bar > .acci:not([data-beat]) + .acci:not([data-beat])                         { margin-left: calc(var(--clef-acci-gap) + 1 * var(--acci-acci-gap)); }
+.bar > .acci:not([data-beat]) + * + .acci:not([data-beat])                     { margin-left: calc(var(--clef-acci-gap) + 2 * var(--acci-acci-gap)); }
+.bar > .acci:not([data-beat]) + * + * + .acci:not([data-beat])                 { margin-left: calc(var(--clef-acci-gap) + 3 * var(--acci-acci-gap)); }
+.bar > .acci:not([data-beat]) + * + * + * + .acci:not([data-beat])             { margin-left: calc(var(--clef-acci-gap) + 4 * var(--acci-acci-gap)); }
+.bar > .acci:not([data-beat]) + * + * + * + * + .acci:not([data-beat])         { margin-left: calc(var(--clef-acci-gap) + 5 * var(--acci-acci-gap)); }
+.bar > .acci:not([data-beat]) + * + * + * + * + * + .acci:not([data-beat])     { margin-left: calc(var(--clef-acci-gap) + 6 * var(--acci-acci-gap)); }
+.bar > .acci:not([data-beat]) + * + * + * + * + * + * + .acci:not([data-beat]) { margin-left: calc(var(--clef-acci-gap) + 7 * var(--acci-acci-gap)); }
+
+.bar > .acci:not([data-beat]) + .timesig                                                  { margin-left: calc(var(--clef-acci-gap) + 1 * var(--acci-acci-gap) + var(--timesig-gap)); }
+.bar > .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                         { margin-left: calc(var(--clef-acci-gap) + 2 * var(--acci-acci-gap) + var(--timesig-gap)); }
+.bar > .acci:not([data-beat]) + * + .acci:not([data-beat]) + .timesig                     { margin-left: calc(var(--clef-acci-gap) + 3 * var(--acci-acci-gap) + var(--timesig-gap)); }
+.bar > .acci:not([data-beat]) + * + * + .acci:not([data-beat]) + .timesig                 { margin-left: calc(var(--clef-acci-gap) + 4 * var(--acci-acci-gap) + var(--timesig-gap)); }
+.bar > .acci:not([data-beat]) + * + * + * + .acci:not([data-beat]) + .timesig             { margin-left: calc(var(--clef-acci-gap) + 5 * var(--acci-acci-gap) + var(--timesig-gap)); }
+.bar > .acci:not([data-beat]) + * + * + * + * + .acci:not([data-beat]) + .timesig         { margin-left: calc(var(--clef-acci-gap) + 6 * var(--acci-acci-gap) + var(--timesig-gap)); }
+.bar > .acci:not([data-beat]) + * + * + * + * + * + .acci:not([data-beat]) + .timesig     { margin-left: calc(var(--clef-acci-gap) + 7 * var(--acci-acci-gap) + var(--timesig-gap)); }
+.bar > .acci:not([data-beat]) + * + * + * + * + * + * + .acci:not([data-beat]) + .timesig { margin-left: calc(var(--clef-acci-gap) + 8 * var(--acci-acci-gap) + var(--timesig-gap)); }
+
+
+/*  Map accidentals with beat to the previous column */
+
 .bar > .acci[data-beat^="1"]    { grid-column-start: 2; }
 .bar > .acci[data-beat^="1.04"] { grid-column-start: 3; }
 .bar > .acci[data-beat^="1.08"] { grid-column-start: 4; }
@@ -619,6 +640,31 @@ Bars are divided into:
 .bar > .acci[data-beat^="7.87"] { grid-column-start: 165; }
 .bar > .acci[data-beat^="7.91"] { grid-column-start: 166; }
 .bar > .acci[data-beat^="7.95"] { grid-column-start: 167; }
+
+.bar > .head,
+.bar > .stem,
+.bar > .tail,
+.bar > .ledge {
+	grid-column-end: span 1;
+	justify-self: start;
+	margin-left:  var(--head-margin-left);
+}
+
+.bar > .head {
+	margin-right: var(--head-margin-right);
+}
+
+.bar > .head:last-child {
+	margin-right: 0;
+}
+
+.bar > .up-tail {
+	margin-right: calc(2.5 * var(--y-size));
+}
+
+.bar > .down-tail {
+	margin-right: calc(0.75 * var(--y-size));
+}
 
 .bar > .ledge {
 	width: auto;

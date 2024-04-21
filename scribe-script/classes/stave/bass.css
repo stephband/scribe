@@ -1,5 +1,4 @@
-.bass-stave,
-:host([clef="bass"]) > .stave {
+.bass-stave {
     grid-template-rows:
         [C5] var(--y-size)
         [B4] var(--y-size)
@@ -29,3 +28,19 @@
         [F1] var(--y-size)
         [E1 lyrics] var(--y-size);
 }
+
+/* Map unoctaved pitches to stave lines for key signatures. */
+.bass-stave > [data-pitch="F♭"] { grid-row-start: F4; }
+.bass-stave > [data-pitch="C♭"] { grid-row-start: C5; }
+.bass-stave > [data-pitch="G♭"] { grid-row-start: G4; }
+.bass-stave > [data-pitch="D♭"] { grid-row-start: D5; }
+.bass-stave > [data-pitch="A♭"] { grid-row-start: A4; }
+.bass-stave > [data-pitch="E♭"] { grid-row-start: E5; }
+.bass-stave > [data-pitch="B♭"] { grid-row-start: B4; }
+.bass-stave > [data-pitch="F♯"] { grid-row-start: F3; }
+.bass-stave > [data-pitch="C♯"] { grid-row-start: C3; }
+.bass-stave > [data-pitch="G♯"] { grid-row-start: G3; }
+.bass-stave > [data-pitch="D♯"] { grid-row-start: D3; }
+.bass-stave > [data-pitch="A♯"] { grid-row-start: A2; }
+.bass-stave > [data-pitch="E♯"] { grid-row-start: E3; }
+.bass-stave > [data-pitch="B♯"] { grid-row-start: B2; }
