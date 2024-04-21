@@ -1,5 +1,5 @@
 
-<img src="https://stephen.band/scribe/logo.png" />
+<img src="https://stephen.band/scribe/logo.png" style="float: right;" />
 
 # Scribe
 
