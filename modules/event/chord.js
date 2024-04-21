@@ -107,8 +107,7 @@ export function toChordNotes(str) {
         [] ;
 }
 
-export function transpose(str, n) {
+export function transposeChord(str, n) {
     const root = (rrootname.exec(str) || nothing)[0];
-    const r    = toRootNumber(root);
     return toRootName(toRootNumber(root) + n) + str.slice(root.length);
 }

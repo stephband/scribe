@@ -2,10 +2,11 @@
 import by           from '../../fn/modules/by.js';
 import get          from '../../fn/modules/get.js';
 import overload     from '../../fn/modules/overload.js';
-import { toNoteNumber, toNoteName, normaliseNoteName, toRootName, toRootNumber } from '../../midi/modules/note.js';
+import { toNoteNumber } from '../../midi/modules/note.js';
 import toKeys       from './sequence/to-keys.js';
 import { keysAtBeats, keyFromBeatKeys } from './sequence/key-at-beat.js';
 import eventsAtBeat from './sequence/events-at-beat.js';
+import { transposeChord } from './event/chord.js';
 import * as staves  from './staves.js';
 import { mod12 }    from './maths.js';
 
@@ -16,7 +17,6 @@ const rflat        = /b|♭/;
 const rsharp       = /#|♯/;
 const rdoubleflat  = /bb|𝄫/;
 const rdoublesharp = /##|𝄪/;
-const rrootpitch   = /^[A-G][b#♭♯𝄫𝄪]?/;
 
 const defaultMeter = {
     duration: 4,
@@ -44,12 +44,11 @@ function toPitch(stave, key, transpose, pitch) {
 }
 
 function toChord(stave, key, transpose, string) {
-    const root = (rrootpitch.exec(string) || nothing)[0];
     return stave.getSpelling(
         // key
         mod12(key + transpose),
         // chord name
-        toRootName(toRootNumber(root) + transpose) + string.slice(root.length),
+        transposeChord(string, transpose),
         // type
         'chord'
     );
@@ -502,7 +501,7 @@ function createBar(beat, stave, meter, tieheads) {
 
 const eventNameLogs = {};
 
-function splitByBar(events, beatkeys, stave, keysig, meter, transpose) {
+function createBars(events, beatkeys, stave, keysig, meter, transpose) {
     // A buffer of head symbols to be tied to symbols in the next bar
     const tieheads = [];
     // An array of bar objects
@@ -641,5 +640,6 @@ export default function createSymbols(events, clef, keysig, meter, transpose) {
     // causes measurable delay.
     const beatkeys = keysAtBeats(events);
 
-    return splitByBar(events, beatkeys, stave, keysig, meter, transpose).map(toSymbols);
+    return createBars(events, beatkeys, stave, keysig, meter, transpose)
+    .map(toSymbols);
 }
