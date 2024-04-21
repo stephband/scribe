@@ -196,8 +196,12 @@ export default overload(get('type'), {
         html: '<use href="#rest[' + symbol.duration + ']"></use>'
     }),
 
-    default: function(symbol) {
-        console.log(symbol);
-        console.error('Scribe: symbol type "' + symbol.type + '" not rendered');
-    }
+    default: (function(types) {
+        return function(symbol) {
+            if (types[symbol.type]) return;
+            types[symbol.type] = true;
+            console.log(symbol);
+            console.error('Scribe: symbol type "' + symbol.type + '" not rendered');
+        }
+    })({})
 });

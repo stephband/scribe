@@ -1,11 +1,12 @@
 
 import nothing         from '../../../fn/modules/nothing.js';
-import { noteNumbers } from '../../../midi/modules/note.js';
+import { noteNumbers, toRootNumber, toRootName } from '../../../midi/modules/note.js';
 import keys            from '../keys.js';
 import { mod12, byGreater } from '../maths.js';
 
 
-const rchord = /([ABCDEFG][b#♭♯𝄫𝄪]?)([^\/]*)(?:\/([ABCDEFG]))?/;
+const rrootname = /^[A-G][b#♭♯𝄫𝄪]?/;
+const rchord    = /([ABCDEFG][b#♭♯𝄫𝄪]?)([^\/]*)(?:\/([ABCDEFG]))?/;
 
 const modes = {
     '∆':       0,
@@ -104,4 +105,10 @@ export function toChordNotes(str) {
         .map((n) => mod12(n + root))
         .sort(byGreater) :
         [] ;
+}
+
+export function transpose(str, n) {
+    const root = (rrootname.exec(str) || nothing)[0];
+    const r    = toRootNumber(root);
+    return toRootName(toRootNumber(root) + n) + str.slice(root.length);
 }

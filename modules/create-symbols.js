@@ -1,13 +1,13 @@
 
-import by          from '../../fn/modules/by.js';
-import get         from '../../fn/modules/get.js';
-import overload    from '../../fn/modules/overload.js';
+import by           from '../../fn/modules/by.js';
+import get          from '../../fn/modules/get.js';
+import overload     from '../../fn/modules/overload.js';
 import { toNoteNumber, toNoteName, normaliseNoteName, toRootName, toRootNumber } from '../../midi/modules/note.js';
-import toKeys      from './sequence/to-keys.js';
+import toKeys       from './sequence/to-keys.js';
 import { keysAtBeats, keyFromBeatKeys } from './sequence/key-at-beat.js';
-import transposeEvent from './event/transpose.js';
-import * as staves from './staves.js';
-import { mod12 }   from './maths.js';
+import eventsAtBeat from './sequence/events-at-beat.js';
+import * as staves  from './staves.js';
+import { mod12 }    from './maths.js';
 
 const assign = Object.assign;
 const { abs, ceil, floor } = Math;
@@ -170,8 +170,8 @@ function insertBeam(symbols, stave, beam, stemNote, n) {
             'up' :
             'down' ;
 
-    const stems = [];
-    const ties  = [];
+    const stems  = [];
+    const buffer = [];
 
     // Loop backwards through beam splicing in stem symbols before
     // the heads, all with the winning stem direction
@@ -211,7 +211,7 @@ function insertBeam(symbols, stave, beam, stemNote, n) {
         }
 
         if (head.tie === 'begin') {
-            ties.push(assign({}, head, {
+            buffer.push(assign({}, head, {
                 type: 'tie',
                 beat:   head.beat,
                 updown: head.tieDirection,
@@ -249,10 +249,10 @@ function insertBeam(symbols, stave, beam, stemNote, n) {
         stems:  stems
     }));
 
-    symbols.splice(i, 0, ...ties);
+    symbols.splice(i, 0, ...buffer);
 
     // We just spliced a bunch of symbols in before index n
-    return stems.length + ties.length + 1;
+    return stems.length + buffer.length + 1;
 }
 
 function insertSymbols(symbols, bar, stemNote) {
@@ -269,12 +269,9 @@ function insertSymbols(symbols, bar, stemNote) {
         endBeat = head.beat + head.duration;
 
         // We are only interested in notes
-        if (head.type !== 'head') {
-            continue;
-        }
+        if (head.type !== 'head') continue;
 
         // Rest
-
         // Insert rest if head beat is greater than beat
         if (head.beat > beat) {
             // [beat, 'rest', pitch (currently unused), duration]
@@ -288,12 +285,9 @@ function insertSymbols(symbols, bar, stemNote) {
         }
 
         // Update beat
-        if (endBeat > beat) {
-            beat = endBeat;
-        }
+        if (endBeat > beat) beat = endBeat;
 
         // Accidental
-
         // Determine accidental
         const acci = rsharp.test(head.pitch) ? 1 :
             rflat.test(head.pitch) ? -1 :
@@ -315,7 +309,6 @@ function insertSymbols(symbols, bar, stemNote) {
                 value: acci || 0
             }));
         }
-
 
         // Up ledger lines
         let ledgerrows = subtractStaveRows(bar.stave, 'G5', head.pitch);
@@ -353,8 +346,8 @@ function insertSymbols(symbols, bar, stemNote) {
             }
         }
 
-        // Stem and ties. We must wait for stems to be decided before rendering
-        // ties as their up/down direction is dependent.
+        // Stem and tieheads. We must wait for stems to be decided before rendering
+        // tieheads as their up/down direction is dependent.
         if (head.duration < 4) {
             // Is this head less than 1 beat, and not 1 triplet beat, long?
             // Wait for it to be beamed.
@@ -435,7 +428,7 @@ function toSymbols(bar) {
         }, {})
     );
 
-    // Fill each parts with accidentals, rests, beams, ties
+    // Fill each parts with accidentals, rests, beams, tieheads
     parts.forEach((part) => insertSymbols(part, bar, state.clef.stemDirectionNote));
 
     // Empty out bar.symbols and push in symbols from parts
@@ -448,53 +441,58 @@ function toSymbols(bar) {
     return bar;
 }
 
-function createBarFromBuffer(beat, buffer, beatkeys, stave, meter, transpose) {
+function createBar(beat, stave, meter, tieheads) {
     const bar = {
         beat:     beat,
         duration: meter[2],
-        breaks:   meter[2] === 4 ? [2] : meter[2] === 3 ? [1,2] : [2],
+        // TODO do something about breaks
+        breaks:   meter[2] === 4 ? [2] :
+            meter[2] === 3 ? [1,2]
+            : [2],
         symbols:  [],
         stave:    stave
     };
 
+    // If meter change is on this beat push a timesig into symbols
+    if (meter[0] === beat) {
+        bar.symbols.push({
+            type:        'timesig',
+            beat:        0,
+            numerator:   meter[2] / meter[3],
+            denominator: 4 / meter[3],
+            event:       meter
+        });
+    }
+
+    // Push tied heads into symbols
     let m = -1;
-    let tied, key, pitch;
-    while (buffer[++m] && buffer[m][0] < bar.beat + meter[2]) {
-        tied  = buffer[m];
-        key   = keyFromBeatKeys(beatkeys, tied[0]);
-        pitch = toPitch(stave, key, transpose, tied[2]);
+    let head, event;
+    while ((head = tieheads[++m])
+        && (event = head.event)
+        && event[0] < bar.beat + meter[2]
+    ) {
+        const duration = event[0] + event[4] - bar.beat;
 
-        // Event ends after this bar
-        if (bar.beat + bar.duration < tied[0] + tied[4]) {
-            bar.symbols.push(assign({
-                type: 'head',
+        if (duration > bar.duration) {
+            // Event ends after this bar
+            bar.symbols.push(assign({}, head, {
                 beat: 0,
-                pitch,
                 duration: bar.duration,
-                transpose,
-                head: stave.getHead && stave.getHead(pitch, bar.duration),
-                tie: 'middle',
-                event: tied
-            }, stave.getPart && stave.getPart(pitch)));
+                head: stave.getHead && stave.getHead(head.pitch, bar.duration),
+                tie: 'middle'
+            }, stave.getPart && stave.getPart(head.pitch)));
         }
-
-        // Event ends in this bar
         else {
-            let duration = tied[0] + tied[4] - bar.beat;
-
-            bar.symbols.push(assign({
-                type: 'head',
+            // Event ends in this bar
+            bar.symbols.push(assign({}, head, {
                 beat: 0,
-                pitch,
                 duration,
-                transpose,
-                head: stave.getHead && stave.getHead(pitch, duration),
-                tie: 'end',
-                event: tied
-            }, stave.getPart && stave.getPart(pitch)));
+                head: stave.getHead && stave.getHead(head.pitch, duration),
+                tie: 'end'
+            }, stave.getPart && stave.getPart(head.pitch)));
 
-            // Remove event from buffer, as it has ended
-            buffer.splice(m, 1);
+            // Remove event from tieheads, as it has ended
+            tieheads.splice(m, 1);
             --m;
         }
     }
@@ -502,154 +500,127 @@ function createBarFromBuffer(beat, buffer, beatkeys, stave, meter, transpose) {
     return bar;
 }
 
-function splitByBar(events, beatkeys, stave, keysig, meter, transpose) {
-    const bars   = [];
-    const buffer = [];
+const eventNameLogs = {};
 
-    //let barBeat = 0;
-    let bar = createBarFromBuffer(0, buffer, beatkeys, stave, meter, transpose);
+function splitByBar(events, beatkeys, stave, keysig, meter, transpose) {
+    // A buffer of head symbols to be tied to symbols in the next bar
+    const tieheads = [];
+    // An array of bar objects
+    const bars = [];
+
+    const events0 = eventsAtBeat(events, 0);
+    meter = events0.find((event) => event[1] === 'meter') || meter ;
+
+    // First bar
+    let bar = createBar(0, stave, meter, tieheads);
     bars.push(bar);
 
-    bar.symbols.push({
+    // TODO: Add key signature in front of timesig
+    bar.symbols.unshift({
+        type:   'keysig',
+        beat:   0,
+        keysig: keysig
+    });
+
+    // Add clef in front of keysig
+    bar.symbols.unshift({
         type: 'clef',
         beat: 0,
         clef: stave.clef
     });
-
-    // TODO: create keysig symbol
 
     let n = -1;
     let event;
     while (event = events[++n]) {
         if (event[1] === 'meter') {
             if (event[0] !== bar.beat) {
-                new TypeError('A "meter" event must occur at bar start – event [' + event.join(', ') + '] is on beat ' + (event[0] - bar.beat) + ' of bar')
+                new TypeError('Scribe: "meter" event must occur at bar start – event [' + event.join(', ') + '] is on beat ' + (event[0] - bar.beat) + ' of bar')
             }
-
-            bar.duration = event[2];
-            bar.breaks = meter.duration === 4 ? [2] :
-                bar.duration === 3 ? [1,2] :
-                bar.duration === 2 ? [1] :
-                [] ;
-
-            // Push a time signature if there is a meter change
-            if (event[2] !== meter[2] || event[3] !== meter[3]) {
-                bar.symbols.push({
-                    type:        'timesig',
-                    beat:        0,
-                    numerator:   event[2] / event[3],
-                    denominator: 4 / event[3],
-                    event:       event
-                });
-            }
-
-            meter = event;
             continue;
         }
 
         if (event[1] !== 'note' && event[1] !== 'chord' && event[1] !== 'lyric') {
-            console.log('Scribe: event type "' + event[1] + '" not rendered');
+            if (window.DEBUG && !eventNameLogs[event[1]]) {
+                eventNameLogs[event[1]] = true;
+                console.log('Scribe "' + event[1] + '" events ignored');
+            }
             continue;
         }
 
         // Event is in a future bar
         while (event[0] >= bar.beat + bar.duration) {
+            // Pick up meter for next bar
+            if (event[0] === bar.beat + bar.duration) {
+                let m = n - 1;
+                while (events[++m] && events[m][0] === event[0]) {
+                    if (events[m][1] === 'meter') {
+                        meter = events[m];
+                        // TODO: We may want to add an advisory timesig to the
+                        // end of the current bar, to be displayed when this bar
+                        // is at the end of a line
+                    }
+                }
+            }
+
             // Create the next bar
-            bar = createBarFromBuffer(bar.beat + bar.duration, buffer, beatkeys, stave, meter, transpose);
+            bar = createBar(bar.beat + bar.duration, stave, meter, tieheads);
             bars.push(bar);
         }
 
-        const beat = event[0] - bar.beat;
-        const key  = keyFromBeatKeys(beatkeys, event[0]);
+        const beat     = event[0] - bar.beat;
+        const key      = keyFromBeatKeys(beatkeys, event[0]);
 
-        // Event ends after this bar
-        if (event[0] + getDuration(event) > bar.beat + bar.duration) {
-            if (event[1] === 'note') {
-                let pitch    = toPitch(stave, key, transpose, event[2]);
-                let duration = bar.beat + bar.duration - event[0];
+        // Truncate duration to bar end
+        const duration = event[0] + getDuration(event) > bar.beat + bar.duration ?
+            bar.beat + bar.duration - event[0] :
+            getDuration(event) ;
 
-                bar.symbols.push(assign({
-                    type: 'head',
-                    beat,
-                    pitch,
-                    duration,
-                    transpose,
-                    head: stave.getHead && stave.getHead(pitch, duration),
-                    tie: 'begin',
-                    event: event
-                }, stave.getPart && stave.getPart(pitch)));
+        if (event[1] === 'note') {
+            let pitch = toPitch(stave, key, transpose, event[2]);
+            let head = assign({
+                type: 'head',
+                beat,
+                pitch,
+                duration,
+                transpose,
+                head: stave.getHead && stave.getHead(pitch, duration),
+                event: event
+            }, stave.getPart && stave.getPart(pitch));
 
-                // Stick it in the ties buffer
-                buffer.push(event);
-            }
+            // Stick it in symbols
+            bar.symbols.push(head);
 
-            else if (event[1] === 'chord') {
-                // Truncate 'chord' to bar end, spell according to current key
-                bar.symbols.push({
-                    type:  event[1],
-                    beat,
-                    value: toChord(stave, key, transpose, event[2]),
-                    duration: bar.beat + bar.duration - event[0],
-                    transpose,
-                    event: event
-                });
-            }
-
-            else {
-                // Truncate 'lyric' to bar end
-                bar.symbols.push({
-                    type:  event[1],
-                    beat,
-                    value: event[2],
-                    duration: bar.beat + bar.duration - event[0],
-                    event: event
-                });
+            // If it's longer than the bar stick it in tieheads buffer
+            if (event[4] > duration) {
+                head.tie = 'begin';
+                tieheads.push(head);
             }
         }
-
-        // Event ends inside this bar
+        else if (event[1] === 'chord') {
+            bar.symbols.push({
+                type:  'chord',
+                beat,
+                duration,
+                transpose,
+                value: toChord(stave, key, transpose, event[2]),
+                event: event
+            });
+        }
         else {
-            if (event[1] === 'note') {
-                let pitch = toPitch(stave, key, transpose, event[2]);
-                bar.symbols.push(assign({
-                    type: 'head',
-                    beat,
-                    pitch,
-                    duration: event[4],
-                    transpose,
-                    head: stave.getHead && stave.getHead(pitch, event[4]),
-                    event: event
-                }, stave.getPart && stave.getPart(pitch)));
-            }
-
-            else if (event[1] === 'chord') {
-                bar.symbols.push({
-                    type: event[1],
-                    beat,
-                    value: toChord(stave, key, transpose, event[2]),
-                    duration: event[3],
-                    transpose,
-                    event: event
-                });
-            }
-
-            else {
-                // Type 'lyric'
-                bar.symbols.push({
-                    type: event[1],
-                    beat,
-                    value: event[2],
-                    duration: event[3],
-                    event: event
-                });
-            }
+            bar.symbols.push({
+                type:  'lyric',
+                beat,
+                duration,
+                value: event[2],
+                event: event
+            });
         }
     }
 
     // There are still hanging notes to render
-    while (buffer.length) {
+    while (tieheads.length) {
         // Create the next bar
-        bar = createBarFromBuffer(bar.beat + bar.duration, buffer, beatkeys, stave, meter, transpose);
+        bar = createBar(bar.beat + bar.duration, stave, meter, tieheads);
         bars.push(bar);
     }
 
