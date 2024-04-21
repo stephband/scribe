@@ -436,7 +436,7 @@ Bars are divided into:
 
 .bar > .clef ~ .acci:not([data-beat]) {
     /* If they are preceded by a stave, move them right */
-    --clef-acci-gap: 1.9em;
+    --clef-acci-gap: 1.8em;
 }
 
 .bar > .clef + .timesig {
@@ -447,7 +447,7 @@ Bars are divided into:
 .bar > .acci:not([data-beat]) + .timesig {
     /* If they are preceded by a stave, move them right */
     --timesig-gap:   0.6em;
-    --clef-acci-gap: 1.9em;
+    --clef-acci-gap: 1.8em;
     --acci-acci-gap: 0.6em;
 }
 

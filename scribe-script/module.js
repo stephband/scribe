@@ -2,11 +2,10 @@
 import Signal            from '../../fn/modules/signal.js';
 import create            from '../../dom/modules/create.js';
 import element, { getInternals } from '../../dom/modules/element.js';
-import { toRootNumber }  from '../../midi/modules/note.js';
+import { toRootName, toRootNumber } from '../../midi/modules/note.js';
 import createSymbols     from '../modules/create-symbols.js';
 import requestData       from '../modules/request-data.js';
 import parseSource       from '../modules/parse.js';
-import keyAtBeat         from '../modules/sequence/key-at-beat.js';
 import createElement     from './modules/create-element.js';
 
 
@@ -222,14 +221,23 @@ export default define(element('scribe-script', {
 
     /**
     key="C"
-    Choose the default key to render. Not that if the rendered sequence
-    contains key events, they override this choice. Possible keys are
-    `"A"`, `"B"`, `"C"`, `"D"`, `"E"`, `"F"`, `"G"`.
+    Choose the default key to render.
     **/
     key: {
         attribute: function(value) { this.key = value; },
         get: function() { return getInternals(this).key.value; },
-        set: function(value) { getInternals(this).key.value = value; }
+        set: function(value) {
+            const internals = getInternals(this);
+
+            // Validate
+            if (typeof value !== 'string' || !/^[A-G][#b♯♭]?$/.test(value)) {
+                console.warn('<scribe-script> Attempt to set invalid key="' + value + '" ignored');
+                return;
+            }
+
+            // Set
+            internals.key.value = value.replace(/[#b]$/, ($0) => $0 === '#' ? '♯' : '♭');
+        }
     },
 
     /**
@@ -260,17 +268,6 @@ export default define(element('scribe-script', {
             getInternals(this).transpose.value = typeof value === 'number' ?
                 Math.round(value) :
                 parseInt(value, 10) ;
-        }
-    },
-
-    /*
-    keyAtBeat(beat)
-    Returns the probable key centre at `beat`, as inferred
-    from surrounding notes and chords.
-    keyAtBeat: {
-        value: function(beat) {
-            console.log(1, this.data.events);
-            return keyAtBeat(this.data.events, beat);
         }
     },
 
@@ -311,6 +308,7 @@ export default define(element('scribe-script', {
         default: null
     }
 }, './shadow.css'), {
+    // Define ScribeScript.styleheet as the stylesheet signal
     stylesheet: {
         set: (url) => stylesheet.value = url,
         get: ()    => stylesheet.value
