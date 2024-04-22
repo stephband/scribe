@@ -79,7 +79,8 @@ A URL of some sequence data in JSON, ABC or Scribe's own sequence text format.
 
 #### `clef="treble"`
 
-Sets the default stave. May be overridden by `"clef"` events in data.
+Sets the stave. One of `"treble"`, `"bass"`, `"piano"`, `"drums"`, `"percussion"` or
+`"chords"`.
 
 #### `key="C"`
 
