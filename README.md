@@ -3,7 +3,7 @@
 
 # Scribe
 
-Scribe notates music in HTML.
+Scribe renders music notation in HTML.
 
 Scribe takes a sequence of events – notes, chords, meter changes and so on – and
 renders notation as symbols in a CSS grid.
