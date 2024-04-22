@@ -34,9 +34,9 @@ it's content:
 ```html
 <scribe-script type="sequence" clef="treble" meter="4/4">
     0 chord Dmaj    4
-    0 note  F#5 0.2 1
-    0 note  A4  0.2 1
-    0 note  D4  0.2 1
+    0 F#5 0.2 1
+    0 A4  0.2 1
+    0 D4  0.2 1
 </scribe-script>
 ```
 
@@ -82,7 +82,8 @@ Each event type has its own structure. Scribe 0.3 supports these event types:
 
 Scribe 0.3 also parses a shorthand version of this format intended for quick hand authoring,
 as in the first example above, which is basically Sequence JSON structure with all the JSON 
-syntax – commas and brackets and quotemarks – removed.
+syntax – commas and brackets and quotemarks – removed, and with the `note` type optional when 
+`note` events have pitch identifiers (like `G4`, as oppposed to pitch numbers like `67`).
 
 Scribe 0.3 also parses ABC (thanks to the parser from [ABCjs](https://github.com/paulrosen/abcjs)).
 
