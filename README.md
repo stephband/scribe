@@ -53,13 +53,14 @@ let scribe = document.body.querySelector('scribe-script');
 
 scribe.data = {
     name:      'My Song',
-    events:    [...],
-    sequences: [...]
+    events:    [...]
 };
 ```
 
 Scribe consumes <a href="https://github.com/soundio/music-json/">Sequence JSON</a>
-(and data objects of the same structure). Scribe 0.3 supports these event types:
+(and data objects of the same structure). Events are described by arrays of data stored
+in the `.events` array. Each event type has an array structure. Scribe 0.3 supports these 
+event types:
 
 | beat   | type         | 2 | 3 | 4 | 5 |
 | :----- | :----------- | :--- | :--- | :--- | :--- |
