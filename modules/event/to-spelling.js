@@ -14,7 +14,9 @@ const accidentals = {
 
 const rroot = /^[A-G][b#♭♯𝄫𝄪]?/;
 
-export default function toSpelling(key, note) {
+export default function toSpelling(key, note, type, transpose) {
+    key = mod12(key + transpose);
+
     // Make sure key is a key object
     key = typeof key === 'number' ? keys[key] :
         typeof key === 'string' ? keys.find((o) => o.name === key) :
@@ -37,8 +39,8 @@ export default function toSpelling(key, note) {
         rest = toNoteOctave(note) || '' ;
     }
 
-    const spelling   = key.spellings[mod12(r)];
-    const name       = noteNames[mod12(r - spelling)];
+    const spelling   = key.spellings[mod12(r + transpose)];
+    const name       = noteNames[mod12(r + transpose - spelling)];
     const accidental = accidentals[spelling];
 
     if (window.DEBUG && name === undefined) {

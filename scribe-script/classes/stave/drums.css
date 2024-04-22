@@ -35,7 +35,7 @@ https://web.mit.edu/merolish/Public/drums.pdf
 }
 
 /* TEMP */
-.drums-stave > .ledge
+.drums-stave > .ledge,
 /* Just a precaution. */
 .drums-stave > .acci {
     display: none !important;
@@ -49,51 +49,57 @@ https://web.mit.edu/merolish/Public/drums.pdf
     grid-row: stave-lower;
 }
 
-.drums-stave > [data-pitch="B1"]  { grid-row: kick; }     /* Acoustic Bass Drum */
-.drums-stave > [data-pitch="C2"]  { grid-row: kick; }     /* Bass Drum 1 */
-.drums-stave > [data-pitch="C♯2"] { grid-row: snare; }    /* Side Stick */
-.drums-stave > [data-pitch="D2"]  { grid-row: snare; }    /* Acoustic Snare */
-.drums-stave > [data-pitch="E♭2"] { grid-row: snare; }    /* Hand Clap */
-.drums-stave > [data-pitch="E2"]  { grid-row: snare; }    /* Electric Snare */
-.drums-stave > [data-pitch="F2"]  { grid-row: lowfloortom; } /* Low Floor Tom */
-.drums-stave > [data-pitch="F♯2"] { grid-row: hihat; }    /* Closed Hi-Hat */
-.drums-stave > [data-pitch="G2"]  { grid-row: floortom; } /* High Floor Tom */
-.drums-stave > [data-pitch="A♭2"] { grid-row: hihatpedal; } /* Pedal Hi-Hat */
-.drums-stave > [data-pitch="A2"]  { grid-row: midtom; }   /* Low Tom */
-.drums-stave > [data-pitch="B♭2"] { grid-row: hihat; }    /* Open Hi-Hat */
-.drums-stave > [data-pitch="B2"]  { grid-row: midtom; }   /* Low-Mid Tom */
-.drums-stave > [data-pitch="C3"]  { grid-row: hightom; }  /* Hi-Mid Tom */
-.drums-stave > [data-pitch="C♯3"] { grid-row: crash; }    /* Crash Cymbal 1 */
-.drums-stave > [data-pitch="D3"]  { grid-row: hightom; }  /* High Tom */
-.drums-stave > [data-pitch="E♭3"] { grid-row: ride; }     /* Ride Cymbal 1 */
-.drums-stave > [data-pitch="E3"]  { grid-row: splash; }   /* Chinese Cymbal */
-.drums-stave > [data-pitch="F3"]  { grid-row: ride; }     /* Ride Bell */
-.drums-stave > [data-pitch="F♯3"] { grid-row: foot; }     /* Tambourine */
-.drums-stave > [data-pitch="G3"]  { grid-row: splash; }   /* Splash Cymbal */
-.drums-stave > [data-pitch="A♭3"] { grid-row: lowtom; }   /* Cowbell*/
-.drums-stave > [data-pitch="A3"]  { grid-row: crash2; }   /* Crash Symbol 2 */
-.drums-stave > [data-pitch="B♭3"] { grid-row: midtom; }   /* Vibraslap */
-.drums-stave > [data-pitch="B3"]  { grid-row: crash2; }   /* Ride Cymbal 2*/
-.drums-stave > [data-pitch="C4"]  { grid-row: midtom; }   /* Hi Bongo */
-.drums-stave > [data-pitch="C♯4"] { grid-row: lowtom; }   /* Low Bongo */
-.drums-stave > [data-pitch="D4"]  { grid-row: midtom; }   /* Mute Hi Conga */
-.drums-stave > [data-pitch="E♭4"] { grid-row: midtom; }   /* Open Hi Conga */
-.drums-stave > [data-pitch="E4"]  { grid-row: lowtom; }   /* Low Conga */
-.drums-stave > [data-pitch="F4"]  { grid-row: hightom; }  /* High Timbale */
-.drums-stave > [data-pitch="F♯4"] { grid-row: floortom; } /* Low Timbale */
-.drums-stave > [data-pitch="G4"]  { grid-row: splash; }   /* High Agogo */
-.drums-stave > [data-pitch="A♭4"] { grid-row: crash; }    /* Low Agogo */
-.drums-stave > [data-pitch="A4"]  { grid-row: hihat; }    /* Cabasa */
-.drums-stave > [data-pitch="B♭4"] { grid-row: hihat; }    /* Maracas */
-.drums-stave > [data-pitch="B4"]  { grid-row: lowtom; }   /* Short Whistle */
-.drums-stave > [data-pitch="C5"]  { grid-row: lowtom; }   /* Long Whistle */
-.drums-stave > [data-pitch="C♯5"] { grid-row: lowtom; }   /* Short Guiro */
-.drums-stave > [data-pitch="D5"]  { grid-row: lowtom; }   /* Long Guiro */
-.drums-stave > [data-pitch="E♭5"] { grid-row: midtom; }   /* Claves */
-.drums-stave > [data-pitch="E5"]  { grid-row: midtom; }   /* Hi Wood Block */
-.drums-stave > [data-pitch="F5"]  { grid-row: lowtom; }   /* Low Wood Block */
-.drums-stave > [data-pitch="F♯5"] { grid-row: ride;   }   /* Mute Cuica */
-.drums-stave > [data-pitch="G5"]  { grid-row: ride;   }   /* Open Cuica */
-.drums-stave > [data-pitch="A♭5"] { grid-row: crash;  }   /* Mute Triangle */
-.drums-stave > [data-pitch="A5"]  { grid-row: crash;  }   /* Open Triangle */
-.drums-stave > [data-pitch="B♭5"] { grid-row: hihat;  }   /* Shaker */
+/* Selectors must match the importance of data-pitch selectors found on
+   the base class .stave, hence the double attribute selector. */
+.drums-stave > [data-pitch][data-pitch="B1"]  { grid-row: kick; }     /* Acoustic Bass Drum */
+.drums-stave > [data-pitch][data-pitch="C2"]  { grid-row: kick; }     /* Bass Drum 1 */
+.drums-stave > [data-pitch][data-pitch="C♯2"] { grid-row: snare; }    /* Side Stick */
+.drums-stave > [data-pitch][data-pitch="D2"]  { grid-row: snare; }    /* Acoustic Snare */
+.drums-stave > [data-pitch][data-pitch="E♭2"] { grid-row: snare; }    /* Hand Clap */
+.drums-stave > [data-pitch][data-pitch="E2"]  { grid-row: snare; }    /* Electric Snare */
+.drums-stave > [data-pitch][data-pitch="F2"]  { grid-row: lowfloortom; } /* Low Floor Tom */
+.drums-stave > [data-pitch][data-pitch="F♯2"] { grid-row: hihat; }    /* Closed Hi-Hat */
+.drums-stave > [data-pitch][data-pitch="G2"]  { grid-row: floortom; } /* High Floor Tom */
+.drums-stave > [data-pitch][data-pitch="G♯2"],
+.drums-stave > [data-pitch][data-pitch="A♭2"] { grid-row: hihatpedal; } /* Pedal Hi-Hat */
+.drums-stave > [data-pitch][data-pitch="A2"]  { grid-row: midtom; }   /* Low Tom */
+.drums-stave > [data-pitch][data-pitch="B♭2"] { grid-row: hihat; }    /* Open Hi-Hat */
+.drums-stave > [data-pitch][data-pitch="B2"]  { grid-row: midtom; }   /* Low-Mid Tom */
+.drums-stave > [data-pitch][data-pitch="C3"]  { grid-row: hightom; }  /* Hi-Mid Tom */
+.drums-stave > [data-pitch][data-pitch="C♯3"] { grid-row: crash; }    /* Crash Cymbal 1 */
+.drums-stave > [data-pitch][data-pitch="D3"]  { grid-row: hightom; }  /* High Tom */
+.drums-stave > [data-pitch][data-pitch="E♭3"] { grid-row: ride; }     /* Ride Cymbal 1 */
+.drums-stave > [data-pitch][data-pitch="E3"]  { grid-row: splash; }   /* Chinese Cymbal */
+.drums-stave > [data-pitch][data-pitch="F3"]  { grid-row: ride; }     /* Ride Bell */
+.drums-stave > [data-pitch][data-pitch="F♯3"] { grid-row: foot; }     /* Tambourine */
+.drums-stave > [data-pitch][data-pitch="G3"]  { grid-row: splash; }   /* Splash Cymbal */
+.drums-stave > [data-pitch][data-pitch="G♯3"],
+.drums-stave > [data-pitch][data-pitch="A♭3"] { grid-row: lowtom; }   /* Cowbell*/
+.drums-stave > [data-pitch][data-pitch="A3"]  { grid-row: crash2; }   /* Crash Symbol 2 */
+.drums-stave > [data-pitch][data-pitch="B♭3"] { grid-row: midtom; }   /* Vibraslap */
+.drums-stave > [data-pitch][data-pitch="B3"]  { grid-row: crash2; }   /* Ride Cymbal 2*/
+.drums-stave > [data-pitch][data-pitch="C4"]  { grid-row: midtom; }   /* Hi Bongo */
+.drums-stave > [data-pitch][data-pitch="C♯4"] { grid-row: lowtom; }   /* Low Bongo */
+.drums-stave > [data-pitch][data-pitch="D4"]  { grid-row: midtom; }   /* Mute Hi Conga */
+.drums-stave > [data-pitch][data-pitch="E♭4"] { grid-row: midtom; }   /* Open Hi Conga */
+.drums-stave > [data-pitch][data-pitch="E4"]  { grid-row: lowtom; }   /* Low Conga */
+.drums-stave > [data-pitch][data-pitch="F4"]  { grid-row: hightom; }  /* High Timbale */
+.drums-stave > [data-pitch][data-pitch="F♯4"] { grid-row: floortom; } /* Low Timbale */
+.drums-stave > [data-pitch][data-pitch="G4"]  { grid-row: splash; }   /* High Agogo */
+.drums-stave > [data-pitch][data-pitch="G♯4"],
+.drums-stave > [data-pitch][data-pitch="A♭4"] { grid-row: crash; }    /* Low Agogo */
+.drums-stave > [data-pitch][data-pitch="A4"]  { grid-row: hihat; }    /* Cabasa */
+.drums-stave > [data-pitch][data-pitch="B♭4"] { grid-row: hihat; }    /* Maracas */
+.drums-stave > [data-pitch][data-pitch="B4"]  { grid-row: lowtom; }   /* Short Whistle */
+.drums-stave > [data-pitch][data-pitch="C5"]  { grid-row: lowtom; }   /* Long Whistle */
+.drums-stave > [data-pitch][data-pitch="C♯5"] { grid-row: lowtom; }   /* Short Guiro */
+.drums-stave > [data-pitch][data-pitch="D5"]  { grid-row: lowtom; }   /* Long Guiro */
+.drums-stave > [data-pitch][data-pitch="E♭5"] { grid-row: midtom; }   /* Claves */
+.drums-stave > [data-pitch][data-pitch="E5"]  { grid-row: midtom; }   /* Hi Wood Block */
+.drums-stave > [data-pitch][data-pitch="F5"]  { grid-row: lowtom; }   /* Low Wood Block */
+.drums-stave > [data-pitch][data-pitch="F♯5"] { grid-row: ride;   }   /* Mute Cuica */
+.drums-stave > [data-pitch][data-pitch="G5"]  { grid-row: ride;   }   /* Open Cuica */
+.drums-stave > [data-pitch][data-pitch="G♯5"],
+.drums-stave > [data-pitch][data-pitch="A♭5"] { grid-row: crash;  }   /* Mute Triangle */
+.drums-stave > [data-pitch][data-pitch="A5"]  { grid-row: crash;  }   /* Open Triangle */
+.drums-stave > [data-pitch][data-pitch="B♭5"] { grid-row: hihat;  }   /* Shaker */

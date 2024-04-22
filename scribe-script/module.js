@@ -254,7 +254,7 @@ export default define(element('scribe-script', {
     beat `0` in the data.
     **/
     meter: {
-        attribute: function(value) { this.key = value; },
+        attribute: function(value) { this.meter = value; },
         get: function() { return getInternals(this).meter.value; },
         set: function(value) { getInternals(this).meter.value = value; }
     },

@@ -23,29 +23,6 @@ const rdoublesharp = /##|𝄪/;
 
 const cScale = [0,2,4,5,7,9,11];
 
-
-function toPitch(stave, key, transpose, pitch) {
-    return stave.getSpelling(
-        // key
-        mod12(key + transpose),
-        // number
-        toNoteNumber(pitch) + transpose,
-        // type
-        'note'
-    );
-}
-
-function toChord(stave, key, transpose, string) {
-    return stave.getSpelling(
-        // key
-        mod12(key + transpose),
-        // chord name
-        transposeChord(string, transpose),
-        // type
-        'chord'
-    );
-}
-
 const fathercharles = [
     // Father Charles Goes Down And Ends Battle,
     'F♯', 'C♯', 'G♯', 'D♯', 'A♯', 'E♯', 'B♯',
@@ -59,9 +36,9 @@ function byFatherCharlesPitch(a, b) {
     return ai > bi ? 1 : ai < bi ? -1 : 0 ;
 }
 
-function getStemDirection(note, head) {
+function getStemDirection(centerPitch, head) {
     return head && head.stemDirection || (
-        toNoteNumber(note) < toNoteNumber(head.pitch) ?
+        toNoteNumber(centerPitch) < toNoteNumber(head.pitch) ?
             'down' :
             'up' );
 }
@@ -78,9 +55,9 @@ function toDuration(event) {
         event[4] ;
 }
 
-function insertTail(symbols, stemNote, i) {
+function insertTail(symbols, stave, i) {
     const head = symbols[i];
-    const stemDirection = getStemDirection(stemNote, head) ;
+    const stemDirection = getStemDirection(stave.centerPitch, head) ;
 
     // Splice stem and tail in before head
     symbols.splice(i, 0, assign({}, head, {
@@ -152,7 +129,7 @@ function subtractStaveRows(stave, r1, r2) {
     return n + (octave2 - octave1) * 7;
 }
 
-function createBeam(symbols, stave, beam, stemNote, n) {
+function createBeam(symbols, stave, beam, n) {
     const part = symbols[0].part;
 
     // Not enough stems for a beam, give it a tail
@@ -161,14 +138,14 @@ function createBeam(symbols, stave, beam, stemNote, n) {
             throw new Error('Last beam index (' + i + ') cant be greater than n (' + n + ')');
         }
 
-        return insertTail(symbols, stemNote, beam[0]);
+        return insertTail(symbols, stave, beam[0]);
     }
 
     // Render stems and beam
     const stemDirection = symbols[beam[0]] && symbols[beam[0]].stemDirection ?
             symbols[beam[0]].stemDirection :
         (beam
-        .map((i) => subtractStaveRows(stave, stemNote, symbols[i].pitch))
+        .map((i) => subtractStaveRows(stave, stave.centerPitch, symbols[i].pitch))
         .reduce((t, u) => t + u, 0) / beam.length) < 0 ?
             'up' :
             'down' ;
@@ -185,7 +162,7 @@ function createBeam(symbols, stave, beam, stemNote, n) {
     while (beam[++b] !== undefined) {
         i    = beam[b];
         head = symbols[i];
-        line = subtractStaveRows(stave, stemNote, head.pitch);
+        line = subtractStaveRows(stave, stave.centerPitch, head.pitch);
 
         head.stemDirection = stemDirection;
         head.tieDirection  = stemDirection === 'up' ? 'down' : 'up' ;
@@ -258,9 +235,10 @@ function createBeam(symbols, stave, beam, stemNote, n) {
     return stems.length + buffer.length + 1;
 }
 
-function createSymbols(symbols, bar, stemNote) {
+function createSymbols(symbols, bar) {
     // All events in symbols have the same part
-    const part = symbols[0].part;
+    const part  = symbols[0].part;
+    const stave = bar.stave;
 
     // Populate accidentals with key signature sharps and flats
     const accidentals = bar.key.reduce((accidentals, n, i) => {
@@ -355,7 +333,7 @@ function createSymbols(symbols, bar, stemNote) {
                 || isAfterBreak(bar.breaks, symbols[beam[beam.length - 1]].beat, head.beat)
             ) {
                 // Close the current beam
-                n += createBeam(symbols, bar.stave, beam, stemNote, n);
+                n += createBeam(symbols, bar.stave, beam, n);
                 beam = undefined;
             }
         }
@@ -377,7 +355,7 @@ function createSymbols(symbols, bar, stemNote) {
             }
             // Otherwise render the stem immediately
             else {
-                let stemDirection = getStemDirection(stemNote, head);
+                let stemDirection = getStemDirection(stave.centerPitch, head);
                 symbols.splice(n++, 0, assign({}, head, {
                     type: 'stem',
                     stemDirection
@@ -396,7 +374,7 @@ function createSymbols(symbols, bar, stemNote) {
         }
         else {
             if (head.tie === 'begin' || head.tie === 'middle') {
-                let stemDirection = getStemDirection(stemNote, head);
+                let stemDirection = getStemDirection(stave.centerPitch, head);
                 symbols.splice(n++, 0, assign({}, head, {
                     type: 'tie',
                     // Move tie into following grid column
@@ -410,7 +388,7 @@ function createSymbols(symbols, bar, stemNote) {
 
     // Close the current beam
     if (beam && beam.length) {
-        n += createBeam(symbols, bar.stave, beam, stemNote, n);
+        n += createBeam(symbols, bar.stave, beam, n);
         beam = undefined;
     }
 
@@ -533,7 +511,7 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
 
     const events0 = eventsAtBeat(events, 0);
     meter = events0.find((event) => event[1] === 'meter') || meter ;
-
+console.log(meter);
     // First bar. Where meter is at beat 0, also inserts a time signature.
     let bar = createBar(0, stave, keyscale, meter, tieheads);
     bars.push(bar);
@@ -605,7 +583,7 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
             toDuration(event) ;
 
         if (event[1] === 'note') {
-            let pitch = toPitch(stave, key, transpose, event[2]);
+            let pitch = stave.getSpelling(key, event[2], event[1], transpose);
             let head = assign({
                 type: 'head',
                 beat,
@@ -631,7 +609,7 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
                 beat,
                 duration,
                 transpose,
-                value: toChord(stave, key, transpose, event[2]),
+                value: stave.getSpelling(key, event[2], event[1], transpose),
                 event: event
             });
         }
