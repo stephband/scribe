@@ -62,14 +62,14 @@ Scribe consumes <a href="https://github.com/soundio/music-json/">Sequence JSON</
 in the `.events` array. Each event type has an array structure. Scribe 0.3 supports these 
 event types:
 
-| beat   | type         | 2 | 3 | 4 | 5 |
-| :----- | :----------- | :--- | :--- | :--- | :--- |
-| `beat` | `"chord"`    | `root` | `mode` | `duration` |  |
-| `beat` | `"note"`     | `pitch` | `gain` | `duration` |  |
-| `beat` | `"meter"`    | `duration` | `divisor` |  |  |
-| `beat` | `"rate"`     | `number` |  |  |  |
-| `beat` | `"key"`      | `notename` |  |  |  |
-| `beat` | `"clef"`     | `clefname` |  |  |  |
+| beat   | type         | 2 | 3 | 4 |
+| :----- | :----------- | :--- | :--- | :--- |
+| `beat` | `"chord"`    | `root` | `mode` | `duration` |
+| `beat` | `"note"`     | `pitch` | `gain` | `duration` |
+| `beat` | `"meter"`    | `duration` | `divisor` |  |
+| `beat` | `"rate"`     | `number` |  |  |
+| `beat` | `"key"`      | `notename` |  |  |
+| `beat` | `"clef"`     | `clefname` |  |  |
 
 ---
 
