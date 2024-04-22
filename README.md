@@ -61,6 +61,7 @@ scribe.data = {
 Scribe consumes <a href="https://github.com/soundio/music-json/">Sequence JSON</a>
 (and data objects of the same structure).
 
+---
 
 ### Attributes
 
@@ -78,7 +79,8 @@ A URL of some sequence data in JSON, ABC or Scribe's own sequence text format.
 
 #### `clef="treble"`
 
-Sets the default stave. May be overridden by `"clef"` events in data.
+Sets the stave. One of `"treble"`, `"bass"`, `"piano"`, `"drums"`, `"percussion"` or
+`"chords"`.
 
 #### `key="C"`
 
@@ -94,14 +96,17 @@ Sets the default meter. May be overridden by any `"meter"` events in data.
 Sets scribe to render notation transposed by `transpose` semitones. Transposition
 is applied to key signature, notes and chords.
 
+---
+
 ### Properties
 
 #### `.clef`
 
-The name of the clef, one of 'treble', 'bass', 'piano', 'drums', `percussion`,
-`chords`.
+The name of the clef, one of `"treble"`, `"bass"`, `"piano"`, `"drums"`, `"percussion"` or
+`"chords"`.
 
 ```js
+let scribe = document.body.querySelector('scribe-script');
 scribe.clef = "bass";
 ```
 
@@ -112,6 +117,7 @@ The key signature of the stave. This is the key signature pre-transpose, if
 before render.
 
 ```js
+let scribe = document.body.querySelector('scribe-script');
 scribe.key = "Bb";
 ```
 
@@ -121,6 +127,7 @@ The meter, expressed as a standard time signature. This setting is overridden
 by any meter event found in the data at beat `0`.
 
 ```js
+let scribe = document.body.querySelector('scribe-script');
 scribe.meter = "4/4";
 ```
 
@@ -130,6 +137,7 @@ A transpose value in semitones, an integer, applied to both key, notes and
 chords before rendering.
 
 ```js
+let scribe = document.body.querySelector('scribe-script');
 scribe.transpose = 2;
 ```
 
@@ -162,7 +170,6 @@ to render it.
 
 ```js
 let scribe = document.body.querySelector('scribe-script');
-
 scribe.data = {
     name:      'My Song',
     events:    [...],
@@ -170,6 +177,7 @@ scribe.data = {
 };
 ```
 
+---
 
 ## Develop
 
