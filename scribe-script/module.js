@@ -6,6 +6,7 @@ import { toRootName, toRootNumber } from '../../midi/modules/note.js';
 import createSymbols     from '../modules/create-symbols.js';
 import requestData       from '../modules/request-data.js';
 import parseSource       from '../modules/parse.js';
+import * as staves       from '../modules/staves.js';
 import createElement     from './modules/create-element.js';
 
 
@@ -180,6 +181,7 @@ export default define(element('scribe-script', {
             this.classList.add('safari');
         }
 
+        // Compute signal listens to changs
         Signal.from(() => (
             internals.data.value && createSymbols(
                 // Events from data
@@ -215,8 +217,14 @@ export default define(element('scribe-script', {
     **/
     clef: {
         attribute: function(value) { this.clef = value; },
-        get: function() { return getInternals(this).clef.value; },
-        set: function(value) { getInternals(this).clef.value = value; }
+        get: function() {  return getInternals(this).clef.value; },
+        set: function(value) {
+            if (!staves[value]) {
+                console.warn('<scribe-script> Attempt to set invalid clef="' + value + '" ignored');
+                return;
+            }
+            getInternals(this).clef.value = value;
+        }
     },
 
     /**
