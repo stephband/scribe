@@ -74,7 +74,7 @@ Each event type has its own structure. Scribe 0.3 supports these event types:
 | beat   | type         | 2 | 3 | 4 |
 | :----- | :----------- | :--- | :--- | :--- |
 | `beat` | `"chord"`    | `root` | `mode` | `duration` |
-| `beat` | `"note"`     | `pitch` | `gain` | `duration` |
+| `beat` | `"note"`     | `pitch` | `dynamic` | `duration` |
 | `beat` | `"meter"`    | `duration` | `divisor` |  |
 | `beat` | `"rate"`     | `number` |  |  |
 | `beat` | `"key"`      | `notename` |  |  |
