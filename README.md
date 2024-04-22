@@ -58,9 +58,18 @@ scribe.data = {
 ```
 
 Scribe consumes <a href="https://github.com/soundio/music-json/">Sequence JSON</a>
-(and data objects of the same structure). Events are described by arrays of data stored
-in the `.events` array. Each event type has an array structure. Scribe 0.3 supports these 
-event types:
+(and data objects of the same structure). Events are described by arrays of data in 
+the `.events` array:
+
+```js
+scribe.data = {
+    events: [
+        [0, "note", "G4", 0.2, 3]
+    ]
+};
+```
+
+Each event type has its own structure. Scribe 0.3 supports these event types:
 
 | beat   | type         | 2 | 3 | 4 |
 | :----- | :----------- | :--- | :--- | :--- |
