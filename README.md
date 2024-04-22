@@ -101,8 +101,8 @@ is applied to key signature, notes and chords.
 
 #### `.clef`
 
-The name of the clef, one of 'treble', 'bass', 'piano', 'drums', `percussion`,
-`chords`.
+The name of the clef, one of `"treble"`, `"bass"`, `"piano"`, `"drums"`, `"percussion"` or
+`"chords"`.
 
 ```js
 let scribe = document.body.querySelector('scribe-script');
