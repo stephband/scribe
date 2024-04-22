@@ -80,6 +80,12 @@ Each event type has its own structure. Scribe 0.3 supports these event types:
 | `beat` | `"key"`      | `notename` |  |  |
 | `beat` | `"clef"`     | `clefname` |  |  |
 
+Scribe 0.3 also parses a shorthand version of this format, as in the first example above,
+which is basically Sequence JSON with all the JSON syntax, commas and brackets and quotemarks,
+removed.
+
+Scribe 0.3 also parses ABC (thanks to use of the parser from [https://github.com/paulrosen/abcjs](ABCjs).
+
 ---
 
 ### Attributes
