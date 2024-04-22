@@ -40,11 +40,27 @@ it's content:
 </scribe-script>
 ```
 
-Or imported from a file in its `src` attribute:
+Or imported from a file in its `src` attribute, like this gist:
 
 ```html
 <scribe-script type="json" src="https://api.github.com/gists/739fa16055debb7972737835e4fa4623"></scribe-script>
 ```
+
+Or set on it's data property:
+
+```js
+let scribe = document.body.querySelector('scribe-script');
+
+scribe.data = {
+    name:      'My Song',
+    events:    [...],
+    sequences: [...]
+};
+```
+
+Scribe consumes <a href="https://github.com/soundio/music-json/">Sequence JSON</a>
+(and data objects of the same structure).
+
 
 ### Attributes
 
@@ -64,17 +80,95 @@ A URL of some sequence data in JSON, ABC or Scribe's own sequence text format.
 
 Sets the default stave. May be overridden by `"clef"` events in data.
 
+#### `key="C"`
+
+Gets and sets the key signature of the stave. Accepts any chromatic note name,
+spelled with unicode sharps `♯` and flats `♭` or with hash `#` and small case `b`.
+
 #### `meter="4/4"`
 
-Sets the default meter. May be overridden by `"meter"` events in data.
+Sets the default meter. May be overridden by any `"meter"` events in data.
+
+#### `transpose="0"`
+
+Sets scribe to render notation transposed by `transpose` semitones. Transposition
+is applied to key signature, notes and chords.
 
 ### Properties
-#### `.type`
+
+#### `.clef`
+
+The name of the clef, one of 'treble', 'bass', 'piano', 'drums', `percussion`,
+`chords`.
+
+```js
+scribe.clef = "bass";
+```
+
+#### `.key`
+
+The key signature of the stave. This is the key signature pre-transpose, if
+`scribe.transpose` is something other than `0`, the key signature is transposed
+before render.
+
+```js
+scribe.key = "Bb";
+```
+
+#### `.meter`
+
+The meter, expressed as a standard time signature. This setting is overridden
+by any meter event found in the data at beat `0`.
+
+```js
+scribe.meter = "4/4";
+```
+
+#### `.transpose`
+
+A transpose value in semitones, an integer, applied to both key, notes and
+chords before rendering.
+
+```js
+scribe.transpose = 2;
+```
+
+Transposing a `scribe` does not change `scribe.data`, only the rendered output.
+
 #### `.src`
+
+URL of data to be parsed and rendered.
+
+#### `.type`
+
+Mimetype or type of data to fetch from `src` or to parse from text content.
+
+- "application/json", or just "json"
+- "text/x-abc", or just "abc"
+- "text/x-sequence", or just "sequence"
+
 #### `.data`
 
-Returns an observable proxy of Scribe's internal data object. Changes to this
-data are observed and cause Scribe to update.
+Gets Scribe's internal data object, whose structure is a <a href="https://github.com/soundio/music-json/#sequence">Sequence</a>.
+To export Sequence JSON, simply stringify it:
+
+```js
+let scribe = document.body.querySelector('scribe-script');
+let mySong = JSON.stringify(scribe.data);
+```
+
+Set a `.data` object, structured as a <a href="https://github.com/soundio/music-json/#sequence">Sequence</a>,
+to render it.
+
+```js
+let scribe = document.body.querySelector('scribe-script');
+
+scribe.data = {
+    name:      'My Song',
+    events:    [...],
+    sequences: [...]
+};
+```
 
 
 ## Develop

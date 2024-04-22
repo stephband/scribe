@@ -46,6 +46,12 @@ const keynumbers = {
     'B♯':  12
 };
 
+export function toKeyNumber(keyname) {
+    return typeof keyname === 'number' ?
+        keyname :
+        keynumbers[keyname] ;
+}
+
 export function toKeyScale(key) {
     return typeof key === 'number' ?
         transposeScale(cScale, key) :

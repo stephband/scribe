@@ -9,7 +9,7 @@ import { keysAtBeats, keyFromBeatKeys } from './sequence/key-at-beat.js';
 import { transposeChord } from './event/chord.js';
 import { transposeScale } from './scale.js';
 import * as staves        from './staves.js';
-import { toKeyScale }     from './keys.js';
+import { toKeyScale, toKeyNumber } from './keys.js';
 import { mod12, byGreater } from './maths.js';
 
 
@@ -670,10 +670,13 @@ export default function eventsToSymbols(events, clef, keyname, meter, transpose)
     // causes measurable delay.
     const beatkeys  = keysAtBeats(events);
 
-    // Create a scale from C scale transposed by key. This scale is not a true
+    // Get the key scale from keyname. This scale is not a true
     // 'scale' in an internal-data sense as it may not begin with a 0, but it
-    // maps naturals to accidentals when compared against the C scale
-    const keyscale  = toKeyScale(keyname);
+    // maps naturals to accidentals when compared against the C scale. Remember
+    // keynumber is on a continuous scale of fourths, so multiply by 7 semitones
+    // to get chromatic number relative to C.
+    const keynumber = toKeyNumber(keyname);
+    const keyscale  = toKeyScale(keynumber * 7 + transpose);
 
     // TODO: this is a two-pass symbol generation, I wonder if we can get
     // it down to one? :)
