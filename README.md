@@ -61,6 +61,7 @@ scribe.data = {
 Scribe consumes <a href="https://github.com/soundio/music-json/">Sequence JSON</a>
 (and data objects of the same structure).
 
+---
 
 ### Attributes
 
@@ -93,6 +94,8 @@ Sets the default meter. May be overridden by any `"meter"` events in data.
 
 Sets scribe to render notation transposed by `transpose` semitones. Transposition
 is applied to key signature, notes and chords.
+
+---
 
 ### Properties
 
@@ -170,6 +173,7 @@ scribe.data = {
 };
 ```
 
+---
 
 ## Develop
 
