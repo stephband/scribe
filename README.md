@@ -84,7 +84,7 @@ Scribe 0.3 also parses a shorthand version of this format, as in the first examp
 which is basically Sequence JSON with all the JSON syntax, commas and brackets and quotemarks,
 removed.
 
-Scribe 0.3 also parses ABC (thanks to use of the parser from [ABCjs](https://github.com/paulrosen/abcjs).
+Scribe 0.3 also parses ABC (thanks to the parser from [ABCjs](https://github.com/paulrosen/abcjs)).
 
 ---
 
