@@ -10,13 +10,17 @@ export const chords = {
 
 export const treble = {
     clef: 'treble',
+    topPitch:    'G5',
     centerPitch: 'B4',
+    bottomPitch: 'D4',
     getSpelling: toSpelling
 };
 
 export const bass = {
     clef: 'bass',
+    topPitch:    'B3',
     centerPitch: 'D3',
+    bottomPitch: 'F2',
     getSpelling: toSpelling
 };
 
@@ -25,7 +29,9 @@ export const piano = {
     getSpelling: toSpelling,
 
     // TEMP
+    topPitch:    'G5',
     centerPitch: 'B4',
+    bottomPitch: 'D4',
 
     // TODO: there should be four parts available, soprano alto, tenor bass
     getPart: function(pitch) {
@@ -145,7 +151,9 @@ export const percussion = {
     clef: 'percussion',
 
     // TEMP
+    topPitch:    'C4',
     centerPitch: 'B4',
+    bottomPitch: 'A4',
 
     getSpelling: (key, name, type, transpose) => {
         if (type === 'chord') {

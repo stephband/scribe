@@ -209,14 +209,21 @@ export default define(element('scribe-script', {
         }
     }
 }, {
-    /**
-    clef="treble"
-    Choose the default clef to render. Not that if the rendered sequence
-    contains clef events, they override this choice. Possible clefs are
-    `"treble"`, `"bass"`, `"piano"`, `"drums"`, `"percussion"`, `"chord"`.
-    **/
     clef: {
+        /**
+        clef="treble"
+        Choose the default clef to render. Not that if the rendered sequence
+        contains clef events, they override this choice. Possible clefs are
+        `"treble"`, `"bass"`, `"piano"`, `"drums"`, `"percussion"`, `"chord"`.
+        **/
         attribute: function(value) { this.clef = value; },
+
+        /**
+        .clef = "treble"
+        Choose the default clef to render. Not that if the rendered sequence
+        contains clef events, they override this choice. Possible clefs are
+        `"treble"`, `"bass"`, `"piano"`, `"drums"`, `"percussion"`, `"chord"`.
+        **/
         get: function() {  return getInternals(this).clef.value; },
         set: function(value) {
             if (!staves[value]) {
@@ -227,12 +234,17 @@ export default define(element('scribe-script', {
         }
     },
 
-    /**
-    key="C"
-    Choose the default key to render.
-    **/
     key: {
+        /**
+        key="C"
+        Choose the key signature.
+        **/
         attribute: function(value) { this.key = value; },
+
+        /**
+        .key="C"
+        Choose the key signature.
+        **/
         get: function() { return getInternals(this).key.value; },
         set: function(value) {
             const internals = getInternals(this);
@@ -248,28 +260,34 @@ export default define(element('scribe-script', {
         }
     },
 
-    /**
-    meter="4/4"
-    Sets the meter. Note that this is overridden by any `"meter"` event found at
-    beat `0` in the data.
-    **/
     meter: {
+        /**
+        meter="4/4"
+        Sets the meter. Note that this is overridden by any `"meter"` event
+        found at beat `0` in the data.
+        **/
         attribute: function(value) { this.meter = value; },
+
+        /**
+        .meter = "4/4"
+        Sets the meter. Note that this is overridden by any `"meter"` event
+        found at beat `0` in the data.
+        **/
         get: function() { return getInternals(this).meter.value; },
         set: function(value) { getInternals(this).meter.value = value; }
     },
 
-    /**
-    transpose="0"
-    Sets transposition value for display of notation.
-    **/
-
-    /**
-    .transpose = 0
-    Sets transposition value for display of notation.
-    **/
     transpose: {
+        /**
+        transpose="0"
+        Sets transposition value for display of notation.
+        **/
         attribute: function(value) { this.transpose = value; },
+
+        /**
+        .transpose = 0
+        Sets transposition value for display of notation.
+        **/
         get: function() { return getInternals(this).transpose.value; },
         set: function(value) {
             // Set integer from value
@@ -279,16 +297,23 @@ export default define(element('scribe-script', {
         }
     },
 
-    /**
-    type="application/json"
-    Mimetype or type of data to fetch. Possible mimetypes:
-    - `"text/x-abc"`
-    - `"text/plain"`
-    - `"application/json"`
-    **/
-
     type: {
+        /**
+        type="application/json"
+        Mimetype or type of data to fetch. Possible mimetypes:
+        - `"text/x-abc"`
+        - `"text/plain"`
+        - `"application/json"`
+        **/
         attribute: function(value) { this.type = value; },
+
+        /**
+        .type = "application/json"
+        Mimetype or type of data to fetch. Possible mimetypes:
+        - `"text/x-abc"`
+        - `"text/plain"`
+        - `"application/json"`
+        **/
         writable: true
     },
 

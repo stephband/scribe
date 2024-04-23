@@ -303,7 +303,7 @@ function createSymbols(symbols, bar) {
         }
 
         // Up ledger lines
-        let ledgerrows = subtractStaveRows(bar.stave, 'G5', head.pitch);
+        let ledgerrows = subtractStaveRows(bar.stave, bar.stave.topPitch, head.pitch);
 
         if (ledgerrows > 0) {
             symbols.splice(n++, 0, assign({}, head, {
@@ -314,7 +314,7 @@ function createSymbols(symbols, bar) {
 
         // Down ledger lines
         else {
-            ledgerrows = subtractStaveRows(bar.stave, head.pitch, 'D4');
+            ledgerrows = subtractStaveRows(bar.stave, head.pitch, bar.stave.bottomPitch);
             if (ledgerrows > 0) {
                 symbols.splice(n++, 0, assign({}, head, {
                     type: 'downledger',
@@ -511,7 +511,7 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
 
     const events0 = eventsAtBeat(events, 0);
     meter = events0.find((event) => event[1] === 'meter') || meter ;
-console.log(meter);
+
     // First bar. Where meter is at beat 0, also inserts a time signature.
     let bar = createBar(0, stave, keyscale, meter, tieheads);
     bars.push(bar);
