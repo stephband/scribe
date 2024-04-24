@@ -50,6 +50,14 @@ function timesigToMeter(string) {
     return [0, "meter", num * div, div];
 }
 
+function meterToTimesig(meter) {
+    const dur = meter[2];
+    const div = meter[3];
+    const num = dur / div;
+    const den = 4 / div;
+    return num + '/' + den;
+}
+
 
 /* Register <scribe-script> */
 
@@ -165,7 +173,7 @@ export default define(element('scribe-script', {
         internals.data      = Signal.of();
         internals.clef      = Signal.of('treble');
         internals.key       = Signal.of('C');
-        internals.meter     = Signal.of('4/4');
+        internals.meter     = Signal.of([-4, "meter", 4, 1]);
         internals.transpose = Signal.of(0);
 
         /* Safari has some rounding errors to overcome... */
@@ -191,7 +199,7 @@ export default define(element('scribe-script', {
                 // Key name
                 internals.key.value,
                 // Create an initial [0, "meter", ...] event
-                timesigToMeter(internals.meter.value),
+                internals.meter.value,
                 // Transpose is a number
                 internals.transpose.value
             ).reduce(toBarElements, []))
@@ -237,9 +245,11 @@ export default define(element('scribe-script', {
     key: {
         /**
         key="C"
-        Choose the key signature.
+        Choose the key signature. Defaults to "C".
         **/
-        attribute: function(value) { this.key = value; },
+        attribute: function(value) {
+            this.key = value === '' ? 'C' : '';
+        },
 
         /**
         .key="C"
@@ -266,15 +276,18 @@ export default define(element('scribe-script', {
         Sets the meter. Note that this is overridden by any `"meter"` event
         found at beat `0` in the data.
         **/
-        attribute: function(value) { this.meter = value; },
+        attribute: function(value) {
+            // Default to 4/4 where meter attribute simply exists
+            this.meter = value === '' ? '4/4' : value;
+        },
 
         /**
         .meter = "4/4"
         Sets the meter. Note that this is overridden by any `"meter"` event
         found at beat `0` in the data.
         **/
-        get: function() { return getInternals(this).meter.value; },
-        set: function(value) { getInternals(this).meter.value = value; }
+        get: function() { return meterToTimesig(getInternals(this).meter.value); },
+        set: function(value) { getInternals(this).meter.value = timesigToMeter(value); }
     },
 
     transpose: {
