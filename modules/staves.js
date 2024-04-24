@@ -51,15 +51,14 @@ export const piano = {
 export const drums = {
     clef: 'drums',
 
-    getSpelling: (key, name, type, transpose) => {
-        if (type === 'chord') {
-            return getSpelling(key, name, 'chord', transpose);
-        }
-        else if (type === 'note') {
+    getSpelling: (key, event, transpose) => {
+        if (event[1] === 'note') {
             // Use standard MIDI note names. We don't want any spelling happening
             // on drum parts.
-            return toNoteName(toNoteNumber(name));
+            return toNoteName(toNoteNumber(event[2]));
         }
+
+        return toSpelling(key, event, transpose);
     },
 
     heads: {
@@ -155,14 +154,13 @@ export const percussion = {
     centerPitch: 'B4',
     bottomPitch: 'A4',
 
-    getSpelling: (key, name, type, transpose) => {
-        if (type === 'chord') {
-            return getSpelling(key, name, 'chord', transpose);
-        }
-        else if (type === 'note') {
+    getSpelling: (key, event, transpose) => {
+        if (event[1] === 'note') {
             // Use standard MIDI note names. We don't want any spelling happening
             // on drum parts.
-            return toNoteName(toNoteNumber(name));
+            return toNoteName(toNoteNumber(event[2]));
         }
+
+        return toSpelling(key, event, transpose);
     }
 };

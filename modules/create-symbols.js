@@ -51,7 +51,8 @@ function isAfterBreak(breaks, b1, b2) {
 }
 
 function toDuration(event) {
-    return event[1] === 'chord' ? event[3] :
+    return event[1] === 'lyric' ?
+        event[3] :
         event[4] ;
 }
 
@@ -583,7 +584,7 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
             toDuration(event) ;
 
         if (event[1] === 'note') {
-            let pitch = stave.getSpelling(key, event[2], event[1], transpose);
+            let pitch = stave.getSpelling(key, event, transpose);
             let head = assign({
                 type: 'head',
                 beat,
@@ -609,7 +610,7 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
                 beat,
                 duration,
                 transpose,
-                value: stave.getSpelling(key, event[2], event[1], transpose),
+                value: stave.getSpelling(key, event, transpose) + event[3],
                 event: event
             });
         }

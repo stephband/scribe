@@ -1,6 +1,6 @@
 
 import nothing from '../../../fn/modules/nothing.js';
-import { noteNames, toNoteNumber, toRootNumber, toNoteOctave } from '../../../midi/modules/pitch.js';
+import { noteNames, toNoteNumber, toRootNumber, toNoteOctave } from '../../../midi/modules/note.js';
 import { mod12 } from '../maths.js';
 import keys from '../keys.js';
 
@@ -14,29 +14,29 @@ const accidentals = {
 
 const rpitch = /^[A-G][b#♭♯𝄫𝄪]?(-?\d)?$/;
 
-export default function toSpelling(keynumber, note, type, transpose = 0) {
+export default function toSpelling(keynumber, event, transpose = 0) {
     const key = keys[mod12(keynumber + transpose)];
     let n, a, o;
 
-    if (typeof pitch === 'string') {
-        let [name, octave] = rpitch.exec(pitch) || [name];
+    if (typeof event[2] === 'string') {
+        let [notename, octave] = rpitch.exec(event[2]) || [event[2]];
 
         if (octave) {
-            // pitch is note name, deconstruct it and put it back together
-            n = toNoteNumber(pitch) + transpose;
+            // pitch is note name like "C4", deconstruct it and put it back together
+            n = toNoteNumber(event[2]) + transpose;
             a = key.spellings[mod12(n)];
             o = toNoteOctave(n - a);
         }
         else {
-            // pitch is kay name
-            n = toRootNumber(pitch) + transpose;
+            // pitch is root name like "C"
+            n = toRootNumber(event[2]) + transpose;
             a = key.spellings[mod12(n)];
             o = '';
         }
     }
     else {
         // pitch is a number
-        n = pitch + transpose;
+        n = event[2] + transpose;
         a = key.spellings[mod12(n)];
         o = toNoteOctave(n - a);
     }
