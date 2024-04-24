@@ -14,13 +14,13 @@ const assign = Object.assign;
 const define = Object.defineProperties;
 
 /* ScribeScript.stylesheet */
-const shadowUrl = import.meta.url.replace(/\/[^\/]*\.js/, '/shadow.css');
+const shadowCSSUrl = import.meta.url.replace(/\/[^\/]*\.js/, '/shadow.css');
 const stylesheet = Signal.of();
 const stylefns   = [];
 stylesheet.each((url) => stylefns.forEach((fn) => fn(url)));
 
 
-console.log('SHADOW', shadowUrl);
+console.log('SHADOW', shadowCSSUrl);
 
 
 /* Generate DOM */
@@ -66,7 +66,7 @@ function meterToTimesig(meter) {
 
 export default define(element('scribe-music', {
     shadow: `
-        <link rel="stylesheet" href="./shadow.css" />
+        <link rel="stylesheet" href="${ shadowCSSUrl }" />
         <svg width="0" height="0">
             <defs>
                 <!-- Rests -->
@@ -356,7 +356,7 @@ export default define(element('scribe-music', {
         set: function(data) { getInternals(this).data.value = data; },
         default: null
     }
-}, shadowUrl), {
+}), {
     // Define ScribeScript.styleheet as the stylesheet signal
     stylesheet: {
         set: (url) => stylesheet.value = url,
