@@ -20,6 +20,9 @@ const stylefns   = [];
 stylesheet.each((url) => stylefns.forEach((fn) => fn(url)));
 
 
+console.log('SHADOW', shadowUrl);
+
+
 /* Generate DOM */
 
 function toElements(nodes, symbol) {
