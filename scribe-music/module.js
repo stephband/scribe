@@ -10,11 +10,11 @@ import * as staves       from '../modules/staves.js';
 import createElement     from '../modules/create-element.js';
 
 
-const assign     = Object.assign;
-const define     = Object.defineProperties;
+const assign = Object.assign;
+const define = Object.defineProperties;
 
 /* ScribeScript.stylesheet */
-
+const shadowUrl = import.meta.url.replace(/\/[^\/]*\.js/, '/shadow.css');
 const stylesheet = Signal.of();
 const stylefns   = [];
 stylesheet.each((url) => stylefns.forEach((fn) => fn(url)));
@@ -353,7 +353,7 @@ export default define(element('scribe-music', {
         set: function(data) { getInternals(this).data.value = data; },
         default: null
     }
-}, './shadow.css'), {
+}, shadowUrl), {
     // Define ScribeScript.styleheet as the stylesheet signal
     stylesheet: {
         set: (url) => stylesheet.value = url,
