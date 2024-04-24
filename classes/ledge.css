@@ -14,7 +14,7 @@
     width: calc(4.4 * var(--y-size));
     vector-effect: non-scaling-stroke;
     stroke:currentcolor;
-    stroke-width:0.0625em;
+    stroke-width:0.05em;
     stroke-linejoin:round;
     stroke-linecap:round;
     fill:none;
