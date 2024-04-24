@@ -13,7 +13,7 @@ import createElement     from '../modules/create-element.js';
 const assign = Object.assign;
 const define = Object.defineProperties;
 
-/* ScribeScript.stylesheet */
+/* ScribeMusic.stylesheet */
 const shadowCSSUrl = import.meta.url.replace(/\/[^\/]*\.js/, '/shadow.css');
 const stylesheet = Signal.of();
 const stylefns   = [];
@@ -164,7 +164,7 @@ export default define(element('scribe-music', {
     `,
 
     construct: function(shadow, internals) {
-        // Listen to updates to ScribeScript.stylesheet and update the link
+        // Listen to updates to ScribeMusic.stylesheet and update the link
         const stylelink = shadow.querySelector('link');
         stylefns.push((url) => stylelink.href = url);
         if (stylesheet.value) stylelink.href = stylesheet.value;
@@ -354,7 +354,7 @@ export default define(element('scribe-music', {
         default: null
     }
 }, null, 'github.com/stephband/scribe/'), {
-    // Define ScribeScript.styleheet as the stylesheet signal
+    // Define ScribeMusic.styleheet as the stylesheet signal
     stylesheet: {
         set: (url) => stylesheet.value = url,
         get: ()    => stylesheet.value

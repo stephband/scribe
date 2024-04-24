@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>&lt;scribe-music&gt;</title>
+
+    <meta charset="utf-8" />
+    <meta name="author" content="@stephband" />
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width" />
+
+    <script title="load">
+        document.documentElement.className += ' js loading';
+        // window.addEventListener('DOMContentLoaded', () => document.documentElement.classList.remove('content-loading'));
+        // Wait for other load handlers to run first - Bolt does a few things on
+        // load (eg. targetable scrolls) and we want them to run before the loading
+        // class is removed
+        window.addEventListener('load', () => window.requestAnimationFrame(() => document.documentElement.classList.remove('loading')));
+        window.DEBUG = true;
+    </script>
+
+    <!-- Import <scribe-music> -->
+    <link rel="stylesheet" href="./build/scribe-music/module.css" />
+    <script type="module" src="./build/scribe-music/module.js"></script>
+
+    <style>
+    html, body { margin: 0; padding: 0; }
+    body { padding: 1rem; }
+    a { color: #FE267E; text-decoration: none; }
+    a:hover, a:focus-visible { text-decoration: underline; }
+    header { display: grid; grid-template-columns: 1fr auto 1fr; }
+    header > * { grid-row: 1; margin: 0; }
+    header > h1 { font-size: 3em; grid-column: 2; justify-self: center; align-self: end; }
+    header > form { font-size: 1.2rem; grid-column: 3; justify-self: end; align-self: end; }
+    header > .author { font-size: 1.2rem; grid-column: 1; justify-self: start; align-self: end; }
+    header + scribe-music { margin-top: 3em; }
+    scribe-music { font-size: 1.2rem; }
+    select { font-family: JazzText; font-size: 1.2em; border: 0; }
+    </style>
+
+    <script type="module">
+    document.body.addEventListener('change', function(e) {
+        if (e.target.name !== 'transpose') { return; }
+        const scribe = document.body.querySelector('scribe-music');
+        scribe.transpose = e.target.value;
+    });
+    </script>
+</head>
+
+<body>
+    <header style="font-family: JazzText;">
+        <h1>Dolphin Dance</h1>
+        <p class="author">Herbie Hancock</p>
+        <form class="scribe-part">
+            Transpose:
+            <select name="transpose" id="select-transpose">
+                <option value="12">+12</option>
+                <option value="11">+11</option>
+                <option value="10">+10</option>
+                <option value="9">+9</option>
+                <option value="8">+8</option>
+                <option value="7">+7</option>
+                <option value="6">+6</option>
+                <option value="5">+5</option>
+                <option value="4">+4</option>
+                <option value="3">+3</option>
+                <option value="2">+2</option>
+                <option value="1">+1</option>
+                <option value="0" selected="">0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-3">-3</option>
+                <option value="-4">-4</option>
+                <option value="-5">-5</option>
+                <option value="-6">-6</option>
+                <option value="-7">-7</option>
+                <option value="-8">-8</option>
+                <option value="-9">-9</option>
+                <option value="-10">-10</option>
+                <option value="-11">-11</option>
+                <option value="-12">-12</option>
+            </select>
+        </form>
+    </header>
+
+    <scribe-music clef="treble" type="application/json" src="./data/dolphin-dance.json"></scribe-music>
+
+    <footer style="font-family: JazzText;">
+        <p>Test page for music renderer <a href="https://github.com/stephband/scribe/">Scribe</a>. Contribute on <a href="https://github.com/stephband/scribe">github</a>.</p>
+    </footer>
+</body>
+</html>
