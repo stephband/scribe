@@ -58,7 +58,7 @@ scribe.data = {
 ```
 
 Scribe consumes <a href="https://github.com/soundio/music-json/">Sequence JSON</a>
-(and data objects of the same structure). Events are described by arrays of data in 
+(and data objects of the same structure). Events are described by arrays of data in
 the `.events` array:
 
 ```js
@@ -172,12 +172,12 @@ Mimetype or type of data to fetch from `src` or to parse from text content.
 
 - "application/json", or just "json"
 - "text/x-abc", or just "abc"
-- "text/x-sequence", or just "sequence"
+- "sequence"
 
 #### `.data`
 
 Gets Scribe's internal data object, whose structure is a <a href="https://github.com/soundio/music-json/#sequence">Sequence</a>.
-To export Sequence JSON, simply stringify it:
+To export Sequence JSON, simply stringify `scribe.data`:
 
 ```js
 let scribe = document.body.querySelector('scribe-script');
@@ -220,8 +220,7 @@ To check things are working launch your server and navigate to
 ## Contributions
 
 Rich Sigler of Sigler Music Fonts (http://www.jazzfont.com/) very kindly granted
-permission to use JazzFont shapes as SVG paths in this project. If you use
-Scribe a lot consider buying a JazzFont license.
+permission to use JazzFont shapes as SVG paths in this project.
 
 Gavin Band implemented probabalistic key centre analysis.
 

@@ -1,6 +1,6 @@
 
 import nothing from '../../../fn/modules/nothing.js';
-import { noteNames, toRootNumber, toNoteOctave } from '../../../midi/modules/note.js';
+import { noteNames, toNoteNumber, toRootNumber, toNoteOctave } from '../../../midi/modules/pitch.js';
 import { mod12 } from '../maths.js';
 import keys from '../keys.js';
 
@@ -12,40 +12,46 @@ const accidentals = {
     '2':  '𝄪'
 };
 
-const rroot = /^[A-G][b#♭♯𝄫𝄪]?/;
+const rpitch = /^[A-G][b#♭♯𝄫𝄪]?(-?\d)?$/;
 
-export default function toSpelling(key, note) {
+export default function toSpelling(key, pitch, type, transpose = 0) {
     // Make sure key is a key object
     key = typeof key === 'number' ? keys[key] :
         typeof key === 'string' ? keys.find((o) => o.name === key) :
         key ;
 
-    let r, rest;
+    let n, a, o;
 
-    if (typeof note === 'string') {
-        const root = (rroot.exec(note) || nothing)[0];
+    if (typeof pitch === 'string') {
+        let [name, octave] = rpitch.exec(pitch) || [name];
 
-        if (window.DEBUG && !root) {
-            throw new Error('toSpelling(key, note) note string must start with valid note name "' + note + '"');
+        if (octave) {
+            // pitch is note name, deconstruct it and put it back together
+            n = toNoteNumber(pitch) + transpose;
+            a = key.spellings[mod12(n)];
+            o = toNoteOctave(n - a);
         }
-
-        r    = toRootNumber(root);
-        rest = note.slice(root.length);
+        else {
+            // pitch is kay name
+            n = toRootNumber(pitch) + transpose;
+            a = key.spellings[mod12(n)];
+            o = '';
+        }
     }
     else {
-        r    = toRootNumber(note);
-        rest = toNoteOctave(note) || '' ;
+        // pitch is a number
+        n = pitch + transpose;
+        a = key.spellings[mod12(n)];
+        o = toNoteOctave(n - a);
     }
 
-    const spelling   = key.spellings[mod12(r)];
-    const name       = noteNames[mod12(r - spelling)];
-    const accidental = accidentals[spelling];
+    // key.spellings makes sure name is a natural note name
+    const name = noteNames[mod12(n - a)];
+    const accidental = accidentals[a];
 
     if (window.DEBUG && name === undefined) {
-        throw new Error('Incorrect spelling for note number ' + r + ': ' + name)
+        throw new Error('Incorrect spelling for pitch number ' + n + ': "' + name + '"')
     }
 
-/*console.log(note, name + accidental + rest + ' in the key of ' + key.name);*/
-
-    return name + accidental + rest;
+    return name + accidental + o;
 }
