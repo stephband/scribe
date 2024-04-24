@@ -9,4 +9,9 @@ literal:
 
 modules:
 	rm -rf ./build
-	deno run --allow-read --allow-env --allow-net --allow-write --allow-run ../fn/deno/make-modules.js build module.js
+	deno run --allow-read --allow-env --allow-net --allow-write --allow-run ../fn/deno/make-modules.js build \
+		module.js \
+		module.css \
+		scribe-music/module.js \
+		scribe-music/module.css \
+		scribe-music/shadow.css

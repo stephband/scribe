@@ -7,7 +7,7 @@ import createSymbols     from '../modules/create-symbols.js';
 import requestData       from '../modules/request-data.js';
 import parseSource       from '../modules/parse.js';
 import * as staves       from '../modules/staves.js';
-import createElement     from './modules/create-element.js';
+import createElement     from '../modules/create-element.js';
 
 
 const assign     = Object.assign;
