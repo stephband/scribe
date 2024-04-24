@@ -10,27 +10,40 @@ export const chords = {
 
 export const treble = {
     clef: 'treble',
+    topPitch:    'G5',
+    centerPitch: 'B4',
+    bottomPitch: 'D4',
     getSpelling: toSpelling
 };
 
 export const bass = {
     clef: 'bass',
+    topPitch:    'B3',
+    centerPitch: 'D3',
+    bottomPitch: 'F2',
     getSpelling: toSpelling
 };
 
 export const piano = {
     clef: 'piano',
-
     getSpelling: toSpelling,
 
+    // TEMP
+    topPitch:    'G5',
+    centerPitch: 'B4',
+    bottomPitch: 'D4',
+
+    // TODO: there should be four parts available, soprano alto, tenor bass
     getPart: function(pitch) {
         // A part is an object of properties assigned to a symbol.
         // Render anything below Bb3 on the lower part.
         return /[012]$|[AC-G][b#♭♯𝄫𝄪]*3$/.test(pitch) ? {
-            part:      'lower',
-            centerRow: 'stave-lower'
+            part:        'lower',
+            centerPitch: 'D3',
+            centerRow:   'stave-lower'
         } : {
-            centerRow: 'stave-upper'
+            centerPitch: 'B4',
+            centerRow:   'stave-upper'
         } ;
     }
 };
@@ -38,9 +51,9 @@ export const piano = {
 export const drums = {
     clef: 'drums',
 
-    getSpelling: (key, name, type) => {
+    getSpelling: (key, name, type, transpose) => {
         if (type === 'chord') {
-            return getSpelling(key, name);
+            return getSpelling(key, name, 'chord', transpose);
         }
         else if (type === 'note') {
             // Use standard MIDI note names. We don't want any spelling happening
@@ -53,6 +66,7 @@ export const drums = {
         /*"C♯2":  "head[1]", /* Side Stick */
         "E♭2":  "head[x]", /* Hand Clap */
         "F♯2":  "head[x]", /* Closed Hi-Hat */
+        "G♯2":  "head[x]",
         "A♭2":  "head[x]", /* Pedal Hi-Hat */
         "B♭2":  "head[x]", /* Open Hi-Hat */
         "C♯3":  "head[x]", /* Crash Cymbal 1 */
@@ -61,6 +75,7 @@ export const drums = {
         "F3":   "head[x]", /* Ride Bell */
         "F♯3":  "head[x]", /* Tambourine */
         "G3":   "head[x]", /* Splash Cymbal */
+        "G♯3":  "head[v]",
         "A♭3":  "head[v]", /* Cowbell*/
         "A3":   "head[x]", /* Crash Symbol 2 */
         "B♭3":  "head[v]", /* Vibraslap */
@@ -103,6 +118,8 @@ export const drums = {
     Returns an object of properties assigned to symbols that belong to a part.
     **/
 
+    // TEMP
+    centerPitch: 'B4',
     getPart: function(pitch) {
         // A part is an object of properties assigned to a symbol.
         // Render kick and hihatpedal as part 'feet'.
@@ -110,7 +127,7 @@ export const drums = {
             part:          'feet',
             stemDirection: 'down',
             tieDirection:  'down',
-            centerRow:     'stave-lower'
+            centerRow:     'stave-lower',
         } : {
             // part: Leave part undefined to group with main render
             stemDirection: 'up',
@@ -133,9 +150,14 @@ export const drums = {
 export const percussion = {
     clef: 'percussion',
 
-    getSpelling: (key, name, type) => {
+    // TEMP
+    topPitch:    'C4',
+    centerPitch: 'B4',
+    bottomPitch: 'A4',
+
+    getSpelling: (key, name, type, transpose) => {
         if (type === 'chord') {
-            return getSpelling(key, name);
+            return getSpelling(key, name, 'chord', transpose);
         }
         else if (type === 'note') {
             // Use standard MIDI note names. We don't want any spelling happening

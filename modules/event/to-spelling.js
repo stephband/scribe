@@ -14,12 +14,8 @@ const accidentals = {
 
 const rpitch = /^[A-G][b#♭♯𝄫𝄪]?(-?\d)?$/;
 
-export default function toSpelling(key, pitch, type, transpose = 0) {
-    // Make sure key is a key object
-    key = typeof key === 'number' ? keys[key] :
-        typeof key === 'string' ? keys.find((o) => o.name === key) :
-        key ;
-
+export default function toSpelling(keynumber, note, type, transpose = 0) {
+    const key = keys[mod12(keynumber + transpose)];
     let n, a, o;
 
     if (typeof pitch === 'string') {
