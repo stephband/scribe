@@ -14,42 +14,42 @@ renders notation as symbols in a CSS grid.
 Scribe 0.3 is a recent rewrite, and does not yet have a build.
 
 
-## `<scribe-script>`
+## `<scribe-music>`
 
 Scribe 0.3 is a rewrite, and this custom element is the test bed. To try out the
 development version of the element, import the css, register the element and
 set the path to the shadow DOM stylesheet:
 
 ```html
-<link rel="stylesheet" href="https://stephen.band/scribe/scribe-script/module.css" />
+<link rel="stylesheet" href="https://stephen.band/scribe/scribe-music/module.css" />
 <script type="module">
-    import ScribeScript from 'https://stephen.band/scribe/scribe-script/module.js';
-    ScribeScript.stylesheet = 'https://stephen.band/scribe/scribe-script/shadow.css';
+    import ScribeScript from 'https://stephen.band/scribe/scribe-music/module.js';
+    ScribeScript.stylesheet = 'https://stephen.band/scribe/scribe-music/shadow.css';
 </script>
 ```
 
-Now the `<scribe-script>` element renders music notation from data found in
+Now the `<scribe-music>` element renders music notation from data found in
 it's content:
 
 ```html
-<scribe-script type="sequence" clef="treble" meter="4/4">
+<scribe-music type="sequence" clef="treble" meter="4/4">
     0 chord Dmaj    4
     0 F#5 0.2 1
     0 A4  0.2 1
     0 D4  0.2 1
-</scribe-script>
+</scribe-music>
 ```
 
 Or imported from a file in its `src` attribute, like this gist:
 
 ```html
-<scribe-script type="json" src="https://api.github.com/gists/739fa16055debb7972737835e4fa4623"></scribe-script>
+<scribe-music type="json" src="https://api.github.com/gists/739fa16055debb7972737835e4fa4623"></scribe-music>
 ```
 
 Or set on it's data property:
 
 ```js
-let scribe = document.body.querySelector('scribe-script');
+let scribe = document.body.querySelector('scribe-music');
 
 scribe.data = {
     name:      'My Song',
@@ -132,7 +132,7 @@ The name of the clef, one of `"treble"`, `"bass"`, `"piano"`, `"drums"`, `"percu
 `"chords"`.
 
 ```js
-let scribe = document.body.querySelector('scribe-script');
+let scribe = document.body.querySelector('scribe-music');
 scribe.clef = "bass";
 ```
 
@@ -143,7 +143,7 @@ The key signature of the stave. This is the key signature pre-transpose, if
 before render.
 
 ```js
-let scribe = document.body.querySelector('scribe-script');
+let scribe = document.body.querySelector('scribe-music');
 scribe.key = "Bb";
 ```
 
@@ -153,7 +153,7 @@ The meter, expressed as a standard time signature. This setting is overridden
 by any meter event found in the data at beat `0`.
 
 ```js
-let scribe = document.body.querySelector('scribe-script');
+let scribe = document.body.querySelector('scribe-music');
 scribe.meter = "4/4";
 ```
 
@@ -163,7 +163,7 @@ A transpose value in semitones, an integer, applied to both key, notes and
 chords before rendering.
 
 ```js
-let scribe = document.body.querySelector('scribe-script');
+let scribe = document.body.querySelector('scribe-music');
 scribe.transpose = 2;
 ```
 
@@ -187,7 +187,7 @@ Gets Scribe's internal data object, whose structure is a <a href="https://github
 To export Sequence JSON, simply stringify `scribe.data`:
 
 ```js
-let scribe = document.body.querySelector('scribe-script');
+let scribe = document.body.querySelector('scribe-music');
 let mySong = JSON.stringify(scribe.data);
 ```
 
@@ -195,7 +195,7 @@ Set a `.data` object, structured as a <a href="https://github.com/soundio/music-
 to render it.
 
 ```js
-let scribe = document.body.querySelector('scribe-script');
+let scribe = document.body.querySelector('scribe-music');
 scribe.data = {
     name:      'My Song',
     events:    [...],
@@ -221,7 +221,7 @@ git submodule add git@github.com:stephband/scribe path/to/scribe
 ```
 
 To check things are working launch your server and navigate to
-`path/to/scribe/scribe-script/index.html`.
+`path/to/scribe/scribe-music/index.html`.
 
 
 ## Contributions

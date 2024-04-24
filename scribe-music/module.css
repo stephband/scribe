@@ -8,11 +8,11 @@
     font-style: normal;
 }
 
-scribe-script::after {
+scribe-music::after {
     content: '';
     flex: 6 1;
 }
 
-scribe-script:not(:defined) {
+scribe-music:not(:defined) {
     display: none !important;
 }

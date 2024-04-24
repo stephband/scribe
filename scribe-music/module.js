@@ -59,9 +59,9 @@ function meterToTimesig(meter) {
 }
 
 
-/* Register <scribe-script> */
+/* Register <scribe-music> */
 
-export default define(element('scribe-script', {
+export default define(element('scribe-music', {
     shadow: `
         <link rel="stylesheet" href="./shadow.css" />
         <svg width="0" height="0">
@@ -235,7 +235,7 @@ export default define(element('scribe-script', {
         get: function() {  return getInternals(this).clef.value; },
         set: function(value) {
             if (!staves[value]) {
-                console.warn('<scribe-script> Attempt to set invalid clef="' + value + '" ignored');
+                console.warn('<scribe-music> Attempt to set invalid clef="' + value + '" ignored');
                 return;
             }
             getInternals(this).clef.value = value;
@@ -261,7 +261,7 @@ export default define(element('scribe-script', {
 
             // Validate
             if (typeof value !== 'string' || !/^[A-G][#b♯♭]?$/.test(value)) {
-                console.warn('<scribe-script> Attempt to set invalid key="' + value + '" ignored');
+                console.warn('<scribe-music> Attempt to set invalid key="' + value + '" ignored');
                 return;
             }
 
