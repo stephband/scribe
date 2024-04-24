@@ -11,21 +11,18 @@ renders notation as symbols in a CSS grid.
 
 ## Download
 
-Scribe 0.3 is a recent rewrite, and does not yet have a build.
+Scribe 0.3 is a recent rewrite, and does not yet have a release build.
+Development builds are kept in the `build/` folder.
 
 
 ## `<scribe-music>`
 
 Scribe 0.3 is a rewrite, and this custom element is the test bed. To try out the
-development version of the element, import the css, register the element and
-set the path to the shadow DOM stylesheet:
+development version of the element, import the css and register the element:
 
 ```html
 <link rel="stylesheet" href="https://stephen.band/scribe/scribe-music/module.css" />
-<script type="module">
-    import ScribeScript from 'https://stephen.band/scribe/scribe-music/module.js';
-    ScribeScript.stylesheet = 'https://stephen.band/scribe/scribe-music/shadow.css';
-</script>
+<script type="module" src="https://stephen.band/scribe/scribe-music/module.js"></script>
 ```
 
 Now the `<scribe-music>` element renders music notation from data found in
@@ -81,8 +78,8 @@ Each event type has its own structure. Scribe 0.3 supports these event types:
 | `beat` | `"clef"`     | `clefname` |  |  |
 
 Scribe 0.3 also parses a shorthand version of this format intended for quick hand authoring,
-as in the first example above, which is basically Sequence JSON structure with all the JSON 
-syntax – commas and brackets and quotemarks – removed, and with the `note` type optional when 
+as in the first example above, which is basically Sequence JSON structure with all the JSON
+syntax – commas and brackets and quotemarks – removed, and with the `note` type optional when
 `note` events have pitch identifiers (like `G4`, as oppposed to pitch numbers like `67`).
 
 Scribe 0.3 also parses ABC (thanks to the parser from [ABCjs](https://github.com/paulrosen/abcjs)).
@@ -222,6 +219,18 @@ git submodule add git@github.com:stephband/scribe path/to/scribe
 
 To check things are working launch your server and navigate to
 `path/to/scribe/scribe-music/index.html`.
+
+
+## Roadmap
+
+Asides from some immediate improvements I can make to Scribe 0.3, like
+tuning the autospeller and fixing the 1/16th-note beams and detecting and
+displaying tuplets, here are some longer-term features I would like to investigate:
+
+- <strong>Support for <a href="https://www.smufl.org/fonts/">SMuFL fonts</a></strong> – changing the font used for notation symbols. So far I have not been able to display their extended character sets reliably cross-browser.
+- <strong>Support for nested sequences</strong> – enabling multi-part tunes.
+- <strong>Split-stave rendering</strong> – placing multiple parts on one stave. The mechanics for this are already half in place – the drums stave and piano stave currently auto-split by pitch.
+- <strong>Multi-stave rendering</strong> – placing multiple parts on multiple, aligned, staves.
 
 
 ## Contributions
