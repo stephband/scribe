@@ -353,7 +353,7 @@ export default define(element('scribe-music', {
         set: function(data) { getInternals(this).data.value = data; },
         default: null
     }
-}), {
+}, null, 'github.com/stephband/scribe/'), {
     // Define ScribeScript.styleheet as the stylesheet signal
     stylesheet: {
         set: (url) => stylesheet.value = url,
