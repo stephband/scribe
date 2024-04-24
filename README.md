@@ -24,8 +24,8 @@ Scribe 0.3 is a rewrite, and this custom element is the test bed. To try out the
 development version of the element, import the css and register the element:
 
 ```html
-<link rel="stylesheet" href="https://stephen.band/scribe/scribe-music/module.css" />
-<script type="module" src="https://stephen.band/scribe/scribe-music/module.js"></script>
+<link rel="stylesheet" href="https://stephen.band/scribe/build/scribe-music/module.css" />
+<script type="module" src="https://stephen.band/scribe/build/scribe-music/module.js"></script>
 ```
 
 Now the `<scribe-music>` element renders music notation from data found in
