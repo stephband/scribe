@@ -6,7 +6,7 @@
 Scribe renders music notation in HTML.
 
 Scribe takes a sequence of events – notes, chords, meter changes and so on – and
-renders notation as symbols in a CSS grid.
+renders notation as symbols in a CSS grid that displays as a bar and stave.
 
 There is a description of the CSS grid system in the blog post
 <a href="https://cruncher.ch/blog/printing-music-with-css-grid/">Printing Music with CSS Grid</a>.
