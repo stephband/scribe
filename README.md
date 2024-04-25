@@ -93,15 +93,16 @@ Scribe 0.3 also parses ABC (thanks to the parser from [ABCjs](https://github.com
 
 #### `type="json"`
 
+Mimetype or type of data to fetch from `src` or to parse from text content. 
 Scribe supports 3 types of data:
 
 - "application/json", or just "json"
 - "text/x-abc", or just "abc"
-- "text/x-sequence", or just "sequence"
+- "sequence"
 
 #### `src="url"`
 
-A URL of some sequence data in JSON, ABC or Scribe's own sequence text format.
+A URL of some sequence data in JSON or ABC.
 
 #### `clef="treble"`
 
@@ -115,12 +116,14 @@ spelled with unicode sharps `♯` and flats `♭` or with hash `#` and small cas
 
 #### `meter="4/4"`
 
-Sets the default meter. May be overridden by any `"meter"` events in data.
+Sets the default meter. May be overridden by any `"meter"` events in data. If this
+attribute is omitted no time signature is displayed (unless the data contains a `"meter"`
+event at beat `0`) and the meter defaults to 4/4.
 
 #### `transpose="0"`
 
 Sets scribe to render notation transposed by `transpose` semitones. Transposition
-is applied to key signature, notes and chords.
+is applied to key signature, notes and chords before render, and not to the underlying data.
 
 ---
 
