@@ -178,8 +178,7 @@ to render it.
 let scribe = document.body.querySelector('scribe-music');
 scribe.data = {
     name:      'My Song',
-    events:    [...],
-    sequences: [...]
+    events:    [...]
 };
 ```
 
