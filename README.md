@@ -14,7 +14,7 @@ There is a description of the CSS grid system in the blog post
 
 ## Download
 
-Scribe 0.3 is a recent rewrite, and does not yet have a release build.
+Scribe 0.3 is a rewrite, and does not yet have a release build.
 Development builds are kept in the `build/` folder.
 
 
