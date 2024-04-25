@@ -88,9 +88,10 @@ Scribe 0.3 also parses ABC (thanks to the parser from [ABCjs](https://github.com
 
 ---
 
-### Attributes
+### Attributes and properties
 
-#### `type="json"`
+
+#### `type="json"`, `.type`
 
 Mimetype or type of data to fetch from `src` or to parse from text content. 
 Scribe supports 3 types of data:
@@ -99,36 +100,13 @@ Scribe supports 3 types of data:
 - "text/x-abc", or just "abc"
 - "sequence"
 
-#### `src="url"`
+
+#### `src="url"`, `.src`
 
 A URL of some sequence data in JSON or ABC.
 
-#### `clef="treble"`
 
-Sets the stave. One of `"treble"`, `"bass"`, `"piano"`, `"drums"`, `"percussion"` or
-`"chords"`.
-
-#### `key="C"`
-
-Gets and sets the key signature of the stave. Accepts any chromatic note name,
-spelled with unicode sharps `♯` and flats `♭` or with hash `#` and small case `b`.
-
-#### `meter="4/4"`
-
-Sets the default meter. May be overridden by any `"meter"` events in data. If this
-attribute is omitted no time signature is displayed (unless the data contains a `"meter"`
-event at beat `0`) and the meter defaults to 4/4.
-
-#### `transpose="0"`
-
-Sets scribe to render notation transposed by `transpose` semitones. Transposition
-is applied to key signature, notes and chords before render, and not to the underlying data.
-
----
-
-### Properties
-
-#### `.clef`
+#### `clef="treble"`, `.clef`
 
 The name of the clef, one of `"treble"`, `"bass"`, `"piano"`, `"drums"`, `"percussion"` or
 `"chords"`.
@@ -138,62 +116,63 @@ let scribe = document.body.querySelector('scribe-music');
 scribe.clef = "bass";
 ```
 
-#### `.key`
 
-The key signature of the stave. This is the key signature pre-transpose, if
-`scribe.transpose` is something other than `0`, the key signature is transposed
-before render.
+#### `key="C"`, `.key`
+
+Gets and sets the key signature of the stave. Accepts any chromatic note name,
+spelled with unicode sharps `♯` and flats `♭` or with hash `#` and small case `b`.
+This is the name of the tonic of a major scale.
+
+```html
+<scribe-music key="F#">...</scribe-music>
+```
 
 ```js
 let scribe = document.body.querySelector('scribe-music');
-scribe.key = "Bb";
+scribe.key = "B♭";
 ```
 
-#### `.meter`
+There is no provision for choosing a 'minor' key. Declare its relative major.
 
-The meter, expressed as a standard time signature. This setting is overridden
-by any meter event found in the data at beat `0`.
+The key is the key signature pre-transpose. If `scribe.transpose` is something other 
+than `0`, the key signature is transposed.
+
+
+#### `meter="4/4"`, `.meter`
+
+The meter, expressed as a standard time signature.
+This setting is overridden by any meter event found in the data at beat `0`.
+If this attribute is omitted (or the property not set in JS), no time signature is displayed (unless the data contains a `"meter"` event at beat `0`).
+The meter defaults to 4/4.
+
+```html
+<scribe-music meter="3/4">...</scribe-music>
+```
 
 ```js
 let scribe = document.body.querySelector('scribe-music');
-scribe.meter = "4/4";
+scribe.meter = "3/4";
 ```
 
-#### `.transpose`
 
-A transpose value in semitones, an integer, applied to both key, notes and
-chords before rendering.
+#### `transpose="0"`, `.transpose`
+
+Sets scribe to render notation transposed by `transpose` semitones. Transposition
+is applied to key signature, notes and chords before render, and not to the underlying data.
+
+```html
+<scribe-music transpose="2">...</scribe-music>
+```
 
 ```js
 let scribe = document.body.querySelector('scribe-music');
 scribe.transpose = 2;
 ```
 
-Transposing a `scribe` does not change `scribe.data`, only the rendered output.
-
-#### `.src`
-
-URL of data to be parsed and rendered.
-
-#### `.type`
-
-Mimetype or type of data to fetch from `src` or to parse from text content.
-
-- "application/json", or just "json"
-- "text/x-abc", or just "abc"
-- "sequence"
 
 #### `.data`
 
-Gets Scribe's internal data object, whose structure is a <a href="https://github.com/soundio/music-json/#sequence">Sequence</a>.
-To export Sequence JSON, simply stringify `scribe.data`:
-
-```js
-let scribe = document.body.querySelector('scribe-music');
-let mySong = JSON.stringify(scribe.data);
-```
-
-Set a `.data` object, structured as a <a href="https://github.com/soundio/music-json/#sequence">Sequence</a>,
+Property only. Set a `.data` object, structured as a <a href="https://github.com/soundio/music-json/#sequence">Sequence</a>,
 to render it.
 
 ```js
@@ -204,6 +183,15 @@ scribe.data = {
     sequences: [...]
 };
 ```
+
+Get Scribe's internal data object, whose structure is a <a href="https://github.com/soundio/music-json/#sequence">Sequence</a>.
+To export Sequence JSON, simply stringify `scribe.data`:
+
+```js
+let scribe = document.body.querySelector('scribe-music');
+let mySong = JSON.stringify(scribe.data);
+```
+
 
 ---
 
