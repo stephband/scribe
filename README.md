@@ -82,8 +82,7 @@ Each event type has its own structure. Scribe 0.3 supports these event types:
 
 Scribe 0.3 also parses a shorthand version of this format intended for quick hand authoring,
 as in the first example above, which is basically Sequence JSON structure with all the JSON
-syntax – commas and brackets and quotemarks – removed, and with the `note` type optional when
-`note` events have pitch identifiers (like `G4`, as oppposed to pitch numbers like `67`).
+syntax – commas and brackets and quotemarks – removed.
 
 Scribe 0.3 also parses ABC (thanks to the parser from [ABCjs](https://github.com/paulrosen/abcjs)).
 
@@ -207,6 +206,41 @@ scribe.data = {
 ```
 
 ---
+
+## Sequence format
+
+The `"sequence"` format is intended for quick hand-authoring, and not as an export format. 
+The format is basically Sequence JSON events but with all the JSON syntax – commas, quotes, brackets – removed.
+Values are delineated by whitespace. 
+Any value that does not parse as a number becomes a string.
+
+```
+0 meter 4 1
+0 chord D maj 4
+0 note F#5 0.2 2
+1 note A4  0.2 1
+4 note D4  0.2 1
+```
+
+If notes have named pitches (as opposed to numbered pitches), declaring the `note` type is optional.
+
+```
+0 meter 4 1
+0 chord D maj 4
+0 F#5 0.2 2
+1 A4  0.2 1
+4 D4  0.2 1
+```
+
+The same is true for chords.
+
+```
+0 meter 4 1
+0 D maj 4
+0 F#5 0.2 2
+1 A4  0.2 1
+4 D4  0.2 1
+```
 
 ## Develop
 
