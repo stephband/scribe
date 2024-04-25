@@ -247,3 +247,5 @@ permission to use JazzFont shapes as SVG paths in this project.
 Gavin Band implemented probabalistic key centre analysis.
 
 Scribe logo/mascot by Mariana Alt.
+
+ABC parser borrowed from [ABCjs](https://github.com/paulrosen/abcjs).
