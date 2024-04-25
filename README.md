@@ -104,11 +104,15 @@ Both an attribute and a property.
 The URL of a file containing sequence data in JSON or ABC.
 
 
-### `clef="treble"`, `.clef`
+### `clef="treble"`
 
 Both an attribute and a property.
 The name of the clef, one of `"treble"`, `"bass"`, `"piano"`, `"drums"`, `"percussion"` or
-`"chords"`.
+`"chords"`. Defaults to `"treble"`.
+
+```html
+<scribe-music clef="bass">...</scribe-music>
+```
 
 ```js
 let scribe = document.body.querySelector('scribe-music');
@@ -116,12 +120,12 @@ scribe.clef = "bass";
 ```
 
 
-### `key="C"`, `.key`
+### `key="C"`
 
 Both an attribute and a property.
 Gets and sets the key signature of the stave. Accepts any chromatic note name,
 spelled with unicode sharps `♯` and flats `♭` or with hash `#` and small case `b`.
-This is the name of the tonic of a major scale.
+This is the name of the tonic of a major scale. Defaults to `"C"`.
 
 ```html
 <scribe-music key="F#">...</scribe-music>
@@ -138,13 +142,13 @@ The key is the key signature pre-transpose. If `scribe.transpose` is something o
 than `0`, the key signature is transposed.
 
 
-### `meter="4/4"` and `.meter`
+### `meter="4/4"`
 
 Both an attribute and a property.
 The meter, expressed as a standard time signature.
 This setting is overridden by any meter event found in the data at beat `0`.
 If this attribute is omitted (or the property not set in JS), no time signature is displayed (unless the data contains a `"meter"` event at beat `0`).
-The meter defaults to 4/4.
+Defaults to `"4/4"`.
 
 ```html
 <scribe-music meter="3/4">...</scribe-music>
@@ -156,7 +160,7 @@ scribe.meter = "3/4";
 ```
 
 
-### `transpose="0"` and `.transpose`
+### `transpose="0"`
 
 Both an attribute and a property.
 Sets scribe to render notation transposed by `transpose` semitones. Transposition
