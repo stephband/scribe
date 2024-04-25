@@ -87,8 +87,9 @@ syntax – commas and brackets and quotemarks – removed.
 Scribe 0.3 also parses ABC (thanks to the parser from [ABCjs](https://github.com/paulrosen/abcjs)).
 
 
-### `type="json"` and `.type`
+### `type="json"`
 
+Both an attribute and a property.
 Mimetype or type of data to fetch from `src` or to parse from text content. 
 Scribe supports 3 types of data:
 
@@ -97,13 +98,15 @@ Scribe supports 3 types of data:
 - "sequence"
 
 
-### `src="url"` and `.src`
+### `src="url"`
 
+Both an attribute and a property.
 The URL of a file containing sequence data in JSON or ABC.
 
 
-### `clef="treble"` and `.clef`
+### `clef="treble"`, `.clef`
 
+Both an attribute and a property.
 The name of the clef, one of `"treble"`, `"bass"`, `"piano"`, `"drums"`, `"percussion"` or
 `"chords"`.
 
@@ -113,8 +116,9 @@ scribe.clef = "bass";
 ```
 
 
-### `key="C"` and `.key`
+### `key="C"`, `.key`
 
+Both an attribute and a property.
 Gets and sets the key signature of the stave. Accepts any chromatic note name,
 spelled with unicode sharps `♯` and flats `♭` or with hash `#` and small case `b`.
 This is the name of the tonic of a major scale.
@@ -136,6 +140,7 @@ than `0`, the key signature is transposed.
 
 ### `meter="4/4"` and `.meter`
 
+Both an attribute and a property.
 The meter, expressed as a standard time signature.
 This setting is overridden by any meter event found in the data at beat `0`.
 If this attribute is omitted (or the property not set in JS), no time signature is displayed (unless the data contains a `"meter"` event at beat `0`).
@@ -153,6 +158,7 @@ scribe.meter = "3/4";
 
 ### `transpose="0"` and `.transpose`
 
+Both an attribute and a property.
 Sets scribe to render notation transposed by `transpose` semitones. Transposition
 is applied to key signature, notes and chords before render, and not to the underlying data.
 
@@ -168,8 +174,8 @@ scribe.transpose = 2;
 
 ### `.data`
 
-Property only. Set a `.data` object, structured as a <a href="https://github.com/soundio/music-json/#sequence">Sequence</a>,
-to render it.
+Property only.
+Set a `.data` object, structured as a <a href="https://github.com/soundio/music-json/#sequence">Sequence</a>, to render it.
 
 ```js
 let scribe = document.body.querySelector('scribe-music');
