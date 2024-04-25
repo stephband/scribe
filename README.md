@@ -86,7 +86,6 @@ syntax – commas and brackets and quotemarks – removed.
 
 Scribe 0.3 also parses ABC (thanks to the parser from [ABCjs](https://github.com/paulrosen/abcjs)).
 
----
 
 ### Attributes and properties
 
@@ -103,7 +102,7 @@ Scribe supports 3 types of data:
 
 #### `src="url"` and `.src`
 
-A URL of some sequence data in JSON or ABC.
+The URL of a file containing sequence data in JSON or ABC.
 
 
 #### `clef="treble"` and `.clef`
