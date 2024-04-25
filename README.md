@@ -40,10 +40,10 @@ it's content:
 </scribe-music>
 ```
 
-Or imported from a file in its `src` attribute, like this gist:
+Or imported from a file in its `src` attribute:
 
 ```html
-<scribe-music type="json" src="https://api.github.com/gists/739fa16055debb7972737835e4fa4623"></scribe-music>
+<scribe-music type="application/json" src="/path/to/json"></scribe-music>
 ```
 
 Or set on it's data property:
