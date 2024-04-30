@@ -25,9 +25,17 @@
 
     <script type="module">
     document.body.addEventListener('change', function(e) {
-        if (e.target.name !== 'transpose') { return; }
-        const scribe = document.body.querySelector('scribe-music');
-        scribe.transpose = e.target.value;
+        if (e.target.name === 'transpose') {
+            const scribe = document.body.querySelector('scribe-music');
+            scribe.transpose = e.target.value;
+            return;
+        }
+
+        if (e.target.name === 'clef') {
+            const scribe = document.body.querySelector('scribe-music');
+            scribe.clef = e.target.value;
+            return;
+        }
     });
     </script>
 </head>
@@ -37,7 +45,15 @@
         <h1>Dolphin Dance</h1>
         <p class="author">Herbie Hancock</p>
         <form class="scribe-part">
-            Transpose:
+            <label for="select-clef">Clef:</label>
+            <select name="clef" id="select-clef">
+                <option value="treble">Treble</option>
+                <option value="bass">Bass</option>
+                <option value="piano">Piano</option>
+                <option value="drums">Drums</option>
+                <option value="percussion">Percussion</option>
+            </select>
+            <label for="select-transpose">Transpose:</label>
             <select name="transpose" id="select-transpose">
                 <option value="12">+12</option>
                 <option value="11">+11</option>
