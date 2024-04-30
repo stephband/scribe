@@ -1,0 +1,12 @@
+html, body { margin: 0; padding: 0; }
+body { padding: 1rem; }
+a { color: #FE267E; text-decoration: none; }
+a:hover, a:focus-visible { text-decoration: underline; }
+header { display: grid; grid-template-columns: 1fr auto 1fr; }
+header > * { grid-row: 1; margin: 0; }
+header > h1 { font-size: 3em; grid-column: 2; justify-self: center; align-self: end; }
+header > form { font-size: 1.2rem; grid-column: 3; justify-self: end; align-self: end; }
+header > .author { font-size: 1.2rem; grid-column: 1; justify-self: start; align-self: end; }
+header + scribe-music { margin-top: 3em; }
+scribe-music { font-size: 1.2rem; }
+select { font-family: JazzText; font-size: 1.2em; border: 0; }
