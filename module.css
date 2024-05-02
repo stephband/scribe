@@ -20,11 +20,11 @@
     background-repeat: no-repeat;
 }
 
-:host {
+.scribe {
     /* Metrics */
     --bar-line-size:     0.1rem;
     /* Compress column-gap below 800px viewport to fit more information
-       on mobile (0.08vw becomes 0.04em at 800px viewport). */
+       on mobile (0.08vw becomes 0.04em at 800px viewport assuming no zoom). */
     --bar-column-gap:    min(0.08vw, 0.04em);
     --bar-padding-left:  0.6em;
     --bar-padding-right: 0.3em;
@@ -50,7 +50,8 @@
 
 
 
-:host(.safari) {
+.scribe.safari,
+.safari .scribe {
     /* Bar lines, ::before and ::after on .bar, are placed outside of the bar
        so that the overlap overcomes bar to bar rounding errors in Safari,
        causing 1px white gap. But this means we need to pad the container by
@@ -58,7 +59,7 @@
     padding-right: var(--bar-line-size, 1px);
 }
 
-:host > .bar {
+.scribe > .bar {
     flex: 1 1;
     /* Make bar lines overlap */
     margin-left: calc(-1 * var(--bar-line-size, 1px));

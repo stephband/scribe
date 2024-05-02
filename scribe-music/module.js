@@ -8,6 +8,7 @@ import requestData       from '../modules/request-data.js';
 import parseSource       from '../modules/parse.js';
 import * as staves       from '../modules/staves.js';
 import createElement     from '../modules/create-element.js';
+import createBarElements from '../modules/create-bar-elements.js';
 import svgdefs           from '../modules/svgdefs.js';
 
 
@@ -19,25 +20,6 @@ const shadowCSSUrl = import.meta.url.replace(/\/[^\/]*\.js/, '/shadow.css');
 const stylesheet = Signal.of();
 const stylefns   = [];
 stylesheet.each((url) => stylefns.forEach((fn) => fn(url)));
-
-
-/* Generate DOM */
-
-function toElements(nodes, symbol) {
-    const element = createElement(symbol);
-    if (element) { nodes.push(element); }
-    return nodes;
-}
-
-function toBarElements(elements, bar) {
-    elements.push(create('div', {
-        class: `${ bar.stave.clef }-stave stave bar`,
-        data: { duration: bar.duration },
-        children: bar.symbols.reduce(toElements, [])
-    }));
-
-    return elements;
-}
 
 
 /* Parse attributes */
@@ -104,7 +86,7 @@ export default define(element('scribe-music', {
                 internals.meter.value,
                 // Transpose is a number
                 internals.transpose.value
-            ).reduce(toBarElements, []))
+            ).reduce(createBarElements, []))
         )
         .each((elements) => {
             // Clear the shadow DOM of bars and put new elements in it

@@ -1,0 +1,21 @@
+.zone {
+    background-color: #666666;
+    border-radius: 0.3125em;
+    min-width: 1em;
+    opacity: 0.2;
+}
+
+.stave > .zone {
+    grid-row: 2 / -2 ;
+    /* Guarantee a gap between zones */
+    margin-left: 1px;
+    margin-right: 1px;
+}
+
+.bar > .zone {
+    display: none;
+}
+
+.bar.cursor-active > .zone {
+    display: block;
+}
