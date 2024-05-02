@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>&lt;scribe-music&gt;</title>
+
+    <meta charset="utf-8" />
+    <meta name="author" content="@stephband" />
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width" />
+
+    <script title="load">
+        document.documentElement.className += ' js loading';
+        // window.addEventListener('DOMContentLoaded', () => document.documentElement.classList.remove('content-loading'));
+        // Wait for other load handlers to run first - Bolt does a few things on
+        // load (eg. targetable scrolls) and we want them to run before the loading
+        // class is removed
+        window.addEventListener('load', () => window.requestAnimationFrame(() => document.documentElement.classList.remove('loading')));
+        window.DEBUG = true;
+    </script>
+
+    <link rel="stylesheet" href="./module.css">
+</head>
+<body>
+
+
+
+
+    <script type="module">
+        import ScribeMusic from './module.js';
+        ScribeMusic.stylesheet = '/scribe/scribe-music/shadow.css';
+    </script>
+</body>
+</html>
