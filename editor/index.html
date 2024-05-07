@@ -21,6 +21,13 @@
     <link rel="stylesheet" href="../module.css">
     <link rel="stylesheet" href="./module.css">
 
+    <style>
+        .scribe > .bar:last-child {
+            font-size: 2em;
+            flex: 0 0 100%;
+        }
+    </style>
+
     <script type="module">
         // Add SVG symbol definitions to the body
         import create from '../../dom/modules/create.js';
@@ -93,6 +100,7 @@
         // Track cursor
         let cursor       = 0;
         let editDuration = 0.5;
+        let rate         = 1.5;
 
         function barAtBeat(b) {
             // TODO
@@ -125,18 +133,13 @@
             const barElements = createDOM(sequence);
             renderDOM(barElements);
             updateCursor(cursor + editDuration, barElements);
-            timer = setTimeout(updateNoteEvent, 250, event);
+            timer = setTimeout(updateNoteEvent, 1000 * editDuration / rate, event);
         }
 
         function addNoteEvent(pitch, dynamic) {
-            const event = [cursor, 'note', pitch, dynamic, editDuration];
+            const event = [cursor, 'note', pitch, dynamic, 0];
+            updateNoteEvent(event);
             sequence.events.push(event);
-
-            // Render sequence
-            const barElements = createDOM(sequence);
-            renderDOM(barElements);
-            updateCursor(cursor + editDuration, barElements);
-            timer = setTimeout(updateNoteEvent, 250, event);
         }
 
         keyboard({
