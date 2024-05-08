@@ -29,14 +29,15 @@
     </style>
 
     <script type="module">
+        import './module.js';
+
+
         // Add SVG symbol definitions to the body
-        import create from '../../dom/modules/create.js';
+        import create  from '../../dom/modules/create.js';
         import svgdefs from '../modules/svgdefs.js';
 
         const fragment = create('fragment', svgdefs);
         document.body.append(fragment);
-
-
 
 
         // Flag Safari
@@ -48,142 +49,6 @@
         if (isSafari) {
             document.body.classList.add('safari');
         }
-
-
-
-
-        // Create DOM
-        import createSymbols     from '../modules/create-symbols.js';
-        import createBarElements from '../modules/create-bar-elements.js';
-
-        const element = document.getElementById('scribe-bars');
-
-        function createDOM(sequence) {
-            const symbols = createSymbols(sequence.events, 'treble', 'C', [0, "meter", 4, 1], 0);
-            const bars    = createBarElements(symbols);
-
-            // TEMP: Create 1 extra bar
-            bars.push(create('div', {
-                class: `treble-stave stave bar`,
-                data: { duration: 4 },
-            }));
-
-            bars.forEach((barElement) => {
-                const zoneElements = Array.from({ length: 8 }, (v, i) => create('div', {
-                    class: 'zone',
-                    data: { beat: (i / 2) + 1, duration: 0.5 }
-                }));
-
-                barElement.prepend.apply(barElement, zoneElements);
-            });
-
-            return bars;
-        }
-
-        function renderDOM(elements) {
-            element.innerHTML = '';
-            element.append.apply(element, elements);
-        }
-
-        const sequence = {
-            events: [
-                [0, 'note', 'G4', 1, 1]
-            ]
-        };
-
-        const elements = createDOM(sequence);
-        renderDOM(elements);
-
-
-
-
-        // Track cursor
-        let cursor       = 0;
-        let editDuration = 0.5;
-        let rate         = 1.5;
-
-        function barAtBeat(b) {
-            // TODO
-            return Math.floor(b / 4);
-        }
-
-        function updateCursor(beat, barElements) {
-            // Advance cursor;
-            cursor = beat;
-            const barN = barAtBeat(beat);
-            barElements[barN].classList.add('cursor-active');
-        }
-
-
-
-
-        // Listen to keyboard
-        import keyboard from '../../dom/modules/keyboard.js';
-
-        let timer;
-
-        function stopTimer() {
-            clearTimeout(timer);
-        }
-
-        function updateNoteEvent(event) {
-            event[4] += editDuration;
-
-            // Render sequence
-            const barElements = createDOM(sequence);
-            renderDOM(barElements);
-            updateCursor(cursor + editDuration, barElements);
-            timer = setTimeout(updateNoteEvent, 1000 * editDuration / rate, event);
-        }
-
-        function addNoteEvent(pitch, dynamic) {
-            const event = [cursor, 'note', pitch, dynamic, 0];
-            updateNoteEvent(event);
-            sequence.events.push(event);
-        }
-
-        keyboard({
-            // TODO: I'm doing this wrong. We want to map by key position,
-            // not character name
-            'backquote:down': (e) => addNoteEvent('G3',  1),
-            'backquote:up':   (e) => stopTimer(),
-            'A:down':         (e) => addNoteEvent('Ab3', 1),
-            'A:up':           (e) => stopTimer(),
-            'Z:down':         (e) => addNoteEvent('A3',  1),
-            'Z:up':           (e) => stopTimer(),
-            'S:down':         (e) => addNoteEvent('Bb3', 1),
-            'S:up':           (e) => stopTimer(),
-            'X:down':         (e) => addNoteEvent('B3',  1),
-            'X:up':           (e) => stopTimer(),
-            'C:down':         (e) => addNoteEvent('C4',  1),
-            'C:up':           (e) => stopTimer(),
-            'F:down':         (e) => addNoteEvent('C#4', 1),
-            'F:up':           (e) => stopTimer(),
-            'V:down':         (e) => addNoteEvent('D4',  1),
-            'V:up':           (e) => stopTimer(),
-            'G:down':         (e) => addNoteEvent('Eb4', 1),
-            'G:up':           (e) => stopTimer(),
-            'B:down':         (e) => addNoteEvent('E4',  1),
-            'B:up':           (e) => stopTimer(),
-            'N:down':         (e) => addNoteEvent('F4',  1),
-            'N:up':           (e) => stopTimer(),
-            'J:down':         (e) => addNoteEvent('F#4', 1),
-            'J:up':           (e) => stopTimer(),
-            'M:down':         (e) => addNoteEvent('G4',  1),
-            'M:up':           (e) => stopTimer(),
-            'K:down':         (e) => addNoteEvent('G#4', 1),
-            'K:up':           (e) => stopTimer(),
-            'comma:down':     (e) => addNoteEvent('A4',  1),
-            'comma:up':       (e) => stopTimer(),
-            'L:down':         (e) => addNoteEvent('Bb4', 1),
-            'L:up':           (e) => stopTimer(),
-            'period:down':    (e) => addNoteEvent('B4',  1),
-            'period:up':      (e) => stopTimer(),
-            'slash:down':     (e) => addNoteEvent('C5',  1),
-            'slash:up':       (e) => stopTimer(),
-            'quote:down':     (e) => addNoteEvent('C#5', 1),
-            'quote:up':       (e) => stopTimer()
-        }, document.body);
     </script>
 </head>
 <body>

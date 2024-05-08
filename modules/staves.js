@@ -2,22 +2,27 @@
 import toSpelling from './event/to-spelling.js';
 import { toNoteName, toNoteNumber } from '../../midi/modules/note.js';
 
+const floor = Math.floor;
 
 export const chords = {
-    clef: 'chords',
+    clef:        'chords',
     getSpelling: toSpelling
 };
 
 export const treble = {
-    clef: 'treble',
+    clef:        'treble',
     topPitch:    'G5',
     centerPitch: 'B4',
     bottomPitch: 'D4',
-    getSpelling: toSpelling
+    getSpelling: toSpelling,
+    pitches: ['A6','G6','F6','E6','D6','C6','B5','A5','G5','F5','E5','D5','C5','B4','A4','G4','F4','E4','D4','C4','B3','A3','G3','F3','E3','D3','C3'],
+    yRatioToPitch: function(y) {
+        return this.pitches[floor(y * this.pitches.length)];
+    }
 };
 
 export const bass = {
-    clef: 'bass',
+    clef:        'bass',
     topPitch:    'B3',
     centerPitch: 'D3',
     bottomPitch: 'F2',
@@ -25,7 +30,7 @@ export const bass = {
 };
 
 export const piano = {
-    clef: 'piano',
+    clef:        'piano',
     getSpelling: toSpelling,
 
     // TEMP
@@ -34,7 +39,7 @@ export const piano = {
     bottomPitch: 'D4',
 
     // TODO: there should be four parts available, soprano alto, tenor bass
-    getPart: function(pitch) {
+    getPart: (pitch) => {
         // A part is an object of properties assigned to a symbol.
         // Render anything below Bb3 on the lower part.
         return /[012]$|[AC-G][b#♭♯𝄫𝄪]*3$/.test(pitch) ? {

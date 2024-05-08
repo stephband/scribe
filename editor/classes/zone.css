@@ -5,13 +5,17 @@
     opacity: 0.2;
 }
 
+.zone.active {
+    background-color: #bb6666;
+}
+
 .stave > .zone {
-    grid-row: 2 / -2 ;
+    grid-row: 1 / -1 ;
     /* Guarantee a gap between zones */
     margin-left: 1px;
     margin-right: 1px;
 }
-
+/*
 .bar > .zone {
     display: none;
 }
@@ -19,3 +23,4 @@
 .bar.cursor-active > .zone {
     display: block;
 }
+*/
