@@ -1,0 +1,146 @@
+@font-face {
+    font-family: JazzText;
+    src: url('finalejazztext-webfont.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: BravuraText;
+    src: url('BravuraText.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: JazzText;
+    src: url('finalejazztext-webfont.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+@font-face {
+    font-family: Broadway;
+    src: url('finalebroadway-webfont.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+@font-face {
+    font-family: BroadwayText;
+    src: url('finalebroadwaytext-webfont.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+
+@font-face {
+    font-family: FinaleJazz;
+    src: url('finalejazz-webfont.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: FinaleJazzText;
+    src: url('finalejazztext-webfont.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+
+@font-face {
+    font-family: Petaluma;
+    src: url('Petaluma.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+@font-face {
+    font-family: PetalumaText;
+    src: url('PetalumaText.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+@font-face {
+    font-family: Jazztext;
+    src: url('jazztextregular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+
+@font-face {
+    font-family: Ash;
+    src: url('finaleash-webfont.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+@font-face {
+    font-family: AshText;
+    src: url('finaleashtext-webfont.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+
+
+
+.bravura {
+    font-family: BravuraText;
+}
+
+
+.ash {
+    font-family: Ash;
+}
+
+
+.ash-text {
+    font-family: AshText;
+}
+
+.petaluma {
+    font-family: Petaluma;
+}
+
+.petaluma-text {
+    font-family: PetalumaText;
+}
+
+.broadway {
+    font-family: Broadway;
+}
+.broadway-text {
+    font-family: BroadwayText;
+
+}
+
+.finale {
+    font-family: FinaleJazz;
+}
+
+.finale-text {
+    font-family: FinaleJazzText;
+}
+
+.jazz-text {
+    font-family: Jazztext;
+}
+
+td {
+    border: 1px solid black;
+    padding: 0rem 1rem;
+    font-size: 1.5rem;
+}
