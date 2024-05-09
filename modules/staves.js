@@ -66,6 +66,38 @@ export const drums = {
         return toSpelling(key, event, transpose);
     },
 
+    pitches: [
+    '',
+    '',
+    '',
+    '',
+    'splash',
+    'crash2',
+    'crash',
+    'hihat',
+    'ride',
+    'hightom',
+    'midtom',
+    'snare',
+    'lowtom',
+    'floortom',
+    'lowfloortom',
+    'kick',
+    'kick2',
+    'hihatpedal',
+    'foot',
+    '',
+    '',
+    '',
+    '',
+    '',
+    ''],
+
+
+    yRatioToPitch: function(y) {
+        return this.pitches[floor(y * this.pitches.length)];
+    },
+
     heads: {
         /*"C♯2":  "head[1]", /* Side Stick */
         "E♭2":  "head[x]", /* Hand Clap */

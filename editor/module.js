@@ -6,10 +6,14 @@ import create   from '../../dom/modules/create.js';
 import events   from '../../dom/modules/events.js';
 import gestures from '../../dom/modules/gestures.js';
 import rect     from '../../dom/modules/rect.js';
+import { toNoteName, toNoteNumber } from '../../midi/modules/note.js';
 
 import createSymbols     from '../modules/create-symbols.js';
 import createBarElements from '../modules/create-bar-elements.js';
 import * as staves from '../modules/staves.js';
+
+import isTransposeable from '../modules/event/is-transposeable.js';
+import { selection, select, deselect, clear } from './modules/selection.js';
 
 
 const stave   = staves.treble;
@@ -110,6 +114,36 @@ function addNoteEvent(pitch, dynamic) {
     sequence.events.push(event);
 }
 
+
+
+function moveSelectionPitch(n) {
+    let i = -1;
+    let event;
+    while (event = selection[++i]) {
+        if (isTransposeable(event)) {
+            event[2] = toNoteNumber(event[2]) + n;
+        }
+    }
+
+    render(sequence);
+}
+
+function moveSelectionBeat(n) {
+    let i = -1;
+    let event;
+
+    // If any events in selection would start before 0 as a result of this move
+    // don't move any of them.
+    while (event = selection[++i]) if (event[0] + n < 0) return;
+
+    // Move 'em'
+    i = -1;
+    while (event = selection[++i]) event[0] += n;
+
+    render(sequence);
+}
+
+
 keyboard({
     // TODO: I'm doing this wrong. We want to map by key position,
     // not character name
@@ -150,7 +184,11 @@ keyboard({
     'slash:down':     (e) => addNoteEvent('C5',  1),
     'slash:up':       (e) => stopTimer(),
     'quote:down':     (e) => addNoteEvent('C#5', 1),
-    'quote:up':       (e) => stopTimer()
+    'quote:up':       (e) => stopTimer(),
+    'up:down':        (e) => moveSelectionPitch(1),
+    'down:down':      (e) => moveSelectionPitch(-1),
+    'left:down':      (e) => moveSelectionBeat(-editDuration),
+    'right:down':     (e) => moveSelectionBeat(editDuration)
 }, body);
 
 
@@ -204,6 +242,8 @@ gestures({ select: '.zone', threshold: 0, device: 'mouse pen touch' }, body)
         const event    = addNoteEventByTouch(beat, pitch, 0.2, duration);
         const zones    = Array.from(body.querySelectorAll('.zone'));
 
+        // Clear selection
+        clear();
         activateZonesFromEvent(zones, event);
 
         data.pointermoves = events('pointermove', body)
@@ -242,6 +282,7 @@ gestures({ select: '.zone', threshold: 0, device: 'mouse pen touch' }, body)
             activateZonesFromEvent(zones, event);
         });
 
+        data.event = event;
         return data;
     },
 
@@ -255,6 +296,8 @@ gestures({ select: '.zone', threshold: 0, device: 'mouse pen touch' }, body)
         body
         .querySelectorAll('.zone.active')
         .forEach((zone) => zone.classList.remove('active'));
+
+        select(data.event);
 
         return data;
     }
