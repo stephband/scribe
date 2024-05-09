@@ -4,7 +4,6 @@ import id       from '../../fn/modules/id.js';
 import overload from '../../fn/modules/overload.js';
 import create   from '../../dom/modules/create.js';
 import events   from '../../dom/modules/events.js';
-import gestures from '../../dom/modules/gestures.js';
 import rect     from '../../dom/modules/rect.js';
 import { toNoteName, toNoteNumber } from '../../midi/modules/note.js';
 
@@ -57,9 +56,7 @@ function renderDOM(elements) {
 }
 
 const sequence = {
-    events: [
-        [0, 'note', 'G4', 1, 1]
-    ]
+    events: []
 };
 
 const elements = createDOM(sequence);
@@ -230,75 +227,70 @@ function activateZonesFromEvent(zones, event) {
     .forEach((zone) => zone.classList.add('active'));
 }
 
-gestures({ select: '.zone', threshold: 0, device: 'mouse pen touch' }, body)
-.each((stream) => stream.reduce(overload((data, e) => e.type, {
-    'pointerdown': (data, e) => {
-        const zone     = e.target;
-        const zoneRect = rect(zone);
-        const ratio    = (e.clientY - zoneRect.top) / zoneRect.height;
-        const beat     = Number(zone.dataset.absbeat);
-        const pitch    = stave.yRatioToPitch(ratio);
-        const duration = Number(zone.dataset.duration);
-        const event    = addNoteEventByTouch(beat, pitch, 0.2, duration);
-        const zones    = Array.from(body.querySelectorAll('.zone'));
 
-        // Clear selection
-        clear();
+
+events({ type: 'pointerdown', device: 'mouse pen touch' }, body)
+.each((e) => {
+    const zone     = e.target;
+    const zoneRect = rect(zone);
+    const ratio    = (e.clientY - zoneRect.top) / zoneRect.height;
+    const beat     = Number(zone.dataset.absbeat);
+    const pitch    = stave.yRatioToPitch(ratio);
+    const duration = Number(zone.dataset.duration);
+    const event    = addNoteEventByTouch(beat, pitch, 0.2, duration);
+    const zones    = Array.from(body.querySelectorAll('.zone'));
+
+    // Clear selection
+    clear();
+    activateZonesFromEvent(zones, event);
+
+    const pointermoves = events('pointermove', body)
+    .each((e) => {
+        //console.log('MOVE');
+        const ratio = (e.clientY - zoneRect.top) / zoneRect.height;
+        const pitch = stave.yRatioToPitch(ratio);
+
+        // Is there no change in pitch? Don't rerender.
+        if (event[2] === pitch) { return; }
+
+        // Update pitch
+        event[2] = pitch;
+        render(sequence);
+
+        // Highlight zones
+        const zones = Array.from(body.querySelectorAll('.zone'));
         activateZonesFromEvent(zones, event);
+    });
 
-        data.pointermoves = events('pointermove', body)
-        .each((e) => {
-            //console.log('MOVE');
-            const ratio = (e.clientY - zoneRect.top) / zoneRect.height;
-            const pitch = stave.yRatioToPitch(ratio);
+    const pointerovers = events({ type: 'pointerover', select: '.zone' }, body)
+    .each((e) => {
+        const zone = e.target;
+        const beat = Number(zone.dataset.absbeat);
 
-            // Is there no change in pitch? Don't rerender.
-            if (event[2] === pitch) { return data; }
+        // Are we trying to edit backwards? That doesn't make sense.
+        if (beat < event[0]) { return; }
 
-            // Update pitch
-            event[2] = pitch;
-            render(sequence);
+        // Update duration
+        const duration = Number(zone.dataset.duration);
+        event[4] = beat + duration - event[0];
+        render(sequence);
 
-            // Highlight zones
-            const zones = Array.from(body.querySelectorAll('.zone'));
-            activateZonesFromEvent(zones, event);
-        });
+        // Highlight zones
+        const zones = Array.from(body.querySelectorAll('.zone'));
+        activateZonesFromEvent(zones, event);
+    });
 
-        data.pointerovers = events({ type: 'pointerover', select: '.zone' }, body)
-        .each((e) => {
-            const zone = e.target;
-            const beat = Number(zone.dataset.absbeat);
-
-            // Are we trying to edit backwards? That doesn't make sense.
-            if (beat < event[0]) { return; }
-
-            // Update duration
-            const duration = Number(zone.dataset.duration);
-            event[4] = beat + duration - event[0];
-            render(sequence);
-
-            // Highlight zones
-            const zones = Array.from(body.querySelectorAll('.zone'));
-            activateZonesFromEvent(zones, event);
-        });
-
-        data.event = event;
-        return data;
-    },
-
-    'pointermove': id,
-
-    default: (data, e) => {
-        data.pointerovers.stop();
-        data.pointermoves.stop();
+    const pointerups = events('pointercancel pointerup', body).each(() => {
+        pointermoves.stop();
+        pointerovers.stop();
+        pointerups.stop();
 
         // Unhighlight zones
         body
         .querySelectorAll('.zone.active')
         .forEach((zone) => zone.classList.remove('active'));
 
-        select(data.event);
-
-        return data;
-    }
-}), {}));
+        // Add event to selection
+        select(event);
+    });
+});

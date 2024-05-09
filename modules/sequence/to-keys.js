@@ -137,5 +137,7 @@ export default function toKeys(events) {
 		);
 	}
 
-	return viterbi(notes, initialProb, transitionMatrix, emissionMatrix);
+	return length ?
+		viterbi(notes, initialProb, transitionMatrix, emissionMatrix) :
+		[] ;
 }
