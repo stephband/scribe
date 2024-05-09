@@ -22,6 +22,40 @@
     <link rel="stylesheet" href="./module.css">
 
     <style>
+        .scribe > .bar {
+            flex: 1 1 100%;
+        }
+
+        @media (min-width: 30em) {
+            .scribe > .bar {
+                flex: 1 1 50%;
+            }
+        }
+
+        @media (min-width: 45em) {
+            .scribe > .bar {
+                flex: 1 1 33.3333333%;
+            }
+        }
+
+        @media (min-width: 60em) {
+            .scribe > .bar {
+                flex: 1 1 25%;
+            }
+        }
+
+        @media (min-width: 90em) {
+            .scribe > .bar {
+                flex: 1 1 16.666666667%;
+            }
+        }
+
+        @media (min-width: 120em) {
+            .scribe > .bar {
+                flex: 1 1 12.5%;
+            }
+        }
+
         .scribe > .bar:last-child {
             font-size: 2em;
             flex: 0 0 100%;
