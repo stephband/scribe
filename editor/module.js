@@ -27,10 +27,10 @@ function createDOM(sequence) {
     const bars    = createBarElements(symbols);
 
     // TEMP: Create 1 extra bar
-    bars.push(create('div', {
+    /*bars.push(create('div', {
         class: `treble-stave stave bar`,
         data: { beat: 4, duration: 4 },
-    }));
+    }));*/
 
     bars.forEach((barElement) => {
         const zoneElements = Array.from({ length: 8 }, (v, i) => {
@@ -55,7 +55,8 @@ function renderDOM(elements) {
     element.append.apply(element, elements);
 }
 
-const sequence = {
+// TEMP
+export const sequence = {
     events: []
 };
 
@@ -229,7 +230,7 @@ function activateZonesFromEvent(zones, event) {
 
 
 
-events({ type: 'pointerdown', device: 'mouse pen touch' }, body)
+events({ type: 'pointerdown', select: '.zone', device: 'mouse pen touch' }, body)
 .each((e) => {
     const zone     = e.target;
     const zoneRect = rect(zone);

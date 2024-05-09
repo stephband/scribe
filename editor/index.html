@@ -56,14 +56,29 @@
             }
         }
 
-        .scribe > .bar:last-child {
-            font-size: 2em;
-            flex: 0 0 100%;
+        header input {
+            display: block;
+            width: 100%;
+            resize: auto;
+            padding: 0;
+            background: #eeeeee;
+            border-width: 0;
+        }
+
+        footer > textarea {
+            display: block;
+            width: 100%;
+            resize: auto;
+            padding: 0;
+            background: #eeeeee;
+            border-width: 0;
         }
     </style>
 
     <script type="module">
-        import './module.js';
+        import overload from '../../fn/modules/overload.js';
+        import events   from '../../dom/modules/events.js';
+        import { sequence } from './module.js';
 
 
         // Add SVG symbol definitions to the body
@@ -72,7 +87,6 @@
 
         const fragment = create('fragment', svgdefs);
         document.body.append(fragment);
-
 
         // Flag Safari
         const isSafari = navigator.userAgent.includes('AppleWebKit/')
@@ -83,11 +97,40 @@
         if (isSafari) {
             document.body.classList.add('safari');
         }
+
+        console.log(sequence);
+
+        events({ type: 'input', select: 'input' }, document.body)
+        .each(overload((e) => e.target.name, {
+            'name':     (e) => sequence.name = e.target.value,
+            'author':   (e) => sequence.author = e.target.value,
+            'arranger': (e) => sequence.arranger = e.target.value
+        }));
+
+        events({ type: 'click', select: 'button' }, document.body)
+        .each(overload((e) => e.target.name, {
+            'export': (e) => {
+                console.log(sequence);
+                document.getElementById('json').value = JSON.stringify(sequence);
+            }
+        }));
     </script>
 </head>
 <body>
+    <header>
+        <form>
+            <input class="" type="text" name="name" value="" />
+            <input class="" type="text" name="author" value="" />
+        </form>
+    </header>
+
     <main class="scribe" id="scribe-bars">
 
     </main>
+
+    <footer>
+        <button class="button" name="export" value="">Export</button>
+        <textarea readonly id="json"></textarea>
+    </footer>
 </body>
 </html>

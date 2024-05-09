@@ -1,11 +1,21 @@
 .zone {
-    background-color: #666666;
-    border-radius: 0.3125em;
+    position: relative;
     min-width: 1em;
     opacity: 0.2;
 }
 
-.zone.active {
+.zone::before {
+    content: '';
+    position: absolute;
+    top: 0.125em;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 0.25em);
+    background-color: #666666;
+    border-radius: 0.25em;
+}
+
+.zone.active::before {
     background-color: #bb6666;
 }
 
@@ -15,12 +25,3 @@
     margin-left: 1px;
     margin-right: 1px;
 }
-/*
-.bar > .zone {
-    display: none;
-}
-
-.bar.cursor-active > .zone {
-    display: block;
-}
-*/
