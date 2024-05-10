@@ -2,6 +2,24 @@ import get      from '../../fn/modules/get.js';
 import overload from '../../fn/modules/overload.js';
 import create   from '../../dom/modules/create.js';
 
+const headSymbol = `\uE0A4`;
+
+const restSymbols = {
+    0.0625: "\uE4E8",
+    0.125 : "\uE4E8",
+    0.25  : "\uE4E7",
+    0.375 : "\uE4E7",
+    0.5   : "\uE4E6",
+    0.75  : "\uE4E6",
+    1     : "\uE4E5",
+    1.5   : "\uE4E5",
+    2     : "\uE4E4",
+    3     : "\uE4E4",
+    4     : "\uE4E3",
+    6     : "\uE4E3",
+}
+
+
 const abs = Math.abs;
 
 const beamThickness = 1.1;
@@ -122,12 +140,13 @@ export default overload(get('type'), {
     }),
 
     // Create note head
-    head: (symbol) => create('svg', {
+    head: (symbol) => create('span', {
         class:   "head",
         viewBox: "0 -1 2.7 2",
+        style:"font-size:2em;font-family:Bravura;line-height:0.25em;",
         preserveAspectRatio: "xMidYMid slice",
         data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part },
-        html: `<use href="#${ symbol.head || `head[${ symbol.duration }]` }"></use>`
+        html: headSymbol
     }),
 
     // Create note stem
@@ -178,24 +197,12 @@ export default overload(get('type'), {
     }),
 
     // Create rest
-    rest: (symbol) => create('svg', {
+    rest: (symbol) => create('span', {
         class: "rest",
-        viewBox:
-            symbol.duration === 0.125 ? "0 -4 3.0 8" :
-            symbol.duration === 0.25  ? "0 -4 2.8 8" :
-            symbol.duration === 0.375 ? "0 -4 3.8 8" :
-            symbol.duration === 0.5   ? "0 -4 2.6 8" :
-            symbol.duration === 0.75  ? "-0.2 -4 3.6 8" :
-            symbol.duration === 1     ? "0 -4 2.6 8" :
-            symbol.duration === 1.5   ? "0 -4 3.5 8" :
-            symbol.duration === 2     ? "0 -4 2.6 8" :
-            symbol.duration === 3     ? "0 -4 2.6 8" :
-            symbol.duration === 4     ? "0 -4 2.6 8" :
-            symbol.duration === 6     ? "0 -4 2.6 8" :
-            "0 -4 2.6 8" ,
+        style:"font-size:2em;font-family:Bravura;line-height:0.25em;",
         preserveAspectRatio: "xMidYMid slice",
         data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part },
-        html: '<use href="#rest[' + symbol.duration + ']"></use>'
+        html: restSymbols[symbol.duration]
     }),
 
     default: (function(types) {
