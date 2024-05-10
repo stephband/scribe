@@ -56,15 +56,6 @@
             }
         }
 
-        header input {
-            display: block;
-            width: 100%;
-            resize: auto;
-            padding: 0;
-            background: #eeeeee;
-            border-width: 0;
-        }
-
         footer > textarea {
             display: block;
             width: 100%;
@@ -98,13 +89,29 @@
             document.body.classList.add('safari');
         }
 
-        console.log(sequence);
+        // Make inputs size of their placeholders
+        document.querySelectorAll('input').forEach((input) => {
+            console.log(!!input.value, input.value, input.placeholder);
+            input.size = input.value ? input.value.length : input.placeholder.length || 6;
+        });
 
+        // Make inputs auto-expand to size of value or placeholder or 6
+        events({ type: 'input', select: 'input' }, document.body)
+        .each((e) => (e.target.size =
+            e.target.value ? e.target.value.length :
+            e.target.placeholder ? e.target.placeholder.length :
+            6
+        ));
+
+        // Update sequence from inputs
         events({ type: 'input', select: 'input' }, document.body)
         .each(overload((e) => e.target.name, {
             'name':     (e) => sequence.name = e.target.value,
-            'author':   (e) => sequence.author = e.target.value,
-            'arranger': (e) => sequence.arranger = e.target.value
+            'author':   (e) => sequence.author ?
+                (sequence.author.name = e.target.value) :
+                (sequence.author = { name: e.target.value }),
+            'arranger': (e) => sequence.arranger = e.target.value,
+            default:    (e) => console.log('name="' + e.target.name + '" not handled')
         }));
 
         events({ type: 'click', select: 'button' }, document.body)
@@ -118,9 +125,9 @@
 </head>
 <body>
     <header class="header">
-        <input class="title" type="text" name="name" value="" oninput="this.size = this.value.length"  />
-        <input class="credit" type="text" name="author" value="" />
-        <input class="part" type="text" name="part" value="" />
+        <input class="title" type="text" name="name" value="" placeholder="Song Title" />
+        <input class="credit" type="text" name="author" value="" placeholder="Author" />
+        <input class="part" type="text" name="part" value="" placeholder="Part" />
     </header>
 
     <main class="scribe" id="scribe-bars">

@@ -5,6 +5,11 @@
     column-gap: 1em;
 }
 
+.header > input {
+    padding: 0;
+    border-width: 0;
+}
+
 .header > .credit {
     font-family: JazzText;
     font-size: 1em;
@@ -12,6 +17,9 @@
     justify-self: start;
     grid-row: 1;
     vertical-align: baseline;
+    width: auto;
+    min-width: 16.6666667vw;
+    text-align: left;
 }
 
 .header > .title {
@@ -33,6 +41,9 @@
     justify-self: end;
     grid-row: 1;
     vertical-align: baseline;
+    width: auto;
+    min-width: 16.6666667vw;
+    text-align: right;
 }
 
 .header + * {

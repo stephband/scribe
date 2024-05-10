@@ -1,7 +1,7 @@
 .zone {
     position: relative;
     min-width: 1em;
-    opacity: 0.2;
+    opacity: 0.1;
 }
 
 .zone::before {
@@ -11,7 +11,7 @@
     left: 0;
     width: 100%;
     height: calc(100% - 0.25em);
-    background-color: #666666;
+    background-color: #888888;
     border-radius: 0.25em;
 }
 
