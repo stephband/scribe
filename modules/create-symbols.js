@@ -238,7 +238,7 @@ function createBeam(symbols, stave, beam, n) {
 
 function createSymbols(symbols, bar) {
     // All events in symbols have the same part
-    const part  = symbols[0].part;
+    const part  = symbols[0] && symbols[0].part;
     const stave = bar.stave;
 
     // Populate accidentals with key signature sharps and flats
@@ -420,6 +420,12 @@ function createBarSymbols(bar) {
             return parts;
         }, {})
     );
+
+    // If there are no parts we must nonetheless render a rest
+    // TODO: render rest for each part, even tho there are no parts here?
+    if (parts.length === 0) {
+        parts[0] = [];
+    }
 
     // Fill each parts with accidentals, rests, beams, tieheads
     parts.forEach((part) => createSymbols(part, bar, state.clef.stemDirectionNote));
@@ -636,8 +642,7 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
 }
 
 export default function eventsToSymbols(events, clef, keyname, meter, transpose) {
-    console.log(events, clef, keyname, meter, transpose);
-
+    //console.log(events, clef, keyname, meter, transpose);
 
     // Transpose events before generating keys??
     events.sort(by(get(0)));
@@ -662,13 +667,6 @@ export default function eventsToSymbols(events, clef, keyname, meter, transpose)
 
     // TODO: this is a two-pass symbol generation, I wonder if we can get
     // it down to one?
-    const bars = createBars(events, beatkeys, stave, keyscale, meter, transpose);
-
-    console.log(bars);
-
-    const sy = bars.map(createBarSymbols);
-
-    console.log(sy);
-
-    return sy;
+    return createBars(events, beatkeys, stave, keyscale, meter, transpose)
+    .map(createBarSymbols);
 }
