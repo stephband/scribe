@@ -636,6 +636,9 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
 }
 
 export default function eventsToSymbols(events, clef, keyname, meter, transpose) {
+    console.log(events, clef, keyname, meter, transpose);
+
+
     // Transpose events before generating keys??
     events.sort(by(get(0)));
 
@@ -658,7 +661,14 @@ export default function eventsToSymbols(events, clef, keyname, meter, transpose)
     const keyscale  = toKeyScale(keynumber * 7 + transpose);
 
     // TODO: this is a two-pass symbol generation, I wonder if we can get
-    // it down to one? :)
-    return createBars(events, beatkeys, stave, keyscale, meter, transpose)
-    .map(createBarSymbols);
+    // it down to one?
+    const bars = createBars(events, beatkeys, stave, keyscale, meter, transpose);
+
+    console.log(bars);
+
+    const sy = bars.map(createBarSymbols);
+
+    console.log(sy);
+
+    return sy;
 }

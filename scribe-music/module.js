@@ -7,7 +7,7 @@ import createSymbols     from '../modules/create-symbols.js';
 import requestData       from '../modules/request-data.js';
 import parseSource       from '../modules/parse.js';
 import * as staves       from '../modules/staves.js';
-import createElement     from '../modules/create-element.js';
+//import createElement     from '../modules/create-element.js';
 import createBarElements from '../modules/create-bar-elements.js';
 import svgdefs           from '../modules/svgdefs.js';
 
@@ -75,7 +75,7 @@ export default define(element('scribe-music', {
 
         // Compute signal listens to changs
         Signal.from(() => (
-            internals.data.value && createSymbols(
+            internals.data.value && createBarElements(createSymbols(
                 // Events from data
                 internals.data.value.events,
                 // Clef is a string
@@ -86,8 +86,8 @@ export default define(element('scribe-music', {
                 internals.meter.value,
                 // Transpose is a number
                 internals.transpose.value
-            ).reduce(createBarElements, []))
-        )
+            ))
+        ))
         .each((elements) => {
             // Clear the shadow DOM of bars and put new elements in it
             shadow.querySelectorAll('.bar').forEach((element) => element.remove());

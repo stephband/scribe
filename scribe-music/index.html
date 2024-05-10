@@ -30,14 +30,16 @@
     scribe-music.no-wrap::after { content: none; }
     </style>
 
-    <scribe-music type="sequence" transpose="2" clef="treble" style="width: max-content;">
+    <scribe-music type="json" clef="treble" style="width: max-content;">[[20,"note","G4",0.2,2]]</scribe-music>
+
+    <!--scribe-music type="sequence" transpose="2" clef="treble" style="width: max-content;">
     0     meter 1 0.5
     2.5   G4 1 0.5
     4     G4 1 1
     0     chord A7alt 1
     </scribe-music>
 
-    <scribe-music type="sequence" clef="treble" style="width: max-content;">
+    <!--scribe-music type="sequence" clef="treble" style="width: max-content;">
     8.5   G4 1 0.5
     10    G4 1 1
     </scribe-music>
@@ -408,7 +410,7 @@
         1.5  lyric the       0.5
         1.5  Db5  0.2        0.5
         <!--1.5  G4   0.2        0.5
-        1.5  F4   0.2        0.5-->
+        1.5  F4   0.2        0.5-- >
 
         2    lyric bleak     1
         2    chord E♭∆/G     2
@@ -813,7 +815,7 @@
         [146.5,  "note", 77, 0.25, 0.5],
         [147,    "note", 79, 0.25, 0.5],
         [147.5,  "note", 74, 0.25, 3.5]
-    ]</scribe-music>
+    ]</scribe-music-->
 
     <!--scribe-music type="json" src="https://api.github.com/gists/39b8a36e4abc13baee57825fbc1b6004" clef="drums"></scribe-music>
     <scribe-music type="json" src="https://api.github.com/gists/739fa16055debb7972737835e4fa4623" clef="treble"></scribe-music-->
