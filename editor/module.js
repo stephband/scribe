@@ -14,7 +14,6 @@ import * as staves from '../modules/staves.js';
 import isTransposeable from '../modules/event/is-transposeable.js';
 import { selection, select, deselect, clear } from './modules/selection.js';
 
-
 const stave   = staves.treble;
 const body    = document.body;
 const element = document.getElementById('scribe-bars');
