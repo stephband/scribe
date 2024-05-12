@@ -46,7 +46,7 @@ export default function toSpelling(keynumber, event, transpose = 0) {
     const accidental = accidentals[a];
 
     if (window.DEBUG && name === undefined) {
-        throw new Error('Incorrect spelling for pitch number ' + n + ': "' + name + '"')
+        throw new Error('Incorrect spelling for pitch number ' + n + ': "' + name + '"');
     }
 
     return name + accidental + o;

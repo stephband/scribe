@@ -39,7 +39,7 @@ function getAbsoluteFromDiatonicPitch(root, degree) {
         24, 26, 28, 29, 31, 33, 35,
         36, 38, 40, 41, 43, 45, 47,
         48
-    ][degree] + root + 60
+    ][degree] + root + 60;
 }
 
 export default function parseABC(abc) {
@@ -70,7 +70,7 @@ export default function parseABC(abc) {
                 const roots = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
 
                 if (!roots[root]) {
-                    TODO('ABC says root is "' + root + '", we have not implemented support for that')
+                    TODO('ABC says root is "' + root + '", we have not implemented support for that');
                 }
 
                 const rootN = roots[root];
@@ -103,7 +103,7 @@ export default function parseABC(abc) {
                             // abcPitch numbers are relative to the key root and
                             // describe diatonic steps, not semitones
 
-                            events.push([sequence.cursor, "note", getAbsoluteFromDiatonicPitch(keyEvent[2], abcPitch.pitch), 0.25, voice.duration * 4])
+                            events.push([sequence.cursor, "note", getAbsoluteFromDiatonicPitch(keyEvent[2], abcPitch.pitch), 0.25, voice.duration * 4]);
                             return events;
                         }, events);
 
@@ -127,7 +127,7 @@ console.log('ABC voice ignored:', voice);
                 }, events);
 
                 if (staff.voices[1]) {
-                    TODO('What do we do with a second array of voices?')
+                    TODO('What do we do with a second array of voices?');
                 }
             }
 

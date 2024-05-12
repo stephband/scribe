@@ -136,7 +136,7 @@ function createBeam(symbols, stave, beam, n) {
     // Not enough stems for a beam, give it a tail
     if (beam.length === 1) {
         if (beam[0] >= n) {
-            throw new Error('Last beam index (' + i + ') cant be greater than n (' + n + ')');
+            throw new Error('Last beam index (' + beam[0] + ') cant be greater than n (' + n + ')');
         }
 
         return insertTail(symbols, stave, beam[0]);
@@ -547,7 +547,7 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
     while (event = events[++n]) {
         if (event[1] === 'meter') {
             if (event[0] !== bar.beat) {
-                new TypeError('Scribe: "meter" event must occur at bar start – event [' + event.join(', ') + '] is on beat ' + (event[0] - bar.beat) + ' of bar')
+                new TypeError('Scribe: "meter" event must occur at bar start – event [' + event.join(', ') + '] is on beat ' + (event[0] - bar.beat) + ' of bar');
             }
             continue;
         }

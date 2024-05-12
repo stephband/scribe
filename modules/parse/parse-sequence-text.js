@@ -35,7 +35,7 @@ export default function parseSequenceText(source) {
         let event = [time, type];
         let m = lengths[type];
         if (m === undefined) {
-            throw new TypeError('Unrecognised type "' + type + '" in sequence data')
+            throw new TypeError('Unrecognised type "' + type + '" in sequence data');
         }
 
         if (type === 'chord') {

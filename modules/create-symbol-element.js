@@ -204,6 +204,6 @@ export default overload(get('type'), {
             types[symbol.type] = true;
             console.log(symbol);
             console.error('Scribe: symbol type "' + symbol.type + '" not rendered');
-        }
+        };
     })({})
 });
