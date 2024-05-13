@@ -22,6 +22,19 @@
     <link rel="stylesheet" href="./module.css">
 
     <style>
+        html {
+            padding: 0;
+        }
+
+        body {
+            padding: 0.5em;
+        }
+
+        body > .scribe {
+            margin-left: calc(-1 * var(--bar-padding-left));
+            margin-right: calc(-1 * var(--bar-padding-left));
+        }
+
         .scribe > .bar {
             flex: 1 1 100%;
         }
@@ -56,6 +69,15 @@
             }
         }
 
+        .scribe::after {
+            content: '';
+            flex: 6 1;
+        }
+
+        footer {
+            margin-top: 2em;
+        }
+
         footer > textarea {
             display: block;
             width: 100%;
@@ -69,7 +91,7 @@
     <script type="module">
         import overload from '../../fn/modules/overload.js';
         import events   from '../../dom/modules/events.js';
-        import { sequence } from './module.js';
+        import { sequence, changeZoneDuration, highlightSelectionZones } from './module.js';
 
 
         // Add SVG symbol definitions to the body
@@ -91,7 +113,6 @@
 
         // Make inputs size of their placeholders
         document.querySelectorAll('input').forEach((input) => {
-            console.log(!!input.value, input.value, input.placeholder);
             input.size = input.value ? input.value.length : input.placeholder.length || 6;
         });
 
@@ -106,12 +127,17 @@
         // Update sequence from inputs
         events({ type: 'input', select: 'input' }, document.body)
         .each(overload((e) => e.target.name, {
-            'name':     (e) => sequence.name = e.target.value,
-            'author':   (e) => sequence.author ?
+            'name':      (e) => sequence.name = e.target.value,
+            'author':    (e) => sequence.author ?
                 (sequence.author.name = e.target.value) :
                 (sequence.author = { name: e.target.value }),
-            'arranger': (e) => sequence.arranger = e.target.value,
-            default:    (e) => console.log('name="' + e.target.name + '" not handled')
+            'arranger':  (e) => sequence.arranger = e.target.value,
+            'zone-duration': (e) => {
+                changeZoneDuration(Number(e.target.value));
+                highlightSelectionZones();
+            },
+            'edit-mode': (e) => document.body.classList[e.target.checked ? 'add' : 'remove']('edit'),
+            default:     (e) => console.log('name="' + e.target.name + '" not handled')
         }));
 
         events({ type: 'click', select: 'button' }, document.body)
@@ -131,9 +157,32 @@
     </header>
 
     <main class="scribe" id="scribe-bars">
+
     </main>
 
     <footer>
+        <hr/>
+
+        <input type="radio" name="zone-duration" value="0.166666667" id="zone-duration-triplet16th" />
+        <label for="zone-duration-triplet16th">triplet 16th</label>
+        <input type="radio" name="zone-duration" value="0.25" id="zone-duration-16th" />
+        <label for="zone-duration-16th">16th</label>
+        <input type="radio" name="zone-duration" value="0.333333333" id="zone-duration-triplet8th" />
+        <label for="zone-duration-triplet8th">triplet 8th</label>
+        <input type="radio" name="zone-duration" value="0.5" id="zone-duration-8th" checked />
+        <label for="zone-duration-8th">8th</label>
+        <input type="radio" name="zone-duration" value="0.666666667" id="zone-duration-triplet" />
+        <label for="zone-duration-triplet">triplet</label>
+        <input type="radio" name="zone-duration" value="1" id="zone-duration-quarter" />
+        <label for="zone-duration-quarter">quarter</label>
+
+        <hr/>
+
+        <input type="checkbox" name="edit-mode" id="edit-mode" checked />
+        <label for="edit-mode">Edit mode</label>
+
+        <hr/>
+
         <button class="button" name="export" value="">Export</button>
         <textarea readonly id="json"></textarea>
     </footer>

@@ -26,6 +26,5 @@ function toBarElements(elements, bar) {
 }
 
 export default function createBarElements(symbols) {
-    console.log(symbols);
     return symbols.reduce(toBarElements, []);
 }

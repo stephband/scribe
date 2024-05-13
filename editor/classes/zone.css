@@ -1,7 +1,7 @@
 .zone {
+    cursor: crosshair;
     position: relative;
     min-width: 1em;
-    opacity: 0.1;
 }
 
 .zone::before {
@@ -11,17 +11,29 @@
     left: 0;
     width: 100%;
     height: calc(100% - 0.25em);
-    background-color: #888888;
+    background-color: rgba(80,80,80,0.06);
     border-radius: 0.25em;
 }
 
 .zone.active::before {
-    background-color: #bb6666;
+    background-color: rgba(60,180,120,0.14);
 }
+
+
 
 .stave > .zone {
     grid-row: 1 / -1 ;
     /* Guarantee a gap between zones */
     margin-left: 1px;
     margin-right: 1px;
+}
+
+
+
+body .zone {
+    display: none;
+}
+
+body.edit .zone {
+    display: block;
 }

@@ -21,25 +21,27 @@ const element = document.getElementById('scribe-bars');
 // Zones cache
 const zones = {};
 
+
+let editDuration = 0.5;
+
+function round24(n) {
+    return Math.round(n * 24) / 24;
+}
+
 function createDOM(sequence) {
     const symbols = createSymbols(sequence.events, 'treble', 'C', [0, "meter", 4, 1], 0);
     const bars    = createBarElements(symbols);
 
-    // TEMP: Create 1 extra bar
-    /*bars.push(create('div', {
-        class: `treble-stave stave bar`,
-        data: { beat: 4, duration: 4 },
-    }));*/
-
     bars.forEach((barElement) => {
-        const zoneElements = Array.from({ length: 8 }, (v, i) => {
-            const beat    = i / 2;
+        const length = Math.round(Number(barElement.dataset.duration) / editDuration);
+        const zoneElements = Array.from({ length }, (v, i) => {
+            const beat    = round24(i * editDuration);
             const absbeat = Number(barElement.dataset.beat) + beat;
 
             // Cache zones
             return zones[absbeat] || (zones[absbeat] = create('div', {
                 class: 'zone',
-                data: { beat: beat + 1, duration: 0.5, absbeat }
+                data: { beat: beat + 1, duration: editDuration, absbeat }
             }));
         });
 
@@ -67,7 +69,6 @@ renderDOM(elements);
 
 // Track cursor
 let cursor       = 0;
-let editDuration = 0.5;
 let rate         = 1.5;
 
 function barAtBeat(b) {
@@ -80,6 +81,16 @@ function updateCursor(beat, barElements) {
     cursor = beat;
     const barN = barAtBeat(beat);
     barElements[barN].classList.add('cursor-active');
+}
+
+export function changeZoneDuration(duration) {
+    // Throw away cached zones
+    let n;
+    for (n in zones) delete zones[n];
+
+    // Change zone duration and rerender
+    editDuration = duration;
+    render(sequence);
 }
 
 
@@ -111,8 +122,6 @@ function addNoteEvent(pitch, dynamic) {
     sequence.events.push(event);
 }
 
-
-
 function moveSelectionPitch(n) {
     let i = -1;
     let event;
@@ -140,52 +149,69 @@ function moveSelectionBeat(n) {
     render(sequence);
 }
 
+function moveSelectionDuration(n) {
+    let i = -1;
+    let event;
+
+    // If any events in selection would reach duration 0 as a result of this
+    // move don't shorten any of them.
+    while (event = selection[++i]) if (event[4] + n <= 0) return;
+
+    // Move 'em'
+    i = -1;
+    while (event = selection[++i]) event[4] += n;
+
+    render(sequence);
+}
+
 
 keyboard({
     // TODO: I'm doing this wrong. We want to map by key position,
     // not character name
-    'backquote:down': (e) => addNoteEvent('G3',  1),
-    'backquote:up':   (e) => stopTimer(),
-    'A:down':         (e) => addNoteEvent('Ab3', 1),
-    'A:up':           (e) => stopTimer(),
-    'Z:down':         (e) => addNoteEvent('A3',  1),
-    'Z:up':           (e) => stopTimer(),
-    'S:down':         (e) => addNoteEvent('Bb3', 1),
-    'S:up':           (e) => stopTimer(),
-    'X:down':         (e) => addNoteEvent('B3',  1),
-    'X:up':           (e) => stopTimer(),
-    'C:down':         (e) => addNoteEvent('C4',  1),
-    'C:up':           (e) => stopTimer(),
-    'F:down':         (e) => addNoteEvent('C#4', 1),
-    'F:up':           (e) => stopTimer(),
-    'V:down':         (e) => addNoteEvent('D4',  1),
-    'V:up':           (e) => stopTimer(),
-    'G:down':         (e) => addNoteEvent('Eb4', 1),
-    'G:up':           (e) => stopTimer(),
-    'B:down':         (e) => addNoteEvent('E4',  1),
-    'B:up':           (e) => stopTimer(),
-    'N:down':         (e) => addNoteEvent('F4',  1),
-    'N:up':           (e) => stopTimer(),
-    'J:down':         (e) => addNoteEvent('F#4', 1),
-    'J:up':           (e) => stopTimer(),
-    'M:down':         (e) => addNoteEvent('G4',  1),
-    'M:up':           (e) => stopTimer(),
-    'K:down':         (e) => addNoteEvent('G#4', 1),
-    'K:up':           (e) => stopTimer(),
-    'comma:down':     (e) => addNoteEvent('A4',  1),
-    'comma:up':       (e) => stopTimer(),
-    'L:down':         (e) => addNoteEvent('Bb4', 1),
-    'L:up':           (e) => stopTimer(),
-    'period:down':    (e) => addNoteEvent('B4',  1),
-    'period:up':      (e) => stopTimer(),
-    'slash:down':     (e) => addNoteEvent('C5',  1),
-    'slash:up':       (e) => stopTimer(),
-    'quote:down':     (e) => addNoteEvent('C#5', 1),
-    'quote:up':       (e) => stopTimer(),
-    'up:down':        (e) => moveSelectionPitch(1),
-    'down:down':      (e) => moveSelectionPitch(-1),
-    'left:down':      (e) => moveSelectionBeat(-editDuration),
-    'right:down':     (e) => moveSelectionBeat(editDuration)
+    'backquote:down':   (e) => addNoteEvent('G3',  1),
+    'backquote:up':     (e) => stopTimer(),
+    'A:down':           (e) => addNoteEvent('Ab3', 1),
+    'A:up':             (e) => stopTimer(),
+    'Z:down':           (e) => addNoteEvent('A3',  1),
+    'Z:up':             (e) => stopTimer(),
+    'S:down':           (e) => addNoteEvent('Bb3', 1),
+    'S:up':             (e) => stopTimer(),
+    'X:down':           (e) => addNoteEvent('B3',  1),
+    'X:up':             (e) => stopTimer(),
+    'C:down':           (e) => addNoteEvent('C4',  1),
+    'C:up':             (e) => stopTimer(),
+    'F:down':           (e) => addNoteEvent('C#4', 1),
+    'F:up':             (e) => stopTimer(),
+    'V:down':           (e) => addNoteEvent('D4',  1),
+    'V:up':             (e) => stopTimer(),
+    'G:down':           (e) => addNoteEvent('Eb4', 1),
+    'G:up':             (e) => stopTimer(),
+    'B:down':           (e) => addNoteEvent('E4',  1),
+    'B:up':             (e) => stopTimer(),
+    'N:down':           (e) => addNoteEvent('F4',  1),
+    'N:up':             (e) => stopTimer(),
+    'J:down':           (e) => addNoteEvent('F#4', 1),
+    'J:up':             (e) => stopTimer(),
+    'M:down':           (e) => addNoteEvent('G4',  1),
+    'M:up':             (e) => stopTimer(),
+    'K:down':           (e) => addNoteEvent('G#4', 1),
+    'K:up':             (e) => stopTimer(),
+    'comma:down':       (e) => addNoteEvent('A4',  1),
+    'comma:up':         (e) => stopTimer(),
+    'L:down':           (e) => addNoteEvent('Bb4', 1),
+    'L:up':             (e) => stopTimer(),
+    'period:down':      (e) => addNoteEvent('B4',  1),
+    'period:up':        (e) => stopTimer(),
+    'slash:down':       (e) => addNoteEvent('C5',  1),
+    'slash:up':         (e) => stopTimer(),
+    'quote:down':       (e) => addNoteEvent('C#5', 1),
+    'quote:up':         (e) => stopTimer(),
+    'up:down':          (e) => moveSelectionPitch(1),
+    'down:down':        (e) => moveSelectionPitch(-1),
+    'left:down':        (e) => moveSelectionBeat(-editDuration),
+    'right:down':       (e) => moveSelectionBeat(editDuration),
+    'shift-left:down':  (e) => moveSelectionDuration(-editDuration),
+    'shift-right:down': (e) => moveSelectionDuration(editDuration)
 }, body);
 
 
@@ -204,9 +230,35 @@ keyboard({
 
 // Touch
 
+function trunc2(n) {
+    const decimals = ((n % 1) + '').slice(2,4)
+    return Math.trunc(n) + (decimals ? '.' + decimals : '') ;
+}
+
+function unhighlightZones() {
+    // Unhighlight zones
+    body
+    .querySelectorAll('.zone.active')
+    .forEach((zone) => zone.classList.remove('active'));
+}
+
+export function highlightSelectionZones() {
+    unhighlightZones();
+    selection.forEach((event) => {
+        // Select all zones up to end fo duration
+        let absbeat = event[0];
+        while (absbeat < event[0] + event[4]) {
+            const zone = body.querySelector('.zone[data-absbeat^="' + trunc2(absbeat) + '"]');
+            if (zone) zone.classList.add('active');
+            absbeat += editDuration;
+        }
+    });
+}
+
 function render(sequence) {
     const barElements = createDOM(sequence);
     renderDOM(barElements);
+    highlightSelectionZones();
 }
 
 function addNoteEventByTouch(beat, pitch, dynamic, duration) {
@@ -286,11 +338,10 @@ events({ type: 'pointerdown', select: '.zone', device: 'mouse pen touch' }, body
         pointerups.stop();
 
         // Unhighlight zones
-        body
-        .querySelectorAll('.zone.active')
-        .forEach((zone) => zone.classList.remove('active'));
+        unhighlightZones();
 
         // Add event to selection
         select(event);
+        highlightSelectionZones();
     });
 });
