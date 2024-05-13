@@ -2,7 +2,21 @@ import get      from '../../fn/modules/get.js';
 import overload from '../../fn/modules/overload.js';
 import create   from '../../dom/modules/create.js';
 
-const headSymbol = `\uE0A4`;
+const headSymbols = {
+        0.0625: "\uE0A4",
+        0.125 : "\uE0A4",
+        0.25  : "\uE0A4",
+        0.375 : "\uE0A4",
+        0.5   : "\uE0A4",
+        0.75  : "\uE0A4",
+        1     : "\uE0A4",
+        1.5   : "\uE0A4",
+        2     : "\uE4E3",
+        3     : "\uE0A3",
+        4     : "\uE0A2",
+        6     : "\uE0A2",
+        "dot" : "\uD834\uDD6D",
+}
 
 const restSymbols = {
     0.0625: "\uE4E8",
@@ -17,6 +31,7 @@ const restSymbols = {
     3     : "\uE4E4",
     4     : "\uE4E3",
     6     : "\uE4E3",
+    "dot" : "\uD834\uDD6D",
 }
 
 
@@ -65,11 +80,12 @@ export default overload(get('type'), {
     // Create clef
     clef: (symbol) => symbol.clef === 'percussion' ?
         undefined :
-        create('svg', {
+        create('span', {
             class:   `${ symbol.clef }-clef clef`,
+            style:"font-size:2em;font-family:Petaluma;line-height:0.25em;",
             viewBox: "0 0.4 5.2 14.6",
             preserveAspectRatio: "none",
-            html: `<use x="3.2" y="1" width="8" href="#${ symbol.clef }-clef"></use>`
+            html: "\uE050"
         }),
 
     // Create chord symbol
@@ -146,7 +162,7 @@ export default overload(get('type'), {
         style:"font-size:2em;font-family:Bravura;line-height:0.25em;",
         preserveAspectRatio: "xMidYMid slice",
         data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part },
-        html: headSymbol
+        html: ![0.125,0.375,0.75,1.5,3,6].includes(symbol.duration) ? headSymbols[symbol.duration] : `${headSymbols[symbol.duration]}<span>${headSymbols["dot"]}</span>` 
     }),
 
     // Create note stem
@@ -199,10 +215,10 @@ export default overload(get('type'), {
     // Create rest
     rest: (symbol) => create('span', {
         class: "rest",
-        style:"font-size:2em;font-family:Bravura;line-height:0.25em;",
+        style:"font-size:2em;font-family:Petaluma;line-height:0.25em;",
         preserveAspectRatio: "xMidYMid slice",
         data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part },
-        html: restSymbols[symbol.duration]
+        html: ![0.125,0.375,0.75,1.5,3,6].includes(symbol.duration) ? restSymbols[symbol.duration] : `${restSymbols[symbol.duration]}<span>${restSymbols["dot"]}</span>` 
     }),
 
     default: (function(types) {
