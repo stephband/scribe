@@ -18,7 +18,14 @@ const headSymbols = {
         4     : "\uE0A2",
         6     : "\uE0A2",
         "dot" : "\uD834\uDD6D",
-};
+        noteheadSlashedBlack:"\uE0CF", 
+        noteheadXBlack:"\uE0A9",
+        noteheadCircleX: "\uE0B3",
+        noteheadXOrnate: "\uE0AA",
+        noteheadTriangleUpBlack: "\uE0BE",
+        noteheadDiamondBlack: "\uE0DB",
+        noteheadCircledBlack: "\uE0E4",
+    };
 
 const restSymbols = {
     0.0625: "\uE4E8",
@@ -182,7 +189,7 @@ export default overload(get('type'), {
         style:`font-size:2em;font-family:${fontFamily};line-height:0.25em;`,
         preserveAspectRatio: "xMidYMid slice",
         data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part },
-        html: ![0.125,0.375,0.75,1.5,3,6].includes(symbol.duration) ? headSymbols[symbol.duration] : `${headSymbols[symbol.duration]}<span>${headSymbols["dot"]}</span>` 
+        html: symbol.head ? headSymbols[symbol.head] : ![0.125,0.375,0.75,1.5,3,6].includes(symbol.duration) ? headSymbols[symbol.duration] : `${headSymbols[symbol.duration]}<span>${headSymbols["dot"]}</span>` 
     }),
 
     // Create note stem
