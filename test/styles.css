@@ -21,14 +21,6 @@
 }
 
 @font-face {
-    font-family: FinaleJazzText;
-    src: url('../fonts/FinaleJazzText/finalejazztext-webfont.woff2') format('woff2');
-    font-weight: normal;
-    font-style: normal;
-}
-
-
-@font-face {
     font-family: Broadway;
     src: url('../fonts/Broadway/finalebroadway-webfont.woff2') format('woff2');
     font-weight: normal;
@@ -75,15 +67,6 @@
     font-weight: normal;
     font-style: normal;
 }
-
-
-@font-face {
-    font-family: Jazztext;
-    src: url('../fonts/jazztext/jazztextregular-webfont.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-}
-
 
 
 @font-face {
