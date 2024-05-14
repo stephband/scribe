@@ -19,6 +19,10 @@ export function identify(event) {
     return event[$id];
 }
 
+export function findEvent(events, id) {
+    return events.find((event) => (event[$id] === id));
+}
+
 
 /* Beams */
 

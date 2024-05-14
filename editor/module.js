@@ -3,13 +3,14 @@ import get      from '../../fn/modules/get.js';
 import id       from '../../fn/modules/id.js';
 import overload from '../../fn/modules/overload.js';
 import create   from '../../dom/modules/create.js';
+import delegate from '../../dom/modules/delegate.js';
 import events   from '../../dom/modules/events.js';
 import rect     from '../../dom/modules/rect.js';
 import { toNoteName, toNoteNumber } from '../../midi/modules/note.js';
 
 import createSymbols     from '../modules/create-symbols.js';
 import createBarElements from '../modules/create-bar-elements.js';
-import { identify }      from '../modules/create-symbol-element.js';
+import { identify, findEvent } from '../modules/create-symbol-element.js';
 import * as staves from '../modules/staves.js';
 
 import isTransposeable from '../modules/event/is-transposeable.js';
@@ -311,78 +312,95 @@ function activateZonesFromEvent(zones, event) {
 
 
 events({ type: 'pointerdown', device: 'mouse pen touch' }, document)
-.each((e) => {
-    const zone     = e.target.closest('.zone');
+.each(delegate({
+    '.zone': (zone, e) => {
+        const zoneRect = rect(zone);
+        const ratio    = (e.clientY - zoneRect.top) / zoneRect.height;
+        const beat     = Number(zone.dataset.absbeat);
+        const pitch    = stave.yRatioToPitch(ratio);
+        const duration = Number(zone.dataset.duration);
+        const event    = addNoteEventByTouch(beat, pitch, 0.2, duration);
+        const zones    = Array.from(body.querySelectorAll('.zone'));
 
-    // If pointerdown is outside a zone deselect everything
-    if (!zone) {
+        // Clear selection
+        clear();
+        activateZonesFromEvent(zones, event);
+
+        const pointermoves = events('pointermove', body)
+        .each((e) => {
+            //console.log('MOVE');
+            const ratio = (e.clientY - zoneRect.top) / zoneRect.height;
+            const pitch = stave.yRatioToPitch(ratio);
+
+            // If there is no pitch to move to do nothing
+            if (!pitch) { return; }
+
+            // Is there no change in pitch? Don't rerender.
+            if (event[2] === pitch) { return; }
+
+            // Update pitch
+            event[2] = pitch;
+            render(sequence);
+
+            // Highlight zones
+            const zones = Array.from(body.querySelectorAll('.zone'));
+            activateZonesFromEvent(zones, event);
+        });
+
+        const pointerovers = events({ type: 'pointerover', select: '.zone' }, body)
+        .each((e) => {
+            const zone = e.target;
+            const beat = Number(zone.dataset.absbeat);
+
+            // Are we trying to edit backwards? That doesn't make sense.
+            if (beat < event[0]) { return; }
+
+            // Update duration
+            const duration = Number(zone.dataset.duration);
+            event[4] = beat + duration - event[0];
+            render(sequence);
+
+            // Highlight zones
+            const zones = Array.from(body.querySelectorAll('.zone'));
+            activateZonesFromEvent(zones, event);
+        });
+
+        const pointerups = events('pointercancel pointerup', body).each(() => {
+            pointermoves.stop();
+            pointerovers.stop();
+            pointerups.stop();
+
+            // Unhighlight zones
+            unhighlightZones();
+
+            // Add event to selection
+            select(event);
+            highlightZones();
+        });
+    },
+
+    '.head': (head, e) => {
+        // Select head
+        const id    = head.dataset.eventId;
+        const event = findEvent(sequence.events, id);
+
+        // If head is in selection do nothing
+        if (selection.includes(event)) return;
+
+        // Deselect everything
+        clear();
+
+        // Select event
+        select(event);
+        highlightZones();
+    },
+
+    '*': () => {
+        // Deselect everything
         clear();
         unhighlightSymbols();
         unhighlightZones();
         return;
     }
+}));
 
-    const zoneRect = rect(zone);
-    const ratio    = (e.clientY - zoneRect.top) / zoneRect.height;
-    const beat     = Number(zone.dataset.absbeat);
-    const pitch    = stave.yRatioToPitch(ratio);
-    const duration = Number(zone.dataset.duration);
-    const event    = addNoteEventByTouch(beat, pitch, 0.2, duration);
-    const zones    = Array.from(body.querySelectorAll('.zone'));
-
-    // Clear selection
-    clear();
-    activateZonesFromEvent(zones, event);
-
-    const pointermoves = events('pointermove', body)
-    .each((e) => {
-        //console.log('MOVE');
-        const ratio = (e.clientY - zoneRect.top) / zoneRect.height;
-        const pitch = stave.yRatioToPitch(ratio);
-
-        // If there is no pitch to move to do nothing
-        if (!pitch) { return; }
-
-        // Is there no change in pitch? Don't rerender.
-        if (event[2] === pitch) { return; }
-
-        // Update pitch
-        event[2] = pitch;
-        render(sequence);
-
-        // Highlight zones
-        const zones = Array.from(body.querySelectorAll('.zone'));
-        activateZonesFromEvent(zones, event);
-    });
-
-    const pointerovers = events({ type: 'pointerover', select: '.zone' }, body)
-    .each((e) => {
-        const zone = e.target;
-        const beat = Number(zone.dataset.absbeat);
-
-        // Are we trying to edit backwards? That doesn't make sense.
-        if (beat < event[0]) { return; }
-
-        // Update duration
-        const duration = Number(zone.dataset.duration);
-        event[4] = beat + duration - event[0];
-        render(sequence);
-
-        // Highlight zones
-        const zones = Array.from(body.querySelectorAll('.zone'));
-        activateZonesFromEvent(zones, event);
-    });
-
-    const pointerups = events('pointercancel pointerup', body).each(() => {
-        pointermoves.stop();
-        pointerovers.stop();
-        pointerups.stop();
-
-        // Unhighlight zones
-        unhighlightZones();
-
-        // Add event to selection
-        select(event);
-        highlightZones();
-    });
-});
