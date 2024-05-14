@@ -4,6 +4,24 @@ import create   from '../../dom/modules/create.js';
 
 const abs = Math.abs;
 
+
+/* Event ids */
+
+const $id = Symbol('scribe-id');
+
+//const eventMap = {};
+let id = 0;
+
+export function identify(event) {
+    if (event[$id]) return event[$id];
+    event[$id] = (++id + '');
+    //eventMap[id] = event;
+    return event[$id];
+}
+
+
+/* Beams */
+
 const beamThickness = 1.1;
 
 function renderBeam(range, stems, beam) {
@@ -57,7 +75,7 @@ export default overload(get('type'), {
     // Create chord symbol
     chord: (symbol) => create('p', {
         class:   "chord",
-        data: { beat: symbol.beat + 1, duration: symbol.duration },
+        data: { beat: symbol.beat + 1, duration: symbol.duration, eventId: identify(symbol.event) },
         html: (() => {
             return symbol.value
             .replace('(♯11)', '<sup class="chord-brackets">(♯11)</sup>')
@@ -83,7 +101,7 @@ export default overload(get('type'), {
 
     lyric: (symbol) => create('p', {
         class:   "lyric",
-        data: { beat: symbol.beat + 1, duration: symbol.duration },
+        data: { beat: symbol.beat + 1, duration: symbol.duration, eventId: symbol.event },
         html: symbol.value
     }),
 
@@ -96,7 +114,7 @@ export default overload(get('type'), {
         preserveAspectRatio: "xMidYMid slice",
         data: symbol.beat === undefined ?
             { pitch: symbol.pitch } :
-            { beat: symbol.beat + 1, pitch: symbol.pitch, part: symbol.part } ,
+            { beat: symbol.beat + 1, pitch: symbol.pitch, part: symbol.part, eventId: identify(symbol.event) } ,
         html: '<use href="#acci-'
             + (symbol.value === 1 ? 'sharp' : symbol.value === -1 ? 'flat' : 'natural')
             + '"></use>'
@@ -126,7 +144,7 @@ export default overload(get('type'), {
         class:   "head",
         viewBox: "0 -1 2.7 2",
         preserveAspectRatio: "xMidYMid slice",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part },
+        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part, eventId: identify(symbol.event) },
         html: `<use href="#${ symbol.head || `head[${ symbol.duration }]` }"></use>`
     }),
 
@@ -173,7 +191,7 @@ export default overload(get('type'), {
         class: `${ symbol.stemDirection }-tail tail`,
         viewBox: "0 -1 2.7 2",
         preserveAspectRatio: "xMidYMid",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part },
+        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part, eventId: identify(symbol.event) },
         html: '<use href="#tail' + symbol.stemDirection + '[' + symbol.duration + ']"></use>'
     }),
 

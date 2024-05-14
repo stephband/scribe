@@ -582,7 +582,7 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
         }
 
         const beat = event[0] - bar.beat;
-        const key  = keyFromBeatKeys(beatkeys, event[0]);
+        const key  = beatkeys && keyFromBeatKeys(beatkeys, event[0]);
 
         // Truncate duration to bar end
         const duration = event[0] + toDuration(event) > bar.beat + bar.duration ?
@@ -591,6 +591,8 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
 
         if (event[1] === 'note') {
             let pitch = stave.getSpelling(key, event, transpose);
+console.log('>', pitch);
+
             let head = assign({
                 type: 'head',
                 beat,
@@ -655,7 +657,10 @@ export default function eventsToSymbols(events, clef, keyname, meter, transpose)
     // Create a map of keys at beats. Doing this here is n optimisation so we
     // don't end up running the keys matrix calculations on every note which
     // causes measurable delay.
-    const beatkeys  = keysAtBeats(events);
+    // TEMP: don't get keys for unpitched staves
+    const beatkeys  = clef === 'drums' ?
+        null :
+        keysAtBeats(events) ;
 
     // Get the key scale from keyname. This scale is not a true
     // 'scale' in an internal-data sense as it may not begin with a 0, but it

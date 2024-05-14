@@ -1,3 +1,17 @@
 
 @import './classes/header.css';
 @import './classes/zone.css';
+
+.selected {
+    color: rgb(30,90,60);
+}
+
+.bar > .zone {
+    position: relative;
+    z-index: 2;
+}
+
+.bar > .head {
+    position: relative;
+    z-index: 3;
+}

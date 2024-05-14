@@ -9,17 +9,20 @@ import { toNoteName, toNoteNumber } from '../../midi/modules/note.js';
 
 import createSymbols     from '../modules/create-symbols.js';
 import createBarElements from '../modules/create-bar-elements.js';
+import { identify }      from '../modules/create-symbol-element.js';
 import * as staves from '../modules/staves.js';
 
 import isTransposeable from '../modules/event/is-transposeable.js';
 import { selection, select, deselect, clear } from './modules/selection.js';
 
-const stave   = staves.treble;
+const stave   = staves.drums;
 const body    = document.body;
 const element = document.getElementById('scribe-bars');
 
 // Zones cache
 const zones = {};
+
+
 
 
 let editDuration = 0.5;
@@ -29,7 +32,8 @@ function round24(n) {
 }
 
 function createDOM(sequence) {
-    const symbols = createSymbols(sequence.events, 'treble', 'C', [0, "meter", 4, 1], 0);
+    //const symbols = createSymbols(sequence.events, 'treble', 'C', [0, "meter", 4, 1], 0);
+    const symbols = createSymbols(sequence.events, 'drums', 'C', [0, "meter", 4, 1], 0);
     const bars    = createBarElements(symbols);
 
     bars.forEach((barElement) => {
@@ -122,12 +126,23 @@ function addNoteEvent(pitch, dynamic) {
     sequence.events.push(event);
 }
 
-function moveSelectionPitch(n) {
+function moveSelectionPitch(stave, n) {
     let i = -1;
     let event;
+
+    // Check that all pitches may be transposed
     while (event = selection[++i]) {
         if (isTransposeable(event)) {
-            event[2] = toNoteNumber(event[2]) + n;
+            const pitch = stave.movePitch(event[2], n);
+            if (!pitch) return;
+        }
+    }
+
+    // Transpose them
+    i = -1;
+    while (event = selection[++i]) {
+        if (isTransposeable(event)) {
+            event[2] = stave.movePitch(event[2], n);
         }
     }
 
@@ -206,8 +221,8 @@ keyboard({
     'slash:up':         (e) => stopTimer(),
     'quote:down':       (e) => addNoteEvent('C#5', 1),
     'quote:up':         (e) => stopTimer(),
-    'up:down':          (e) => moveSelectionPitch(1),
-    'down:down':        (e) => moveSelectionPitch(-1),
+    'up:down':          (e) => moveSelectionPitch(stave, 1),
+    'down:down':        (e) => moveSelectionPitch(stave, -1),
     'left:down':        (e) => moveSelectionBeat(-editDuration),
     'right:down':       (e) => moveSelectionBeat(editDuration),
     'shift-left:down':  (e) => moveSelectionDuration(-editDuration),
@@ -235,30 +250,44 @@ function trunc2(n) {
     return Math.trunc(n) + (decimals ? '.' + decimals : '') ;
 }
 
-function unhighlightZones() {
+export function unhighlightZones() {
     // Unhighlight zones
     body
     .querySelectorAll('.zone.active')
     .forEach((zone) => zone.classList.remove('active'));
 }
 
-export function highlightSelectionZones() {
+export function unhighlightSymbols() {
+    // Unhighlight zones
+    body
+    .querySelectorAll('.selected')
+    .forEach((element) => element.classList.remove('selected'));
+}
+
+export function highlightZones() {
     unhighlightZones();
+    unhighlightSymbols();
+
     selection.forEach((event) => {
-        // Select all zones up to end fo duration
+        // Select all zones up to end of event duration
         let absbeat = event[0];
         while (absbeat < event[0] + event[4]) {
             const zone = body.querySelector('.zone[data-absbeat^="' + trunc2(absbeat) + '"]');
             if (zone) zone.classList.add('active');
             absbeat += editDuration;
         }
+
+        // Select elements identified by event
+        body
+        .querySelectorAll('[data-event-id="' + identify(event) + '"]')
+        .forEach((element) => element.classList.add('selected'));
     });
 }
 
 function render(sequence) {
     const barElements = createDOM(sequence);
     renderDOM(barElements);
-    highlightSelectionZones();
+    highlightZones();
 }
 
 function addNoteEventByTouch(beat, pitch, dynamic, duration) {
@@ -281,9 +310,18 @@ function activateZonesFromEvent(zones, event) {
 
 
 
-events({ type: 'pointerdown', select: '.zone', device: 'mouse pen touch' }, body)
+events({ type: 'pointerdown', device: 'mouse pen touch' }, document)
 .each((e) => {
-    const zone     = e.target;
+    const zone     = e.target.closest('.zone');
+
+    // If pointerdown is outside a zone deselect everything
+    if (!zone) {
+        clear();
+        unhighlightSymbols();
+        unhighlightZones();
+        return;
+    }
+
     const zoneRect = rect(zone);
     const ratio    = (e.clientY - zoneRect.top) / zoneRect.height;
     const beat     = Number(zone.dataset.absbeat);
@@ -301,6 +339,9 @@ events({ type: 'pointerdown', select: '.zone', device: 'mouse pen touch' }, body
         //console.log('MOVE');
         const ratio = (e.clientY - zoneRect.top) / zoneRect.height;
         const pitch = stave.yRatioToPitch(ratio);
+
+        // If there is no pitch to move to do nothing
+        if (!pitch) { return; }
 
         // Is there no change in pitch? Don't rerender.
         if (event[2] === pitch) { return; }
@@ -342,6 +383,6 @@ events({ type: 'pointerdown', select: '.zone', device: 'mouse pen touch' }, body
 
         // Add event to selection
         select(event);
-        highlightSelectionZones();
+        highlightZones();
     });
 });
