@@ -1,6 +1,6 @@
 
-import get      from '../../../fn/modules/get.js';
-import overload from '../../../fn/modules/overload.js';
+import get      from '../../lib/fn/modules/get.js';
+import overload from '../../lib/fn/modules/overload.js';
 
 export default overload(get(1), {
     chord:    (event) => event[3],

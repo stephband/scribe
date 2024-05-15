@@ -90,7 +90,7 @@ Scribe 0.3 also parses ABC (thanks to the parser from [ABCjs](https://github.com
 ### `type="json"`
 
 Both an attribute and a property.
-Mimetype or type of data to fetch from `src` or to parse from text content. 
+Mimetype or type of data to fetch from `src` or to parse from text content.
 Scribe supports 3 types of data:
 
 - "application/json", or just "json"
@@ -138,7 +138,7 @@ scribe.key = "B♭";
 
 There is no provision for choosing a 'minor' key. Declare its relative major.
 
-The key is the key signature pre-transpose. If `scribe.transpose` is something other 
+The key is the key signature pre-transpose. If `scribe.transpose` is something other
 than `0`, the key signature is transposed.
 
 
@@ -202,9 +202,9 @@ let mySong = JSON.stringify(scribe.data);
 
 ## Sequence format
 
-The `"sequence"` format is intended for quick hand-authoring, and not as an export format. 
+The `"sequence"` format is intended for quick hand-authoring, and not as an export format.
 The format is basically Sequence JSON events but with all the JSON syntax – commas, quotes, brackets – removed.
-Values are delineated by whitespace. 
+Values are delineated by whitespace.
 Any value that does not parse as a number becomes a string.
 
 ```
@@ -237,21 +237,17 @@ The same is true for chords.
 
 ## Develop
 
-To install Scribe locally you need several repos served from one directory, as
-Scribe's modules import modules from these other repos using relative paths.
-
-Assuming you are inside a project repo, add the submodules:
+To install Scribe locally clone the repo and update the submodules:
 
 ```
-git submodule add git@github.com:stephband/fn path/to/fn
-git submodule add git@github.com:stephband/dom path/to/dom
-git submodule add git@github.com:stephband/abcjs path/to/abcjs
-git submodule add git@github.com:stephband/midi path/to/midi
-git submodule add git@github.com:stephband/scribe path/to/scribe
+git clone https://github.com/stephband/scribe.git scribe
+cd scribe
+git submodule update --init
 ```
 
-To check things are working launch your server and navigate to
-`path/to/scribe/scribe-music/index.html`.
+To check things are working serve this directory and navigate to
+`host://scribe-music/index.html` (obviously `host://` needs to be replaced
+depending on what you are using as a server).
 
 
 ## Roadmap
@@ -266,13 +262,18 @@ displaying tuplets, here are some longer-term features I would like to investiga
 - <strong>Multi-stave rendering</strong> – placing multiple parts on multiple, aligned, staves.
 
 
-## Contributions
+## Credits
 
-Rich Sigler of Sigler Music Fonts (http://www.jazzfont.com/) very kindly granted
-permission to use JazzFont shapes as SVG paths in this project.
+Developed at [Cruncher](https://cruncher.ch) by [Stephen Band](https://stephen.band).
 
-Gavin Band implemented probabalistic key centre analysis.
+Rich Sigler of Sigler Music Fonts [jazzfont.com](http://www.jazzfont.com/) very
+kindly granted permission to use JazzFont shapes as SVG paths in this project
+(although we have since moved to using the Finale Jazz font instead).
 
-Scribe logo/mascot by Mariana Alt.
+Scribe logo/mascot by [Mariana Alt](https://www.mariana.lt/).
+
+Gavin Band dreamed up probabalistic key centre analysis.
 
 ABC parser borrowed from [ABCjs](https://github.com/paulrosen/abcjs).
+
+Code contributions: Halit Celik.

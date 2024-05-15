@@ -1,6 +1,6 @@
-import get      from '../../fn/modules/get.js';
-import overload from '../../fn/modules/overload.js';
-import create   from '../../dom/modules/create.js';
+import get      from '../lib/fn/modules/get.js';
+import overload from '../lib/fn/modules/overload.js';
+import create   from '../lib/dom/modules/create.js';
 
 const abs = Math.abs;
 

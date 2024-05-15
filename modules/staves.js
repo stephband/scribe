@@ -1,6 +1,6 @@
 
 import toSpelling from './event/to-spelling.js';
-import { toNoteName, toNoteNumber } from '../../midi/modules/note.js';
+import { toNoteName, toNoteNumber } from '../lib/midi/modules/note.js';
 
 const floor = Math.floor;
 

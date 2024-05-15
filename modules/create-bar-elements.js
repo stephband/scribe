@@ -5,7 +5,7 @@ Returns an array of bar elements each populated with symbol elements.
 **/
 
 
-import create              from '../../dom/modules/create.js';
+import create              from '../lib/dom/modules/create.js';
 import createSymbolElement from './create-symbol-element.js';
 
 

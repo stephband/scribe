@@ -1,8 +1,8 @@
 
-import by                 from '../../fn/modules/by.js';
-import get                from '../../fn/modules/get.js';
-import overload           from '../../fn/modules/overload.js';
-import { toNoteNumber, toRootName, toRootNumber } from '../../midi/modules/note.js';
+import by                 from '../lib/fn/modules/by.js';
+import get                from '../lib/fn/modules/get.js';
+import overload           from '../lib/fn/modules/overload.js';
+import { toNoteNumber, toRootName, toRootNumber } from '../lib/midi/modules/note.js';
 import toKeys             from './sequence/to-keys.js';
 import eventsAtBeat       from './sequence/events-at-beat.js';
 import { keysAtBeats, keyFromBeatKeys } from './sequence/key-at-beat.js';

@@ -1,12 +1,12 @@
 
-import get      from '../../fn/modules/get.js';
-import id       from '../../fn/modules/id.js';
-import overload from '../../fn/modules/overload.js';
-import create   from '../../dom/modules/create.js';
-import delegate from '../../dom/modules/delegate.js';
-import events   from '../../dom/modules/events.js';
-import rect     from '../../dom/modules/rect.js';
-import { toNoteName, toNoteNumber } from '../../midi/modules/note.js';
+import get      from '../lib/fn/modules/get.js';
+import id       from '../lib/fn/modules/id.js';
+import overload from '../lib/fn/modules/overload.js';
+import create   from '../lib/dom/modules/create.js';
+import delegate from '../lib/dom/modules/delegate.js';
+import events   from '../lib/dom/modules/events.js';
+import rect     from '../lib/dom/modules/rect.js';
+import { toNoteName, toNoteNumber } from '../lib/midi/modules/note.js';
 
 import createSymbols     from '../modules/create-symbols.js';
 import createBarElements from '../modules/create-bar-elements.js';
@@ -144,7 +144,7 @@ export function changeZoneDuration(duration) {
 
 // Keys
 
-import keyboard from '../../dom/modules/keyboard.js';
+import keyboard from '../lib/dom/modules/keyboard.js';
 
 let timer;
 
