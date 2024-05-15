@@ -1,4 +1,10 @@
 
+
+@import '../../bolt/classes/button.css';
+@import '../../bolt/classes/list.css';
+@import '../../bolt/classes/menu.css';
+@import '../../bolt/classes/color.css';
+
 @import './classes/header.css';
 @import './classes/zone.css';
 

@@ -95,16 +95,16 @@
     </style>
 
     <script type="module">
-        import overload from '../../fn/modules/overload.js';
-        import events   from '../../dom/modules/events.js';
-        import { sequence, changeZoneDuration, highlightZones, unhighlightZones, unhighlightSymbols } from './module.js';
-        import { clear } from './modules/selection.js';
+        import overload   from '../../fn/modules/overload.js';
+        import slugify    from '../../fn/modules/slugify.js';
+        import create     from '../../dom/modules/create.js';
+        import events     from '../../dom/modules/events.js';
+        import { renderData, getData } from './module.js';
+        import { clear }  from './modules/selection.js';
 
 
         // Add SVG symbol definitions to the body
-        import create  from '../../dom/modules/create.js';
         import svgdefs from '../modules/svgdefs.js';
-
         const fragment = create('fragment', svgdefs);
         document.body.append(fragment);
 
@@ -118,57 +118,75 @@
             document.body.classList.add('safari');
         }
 
-        // Make inputs size of their placeholders
-        document.querySelectorAll('input').forEach((input) => {
-            input.size = input.value ? input.value.length : input.placeholder.length || 6;
-        });
 
-        // Make inputs auto-expand to size of value or placeholder or 6
-        events({ type: 'input', select: 'input' }, document.body)
-        .each((e) => (e.target.size =
-            e.target.value ? e.target.value.length :
-            e.target.placeholder ? e.target.placeholder.length :
-            6
-        ));
-
-        // Update sequence from inputs
-        events({ type: 'input', select: 'input' }, document.body)
-        .each(overload((e) => e.target.name, {
-            'name':      (e) => sequence.name = e.target.value,
-            'author':    (e) => sequence.author ?
-                (sequence.author.name = e.target.value) :
-                (sequence.author = { name: e.target.value }),
-            'arranger':  (e) => sequence.arranger = e.target.value,
-            'zone-duration': (e) => {
-                changeZoneDuration(Number(e.target.value));
-                highlightZones();
-            },
-            'edit-mode': (e) => {
-                if (e.target.checked) {
-                    document.body.classList.add('edit');
-                }
-                else {
-                    document.body.classList.remove('edit');
-                    clear();
-                    unhighlightZones();
-                    unhighlightSymbols();
-                }
-            },
-            default:     (e) => console.log('name="' + e.target.name + '" not handled')
-        }));
+        const documents = {};
+        const menu = document.getElementById('documents-menu');
 
         events({ type: 'click', select: 'button' }, document.body)
         .each(overload((e) => e.target.name, {
-            'export': (e) => {
-                console.log(sequence);
-                document.getElementById('json').value = JSON.stringify(sequence);
+            'load': (e) => {
+                const slug = e.target.value;
+                const sequence = documents[slug];
+                renderData(sequence);
+                //console.log(sequence);
+            },
+
+            'save': (e) => {
+                const sequence = getData();
+                const button   = e.target.closest('button');
+
+                // If sequence has no name we cannot save it
+                if (!sequence.name) {
+                    const p = create('p', {
+                        class: 'white-fg warn-bg',
+                        text: 'Song must have a name to be saved to local storage'
+                    });
+                    setTimeout(() => p.remove(), 4000);
+                    button.after(p);
+                    document.getElementById('sequence-name').focus();
+                    return;
+                }
+
+                // Slugify name and save locally against slug
+                const slug = slugify(sequence.name);
+                localStorage.setItem(slug, JSON.stringify(sequence));
+
+                // Report success
+                const p = create('p', {
+                    class: 'white-fg success-bg',
+                    text: sequence.name + ' saved to local storage'
+                });
+                setTimeout(() => p.remove(), 4000);
+                button.after(p);
+            },
+
+            'embed': (e) => {
+                const sequence = getData();
+                document.getElementById('json').textContent = `<link rel="stylesheet" href="https://stephen.band/scribe/build/scribe-music/module.css" />
+<script type="module" src="https://stephen.band/scribe/build/scribe-music/module.js"><\/script>
+<scribe-music clef="treble" meter="4/4">${ JSON.stringify(sequence) }</scribe-music>`;
             }
         }));
+
+        let i = -1;
+        let slug;
+        while (slug = localStorage.key(++i)) {
+            try {
+                documents[slug] = JSON.parse(localStorage.getItem(slug));
+                menu.append(create('li', {
+                    html: '<button class="menu-button button" name="load" value="' + slug + '">' + documents[slug].name + '</button>'
+                }));
+            }
+            catch(e) {
+                console.log('Cannot parse local document "' + slug + '". Not JSON.');
+            }
+        }
     </script>
 </head>
+
 <body>
     <header class="header">
-        <input class="title" type="text" name="name" value="" placeholder="Song Title" />
+        <input class="title" type="text" name="name" value="" placeholder="Song Title" id="sequence-name" />
         <input class="credit" type="text" name="author" value="" placeholder="Author" />
         <input class="part" type="text" name="part" value="" placeholder="Part" />
     </header>
@@ -180,28 +198,32 @@
     <footer>
         <hr/>
 
-        <input type="radio" name="zone-duration" value="0.166666667" id="zone-duration-triplet16th" />
-        <label for="zone-duration-triplet16th">triplet 16th</label>
+        <!--input type="radio" name="zone-duration" value="0.166666667" id="zone-duration-triplet16th" />
+        <label for="zone-duration-triplet16th">triplet 16th</label-->
         <input type="radio" name="zone-duration" value="0.25" id="zone-duration-16th" />
         <label for="zone-duration-16th">16th</label>
-        <input type="radio" name="zone-duration" value="0.333333333" id="zone-duration-triplet8th" />
-        <label for="zone-duration-triplet8th">triplet 8th</label>
+        <!--input type="radio" name="zone-duration" value="0.333333333" id="zone-duration-triplet8th" />
+        <label for="zone-duration-triplet8th">triplet 8th</label-->
         <input type="radio" name="zone-duration" value="0.5" id="zone-duration-8th" checked />
         <label for="zone-duration-8th">8th</label>
-        <input type="radio" name="zone-duration" value="0.666666667" id="zone-duration-triplet" />
-        <label for="zone-duration-triplet">triplet</label>
+        <!--input type="radio" name="zone-duration" value="0.666666667" id="zone-duration-triplet" />
+        <label for="zone-duration-triplet">triplet</label-->
         <input type="radio" name="zone-duration" value="1" id="zone-duration-quarter" />
         <label for="zone-duration-quarter">quarter</label>
 
         <hr/>
 
-        <input type="checkbox" name="edit-mode" id="edit-mode" checked />
+        <input type="checkbox" name="edit-mode" id="edit-mode" />
         <label for="edit-mode">Edit mode</label>
 
         <hr/>
 
-        <button class="button" name="export" value="">Export</button>
-        <textarea readonly id="json"></textarea>
+        <menu class="menu-list list" id="documents-menu">
+        </menu>
+
+        <button class="button" name="save" value="">Save</button>
+        <button class="button" name="embed" value="">Embed</button>
+        <pre id="json" style="font-size: 0.875em;"></pre>
     </footer>
 </body>
 </html>

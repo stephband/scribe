@@ -20,6 +20,9 @@ const stave   = staves.drums;
 const body    = document.body;
 const element = document.getElementById('scribe-bars');
 
+let sequence = { events: [] };
+
+
 // Zones cache
 const zones = {};
 
@@ -61,13 +64,55 @@ function renderDOM(elements) {
     element.append.apply(element, elements);
 }
 
-// TEMP
-export const sequence = {
-    events: []
-};
 
-const elements = createDOM(sequence);
-renderDOM(elements);
+
+
+// Inputs
+// Make inputs size of their placeholders
+document.querySelectorAll('input').forEach((input) => {
+    input.size = input.value ? input.value.length : input.placeholder.length || 6;
+});
+
+// Make inputs auto-expand to size of value or placeholder or 6
+events({ type: 'input', select: 'input' }, document.body)
+.each((e) => (e.target.size =
+    e.target.value ? e.target.value.length :
+    e.target.placeholder ? e.target.placeholder.length :
+    6
+));
+
+// Update sequence from inputs
+events({ type: 'input', select: 'input' }, document.body)
+.each(overload((e) => e.target.name, {
+    'name':      (e) => sequence.name = e.target.value,
+
+    'author':    (e) => sequence.author ?
+        (sequence.author.name = e.target.value) :
+        (sequence.author = { name: e.target.value }),
+
+    'arranger':  (e) => sequence.arranger = e.target.value,
+
+    'zone-duration': (e) => {
+        changeZoneDuration(Number(e.target.value));
+        highlightZones();
+    },
+
+    'edit-mode': (e) => {
+        if (e.target.checked) {
+            document.body.classList.add('edit');
+        }
+        else {
+            document.body.classList.remove('edit');
+            clear();
+            unhighlightZones();
+            unhighlightSymbols();
+        }
+    },
+
+    default: (e) => console.log('name="' + e.target.name + '" not handled')
+}));
+
+
 
 
 
@@ -180,6 +225,15 @@ function moveSelectionDuration(n) {
     render(sequence);
 }
 
+function deleteSelection() {
+    let i;
+    while (event = selection.pop()) {
+        i = sequence.events.indexOf(event);
+        sequence.events.splice(i, 1);
+    }
+    render(sequence);
+}
+
 
 keyboard({
     // TODO: I'm doing this wrong. We want to map by key position,
@@ -227,7 +281,8 @@ keyboard({
     'left:down':        (e) => moveSelectionBeat(-editDuration),
     'right:down':       (e) => moveSelectionBeat(editDuration),
     'shift-left:down':  (e) => moveSelectionDuration(-editDuration),
-    'shift-right:down': (e) => moveSelectionDuration(editDuration)
+    'shift-right:down': (e) => moveSelectionDuration(editDuration),
+    'backspace:down':   (e) => deleteSelection()
 }, body);
 
 
@@ -285,10 +340,24 @@ export function highlightZones() {
     });
 }
 
-function render(sequence) {
-    const barElements = createDOM(sequence);
+function render(data) {
+    sequence = data;
+    const barElements = createDOM(data);
     renderDOM(barElements);
     highlightZones();
+}
+
+export function renderData(data) {
+    sequence = data;
+
+    document.querySelectorAll('[name="name"]').forEach((input) => input.value = sequence.name);
+    document.querySelectorAll('[name="author"]').forEach((input) => input.value = sequence.author ? sequence.author.name : '');
+
+    render(sequence);
+}
+
+export function getData() {
+    return sequence;
 }
 
 function addNoteEventByTouch(beat, pitch, dynamic, duration) {
@@ -404,3 +473,7 @@ events({ type: 'pointerdown', device: 'mouse pen touch' }, document)
     }
 }));
 
+
+
+// Kick off with default sequence
+render(sequence);
