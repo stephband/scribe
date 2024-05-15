@@ -92,26 +92,22 @@ events({ type: 'input', select: 'input' }, document.body)
 
     'arranger':  (e) => sequence.arranger = e.target.value,
 
-    'zone-duration': (e) => {
-        changeZoneDuration(Number(e.target.value));
-        highlightZones();
-    },
-
-    'edit-mode': (e) => {
-        if (e.target.checked) {
-            document.body.classList.add('edit');
-        }
-        else {
+    'edit-duration': (e) => {
+        if (!e.target.value) {
             document.body.classList.remove('edit');
             clear();
             unhighlightZones();
             unhighlightSymbols();
+            return;
         }
+
+        document.body.classList.add('edit');
+        changeZoneDuration(Number(e.target.value));
+        highlightZones();
     },
 
     default: (e) => console.log('name="' + e.target.name + '" not handled')
 }));
-
 
 
 

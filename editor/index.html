@@ -22,12 +22,12 @@
     <link rel="stylesheet" href="./module.css">
 
     <style>
-        html {
-            padding: 0;
-        }
-
         body {
-            padding: 0.5em;
+            --padding: 0.75rem;
+            --padding-x:  var(--padding);
+
+            font-family: Helvetica, sans-serif;
+            padding: var(--padding);
         }
 
         body > .scribe {
@@ -95,6 +95,11 @@
     </style>
 
     <script type="module">
+        import '../../bolt/attributes/data-switchable.js';
+        import '../../bolt/classes/folder.js';
+        import { activate, deactivate } from '../../bolt/events/dom-activate.js';
+
+        import noop       from '../../fn/modules/noop.js';
         import overload   from '../../fn/modules/overload.js';
         import slugify    from '../../fn/modules/slugify.js';
         import create     from '../../dom/modules/create.js';
@@ -118,31 +123,33 @@
             document.body.classList.add('safari');
         }
 
-
-        const documents = {};
-        const menu = document.getElementById('documents-menu');
-
         events({ type: 'click', select: 'button' }, document.body)
         .each(overload((e) => e.target.name, {
             'load': (e) => {
                 const slug = e.target.value;
-                const sequence = documents[slug];
+                const sequence = JSON.parse(localStorage.getItem(slug));
                 renderData(sequence);
-                //console.log(sequence);
             },
 
             'save': (e) => {
                 const sequence = getData();
                 const button   = e.target.closest('button');
+                const saveSection = document.getElementById('save-section');
 
                 // If sequence has no name we cannot save it
                 if (!sequence.name) {
                     const p = create('p', {
-                        class: 'white-fg warn-bg',
+                        class: 'white-fg error-bg',
                         text: 'Song must have a name to be saved to local storage'
                     });
-                    setTimeout(() => p.remove(), 4000);
-                    button.after(p);
+
+                    saveSection.append(p);
+                    activate(saveSection);
+                    setTimeout(() => {
+                        deactivate(saveSection);
+                        setTimeout(() => p.remove(), 1000);
+                    }, 4000);
+
                     document.getElementById('sequence-name').focus();
                     return;
                 }
@@ -154,33 +161,52 @@
                 // Report success
                 const p = create('p', {
                     class: 'white-fg success-bg',
-                    text: sequence.name + ' saved to local storage'
+                    text: '"' + sequence.name + '" saved to local storage'
                 });
-                setTimeout(() => p.remove(), 4000);
-                button.after(p);
+                saveSection.append(p);
+                activate(saveSection);
+                setTimeout(() => {
+                    deactivate(saveSection);
+                    setTimeout(() => p.remove(), 1000);
+                }, 4000);
+
+                createMenuFromStorage();
             },
 
             'embed': (e) => {
+                const embedSection = document.getElementById('embed-section');
                 const sequence = getData();
                 document.getElementById('json').textContent = `<link rel="stylesheet" href="https://stephen.band/scribe/build/scribe-music/module.css" />
 <script type="module" src="https://stephen.band/scribe/build/scribe-music/module.js"><\/script>
 <scribe-music clef="treble" meter="4/4">${ JSON.stringify(sequence) }</scribe-music>`;
-            }
+                activate(embedSection);
+            },
+
+            default: noop
         }));
 
-        let i = -1;
-        let slug;
-        while (slug = localStorage.key(++i)) {
-            try {
-                documents[slug] = JSON.parse(localStorage.getItem(slug));
-                menu.append(create('li', {
-                    html: '<button class="menu-button button" name="load" value="' + slug + '">' + documents[slug].name + '</button>'
-                }));
-            }
-            catch(e) {
-                console.log('Cannot parse local document "' + slug + '". Not JSON.');
+
+        const menu = document.getElementById('documents-menu');
+
+        function createMenuFromStorage() {
+            menu.innerHTML = '';
+
+            let i = -1;
+            let slug;
+            while (slug = localStorage.key(++i)) {
+                try {
+                    const document = JSON.parse(localStorage.getItem(slug))
+                    menu.append(create('li', {
+                        html: '<button class="menu-button button" name="load" value="' + slug + '">' + document.name + '</button>'
+                    }));
+                }
+                catch(e) {
+                    console.log('Cannot parse local document "' + slug + '". Not JSON.');
+                }
             }
         }
+
+        createMenuFromStorage();
     </script>
 </head>
 
@@ -195,35 +221,45 @@
 
     </main>
 
-    <footer>
-        <hr/>
+    <footer class="grid">
+        <label class="text-10 x1 y1">Edit</label>
 
-        <!--input type="radio" name="zone-duration" value="0.166666667" id="zone-duration-triplet16th" />
-        <label for="zone-duration-triplet16th">triplet 16th</label-->
-        <input type="radio" name="zone-duration" value="0.25" id="zone-duration-16th" />
-        <label for="zone-duration-16th">16th</label>
-        <!--input type="radio" name="zone-duration" value="0.333333333" id="zone-duration-triplet8th" />
-        <label for="zone-duration-triplet8th">triplet 8th</label-->
-        <input type="radio" name="zone-duration" value="0.5" id="zone-duration-8th" checked />
-        <label for="zone-duration-8th">8th</label>
-        <!--input type="radio" name="zone-duration" value="0.666666667" id="zone-duration-triplet" />
-        <label for="zone-duration-triplet">triplet</label-->
-        <input type="radio" name="zone-duration" value="1" id="zone-duration-quarter" />
-        <label for="zone-duration-quarter">quarter</label>
+        <div class="x-stretch bar-flex flex x1 y1">
+            <input class="invisible" type="radio" name="edit-duration" id="edit-duration" checked />
+            <label class="bar-button button" for="edit-duration">Off</label>
+            <!--input type="radio" name="edit-duration" value="0.166666667" id="edit-duration-triplet16th" />
+            <label for="edit-duration-triplet16th">triplet 16th</label-->
+            <input class="invisible" type="radio" name="edit-duration" value="0.25" id="edit-duration-16th" />
+            <label class="bar-button button" for="edit-duration-16th">16th</label>
+            <!--input type="radio" name="edit-duration" value="0.333333333" id="edit-duration-triplet8th" />
+            <label for="edit-duration-triplet8th">triplet 8th</label-->
+            <input class="invisible" type="radio" name="edit-duration" value="0.5" id="edit-duration-8th" />
+            <label class="bar-button button" for="edit-duration-8th">8th</label>
+            <!--input type="radio" name="edit-duration" value="0.666666667" id="edit-duration-triplet" />
+            <label for="edit-duration-triplet">triplet</label-->
+            <input class="invisible" type="radio" name="edit-duration" value="1" id="edit-duration-quarter" />
+            <label class="bar-button button" for="edit-duration-quarter">quarter</label>
+        </div>
 
-        <hr/>
+        <div class="x-stretch x1 y2">
+            <button class="action-button button" name="activate" value="#load-section">Load</button>
+            <button class="action-button button" name="save" value="">Save</button>
+            <button class="action-button button" name="embed" value="">Embed</button>
+        </div>
 
-        <input type="checkbox" name="edit-mode" id="edit-mode" />
-        <label for="edit-mode">Edit mode</label>
+        <div class="x-flood folder-block x1 y3" data-switchable id="load-section">
+            <menu class="menu-list list" id="documents-menu">
+            </menu>
+        </div>
 
-        <hr/>
+        <div class="x-flood folder-block x1 y3" data-switchable id="save-section">
 
-        <menu class="menu-list list" id="documents-menu">
-        </menu>
+        </div>
 
-        <button class="button" name="save" value="">Save</button>
-        <button class="button" name="embed" value="">Embed</button>
-        <pre id="json" style="font-size: 0.875em;"></pre>
+        <div class="x-flood folder-block x1 y3" data-switchable id="embed-section">
+            <pre class="code-pre" id="json"></pre>
+            <p class="warn-bg">Code provided for testing. Scribe 0.3 is <strong>not</strong> ready for production.</p>
+        </div>
     </footer>
 </body>
 </html>
