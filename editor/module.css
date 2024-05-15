@@ -1,17 +1,17 @@
 
-@import '../../bolt/elements/html.css';
-@import '../../bolt/elements/body.css';
-@import '../../bolt/elements/type.css';
-@import '../../bolt/classes/button.css';
-@import '../../bolt/classes/flex.css';
-@import '../../bolt/classes/list.css';
-@import '../../bolt/classes/menu.css';
-@import '../../bolt/classes/folder.css';
-@import '../../bolt/elements/input.css';
-@import '../../bolt/elements/focus.css';
-@import '../../bolt/classes/check-label.css';
-@import '../../bolt/classes/atoms.css';
-@import '../../bolt/classes/color.css';
+@import '../lib/bolt/elements/html.css';
+@import '../lib/bolt/elements/body.css';
+@import '../lib/bolt/elements/type.css';
+@import '../lib/bolt/classes/button.css';
+@import '../lib/bolt/classes/flex.css';
+@import '../lib/bolt/classes/list.css';
+@import '../lib/bolt/classes/menu.css';
+@import '../lib/bolt/classes/folder.css';
+@import '../lib/bolt/elements/input.css';
+@import '../lib/bolt/elements/focus.css';
+@import '../lib/bolt/classes/check-label.css';
+@import '../lib/bolt/classes/atoms.css';
+@import '../lib/bolt/classes/color.css';
 
 @import './classes/header.css';
 @import './classes/zone.css';

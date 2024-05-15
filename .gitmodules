@@ -10,3 +10,18 @@
 [submodule "fonts/MartianMono"]
 	path = fonts/MartianMono
 	url = https://github.com/evilmartians/mono.git
+[submodule "lib/bolt"]
+	path = lib/bolt
+	url = git@github.com:stephband/bolt-2
+[submodule "lib/fn"]
+	path = lib/fn
+	url = git@github.com:stephband/fn
+[submodule "lib/dom"]
+	path = lib/dom
+	url = git@github.com:stephband/dom
+[submodule "lib/midi"]
+	path = lib/midi
+	url = git@github.com:stephband/midi
+[submodule "lib/abcjs"]
+	path = lib/abcjs
+	url = git@github.com:stephband/abcjs
