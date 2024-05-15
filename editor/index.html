@@ -156,13 +156,13 @@
                 }
 
                 // Slugify name and save locally against slug
-                const slug = slugify(sequence.name);
+                const slug = 'scribe/' + slugify(sequence.name);
                 localStorage.setItem(slug, JSON.stringify(sequence));
 
                 // Report success
                 const p = create('p', {
                     class: 'white-fg success-bg',
-                    text: '"' + sequence.name + '" saved to local storage'
+                    text: 'Saved to local storage'
                 });
                 saveSection.append(p);
                 activate(saveSection);
@@ -195,6 +195,9 @@
             let i = -1;
             let slug;
             while (slug = localStorage.key(++i)) {
+                // Ignore stuff in storage that does not start with 'scribe/'
+                if (!/^scribe\//.test(slug)) continue;
+
                 try {
                     const document = JSON.parse(localStorage.getItem(slug))
                     menu.append(create('li', {
@@ -213,7 +216,7 @@
 
 <body>
     <header class="header">
-        <input class="title" type="text" name="name" value="" placeholder="Song Title" id="sequence-name" />
+        <input class="title" type="text" name="name" value="" placeholder="Title" id="sequence-name" />
         <input class="credit" type="text" name="author" value="" placeholder="Author" />
         <input class="part" type="text" name="part" value="" placeholder="Part" />
     </header>
@@ -245,9 +248,9 @@
         <hr class="x1 y2" style="color: #cccccc;" />
 
         <div class="x-stretch x1 y3">
-            <button class="action-button button" name="activate" value="#load-section">Storage</button>
-            <button class="action-button button" name="save" value="">Save</button>
-            <button class="action-button button" name="embed" value="">Embed</button>
+            <button class="action-button button" name="activate" value="#load-section" title="Show scribe documents in local storage">Storage</button>
+            <button class="action-button button" name="save" value="" title="Save to local storage">Save</button>
+            <button class="action-button button" name="embed" value="" title="Generate HTML embed code">Embed</button>
         </div>
 
         <div class="x-flood folder-block x1 y4" data-switchable id="load-section">
