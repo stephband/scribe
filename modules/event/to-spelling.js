@@ -1,6 +1,6 @@
 
-import nothing from '../../../fn/modules/nothing.js';
-import { noteNames, toNoteNumber, toRootNumber, toNoteOctave } from '../../../midi/modules/note.js';
+import nothing from '../../lib/fn/modules/nothing.js';
+import { noteNames, toNoteNumber, toRootNumber, toNoteOctave } from '../../lib/midi/modules/note.js';
 import { mod12 } from '../maths.js';
 import keys from '../keys.js';
 
@@ -46,7 +46,7 @@ export default function toSpelling(keynumber, event, transpose = 0) {
     const accidental = accidentals[a];
 
     if (window.DEBUG && name === undefined) {
-        throw new Error('Incorrect spelling for pitch number ' + n + ': "' + name + '"')
+        throw new Error('Incorrect spelling for pitch number ' + n + ': "' + name + '"');
     }
 
     return name + accidental + o;

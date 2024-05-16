@@ -1,8 +1,8 @@
 
-import Signal            from '../../fn/modules/signal.js';
-import create            from '../../dom/modules/create.js';
-import element, { getInternals } from '../../dom/modules/element.js';
-import { toRootName, toRootNumber } from '../../midi/modules/note.js';
+import Signal            from '../lib/fn/modules/signal.js';
+import create            from '../lib/dom/modules/create.js';
+import element, { getInternals } from '../lib/dom/modules/element.js';
+import { toRootName, toRootNumber } from '../lib/midi/modules/note.js';
 import createSymbols     from '../modules/create-symbols.js';
 import requestData       from '../modules/request-data.js';
 import parseSource       from '../modules/parse.js';

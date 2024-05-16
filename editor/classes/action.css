@@ -1,0 +1,12 @@
+
+.action-button {
+    --font-size: 0.75rem;
+    --size: 3em;
+
+    --padding-left: 2em;
+    --padding-right: 2em;
+
+    font-family: MartianMono;
+    text-transform: uppercase;
+    background-color: #cccccc;
+}

@@ -1,8 +1,8 @@
 
-import by                 from '../../fn/modules/by.js';
-import get                from '../../fn/modules/get.js';
-import overload           from '../../fn/modules/overload.js';
-import { toNoteNumber, toRootName, toRootNumber } from '../../midi/modules/note.js';
+import by                 from '../lib/fn/modules/by.js';
+import get                from '../lib/fn/modules/get.js';
+import overload           from '../lib/fn/modules/overload.js';
+import { toNoteNumber, toRootName, toRootNumber } from '../lib/midi/modules/note.js';
 import toKeys             from './sequence/to-keys.js';
 import eventsAtBeat       from './sequence/events-at-beat.js';
 import { keysAtBeats, keyFromBeatKeys } from './sequence/key-at-beat.js';
@@ -136,7 +136,7 @@ function createBeam(symbols, stave, beam, n) {
     // Not enough stems for a beam, give it a tail
     if (beam.length === 1) {
         if (beam[0] >= n) {
-            throw new Error('Last beam index (' + i + ') cant be greater than n (' + n + ')');
+            throw new Error('Last beam index (' + beam[0] + ') cant be greater than n (' + n + ')');
         }
 
         return insertTail(symbols, stave, beam[0]);
@@ -238,7 +238,7 @@ function createBeam(symbols, stave, beam, n) {
 
 function createSymbols(symbols, bar) {
     // All events in symbols have the same part
-    const part  = symbols[0].part;
+    const part  = symbols[0] && symbols[0].part;
     const stave = bar.stave;
 
     // Populate accidentals with key signature sharps and flats
@@ -421,6 +421,12 @@ function createBarSymbols(bar) {
         }, {})
     );
 
+    // If there are no parts we must nonetheless render a rest
+    // TODO: render rest for each part, even tho there are no parts here?
+    if (parts.length === 0) {
+        parts[0] = [];
+    }
+
     // Fill each parts with accidentals, rests, beams, tieheads
     parts.forEach((part) => createSymbols(part, bar, state.clef.stemDirectionNote));
 
@@ -541,7 +547,7 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
     while (event = events[++n]) {
         if (event[1] === 'meter') {
             if (event[0] !== bar.beat) {
-                new TypeError('Scribe: "meter" event must occur at bar start – event [' + event.join(', ') + '] is on beat ' + (event[0] - bar.beat) + ' of bar')
+                new TypeError('Scribe: "meter" event must occur at bar start – event [' + event.join(', ') + '] is on beat ' + (event[0] - bar.beat) + ' of bar');
             }
             continue;
         }
@@ -576,7 +582,7 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
         }
 
         const beat = event[0] - bar.beat;
-        const key  = keyFromBeatKeys(beatkeys, event[0]);
+        const key  = beatkeys && keyFromBeatKeys(beatkeys, event[0]);
 
         // Truncate duration to bar end
         const duration = event[0] + toDuration(event) > bar.beat + bar.duration ?
@@ -585,6 +591,8 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
 
         if (event[1] === 'note') {
             let pitch = stave.getSpelling(key, event, transpose);
+console.log('>', pitch);
+
             let head = assign({
                 type: 'head',
                 beat,
@@ -636,8 +644,7 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
 }
 
 export default function eventsToSymbols(events, clef, keyname, meter, transpose) {
-    console.log(events, clef, keyname, meter, transpose);
-
+    //console.log(events, clef, keyname, meter, transpose);
 
     // Transpose events before generating keys??
     events.sort(by(get(0)));
@@ -650,7 +657,10 @@ export default function eventsToSymbols(events, clef, keyname, meter, transpose)
     // Create a map of keys at beats. Doing this here is n optimisation so we
     // don't end up running the keys matrix calculations on every note which
     // causes measurable delay.
-    const beatkeys  = keysAtBeats(events);
+    // TEMP: don't get keys for unpitched staves
+    const beatkeys  = clef === 'drums' ?
+        null :
+        keysAtBeats(events) ;
 
     // Get the key scale from keyname. This scale is not a true
     // 'scale' in an internal-data sense as it may not begin with a 0, but it
@@ -662,13 +672,6 @@ export default function eventsToSymbols(events, clef, keyname, meter, transpose)
 
     // TODO: this is a two-pass symbol generation, I wonder if we can get
     // it down to one?
-    const bars = createBars(events, beatkeys, stave, keyscale, meter, transpose);
-
-    console.log(bars);
-
-    const sy = bars.map(createBarSymbols);
-
-    console.log(sy);
-
-    return sy;
+    return createBars(events, beatkeys, stave, keyscale, meter, transpose)
+    .map(createBarSymbols);
 }

@@ -1,3 +1,124 @@
 
+@import '../lib/bolt/elements/html.css';
+@import '../lib/bolt/elements/body.css';
+@import '../lib/bolt/elements/type.css';
+@import '../lib/bolt/classes/button.css';
+@import '../lib/bolt/classes/flex.css';
+@import '../lib/bolt/classes/list.css';
+@import '../lib/bolt/classes/menu.css';
+@import '../lib/bolt/classes/folder.css';
+@import '../lib/bolt/elements/input.css';
+@import '../lib/bolt/elements/focus.css';
+@import '../lib/bolt/elements/label.css';
+@import '../lib/bolt/classes/check-label.css';
+@import '../lib/bolt/classes/atoms.css';
+@import '../lib/bolt/classes/color.css';
+
 @import './classes/header.css';
 @import './classes/zone.css';
+@import './classes/bar.css';
+@import './classes/action.css';
+@import './classes/color.css';
+
+@font-face {
+    font-family: MartianMono;
+    src: url('../fonts/MartianMono/fonts/webfonts/MartianMono-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: ScribeText;
+    src: url('../fonts/FinaleJazzText/finalejazztext-webfont.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: ScribeMusic;
+    src: url('../fonts/FinaleJazz/finalejazz-webfont.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+pre {
+    font-family: MartianMono;
+    font-size: 0.625rem;
+}
+
+.code-pre {
+    width: 100%;
+    max-width: 100%;
+    overflow: auto;
+    white-space: pre;
+    background-color: #eeeeee;
+}
+
+.x-flood {
+    margin-left: calc(-1 * var(--padding-x));
+    margin-right: calc(-1 * var(--padding-x));
+    width: calc(100% + 2 * var(--padding-x));
+    max-width: calc(100% + 2 * var(--padding-x));
+}
+
+.x-flood > * {
+    padding: var(--padding);
+}
+
+label {
+    font-family: MartianMono;
+    font-size: 0.625rem;
+    text-transform: uppercase;
+}
+
+.selected {
+    color: rgb(30,90,60);
+}
+
+.bar > .zone {
+    position: relative;
+    z-index: 2;
+}
+
+.bar > .head {
+    position: relative;
+    z-index: 3;
+    cursor: pointer;
+}
+
+::placeholder {
+    font-style: normal;
+}
+
+.folder-block {
+    padding: 0;
+    transition-duration: 0.2s, 0.2s, 0.2s, 0.2s, 0.2s, 0.2s, 0.2s, 0.2s, 0.2s, 0.2s;
+}
+
+.menu-list {
+    --padding-left: 0.75rem;
+    --padding-right: 0.75rem;
+}
+
+.menu-list > li + li {
+    border-top: 0px;
+    margin-top: 1px;
+}
+
+.menu-list > li > .menu-button {
+    --padding-left: 0.75rem;
+    --padding-right: 0.75rem;
+}
+
+.menu-button {
+    --size: 2em;
+}
+
+.menu-button:hover {
+    background-color: #cccccc;
+}
+
+.grid {
+    --x-gap: 0.75rem;
+}

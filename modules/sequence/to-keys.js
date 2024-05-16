@@ -1,5 +1,5 @@
 
-import sum          from '../../../fn/modules/sum.js';
+import sum          from '../../lib/fn/modules/sum.js';
 import toBeats      from '../sequence/to-beats.js';
 import toNotes      from '../event/to-notes.js';
 import keys         from '../keys.js';
@@ -103,7 +103,7 @@ function viterbi(data, initialProb, transitionMatrix, emissionMatrix) {
 }
 
 function pushAll(array1, array2) {
-	array1.push.apply(array1, array2)
+	array1.push.apply(array1, array2);
 	return array1;
 }
 
@@ -126,7 +126,7 @@ export default function toKeys(events) {
 		if (arraysOfNotes.find((notes) => notes.find(Number.isNaN) !== undefined) !== undefined) {
 			console.log(beatEvents);
 			throw new Error('toNotes has returned NaN for beatEvents');
-		};
+		}
 
 		notes.push(
 			beatEvents

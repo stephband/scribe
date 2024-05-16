@@ -1,6 +1,6 @@
-import get      from '../../fn/modules/get.js';
-import overload from '../../fn/modules/overload.js';
-import create   from '../../dom/modules/create.js';
+import get      from '../lib/fn/modules/get.js';
+import overload from '../lib/fn/modules/overload.js';
+import create   from '../lib/dom/modules/create.js';
 
 
 const fontFamily = "Bravura";
@@ -77,6 +77,28 @@ const timeSignatures = {
 
 const abs = Math.abs;
 
+
+/* Event ids */
+
+const $id = Symbol('scribe-id');
+
+//const eventMap = {};
+let id = 0;
+
+export function identify(event) {
+    if (event[$id]) return event[$id];
+    event[$id] = (++id + '');
+    //eventMap[id] = event;
+    return event[$id];
+}
+
+export function findEvent(events, id) {
+    return events.find((event) => (event[$id] === id));
+}
+
+
+/* Beams */
+
 const beamThickness = 1.1;
 
 function renderBeam(range, stems, beam) {
@@ -123,6 +145,7 @@ export default overload(get('type'), {
         create('span', {
             class:   `${ symbol.clef }-clef clef`,
             style:`font-size:2em;font-family:${fontFamily};line-height:0.25em;`,
+            //data: { eventId: identify(symbol.event) },
             viewBox: "0 0.4 5.2 14.6",
             preserveAspectRatio: "none",
             html: "\uE050"
@@ -131,7 +154,7 @@ export default overload(get('type'), {
     // Create chord symbol
     chord: (symbol) => create('p', {
         class:   "chord",
-        data: { beat: symbol.beat + 1, duration: symbol.duration },
+        data: { beat: symbol.beat + 1, duration: symbol.duration, eventId: identify(symbol.event) },
         html: (() => {
             return symbol.value
             .replace('(♯11)', '<sup class="chord-brackets">(♯11)</sup>')
@@ -149,15 +172,16 @@ export default overload(get('type'), {
         })(symbol)
     }),
 
-    timesig: (symbol) => create('header', {
+    timesig: (symbol) => create('span', {
         class: "timesig",
         html: `<span style="font-size:1.5em;font-family:${fontFamily};line-height:1em;">${ timeSignatures[symbol.numerator] }</span>
-            <span style="font-size:1.5em;font-family:${fontFamily};line-height:1em;">${ timeSignatures[symbol.denominator] }</span>`
+            <span style="font-size:1.5em;font-family:${fontFamily};line-height:1em;">${ timeSignatures[symbol.denominator] }</span>`,
+        data: { eventId: identify(symbol.event) },
     }),
 
     lyric: (symbol) => create('p', {
         class:   "lyric",
-        data: { beat: symbol.beat + 1, duration: symbol.duration },
+        data: { beat: symbol.beat + 1, duration: symbol.duration, eventId: identify(symbol.event) },
         html: symbol.value
     }),
 
@@ -167,7 +191,7 @@ export default overload(get('type'), {
         style:`font-size:2em;font-family:${fontFamily};line-height:0.25em;`,
         data: symbol.beat === undefined ?
             { pitch: symbol.pitch } :
-            { beat: symbol.beat + 1, pitch: symbol.pitch, part: symbol.part } ,
+            { beat: symbol.beat + 1, pitch: symbol.pitch, part: symbol.part, eventId: identify(symbol.event) } ,
         html: symbol.value === 1 ? '\uE262' : symbol.value === -1 ? '\uE260' : '\uE261'
     }),
 
@@ -196,7 +220,7 @@ export default overload(get('type'), {
         viewBox: "0 -1 2.7 2",
         style:`font-size:2em;font-family:${fontFamily};line-height:0.25em;`,
         preserveAspectRatio: "xMidYMid slice",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part, head: symbol.head },
+        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part, eventId: identify(symbol.event) },
         html: symbol.head ? headSymbols[symbol.head] : ![0.125,0.375,0.75,1.5,3,6].includes(symbol.duration) ? headSymbols[symbol.duration] : `${headSymbols[symbol.duration]}<span>${headSymbols["dot"]}</span>` 
     }),
 
@@ -242,7 +266,7 @@ export default overload(get('type'), {
     tail: (symbol) => create('span', {
         class: `${ symbol.stemDirection }-tail tail`,
         style:`font-size:2em;font-family:${fontFamily};line-height:0.25em;`,
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part },
+        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part, eventId: identify(symbol.event) },
         html: tailSymbols[symbol.stemDirection][symbol.duration]
     }),
 
@@ -261,6 +285,6 @@ export default overload(get('type'), {
             types[symbol.type] = true;
             console.log(symbol);
             console.error('Scribe: symbol type "' + symbol.type + '" not rendered');
-        }
+        };
     })({})
 });

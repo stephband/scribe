@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>&lt;scribe-music&gt;</title>
+    <title>Scribe editor</title>
 
     <meta charset="utf-8" />
     <meta name="author" content="@stephband" />
@@ -22,6 +22,26 @@
     <link rel="stylesheet" href="./module.css">
 
     <style>
+        body {
+            --padding: 0.75rem;
+            --padding-x:  var(--padding);
+
+            font-family: Helvetica, sans-serif;
+            padding: var(--padding);
+        }
+
+        body > .scribe {
+            margin-left: calc(-0.5 * var(--padding-x));
+            margin-right: calc(-0.5 * var(--padding-x));
+        }
+
+        .scribe {
+            font-size: 1.5em;
+            -webkit-user-select: none; /* Safari */
+                -ms-user-select: none; /* IE 10 and IE 11 */
+                    user-select: none; /* Standard syntax */
+        }
+
         .scribe > .bar {
             flex: 1 1 100%;
         }
@@ -56,6 +76,15 @@
             }
         }
 
+        .scribe::after {
+            content: '';
+            flex: 6 1;
+        }
+
+        footer {
+            margin-top: 2em;
+        }
+
         footer > textarea {
             display: block;
             width: 100%;
@@ -67,15 +96,21 @@
     </style>
 
     <script type="module">
-        import overload from '../../fn/modules/overload.js';
-        import events   from '../../dom/modules/events.js';
-        import { sequence } from './module.js';
+        import '../lib/bolt/attributes/data-switchable.js';
+        import '../lib/bolt/classes/folder.js';
+        import { activate, deactivate } from '../lib/bolt/events/dom-activate.js';
+
+        import noop       from '../lib/fn/modules/noop.js';
+        import overload   from '../lib/fn/modules/overload.js';
+        import slugify    from '../lib/fn/modules/slugify.js';
+        import create     from '../lib/dom/modules/create.js';
+        import events     from '../lib/dom/modules/events.js';
+        import { renderData, getData } from './module.js';
+        import { clear }  from './modules/selection.js';
 
 
         // Add SVG symbol definitions to the body
-        import create  from '../../dom/modules/create.js';
         import svgdefs from '../modules/svgdefs.js';
-
         const fragment = create('fragment', svgdefs);
         document.body.append(fragment);
 
@@ -89,53 +124,148 @@
             document.body.classList.add('safari');
         }
 
-        // Make inputs size of their placeholders
-        document.querySelectorAll('input').forEach((input) => {
-            console.log(!!input.value, input.value, input.placeholder);
-            input.size = input.value ? input.value.length : input.placeholder.length || 6;
-        });
-
-        // Make inputs auto-expand to size of value or placeholder or 6
-        events({ type: 'input', select: 'input' }, document.body)
-        .each((e) => (e.target.size =
-            e.target.value ? e.target.value.length :
-            e.target.placeholder ? e.target.placeholder.length :
-            6
-        ));
-
-        // Update sequence from inputs
-        events({ type: 'input', select: 'input' }, document.body)
-        .each(overload((e) => e.target.name, {
-            'name':     (e) => sequence.name = e.target.value,
-            'author':   (e) => sequence.author ?
-                (sequence.author.name = e.target.value) :
-                (sequence.author = { name: e.target.value }),
-            'arranger': (e) => sequence.arranger = e.target.value,
-            default:    (e) => console.log('name="' + e.target.name + '" not handled')
-        }));
-
         events({ type: 'click', select: 'button' }, document.body)
         .each(overload((e) => e.target.name, {
-            'export': (e) => {
-                console.log(sequence);
-                document.getElementById('json').value = JSON.stringify(sequence);
-            }
+            'load': (e) => {
+                const slug = e.target.value;
+                const sequence = JSON.parse(localStorage.getItem(slug));
+                renderData(sequence);
+            },
+
+            'save': (e) => {
+                const sequence = getData();
+                const button   = e.target.closest('button');
+                const saveSection = document.getElementById('save-section');
+
+                // If sequence has no name we cannot save it
+                if (!sequence.name) {
+                    const p = create('p', {
+                        class: 'white-fg error-bg',
+                        text: 'Song must have a name to be saved to local storage'
+                    });
+
+                    saveSection.append(p);
+                    activate(saveSection);
+                    setTimeout(() => {
+                        deactivate(saveSection);
+                        setTimeout(() => p.remove(), 1000);
+                    }, 4000);
+
+                    document.getElementById('sequence-name').focus();
+                    return;
+                }
+
+                // Slugify name and save locally against slug
+                const slug = 'scribe/' + slugify(sequence.name);
+                localStorage.setItem(slug, JSON.stringify(sequence));
+
+                // Report success
+                const p = create('p', {
+                    class: 'white-fg success-bg',
+                    text: 'Saved to local storage'
+                });
+                saveSection.append(p);
+                activate(saveSection);
+                setTimeout(() => {
+                    deactivate(saveSection);
+                    setTimeout(() => p.remove(), 1000);
+                }, 4000);
+
+                createMenuFromStorage();
+            },
+
+            'embed': (e) => {
+                const embedSection = document.getElementById('embed-section');
+                const sequence = getData();
+                document.getElementById('json').textContent = `<link rel="stylesheet" href="https://stephen.band/scribe/build/scribe-music/module.css" />
+<script type="module" src="https://stephen.band/scribe/build/scribe-music/module.js"><\/script>
+<scribe-music clef="treble" meter="4/4">${ JSON.stringify(sequence) }</scribe-music>`;
+                activate(embedSection);
+            },
+
+            default: noop
         }));
+
+
+        const menu = document.getElementById('documents-menu');
+
+        function createMenuFromStorage() {
+            menu.innerHTML = '';
+
+            let i = -1;
+            let slug;
+            while (slug = localStorage.key(++i)) {
+                // Ignore stuff in storage that does not start with 'scribe/'
+                if (!/^scribe\//.test(slug)) continue;
+
+                try {
+                    const document = JSON.parse(localStorage.getItem(slug))
+                    menu.append(create('li', {
+                        html: '<button class="menu-button button" name="load" value="' + slug + '">' + document.name + '</button>'
+                    }));
+                }
+                catch(e) {
+                    console.log('Cannot parse local document "' + slug + '". Not JSON.');
+                }
+            }
+        }
+
+        createMenuFromStorage();
     </script>
 </head>
+
 <body>
     <header class="header">
-        <input class="title" type="text" name="name" value="" placeholder="Song Title" />
+        <input class="title" type="text" name="name" value="" placeholder="Title" id="sequence-name" />
         <input class="credit" type="text" name="author" value="" placeholder="Author" />
         <input class="part" type="text" name="part" value="" placeholder="Part" />
     </header>
 
     <main class="scribe" id="scribe-bars">
+
     </main>
 
-    <footer>
-        <button class="button" name="export" value="">Export</button>
-        <textarea readonly id="json"></textarea>
+    <footer class="grid">
+        <label class="text-10 x1 y1">Edit</label>
+
+        <div class="x-stretch bar-flex flex x1 y1">
+            <input class="invisible" type="radio" name="edit-duration" id="edit-duration" checked />
+            <label class="bar-button button" for="edit-duration">Off</label>
+            <!--input type="radio" name="edit-duration" value="0.166666667" id="edit-duration-triplet16th" />
+            <label for="edit-duration-triplet16th">triplet 16th</label-->
+            <input class="invisible" type="radio" name="edit-duration" value="0.25" id="edit-duration-16th" />
+            <label class="bar-button button" for="edit-duration-16th">16th</label>
+            <!--input type="radio" name="edit-duration" value="0.333333333" id="edit-duration-triplet8th" />
+            <label for="edit-duration-triplet8th">triplet 8th</label-->
+            <input class="invisible" type="radio" name="edit-duration" value="0.5" id="edit-duration-8th" />
+            <label class="bar-button button" for="edit-duration-8th">8th</label>
+            <!--input type="radio" name="edit-duration" value="0.666666667" id="edit-duration-triplet" />
+            <label for="edit-duration-triplet">triplet</label-->
+            <input class="invisible" type="radio" name="edit-duration" value="1" id="edit-duration-quarter" />
+            <label class="bar-button button" for="edit-duration-quarter">quarter</label>
+        </div>
+
+        <hr class="x1 y2" style="color: #cccccc;" />
+
+        <div class="x-stretch x1 y3">
+            <button class="action-button button" name="activate" value="#load-section" title="Show scribe documents in local storage">Storage</button>
+            <button class="action-button button" name="save" value="" title="Save to local storage">Save</button>
+            <button class="action-button button" name="embed" value="" title="Generate HTML embed code">Embed</button>
+        </div>
+
+        <div class="x-flood folder-block x1 y4" data-switchable id="load-section">
+            <menu class="menu-list list" id="documents-menu">
+            </menu>
+        </div>
+
+        <div class="x-flood folder-block x1 y4" data-switchable id="save-section">
+
+        </div>
+
+        <div class="x-flood folder-block x1 y4" data-switchable id="embed-section">
+            <pre class="code-pre" id="json"></pre>
+            <p class="warn-bg">Code provided for testing. Scribe 0.3 is <strong>not</strong> ready for production.</p>
+        </div>
     </footer>
 </body>
 </html>

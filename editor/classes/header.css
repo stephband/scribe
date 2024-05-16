@@ -1,5 +1,5 @@
 .header {
-    font-family: JazzText;
+    font-family: ScribeText;
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     column-gap: 1em;
@@ -11,7 +11,7 @@
 }
 
 .header > .credit {
-    font-family: JazzText;
+    font-family: ScribeText;
     font-size: 1em;
     grid-column: 1;
     justify-self: start;
@@ -23,7 +23,7 @@
 }
 
 .header > .title {
-    font-family: JazzText;
+    font-family: ScribeText;
     font-size: 2em;
     grid-column: 2;
     justify-self: center;
@@ -35,7 +35,7 @@
 }
 
 .header > .part {
-    font-family: JazzText;
+    font-family: ScribeText;
     font-size: 1em;
     grid-column: 3;
     justify-self: end;

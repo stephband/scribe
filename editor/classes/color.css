@@ -1,0 +1,6 @@
+
+body { --brightgreen: rgb(193, 255, 119); }
+
+.brightgreen-fg {
+    color: rgb(193, 255, 119);
+}
