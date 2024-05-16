@@ -39,6 +39,13 @@ const zones = {};
 
 let editDuration = 0.5;
 
+function insertByBeat(array, object) {
+    let i = -1;
+    let event;
+    while((event = array[++i]) && event[0] < object[0]);
+    array.splice(i, 0, object);
+}
+
 function round24(n) {
     return Math.round(n * 24) / 24;
 }
@@ -382,7 +389,11 @@ function activateZonesFromEvent(zones, event) {
     .forEach((zone) => zone.classList.add('active'));
 }
 
-
+function createEvent() {
+    const event = Array.from(arguments);
+    insertByBeat(sequence.events, event);
+    return event;
+}
 
 events({ type: 'pointerdown', device: 'mouse pen touch' }, document)
 .each(delegate({
@@ -490,7 +501,7 @@ events('click', document)
     '.keysig[data-event-id]': (button, e) => {
         const dialog  = document.getElementById('clef-dialog');
         const eventId = button.dataset.eventId;
-        const event   = findEvent(sequence.events, eventId) || defaultKey;
+        const event   = findEvent(sequence.events, eventId) || createEvent(0, 'key', 'C');
         const closes  = events('close', dialog)
             .each((e) => {
                 closes.stop();
@@ -506,7 +517,7 @@ events('click', document)
     '.timesig[data-event-id]': (button, e) => {
         const dialog  = document.getElementById('timesig-dialog');
         const eventId = button.dataset.eventId;
-        const event   = findEvent(sequence.events, eventId) || defaultMeter;
+        const event   = findEvent(sequence.events, eventId) || createEvent(0, 'meter', 4, 1);
         const closes  = events('close', dialog)
             .each((e) => {
                 closes.stop();
