@@ -23,8 +23,6 @@ const stylefns   = [];
 stylesheet.each((url) => stylefns.forEach((fn) => fn(url)));
 
 
-
-
 /* Register <scribe-music> */
 
 export default define(element('scribe-music', {
