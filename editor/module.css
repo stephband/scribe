@@ -7,6 +7,7 @@
 @import '../lib/bolt/classes/list.css';
 @import '../lib/bolt/classes/menu.css';
 @import '../lib/bolt/classes/folder.css';
+@import '../lib/bolt/elements/dialog.css';
 @import '../lib/bolt/elements/input.css';
 @import '../lib/bolt/elements/focus.css';
 @import '../lib/bolt/elements/label.css';
@@ -84,6 +85,9 @@ label {
 .bar > .head {
     position: relative;
     z-index: 3;
+}
+
+.bar > [data-event-id] {
     cursor: pointer;
 }
 
@@ -121,4 +125,16 @@ label {
 
 .grid {
     --x-gap: 0.75rem;
+}
+
+.clefs-grid {
+    align-content: start;
+    column-gap: 0.25em;
+    row-gap: 0.5em;
+}
+
+.timesigs-grid {
+    align-content: start;
+    column-gap: 0.25em;
+    row-gap: 0.5em;
 }

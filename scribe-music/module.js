@@ -6,6 +6,7 @@ import { toRootName, toRootNumber } from '../lib/midi/modules/note.js';
 import createSymbols     from '../modules/create-symbols.js';
 import requestData       from '../modules/request-data.js';
 import parseSource       from '../modules/parse.js';
+import { timesigToMeter, meterToTimesig } from '../modules/timesig.js';
 import * as staves       from '../modules/staves.js';
 //import createElement     from '../modules/create-element.js';
 import createBarElements from '../modules/create-bar-elements.js';
@@ -22,24 +23,6 @@ const stylefns   = [];
 stylesheet.each((url) => stylefns.forEach((fn) => fn(url)));
 
 
-/* Parse attributes */
-
-const rtimesig = /^(\d+)\/(\d+)$/;
-
-function timesigToMeter(string) {
-    const groups = rtimesig.exec(string);
-    const num = parseInt(groups[1], 10);
-    const div = 4 / parseInt(groups[2], 10);
-    return [0, "meter", num * div, div];
-}
-
-function meterToTimesig(meter) {
-    const dur = meter[2];
-    const div = meter[3];
-    const num = dur / div;
-    const den = 4 / div;
-    return num + '/' + den;
-}
 
 
 /* Register <scribe-music> */
@@ -171,7 +154,7 @@ export default define(element('scribe-music', {
         found at beat `0` in the data.
         **/
         get: function() { return meterToTimesig(getInternals(this).meter.value); },
-        set: function(value) { getInternals(this).meter.value = timesigToMeter(value); }
+        set: function(value) { getInternals(this).meter.value = assign([0], timesigToMeter(value)); }
     },
 
     transpose: {

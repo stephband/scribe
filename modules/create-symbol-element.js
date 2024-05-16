@@ -71,7 +71,7 @@ export default overload(get('type'), {
         undefined :
         create('svg', {
             class:   `${ symbol.clef }-clef clef`,
-            //data: { eventId: identify(symbol.event) },
+            data: { eventId: null },
             viewBox: "0 0.4 5.2 14.6",
             preserveAspectRatio: "none",
             html: `<use x="3.2" y="1" width="8" href="#${ symbol.clef }-clef"></use>`
@@ -101,8 +101,7 @@ export default overload(get('type'), {
     timesig: (symbol) => create('span', {
         class: "timesig",
         data: { eventId: identify(symbol.event) },
-        html: `<p>${ symbol.numerator }</p>
-            <p>${ symbol.denominator }</p>`
+        html: `<sup>${ symbol.numerator }</sup><sub>${ symbol.denominator }</sub>`
     }),
 
     lyric: (symbol) => create('p', {
