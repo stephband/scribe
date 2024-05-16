@@ -65,6 +65,12 @@ export const drums = {
 
         return toSpelling(key, event, transpose);
     },
+    slashedBlack:"\uE0CF", 
+    xBlack:"\uE0A9",
+    xOrnate: "\uE0AA",
+    triangleUpBlack: "\uE0BE",
+    diamondBlack: "\uE0DB",
+    circledBlack: "\uE0E4",
 
     pitches: [
     '',
@@ -100,22 +106,24 @@ export const drums = {
 
     heads: {
         /*"C♯2":  "head[1]", /* Side Stick */
+        "B1": 1,
+        "D2": 1,
         "E♭2":  "head[x]", /* Hand Clap */
-        "F♯2":  "head[x]", /* Closed Hi-Hat */
-        "G♯2":  "head[x]",
-        "A♭2":  "head[x]", /* Pedal Hi-Hat */
-        "B♭2":  "head[x]", /* Open Hi-Hat */
-        "C♯3":  "head[x]", /* Crash Cymbal 1 */
-        "E♭3":  "head[x]", /* Ride Cymbal 1 */
-        "E3":   "head[x]", /* Chinese Cymbal */
+        "F♯2":  "xBlack", /* Closed Hi-Hat */
+        "G♯2":  "xBlack",
+        "A♭2":  "xBlack", /* Pedal Hi-Hat */
+        "B♭2":  "xCircle", /* Open Hi-Hat */
+        "C♯3":  "xCircle", /* Crash Cymbal 1 */
+        "E♭3":  "xBlack", /* Ride Cymbal 1 */
+        "E3":   "xCircle", /* Chinese Cymbal */
         "F3":   "head[x]", /* Ride Bell */
         "F♯3":  "head[x]", /* Tambourine */
-        "G3":   "head[x]", /* Splash Cymbal */
+        "G3":   "xCircle", /* Splash Cymbal */
         "G♯3":  "head[v]",
-        "A♭3":  "head[v]", /* Cowbell*/
-        "A3":   "head[x]", /* Crash Symbol 2 */
+        "A♭3":  "triangleUpBlack", /* Cowbell*/
+        "A3":   "xCircle", /* Crash Symbol 2 */
         "B♭3":  "head[v]", /* Vibraslap */
-        "B3":   "head[x]", /* Ride Cymbal 2 */
+        "B3":   "xBlack", /* Ride Cymbal 2 */
 
         /*"C4":   "", /* Hi Bongo */
         /*"C♯4":  "", /* Low Bongo */
@@ -146,8 +154,8 @@ export const drums = {
     A stave may override symbols used as note heads. Returns an id of a symbol.
     **/
 
-    getHead: function(pitch, duration) {
-        return this.heads[pitch];
+    getHead: function(pitch, dynamic, duration) {
+        return dynamic < 0.02 ? this.heads[pitch]+"Ghost" : this.heads[pitch];
     },
 
     /** getPart(pitch)

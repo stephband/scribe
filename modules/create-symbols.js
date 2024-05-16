@@ -473,7 +473,7 @@ function createBar(beat, stave, key, meter, tieheads) {
             bar.symbols.push(assign({}, head, {
                 beat: 0,
                 duration: bar.duration,
-                head: stave.getHead && stave.getHead(head.pitch, bar.duration),
+                head: stave.getHead && stave.getHead(head.pitch, event[3], bar.duration),
                 tie: 'middle'
             }, stave.getPart && stave.getPart(head.pitch)));
         }
@@ -482,7 +482,7 @@ function createBar(beat, stave, key, meter, tieheads) {
             bar.symbols.push(assign({}, head, {
                 beat: 0,
                 duration,
-                head: stave.getHead && stave.getHead(head.pitch, duration),
+                head: stave.getHead && stave.getHead(head.pitch, event[3], duration),
                 tie: 'end'
             }, stave.getPart && stave.getPart(head.pitch)));
 
@@ -591,7 +591,7 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
                 duration,
                 pitch,
                 transpose,
-                head: stave.getHead && stave.getHead(pitch, duration),
+                head: stave.getHead && stave.getHead(pitch, event[3], duration),
                 event: event
             }, stave.getPart && stave.getPart(pitch));
 
