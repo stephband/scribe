@@ -9,4 +9,4 @@ header > form { font-size: 1.2rem; grid-column: 3; justify-self: end; align-self
 header > .author { font-size: 1.2rem; grid-column: 1; justify-self: start; align-self: end; }
 header + scribe-music { margin-top: 3em; }
 scribe-music { font-size: 1.2rem; }
-select { font-family: JazzText; font-size: 1.2em; border: 0; }
+select { font-family: ScribeText; font-size: 1.2em; border: 0; }

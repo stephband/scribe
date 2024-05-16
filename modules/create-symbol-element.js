@@ -71,6 +71,7 @@ export default overload(get('type'), {
         undefined :
         create('svg', {
             class:   `${ symbol.clef }-clef clef`,
+            //data: { eventId: identify(symbol.event) },
             viewBox: "0 0.4 5.2 14.6",
             preserveAspectRatio: "none",
             html: `<use x="3.2" y="1" width="8" href="#${ symbol.clef }-clef"></use>`
@@ -97,15 +98,16 @@ export default overload(get('type'), {
         })(symbol)
     }),
 
-    timesig: (symbol) => create('header', {
+    timesig: (symbol) => create('span', {
         class: "timesig",
+        data: { eventId: identify(symbol.event) },
         html: `<p>${ symbol.numerator }</p>
             <p>${ symbol.denominator }</p>`
     }),
 
     lyric: (symbol) => create('p', {
         class:   "lyric",
-        data: { beat: symbol.beat + 1, duration: symbol.duration, eventId: symbol.event },
+        data: { beat: symbol.beat + 1, duration: symbol.duration, eventId: identify(symbol.event) },
         html: symbol.value
     }),
 

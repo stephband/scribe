@@ -2,7 +2,7 @@
 /* Warning: To use a font inside the shadow DOM in Chrome, @font-face must
    be declared in the main DOM – ie. in module.css */
 /* @font-face {
-    font-family: JazzText;
+    font-family: ScribeText;
     src: url('../../fonts/FinaleJazzText/finalejazztext-webfont.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
@@ -10,7 +10,7 @@
 */
 
 .chord {
-    font-family: JazzText, math;
+    font-family: ScribeText, math;
     font-size: 1.333333333em;
     font-weight: 400;
     letter-spacing: 0;

@@ -17,7 +17,7 @@
 }
 
 .timesig > * {
-    font-family: JazzText, math;
+    font-family: ScribeText, math;
     font-size: 1.333333em;
     font-weight: bold;
     align-self: end;
