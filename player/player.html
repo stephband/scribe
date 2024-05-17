@@ -5,16 +5,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="https://labs.cruncher.ch/scribe/build/scribe-music/module.css" />
-    <script type="module" src="https://labs.cruncher.ch/scribe/build/scribe-music/module.js"></script>
+    <link rel="stylesheet" href="../scribe-music/module.css" />
+    <link rel="stylesheet" href="../scribe-music/module-bravura.css" />
+    <script type="module" src="../scribe-music/module.js"></script>
+    <style>
+        body {
+            font-family: ScribeMusic, ScribeText;
+        }
+    </style>
 </head>
 
 <body style="background-color: white">
     
     <scribe-music type="application/json" clef="treble" meter="4/4">
     </scribe-music>
+    <hr>
+    <scribe-music class="bravura" type="application/json" clef="treble" meter="4/4">
+    </scribe-music>
+    <style>
+        .bravura {
+            font-family: Bravura, BravuraText
+        }
+    </style>
     <script>
-        document.querySelector("scribe-music").src = new URLSearchParams(new URL(window.location.href).search).get("src");
+        document.querySelectorAll("scribe-music").forEach(
+            element => {
+                element.src = new URLSearchParams(new URL(window.location.href).search).get("src")
+            }
+        );
     </script>
     <audio src="https://sound.stephen.band/samples/steinway-piano/m4a/65-piano-ff.m4a" autoplay></audio>
 </body>

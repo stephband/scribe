@@ -1,79 +1,7 @@
 import get from '../lib/fn/modules/get.js';
 import overload from '../lib/fn/modules/overload.js';
 import create from '../lib/dom/modules/create.js';
-
-
-const fontFamily = "Bravura";
-const headSymbols = {
-    0.0625: "\uE0A4",
-    0.125: "\uE0A4",
-    0.25: "\uE0A4",
-    0.375: "\uE0A4",
-    0.5: "\uE0A4",
-    0.75: "\uE0A4",
-    1: "\uE0A4",
-    "1Ghost": "\uE0A4<span>\uE0CE</span>",
-    1.5: "\uE0A4",
-    2: "\uE4E3",
-    3: "\uE0A3",
-    4: "\uE0A2",
-    6: "\uE0A2",
-    "dot": "\uD834\uDD6D",
-    slashedBlack: "\uE0D0",
-    slashedBlackGhost: "\uE0D0<span>\uE0CE</span>",
-    xBlack: "\uE0A9",
-    xBlackGhost: "\uE0A9<span>\uE0CE</span>",
-    circleX: "\uE0B3",
-    circleXGhost: "\uE0B3<span>\uE0CE</span>",
-    xOrnate: "\uE0AA",
-    xOrnateGhost: "\uE0AA<span>\uE0CE</span>",
-    triangleUpBlack: "\uE0BE",
-    triangleUpBlackGhost: "\uE0BE<span>\uE0CE</span>",
-    diamondBlack: "\uE0DB",
-    diamondBlackGhost: "\uE0DB<span>\uE0CE</span>",
-    circledBlack: "\uE0E4",
-    circledBlackGhost: "\uE0E4<span>\uE0CE</span>",
-};
-
-const restSymbols = {
-    0.0625: "\uE4E8",
-    0.125: "\uE4E8",
-    0.25: "\uE4E7",
-    0.375: "\uE4E7",
-    0.5: "\uE4E6",
-    0.75: "\uE4E6",
-    1: "\uE4E5",
-    1.5: "\uE4E5",
-    2: "\uE4E4",
-    3: "\uE4E4",
-    4: "\uE4E3",
-    6: "\uE4E3",
-    "dot": "\uD834\uDD6D",
-};
-
-const tailSymbols = {
-    up: {
-        0.5: "\uE240",
-    },
-    down: {
-        0.5: "\uE241",
-    }
-
-}
-
-const timeSignatures = {
-    0: "\uE080",
-    1: "\uE081",
-    2: "\uE082",
-    3: "\uE083",
-    4: "\uE084",
-    5: "\uE085",
-    6: "\uE086",
-    7: "\uE087",
-    8: "\uE088",
-    9: "\uE089",
-};
-
+import { headGlyphs, restGlyphs, tailGlyphs, timeGlyphs, chordGlyphs } from "./glyphs.js";
 
 const abs = Math.abs;
 
@@ -144,7 +72,7 @@ export default overload(get('type'), {
         undefined :
         create('span', {
             class: `${symbol.clef}-clef clef`,
-            style: `font-size:2em;font-family:${fontFamily};line-height:0.25em;`,
+            style: `font-size:2em;line-height:0.25em;`,
             //data: { eventId: identify(symbol.event) },
             data: { eventId: null },
             viewBox: "0 0.4 5.2 14.6",
@@ -156,27 +84,13 @@ export default overload(get('type'), {
     chord: (symbol) => create('p', {
         class: "chord",
         data: { beat: symbol.beat + 1, duration: symbol.duration, eventId: identify(symbol.event) },
-        html: (() => {
-            return symbol.value
-                .replace('(♯11)', '<sup class="chord-brackets">(♯11)</sup>')
-                .replace('6', '<sup class="six">6</sup>')
-                .replace('7', '<sup class="seven">7</sup>')
-                .replace('9', '<sup class="nine">9</sup>')
-                .replace('maj', '<sub class="tag">maj</sub>')
-                .replace('min', '<sub class="tag">min</sub>')
-                .replace('alt', '<sub class="tag">alt</sub>')
-                .replace('sus', '<sub class="tag">sus</sub>')
-                .replace('ø', '<sup class="halfdim">ø</sup>')
-                .replace('♯', '<span class="sharp">♯</span>')
-                .replace('♭', '<span class="flat">♭</span>')
-                .replace('♮', '<span class="natural">♮</span>');
-        })(symbol)
+        html: symbol.root + (chordGlyphs[symbol.extension] ? chordGlyphs[symbol.extension] : symbol.extension)
     }),
 
     timesig: (symbol) => create('span', {
         class: "timesig",
-        html: `<span style="font-size:1.5em;font-family:${fontFamily};line-height:1em;">${timeSignatures[symbol.numerator]}</span>
-            <span style="font-size:1.5em;font-family:${fontFamily};line-height:1em;">${timeSignatures[symbol.denominator]}</span>`,
+        html: `<span style="font-size:1.5em;line-height:1em;">${timeGlyphs[symbol.numerator]}</span>
+            <span style="font-size:1.5em;line-height:1em;">${timeGlyphs[symbol.denominator]}</span>`,
         data: { eventId: identify(symbol.event) },
     }),
 
@@ -189,7 +103,7 @@ export default overload(get('type'), {
     // Create accidental
     acci: (symbol) => create('span', {
         class: "acci",
-        style: `font-size:2em;font-family:${fontFamily};line-height:0.25em;`,
+        style: `font-size:2em;line-height:0.25em;`,
         data: symbol.beat === undefined ?
             { pitch: symbol.pitch } :
             { beat: symbol.beat + 1, pitch: symbol.pitch, part: symbol.part, eventId: identify(symbol.event) },
@@ -219,10 +133,10 @@ export default overload(get('type'), {
     head: (symbol) => create('span', {
         class: "head",
         viewBox: "0 -1 2.7 2",
-        style: `font-size:2em;font-family:${fontFamily};line-height:0.25em;`,
+        style: `font-size:2em;line-height:0.25em;`,
         preserveAspectRatio: "xMidYMid slice",
         data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part, eventId: identify(symbol.event) },
-        html: symbol.head ? headSymbols[symbol.head] : ![0.125, 0.375, 0.75, 1.5, 3, 6].includes(symbol.duration) ? headSymbols[symbol.duration] : `${headSymbols[symbol.duration]}<span>${headSymbols["dot"]}</span>`
+        html: symbol.head ? headGlyphs[symbol.head] : ![0.125, 0.375, 0.75, 1.5, 3, 6].includes(symbol.duration) ? headGlyphs[symbol.duration] : `${headGlyphs[symbol.duration]}<span>${headGlyphs["dot"]}</span>`
     }),
 
     // Create note stem
@@ -266,18 +180,18 @@ export default overload(get('type'), {
     // Create note tail
     tail: (symbol) => create('span', {
         class: `${symbol.stemDirection}-tail tail`,
-        style: `font-size:2em;font-family:${fontFamily};line-height:0.25em;`,
+        style: `font-size:2em;line-height:0.25em;`,
         data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part, eventId: identify(symbol.event) },
-        html: tailSymbols[symbol.stemDirection][symbol.duration]
+        html: tailGlyphs[symbol.stemDirection][symbol.duration]
     }),
 
     // Create rest
     rest: (symbol) => create('span', {
         class: "rest",
-        style: `font-size:2em;font-family:${fontFamily};line-height:0.25em;`,
+        style: `font-size:2em;line-height:0.25em;`,
         preserveAspectRatio: "xMidYMid slice",
         data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part },
-        html: ![0.125, 0.375, 0.75, 1.5, 3, 6].includes(symbol.duration) ? restSymbols[symbol.duration] : `${restSymbols[symbol.duration]}<span>${restSymbols["dot"]}</span>`
+        html: ![0.125, 0.375, 0.75, 1.5, 3, 6].includes(symbol.duration) ? restGlyphs[symbol.duration] : `${restGlyphs[symbol.duration]}<span>${restGlyphs["dot"]}</span>`
     }),
 
     default: (function (types) {

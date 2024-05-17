@@ -1,14 +1,14 @@
 
-import by                 from '../lib/fn/modules/by.js';
-import get                from '../lib/fn/modules/get.js';
-import overload           from '../lib/fn/modules/overload.js';
+import by from '../lib/fn/modules/by.js';
+import get from '../lib/fn/modules/get.js';
+import overload from '../lib/fn/modules/overload.js';
 import { toNoteNumber, toRootName, toRootNumber } from '../lib/midi/modules/note.js';
-import toKeys             from './sequence/to-keys.js';
-import eventsAtBeat       from './sequence/events-at-beat.js';
+import toKeys from './sequence/to-keys.js';
+import eventsAtBeat from './sequence/events-at-beat.js';
 import { keysAtBeats, keyFromBeatKeys } from './sequence/key-at-beat.js';
 import { transposeChord } from './event/chord.js';
 import { transposeScale } from './scale.js';
-import * as staves        from './staves.js';
+import * as staves from './staves.js';
 import { toKeyScale, toKeyNumber } from './keys.js';
 import { mod12, byGreater } from './maths.js';
 
@@ -16,12 +16,12 @@ import { mod12, byGreater } from './maths.js';
 const assign = Object.assign;
 const { abs, ceil, floor } = Math;
 
-const rflat        = /b|♭/;
-const rsharp       = /#|♯/;
-const rdoubleflat  = /bb|𝄫/;
+const rflat = /b|♭/;
+const rsharp = /#|♯/;
+const rdoubleflat = /bb|𝄫/;
 const rdoublesharp = /##|𝄪/;
 
-const cScale = [0,2,4,5,7,9,11];
+const cScale = [0, 2, 4, 5, 7, 9, 11];
 
 const fathercharles = [
     // Father Charles Goes Down And Ends Battle,
@@ -33,14 +33,14 @@ const fathercharles = [
 function byFatherCharlesPitch(a, b) {
     const ai = fathercharles.indexOf(a.pitch);
     const bi = fathercharles.indexOf(b.pitch);
-    return ai > bi ? 1 : ai < bi ? -1 : 0 ;
+    return ai > bi ? 1 : ai < bi ? -1 : 0;
 }
 
 function getStemDirection(centerPitch, head) {
     return head && head.stemDirection || (
         toNoteNumber(centerPitch) < toNoteNumber(head.pitch) ?
             'down' :
-            'up' );
+            'up');
 }
 
 function isAfterBreak(breaks, b1, b2) {
@@ -53,12 +53,12 @@ function isAfterBreak(breaks, b1, b2) {
 function toDuration(event) {
     return event[1] === 'lyric' ?
         event[3] :
-        event[4] ;
+        event[4];
 }
 
 function insertTail(symbols, stave, i) {
     const head = symbols[i];
-    const stemDirection = getStemDirection(stave.centerPitch, head) ;
+    const stemDirection = getStemDirection(stave.centerPitch, head);
 
     // Splice stem and tail in before head
     symbols.splice(i, 0, assign({}, head, {
@@ -78,7 +78,7 @@ const lines = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 function addStaveRows(n, row) {
     if (n < 0) {
         while (n++) {
-            const line   = row[0];
+            const line = row[0];
             const octave = parseInt(row[row.length - 1], 10);
 
             // Are we switching octave down the way ?
@@ -125,7 +125,7 @@ function subtractStaveRows(stave, r1, r2) {
 
     let i1 = lines.indexOf(degree1);
     let i2 = lines.indexOf(degree2);
-    let n  = i2 - i1;
+    let n = i2 - i1;
 
     return n + (octave2 - octave1) * 7;
 }
@@ -144,29 +144,29 @@ function createBeam(symbols, stave, beam, n) {
 
     // Render stems and beam
     const stemDirection = symbols[beam[0]] && symbols[beam[0]].stemDirection ?
-            symbols[beam[0]].stemDirection :
+        symbols[beam[0]].stemDirection :
         (beam
-        .map((i) => subtractStaveRows(stave, stave.centerPitch, symbols[i].pitch))
-        .reduce((t, u) => t + u, 0) / beam.length) < 0 ?
+            .map((i) => subtractStaveRows(stave, stave.centerPitch, symbols[i].pitch))
+            .reduce((t, u) => t + u, 0) / beam.length) < 0 ?
             'up' :
-            'down' ;
+            'down';
 
-    const stems  = [];
+    const stems = [];
     const buffer = [];
 
     // Loop backwards through beam splicing in stem symbols before
     // the heads, all with the winning stem direction
     let b = -1;
     let avgBeginLine = 0;
-    let avgEndLine   = 0;
+    let avgEndLine = 0;
     let i, head, line, stem;
     while (beam[++b] !== undefined) {
-        i    = beam[b];
+        i = beam[b];
         head = symbols[i];
         line = subtractStaveRows(stave, stave.centerPitch, head.pitch);
 
         head.stemDirection = stemDirection;
-        head.tieDirection  = stemDirection === 'up' ? 'down' : 'up' ;
+        head.tieDirection = stemDirection === 'up' ? 'down' : 'up';
 
         if (b < (beam.length - 1) / 2) {
             avgBeginLine += line / Math.floor(beam.length / 2);
@@ -182,7 +182,7 @@ function createBeam(symbols, stave, beam, n) {
             stem.range = subtractStaveRows(stave, stem.pitch, head.pitch);
             stem.pitch = stem.range < 0 ?
                 stem.stemDirection === 'up' ? stem.pitch : head.pitch :
-                stem.stemDirection === 'up' ? head.pitch : stem.pitch ;
+                stem.stemDirection === 'up' ? head.pitch : stem.pitch;
         }
         else {
             stem = assign({}, head, {
@@ -194,40 +194,40 @@ function createBeam(symbols, stave, beam, n) {
         if (head.tie === 'begin') {
             buffer.push(assign({}, head, {
                 type: 'tie',
-                beat:   head.beat,
+                beat: head.beat,
                 updown: head.tieDirection,
-                event:  head.event
+                event: head.event
             }));
         }
     }
 
     // Calculate where to put beam exactly
-    let begin    = stems[0];
-    let end      = stems[stems.length - 1];
+    let begin = stems[0];
+    let end = stems[stems.length - 1];
     let endRange = subtractStaveRows(stave, begin.pitch, end.pitch);
     let avgRange = avgEndLine - avgBeginLine;
-    let range    = abs(avgRange) > abs(0.75 * endRange) ?
+    let range = abs(avgRange) > abs(0.75 * endRange) ?
         0.75 * endRange :
-        avgRange ;
+        avgRange;
 
     stems.forEach((stem, i) => {
         stem.beamY = stemDirection === 'down' ?
             -range * i / (stems.length - 1) + subtractStaveRows(stave, begin.pitch, stem.pitch) :
-            range * i / (stems.length - 1) - subtractStaveRows(stave, begin.pitch, stem.pitch) ;
+            range * i / (stems.length - 1) - subtractStaveRows(stave, begin.pitch, stem.pitch);
     });
 
     symbols.splice(i, 0, ...stems);
 
     // Put the beam in front of the first head (??)
     symbols.splice(i, 0, assign({}, begin, {
-        type:   'beam',
+        type: 'beam',
         // Push beam start into next grid column
-        beat:   begin.beat,
+        beat: begin.beat,
         duration: end.beat - begin.beat,
         //pitch:  begin.pitch,
-        range:  range,
+        range: range,
         updown: stemDirection,
-        stems:  stems
+        stems: stems
     }));
 
     symbols.splice(i, 0, ...buffer);
@@ -238,19 +238,19 @@ function createBeam(symbols, stave, beam, n) {
 
 function createSymbols(symbols, bar) {
     // All events in symbols have the same part
-    const part  = symbols[0] && symbols[0].part;
+    const part = symbols[0] && symbols[0].part;
     const stave = bar.stave;
 
     // Populate accidentals with key signature sharps and flats
     const accidentals = bar.key.reduce((accidentals, n, i) => {
-            const acci = n - cScale[i];
-            if (acci !== 0) {
-                const name = toRootName(cScale[i]);
-                let n = 10;
-                while (n--) accidentals[name + n] = acci;
-            }
-            return accidentals;
-        }, {});
+        const acci = n - cScale[i];
+        if (acci !== 0) {
+            const name = toRootName(cScale[i]);
+            let n = 10;
+            while (n--) accidentals[name + n] = acci;
+        }
+        return accidentals;
+    }, {});
 
     let beat = 0;
     let n = -1;
@@ -270,9 +270,9 @@ function createSymbols(symbols, bar) {
             // [beat, 'rest', pitch (currently unused), duration]
             symbols.splice(n++, 0, {
                 beat,
-                type:     'rest',
-                pitch:    '',
-                part:     part,
+                type: 'rest',
+                pitch: '',
+                part: part,
                 duration: head.beat - beat
             });
         }
@@ -284,7 +284,7 @@ function createSymbols(symbols, bar) {
         // Determine accidental
         const acci = rsharp.test(head.pitch) ? 1 :
             rflat.test(head.pitch) ? -1 :
-            undefined ;
+                undefined;
 
         // Line name is note name + octave (no # or b)
         const line = head.pitch[0] + head.pitch.slice(-1);
@@ -366,9 +366,9 @@ function createSymbols(symbols, bar) {
                     symbols.splice(n++, 0, assign({}, head, {
                         type: 'tie',
                         // Move tie into following grid column
-                        beat:   head.beat,
+                        beat: head.beat,
                         updown: stemDirection === 'up' ? 'down' : 'up',
-                        event:  head.event
+                        event: head.event
                     }));
                 }
             }
@@ -379,9 +379,9 @@ function createSymbols(symbols, bar) {
                 symbols.splice(n++, 0, assign({}, head, {
                     type: 'tie',
                     // Move tie into following grid column
-                    beat:   head.beat,
+                    beat: head.beat,
                     updown: stemDirection === 'up' ? 'down' : 'up',
-                    event:  head.event
+                    event: head.event
                 }));
             }
         }
@@ -396,11 +396,11 @@ function createSymbols(symbols, bar) {
     // If last event has not taken us to the end of the bar, insert rest
     if (beat < bar.duration) {
         symbols.push({
-            type:     'rest',
+            type: 'rest',
             beat,
             duration: bar.duration - beat,
-            pitch:    '',
-            part:     part
+            pitch: '',
+            part: part
         });
     }
 
@@ -442,26 +442,26 @@ function createBarSymbols(bar) {
 
 function createBar(beat, stave, key, meter, tieheads) {
     const bar = {
-        beat:     beat,
+        beat: beat,
         duration: meter[2],
         // TODO do something about breaks
-        breaks:   meter[2] === 4 ? [2] :
-            meter[2] === 3 ? [1,2]
-            : [2],
-        symbols:  [],
-        stave:    stave,
-        key:      key,
-        meter:    meter
+        breaks: meter[2] === 4 ? [2] :
+            meter[2] === 3 ? [1, 2]
+                : [2],
+        symbols: [],
+        stave: stave,
+        key: key,
+        meter: meter
     };
 
     // If meter change is on this beat push a timesig into symbols
     if (meter[0] === beat) {
         bar.symbols.push({
-            type:        'timesig',
-            beat:        0,
-            numerator:   meter[2] / meter[3],
+            type: 'timesig',
+            beat: 0,
+            numerator: meter[2] / meter[3],
             denominator: 4 / meter[3],
-            event:       meter
+            event: meter
         });
     }
 
@@ -505,9 +505,9 @@ const eventNameLogs = {};
 const accidentals = {
     '-2': '𝄫',
     '-1': '♭',
-    '0':  '',
-    '1':  '♯',
-    '2':  '𝄪'
+    '0': '',
+    '1': '♯',
+    '2': '𝄪'
 };
 
 function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
@@ -517,7 +517,7 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
     const bars = [];
 
     const events0 = eventsAtBeat(events, 0);
-    meter = events0.find((event) => event[1] === 'meter') || meter ;
+    meter = events0.find((event) => event[1] === 'meter') || meter;
 
     // First bar. Where meter is at beat 0, also inserts a time signature.
     let bar = createBar(0, stave, keyscale, meter, tieheads);
@@ -527,7 +527,7 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
     bar.symbols.unshift.apply(bar.symbols, keyscale
         .map((n, i) => (n - cScale[i] && {
             // No beat for key signature accidentals
-            type:  'acci',
+            type: 'acci',
             pitch: toRootName(cScale[i]) + accidentals[n - cScale[i]],
             value: n - cScale[i]
         }))
@@ -582,16 +582,16 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
         }
 
         const beat = event[0] - bar.beat;
-        const key  = beatkeys && keyFromBeatKeys(beatkeys, event[0]);
+        const key = beatkeys && keyFromBeatKeys(beatkeys, event[0]);
 
         // Truncate duration to bar end
         const duration = event[0] + toDuration(event) > bar.beat + bar.duration ?
             bar.beat + bar.duration - event[0] :
-            toDuration(event) ;
+            toDuration(event);
 
         if (event[1] === 'note') {
             let pitch = stave.getSpelling(key, event, transpose);
-console.log('>', pitch);
+            console.log('>', pitch);
 
             let head = assign({
                 type: 'head',
@@ -614,17 +614,19 @@ console.log('>', pitch);
         }
         else if (event[1] === 'chord') {
             bar.symbols.push({
-                type:  'chord',
+                type: 'chord',
                 beat,
                 duration,
                 transpose,
-                value: stave.getSpelling(key, event, transpose) + event[3],
+                // value: stave.getSpelling(key, event, transpose) + event[3],
+                root: stave.getSpelling(key, event, transpose),
+                extension: event[3],
                 event: event
             });
         }
         else {
             bar.symbols.push({
-                type:  'lyric',
+                type: 'lyric',
                 beat,
                 duration,
                 value: event[2],
@@ -652,15 +654,15 @@ export default function eventsToSymbols(events, clef, keyname, meter, transpose)
     // Get the stave controller
     const stave = clef ?
         staves[clef] :
-        staves.treble ;
+        staves.treble;
 
     // Create a map of keys at beats. Doing this here is n optimisation so we
     // don't end up running the keys matrix calculations on every note which
     // causes measurable delay.
     // TEMP: don't get keys for unpitched staves
-    const beatkeys  = clef === 'drums' ?
+    const beatkeys = clef === 'drums' ?
         null :
-        keysAtBeats(events) ;
+        keysAtBeats(events);
 
     // Get the key scale from keyname. This scale is not a true
     // 'scale' in an internal-data sense as it may not begin with a 0, but it
@@ -668,10 +670,10 @@ export default function eventsToSymbols(events, clef, keyname, meter, transpose)
     // keynumber is on a continuous scale of fourths, so multiply by 7 semitones
     // to get chromatic number relative to C.
     const keynumber = toKeyNumber(keyname);
-    const keyscale  = toKeyScale(keynumber * 7 + transpose);
+    const keyscale = toKeyScale(keynumber * 7 + transpose);
 
     // TODO: this is a two-pass symbol generation, I wonder if we can get
     // it down to one?
     return createBars(events, beatkeys, stave, keyscale, meter, transpose)
-    .map(createBarSymbols);
+        .map(createBarSymbols);
 }

@@ -1,0 +1,14 @@
+
+@font-face {
+    font-family: BravuraText;
+    src: url('../fonts/Bravura/redist/woff/BravuraText.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: BravuraMusic;
+    src: url('../fonts/Bravura/redist/woff/Bravura.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
