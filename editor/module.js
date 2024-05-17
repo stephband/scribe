@@ -1,6 +1,9 @@
 
+import '../lib/bolt/elements/dialog.js';
+
 import get      from '../lib/fn/modules/get.js';
 import id       from '../lib/fn/modules/id.js';
+import noop     from '../lib/fn/modules/noop.js';
 import overload from '../lib/fn/modules/overload.js';
 import create   from '../lib/dom/modules/create.js';
 import delegate from '../lib/dom/modules/delegate.js';
@@ -12,13 +15,18 @@ import createSymbols     from '../modules/create-symbols.js';
 import createBarElements from '../modules/create-bar-elements.js';
 import { identify, findEvent } from '../modules/create-symbol-element.js';
 import * as staves from '../modules/staves.js';
+import { timesigToMeter } from '../modules/timesig.js';
 
 import isTransposeable from '../modules/event/is-transposeable.js';
 import { selection, select, deselect, clear } from './modules/selection.js';
 
+const assign  = Object.assign;
 const stave   = staves.drums;
 const body    = document.body;
 const element = document.getElementById('scribe-bars');
+const defaultClef  = [0, "clef", "treble"];
+const defaultKey   = [0, "key", "C"];
+const defaultMeter = [0, "meter", 4, 1];
 
 let sequence = { events: [] };
 
@@ -31,13 +39,20 @@ const zones = {};
 
 let editDuration = 0.5;
 
+function insertByBeat(array, object) {
+    let i = -1;
+    let event;
+    while((event = array[++i]) && event[0] < object[0]);
+    array.splice(i, 0, object);
+}
+
 function round24(n) {
     return Math.round(n * 24) / 24;
 }
 
 function createDOM(sequence) {
     //const symbols = createSymbols(sequence.events, 'treble', 'C', [0, "meter", 4, 1], 0);
-    const symbols = createSymbols(sequence.events, 'drums', 'C', [0, "meter", 4, 1], 0);
+    const symbols = createSymbols(sequence.events, defaultClef[2], defaultKey[2], defaultMeter, 0);
     const bars    = createBarElements(symbols);
 
     bars.forEach((barElement) => {
@@ -84,13 +99,13 @@ events({ type: 'input', select: 'input' }, document.body)
 // Update sequence from inputs
 events({ type: 'input', select: 'input' }, document.body)
 .each(overload((e) => e.target.name, {
-    'name':      (e) => sequence.name = e.target.value,
+    'name': (e) => sequence.name = e.target.value,
 
-    'author':    (e) => sequence.author ?
+    'author': (e) => sequence.author ?
         (sequence.author.name = e.target.value) :
         (sequence.author = { name: e.target.value }),
 
-    'arranger':  (e) => sequence.arranger = e.target.value,
+    'arranger': (e) => sequence.arranger = e.target.value,
 
     'edit-duration': (e) => {
         if (!e.target.value) {
@@ -374,7 +389,11 @@ function activateZonesFromEvent(zones, event) {
     .forEach((zone) => zone.classList.add('active'));
 }
 
-
+function createEvent() {
+    const event = Array.from(arguments);
+    insertByBeat(sequence.events, event);
+    return event;
+}
 
 events({ type: 'pointerdown', device: 'mouse pen touch' }, document)
 .each(delegate({
@@ -458,6 +477,57 @@ events({ type: 'pointerdown', device: 'mouse pen touch' }, document)
         // Select event
         select(event);
         highlightZones();
+    }
+}));
+
+events('click', document)
+.each(delegate({
+    '.clef[data-event-id]': (button, e) => {
+        const dialog  = document.getElementById('clef-dialog');
+        //const eventId = button.dataset.eventId;
+        //const event   = findEvent(sequence.events, eventId) || defaultClef;
+        const closes  = events('close', dialog)
+            .each((e) => {
+                closes.stop();
+                if (dialog.returnValue) {
+                    defaultClef[2] = dialog.returnValue;
+                    render(sequence);
+                }
+            });
+
+        dialog.showModal();
+    },
+
+    '.keysig[data-event-id]': (button, e) => {
+        const dialog  = document.getElementById('clef-dialog');
+        const eventId = button.dataset.eventId;
+        const event   = findEvent(sequence.events, eventId) || createEvent(0, 'key', 'C');
+        const closes  = events('close', dialog)
+            .each((e) => {
+                closes.stop();
+                if (dialog.returnValue) {
+                    defaultKey[2] = dialog.returnValue;
+                    render(sequence);
+                }
+            });
+
+        dialog.showModal();
+    },
+
+    '.timesig[data-event-id]': (button, e) => {
+        const dialog  = document.getElementById('timesig-dialog');
+        const eventId = button.dataset.eventId;
+        const event   = findEvent(sequence.events, eventId) || createEvent(0, 'meter', 4, 1);
+        const closes  = events('close', dialog)
+            .each((e) => {
+                closes.stop();
+                if (dialog.returnValue) {
+                    assign(event, timesigToMeter(dialog.returnValue));
+                    render(sequence);
+                }
+            });
+
+        dialog.showModal();
     },
 
     '*': () => {
