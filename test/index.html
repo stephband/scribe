@@ -34,9 +34,11 @@
             expect(quantize([[0.2, 'note', 'C4', 1, 1]]));
             expect(quantize([[0.3, 'note', 'C4', 1, 1]]));
             expect(quantize([[0.4, 'note', 'C4', 1, 1]]));
+
             quantize([[0.5, 'note', 'C4', 1, 1]]);
             quantize([[0.6, 'note', 'C4', 1, 1]]);
             quantize([[0.7, 'note', 'C4', 1, 1]]);
+
             expect(quantize([[0.8, 'note', 'C4', 1, 1]]));
             expect(quantize([[0.9, 'note', 'C4', 1, 1]]));
             done();
