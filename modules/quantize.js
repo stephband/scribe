@@ -1,20 +1,24 @@
 
-const assign  = Object.assign;
-const round32 = Math.fround;
-
+const assign   = Object.assign;
+const round32  = Math.fround;
+const buffer00 = [];
+const buffer33 = [];
+const buffer50 = [];
+const buffer67 = [];
 
 
 /**
 quantize()
-Quantize events into triplets and duplets.
+Quantize events into triplets and duplets. TODO: This is probably
+overcomplicated for what it does. It was originally intended to recurse at
+different durations.
 **/
 
-function collect(split, events, i) {
+function collect(buffer, split, events, i) {
     let n = i - 1;
-    while(events[++n] && events[n][0] < split);
-    return n > i ?
-        events.slice(i, n) :
-        undefined ;
+    while(events[++n] && events[n][0] < split) {
+        buffer.push(events[n]);
+    }
 }
 
 function toBeat(data, event) {
@@ -26,73 +30,79 @@ function toBeat(data, event) {
 function quantizeDuplet(output, events, scale, i, beat) {
     const props = {};
     const data  = { output, props };
+
+    buffer00.length = 0;
+    buffer50.length = 0;
+
     let n = i;
 
-    const events00 = collect(beat + scale * 0.25, events, n);
-    if (events00) n += events00.length;
-
-    const events50 = collect(beat + scale * 0.75, events, n);
-    if (events50) n += events50.length;
-
-    if (events00) {
+    collect(buffer00, beat + scale * 0.25, events, n);
+    if (buffer00.length) {
+        n += buffer00.length;
         data.props[0] = round32(beat);
-        events00.reduce(toBeat, data);
+        buffer00.reduce(toBeat, data);
     }
 
-    if (events50) {
+    collect(buffer50, beat + scale * 0.75, events, n);
+    if (buffer50.length) {
+        n += buffer50.length;
         data.props[0] = round32(beat + scale * 0.5);
-        events50.reduce(toBeat, data);
+        buffer50.reduce(toBeat, data);
     }
 
     return output;
 }
 
 function quantizeDupletTriplet(output, events, scale, i, beat, stopbeat) {
-    const props = {};
-    const data  = { output, props };
+    const props   = {};
+    const data    = { output, props };
+
+    buffer00.length = 0;
+    buffer33.length = 0;
+    buffer50.length = 0;
+    buffer67.length = 0;
+
     let n = i;
 
-    const events00 = collect(beat + scale * 0.1666666667, events, n);
-    if (events00) n += events00.length;
+    collect(buffer00, beat + scale * 0.1666666667, events, n);
+    if (buffer00.length) n += buffer00.length;
 
-    const events33 = collect(beat + scale * 0.4166666667, events, n);
-    if (events33) n += events33.length;
+    collect(buffer33, beat + scale * 0.4166666667, events, n);
+    if (buffer33.length) n += buffer33.length;
 
-    const events50 = collect(beat + scale * 0.5833333333, events, n);
-    if (events50) n += events50.length;
+    collect(buffer50, beat + scale * 0.5833333333, events, n);
+    if (buffer50.length) n += buffer50.length;
 
-    const events67 = collect(beat + scale * 0.8611111111, events, n);
-    if (events67) n += events67.length;
+    collect(buffer67, beat + scale * 0.8611111111, events, n);
+    if (buffer67.length) n += buffer67.length;
 
     // If there is one at 50% it's definitely a duplet. Pass over the data
     // again, force quantizing to duplets.
-    if (events50) {
+    if (buffer50.length) {
         quantizeDuplet(output, events, scale, i);
-        return beat + scale < stopbeat ?
-            quantizeDupletTriplet(output, events, scale, n, beat + scale, stopbeat) :
-            output ;
     }
+    // Otherwise it may (or may not) be a triplet.
+    else {
+        if (buffer00.length) {
+            data.props[0] = round32(beat);
+            buffer00.reduce(toBeat, data);
+        }
 
-    if (events00) {
-        data.props[0] = round32(beat);
-        events00.reduce(toBeat, data);
-    }
+        if (buffer33.length) {
+            data.props[0] = round32(beat + scale * 0.3333333333);
+            buffer33.reduce(toBeat, data);
+        }
 
-    if (events33) {
-        data.props[0] = round32(beat + scale * 0.3333333333);
-        events33.reduce(toBeat, data);
-    }
-
-    if (events67) {
-        data.props[0] = round32(beat + scale * 0.6666666667);
-        events67.reduce(toBeat, data);
+        if (buffer67.length) {
+            data.props[0] = round32(beat + scale * 0.6666666667);
+            buffer67.reduce(toBeat, data);
+        }
     }
 
     return beat + scale < stopbeat ?
         quantizeDupletTriplet(output, events, scale, n, beat + scale, stopbeat) :
         output ;
 }
-
 
 export default function quantize(events, beat = 0, duration = 4) {
     // Limit scale if duration is short
