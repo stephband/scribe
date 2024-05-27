@@ -30,19 +30,9 @@
 
         .music {
             font-family: FinaleJazz, FinaleJazzText;
-            font-size: 5em;
+            font-size: 2em;
         }
 
-        sup {
-            /* We don't make sup smaller because some glyphs are already small sized */
-            font-size: 0.66666667em;
-            vertical-align: 0.3333333em;
-            margin-left: 0.04em;
-        }
-
-        .small {
-            font-size: 0.75em;
-        }
 
         .chord-abbr,
         span {
@@ -51,36 +41,32 @@
             background-color: rgba(0,0,0,0.08);
         }
 
-
-
-
-
-        .chord-abbr > .chord-maj {
+        .chord-abbr .chord-maj {
             font-size: inherit;
             vertical-align: 0em;
         }
 
-        .chord-abbr > .chord-min {
+        .chord-abbr .chord-min {
             font-size: inherit;
             vertical-align: 0.1875em;
         }
 
-        .chord-abbr > .chord-halfdim {
+        .chord-abbr .chord-halfdim {
             font-size: inherit;
             vertical-align: 0.3125em;
         }
 
-        .chord-abbr > .chord-dim {
+        .chord-abbr .chord-dim {
             font-size: inherit;
             vertical-align: 0.3125em;
         }
 
-        .chord-abbr > .chord-aug {
+        .chord-abbr .chord-aug {
             font-size: inherit;
             vertical-align: 0.1875em;
         }
 
-        .chord-abbr > .chord-root {
+        .chord-abbr .chord-root {
             font-size: 0.75em;
         }
 
@@ -93,17 +79,18 @@
             vertical-align: 0.333333333em;
         }
 
-        .chord-abbr > sup {
+        .chord-abbr sup {
             font-size: 0.5625em;
             vertical-align: 0.333333333em;
+            margin-left: 0.04em;
         }
 
-        .chord-abbr > sub {
+        .chord-abbr sub {
             font-size: 0.5625em;
             vertical-align: 0em;
         }
 
-        .chord-abbr > .chord-brackets {
+        .chord-abbr .chord-brackets {
             font-size: 0.5em;
             vertical-align: 0.4em;
         }
