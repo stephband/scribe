@@ -1,17 +1,24 @@
 
-const assign = Object.assign;
+const assign   = Object.assign;
+const round32  = Math.fround;
+const buffer00 = [];
+const buffer33 = [];
+const buffer50 = [];
+const buffer67 = [];
+
 
 /**
 quantize()
-Quantize events into triplets and duplets.
+Quantize events into triplets and duplets. TODO: This is probably
+overcomplicated for what it does. It was originally intended to recurse at
+different durations.
 **/
 
-function collect(split, events, i) {
+function collect(buffer, split, events, i) {
     let n = i - 1;
-    while(events[++n] && events[n][0] < split);
-    return n > i ?
-        events.slice(i, n) :
-        undefined ;
+    while(events[++n] && events[n][0] < split) {
+        buffer.push(events[n]);
+    }
 }
 
 function toBeat(data, event) {
@@ -20,72 +27,91 @@ function toBeat(data, event) {
     return data;
 }
 
-function quantizeScale(output, events, scale = 1) {
+function quantizeDuplet(output, events, scale, i, beat) {
     const props = {};
     const data  = { output, props };
-    let i = 0;
 
-    const events00 = collect(scale * 0.0972222222, events, i);
-    if (events00) {
-        i += events00.length;
-        data.props[0] = 0;
-        events00.reduce(toBeat, data);
+    buffer00.length = 0;
+    buffer50.length = 0;
+
+    let n = i;
+
+    collect(buffer00, beat + scale * 0.25, events, n);
+    if (buffer00.length) {
+        n += buffer00.length;
+        data.props[0] = round32(beat);
+        buffer00.reduce(toBeat, data);
     }
 
-    const events25 = collect(scale * 0.2916666667, events, i);
-    if (events25) i += events25.length;
-    const events33 = collect(scale * 0.4305555556, events, i);
-    if (events33) i += events33.length;
-    const events50 = collect(scale * 0.5694444444, events, i);
-    if (events50) i += events50.length;
-    const events67 = collect(scale * 0.7083333333, events, i);
-    if (events67) i += events67.length;
-    const events75 = collect(scale * 0.9027777778, events, i);
-
-    // Quadruplets
-    if (events25 && events50
-        || events25 && events75
-        || events50 && events75
-        || events25 && events33
-        || events33 && events50
-        || events50 && events67
-        || events67 && events75
-    ) {
-        console.log('Quadruplets');
-        return;
-    }
-
-    if (events33) {
-        data.props[0] = 0.333333333;
-        events33.reduce(toBeat, data);
-        return output;
-    }
-
-    // We already checked (events50 && events67) so this is exclusive OR. In
-    // english, that means there is only one event beat at 50% or 67% in this
-    // beat, and we want to fall through to looking at these events at 2x zoom
-    if (events50 || events67) {
-        quantizeScale(output, events, 2);
-        console.log('Recurse at 2x');
-        return;
-    }
-
-    // Quadruplets
-    if (events25) {
-        data.props[0] = 0.25;
-        events25.reduce(toBeat, data);
-        return output;
-    }
-
-    if (events75) {
-        data.props[0] = 0.75;
-        events75.reduce(toBeat, data);
-        return output;
+    collect(buffer50, beat + scale * 0.75, events, n);
+    if (buffer50.length) {
+        n += buffer50.length;
+        data.props[0] = round32(beat + scale * 0.5);
+        buffer50.reduce(toBeat, data);
     }
 
     return output;
 }
 
-export default function quantize(events) {
-    return quantizeScale([], events, 1);
+function quantizeDupletTriplet(output, events, scale, i, beat, stopbeat) {
+    const props   = {};
+    const data    = { output, props };
+
+    buffer00.length = 0;
+    buffer33.length = 0;
+    buffer50.length = 0;
+    buffer67.length = 0;
+
+    let n = i;
+
+    collect(buffer00, beat + scale * 0.1666666667, events, n);
+    if (buffer00.length) n += buffer00.length;
+
+    collect(buffer33, beat + scale * 0.4166666667, events, n);
+    if (buffer33.length) n += buffer33.length;
+
+    collect(buffer50, beat + scale * 0.5833333333, events, n);
+    if (buffer50.length) n += buffer50.length;
+
+    collect(buffer67, beat + scale * 0.8611111111, events, n);
+    if (buffer67.length) n += buffer67.length;
+
+    // If there is one at 50% it's definitely a duplet. Pass over the data
+    // again, force quantizing to duplets.
+    if (buffer50.length) {
+        quantizeDuplet(output, events, scale, i);
+    }
+    // Otherwise it may (or may not) be a triplet.
+    else {
+        if (buffer00.length) {
+            data.props[0] = round32(beat);
+            buffer00.reduce(toBeat, data);
+        }
+
+        if (buffer33.length) {
+            data.props[0] = round32(beat + scale * 0.3333333333);
+            buffer33.reduce(toBeat, data);
+        }
+
+        if (buffer67.length) {
+            data.props[0] = round32(beat + scale * 0.6666666667);
+            buffer67.reduce(toBeat, data);
+        }
+    }
+
+    return beat + scale < stopbeat ?
+        quantizeDupletTriplet(output, events, scale, n, beat + scale, stopbeat) :
+        output ;
+}
+
+export default function quantize(events, beat = 0, duration = 4) {
+    // Limit scale if duration is short
+    const scale     = 0.25;
+    const startbeat = beat - scale * 0.1666666667;
+
+    // Scan events until we get to event index on or after beat
+    let i = -1;
+    while (events[++i] && events[i][0] < startbeat);
+
+    return quantizeDupletTriplet([], events, scale, i, beat, beat + duration);
 }
