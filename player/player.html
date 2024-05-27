@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,25 +7,9 @@
     <link rel="stylesheet" href="../scribe-music/module.css" />
     <link rel="stylesheet" href="../scribe-music/module-bravura.css" />
     <script type="module" src="../scribe-music/module.js"></script>
-    <style>
-        body {
-            font-family: ScribeMusic, ScribeText;
-        }
-    </style>
 </head>
-
-<body style="background-color: white">
-    
-    <scribe-music type="application/json" clef="treble" meter="4/4">
-    </scribe-music>
-    <hr>
-    <scribe-music class="bravura" type="application/json" clef="treble" meter="4/4">
-    </scribe-music>
-    <style>
-        .bravura {
-            font-family: Bravura, BravuraText
-        }
-    </style>
+<body>
+    <scribe-music type="application/json" clef="treble" meter="4/4"></scribe-music>
     <script>
         document.querySelectorAll("scribe-music").forEach(
             element => {
@@ -34,7 +17,5 @@
             }
         );
     </script>
-    <audio src="https://sound.stephen.band/samples/steinway-piano/m4a/65-piano-ff.m4a" autoplay></audio>
 </body>
-
 </html>

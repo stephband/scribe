@@ -1,4 +1,5 @@
 
+@import './fonts/finale-jazz.css';
 @import './classes/accidental.css';
 @import './classes/stave.css';
 @import './classes/bar.css';
@@ -14,6 +15,7 @@
 @import './classes/tie.css';
 @import './classes/lyric.css';
 @import './classes/svg.css';
+
 
 *, ::before, ::after {
     box-sizing: border-box;
