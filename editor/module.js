@@ -37,8 +37,6 @@ let sequence = { events: [] };
 const zones = {};
 
 
-
-
 let editDuration = 0.5;
 
 function insertByBeat(array, object) {
