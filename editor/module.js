@@ -21,12 +21,14 @@ import isTransposeable from '../modules/event/is-transposeable.js';
 import { selection, select, deselect, clear } from './modules/selection.js';
 
 const assign  = Object.assign;
-const stave   = staves.drums;
 const body    = document.body;
 const element = document.getElementById('scribe-bars');
 const defaultClef  = [0, "clef", "treble"];
 const defaultKey   = [0, "key", "C"];
 const defaultMeter = [0, "meter", 4, 1];
+
+// TODO: stave should be a bar-by-bar variable, matey-boy
+let stave   = staves.treble;
 
 let sequence = { events: [] };
 
@@ -51,7 +53,6 @@ function round24(n) {
 }
 
 function createDOM(sequence) {
-    //const symbols = createSymbols(sequence.events, 'treble', 'C', [0, "meter", 4, 1], 0);
     const symbols = createSymbols(sequence.events, defaultClef[2], defaultKey[2], defaultMeter, 0);
     const bars    = createBarElements(symbols);
 
@@ -490,6 +491,7 @@ events('click', document)
             .each((e) => {
                 closes.stop();
                 if (dialog.returnValue) {
+                    stave = staves[dialog.returnValue];
                     defaultClef[2] = dialog.returnValue;
                     render(sequence);
                 }
