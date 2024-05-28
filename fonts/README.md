@@ -14,3 +14,8 @@ is aware).
 Not all these fonts have all glyphs that Scribe supports. There is a test page
 at (test/glyphs.html)[../test/glyphs.html]. In particular Ash and Leipzig have
 several note heads and chord symbols missing. Your mileage may vary.
+
+## Scribe Developers
+
+Where fonts are available in a git repo, feel free to add them here as submodules
+along with a CSS file that includes them.
