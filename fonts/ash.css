@@ -1,0 +1,14 @@
+
+@font-face {
+    font-family: AshFont;
+    src: url('../fonts/Ash/finaleashtext-webfont.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: Ash;
+    src: url('../fonts/Ash/finaleash-webfont.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}

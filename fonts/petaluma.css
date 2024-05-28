@@ -1,0 +1,14 @@
+
+@font-face {
+    font-family: PetalumaText;
+    src: url('../fonts/Petaluma/redist/woff/PetalumaText.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: Petaluma;
+    src: url('../fonts/Petaluma/redist/woff/Petaluma.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}

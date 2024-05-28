@@ -24,12 +24,16 @@
     <link rel="stylesheet" href="../module.css">
 
     <style>
+        @import '../fonts/bravura.css';
+        @import '../fonts/petaluma.css';
+        @import '../fonts/ash.css';
+
         body {
             font-family: sans-serif;
         }
 
         .music {
-            font-family: FinaleJazz, FinaleJazzText;
+            font-family: Ash, AshText;
             font-size: 2em;
         }
 
@@ -145,6 +149,10 @@
         <span title="augmentationDot">&#xE0A4;&#xE1E7;</span>
     </section>
 
+    <p style="background-color: yellow;">
+    <span class="music" title="noteheadWhole" style="line-height: 0.25em; display: inline-block; border-radius: 50%; background-color: orange;">&#xE0A2;</span>
+    </p>
+
     <h2>Tails (flags)</h2>
     <section class="music">
         <!-- Stave -->
@@ -256,6 +264,7 @@
         <span title="metNote8thDown">&#xECA8;</span>
         <span title="metAugmentationDot">&#xECB7;</span>
         <span title="timeSigEquals">&#xE08F;</span>
+        <span title="=">=</span>
     </section>
 
     <h2>Bars</h2>
@@ -345,10 +354,5 @@
     officia nostrud operating system alertus. Hyper text linkus operari avec
     computatrum ad coniungere hominum. Standards code est pulchra on chromium et
     foxus sed souvent suckum in internet explorum.</p>
-
-    <script type="module">
-        import ScribeMusic from './module.js';
-        ScribeMusic.stylesheet = '/scribe/scribe-music/shadow.css';
-    </script>
 </body>
 </html>
