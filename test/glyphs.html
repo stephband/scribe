@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>&lt;scribe-music&gt;</title>
+    <title>Scribe glyphs</title>
 
     <meta charset="utf-8" />
     <meta name="author" content="@stephband" />
@@ -24,18 +24,88 @@
     <link rel="stylesheet" href="../module.css">
 
     <style>
-        @import '../fonts/bravura.css';
-        @import '../fonts/petaluma.css';
         @import '../fonts/ash.css';
+        @import '../fonts/bravura.css';
+        @import '../fonts/broadway.css';
+        @import '../fonts/lilyjazz.css';
+        @import '../fonts/petaluma.css';
 
         body {
             font-family: sans-serif;
         }
 
-        .music {
-            font-family: Ash, AshText;
-            font-size: 2em;
+        .em-box {
+            display: inline-block;
+            font-family: sans-serif;
+            line-height: 1em;
+            width: 1em;
+            height: 1em;
+            background-color: #dddddd;
+            vertical-align: baseline;
+            text-align: center;
         }
+
+        .em-box > small {
+            font-size: 0.375em;
+            font-family: monospace;
+        }
+
+        .test {
+            display: flex;
+            align-items: baseline;
+            column-gap: 2px;
+            font-family: FinaleJazz, FinaleJazzText;
+            font-size: 3em;
+        }
+
+        .test::before {
+            display: inline-block;
+            font-family: sans-serif;
+            font-size: 1rem;
+            width: 6rem;
+            text-align: right;
+        }
+
+        .ash-test {
+            font-family: Ash, AshText;
+        }
+
+        .ash-test::before {
+            content: 'Ash';
+        }
+
+        .bravura-test {
+            font-family: Bravura, BravuraText;
+        }
+
+        .bravura-test::before {
+            content: 'Bravura';
+        }
+
+        .broadway-test {
+            font-family: Broadway, BroadwayText;
+        }
+
+        .broadway-test::before {
+            content: 'Broadway';
+        }
+
+        .jazz-test {
+            font-family: FinaleJazz, FinaleJazzText;
+        }
+
+        .jazz-test::before {
+            content: 'Jazz';
+        }
+
+        .petaluma-test {
+            font-family: Petaluma, PetalumaText;
+        }
+
+        .petaluma-test::before {
+            content: 'Petaluma';
+        }
+
 
 
         .chord-abbr,
@@ -103,12 +173,18 @@
 <body>
     <h1>Scribe Glyphs</h1>
     <p>From the SMuFL spec at <a href="https://w3c.github.io/smufl/latest/index.html">w3c.github.io/smufl/latest/index.html</a></p>
-    <p>Each glyph presented here in a span that, I think, represents its line box.</p>
+    <p>Each glyph presented here in a span that, I think, but am not entirely sure, represents its line box.</p>
 
     <h2>Notes</h2>
-    <section class="music">
+    <p style="background-color: yellow;">
+        Hello
+        <span class="test" title="noteheadWhole" style="line-height: 0.25em; display: inline-block; border-radius: 50%; background-color: orange;">&#xE0A2;</span>
+    </p>
+
+    <section class="jazz-test test">
+        <span class="em-box"><small>1em</small></span>
         <!-- Stave -->
-        <span>&#xE014;</span>
+        <span title="stave">&#xE014;</span>
         <!-- Accidentals -->
         <span title="accidentalDoubleFlat">&#xE264;</span>
         <span title="accidentalFlat">&#xE260;</span>
@@ -149,12 +225,184 @@
         <span title="augmentationDot">&#xE0A4;&#xE1E7;</span>
     </section>
 
-    <p style="background-color: yellow;">
-    <span class="music" title="noteheadWhole" style="line-height: 0.25em; display: inline-block; border-radius: 50%; background-color: orange;">&#xE0A2;</span>
-    </p>
+    <section class="ash-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span title="stave">&#xE014;</span>
+        <!-- Accidentals -->
+        <span title="accidentalDoubleFlat">&#xE264;</span>
+        <span title="accidentalFlat">&#xE260;</span>
+        <span title="accidentalNatural">&#xE261;</span>
+        <span title="accidentalSharp">&#xE262;</span>
+        <span title="accidentalDoubleSharp">&#xE263;</span>
+        <span title="accidentalParensLeft + accidentalParensRight">&#xE26A;&#xE260;&#xE26B;</span>
+        <!-- Heads -->
+        <span title="noteheadWhole">&#xE0A2;</span>
+        <span title="noteheadHalf">&#xE0A3;</span>
+        <span title="noteheadBlack">&#xE0A4;</span>
+        <span title="noteheadSlashedBlack2">&#xE0D0;</span>
+        <span title="noteheadDiamondBlack">&#xE0DB;</span>
+        <span title="noteheadDiamondBlackWide">&#xE0DC;</span>
+        <span title="noteheadXBlack">&#xE0A9;</span>
+        <span title="noteheadPlusBlack">&#xE0AF;</span>
+        <span title="noteheadCircleX">&#xE0B3;</span>
+        <span title="noteheadTriangleUpBlack">&#xE0BE;</span>
+        <span title="noteheadSlashVerticalEnds">&#xE100;</span>
+        <span title="noteheadSlashHorizontalEnds (doesn't have horizontal ends in FinaleJazz at least)">&#xE101;</span>
+
+        <span title="(noteheadWhole)">&#xE0F5;&#xE0A2;&#xE0F6;</span>
+        <span title="(noteheadHalf)">&#xE0F5;&#xE0A3;&#xE0F6;</span>
+        <span title="(noteheadBlack)">&#xE0F5;&#xE0A4;&#xE0F6;</span>
+        <span title="(noteheadSlashedBlack2)">&#xE0F5;&#xE0D0;&#xE0F6;</span>
+        <span title="(noteheadDiamondBlack)">&#xE0F5;&#xE0DB;&#xE0F6;</span>
+        <span title="(noteheadDiamondBlackWide)">&#xE0F5;&#xE0DC;&#xE0F6;</span>
+        <span title="(noteheadXBlack)">&#xE0F5;&#xE0A9;&#xE0F6;</span>
+        <span title="(noteheadPlusBlack)">&#xE0F5;&#xE0AF;&#xE0F6;</span>
+        <span title="(noteheadCircleX)">&#xE0F5;&#xE0B3;&#xE0F6;</span>
+        <span title="(noteheadTriangleUpBlack)">&#xE0F5;&#xE0BE;&#xE0F6;</span>
+        <span title="(noteheadSlashVerticalEnds)">&#xE0F5;&#xE100;&#xE0F6;</span>
+
+        <span title="graceNoteAcciaccaturaStemUp">&#xE560;</span>
+        <span title="graceNoteAcciaccaturaStemDown">&#xE561;</span>
+
+        <span title=".">&#xE0A4;.</span>
+        <span title="augmentationDot">&#xE0A4;&#xE1E7;</span>
+    </section>
+
+    <section class="bravura-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span title="stave">&#xE014;</span>
+        <!-- Accidentals -->
+        <span title="accidentalDoubleFlat">&#xE264;</span>
+        <span title="accidentalFlat">&#xE260;</span>
+        <span title="accidentalNatural">&#xE261;</span>
+        <span title="accidentalSharp">&#xE262;</span>
+        <span title="accidentalDoubleSharp">&#xE263;</span>
+        <span title="accidentalParensLeft + accidentalParensRight">&#xE26A;&#xE260;&#xE26B;</span>
+        <!-- Heads -->
+        <span title="noteheadWhole">&#xE0A2;</span>
+        <span title="noteheadHalf">&#xE0A3;</span>
+        <span title="noteheadBlack">&#xE0A4;</span>
+        <span title="noteheadSlashedBlack2">&#xE0D0;</span>
+        <span title="noteheadDiamondBlack">&#xE0DB;</span>
+        <span title="noteheadDiamondBlackWide">&#xE0DC;</span>
+        <span title="noteheadXBlack">&#xE0A9;</span>
+        <span title="noteheadPlusBlack">&#xE0AF;</span>
+        <span title="noteheadCircleX">&#xE0B3;</span>
+        <span title="noteheadTriangleUpBlack">&#xE0BE;</span>
+        <span title="noteheadSlashVerticalEnds">&#xE100;</span>
+        <span title="noteheadSlashHorizontalEnds (doesn't have horizontal ends in FinaleJazz at least)">&#xE101;</span>
+
+        <span title="(noteheadWhole)">&#xE0F5;&#xE0A2;&#xE0F6;</span>
+        <span title="(noteheadHalf)">&#xE0F5;&#xE0A3;&#xE0F6;</span>
+        <span title="(noteheadBlack)">&#xE0F5;&#xE0A4;&#xE0F6;</span>
+        <span title="(noteheadSlashedBlack2)">&#xE0F5;&#xE0D0;&#xE0F6;</span>
+        <span title="(noteheadDiamondBlack)">&#xE0F5;&#xE0DB;&#xE0F6;</span>
+        <span title="(noteheadDiamondBlackWide)">&#xE0F5;&#xE0DC;&#xE0F6;</span>
+        <span title="(noteheadXBlack)">&#xE0F5;&#xE0A9;&#xE0F6;</span>
+        <span title="(noteheadPlusBlack)">&#xE0F5;&#xE0AF;&#xE0F6;</span>
+        <span title="(noteheadCircleX)">&#xE0F5;&#xE0B3;&#xE0F6;</span>
+        <span title="(noteheadTriangleUpBlack)">&#xE0F5;&#xE0BE;&#xE0F6;</span>
+        <span title="(noteheadSlashVerticalEnds)">&#xE0F5;&#xE100;&#xE0F6;</span>
+
+        <span title="graceNoteAcciaccaturaStemUp">&#xE560;</span>
+        <span title="graceNoteAcciaccaturaStemDown">&#xE561;</span>
+
+        <span title=".">&#xE0A4;.</span>
+        <span title="augmentationDot">&#xE0A4;&#xE1E7;</span>
+    </section>
+
+    <section class="broadway-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span title="stave">&#xE014;</span>
+        <!-- Accidentals -->
+        <span title="accidentalDoubleFlat">&#xE264;</span>
+        <span title="accidentalFlat">&#xE260;</span>
+        <span title="accidentalNatural">&#xE261;</span>
+        <span title="accidentalSharp">&#xE262;</span>
+        <span title="accidentalDoubleSharp">&#xE263;</span>
+        <span title="accidentalParensLeft + accidentalParensRight">&#xE26A;&#xE260;&#xE26B;</span>
+        <!-- Heads -->
+        <span title="noteheadWhole">&#xE0A2;</span>
+        <span title="noteheadHalf">&#xE0A3;</span>
+        <span title="noteheadBlack">&#xE0A4;</span>
+        <span title="noteheadSlashedBlack2">&#xE0D0;</span>
+        <span title="noteheadDiamondBlack">&#xE0DB;</span>
+        <span title="noteheadDiamondBlackWide">&#xE0DC;</span>
+        <span title="noteheadXBlack">&#xE0A9;</span>
+        <span title="noteheadPlusBlack">&#xE0AF;</span>
+        <span title="noteheadCircleX">&#xE0B3;</span>
+        <span title="noteheadTriangleUpBlack">&#xE0BE;</span>
+        <span title="noteheadSlashVerticalEnds">&#xE100;</span>
+        <span title="noteheadSlashHorizontalEnds (doesn't have horizontal ends in FinaleJazz at least)">&#xE101;</span>
+
+        <span title="(noteheadWhole)">&#xE0F5;&#xE0A2;&#xE0F6;</span>
+        <span title="(noteheadHalf)">&#xE0F5;&#xE0A3;&#xE0F6;</span>
+        <span title="(noteheadBlack)">&#xE0F5;&#xE0A4;&#xE0F6;</span>
+        <span title="(noteheadSlashedBlack2)">&#xE0F5;&#xE0D0;&#xE0F6;</span>
+        <span title="(noteheadDiamondBlack)">&#xE0F5;&#xE0DB;&#xE0F6;</span>
+        <span title="(noteheadDiamondBlackWide)">&#xE0F5;&#xE0DC;&#xE0F6;</span>
+        <span title="(noteheadXBlack)">&#xE0F5;&#xE0A9;&#xE0F6;</span>
+        <span title="(noteheadPlusBlack)">&#xE0F5;&#xE0AF;&#xE0F6;</span>
+        <span title="(noteheadCircleX)">&#xE0F5;&#xE0B3;&#xE0F6;</span>
+        <span title="(noteheadTriangleUpBlack)">&#xE0F5;&#xE0BE;&#xE0F6;</span>
+        <span title="(noteheadSlashVerticalEnds)">&#xE0F5;&#xE100;&#xE0F6;</span>
+
+        <span title="graceNoteAcciaccaturaStemUp">&#xE560;</span>
+        <span title="graceNoteAcciaccaturaStemDown">&#xE561;</span>
+
+        <span title=".">&#xE0A4;.</span>
+        <span title="augmentationDot">&#xE0A4;&#xE1E7;</span>
+    </section>
+
+    <section class="petaluma-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span title="stave">&#xE014;</span>
+        <!-- Accidentals -->
+        <span title="accidentalDoubleFlat">&#xE264;</span>
+        <span title="accidentalFlat">&#xE260;</span>
+        <span title="accidentalNatural">&#xE261;</span>
+        <span title="accidentalSharp">&#xE262;</span>
+        <span title="accidentalDoubleSharp">&#xE263;</span>
+        <span title="accidentalParensLeft + accidentalParensRight">&#xE26A;&#xE260;&#xE26B;</span>
+        <!-- Heads -->
+        <span title="noteheadWhole">&#xE0A2;</span>
+        <span title="noteheadHalf">&#xE0A3;</span>
+        <span title="noteheadBlack">&#xE0A4;</span>
+        <span title="noteheadSlashedBlack2">&#xE0D0;</span>
+        <span title="noteheadDiamondBlack">&#xE0DB;</span>
+        <span title="noteheadDiamondBlackWide">&#xE0DC;</span>
+        <span title="noteheadXBlack">&#xE0A9;</span>
+        <span title="noteheadPlusBlack">&#xE0AF;</span>
+        <span title="noteheadCircleX">&#xE0B3;</span>
+        <span title="noteheadTriangleUpBlack">&#xE0BE;</span>
+        <span title="noteheadSlashVerticalEnds">&#xE100;</span>
+        <span title="noteheadSlashHorizontalEnds (doesn't have horizontal ends in FinaleJazz at least)">&#xE101;</span>
+
+        <span title="(noteheadWhole)">&#xE0F5;&#xE0A2;&#xE0F6;</span>
+        <span title="(noteheadHalf)">&#xE0F5;&#xE0A3;&#xE0F6;</span>
+        <span title="(noteheadBlack)">&#xE0F5;&#xE0A4;&#xE0F6;</span>
+        <span title="(noteheadSlashedBlack2)">&#xE0F5;&#xE0D0;&#xE0F6;</span>
+        <span title="(noteheadDiamondBlack)">&#xE0F5;&#xE0DB;&#xE0F6;</span>
+        <span title="(noteheadDiamondBlackWide)">&#xE0F5;&#xE0DC;&#xE0F6;</span>
+        <span title="(noteheadXBlack)">&#xE0F5;&#xE0A9;&#xE0F6;</span>
+        <span title="(noteheadPlusBlack)">&#xE0F5;&#xE0AF;&#xE0F6;</span>
+        <span title="(noteheadCircleX)">&#xE0F5;&#xE0B3;&#xE0F6;</span>
+        <span title="(noteheadTriangleUpBlack)">&#xE0F5;&#xE0BE;&#xE0F6;</span>
+        <span title="(noteheadSlashVerticalEnds)">&#xE0F5;&#xE100;&#xE0F6;</span>
+
+        <span title="graceNoteAcciaccaturaStemUp">&#xE560;</span>
+        <span title="graceNoteAcciaccaturaStemDown">&#xE561;</span>
+
+        <span title=".">&#xE0A4;.</span>
+        <span title="augmentationDot">&#xE0A4;&#xE1E7;</span>
+    </section>
 
     <h2>Tails (flags)</h2>
-    <section class="music">
+    <section class="test">
         <!-- Stave -->
         <span>&#xE014;</span>
         <!-- Heads -->
@@ -180,7 +428,7 @@
     </section>
 
     <h2>Rests</h2>
-    <section class="music">
+    <section class="test">
         <!-- Stave -->
         <span>&#xE014;</span>
         <!-- Rests -->
@@ -199,7 +447,7 @@
     </section>
 
     <h2>Accents</h2>
-    <section class="music">
+    <section class="test">
         <!-- Stave -->
         <span>&#xE014;</span>
         <!-- Rests -->
@@ -214,7 +462,7 @@
     </section>
 
     <h2>Meter</h2>
-    <section class="music">
+    <section class="test">
         <!-- Stave -->
         <span>&#xE014;</span>
         <!--  -->
@@ -235,7 +483,7 @@
     </section>
 
     <h2>Tuplets</h2>
-    <section class="music">
+    <section class="test">
         <!-- Stave -->
         <span>&#xE014;</span>
         <!-- Tuplets -->
@@ -252,7 +500,7 @@
     </section>
 
     <h2>Tempo</h2>
-    <section class="music">
+    <section class="test">
         <!-- Stave -->
         <span>&#xE014;</span>
         <!-- Notes -->
@@ -268,7 +516,7 @@
     </section>
 
     <h2>Bars</h2>
-    <section class="music">
+    <section class="test">
         <!-- Stave -->
         <span>&#xE014;</span>
         <!-- Lines -->
@@ -280,7 +528,7 @@
     </section>
 
     <h2>Clefs</h2>
-    <section class="music">
+    <section class="test">
         <!-- Stave -->
         <span>&#xE014;</span>
         <!-- Clefs -->
@@ -293,7 +541,7 @@
     </section>
 
     <h2>Chords</h2>
-    <section class="music">
+    <section class="test">
         <!-- Stave -->
         <span>&#xE014;</span>
         <!-- Symbols -->

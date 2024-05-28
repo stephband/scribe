@@ -1,0 +1,14 @@
+
+@font-face {
+    font-family: BroadwayText;
+    src: url('../fonts/Broadway/finalebroadwaytext-webfont.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: Broadway;
+    src: url('../fonts/Broadway/finalebroadway-webfont.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
