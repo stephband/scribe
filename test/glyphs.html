@@ -34,6 +34,10 @@
             font-family: sans-serif;
         }
 
+        p {
+            max-width: 40em;
+        }
+
         .em-box {
             display: inline-block;
             font-family: sans-serif;
@@ -128,6 +132,10 @@
             grid-column-end: span 1 !important;
             margin-left: 0 !important;
             margin-right: 0 !important;
+        }
+
+        .chord-abbr {
+            line-height: 1em;
         }
 
         .chord-abbr .chord-maj {
@@ -257,7 +265,9 @@
     <p>From the SMuFL spec at <a href="https://w3c.github.io/smufl/latest/index.html">w3c.github.io/smufl/latest/index.html</a>,
     and its <a href="https://w3c.github.io/smufl/latest/specification/scoring-metrics-glyph-registration.html">description
     of SMuFL font metrics</a>.</p>
-    <p>Each glyph presented here in a span that, I think, but am not entirely sure, represents its line box.</p>
+    <p>Each glyph presented here in a span. Spans with classes have their line-height
+    adjusted to fit their glyphs. By default SMuFL glyphs have enormous line boxes.
+    I don't know why.</p>
 
     <h2>Notes</h2>
     <section class="jazz-test test">
