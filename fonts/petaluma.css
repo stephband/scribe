@@ -1,7 +1,7 @@
 
 @font-face {
     font-family: PetalumaText;
-    src: url('../fonts/Petaluma/redist/woff/PetalumaText.woff2') format('woff2');
+    src: url('../fonts/Petaluma/redist/woff/PetalumaScript.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
 }
@@ -11,4 +11,8 @@
     src: url('../fonts/Petaluma/redist/woff/Petaluma.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
+}
+
+.petaluma-font {
+    font-family: Petaluma, PetalumaText;
 }

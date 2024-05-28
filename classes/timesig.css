@@ -1,4 +1,4 @@
-
+/*
 .timesig {
     display: grid;
     grid-auto-flow: rows;
@@ -15,7 +15,7 @@
     align-self: start;
     justify-self: center;
 }
-
+*/
 
 /* The 'new' way! */
 
@@ -43,10 +43,8 @@ button.timesig:hover {
     display: block;
     position: static;
 
-    font-family: ScribeText, math;
-    font-size: 1.333333em;
-    line-height: 0.92em;
-    font-weight: bold;
+    font-size: inherit;
+    line-height: 0.625em;
 
     margin: 0;
     grid-column: 1;

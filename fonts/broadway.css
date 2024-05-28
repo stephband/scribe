@@ -1,7 +1,7 @@
 
 @font-face {
     font-family: BroadwayText;
-    src: url('../fonts/Broadway/finalebroadwaytext-webfont.woff2') format('woff2');
+    src: url('../fonts/BroadwayText/finalebroadwaytext-webfont.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
 }
@@ -11,4 +11,8 @@
     src: url('../fonts/Broadway/finalebroadway-webfont.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
+}
+
+.broadway-font {
+    font-family: Broadway, BroadwayText;
 }

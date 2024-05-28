@@ -2,7 +2,7 @@
 @import '../fonts/jazz.css';
 
 scribe-music {
-    font-family: FinaleJazz, FinaleJazzText, sans-serif;
+    font-family: Jazz, JazzText, sans-serif;
 }
 
 scribe-music::after {
