@@ -72,11 +72,11 @@ export default overload(get('type'), {
         undefined :
         create('span', {
             class: `${symbol.clef}-clef clef`,
-            style: `font-size:2em;line-height:0.25em;`,
+//            style: `font-size:2em;line-height:0.25em;`,
             //data: { eventId: identify(symbol.event) },
             data: { eventId: null },
             viewBox: "0 0.4 5.2 14.6",
-            preserveAspectRatio: "none",
+//            preserveAspectRatio: "none",
             html: "\uE050"
         }),
 
@@ -103,7 +103,7 @@ export default overload(get('type'), {
     // Create accidental
     acci: (symbol) => create('span', {
         class: "acci",
-        style: `font-size:2em;line-height:0.25em;`,
+//        style: `font-size:2em;line-height:0.25em;`,
         data: symbol.beat === undefined ?
             { pitch: symbol.pitch } :
             { beat: symbol.beat + 1, pitch: symbol.pitch, part: symbol.part, eventId: identify(symbol.event) },
@@ -116,7 +116,7 @@ export default overload(get('type'), {
         viewBox: `0 ${0.5 - symbol.rows} 4.4 ${symbol.rows}`,
         preserveAspectRatio: "xMidYMax",
         data: { beat: symbol.beat + 1, pitch: symbol.pitch, part: symbol.part },
-        style: `height: calc(${symbol.rows} * var(--y-size));`,
+        style: `height: ${ symbol.rows * 0.125 }em;`,
         html: '<use x="0" y="-8" href="#ledges"></use>'
     }),
 
@@ -125,16 +125,13 @@ export default overload(get('type'), {
         viewBox: `0 -0.5 4.4 ${symbol.rows}`,
         preserveAspectRatio: "xMidYMin",
         data: { beat: symbol.beat + 1, pitch: symbol.pitch, part: symbol.part },
-        style: `height: calc(${symbol.rows} * var(--y-size));`,
+        style: `height: ${ symbol.rows * 0.125 }em;`,
         html: '<use x="0" y="-8" href="#ledges"></use>'
     }),
 
     // Create note head
     head: (symbol) => create('span', {
         class: "head",
-        viewBox: "0 -1 2.7 2",
-        style: `font-size:2em;line-height:0.25em;`,
-        preserveAspectRatio: "xMidYMid slice",
         data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part, eventId: identify(symbol.event) },
         html: symbol.head ? headGlyphs[symbol.head] : ![0.125, 0.375, 0.75, 1.5, 3, 6].includes(symbol.duration) ? headGlyphs[symbol.duration] : `${headGlyphs[symbol.duration]}<span>${headGlyphs["dot"]}</span>`
     }),
@@ -158,7 +155,7 @@ export default overload(get('type'), {
         preserveAspectRatio: "none",
         data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part },
         /*style: 'grid-row-end: span ' + Math.ceil(1 - symbol.range),*/
-        style: `height: calc(${abs(symbol.range) + 1} * var(--y-size)); align-self: ${symbol.range > 0 ? 'end' : 'start'};`,
+        style: `height: ${ (abs(symbol.range) + 1) * 0.125 }em; align-self: ${symbol.range > 0 ? 'end' : 'start'};`,
         html: `
             <path class="beam-path" d="M0,${-0.5 * beamThickness} L${symbol.stems.length - 1},${-symbol.range - 0.5 * beamThickness} L${symbol.stems.length - 1},${-symbol.range + 0.5 * beamThickness} L0,${0.5 * beamThickness} Z"></path>
             ${create16thNoteBeams(symbol.stems, symbol.range)}
@@ -173,14 +170,14 @@ export default overload(get('type'), {
         preserveAspectRatio: "none",
         data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part },
         /*style: 'grid-row-end: span ' + symbol.duration / 24 + ';' */
-        style: `height: calc(6 * var(--y-size)); align-self: ${symbol.updown === 'up' ? 'end' : 'start'};`,
+        style: `height: 0.75em; align-self: ${symbol.updown === 'up' ? 'end' : 'start'};`,
         html: `<use href="#tie"></use>`
     }),
 
     // Create note tail
     tail: (symbol) => create('span', {
         class: `${symbol.stemDirection}-tail tail`,
-        style: `font-size:2em;line-height:0.25em;`,
+//        style: `font-size:2em;line-height:0.25em;`,
         data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part, eventId: identify(symbol.event) },
         html: tailGlyphs[symbol.stemDirection][symbol.duration]
     }),
@@ -188,7 +185,7 @@ export default overload(get('type'), {
     // Create rest
     rest: (symbol) => create('span', {
         class: "rest",
-        style: `font-size:2em;line-height:0.25em;`,
+//        style: `font-size:2em;line-height:0.25em;`,
         preserveAspectRatio: "xMidYMid slice",
         data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part },
         html: ![0.125, 0.375, 0.75, 1.5, 3, 6].includes(symbol.duration) ? restGlyphs[symbol.duration] : `${restGlyphs[symbol.duration]}<span>${restGlyphs["dot"]}</span>`

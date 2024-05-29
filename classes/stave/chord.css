@@ -1,22 +1,22 @@
 
 .chord-stave {
     grid-template-rows:
-        var(--y-size)
-        var(--y-size)
-        var(--y-size)
-        [stave-top] var(--y-size)
-        var(--y-size)
-        var(--y-size)
-        var(--y-size)
-        var(--y-size)
-        [stave-center stave-top] var(--y-size)
-        var(--y-size)
-        var(--y-size)
-        [chords] var(--y-size)
-        var(--y-size)
-        [stave-bottom] var(--y-size)
-        var(--y-size)
-        [lyrics] var(--y-size);
+        0.125em
+        0.125em
+        0.125em
+        [stave-top] 0.125em
+        0.125em
+        0.125em
+        0.125em
+        0.125em
+        [stave-center stave-top] 0.125em
+        0.125em
+        0.125em
+        [chords] 0.125em
+        0.125em
+        [stave-bottom] 0.125em
+        0.125em
+        [lyrics] 0.125em;
 
     background-image: none;
 }

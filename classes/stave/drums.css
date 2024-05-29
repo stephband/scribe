@@ -7,31 +7,31 @@ https://web.mit.edu/merolish/Public/drums.pdf
 
 .drums-stave {
     grid-template-rows:
-        var(--y-size)
-        var(--y-size)
-        [chords] var(--y-size)
-        var(--y-size)
-        [splash]      var(--y-size)
-        [crash2]      var(--y-size)
-        [crash]       var(--y-size)
-        [hihat]       var(--y-size)
-        [ride stave-top] var(--y-size)
-        [hightom]     var(--y-size)
-        [midtom stave-upper] var(--y-size)
-        [snare]       var(--y-size)
-        [lowtom stave-center] var(--y-size)
-        [floortom]    var(--y-size)
-        [lowfloortom] var(--y-size)
-        [kick]       var(--y-size)
-        [kick2 stave-lower] var(--y-size)
-        [hihatpedal stave-bottom] var(--y-size)
-        [foot]        var(--y-size)
-        var(--y-size)
-        var(--y-size)
-        var(--y-size)
-        var(--y-size)
-        var(--y-size)
-        [lyrics] var(--y-size);
+        0.125em
+        0.125em
+        [chords] 0.125em
+        0.125em
+        [splash]   0.125em
+        [crash2]   0.125em
+        [crash]    0.125em
+        [hihat]    0.125em
+        [ride stave-top] 0.125em
+        [hightom]  0.125em
+        [midtom stave-upper] 0.125em
+        [snare]    0.125em
+        [lowtom stave-center] 0.125em
+        [floortom] 0.125em
+        [lowfloortom] 0.125em
+        [kick]     0.125em
+        [kick2 stave-lower] 0.125em
+        [hihatpedal stave-bottom] 0.125em
+        [foot]     0.125em
+        0.125em
+        0.125em
+        0.125em
+        0.125em
+        0.125em
+        [lyrics] 0.125em;
 }
 
 /* TEMP */

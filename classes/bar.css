@@ -9,7 +9,7 @@
 	--bar-padding-right: 0.3em;
 	--acci-margin-left:  0;
 	--acci-margin-right: 0.25em;
-	--head-width:        calc(2.7 * var(--y-size));
+	--head-width:        0.3375em;
 	--head-margin-left:  0.25em;
 	--head-margin-right: 0.1em;
 	--stem-thickness:    0.06em;
@@ -22,7 +22,6 @@
 	justify-content: stretch;
 	justify-items: stretch;
 	column-gap:    var(--bar-column-gap);
-
 	padding-left:  var(--bar-padding-left);
 	padding-right: var(--bar-padding-right);
 }
@@ -163,6 +162,15 @@ Bars are divided into:
 		[bar-end];
 }
 
+.bar[data-duration="8"] {
+	grid-template-columns:
+		[bar-begin]
+		max-content
+		repeat(193, minmax(max-content, auto))
+		max-content
+		[bar-end];
+}
+
 .bar::before,
 .bar::after {
 	content: '';
@@ -170,8 +178,8 @@ Bars are divided into:
 	background: currentcolor;
 	grid-row: stave-top / stave-bottom;
 	align-self: stretch;
-	margin-top: calc(0.5 * var(--y-size));
-	margin-bottom: calc(0.5 * var(--y-size));
+	margin-top: 0.0625em;
+	margin-bottom: 0.0625em;
 }
 
 .bar::before {
@@ -400,8 +408,8 @@ Bars are divided into:
 .bar > .clef {
     justify-self: start;
     grid-column: 1 / span 1;
-    margin-left: calc(-1 * var(--y-size));
-    margin-right: calc(2 * var(--y-size));
+    margin-left: -0.125em;
+    margin-right: 0.25em;
 }
 
 .bar > .timesig {
@@ -664,18 +672,18 @@ Bars are divided into:
 }
 
 .bar > .up-tail {
-	margin-right: calc(2.5 * var(--y-size));
+	margin-right: 0.3125em;
 }
 
 .bar > .down-tail {
-	margin-right: calc(0.75 * var(--y-size));
+	margin-right: 0.09375em;
 }
 
 .bar > .ledge {
 	width: auto;
 	/* Make ledger take up same space as head */
-	margin-left:  calc(var(--head-margin-left) - 1 * var(--y-size));
-	margin-right: calc(-1 * var(--y-size));
+	margin-left:  calc(var(--head-margin-left) - 0.125em);
+	margin-right: -0.125em;
 }
 
 
@@ -697,8 +705,8 @@ in their duration span. */
 .bar > .rest[data-duration="1.5"],
 .bar > .rest[data-duration="1.75"] {
 	grid-column-end: span 1;
-	margin-left:  calc(var(--head-margin-left) + 0.125 * var(--y-size));
-	margin-right: calc(0.125 * var(--y-size))
+	margin-left:  calc(var(--head-margin-left) + 0.015625em);
+	margin-right: 0.015625em;
 }
 
 .bar > .rest[data-duration="2"],
@@ -722,8 +730,8 @@ in their duration span. */
 }
 
 .bar > .up-beam {
-	margin-left:  calc(var(--head-margin-left) + 2.7 * var(--y-size) - var(--stem-thickness));
-	margin-right: calc(-1 * var(--head-margin-left) - var(--bar-column-gap, 0.03125em) - 2.7 * var(--y-size));
+	margin-left:  calc(var(--head-margin-left) + 0.3375em - var(--stem-thickness));
+	margin-right: calc(-1 * var(--head-margin-left) - var(--bar-column-gap, 0.03125em) - 0.3375em);
 }
 
 .bar > .down-beam {
@@ -753,8 +761,8 @@ in their duration span. */
 	/* Make tie span from centre of one head to centre of next. A tie to the
 	   next bar ends in the bar end column. */
 	/* - column gap - half of head width */
-	margin-left: calc(var(--head-margin-left) + 2.7 * var(--y-size));
+	margin-left: calc(var(--head-margin-left) + 0.3375em);
 	/* - bar start gap - half of head width */
-	margin-right: calc(-3 * var(--y-size));
-	min-width: calc(4 * var(--y-size));
+	margin-right: -0.375em;
+	min-width: 0.5em;
 }

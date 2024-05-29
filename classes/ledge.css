@@ -11,7 +11,7 @@
 
 .ledge {
     overflow: hidden;
-    width: calc(4.4 * var(--y-size));
+    width: 0.55em;
     vector-effect: non-scaling-stroke;
     stroke:currentcolor;
     stroke-width:0.05em;

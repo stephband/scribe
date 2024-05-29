@@ -1,55 +1,55 @@
 
 .piano-stave {
     grid-template-rows:
-        [B6] var(--y-size)
-        [A6] var(--y-size)
-        [G6] var(--y-size)
-        [F6 chords] var(--y-size)
-        [E6] var(--y-size)
-        [D6] var(--y-size)
-        [C6] var(--y-size)
-        [B5] var(--y-size)
-        [A5] var(--y-size)
-        [G5] var(--y-size)
-        [F5 stave-top] var(--y-size)
-        [E5] var(--y-size)
-        [D5] var(--y-size)
-        [C5] var(--y-size)
-        [B4 stave-upper] var(--y-size)
-        [A4] var(--y-size)
-        [G4] var(--y-size)
-        [F4] var(--y-size)
-        [E4] var(--y-size)
-        [D4] var(--y-size)
-        [C4] var(--y-size)
-        [B3] var(--y-size)
-        var(--y-size)
-        var(--y-size)
-        [stave-center lyrics] var(--y-size)
-        var(--y-size)
-        var(--y-size)
-        var(--y-size)
-        var(--y-size)
-        var(--y-size)
-        [A3] var(--y-size)
-        [G3] var(--y-size)
-        [F3] var(--y-size)
-        [E3] var(--y-size)
-        [D3 stave-lower] var(--y-size)
-        [C3] var(--y-size)
-        [B2] var(--y-size)
-        [A2] var(--y-size)
-        [G2] var(--y-size)
-        [F2 stave-bottom] var(--y-size)
-        [E2] var(--y-size)
-        [D2] var(--y-size)
-        [C2] var(--y-size)
-        [A1] var(--y-size)
-        [G1] var(--y-size)
-        [F1] var(--y-size)
-        [E1] var(--y-size)
-        [D1] var(--y-size)
-        [C1] var(--y-size);
+        [B6] 0.125em
+        [A6] 0.125em
+        [G6] 0.125em
+        [F6 chords] 0.125em
+        [E6] 0.125em
+        [D6] 0.125em
+        [C6] 0.125em
+        [B5] 0.125em
+        [A5] 0.125em
+        [G5] 0.125em
+        [F5 stave-top] 0.125em
+        [E5] 0.125em
+        [D5] 0.125em
+        [C5] 0.125em
+        [B4 stave-upper] 0.125em
+        [A4] 0.125em
+        [G4] 0.125em
+        [F4] 0.125em
+        [E4] 0.125em
+        [D4] 0.125em
+        [C4] 0.125em
+        [B3] 0.125em
+        0.125em
+        0.125em
+        [stave-center lyrics] 0.125em
+        0.125em
+        0.125em
+        0.125em
+        0.125em
+        0.125em
+        [A3] 0.125em
+        [G3] 0.125em
+        [F3] 0.125em
+        [E3] 0.125em
+        [D3 stave-lower] 0.125em
+        [C3] 0.125em
+        [B2] 0.125em
+        [A2] 0.125em
+        [G2] 0.125em
+        [F2 stave-bottom] 0.125em
+        [E2] 0.125em
+        [D2] 0.125em
+        [C2] 0.125em
+        [A1] 0.125em
+        [G1] 0.125em
+        [F1] 0.125em
+        [E1] 0.125em
+        [D1] 0.125em
+        [C1] 0.125em;
 
     background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -14.5 1 29" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
         <style>line{vector-effect:non-scaling-stroke;stroke:currentcolor;stroke-width:0.04em;stroke-linejoin:round;stroke-linecap:round;fill:none;}</style>\

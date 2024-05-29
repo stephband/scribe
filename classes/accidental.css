@@ -4,7 +4,7 @@
 
     /*width: calc(2.5 * var(--y-size));*/
     width: auto;
-    height: calc(8 * var(--y-size));
+    height: 1em;
     /*
     background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -4 2.5 8" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
         <style>path{vector-effect:non-scaling-stroke;fill:red;}</style>\
@@ -13,9 +13,9 @@
     */
 }
 
-.acci:not([pitch*="♭"], [pitch*="♯"]) { width: calc(1.8 * var(--y-size)); }
-.acci[pitch*="♭"] { width: calc(2 * var(--y-size)); }
-.acci[pitch*="♯"] { width: calc(2.3 * var(--y-size)); }
+.acci:not([pitch*="♭"], [pitch*="♯"]) { width: 0.225em; }
+.acci[pitch*="♭"] { width: 0.5em; }
+.acci[pitch*="♯"] { width: 0.2875em; }
 
 /* An accidental does not need to be displayed twice in one bar. */
 /*

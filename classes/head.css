@@ -1,8 +1,8 @@
 .head {
     stroke: none;
     stroke-width: 0;
-    width:  calc(2.7 * var(--y-size));
-    height: var(--y-size);
+    /*width:  0.3375em;*/
+    height: 0.125em;
 }
 
 div.head {

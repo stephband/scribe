@@ -1,7 +1,8 @@
 
 .stave {
-    /* 4px per row means 8px per line, 32px stave */
-    --y-size: 0.25em;
+    /* The SMuFL font spec says that a standard five-line stave is 1em high,
+       making the stave line to stave line distance 0.25em, and a stave row 0.125em */
+    --y-size: 0.125em;
     --stem-size: 7;
 
     display: grid;
@@ -9,11 +10,11 @@
     /* Prevent stray content from breaking layout */
     grid-auto-rows: 0;
 
-    /* This helps mask rounding error gaps between bars in Safari, but we don't
-       really want to do this. */
-    /* background-color: white; */
+    /* By default, render staves at 32px high */
+    font-size: 2em;
 
-    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -4.5 1 9" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
+    /* Render the stave as a background image */
+    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -5 1 10" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
         <style>line{vector-effect:non-scaling-stroke;stroke:currentcolor;stroke-width:0.04em;stroke-linejoin:round;stroke-linecap:round;fill:none;}</style>\
         <line x1="0" x2="1" y1="4" y2="4"></line>\
         <line x1="0" x2="1" y1="2" y2="2"></line>\
@@ -22,7 +23,7 @@
         <line x1="0" x2="1" y1="-4" y2="-4"></line>\
     </svg>');
     background-repeat: repeat-x;
-    background-size: 100% calc(9 * var(--y-size));
+    background-size: 100% 1.25em;
     background-position: 0 50%;
 }
 
@@ -33,8 +34,32 @@
 }
 
 .stave > .clef {
-    grid-row: stave-center;
     align-self: center;
+}
+
+.stave > .treble-clef {
+    grid-row: G4;
+}
+
+.stave > .treble8up-clef {
+    grid-row: G5;
+}
+
+.stave > .treble8down-clef {
+    grid-row: G3;
+}
+
+.stave > .bass-clef {
+    grid-row: F3;
+}
+
+.stave > .alto-clef {
+    grid-row: C4;
+}
+
+.stave > .drum-clef,
+.stave > .percussion-clef {
+    grid-row: stave-center;
 }
 
 .stave > .timesig {
@@ -64,12 +89,12 @@
 
 .stave > .up-stem {
     align-self: end;
-    margin-bottom: calc(0.5 * var(--y-size));
+    margin-bottom: 0.0625em;
 }
 
 .stave > .down-stem {
     align-self: start;
-    margin-top: calc(0.5 * var(--y-size));
+    margin-top: 0.0625em;
 }
 
 .stave > .ledge {
@@ -95,12 +120,12 @@
 
 .stave > .up-beam {
     position: relative;
-    top: calc(-1 * var(--stem-size) * var(--y-size));
+    top: calc(-1 * var(--stem-size) * 0.125em);
 }
 
 .stave > .down-beam {
     position: relative;
-    top: calc(var(--stem-size) * var(--y-size));
+    top: calc(var(--stem-size) * 0.125em);
 }
 
 .stave > .rest {
@@ -111,12 +136,12 @@
 .stave > .tie,
 .stave > .down-tie {
     align-self: start;
-    margin-top: calc(1.8 * var(--y-size));
+    margin-top: 0.225em;
 }
 
 .stave > .up-tie {
     align-self: end;
-    margin-bottom: calc(1.8 * var(--y-size));
+    margin-bottom: 0.225em;
 }
 
 .stave > .lyric {
