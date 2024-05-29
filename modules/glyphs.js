@@ -1,55 +1,4 @@
 
-export const headGlyphs = {
-    0.0625: "\uE0A4",
-    0.125: "\uE0A4",
-    0.25: "\uE0A4",
-    0.375: "\uE0A4",
-    0.5: "\uE0A4",
-    0.75: "\uE0A4",
-    1: "\uE0A4",
-    "1Ghost": "\uE0A4<span>\uE0CE</span>",
-    1.5: "\uE0A4",
-    2: "\uE4E3",
-    3: "\uE0A3",
-    4: "\uE0A2",
-    6: "\uE0A2",
-    "dot": "\uD834\uDD6D",
-    slashedBlack: "\uE0D0",
-    slashedBlackGhost: "\uE0D0<span>\uE0CE</span>",
-    xBlack: "\uE0A9",
-    xBlackGhost: "\uE0A9<span>\uE0CE</span>",
-    circleX: "\uE0B3",
-    circleXGhost: "\uE0B3<span>\uE0CE</span>",
-    xOrnate: "\uE0AA",
-    xOrnateGhost: "\uE0AA<span>\uE0CE</span>",
-    triangleUpBlack: "\uE0BE",
-    triangleUpBlackGhost: "\uE0BE<span>\uE0CE</span>",
-    diamondBlack: "\uE0DB",
-    diamondBlackGhost: "\uE0DB<span>\uE0CE</span>",
-    circledBlack: "\uE0E4",
-    circledBlackGhost: "\uE0E4<span>\uE0CE</span>",
-};
-
-export const chordGlyphs = {
-    "∆♯11": "\uE873\uED6211",
-    "∆": "\uE873",
-    "7": "7",
-    "-7": "\uE8747",
-    "-♭6": "\uE874\uED606",
-    "7sus♭9": "7sus\uED62",
-    "ø": "\uE871",
-    "7♯11": "7\uED6211",
-    "-∆": "\uE874\uE873",
-    "∆♭6": "\uE873\uED606",
-    "-♭9": "\uE874\uED609",
-    "ø7": "\uE8717",
-    "∆♯5": "\uE873\uED625",
-    "7alt": "7alt",
-    "°": "\uE870",
-    "7♭9": "7\uED60",
-    "+7": "\uE8727",
-}
-
 export const trebleClef      = '&#xE050;';
 export const treble8downClef = '&#xE052;';
 export const treble8upClef   = '&#xE053;';
@@ -92,6 +41,8 @@ export const head3     = '&#xE0A3;&#xE1E7;';
 export const head4     = '&#xE0A2;';
 export const head6     = '&#xE0A2;&#xE1E7;';
 
+export const headBracketLeft         = '&#xE0F5;';
+export const headBracketRight        = '&#xE0F6;';
 export const headSlashedBlack2       = '&#xE0D0;';
 export const headDiamondBlack        = '&#xE0DB;';
 export const headDiamondBlackWide    = '&#xE0DC;';
@@ -102,22 +53,8 @@ export const headTriangleUpBlack     = '&#xE0BE;';
 export const headSlashVerticalEnds   = '&#xE100;';
 export const headSlashHorizontalEnds = '&#xE101;';
 
-/*
-export const (noteheadWhole)">&#xE0F5;&#xE0A2;&#xE0F6;';
-export const (noteheadHalf)">&#xE0F5;&#xE0A3;&#xE0F6;';
-export const (noteheadBlack)">&#xE0F5;&#xE0A4;&#xE0F6;';
-export const (noteheadSlashedBlack2)">&#xE0F5;&#xE0D0;&#xE0F6;';
-export const (noteheadDiamondBlack)">&#xE0F5;&#xE0DB;&#xE0F6;';
-export const (noteheadDiamondBlackWide)">&#xE0F5;&#xE0DC;&#xE0F6;';
-export const (noteheadXBlack)">&#xE0F5;&#xE0A9;&#xE0F6;';
-export const (noteheadPlusBlack)">&#xE0F5;&#xE0AF;&#xE0F6;';
-export const (noteheadCircleX)">&#xE0F5;&#xE0B3;&#xE0F6;';
-export const (noteheadTriangleUpBlack)">&#xE0F5;&#xE0BE;&#xE0F6;';
-export const (noteheadSlashVerticalEnds)">&#xE0F5;&#xE100;&#xE0F6;';
-
-<span class="head" title="graceNoteAcciaccaturaStemUp">&#xE560;</span>
-<span class="head" title="graceNoteAcciaccaturaStemDown">&#xE561;</span>
-*/
+export const graceNoteStemUp   = '&#xE560;';
+export const graceNoteStemDown = '&#xE561;';
 
 export const tailUp05     = '&#xE240;'
 export const tailDown05   = '&#xE241;'
@@ -138,3 +75,34 @@ export const rest2     = '&#xE4E4;';
 export const rest3     = '&#xE4E4;&#xE1E7;';
 export const rest4     = '&#xE4E3;';
 export const rest6     = '&#xE4E3;&#xE1E7;';
+
+export const chordDiminished      = '&#xE870;';
+export const chordHalfDiminished  = '&#xE871;';
+export const chordAugmented       = '&#xE872;';
+export const chordMajorSeventh    = '&#xE873;';
+export const chordMinor           = '&#xE874;';
+export const chordParensLeftTall  = '&#xE875;';
+export const chordParensRightTall = '&#xE876;';
+export const chordBracketLeft     = '(';
+export const chordBracketRight    = ')';
+export const chordBassSlash       = '&#xE87B;';
+
+export const chordGlyphs = {
+    "∆♯11": "\uE873\uED6211",
+    "∆": "\uE873",
+    "7": "7",
+    "-7": "\uE8747",
+    "-♭6": "\uE874\uED606",
+    "7sus♭9": "7sus\uED62",
+    "ø": "\uE871",
+    "7♯11": "7\uED6211",
+    "-∆": "\uE874\uE873",
+    "∆♭6": "\uE873\uED606",
+    "-♭9": "\uE874\uED609",
+    "ø7": "\uE8717",
+    "∆♯5": "\uE873\uED625",
+    "7alt": "7alt",
+    "°": "\uE870",
+    "7♭9": "7\uED60",
+    "+7": "\uE8727",
+};

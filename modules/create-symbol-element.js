@@ -83,7 +83,9 @@ export default overload(get('type'), {
             duration: symbol.duration,
             eventId:  identify(symbol.event)
         },
-        html: symbol.root + (chordGlyphs[symbol.extension] ? chordGlyphs[symbol.extension] : symbol.extension)
+        html: '<span class="chord-root">' + symbol.root + '</span>'
+            + (chordGlyphs[symbol.extension] ? chordGlyphs[symbol.extension] : symbol.extension)
+            + (symbol.bass ? glyphs.chordBassSlash + '<span class="chord-bass">' + symbol.bass + '</span>' : '')
     }),
 
     timesig: (symbol) => create('span', {
