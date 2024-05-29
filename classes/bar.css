@@ -416,7 +416,7 @@ Bars are divided into:
     justify-self: start;
     grid-column: 1 / span 1;
     margin-left: 0;
-    margin-right: 0.6em;
+    margin-right: 0.3em;
 
     --timesig-gap: 1em;
 }
@@ -453,7 +453,7 @@ Bars are divided into:
 }
 
 .bar > .clef + .timesig {
-    --clef-timesig: 2em;
+    --clef-timesig: 1em;
     margin-left: var(--clef-timesig);
 }
 
