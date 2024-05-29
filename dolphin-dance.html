@@ -22,6 +22,11 @@
     <link rel="stylesheet" href="./build/scribe-music/module.css" />
     <script type="module" src="./build/scribe-music/module.js"></script>
     <link rel="stylesheet" href="./elements/lead-sheet-document.css" />
+    <style>
+    body {
+        font-family: Jazz, JazzText;
+    }
+    </style>
 
     <script type="module">
     document.body.addEventListener('change', function(e) {
@@ -41,7 +46,7 @@
 </head>
 
 <body>
-    <header style="font-family: ScribeText;">
+    <header>
         <h1>Dolphin Dance</h1>
         <p class="author">Herbie Hancock</p>
         <form class="scribe-part">
@@ -50,7 +55,7 @@
                 <option value="treble">Treble</option>
                 <option value="bass">Bass</option>
                 <option value="piano">Piano</option>
-                <option value="drums">Drums</option>
+                <option value="drum">Drums</option>
                 <option value="percussion">Percussion</option>
             </select>
             <label for="select-transpose">Transpose:</label>
@@ -86,7 +91,7 @@
 
     <scribe-music clef="treble" type="application/json" src="./data/dolphin-dance.json"></scribe-music>
 
-    <footer style="font-family: ScribeText;">
+    <footer>
         <p>Test page for music renderer <a href="https://github.com/stephband/scribe/">Scribe</a>. Contribute on <a href="https://github.com/stephband/scribe">github</a>.</p>
     </footer>
 </body>

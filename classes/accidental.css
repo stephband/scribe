@@ -1,27 +1,6 @@
+
 .acci {
-    stroke: none;
-    stroke-width: 0;
-
-    /*width: calc(2.5 * var(--y-size));*/
-    width: auto;
-    height: calc(8 * var(--y-size));
-    /*
-    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -4 2.5 8" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
-        <style>path{vector-effect:non-scaling-stroke;fill:red;}</style>\
-        <path d="M0,-4 L2.5,-4 L2.5,4 L0,4 Z"></path>\
-    </svg>');
-    */
+    /* Make it's box two stave spaces high */
+    line-height: 0.5em;
+    height: auto;
 }
-
-.acci:not([pitch*="♭"], [pitch*="♯"]) { width: calc(1.8 * var(--y-size)); }
-.acci[pitch*="♭"] { width: calc(2 * var(--y-size)); }
-.acci[pitch*="♯"] { width: calc(2.3 * var(--y-size)); }
-
-/* An accidental does not need to be displayed twice in one bar. */
-/*
-.acci[pitch*="b"] ~ .acci[pitch*="b"],
-.acci[pitch*="#"] ~ .acci[pitch*="#"],
-.acci:not([pitch*="b"], [pitch*="#"]) ~ .acci:not([pitch*="b"], [pitch*="#"]) {
-    display: none;
-}
-*/

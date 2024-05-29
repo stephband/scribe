@@ -1,6 +1,9 @@
-import get      from '../lib/fn/modules/get.js';
+import get from '../lib/fn/modules/get.js';
 import overload from '../lib/fn/modules/overload.js';
-import create   from '../lib/dom/modules/create.js';
+import create from '../lib/dom/modules/create.js';
+import * as glyphs from "./glyphs.js";
+import { chordGlyphs } from "./glyphs.js";
+import { rflat, rsharp } from './regexp.js';
 
 const abs = Math.abs;
 
@@ -30,10 +33,10 @@ const beamThickness = 1.1;
 
 function renderBeam(range, stems, beam) {
     return `<path class="beam-path-16th beam-path" d="
-        M${ beam[0] },              ${ (-range * beam[0] / (stems.length - 1)) - 0.5 * beamThickness }
-        L${ beam[beam.length - 1] },${ (-range * beam[beam.length - 1] / (stems.length - 1)) - 0.5 * beamThickness }
-        L${ beam[beam.length - 1] },${ (-range * beam[beam.length - 1] / (stems.length - 1)) + 0.5 * beamThickness }
-        L${ beam[0] },              ${ (-range * beam[0] / (stems.length - 1)) + 0.5 * beamThickness }
+        M${beam[0]},              ${(-range * beam[0] / (stems.length - 1)) - 0.5 * beamThickness}
+        L${beam[beam.length - 1]},${(-range * beam[beam.length - 1] / (stems.length - 1)) - 0.5 * beamThickness}
+        L${beam[beam.length - 1]},${(-range * beam[beam.length - 1] / (stems.length - 1)) + 0.5 * beamThickness}
+        L${beam[0]},              ${(-range * beam[0] / (stems.length - 1)) + 0.5 * beamThickness}
     Z"></path>`;
 }
 
@@ -65,164 +68,200 @@ function create16thNoteBeams(stems, range) {
     return html;
 }
 
-export default overload(get('type'), {
-    // Create clef
-    clef: (symbol) => symbol.clef === 'percussion' ?
-        undefined :
-        create('svg', {
-            class:   `${ symbol.clef }-clef clef`,
-            data: { eventId: null },
-            viewBox: "0 0.4 5.2 14.6",
-            preserveAspectRatio: "none",
-            html: `<use x="3.2" y="1" width="8" href="#${ symbol.clef }-clef"></use>`
-        }),
+const chordParts = {
+    'flat':  `<span class="chord-flat">${ glyphs.acciFlat }</span>`,
+    'sharp': `<span class="chord-sharp">${ glyphs.acciSharp }</span>`
+};
 
-    // Create chord symbol
-    chord: (symbol) => create('p', {
-        class:   "chord",
-        data: { beat: symbol.beat + 1, duration: symbol.duration, eventId: identify(symbol.event) },
-        html: (() => {
-            return symbol.value
-            .replace('(♯11)', '<sup class="chord-brackets">(♯11)</sup>')
-            .replace('6',   '<sup class="six">6</sup>')
-            .replace('7',   '<sup class="seven">7</sup>')
-            .replace('9',   '<sup class="nine">9</sup>')
-            .replace('maj', '<sub class="tag">maj</sub>')
-            .replace('min', '<sub class="tag">min</sub>')
-            .replace('alt', '<sub class="tag">alt</sub>')
-            .replace('sus', '<sub class="tag">sus</sub>')
-            .replace('ø',   '<sup class="halfdim">ø</sup>')
-            .replace('♯', '<span class="sharp">♯</span>')
-            .replace('♭', '<span class="flat">♭</span>')
-            .replace('♮', '<span class="natural">♮</span>');
-        })(symbol)
+export default overload(get('type'), {
+    clef: (symbol) => create('span', {
+        class: `${ symbol.clef }-clef clef`,
+        //data: { eventId: identify(symbol.event) },
+        data: { eventId: null },
+        html: glyphs[symbol.clef + 'Clef'] || ''
+    }),
+
+    chord: (symbol) => create('abbr', {
+        class: "chord-abbr",
+        title: "TODO - name of chord",
+        data: {
+            beat:     symbol.beat + 1,
+            duration: symbol.duration,
+            eventId:  identify(symbol.event)
+        },
+        // Note that we must detect sharps before flats because HTML entities
+        // contain hash symbols that can be interpreted as sharps
+        html: '<span class="chord-root">' + symbol.root.replace(rsharp, chordParts.sharp).replace(rflat, chordParts.flat) + '</span>'
+            + '<sup>' + symbol.extension.replace(rsharp, chordParts.sharp).replace(rflat, chordParts.flat) + '</sup>'
+            + (symbol.bass ? glyphs.chordBassSlash + '<span class="chord-bass">' + symbol.bass + '</span>' : '')
     }),
 
     timesig: (symbol) => create('span', {
         class: "timesig",
-        data: { eventId: identify(symbol.event) },
-        html: `<sup>${ symbol.numerator }</sup><sub>${ symbol.denominator }</sub>`
+        data: {
+            eventId: identify(symbol.event)
+        },
+        html: `<sup>${ glyphs['timeSig' + symbol.numerator] }</sup>
+            <sub>${ glyphs['timeSig' + symbol.denominator] }</sub>`
     }),
 
-    lyric: (symbol) => create('p', {
-        class:   "lyric",
-        data: { beat: symbol.beat + 1, duration: symbol.duration, eventId: identify(symbol.event) },
+    lyric: (symbol) => create('span', {
+        class: "lyric",
+        part:  "lyric",
+        data: {
+            beat:     symbol.beat + 1,
+            duration: symbol.duration,
+            eventId:  identify(symbol.event)
+        },
         html: symbol.value
     }),
 
-    // Create accidental
-    acci: (symbol) => create('svg', {
-        class:   "acci",
-        viewBox: symbol.value === 1 ? "0 -4 2.3 4" :
-            symbol.value === -1 ? "0 -4 2 4" :
-            "0 -4 1.8 4" ,
-        preserveAspectRatio: "xMidYMid slice",
-        data: symbol.beat === undefined ?
-            { pitch: symbol.pitch } :
-            { beat: symbol.beat + 1, pitch: symbol.pitch, part: symbol.part, eventId: identify(symbol.event) } ,
-        html: '<use href="#acci-'
-            + (symbol.value === 1 ? 'sharp' : symbol.value === -1 ? 'flat' : 'natural')
-            + '"></use>'
+    acci: (symbol) => create('span', {
+        class: "acci",
+        data: symbol.beat === undefined ? { pitch: symbol.pitch } : {
+            beat:    symbol.beat + 1,
+            pitch:   symbol.pitch,
+            part:    symbol.part,
+            eventId: identify(symbol.event)
+        },
+        html: symbol.value === 1 ? glyphs.acciSharp :
+            symbol.value === -1 ? glyphs.acciFlat :
+            glyphs.acciNatural
     }),
 
-    // Create note head
     upledger: (symbol) => create('svg', {
-        class:   "up-ledge ledge",
-        viewBox: `0 ${ 0.5 - symbol.rows } 4.4 ${ symbol.rows }`,
+        class: "up-ledge ledge",
+        viewBox: `0 ${0.5 - symbol.rows} 4.4 ${symbol.rows}`,
         preserveAspectRatio: "xMidYMax",
-        data:    { beat: symbol.beat + 1, pitch: symbol.pitch, part: symbol.part },
-        style:   `height: calc(${ symbol.rows } * var(--y-size));`,
-        html:    '<use x="0" y="-8" href="#ledges"></use>'
+        data: {
+            beat:  symbol.beat + 1,
+            pitch: symbol.pitch,
+            part:  symbol.part
+        },
+        style: `height: ${ symbol.rows * 0.125 }em;`,
+        html: `<g transform="translate(0 -8)">
+            <line x1="0" x2="4.4" y1="8" y2="8"></line>
+            <line x1="0" x2="4.4" y1="6" y2="6"></line>
+            <line x1="0" x2="4.4" y1="4" y2="4"></line>
+            <line x1="0" x2="4.4" y1="2" y2="2"></line>
+            <line x1="0" x2="4.4" y1="0" y2="0"></line>
+            <line x1="0" x2="4.4" y1="2" y2="2"></line>
+            <line x1="0" x2="4.4" y1="4" y2="4"></line>
+            <line x1="0" x2="4.4" y1="6" y2="6"></line>
+            <line x1="0" x2="4.4" y1="8" y2="8"></line>
+        </g>`
     }),
 
     downledger: (symbol) => create('svg', {
-        class:   "down-ledge ledge",
-        viewBox: `0 -0.5 4.4 ${ symbol.rows }`,
+        class: "down-ledge ledge",
+        viewBox: `0 -0.5 4.4 ${symbol.rows}`,
         preserveAspectRatio: "xMidYMin",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, part: symbol.part },
-        style:   `height: calc(${ symbol.rows } * var(--y-size));`,
-        html: '<use x="0" y="-8" href="#ledges"></use>'
+        data: {
+            beat:  symbol.beat + 1,
+            pitch: symbol.pitch,
+            part:  symbol.part
+        },
+        style: `height: ${ symbol.rows * 0.125 }em;`,
+        html: `<g transform="translate(0 -8)">
+            <line x1="0" x2="4.4" y1="8" y2="8"></line>
+            <line x1="0" x2="4.4" y1="6" y2="6"></line>
+            <line x1="0" x2="4.4" y1="4" y2="4"></line>
+            <line x1="0" x2="4.4" y1="2" y2="2"></line>
+            <line x1="0" x2="4.4" y1="0" y2="0"></line>
+            <line x1="0" x2="4.4" y1="2" y2="2"></line>
+            <line x1="0" x2="4.4" y1="4" y2="4"></line>
+            <line x1="0" x2="4.4" y1="6" y2="6"></line>
+            <line x1="0" x2="4.4" y1="8" y2="8"></line>
+        </g>`
     }),
 
-    // Create note head
-    head: (symbol) => create('svg', {
-        class:   "head",
-        viewBox: "0 -1 2.7 2",
-        preserveAspectRatio: "xMidYMid slice",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part, eventId: identify(symbol.event) },
-        html: `<use href="#${ symbol.head || `head[${ symbol.duration }]` }"></use>`
+    head: (symbol) => create('span', {
+        class: "head",
+        data: {
+            beat:     symbol.beat + 1,
+            pitch:    symbol.pitch,
+            duration: symbol.duration,
+            part:     symbol.part,
+            eventId:  identify(symbol.event)
+        },
+        html: `${ glyphs['head' + (symbol.duration + '').replace('.', '')] || '' }`
     }),
 
-    // Create note stem
     stem: (symbol) => create('svg', {
-        class:   `${ symbol.stemDirection }-stem stem`,
+        class: `${ symbol.stemDirection }-stem stem`,
         viewBox: "0 0 2.7 7",
         // Stretch stems by height
         preserveAspectRatio: "none",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part },
+        data: {
+            beat:     symbol.beat + 1,
+            pitch:    symbol.pitch,
+            duration: symbol.duration,
+            part:     symbol.part
+        },
         style: `--beam-y: ${ symbol.beamY === undefined ? 0 : symbol.beamY };`,
-        html: '<use href="#stem' + symbol.stemDirection + '"></use>'
+        html: symbol.stemDirection === 'up' ?
+            '<line class="stem-path" x1="2.6" y1="0" x2="2.6" y2="6.6"></line>' :
+            '<line class="stem-path" x1="0.1" y1="0.4" x2="0.1" y2="7"></line>'
     }),
 
-    // Create note beam
     beam: (symbol) => create('svg', {
         // Beam is sloped down
-        class:   `${ symbol.updown }-beam beam`,
-        viewBox: `0 ${ (symbol.range > 0 ? -symbol.range : 0) - 0.5 } ${ symbol.stems.length -1 } ${ abs(symbol.range) + 1 }`,
+        class: `${symbol.updown}-beam beam`,
+        viewBox: `0 ${ (symbol.range > 0 ? -symbol.range : 0) - 0.5 } ${ symbol.stems.length - 1 } ${ abs(symbol.range) + 1 }`,
         preserveAspectRatio: "none",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part },
+        data: {
+            beat:     symbol.beat + 1,
+            pitch:    symbol.pitch,
+            duration: symbol.duration,
+            part:     symbol.part
+        },
         /*style: 'grid-row-end: span ' + Math.ceil(1 - symbol.range),*/
-        style: `height: calc(${ abs(symbol.range) + 1 } * var(--y-size)); align-self: ${ symbol.range > 0 ? 'end' : 'start' };`,
+        style: `height: ${ (abs(symbol.range) + 1) * 0.125 }em; align-self: ${ symbol.range > 0 ? 'end' : 'start' };`,
         html: `
             <path class="beam-path" d="M0,${ -0.5 * beamThickness } L${ symbol.stems.length - 1 },${ -symbol.range - 0.5 * beamThickness } L${ symbol.stems.length - 1 },${ -symbol.range + 0.5 * beamThickness } L0,${ 0.5 * beamThickness } Z"></path>
             ${ create16thNoteBeams(symbol.stems, symbol.range) }
         `
     }),
 
-    // Create note beam
     tie: (symbol) => create('svg', {
-        // Beam is sloped down
-        class:   `${ symbol.updown }-tie tie`,
+        class: `${ symbol.updown }-tie tie`,
         viewBox: `0 0 1 1`,
         preserveAspectRatio: "none",
-        data:    { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part },
-        /*style: 'grid-row-end: span ' + symbol.duration / 24 + ';' */
-        style:   `height: calc(6 * var(--y-size)); align-self: ${ symbol.updown === 'up' ? 'end' : 'start' };`,
-        html:    `<use href="#tie"></use>`
+        data: {
+            beat:     symbol.beat + 1,
+            pitch:    symbol.pitch,
+            duration: symbol.duration,
+            part:     symbol.part
+        },
+        style: `height: 0.75em; align-self: ${ symbol.updown === 'up' ? 'start' : 'end' };`,
+        html: `<path class="tie-path" transform="translate(0, 0.14) scale(1 0.6)" d="M0.979174733,0.0124875307 C0.650597814,1.1195554 0.135029714,1.00095361 0.0165376402,0.026468657 C0.0113570514,0.0135475362 0.00253387291,0.00218807553 0,0 C0.0977526897,1.29523004 0.656681642,1.37089992 1,2.43111793e-08 C0.991901367,2.43111797e-08 0.987703936,0.01248753 0.979174733,0.0124875307 Z M0.979174733,0.0124875307"></path>`
     }),
 
-    // Create note tail
-    tail: (symbol) => create('svg', {
-        class: `${ symbol.stemDirection }-tail tail`,
-        viewBox: "0 -1 2.7 2",
-        preserveAspectRatio: "xMidYMid",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part, eventId: identify(symbol.event) },
-        html: '<use href="#tail' + symbol.stemDirection + '[' + symbol.duration + ']"></use>'
+    tail: (symbol) => create('span', {
+        class: `${symbol.stemDirection}-tail tail`,
+        data: {
+            beat:     symbol.beat + 1,
+            pitch:    symbol.pitch,
+            duration: symbol.duration,
+            part:     symbol.part,
+            eventId:  identify(symbol.event)
+        },
+        html: glyphs['tail' + (symbol.stemDirection === 'up' ? 'Up' : 'Down') + (symbol.duration + '').replace('.', '')]
     }),
 
-    // Create rest
-    rest: (symbol) => create('svg', {
+    rest: (symbol) => create('span', {
         class: "rest",
-        viewBox:
-            symbol.duration === 0.125 ? "0 -4 3.0 8" :
-            symbol.duration === 0.25  ? "0 -4 2.8 8" :
-            symbol.duration === 0.375 ? "0 -4 3.8 8" :
-            symbol.duration === 0.5   ? "0 -4 2.6 8" :
-            symbol.duration === 0.75  ? "-0.2 -4 3.6 8" :
-            symbol.duration === 1     ? "0 -4 2.6 8" :
-            symbol.duration === 1.5   ? "0 -4 3.5 8" :
-            symbol.duration === 2     ? "0 -4 2.6 8" :
-            symbol.duration === 3     ? "0 -4 2.6 8" :
-            symbol.duration === 4     ? "0 -4 2.6 8" :
-            symbol.duration === 6     ? "0 -4 2.6 8" :
-            "0 -4 2.6 8" ,
-        preserveAspectRatio: "xMidYMid slice",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part },
-        html: '<use href="#rest[' + symbol.duration + ']"></use>'
+        data: {
+            beat:     symbol.beat + 1,
+            pitch:    symbol.pitch,
+            duration: symbol.duration,
+            part:     symbol.part
+        },
+        html: `${ glyphs['rest' + (symbol.duration + '').replace('.', '')] || '' }`
     }),
 
-    default: (function(types) {
-        return function(symbol) {
+    default: (function (types) {
+        return function (symbol) {
             if (types[symbol.type]) return;
             types[symbol.type] = true;
             console.log(symbol);

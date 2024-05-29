@@ -1,16 +1,8 @@
 
-@font-face {
-    font-family: ScribeText;
-    src: url('../fonts/FinaleJazzText/finalejazztext-webfont.woff2') format('woff2');
-    font-weight: normal;
-    font-style: normal;
-}
+@import '../fonts/jazz.css';
 
-@font-face {
-    font-family: ScribeMusic;
-    src: url('../fonts/FinaleJazz/finalejazz-webfont.woff2') format('woff2');
-    font-weight: normal;
-    font-style: normal;
+scribe-music {
+    font-family: Jazz, JazzText, sans-serif;
 }
 
 scribe-music::after {

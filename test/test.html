@@ -27,6 +27,27 @@
         </thead>
         <tbody>
             <tr>
+                <td style="text-align:center"><span>U+E014</span></td>
+                <td style="text-align:center">
+                    <span class="bravura"></span><span class="petaluma"></span><span class="finale"></span>
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <text x="11" y="24" class="bravura"></text>
+                        <text x="11" y="24" class="petaluma"></text>
+                        <text x="11" y="24" class="finale"></text>
+                    </svg>
+                </td>
+                <td style="text-align:center"><span class="petaluma"></span>
+                </td>
+                <td style="text-align:center"><span class="petaluma-text"></span></td>
+                <td style="text-align:center"><span class="broadway"></span></td>
+                <td style="text-align:center"><span class="broadway-text"></span></td>
+                <td style="text-align:center"><span class="finale"></span></td>
+                <td style="text-align:center"><span class="finale-text"></span></td>
+                <td style="text-align:center"><span class="jazz-text"></span></td>
+                <td style="text-align:center"><span class="ash"></span></td>
+                <td style="text-align:center"><span class="ash-text"></span></td>
+            </tr>
+            <tr>
                 <td style="text-align:center"><span>U+ED60</span></td>
                 <td style="text-align:center">
                     <span class="bravura"></span><span class="petaluma"></span><span class="finale"></span>
@@ -133,6 +154,39 @@
             </tr>
         </tbody>
     </table>
+    <span style="display: inline-block; font-size:2em;" class="broadway"></span><span
+        style="display: inline-block; font-size:2em;" class="finale"></span><span
+        style="display: inline-block; font-size:2em;" class="ash"></span><span
+        style="display: inline-block; font-size:2em;" class="bravura"></span>
+    <span style="display: inline-block;height:2em;width:1rem;background-color: orange;"></span>
+    <svg viewBox="0 0 16 16" style="width: 2em;height:2em;overflow:visible" xmlns="http://www.w3.org/2000/svg">
+        <text x="0" y="16" height="4" class="bravura"></text>
+    </svg>
+    <span style="display: inline-block; font-size:2em;" class="bravura"></span>
+    <span style="display: inline-block; font-size:2em; vertical-align:1em;" class="bravura"></span>
+    <svg viewBox="0 0 16 16" style="width: 2em;height:2em;overflow:visible" xmlns="http://www.w3.org/2000/svg">
+        <text x="0" y="16" class="finale"></text>
+    </svg>
+    <span style="display: inline-block; font-size:2em;" class="finale"></span>
+    <span style="display: inline-block; font-size:2em; vertical-align:1em;" class="finale"></span>
+    <svg viewBox="0 0 16 16" style="width: 2em;height:2em;overflow:visible" xmlns="http://www.w3.org/2000/svg">
+        <text x="0" y="16" class="ash"></text>
+    </svg>
+    <span style="display: inline-block; font-size:2em;" class="ash"></span>
+    <span style="display: inline-block; font-size:2em; vertical-align:1em;" class="ash"></span>
+    <svg viewBox="0 0 16 16" style="width: 2em;height:2em;overflow:visible" xmlns="http://www.w3.org/2000/svg">
+        <text x="0" y="16" class="broadway"></text>
+    </svg>
+    <span style="display: inline-block; font-size:2em;" class="broadway"></span>
+    <span style="display: inline-block; font-size:2em; vertical-align:1em;" class="broadway"></span>
+    <script>
+        document.querySelectorAll("svg").forEach(item => {
+            item.addEventListener("click", (e) => {
+                console.log(e.target)
+            })
+        });
+
+    </script>
 </body>
 
 </html>

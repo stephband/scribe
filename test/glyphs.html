@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Scribe glyphs</title>
+
+    <meta charset="utf-8" />
+    <meta name="author" content="@stephband" />
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width" />
+
+    <script title="load">
+        document.documentElement.className += ' js loading';
+        // window.addEventListener('DOMContentLoaded', () => document.documentElement.classList.remove('content-loading'));
+        // Wait for other load handlers to run first - Bolt does a few things on
+        // load (eg. targetable scrolls) and we want them to run before the loading
+        // class is removed
+        window.addEventListener('load', () => window.requestAnimationFrame(() => document.documentElement.classList.remove('loading')));
+    </script>
+
+    <script title="debug">
+        window.DEBUG = true;
+    </script>
+
+    <link rel="stylesheet" href="../module.css">
+
+    <style>
+        @import '../fonts/ash.css';
+        @import '../fonts/bravura.css';
+        @import '../fonts/broadway.css';
+        @import '../fonts/leipzig.css';
+        @import '../fonts/petaluma.css';
+
+        body {
+            font-family: sans-serif;
+        }
+
+        p {
+            max-width: 40em;
+        }
+
+        .em-box {
+            display: inline-block;
+            font-family: sans-serif;
+            line-height: 1em;
+            width: 1em;
+            height: 1em;
+            background-color: #dddddd;
+            vertical-align: baseline;
+            text-align: center;
+        }
+
+        .em-box > small {
+            font-size: 0.375em;
+            font-family: monospace;
+        }
+
+        .test {
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: min-content;
+            align-items: baseline;
+            column-gap: 2px;
+            font-family: Jazz, JazzText;
+            font-size: 3em;
+        }
+
+        .test::before {
+            display: inline-block;
+            font-family: sans-serif;
+            font-size: 1rem;
+            width: 6rem;
+            text-align: right;
+            margin-right: 0.25em;
+        }
+
+        .ash-test {
+            font-family: Ash, AshText;
+        }
+
+        .ash-test::before {
+            content: 'Ash';
+        }
+
+        .bravura-test {
+            font-family: Bravura, BravuraText;
+        }
+
+        .bravura-test::before {
+            content: 'Bravura';
+        }
+
+        .broadway-test {
+            font-family: Broadway, BroadwayText;
+        }
+
+        .broadway-test::before {
+            content: 'Broadway';
+        }
+
+        .jazz-test {
+            font-family: Jazz, JazzText;
+        }
+
+        .jazz-test::before {
+            content: 'Jazz';
+        }
+
+        .petaluma-test {
+            font-family: Petaluma, PetalumaText;
+        }
+
+        .petaluma-test::before {
+            content: 'Petaluma';
+        }
+
+        .leipzig-test {
+            font-family: Leipzig;
+        }
+
+        .leipzig-test::before {
+            content: 'Leipzig';
+        }
+
+        .chord-abbr,
+        span {
+            display: inline;
+            vertical-align: baseline;
+            background-color: rgba(0,0,0,0.08);
+            grid-column-end: span 1 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+
+        .test > .timesig {
+            position: relative;
+            top: -0.75em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Scribe Glyphs</h1>
+    <p>From the SMuFL spec at <a href="https://w3c.github.io/smufl/latest/index.html">w3c.github.io/smufl/latest/index.html</a>,
+    and its <a href="https://w3c.github.io/smufl/latest/specification/scoring-metrics-glyph-registration.html">description
+    of SMuFL font metrics</a>.</p>
+    <p>Each glyph presented here in a span. Spans with classes have their line-height
+    adjusted to fit their glyphs. By default SMuFL glyphs have enormous line boxes.
+    I don't know why.</p>
+
+    <h2>Notes</h2>
+    <section class="jazz-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span title="stave">&#xE014;</span>
+        <!-- Accidentals -->
+        <span class="acci" title="accidentalDoubleFlat">&#xE264;</span>
+        <span class="acci" title="accidentalFlat">&#xE260;</span>
+        <span class="acci" title="accidentalNatural">&#xE261;</span>
+        <span class="acci" title="accidentalSharp">&#xE262;</span>
+        <span class="acci" title="accidentalDoubleSharp">&#xE263;</span>
+        <span class="acci" title="accidentalParensLeft + accidentalParensRight">&#xE26A;&#xE260;&#xE26B;</span>
+        <!-- Heads -->
+        <span class="head" title="noteheadWhole">&#xE0A2;</span>
+        <span class="head" title="noteheadHalf">&#xE0A3;</span>
+        <span class="head" title="noteheadBlack">&#xE0A4;</span>
+        <span class="head" title="noteheadSlashedBlack2">&#xE0D0;</span>
+        <span class="head" title="noteheadDiamondBlack">&#xE0DB;</span>
+        <span class="head" title="noteheadDiamondBlackWide">&#xE0DC;</span>
+        <span class="head" title="noteheadXBlack">&#xE0A9;</span>
+        <span class="head" title="noteheadPlusBlack">&#xE0AF;</span>
+        <span class="head" title="noteheadCircleX">&#xE0B3;</span>
+        <span class="head" title="noteheadTriangleUpBlack">&#xE0BE;</span>
+        <span class="head" title="noteheadSlashVerticalEnds">&#xE100;</span>
+        <span class="head" title="noteheadSlashHorizontalEnds (doesn't have horizontal ends in Jazz at least)">&#xE101;</span>
+        <!-- Brackets -->
+        <span class="head" title="(noteheadWhole)">&#xE0F5;&#xE0A2;&#xE0F6;</span>
+        <span class="head" title="(noteheadHalf)">&#xE0F5;&#xE0A3;&#xE0F6;</span>
+        <span class="head" title="(noteheadBlack)">&#xE0F5;&#xE0A4;&#xE0F6;</span>
+        <span class="head" title="(noteheadSlashedBlack2)">&#xE0F5;&#xE0D0;&#xE0F6;</span>
+        <span class="head" title="(noteheadDiamondBlack)">&#xE0F5;&#xE0DB;&#xE0F6;</span>
+        <span class="head" title="(noteheadDiamondBlackWide)">&#xE0F5;&#xE0DC;&#xE0F6;</span>
+        <span class="head" title="(noteheadXBlack)">&#xE0F5;&#xE0A9;&#xE0F6;</span>
+        <span class="head" title="(noteheadPlusBlack)">&#xE0F5;&#xE0AF;&#xE0F6;</span>
+        <span class="head" title="(noteheadCircleX)">&#xE0F5;&#xE0B3;&#xE0F6;</span>
+        <span class="head" title="(noteheadTriangleUpBlack)">&#xE0F5;&#xE0BE;&#xE0F6;</span>
+        <span class="head" title="(noteheadSlashVerticalEnds)">&#xE0F5;&#xE100;&#xE0F6;</span>
+        <!-- Grace -->
+        <span class="head" title="graceNoteAcciaccaturaStemUp">&#xE560;</span>
+        <span class="head" title="graceNoteAcciaccaturaStemDown">&#xE561;</span>
+        <!-- Dots -->
+        <span class="head" title=".">&#xE0A4;.</span>
+        <span class="head" title="augmentationDot">&#xE0A4;&#xE1E7;</span>
+    </section>
+
+    <section class="ash-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span title="stave">&#xE014;</span>
+        <!-- Accidentals -->
+        <span class="acci" title="accidentalDoubleFlat">&#xE264;</span>
+        <span class="acci" title="accidentalFlat">&#xE260;</span>
+        <span class="acci" title="accidentalNatural">&#xE261;</span>
+        <span class="acci" title="accidentalSharp">&#xE262;</span>
+        <span class="acci" title="accidentalDoubleSharp">&#xE263;</span>
+        <span class="acci" title="accidentalParensLeft + accidentalParensRight">&#xE26A;&#xE260;&#xE26B;</span>
+        <!-- Heads -->
+        <span class="head" title="noteheadWhole">&#xE0A2;</span>
+        <span class="head" title="noteheadHalf">&#xE0A3;</span>
+        <span class="head" title="noteheadBlack">&#xE0A4;</span>
+        <span class="head" title="noteheadSlashedBlack2">&#xE0D0;</span>
+        <span class="head" title="noteheadDiamondBlack">&#xE0DB;</span>
+        <span class="head" title="noteheadDiamondBlackWide">&#xE0DC;</span>
+        <span class="head" title="noteheadXBlack">&#xE0A9;</span>
+        <span class="head" title="noteheadPlusBlack">&#xE0AF;</span>
+        <span class="head" title="noteheadCircleX">&#xE0B3;</span>
+        <span class="head" title="noteheadTriangleUpBlack">&#xE0BE;</span>
+        <span class="head" title="noteheadSlashVerticalEnds">&#xE100;</span>
+        <span class="head" title="noteheadSlashHorizontalEnds (doesn't have horizontal ends in Jazz at least)">&#xE101;</span>
+        <!-- Brackets -->
+        <span class="head" title="(noteheadWhole)">&#xE0F5;&#xE0A2;&#xE0F6;</span>
+        <span class="head" title="(noteheadHalf)">&#xE0F5;&#xE0A3;&#xE0F6;</span>
+        <span class="head" title="(noteheadBlack)">&#xE0F5;&#xE0A4;&#xE0F6;</span>
+        <span class="head" title="(noteheadSlashedBlack2)">&#xE0F5;&#xE0D0;&#xE0F6;</span>
+        <span class="head" title="(noteheadDiamondBlack)">&#xE0F5;&#xE0DB;&#xE0F6;</span>
+        <span class="head" title="(noteheadDiamondBlackWide)">&#xE0F5;&#xE0DC;&#xE0F6;</span>
+        <span class="head" title="(noteheadXBlack)">&#xE0F5;&#xE0A9;&#xE0F6;</span>
+        <span class="head" title="(noteheadPlusBlack)">&#xE0F5;&#xE0AF;&#xE0F6;</span>
+        <span class="head" title="(noteheadCircleX)">&#xE0F5;&#xE0B3;&#xE0F6;</span>
+        <span class="head" title="(noteheadTriangleUpBlack)">&#xE0F5;&#xE0BE;&#xE0F6;</span>
+        <span class="head" title="(noteheadSlashVerticalEnds)">&#xE0F5;&#xE100;&#xE0F6;</span>
+        <!-- Grace -->
+        <span class="head" title="graceNoteAcciaccaturaStemUp">&#xE560;</span>
+        <span class="head" title="graceNoteAcciaccaturaStemDown">&#xE561;</span>
+        <!-- Dots -->
+        <span class="head" title=".">&#xE0A4;.</span>
+        <span class="head" title="augmentationDot">&#xE0A4;&#xE1E7;</span>
+    </section>
+
+    <section class="bravura-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span title="stave">&#xE014;</span>
+        <!-- Accidentals -->
+        <span class="acci" title="accidentalDoubleFlat">&#xE264;</span>
+        <span class="acci" title="accidentalFlat">&#xE260;</span>
+        <span class="acci" title="accidentalNatural">&#xE261;</span>
+        <span class="acci" title="accidentalSharp">&#xE262;</span>
+        <span class="acci" title="accidentalDoubleSharp">&#xE263;</span>
+        <span class="acci" title="accidentalParensLeft + accidentalParensRight">&#xE26A;&#xE260;&#xE26B;</span>
+        <!-- Heads -->
+        <span class="head" title="noteheadWhole">&#xE0A2;</span>
+        <span class="head" title="noteheadHalf">&#xE0A3;</span>
+        <span class="head" title="noteheadBlack">&#xE0A4;</span>
+        <span class="head" title="noteheadSlashedBlack2">&#xE0D0;</span>
+        <span class="head" title="noteheadDiamondBlack">&#xE0DB;</span>
+        <span class="head" title="noteheadDiamondBlackWide">&#xE0DC;</span>
+        <span class="head" title="noteheadXBlack">&#xE0A9;</span>
+        <span class="head" title="noteheadPlusBlack">&#xE0AF;</span>
+        <span class="head" title="noteheadCircleX">&#xE0B3;</span>
+        <span class="head" title="noteheadTriangleUpBlack">&#xE0BE;</span>
+        <span class="head" title="noteheadSlashVerticalEnds">&#xE100;</span>
+        <span class="head" title="noteheadSlashHorizontalEnds (doesn't have horizontal ends in Jazz at least)">&#xE101;</span>
+        <!-- Brackets -->
+        <span class="head" title="(noteheadWhole)">&#xE0F5;&#xE0A2;&#xE0F6;</span>
+        <span class="head" title="(noteheadHalf)">&#xE0F5;&#xE0A3;&#xE0F6;</span>
+        <span class="head" title="(noteheadBlack)">&#xE0F5;&#xE0A4;&#xE0F6;</span>
+        <span class="head" title="(noteheadSlashedBlack2)">&#xE0F5;&#xE0D0;&#xE0F6;</span>
+        <span class="head" title="(noteheadDiamondBlack)">&#xE0F5;&#xE0DB;&#xE0F6;</span>
+        <span class="head" title="(noteheadDiamondBlackWide)">&#xE0F5;&#xE0DC;&#xE0F6;</span>
+        <span class="head" title="(noteheadXBlack)">&#xE0F5;&#xE0A9;&#xE0F6;</span>
+        <span class="head" title="(noteheadPlusBlack)">&#xE0F5;&#xE0AF;&#xE0F6;</span>
+        <span class="head" title="(noteheadCircleX)">&#xE0F5;&#xE0B3;&#xE0F6;</span>
+        <span class="head" title="(noteheadTriangleUpBlack)">&#xE0F5;&#xE0BE;&#xE0F6;</span>
+        <span class="head" title="(noteheadSlashVerticalEnds)">&#xE0F5;&#xE100;&#xE0F6;</span>
+        <!-- Grace -->
+        <span class="head" title="graceNoteAcciaccaturaStemUp">&#xE560;</span>
+        <span class="head" title="graceNoteAcciaccaturaStemDown">&#xE561;</span>
+        <!-- Dots -->
+        <span class="head" title=".">&#xE0A4;.</span>
+        <span class="head" title="augmentationDot">&#xE0A4;&#xE1E7;</span>
+    </section>
+
+    <section class="broadway-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span title="stave">&#xE014;</span>
+        <!-- Accidentals -->
+        <span class="acci" title="accidentalDoubleFlat">&#xE264;</span>
+        <span class="acci" title="accidentalFlat">&#xE260;</span>
+        <span class="acci" title="accidentalNatural">&#xE261;</span>
+        <span class="acci" title="accidentalSharp">&#xE262;</span>
+        <span class="acci" title="accidentalDoubleSharp">&#xE263;</span>
+        <span class="acci" title="accidentalParensLeft + accidentalParensRight">&#xE26A;&#xE260;&#xE26B;</span>
+        <!-- Heads -->
+        <span class="head" title="noteheadWhole">&#xE0A2;</span>
+        <span class="head" title="noteheadHalf">&#xE0A3;</span>
+        <span class="head" title="noteheadBlack">&#xE0A4;</span>
+        <span class="head" title="noteheadSlashedBlack2">&#xE0D0;</span>
+        <span class="head" title="noteheadDiamondBlack">&#xE0DB;</span>
+        <span class="head" title="noteheadDiamondBlackWide">&#xE0DC;</span>
+        <span class="head" title="noteheadXBlack">&#xE0A9;</span>
+        <span class="head" title="noteheadPlusBlack">&#xE0AF;</span>
+        <span class="head" title="noteheadCircleX">&#xE0B3;</span>
+        <span class="head" title="noteheadTriangleUpBlack">&#xE0BE;</span>
+        <span class="head" title="noteheadSlashVerticalEnds">&#xE100;</span>
+        <span class="head" title="noteheadSlashHorizontalEnds (doesn't have horizontal ends in Jazz at least)">&#xE101;</span>
+        <!-- Brackets -->
+        <span class="head" title="(noteheadWhole)">&#xE0F5;&#xE0A2;&#xE0F6;</span>
+        <span class="head" title="(noteheadHalf)">&#xE0F5;&#xE0A3;&#xE0F6;</span>
+        <span class="head" title="(noteheadBlack)">&#xE0F5;&#xE0A4;&#xE0F6;</span>
+        <span class="head" title="(noteheadSlashedBlack2)">&#xE0F5;&#xE0D0;&#xE0F6;</span>
+        <span class="head" title="(noteheadDiamondBlack)">&#xE0F5;&#xE0DB;&#xE0F6;</span>
+        <span class="head" title="(noteheadDiamondBlackWide)">&#xE0F5;&#xE0DC;&#xE0F6;</span>
+        <span class="head" title="(noteheadXBlack)">&#xE0F5;&#xE0A9;&#xE0F6;</span>
+        <span class="head" title="(noteheadPlusBlack)">&#xE0F5;&#xE0AF;&#xE0F6;</span>
+        <span class="head" title="(noteheadCircleX)">&#xE0F5;&#xE0B3;&#xE0F6;</span>
+        <span class="head" title="(noteheadTriangleUpBlack)">&#xE0F5;&#xE0BE;&#xE0F6;</span>
+        <span class="head" title="(noteheadSlashVerticalEnds)">&#xE0F5;&#xE100;&#xE0F6;</span>
+        <!-- Grace -->
+        <span class="head" title="graceNoteAcciaccaturaStemUp">&#xE560;</span>
+        <span class="head" title="graceNoteAcciaccaturaStemDown">&#xE561;</span>
+        <!-- Dots -->
+        <span class="head" title=".">&#xE0A4;.</span>
+        <span class="head" title="augmentationDot">&#xE0A4;&#xE1E7;</span>
+    </section>
+
+    <section class="leipzig-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span title="stave">&#xE014;</span>
+        <!-- Accidentals -->
+        <span class="acci" title="accidentalDoubleFlat">&#xE264;</span>
+        <span class="acci" title="accidentalFlat">&#xE260;</span>
+        <span class="acci" title="accidentalNatural">&#xE261;</span>
+        <span class="acci" title="accidentalSharp">&#xE262;</span>
+        <span class="acci" title="accidentalDoubleSharp">&#xE263;</span>
+        <span class="acci" title="accidentalParensLeft + accidentalParensRight">&#xE26A;&#xE260;&#xE26B;</span>
+        <!-- Heads -->
+        <span class="head" title="noteheadWhole">&#xE0A2;</span>
+        <span class="head" title="noteheadHalf">&#xE0A3;</span>
+        <span class="head" title="noteheadBlack">&#xE0A4;</span>
+        <span class="head" title="noteheadSlashedBlack2">&#xE0D0;</span>
+        <span class="head" title="noteheadDiamondBlack">&#xE0DB;</span>
+        <span class="head" title="noteheadDiamondBlackWide">&#xE0DC;</span>
+        <span class="head" title="noteheadXBlack">&#xE0A9;</span>
+        <span class="head" title="noteheadPlusBlack">&#xE0AF;</span>
+        <span class="head" title="noteheadCircleX">&#xE0B3;</span>
+        <span class="head" title="noteheadTriangleUpBlack">&#xE0BE;</span>
+        <span class="head" title="noteheadSlashVerticalEnds">&#xE100;</span>
+        <span class="head" title="noteheadSlashHorizontalEnds (doesn't have horizontal ends in Jazz at least)">&#xE101;</span>
+        <!-- Brackets -->
+        <span class="head" title="(noteheadWhole)">&#xE0F5;&#xE0A2;&#xE0F6;</span>
+        <span class="head" title="(noteheadHalf)">&#xE0F5;&#xE0A3;&#xE0F6;</span>
+        <span class="head" title="(noteheadBlack)">&#xE0F5;&#xE0A4;&#xE0F6;</span>
+        <span class="head" title="(noteheadSlashedBlack2)">&#xE0F5;&#xE0D0;&#xE0F6;</span>
+        <span class="head" title="(noteheadDiamondBlack)">&#xE0F5;&#xE0DB;&#xE0F6;</span>
+        <span class="head" title="(noteheadDiamondBlackWide)">&#xE0F5;&#xE0DC;&#xE0F6;</span>
+        <span class="head" title="(noteheadXBlack)">&#xE0F5;&#xE0A9;&#xE0F6;</span>
+        <span class="head" title="(noteheadPlusBlack)">&#xE0F5;&#xE0AF;&#xE0F6;</span>
+        <span class="head" title="(noteheadCircleX)">&#xE0F5;&#xE0B3;&#xE0F6;</span>
+        <span class="head" title="(noteheadTriangleUpBlack)">&#xE0F5;&#xE0BE;&#xE0F6;</span>
+        <span class="head" title="(noteheadSlashVerticalEnds)">&#xE0F5;&#xE100;&#xE0F6;</span>
+        <!-- Grace -->
+        <span class="head" title="graceNoteAcciaccaturaStemUp">&#xE560;</span>
+        <span class="head" title="graceNoteAcciaccaturaStemDown">&#xE561;</span>
+        <!-- Dots -->
+        <span class="head" title=".">&#xE0A4;.</span>
+        <span class="head" title="augmentationDot">&#xE0A4;&#xE1E7;</span>
+    </section>
+
+    <section class="petaluma-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span title="stave">&#xE014;</span>
+        <!-- Accidentals -->
+        <span class="acci" title="accidentalDoubleFlat">&#xE264;</span>
+        <span class="acci" title="accidentalFlat">&#xE260;</span>
+        <span class="acci" title="accidentalNatural">&#xE261;</span>
+        <span class="acci" title="accidentalSharp">&#xE262;</span>
+        <span class="acci" title="accidentalDoubleSharp">&#xE263;</span>
+        <span class="acci" title="accidentalParensLeft + accidentalParensRight">&#xE26A;&#xE260;&#xE26B;</span>
+        <!-- Heads -->
+        <span class="head" title="noteheadWhole">&#xE0A2;</span>
+        <span class="head" title="noteheadHalf">&#xE0A3;</span>
+        <span class="head" title="noteheadBlack">&#xE0A4;</span>
+        <span class="head" title="noteheadSlashedBlack2">&#xE0D0;</span>
+        <span class="head" title="noteheadDiamondBlack">&#xE0DB;</span>
+        <span class="head" title="noteheadDiamondBlackWide">&#xE0DC;</span>
+        <span class="head" title="noteheadXBlack">&#xE0A9;</span>
+        <span class="head" title="noteheadPlusBlack">&#xE0AF;</span>
+        <span class="head" title="noteheadCircleX">&#xE0B3;</span>
+        <span class="head" title="noteheadTriangleUpBlack">&#xE0BE;</span>
+        <span class="head" title="noteheadSlashVerticalEnds">&#xE100;</span>
+        <span class="head" title="noteheadSlashHorizontalEnds (doesn't have horizontal ends in Jazz at least)">&#xE101;</span>
+        <!-- Brackets -->
+        <span class="head" title="(noteheadWhole)">&#xE0F5;&#xE0A2;&#xE0F6;</span>
+        <span class="head" title="(noteheadHalf)">&#xE0F5;&#xE0A3;&#xE0F6;</span>
+        <span class="head" title="(noteheadBlack)">&#xE0F5;&#xE0A4;&#xE0F6;</span>
+        <span class="head" title="(noteheadSlashedBlack2)">&#xE0F5;&#xE0D0;&#xE0F6;</span>
+        <span class="head" title="(noteheadDiamondBlack)">&#xE0F5;&#xE0DB;&#xE0F6;</span>
+        <span class="head" title="(noteheadDiamondBlackWide)">&#xE0F5;&#xE0DC;&#xE0F6;</span>
+        <span class="head" title="(noteheadXBlack)">&#xE0F5;&#xE0A9;&#xE0F6;</span>
+        <span class="head" title="(noteheadPlusBlack)">&#xE0F5;&#xE0AF;&#xE0F6;</span>
+        <span class="head" title="(noteheadCircleX)">&#xE0F5;&#xE0B3;&#xE0F6;</span>
+        <span class="head" title="(noteheadTriangleUpBlack)">&#xE0F5;&#xE0BE;&#xE0F6;</span>
+        <span class="head" title="(noteheadSlashVerticalEnds)">&#xE0F5;&#xE100;&#xE0F6;</span>
+        <!-- Grace -->
+        <span class="head" title="graceNoteAcciaccaturaStemUp">&#xE560;</span>
+        <span class="head" title="graceNoteAcciaccaturaStemDown">&#xE561;</span>
+        <!-- Dots -->
+        <span class="head" title=".">&#xE0A4;.</span>
+        <span class="head" title="augmentationDot">&#xE0A4;&#xE1E7;</span>
+    </section>
+
+
+
+
+
+
+
+
+
+
+    <h2>Tails (flags)</h2>
+    <section class="jazz-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Notes -->
+        <span title="noteQuarterUp">&#xE1D5;</span>
+        <span title="noteQuarterDown">&#xE1D6;</span>
+        <span title="note8thUp">&#xE1D7;</span>
+        <span title="note8thDown">&#xE1D8;</span>
+        <span title="note16thUp">&#xE1D9;</span>
+        <span title="note16thDown">&#xE1DA;</span>
+        <span title="note32ndUp">&#xE1DB;</span>
+        <span title="note32ndDown">&#xE1DC;</span>
+        <!-- Stems and tails -->
+        <span title="stem">&#xE0A4;&#xE210;</span>
+        <span title="stem">&#xE0A4;&#xE210;</span>
+        <span title="stem + flag8thUp">&#xE0A4;&#xE210;&#xE240;</span>
+        <span title="stem + flag8thDown">&#xE0A4;&#xE210;&#xE241;</span>
+        <span title="stem + flag16thUp">&#xE0A4;&#xE210;&#xE242;</span>
+        <span title="stem + flag16thDown">&#xE0A4;&#xE210;&#xE243;</span>
+        <span title="stem + flag32ndUp (Not supported by Jazz at least)">&#xE0A4;&#xE210;&#xE244;</span>
+        <span title="stem + flag32ndDown (Not supported by Jazz at least)">&#xE0A4;&#xE210;&#xE245;</span>
+        <!-- Tails -->
+        <span class="tail" title="flag8thUp">&#xE240;</span>
+        <span class="tail" title="flag8thDown">&#xE241;</span>
+        <span class="tail" title="flag16thUp">&#xE242;</span>
+        <span class="tail" title="flag16thDown">&#xE243;</span>
+        <span class="tail" title="flag32ndUp (Not supported by Jazz at least)">&#xE244;</span>
+        <span class="tail" title="flag32ndDown (Not supported by Jazz at least)">&#xE245;</span>
+    </section>
+
+    <section class="ash-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Notes -->
+        <span title="noteQuarterUp">&#xE1D5;</span>
+        <span title="noteQuarterDown">&#xE1D6;</span>
+        <span title="note8thUp">&#xE1D7;</span>
+        <span title="note8thDown">&#xE1D8;</span>
+        <span title="note16thUp">&#xE1D9;</span>
+        <span title="note16thDown">&#xE1DA;</span>
+        <span title="note32ndUp">&#xE1DB;</span>
+        <span title="note32ndDown">&#xE1DC;</span>
+        <!-- Stems and tails -->
+        <span title="stem">&#xE0A4;&#xE210;</span>
+        <span title="stem">&#xE0A4;&#xE210;</span>
+        <span title="stem + flag8thUp">&#xE0A4;&#xE210;&#xE240;</span>
+        <span title="stem + flag8thDown">&#xE0A4;&#xE210;&#xE241;</span>
+        <span title="stem + flag16thUp">&#xE0A4;&#xE210;&#xE242;</span>
+        <span title="stem + flag16thDown">&#xE0A4;&#xE210;&#xE243;</span>
+        <span title="stem + flag32ndUp (Not supported by Jazz at least)">&#xE0A4;&#xE210;&#xE244;</span>
+        <span title="stem + flag32ndDown (Not supported by Jazz at least)">&#xE0A4;&#xE210;&#xE245;</span>
+        <!-- Tails -->
+        <span class="tail" title="flag8thUp">&#xE240;</span>
+        <span class="tail" title="flag8thDown">&#xE241;</span>
+        <span class="tail" title="flag16thUp">&#xE242;</span>
+        <span class="tail" title="flag16thDown">&#xE243;</span>
+        <span class="tail" title="flag32ndUp (Not supported by Jazz at least)">&#xE244;</span>
+        <span class="tail" title="flag32ndDown (Not supported by Jazz at least)">&#xE245;</span>
+    </section>
+
+    <section class="bravura-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Notes -->
+        <span title="noteQuarterUp">&#xE1D5;</span>
+        <span title="noteQuarterDown">&#xE1D6;</span>
+        <span title="note8thUp">&#xE1D7;</span>
+        <span title="note8thDown">&#xE1D8;</span>
+        <span title="note16thUp">&#xE1D9;</span>
+        <span title="note16thDown">&#xE1DA;</span>
+        <span title="note32ndUp">&#xE1DB;</span>
+        <span title="note32ndDown">&#xE1DC;</span>
+        <!-- Stems and tails -->
+        <span title="stem">&#xE0A4;&#xE210;</span>
+        <span title="stem">&#xE0A4;&#xE210;</span>
+        <span title="stem + flag8thUp">&#xE0A4;&#xE210;&#xE240;</span>
+        <span title="stem + flag8thDown">&#xE0A4;&#xE210;&#xE241;</span>
+        <span title="stem + flag16thUp">&#xE0A4;&#xE210;&#xE242;</span>
+        <span title="stem + flag16thDown">&#xE0A4;&#xE210;&#xE243;</span>
+        <span title="stem + flag32ndUp (Not supported by Jazz at least)">&#xE0A4;&#xE210;&#xE244;</span>
+        <span title="stem + flag32ndDown (Not supported by Jazz at least)">&#xE0A4;&#xE210;&#xE245;</span>
+        <!-- Tails -->
+        <span class="tail" title="flag8thUp">&#xE240;</span>
+        <span class="tail" title="flag8thDown">&#xE241;</span>
+        <span class="tail" title="flag16thUp">&#xE242;</span>
+        <span class="tail" title="flag16thDown">&#xE243;</span>
+        <span class="tail" title="flag32ndUp (Not supported by Jazz at least)">&#xE244;</span>
+        <span class="tail" title="flag32ndDown (Not supported by Jazz at least)">&#xE245;</span>
+    </section>
+
+    <section class="broadway-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Notes -->
+        <span title="noteQuarterUp">&#xE1D5;</span>
+        <span title="noteQuarterDown">&#xE1D6;</span>
+        <span title="note8thUp">&#xE1D7;</span>
+        <span title="note8thDown">&#xE1D8;</span>
+        <span title="note16thUp">&#xE1D9;</span>
+        <span title="note16thDown">&#xE1DA;</span>
+        <span title="note32ndUp">&#xE1DB;</span>
+        <span title="note32ndDown">&#xE1DC;</span>
+        <!-- Stems and tails -->
+        <span title="stem">&#xE0A4;&#xE210;</span>
+        <span title="stem">&#xE0A4;&#xE210;</span>
+        <span title="stem + flag8thUp">&#xE0A4;&#xE210;&#xE240;</span>
+        <span title="stem + flag8thDown">&#xE0A4;&#xE210;&#xE241;</span>
+        <span title="stem + flag16thUp">&#xE0A4;&#xE210;&#xE242;</span>
+        <span title="stem + flag16thDown">&#xE0A4;&#xE210;&#xE243;</span>
+        <span title="stem + flag32ndUp (Not supported by Jazz at least)">&#xE0A4;&#xE210;&#xE244;</span>
+        <span title="stem + flag32ndDown (Not supported by Jazz at least)">&#xE0A4;&#xE210;&#xE245;</span>
+        <!-- Tails -->
+        <span class="tail" title="flag8thUp">&#xE240;</span>
+        <span class="tail" title="flag8thDown">&#xE241;</span>
+        <span class="tail" title="flag16thUp">&#xE242;</span>
+        <span class="tail" title="flag16thDown">&#xE243;</span>
+        <span class="tail" title="flag32ndUp (Not supported by Jazz at least)">&#xE244;</span>
+        <span class="tail" title="flag32ndDown (Not supported by Jazz at least)">&#xE245;</span>
+    </section>
+
+    <section class="leipzig-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Notes -->
+        <span title="noteQuarterUp">&#xE1D5;</span>
+        <span title="noteQuarterDown">&#xE1D6;</span>
+        <span title="note8thUp">&#xE1D7;</span>
+        <span title="note8thDown">&#xE1D8;</span>
+        <span title="note16thUp">&#xE1D9;</span>
+        <span title="note16thDown">&#xE1DA;</span>
+        <span title="note32ndUp">&#xE1DB;</span>
+        <span title="note32ndDown">&#xE1DC;</span>
+        <!-- Stems and tails -->
+        <span title="stem">&#xE0A4;&#xE210;</span>
+        <span title="stem">&#xE0A4;&#xE210;</span>
+        <span title="stem + flag8thUp">&#xE0A4;&#xE210;&#xE240;</span>
+        <span title="stem + flag8thDown">&#xE0A4;&#xE210;&#xE241;</span>
+        <span title="stem + flag16thUp">&#xE0A4;&#xE210;&#xE242;</span>
+        <span title="stem + flag16thDown">&#xE0A4;&#xE210;&#xE243;</span>
+        <span title="stem + flag32ndUp (Not supported by Jazz at least)">&#xE0A4;&#xE210;&#xE244;</span>
+        <span title="stem + flag32ndDown (Not supported by Jazz at least)">&#xE0A4;&#xE210;&#xE245;</span>
+        <!-- Tails -->
+        <span class="tail" title="flag8thUp">&#xE240;</span>
+        <span class="tail" title="flag8thDown">&#xE241;</span>
+        <span class="tail" title="flag16thUp">&#xE242;</span>
+        <span class="tail" title="flag16thDown">&#xE243;</span>
+        <span class="tail" title="flag32ndUp (Not supported by Jazz at least)">&#xE244;</span>
+        <span class="tail" title="flag32ndDown (Not supported by Jazz at least)">&#xE245;</span>
+    </section>
+
+    <section class="petaluma-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Notes -->
+        <span title="noteQuarterUp">&#xE1D5;</span>
+        <span title="noteQuarterDown">&#xE1D6;</span>
+        <span title="note8thUp">&#xE1D7;</span>
+        <span title="note8thDown">&#xE1D8;</span>
+        <span title="note16thUp">&#xE1D9;</span>
+        <span title="note16thDown">&#xE1DA;</span>
+        <span title="note32ndUp">&#xE1DB;</span>
+        <span title="note32ndDown">&#xE1DC;</span>
+        <!-- Stems and tails -->
+        <span title="stem">&#xE0A4;&#xE210;</span>
+        <span title="stem">&#xE0A4;&#xE210;</span>
+        <span title="stem + flag8thUp">&#xE0A4;&#xE210;&#xE240;</span>
+        <span title="stem + flag8thDown">&#xE0A4;&#xE210;&#xE241;</span>
+        <span title="stem + flag16thUp">&#xE0A4;&#xE210;&#xE242;</span>
+        <span title="stem + flag16thDown">&#xE0A4;&#xE210;&#xE243;</span>
+        <span title="stem + flag32ndUp (Not supported by Jazz at least)">&#xE0A4;&#xE210;&#xE244;</span>
+        <span title="stem + flag32ndDown (Not supported by Jazz at least)">&#xE0A4;&#xE210;&#xE245;</span>
+        <!-- Tails -->
+        <span class="tail" title="flag8thUp">&#xE240;</span>
+        <span class="tail" title="flag8thDown">&#xE241;</span>
+        <span class="tail" title="flag16thUp">&#xE242;</span>
+        <span class="tail" title="flag16thDown">&#xE243;</span>
+        <span class="tail" title="flag32ndUp (Not supported by Jazz at least)">&#xE244;</span>
+        <span class="tail" title="flag32ndDown (Not supported by Jazz at least)">&#xE245;</span>
+    </section>
+
+
+
+    <h2>Rests</h2>
+    <section class="jazz-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Rests -->
+        <span class="rest" data-duration="0.125"  title="">&#xE4E8;</span>
+        <span class="rest" data-duration="0.1875" title="">&#xE4E8;&#xE1E7;</span>
+        <span class="rest" data-duration="0.25"   title="">&#xE4E7;</span>
+        <span class="rest" data-duration="0.375"  title="">&#xE4E7;&#xE1E7;</span>
+        <span class="rest" data-duration="0.5"    title="">&#xE4E6;</span>
+        <span class="rest" data-duration="0.75"   title="">&#xE4E6;&#xE1E7;</span>
+        <span class="rest" data-duration="1"      title="">&#xE4E5;</span>
+        <span class="rest" data-duration="1.5"    title="">&#xE4E5;&#xE1E7;</span>
+        <span class="rest" data-duration="2"      title="">&#xE4E4;</span>
+        <span class="rest" data-duration="3"      title="">&#xE4E4;&#xE1E7;</span>
+        <span class="rest" data-duration="4"      title="">&#xE4E3;</span>
+        <span class="rest" data-duration="6"      title="">&#xE4E3;&#xE1E7;</span>
+    </section>
+    <section class="ash-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Rests -->
+        <span class="rest" data-duration="0.125"  title="">&#xE4E8;</span>
+        <span class="rest" data-duration="0.1875" title="">&#xE4E8;&#xE1E7;</span>
+        <span class="rest" data-duration="0.25"   title="">&#xE4E7;</span>
+        <span class="rest" data-duration="0.375"  title="">&#xE4E7;&#xE1E7;</span>
+        <span class="rest" data-duration="0.5"    title="">&#xE4E6;</span>
+        <span class="rest" data-duration="0.75"   title="">&#xE4E6;&#xE1E7;</span>
+        <span class="rest" data-duration="1"      title="">&#xE4E5;</span>
+        <span class="rest" data-duration="1.5"    title="">&#xE4E5;&#xE1E7;</span>
+        <span class="rest" data-duration="2"      title="">&#xE4E4;</span>
+        <span class="rest" data-duration="3"      title="">&#xE4E4;&#xE1E7;</span>
+        <span class="rest" data-duration="4"      title="">&#xE4E3;</span>
+        <span class="rest" data-duration="6"      title="">&#xE4E3;&#xE1E7;</span>
+    </section>
+    <section class="bravura-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Rests -->
+        <span class="rest" data-duration="0.125"  title="">&#xE4E8;</span>
+        <span class="rest" data-duration="0.1875" title="">&#xE4E8;&#xE1E7;</span>
+        <span class="rest" data-duration="0.25"   title="">&#xE4E7;</span>
+        <span class="rest" data-duration="0.375"  title="">&#xE4E7;&#xE1E7;</span>
+        <span class="rest" data-duration="0.5"    title="">&#xE4E6;</span>
+        <span class="rest" data-duration="0.75"   title="">&#xE4E6;&#xE1E7;</span>
+        <span class="rest" data-duration="1"      title="">&#xE4E5;</span>
+        <span class="rest" data-duration="1.5"    title="">&#xE4E5;&#xE1E7;</span>
+        <span class="rest" data-duration="2"      title="">&#xE4E4;</span>
+        <span class="rest" data-duration="3"      title="">&#xE4E4;&#xE1E7;</span>
+        <span class="rest" data-duration="4"      title="">&#xE4E3;</span>
+        <span class="rest" data-duration="6"      title="">&#xE4E3;&#xE1E7;</span>
+    </section>
+    <section class="broadway-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Rests -->
+        <span class="rest" data-duration="0.125"  title="">&#xE4E8;</span>
+        <span class="rest" data-duration="0.1875" title="">&#xE4E8;&#xE1E7;</span>
+        <span class="rest" data-duration="0.25"   title="">&#xE4E7;</span>
+        <span class="rest" data-duration="0.375"  title="">&#xE4E7;&#xE1E7;</span>
+        <span class="rest" data-duration="0.5"    title="">&#xE4E6;</span>
+        <span class="rest" data-duration="0.75"   title="">&#xE4E6;&#xE1E7;</span>
+        <span class="rest" data-duration="1"      title="">&#xE4E5;</span>
+        <span class="rest" data-duration="1.5"    title="">&#xE4E5;&#xE1E7;</span>
+        <span class="rest" data-duration="2"      title="">&#xE4E4;</span>
+        <span class="rest" data-duration="3"      title="">&#xE4E4;&#xE1E7;</span>
+        <span class="rest" data-duration="4"      title="">&#xE4E3;</span>
+        <span class="rest" data-duration="6"      title="">&#xE4E3;&#xE1E7;</span>
+    </section>
+    <section class="leipzig-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Rests -->
+        <span class="rest" data-duration="0.125"  title="">&#xE4E8;</span>
+        <span class="rest" data-duration="0.1875" title="">&#xE4E8;&#xE1E7;</span>
+        <span class="rest" data-duration="0.25"   title="">&#xE4E7;</span>
+        <span class="rest" data-duration="0.375"  title="">&#xE4E7;&#xE1E7;</span>
+        <span class="rest" data-duration="0.5"    title="">&#xE4E6;</span>
+        <span class="rest" data-duration="0.75"   title="">&#xE4E6;&#xE1E7;</span>
+        <span class="rest" data-duration="1"      title="">&#xE4E5;</span>
+        <span class="rest" data-duration="1.5"    title="">&#xE4E5;&#xE1E7;</span>
+        <span class="rest" data-duration="2"      title="">&#xE4E4;</span>
+        <span class="rest" data-duration="3"      title="">&#xE4E4;&#xE1E7;</span>
+        <span class="rest" data-duration="4"      title="">&#xE4E3;</span>
+        <span class="rest" data-duration="6"      title="">&#xE4E3;&#xE1E7;</span>
+    </section>
+    <section class="petaluma-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Rests -->
+        <span class="rest" data-duration="0.125"  title="">&#xE4E8;</span>
+        <span class="rest" data-duration="0.1875" title="">&#xE4E8;&#xE1E7;</span>
+        <span class="rest" data-duration="0.25"   title="">&#xE4E7;</span>
+        <span class="rest" data-duration="0.375"  title="">&#xE4E7;&#xE1E7;</span>
+        <span class="rest" data-duration="0.5"    title="">&#xE4E6;</span>
+        <span class="rest" data-duration="0.75"   title="">&#xE4E6;&#xE1E7;</span>
+        <span class="rest" data-duration="1"      title="">&#xE4E5;</span>
+        <span class="rest" data-duration="1.5"    title="">&#xE4E5;&#xE1E7;</span>
+        <span class="rest" data-duration="2"      title="">&#xE4E4;</span>
+        <span class="rest" data-duration="3"      title="">&#xE4E4;&#xE1E7;</span>
+        <span class="rest" data-duration="4"      title="">&#xE4E3;</span>
+        <span class="rest" data-duration="6"      title="">&#xE4E3;&#xE1E7;</span>
+    </section>
+
+
+
+
+
+    <h2>Accents</h2>
+    <section class="test">
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Rests -->
+        <span title="articAccentAbove">&#xE4A0;</span>
+        <span title="articAccentBelow">&#xE4A1;</span>
+        <span title="articStaccatoAbove">&#xE4A2;</span>
+        <span title="articStaccatoBelow">&#xE4A3;</span>
+        <span title="articTenutoAbove">&#xE4A4;</span>
+        <span title="articTenutoBelow">&#xE4A5;</span>
+        <span title="articMarcatoAbove">&#xE4AC;</span>
+        <span title="articMarcatoBelow">&#xE4AD;</span>
+    </section>
+
+
+
+    <h2>Time signatures</h2>
+    <section class="jazz-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!--  -->
+        <span title="">&#xE4E3;</span>
+        <!-- Numbers -->
+        <span title="timeSig0">&#xE080;</span>
+        <span title="timeSig1">&#xE081;</span>
+        <span title="timeSig2">&#xE082;</span>
+        <span title="timeSig3">&#xE083;</span>
+        <span title="timeSig4">&#xE084;</span>
+        <span title="timeSig5">&#xE085;</span>
+        <span title="timeSig6">&#xE086;</span>
+        <span title="timeSig7">&#xE087;</span>
+        <span title="timeSig8">&#xE088;</span>
+        <span title="timeSig9">&#xE089;</span>
+        <span title="timeSigCommon">&#xE08A;</span>
+        <span title="timeSigCutCommon">&#xE08B;</span>
+        <!-- Signature -->
+        <span class="timesig" title="4/4"><sup>&#xE084;</sup><sub>&#xE084;</sub></span>
+        <span class="timesig" title="12/8"><sup>&#xE081;&#xE082;</sup><sub>&#xE088;</sub></span>
+    </section>
+    <section class="ash-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!--  -->
+        <span title="">&#xE4E3;</span>
+        <!-- Numbers -->
+        <span title="timeSig0">&#xE080;</span>
+        <span title="timeSig1">&#xE081;</span>
+        <span title="timeSig2">&#xE082;</span>
+        <span title="timeSig3">&#xE083;</span>
+        <span title="timeSig4">&#xE084;</span>
+        <span title="timeSig5">&#xE085;</span>
+        <span title="timeSig6">&#xE086;</span>
+        <span title="timeSig7">&#xE087;</span>
+        <span title="timeSig8">&#xE088;</span>
+        <span title="timeSig9">&#xE089;</span>
+        <span title="timeSigCommon">&#xE08A;</span>
+        <span title="timeSigCutCommon">&#xE08B;</span>
+        <!-- Signature -->
+        <span class="timesig" title="4/4"><sup>&#xE084;</sup><sub>&#xE084;</sub></span>
+        <span class="timesig" title="12/8"><sup>&#xE081;&#xE082;</sup><sub>&#xE088;</sub></span>
+    </section>
+    <section class="bravura-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!--  -->
+        <span title="">&#xE4E3;</span>
+        <!-- Numbers -->
+        <span title="timeSig0">&#xE080;</span>
+        <span title="timeSig1">&#xE081;</span>
+        <span title="timeSig2">&#xE082;</span>
+        <span title="timeSig3">&#xE083;</span>
+        <span title="timeSig4">&#xE084;</span>
+        <span title="timeSig5">&#xE085;</span>
+        <span title="timeSig6">&#xE086;</span>
+        <span title="timeSig7">&#xE087;</span>
+        <span title="timeSig8">&#xE088;</span>
+        <span title="timeSig9">&#xE089;</span>
+        <span title="timeSigCommon">&#xE08A;</span>
+        <span title="timeSigCutCommon">&#xE08B;</span>
+        <!-- Signature -->
+        <span class="timesig" title="4/4"><sup>&#xE084;</sup><sub>&#xE084;</sub></span>
+        <span class="timesig" title="12/8"><sup>&#xE081;&#xE082;</sup><sub>&#xE088;</sub></span>
+    </section>
+    <section class="broadway-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!--  -->
+        <span title="">&#xE4E3;</span>
+        <!-- Numbers -->
+        <span title="timeSig0">&#xE080;</span>
+        <span title="timeSig1">&#xE081;</span>
+        <span title="timeSig2">&#xE082;</span>
+        <span title="timeSig3">&#xE083;</span>
+        <span title="timeSig4">&#xE084;</span>
+        <span title="timeSig5">&#xE085;</span>
+        <span title="timeSig6">&#xE086;</span>
+        <span title="timeSig7">&#xE087;</span>
+        <span title="timeSig8">&#xE088;</span>
+        <span title="timeSig9">&#xE089;</span>
+        <span title="timeSigCommon">&#xE08A;</span>
+        <span title="timeSigCutCommon">&#xE08B;</span>
+        <!-- Signature -->
+        <span class="timesig" title="4/4"><sup>&#xE084;</sup><sub>&#xE084;</sub></span>
+        <span class="timesig" title="12/8"><sup>&#xE081;&#xE082;</sup><sub>&#xE088;</sub></span>
+    </section>
+    <section class="leipzig-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!--  -->
+        <span title="">&#xE4E3;</span>
+        <!-- Numbers -->
+        <span title="timeSig0">&#xE080;</span>
+        <span title="timeSig1">&#xE081;</span>
+        <span title="timeSig2">&#xE082;</span>
+        <span title="timeSig3">&#xE083;</span>
+        <span title="timeSig4">&#xE084;</span>
+        <span title="timeSig5">&#xE085;</span>
+        <span title="timeSig6">&#xE086;</span>
+        <span title="timeSig7">&#xE087;</span>
+        <span title="timeSig8">&#xE088;</span>
+        <span title="timeSig9">&#xE089;</span>
+        <span title="timeSigCommon">&#xE08A;</span>
+        <span title="timeSigCutCommon">&#xE08B;</span>
+        <!-- Signature -->
+        <span class="timesig" title="4/4"><sup>&#xE084;</sup><sub>&#xE084;</sub></span>
+        <span class="timesig" title="12/8"><sup>&#xE081;&#xE082;</sup><sub>&#xE088;</sub></span>
+    </section>
+    <section class="petaluma-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!--  -->
+        <span title="">&#xE4E3;</span>
+        <!-- Numbers -->
+        <span title="timeSig0">&#xE080;</span>
+        <span title="timeSig1">&#xE081;</span>
+        <span title="timeSig2">&#xE082;</span>
+        <span title="timeSig3">&#xE083;</span>
+        <span title="timeSig4">&#xE084;</span>
+        <span title="timeSig5">&#xE085;</span>
+        <span title="timeSig6">&#xE086;</span>
+        <span title="timeSig7">&#xE087;</span>
+        <span title="timeSig8">&#xE088;</span>
+        <span title="timeSig9">&#xE089;</span>
+        <span title="timeSigCommon">&#xE08A;</span>
+        <span title="timeSigCutCommon">&#xE08B;</span>
+        <!-- Signature -->
+        <span class="timesig" title="4/4"><sup>&#xE084;</sup><sub>&#xE084;</sub></span>
+        <span class="timesig" title="12/8"><sup>&#xE081;&#xE082;</sup><sub>&#xE088;</sub></span>
+    </section>
+
+
+
+    <h2>Tuplets</h2>
+    <section class="test">
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Tuplets -->
+        <span title="tuplet0">&#xE880;</span>
+        <span title="tuplet1">&#xE881;</span>
+        <span title="tuplet2">&#xE882;</span>
+        <span title="tuplet3">&#xE883;</span>
+        <span title="tuplet4">&#xE884;</span>
+        <span title="tuplet5">&#xE885;</span>
+        <span title="tuplet6">&#xE886;</span>
+        <span title="tuplet7">&#xE887;</span>
+        <span title="tuplet8">&#xE888;</span>
+        <span title="tuplet9">&#xE889;</span>
+    </section>
+
+    <h2>Tempo</h2>
+    <section class="test">
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Notes -->
+        <span title="metNoteHalfUp">&#xECA3;</span>
+        <span title="metNoteHalfDown">&#xECA4;</span>
+        <span title="metNoteQuarterUp">&#xECA5;</span>
+        <span title="metNoteQuarterDown">&#xECA6;</span>
+        <span title="metNote8thUp">&#xECA7;</span>
+        <span title="metNote8thDown">&#xECA8;</span>
+        <span title="metAugmentationDot">&#xECB7;</span>
+        <span title="timeSigEquals">&#xE08F;</span>
+        <span title="=">=</span>
+    </section>
+
+    <h2>Bars</h2>
+    <section class="test">
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Lines -->
+        <span title="barlineSingle (not for use by scoring programs)">&#xE030;</span>
+        <span title="barlineDashed (not for use by scoring programs)">&#xE036;</span>
+        <span title="repeatLeft (not for use by scoring programs)">&#xE040;</span>
+        <span title="repeatRight (not for use by scoring programs)">&#xE041;</span>
+        <span title="repeatDots">&#xE043;</span>
+    </section>
+
+    <h2>Clefs</h2>
+    <section class="jazz-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Clefs -->
+        <span class="treble-clef clef" title="gClef">&#xE050;</span>
+        <span class="treble-clef clef" title="gClef8vb">&#xE052;</span>
+        <span class="treble-clef clef" title="gClef8va">&#xE053;</span>
+        <span class="alto-clef clef" title="cClef">&#xE05C;</span>
+        <span class="bass-clef clef" title="fClef">&#xE062;</span>
+        <span class="drum-clef clef" title="unpitchedPercussionClef1">&#xE069;</span>
+    </section>
+    <section class="ash-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Clefs -->
+        <span class="treble-clef clef" title="gClef">&#xE050;</span>
+        <span class="treble-clef clef" title="gClef8vb">&#xE052;</span>
+        <span class="treble-clef clef" title="gClef8va">&#xE053;</span>
+        <span class="alto-clef clef" title="cClef">&#xE05C;</span>
+        <span class="bass-clef clef" title="fClef">&#xE062;</span>
+        <span class="drum-clef clef" title="unpitchedPercussionClef1">&#xE069;</span>
+    </section>
+    <section class="bravura-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Clefs -->
+        <span class="treble-clef clef" title="gClef">&#xE050;</span>
+        <span class="treble-clef clef" title="gClef8vb">&#xE052;</span>
+        <span class="treble-clef clef" title="gClef8va">&#xE053;</span>
+        <span class="alto-clef clef" title="cClef">&#xE05C;</span>
+        <span class="bass-clef clef" title="fClef">&#xE062;</span>
+        <span class="drum-clef clef" title="unpitchedPercussionClef1">&#xE069;</span>
+    </section>
+    <section class="broadway-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Clefs -->
+        <span class="treble-clef clef" title="gClef">&#xE050;</span>
+        <span class="treble-clef clef" title="gClef8vb">&#xE052;</span>
+        <span class="treble-clef clef" title="gClef8va">&#xE053;</span>
+        <span class="alto-clef clef" title="cClef">&#xE05C;</span>
+        <span class="bass-clef clef" title="fClef">&#xE062;</span>
+        <span class="drum-clef clef" title="unpitchedPercussionClef1">&#xE069;</span>
+    </section>
+    <section class="leipzig-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Clefs -->
+        <span class="treble-clef clef" title="gClef">&#xE050;</span>
+        <span class="treble-clef clef" title="gClef8vb">&#xE052;</span>
+        <span class="treble-clef clef" title="gClef8va">&#xE053;</span>
+        <span class="alto-clef clef" title="cClef">&#xE05C;</span>
+        <span class="bass-clef clef" title="fClef">&#xE062;</span>
+        <span class="drum-clef clef" title="unpitchedPercussionClef1">&#xE069;</span>
+    </section>
+    <section class="petaluma-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Clefs -->
+        <span class="treble-clef clef" title="gClef">&#xE050;</span>
+        <span class="treble-clef clef" title="gClef8vb">&#xE052;</span>
+        <span class="treble-clef clef" title="gClef8va">&#xE053;</span>
+        <span class="alto-clef clef" title="cClef">&#xE05C;</span>
+        <span class="bass-clef clef" title="fClef">&#xE062;</span>
+        <span class="drum-clef clef" title="unpitchedPercussionClef1">&#xE069;</span>
+    </section>
+
+
+    <h2>Chords</h2>
+    <section class="jazz-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Symbols -->
+        <span title="csymDiminished">&#xE870;</span>
+        <span title="csymHalfDiminished">&#xE871;</span>
+        <span title="csymAugmented">&#xE872;</span>
+        <span title="csymMajorSeventh">&#xE873;</span>
+        <span title="csymMinor">&#xE874;</span>
+        <span title="(">(</span>
+        <span title=")">)</span>
+        <span title="csymParensLeftTall">&#xE875;</span>
+        <span title="csymParensRightTall">&#xE876;</span>
+        <span title="csymAlteredBassSlash">&#xE87B;</span>
+    </section>
+    <section class="jazz-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Symbols -->
+        <abbr class="chord-abbr"><span class="chord-root">F<span class="chord-sharp">&#xE262;</span></span><sup>7</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">A<span class="chord-flat">&#xE260;</span></span><sup>7<span class="chord-flat">&#xE260;</span>9</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">B<span class="chord-flat">&#xE260;</span></span><span class="chord-maj">&#xE873;</span><sup class="chord-brackets">(<span class="chord-sharp">&#xE262;</span>11)</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">E</span><sup>7</sup><sub>alt</sub></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">E</span><sup>7</sup><sub>sus</sub><sup><span class="chord-flat">&#xE260;</span>9</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">C</span><span class="chord-min">&#xE874;</span></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">D</span><span class="chord-min">&#xE874;</span><sup><span class="chord-flat">&#xE260;</span>6</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">G</span><span class="chord-dim">&#xE870;</span></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">D</span><span class="chord-halfdim">&#xE871;</span></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">C<span class="chord-sharp">&#xE262;</span></span><span class="chord-aug">&#xE872;</span><sup>7</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">F</span><sup>7</sup>&#xE87B;<span class="chord-bass">A</span></abbr>
+    </section>
+    <section class="ash-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Symbols -->
+        <span title="csymDiminished">&#xE870;</span>
+        <span title="csymHalfDiminished">&#xE871;</span>
+        <span title="csymAugmented">&#xE872;</span>
+        <span title="csymMajorSeventh">&#xE873;</span>
+        <span title="csymMinor">&#xE874;</span>
+        <span title="(">(</span>
+        <span title=")">)</span>
+        <span title="csymParensLeftTall">&#xE875;</span>
+        <span title="csymParensRightTall">&#xE876;</span>
+        <span title="csymAlteredBassSlash">&#xE87B;</span>
+    </section>
+    <section class="ash-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Symbols -->
+        <abbr class="chord-abbr"><span class="chord-root">F<span class="chord-sharp">&#xE262;</span></span><sup>7</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">A<span class="chord-flat">&#xE260;</span></span><sup>7<span class="chord-flat">&#xE260;</span>9</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">B<span class="chord-flat">&#xE260;</span></span><span class="chord-maj">&#xE873;</span><sup class="chord-brackets">(<span class="chord-sharp">&#xE262;</span>11)</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">E</span><sup>7</sup><sub>alt</sub></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">E</span><sup>7</sup><sub>sus</sub><sup><span class="chord-flat">&#xE260;</span>9</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">C</span><span class="chord-min">&#xE874;</span></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">D</span><span class="chord-min">&#xE874;</span><sup><span class="chord-flat">&#xE260;</span>6</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">G</span><span class="chord-dim">&#xE870;</span></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">D</span><span class="chord-halfdim">&#xE871;</span></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">C<span class="chord-sharp">&#xE262;</span></span><span class="chord-aug">&#xE872;</span><sup>7</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">F</span><sup>7</sup>&#xE87B;<span class="chord-bass">A</span></abbr>
+    </section>
+    <section class="bravura-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Symbols -->
+        <span title="csymDiminished">&#xE870;</span>
+        <span title="csymHalfDiminished">&#xE871;</span>
+        <span title="csymAugmented">&#xE872;</span>
+        <span title="csymMajorSeventh">&#xE873;</span>
+        <span title="csymMinor">&#xE874;</span>
+        <span title="(">(</span>
+        <span title=")">)</span>
+        <span title="csymParensLeftTall">&#xE875;</span>
+        <span title="csymParensRightTall">&#xE876;</span>
+        <span title="csymAlteredBassSlash">&#xE87B;</span>
+    </section>
+    <section class="bravura-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Symbols -->
+        <abbr class="chord-abbr"><span class="chord-root">F<span class="chord-sharp">&#xE262;</span></span><sup>7</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">A<span class="chord-flat">&#xE260;</span></span><sup>7<span class="chord-flat">&#xE260;</span>9</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">B<span class="chord-flat">&#xE260;</span></span><span class="chord-maj">&#xE873;</span><sup class="chord-brackets">(<span class="chord-sharp">&#xE262;</span>11)</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">E</span><sup>7</sup><sub>alt</sub></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">E</span><sup>7</sup><sub>sus</sub><sup><span class="chord-flat">&#xE260;</span>9</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">C</span><span class="chord-min">&#xE874;</span></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">D</span><span class="chord-min">&#xE874;</span><sup><span class="chord-flat">&#xE260;</span>6</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">G</span><span class="chord-dim">&#xE870;</span></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">D</span><span class="chord-halfdim">&#xE871;</span></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">C<span class="chord-sharp">&#xE262;</span></span><span class="chord-aug">&#xE872;</span><sup>7</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">F</span><sup>7</sup>&#xE87B;<span class="chord-bass">A</span></abbr>
+    </section>
+    <section class="broadway-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Symbols -->
+        <span title="csymDiminished">&#xE870;</span>
+        <span title="csymHalfDiminished">&#xE871;</span>
+        <span title="csymAugmented">&#xE872;</span>
+        <span title="csymMajorSeventh">&#xE873;</span>
+        <span title="csymMinor">&#xE874;</span>
+        <span title="(">(</span>
+        <span title=")">)</span>
+        <span title="csymParensLeftTall">&#xE875;</span>
+        <span title="csymParensRightTall">&#xE876;</span>
+        <span title="csymAlteredBassSlash">&#xE87B;</span>
+    </section>
+    <section class="broadway-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Symbols -->
+        <abbr class="chord-abbr"><span class="chord-root">F<span class="chord-sharp">&#xE262;</span></span><sup>7</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">A<span class="chord-flat">&#xE260;</span></span><sup>7<span class="chord-flat">&#xE260;</span>9</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">B<span class="chord-flat">&#xE260;</span></span><span class="chord-maj">&#xE873;</span><sup class="chord-brackets">(<span class="chord-sharp">&#xE262;</span>11)</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">E</span><sup>7</sup><sub>alt</sub></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">E</span><sup>7</sup><sub>sus</sub><sup><span class="chord-flat">&#xE260;</span>9</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">C</span><span class="chord-min">&#xE874;</span></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">D</span><span class="chord-min">&#xE874;</span><sup><span class="chord-flat">&#xE260;</span>6</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">G</span><span class="chord-dim">&#xE870;</span></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">D</span><span class="chord-halfdim">&#xE871;</span></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">C<span class="chord-sharp">&#xE262;</span></span><span class="chord-aug">&#xE872;</span><sup>7</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">F</span><sup>7</sup>&#xE87B;<span class="chord-bass">A</span></abbr>
+    </section>
+    <section class="leipzig-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Symbols -->
+        <span title="csymDiminished">&#xE870;</span>
+        <span title="csymHalfDiminished">&#xE871;</span>
+        <span title="csymAugmented">&#xE872;</span>
+        <span title="csymMajorSeventh">&#xE873;</span>
+        <span title="csymMinor">&#xE874;</span>
+        <span title="(">(</span>
+        <span title=")">)</span>
+        <span title="csymParensLeftTall">&#xE875;</span>
+        <span title="csymParensRightTall">&#xE876;</span>
+        <span title="csymAlteredBassSlash">&#xE87B;</span>
+    </section>
+    <section class="leipzig-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Symbols -->
+        <abbr class="chord-abbr"><span class="chord-root">F<span class="chord-sharp">&#xE262;</span></span><sup>7</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">A<span class="chord-flat">&#xE260;</span></span><sup>7<span class="chord-flat">&#xE260;</span>9</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">B<span class="chord-flat">&#xE260;</span></span><span class="chord-maj">&#xE873;</span><sup class="chord-brackets">(<span class="chord-sharp">&#xE262;</span>11)</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">E</span><sup>7</sup><sub>alt</sub></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">E</span><sup>7</sup><sub>sus</sub><sup><span class="chord-flat">&#xE260;</span>9</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">C</span><span class="chord-min">&#xE874;</span></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">D</span><span class="chord-min">&#xE874;</span><sup><span class="chord-flat">&#xE260;</span>6</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">G</span><span class="chord-dim">&#xE870;</span></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">D</span><span class="chord-halfdim">&#xE871;</span></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">C<span class="chord-sharp">&#xE262;</span></span><span class="chord-aug">&#xE872;</span><sup>7</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">F</span><sup>7</sup>&#xE87B;<span class="chord-bass">A</span></abbr>
+    </section>
+    <section class="petaluma-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Symbols -->
+        <span title="csymDiminished">&#xE870;</span>
+        <span title="csymHalfDiminished">&#xE871;</span>
+        <span title="csymAugmented">&#xE872;</span>
+        <span title="csymMajorSeventh">&#xE873;</span>
+        <span title="csymMinor">&#xE874;</span>
+        <span title="(">(</span>
+        <span title=")">)</span>
+        <span title="csymParensLeftTall">&#xE875;</span>
+        <span title="csymParensRightTall">&#xE876;</span>
+        <span title="csymAlteredBassSlash">&#xE87B;</span>
+    </section>
+    <section class="petaluma-test test">
+        <span class="em-box"><small>1em</small></span>
+        <!-- Stave -->
+        <span>&#xE014;</span>
+        <!-- Symbols -->
+        <abbr class="chord-abbr"><span class="chord-root">F<span class="chord-sharp">&#xE262;</span></span><sup>7</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">A<span class="chord-flat">&#xE260;</span></span><sup>7<span class="chord-flat">&#xE260;</span>9</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">B<span class="chord-flat">&#xE260;</span></span><span class="chord-maj">&#xE873;</span><sup class="chord-brackets">(<span class="chord-sharp">&#xE262;</span>11)</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">E</span><sup>7</sup><sub>alt</sub></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">E</span><sup>7</sup><sub>sus</sub><sup><span class="chord-flat">&#xE260;</span>9</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">C</span><span class="chord-min">&#xE874;</span></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">D</span><span class="chord-min">&#xE874;</span><sup><span class="chord-flat">&#xE260;</span>6</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">G</span><span class="chord-dim">&#xE870;</span></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">D</span><span class="chord-halfdim">&#xE871;</span></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">C<span class="chord-sharp">&#xE262;</span></span><span class="chord-aug">&#xE872;</span><sup>7</sup></abbr>
+        <abbr class="chord-abbr"><span class="chord-root">F</span><sup>7</sup>&#xE87B;<span class="chord-bass">A</span></abbr>
+    </section>
+
+
+    <p>Some default text for size comparison. Crunchum ipsum dolor text sit
+    coder void, constructor function, sed do while loop python orientation semi
+    colon incident. Duis aute irure indent tabs or spaces velit esse cilium
+    buntum how crunchy duntum. Excepteur tranquilis syntax error memorandum qui
+    officia nostrud operating system alertus. Hyper text linkus operari avec
+    computatrum ad coniungere hominum. Standards code est pulchra on chromium et
+    foxus sed souvent suckum in internet explorum.</p>
+</body>
+</html>

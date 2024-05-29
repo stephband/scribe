@@ -1,37 +1,21 @@
-
-/* Warning: To use a font inside the shadow DOM in Chrome, @font-face must
-   be declared in the main DOM – ie. in module.css */
 /*
-@font-face {
-    font-family: JazzText;
-    src: url('../../fonts/FinaleJazzText/finalejazztext-webfont.woff2') format('woff2');
-    font-weight: normal;
-    font-style: normal;
-}
-*/
-
 .timesig {
     display: grid;
-    /*grid-template-rows: 1fr 1fr;*/
     grid-auto-flow: rows;
 }
 
 .timesig > * {
-    font-family: ScribeText, math;
-    /*font-size: 1.333333em;*/
     font-weight: bold;
     align-self: end;
     justify-self: center;
     margin: 0;
-    /*line-height: 0.92em;*/
 }
 
 .timesig > * + * {
     align-self: start;
     justify-self: center;
 }
-
-
+*/
 
 /* The 'new' way! */
 
@@ -59,10 +43,8 @@ button.timesig:hover {
     display: block;
     position: static;
 
-    font-family: ScribeText, math;
-    font-size: 1.333333em;
-    line-height: 0.92em;
-    font-weight: bold;
+    font-size: inherit;
+    line-height: 0.625em;
 
     margin: 0;
     grid-column: 1;

@@ -22,6 +22,11 @@
     <link rel="stylesheet" href="./build/scribe-music/module.css" />
     <script type="module" src="./build/scribe-music/module.js"></script>
     <link rel="stylesheet" href="./elements/lead-sheet-document.css" />
+    <style>
+    body {
+        font-family: Jazz, JazzText;
+    }
+    </style>
 
     <script type="module">
     document.body.addEventListener('change', function(e) {
@@ -33,7 +38,7 @@
 </head>
 
 <body>
-    <header style="font-family: ScribeText;">
+    <header>
         <h1>Sí Bheag Sí Mhór</h1>
         <form class="scribe-part">
             Transpose:
@@ -85,7 +90,7 @@
     B)||D A G D A D D Bm D D G F#m G A D D||
     </scribe-music>
 
-    <footer style="font-family: ScribeText;">
+    <footer>
         <p>Test page for music renderer <a href="https://github.com/stephband/scribe/">Scribe</a>. Contribute on <a href="https://github.com/stephband/scribe">github</a>.</p>
     </footer>
 </body>

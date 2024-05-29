@@ -1,17 +1,7 @@
 
-
-#ledges > line {
-    vector-effect: non-scaling-stroke;
-    stroke:currentcolor;
-    stroke-width: 1.2px;
-    stroke-linejoin:round;
-    stroke-linecap:round;
-    fill:none;
-}
-
 .ledge {
     overflow: hidden;
-    width: calc(4.4 * var(--y-size));
+    width: 0.55em;
     vector-effect: non-scaling-stroke;
     stroke:currentcolor;
     stroke-width:0.05em;
@@ -20,12 +10,11 @@
     fill:none;
 }
 
-.up-ledge {
-    stroke: red;
-    stroke-width: 2px;
-}
-
-.down-ledge {
-    stroke: red;
-    stroke-width: 2px;
+.ledge line {
+    vector-effect: non-scaling-stroke;
+    stroke:currentcolor;
+    stroke-width: 1.2px;
+    stroke-linejoin:round;
+    stroke-linecap:round;
+    fill:none;
 }

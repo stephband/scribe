@@ -1,0 +1,11 @@
+
+@font-face {
+    font-family: Leipzig;
+    src: url('../fonts/Leipzig/Leipzig.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.leipzig-font {
+    font-family: Leipzig;
+}

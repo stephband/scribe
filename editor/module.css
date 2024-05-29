@@ -15,6 +15,7 @@
 @import '../lib/bolt/classes/atoms.css';
 @import '../lib/bolt/classes/color.css';
 
+@import './fonts/jazz.css';
 @import './classes/header.css';
 @import './classes/zone.css';
 @import './classes/bar.css';
@@ -24,20 +25,6 @@
 @font-face {
     font-family: MartianMono;
     src: url('../fonts/MartianMono/fonts/webfonts/MartianMono-Regular.woff2') format('woff2');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: ScribeText;
-    src: url('../fonts/FinaleJazzText/finalejazztext-webfont.woff2') format('woff2');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: ScribeMusic;
-    src: url('../fonts/FinaleJazz/finalejazz-webfont.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
 }
