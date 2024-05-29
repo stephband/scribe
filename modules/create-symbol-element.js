@@ -119,18 +119,46 @@ export default overload(get('type'), {
         class: "up-ledge ledge",
         viewBox: `0 ${0.5 - symbol.rows} 4.4 ${symbol.rows}`,
         preserveAspectRatio: "xMidYMax",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, part: symbol.part },
+        data: {
+            beat:  symbol.beat + 1,
+            pitch: symbol.pitch,
+            part:  symbol.part
+        },
         style: `height: ${ symbol.rows * 0.125 }em;`,
-        html: '<use x="0" y="-8" href="#ledges"></use>'
+        html: `<g transform="translate(0 -8)">
+            <line x1="0" x2="4.4" y1="8" y2="8"></line>
+            <line x1="0" x2="4.4" y1="6" y2="6"></line>
+            <line x1="0" x2="4.4" y1="4" y2="4"></line>
+            <line x1="0" x2="4.4" y1="2" y2="2"></line>
+            <line x1="0" x2="4.4" y1="0" y2="0"></line>
+            <line x1="0" x2="4.4" y1="2" y2="2"></line>
+            <line x1="0" x2="4.4" y1="4" y2="4"></line>
+            <line x1="0" x2="4.4" y1="6" y2="6"></line>
+            <line x1="0" x2="4.4" y1="8" y2="8"></line>
+        </g>`
     }),
 
     downledger: (symbol) => create('svg', {
         class: "down-ledge ledge",
         viewBox: `0 -0.5 4.4 ${symbol.rows}`,
         preserveAspectRatio: "xMidYMin",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, part: symbol.part },
+        data: {
+            beat:  symbol.beat + 1,
+            pitch: symbol.pitch,
+            part:  symbol.part
+        },
         style: `height: ${ symbol.rows * 0.125 }em;`,
-        html: '<use x="0" y="-8" href="#ledges"></use>'
+        html: `<g transform="translate(0 -8)">
+            <line x1="0" x2="4.4" y1="8" y2="8"></line>
+            <line x1="0" x2="4.4" y1="6" y2="6"></line>
+            <line x1="0" x2="4.4" y1="4" y2="4"></line>
+            <line x1="0" x2="4.4" y1="2" y2="2"></line>
+            <line x1="0" x2="4.4" y1="0" y2="0"></line>
+            <line x1="0" x2="4.4" y1="2" y2="2"></line>
+            <line x1="0" x2="4.4" y1="4" y2="4"></line>
+            <line x1="0" x2="4.4" y1="6" y2="6"></line>
+            <line x1="0" x2="4.4" y1="8" y2="8"></line>
+        </g>`
     }),
 
     head: (symbol) => create('span', {
@@ -187,7 +215,7 @@ export default overload(get('type'), {
             part:     symbol.part
         },
         style: `height: 0.75em; align-self: ${symbol.updown === 'up' ? 'end' : 'start'};`,
-        html: `<use href="#tie"></use>`
+        html: `<path class="tie-path" transform="translate(0, 0.14) scale(1 0.6)" d="M0.979174733,0.0124875307 C0.650597814,1.1195554 0.135029714,1.00095361 0.0165376402,0.026468657 C0.0113570514,0.0135475362 0.00253387291,0.00218807553 0,0 C0.0977526897,1.29523004 0.656681642,1.37089992 1,2.43111793e-08 C0.991901367,2.43111797e-08 0.987703936,0.01248753 0.979174733,0.0124875307 Z M0.979174733,0.0124875307"></path>`
     }),
 
     tail: (symbol) => create('span', {
