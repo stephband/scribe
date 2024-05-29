@@ -3,6 +3,7 @@ import overload from '../lib/fn/modules/overload.js';
 import create from '../lib/dom/modules/create.js';
 import * as glyphs from "./glyphs.js";
 import { chordGlyphs } from "./glyphs.js";
+import { rflat, rsharp } from './regexp.js';
 
 const abs = Math.abs;
 
@@ -67,6 +68,11 @@ function create16thNoteBeams(stems, range) {
     return html;
 }
 
+const chordParts = {
+    'flat':  `<span class="chord-flat">${ glyphs.acciFlat }</span>`,
+    'sharp': `<span class="chord-sharp">${ glyphs.acciSharp }</span>`
+};
+
 export default overload(get('type'), {
     clef: (symbol) => create('span', {
         class: `${ symbol.clef }-clef clef`,
@@ -83,8 +89,10 @@ export default overload(get('type'), {
             duration: symbol.duration,
             eventId:  identify(symbol.event)
         },
-        html: '<span class="chord-root">' + symbol.root + '</span>'
-            + (chordGlyphs[symbol.extension] ? chordGlyphs[symbol.extension] : symbol.extension)
+        // Note that we must detect sharps before flats because HTML entities
+        // contain hash symbols that can be interpreted as sharps
+        html: '<span class="chord-root">' + symbol.root.replace(rsharp, chordParts.sharp).replace(rflat, chordParts.flat) + '</span>'
+            + '<sup>' + symbol.extension.replace(rsharp, chordParts.sharp).replace(rflat, chordParts.flat) + '</sup>'
             + (symbol.bass ? glyphs.chordBassSlash + '<span class="chord-bass">' + symbol.bass + '</span>' : '')
     }),
 
@@ -176,11 +184,11 @@ export default overload(get('type'), {
             part:     symbol.part,
             eventId:  identify(symbol.event)
         },
-        html: `${ glyphs['head' + (symbol.duration + '').replace('.', '')] }`
+        html: `${ glyphs['head' + (symbol.duration + '').replace('.', '')] || '' }`
     }),
 
     stem: (symbol) => create('svg', {
-        class: `${symbol.stemDirection}-stem stem`,
+        class: `${ symbol.stemDirection }-stem stem`,
         viewBox: "0 0 2.7 7",
         // Stretch stems by height
         preserveAspectRatio: "none",
@@ -190,7 +198,7 @@ export default overload(get('type'), {
             duration: symbol.duration,
             part:     symbol.part
         },
-        style: `--beam-y: ${symbol.beamY === undefined ? 0 : symbol.beamY};`,
+        style: `--beam-y: ${ symbol.beamY === undefined ? 0 : symbol.beamY };`,
         html: symbol.stemDirection === 'up' ?
             '<line class="stem-path" x1="2.4" y1="0" x2="2.4" y2="6"></line>' :
             '<line class="stem-path" x1="0.1" y1="0.3" x2="0.1" y2="7"></line>'
@@ -199,7 +207,7 @@ export default overload(get('type'), {
     beam: (symbol) => create('svg', {
         // Beam is sloped down
         class: `${symbol.updown}-beam beam`,
-        viewBox: `0 ${(symbol.range > 0 ? -symbol.range : 0) - 0.5} ${symbol.stems.length - 1} ${abs(symbol.range) + 1}`,
+        viewBox: `0 ${ (symbol.range > 0 ? -symbol.range : 0) - 0.5 } ${ symbol.stems.length - 1 } ${ abs(symbol.range) + 1 }`,
         preserveAspectRatio: "none",
         data: {
             beat:     symbol.beat + 1,
@@ -208,15 +216,15 @@ export default overload(get('type'), {
             part:     symbol.part
         },
         /*style: 'grid-row-end: span ' + Math.ceil(1 - symbol.range),*/
-        style: `height: ${ (abs(symbol.range) + 1) * 0.125 }em; align-self: ${symbol.range > 0 ? 'end' : 'start'};`,
+        style: `height: ${ (abs(symbol.range) + 1) * 0.125 }em; align-self: ${ symbol.range > 0 ? 'end' : 'start' };`,
         html: `
-            <path class="beam-path" d="M0,${-0.5 * beamThickness} L${symbol.stems.length - 1},${-symbol.range - 0.5 * beamThickness} L${symbol.stems.length - 1},${-symbol.range + 0.5 * beamThickness} L0,${0.5 * beamThickness} Z"></path>
+            <path class="beam-path" d="M0,${ -0.5 * beamThickness } L${ symbol.stems.length - 1 },${ -symbol.range - 0.5 * beamThickness } L${ symbol.stems.length - 1 },${ -symbol.range + 0.5 * beamThickness } L0,${ 0.5 * beamThickness } Z"></path>
             ${ create16thNoteBeams(symbol.stems, symbol.range) }
         `
     }),
 
     tie: (symbol) => create('svg', {
-        class: `${symbol.updown}-tie tie`,
+        class: `${ symbol.updown }-tie tie`,
         viewBox: `0 0 1 1`,
         preserveAspectRatio: "none",
         data: {
@@ -225,18 +233,18 @@ export default overload(get('type'), {
             duration: symbol.duration,
             part:     symbol.part
         },
-        style: `height: 0.75em; align-self: ${symbol.updown === 'up' ? 'end' : 'start'};`,
+        style: `height: 0.75em; align-self: ${ symbol.updown === 'up' ? 'end' : 'start' };`,
         html: `<path class="tie-path" transform="translate(0, 0.14) scale(1 0.6)" d="M0.979174733,0.0124875307 C0.650597814,1.1195554 0.135029714,1.00095361 0.0165376402,0.026468657 C0.0113570514,0.0135475362 0.00253387291,0.00218807553 0,0 C0.0977526897,1.29523004 0.656681642,1.37089992 1,2.43111793e-08 C0.991901367,2.43111797e-08 0.987703936,0.01248753 0.979174733,0.0124875307 Z M0.979174733,0.0124875307"></path>`
     }),
 
     tail: (symbol) => create('span', {
         class: `${symbol.stemDirection}-tail tail`,
         data: {
-            beat: symbol.beat + 1,
-            pitch: symbol.pitch,
+            beat:     symbol.beat + 1,
+            pitch:    symbol.pitch,
             duration: symbol.duration,
-            part: symbol.part,
-            eventId: identify(symbol.event)
+            part:     symbol.part,
+            eventId:  identify(symbol.event)
         },
         html: glyphs['tail' + (symbol.stemDirection === 'up' ? 'Up' : 'Down') + (symbol.duration + '').replace('.', '')]
     }),
@@ -249,7 +257,7 @@ export default overload(get('type'), {
             duration: symbol.duration,
             part:     symbol.part
         },
-        html: `${ glyphs['rest' + (symbol.duration + '').replace('.', '')] }`
+        html: `${ glyphs['rest' + (symbol.duration + '').replace('.', '')] || '' }`
     }),
 
     default: (function (types) {

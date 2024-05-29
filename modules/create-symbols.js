@@ -11,16 +11,11 @@ import { transposeScale } from './scale.js';
 import * as staves from './staves.js';
 import { toKeyScale, toKeyNumber } from './keys.js';
 import { mod12, byGreater } from './maths.js';
+import { rflat, rsharp, rdoubleflat, rdoublesharp } from './regexp.js';
 
 
 const assign = Object.assign;
 const { abs, ceil, floor } = Math;
-
-const rflat = /b|♭/;
-const rsharp = /#|♯/;
-const rdoubleflat = /bb|𝄫/;
-const rdoublesharp = /##|𝄪/;
-
 const cScale = [0, 2, 4, 5, 7, 9, 11];
 
 const fathercharles = [
@@ -591,8 +586,6 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
 
         if (event[1] === 'note') {
             let pitch = stave.getSpelling(key, event, transpose);
-            console.log('>', pitch);
-
             let head = assign({
                 type: 'head',
                 beat,

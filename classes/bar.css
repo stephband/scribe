@@ -416,9 +416,9 @@ Bars are divided into:
     justify-self: start;
     grid-column: 1 / span 1;
     margin-left: 0;
-    margin-right: 0.3em;
+    margin-right: 0.15em;
 
-    --timesig-gap: 1em;
+    --timesig-gap: 0.5em;
 }
 
 .bar > .acci {
@@ -436,12 +436,12 @@ Bars are divided into:
     grid-column-start: 1;
     justify-self: start;
 
-    --acci-acci-gap: 0.6em;
+    --acci-acci-gap: 0.3em;
 }
 
 .bar > .acci + .acci {
     /* Attempt to space adjacent accidentals. */
-    margin-right: 0.4em;
+    margin-right: 0.1em;
 }
 
 
@@ -449,7 +449,7 @@ Bars are divided into:
 
 .bar > .clef ~ .acci:not([data-beat]) {
     /* If they are preceded by a stave, move them right */
-    --clef-acci-gap: 1.8em;
+    --clef-acci-gap: 0.9em;
 }
 
 .bar > .clef + .timesig {
@@ -459,9 +459,9 @@ Bars are divided into:
 
 .bar > .acci:not([data-beat]) + .timesig {
     /* If they are preceded by a stave, move them right */
-    --timesig-gap:   0.6em;
-    --clef-acci-gap: 1.8em;
-    --acci-acci-gap: 0.6em;
+    --timesig-gap:   0.3em;
+    --clef-acci-gap: 0.9em;
+    --acci-acci-gap: 0.3em;
 }
 
 .bar > .acci:not([data-beat])                                                  { margin-left: var(--clef-acci-gap); }
