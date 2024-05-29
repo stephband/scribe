@@ -457,6 +457,11 @@ Bars are divided into:
     margin-left: var(--clef-timesig);
 }
 
+.bar > .drum-clef + .timesig,
+.bar > .percussion-clef + .timesig {
+	--clef-timesig: 0.2em;
+}
+
 .bar > .acci:not([data-beat]) + .timesig {
     /* If they are preceded by a stave, move them right */
     --timesig-gap:   0.3em;
@@ -837,19 +842,23 @@ Bars are divided into:
 .bar > .down-tail {
 	margin-left:  var(--head-margin-left);
 }
-
+/*
 .bar > .head {
 	margin-right: var(--head-margin-right);
 }
-
+*/
 .bar > .head:last-child {
 	margin-right: 0;
+}
+
+.bar > .up-stem {
+	justify-self: end;
 }
 
 .bar > .up-tail {
 	/* TODO move tail into note head group, where it will automatically add space? */
 	justify-self: start;
-	margin-left: calc(-1 * (var(--bar-column-gap) + var(--head-margin-right)));
+	margin-left: calc(-1 * var(--bar-column-gap));
 }
 
 .bar > .down-tail {

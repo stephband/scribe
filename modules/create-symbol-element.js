@@ -200,8 +200,8 @@ export default overload(get('type'), {
         },
         style: `--beam-y: ${ symbol.beamY === undefined ? 0 : symbol.beamY };`,
         html: symbol.stemDirection === 'up' ?
-            '<line class="stem-path" x1="2.4" y1="0" x2="2.4" y2="6"></line>' :
-            '<line class="stem-path" x1="0.1" y1="0.3" x2="0.1" y2="7"></line>'
+            '<line class="stem-path" x1="2.6" y1="0" x2="2.6" y2="6.6"></line>' :
+            '<line class="stem-path" x1="0.1" y1="0.4" x2="0.1" y2="7"></line>'
     }),
 
     beam: (symbol) => create('svg', {
@@ -233,7 +233,7 @@ export default overload(get('type'), {
             duration: symbol.duration,
             part:     symbol.part
         },
-        style: `height: 0.75em; align-self: ${ symbol.updown === 'up' ? 'end' : 'start' };`,
+        style: `height: 0.75em; align-self: ${ symbol.updown === 'up' ? 'start' : 'end' };`,
         html: `<path class="tie-path" transform="translate(0, 0.14) scale(1 0.6)" d="M0.979174733,0.0124875307 C0.650597814,1.1195554 0.135029714,1.00095361 0.0165376402,0.026468657 C0.0113570514,0.0135475362 0.00253387291,0.00218807553 0,0 C0.0977526897,1.29523004 0.656681642,1.37089992 1,2.43111793e-08 C0.991901367,2.43111797e-08 0.987703936,0.01248753 0.979174733,0.0124875307 Z M0.979174733,0.0124875307"></path>`
     }),
 
