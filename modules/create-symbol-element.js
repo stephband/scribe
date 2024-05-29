@@ -2,7 +2,7 @@ import get from '../lib/fn/modules/get.js';
 import overload from '../lib/fn/modules/overload.js';
 import create from '../lib/dom/modules/create.js';
 import * as glyphs from "./glyphs.js";
-//import { headGlyphs, restGlyphs, tailGlyphs, timeGlyphs, chordGlyphs } from "./glyphs.js";
+import { chordGlyphs } from "./glyphs.js";
 
 const abs = Math.abs;
 
@@ -89,7 +89,8 @@ export default overload(get('type'), {
     timesig: (symbol) => create('span', {
         class: "timesig",
         data: { eventId: identify(symbol.event) },
-        html: `<sup>${ glyphs['timeSig' + symbol.numerator] }</sup><sub>${ glyphs['timeSig' + symbol.denominator] }</sub>`
+        html: `<sup>${ glyphs['timeSig' + symbol.numerator] }</sup>
+            <sub>${ glyphs['timeSig' + symbol.denominator] }</sub>`
     }),
 
     lyric: (symbol) => create('p', {
@@ -154,7 +155,9 @@ export default overload(get('type'), {
             part:     symbol.part
         },
         style: `--beam-y: ${symbol.beamY === undefined ? 0 : symbol.beamY};`,
-        html: '<use href="#stem' + symbol.stemDirection + '"></use>'
+        html: symbol.stemDirection === 'up' ?
+            '<line class="stem-path" x1="2.4" y1="0" x2="2.4" y2="6"></line>' :
+            '<line class="stem-path" x1="0.1" y1="0.3" x2="0.1" y2="7"></line>'
     }),
 
     beam: (symbol) => create('svg', {
