@@ -90,13 +90,16 @@ export default overload(get('type'), {
 
     timesig: (symbol) => create('span', {
         class: "timesig",
-        data: { eventId: identify(symbol.event) },
+        data: {
+            eventId: identify(symbol.event)
+        },
         html: `<sup>${ glyphs['timeSig' + symbol.numerator] }</sup>
             <sub>${ glyphs['timeSig' + symbol.denominator] }</sub>`
     }),
 
-    lyric: (symbol) => create('p', {
+    lyric: (symbol) => create('span', {
         class: "lyric",
+        part:  "lyric",
         data: {
             beat:     symbol.beat + 1,
             duration: symbol.duration,
@@ -107,9 +110,12 @@ export default overload(get('type'), {
 
     acci: (symbol) => create('span', {
         class: "acci",
-        data: symbol.beat === undefined ?
-            { pitch: symbol.pitch } :
-            { beat: symbol.beat + 1, pitch: symbol.pitch, part: symbol.part, eventId: identify(symbol.event) },
+        data: symbol.beat === undefined ? { pitch: symbol.pitch } : {
+            beat:    symbol.beat + 1,
+            pitch:   symbol.pitch,
+            part:    symbol.part,
+            eventId: identify(symbol.event)
+        },
         html: symbol.value === 1 ? glyphs.acciSharp :
             symbol.value === -1 ? glyphs.acciFlat :
             glyphs.acciNatural
@@ -195,12 +201,17 @@ export default overload(get('type'), {
         class: `${symbol.updown}-beam beam`,
         viewBox: `0 ${(symbol.range > 0 ? -symbol.range : 0) - 0.5} ${symbol.stems.length - 1} ${abs(symbol.range) + 1}`,
         preserveAspectRatio: "none",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part },
+        data: {
+            beat:     symbol.beat + 1,
+            pitch:    symbol.pitch,
+            duration: symbol.duration,
+            part:     symbol.part
+        },
         /*style: 'grid-row-end: span ' + Math.ceil(1 - symbol.range),*/
         style: `height: ${ (abs(symbol.range) + 1) * 0.125 }em; align-self: ${symbol.range > 0 ? 'end' : 'start'};`,
         html: `
             <path class="beam-path" d="M0,${-0.5 * beamThickness} L${symbol.stems.length - 1},${-symbol.range - 0.5 * beamThickness} L${symbol.stems.length - 1},${-symbol.range + 0.5 * beamThickness} L0,${0.5 * beamThickness} Z"></path>
-            ${create16thNoteBeams(symbol.stems, symbol.range)}
+            ${ create16thNoteBeams(symbol.stems, symbol.range) }
         `
     }),
 

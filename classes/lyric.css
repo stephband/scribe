@@ -1,6 +1,7 @@
 
 .lyric {
-    font-size: 0.75em;
+    font-family: sans-serif;
+    font-size: 0.375em;
     text-transform: uppercase;
     margin: 0;
 }
