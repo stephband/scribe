@@ -65,7 +65,7 @@
         <line x1="0" x2="1" y1="14"  y2="14"></line>\
     </svg>');
 
-    background-size: 100% calc(29 * var(--y-size));
+    background-size: 100% 3.625em;
 }
 
 .piano-stave > .rest,

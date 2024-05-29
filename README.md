@@ -107,7 +107,7 @@ The URL of a file containing sequence data in JSON or ABC.
 ### `clef="treble"`
 
 Both an attribute and a property.
-The name of the clef, one of `"treble"`, `"bass"`, `"piano"`, `"drums"`, `"percussion"` or
+The name of the clef, one of `"treble"`, `"bass"`, `"piano"`, `"drum"`, `"percussion"` or
 `"chords"`. Defaults to `"treble"`.
 
 ```html

@@ -6,5 +6,5 @@
     stroke-width: 0.31;
     stroke-linecap: round;
     width:  0.3375em;
-    height: calc((var(--beam-y) + var(--stem-size)) * 0.125em);
+    height: calc(var(--beam-y) * 0.125em + var(--stem-size));
 }

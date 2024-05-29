@@ -110,11 +110,6 @@
         import { renderData, getData } from './module.js';
         import { clear } from './modules/selection.js';
 
-        // Add SVG symbol definitions to the body
-        import svgdefs from '../modules/svgdefs.js';
-        const fragment = create('fragment', svgdefs);
-        document.body.append(fragment);
-
         // Flag Safari
         const isSafari = navigator.userAgent.includes('AppleWebKit/')
             && !navigator.userAgent.includes('Chrome/')
@@ -287,7 +282,7 @@
         <button type="button" class="clef-button y1" name="close" value="tenor">Tenor</button>
         <button type="button" class="clef-button y1" name="close" value="bass">Bass</button>
         <button type="button" class="clef-button y2" name="close" value="piano">Grand</button>
-        <button type="button" class="clef-button y3" name="close" value="drums">Drum</button>
+        <button type="button" class="clef-button y3" name="close" value="drum">Drum</button>
         <button type="button" class="clef-button y3" name="close" value="percussion">Percussion</button>
     </dialog>
 

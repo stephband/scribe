@@ -28,7 +28,7 @@ https://web.mit.edu/merolish/Public/drums.pdf
         <line x1="0" x2="1" y1="0" y2="0"></line>\
     </svg>');
 
-    background-size: 100% calc(5 * var(--y-size));
+    background-size: 100% 0.625em;
 }
 
 /* TEMP */

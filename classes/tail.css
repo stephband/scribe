@@ -1,5 +1,16 @@
+
 .tail {
-    stroke: none;
-    stroke-width: 0;
-    width:  0.3375em;
+    /* Use the same registration box as a note head for convenient positioning */
+    line-height: 0.25em;
+    height: auto;
+}
+
+.up-tail {
+    position: relative;
+    top: calc(-1 * var(--stem-size));
+}
+
+.down-tail {
+    position: relative;
+    top: var(--stem-size);
 }

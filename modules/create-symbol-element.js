@@ -1,7 +1,8 @@
 import get from '../lib/fn/modules/get.js';
 import overload from '../lib/fn/modules/overload.js';
 import create from '../lib/dom/modules/create.js';
-import { headGlyphs, restGlyphs, tailGlyphs, timeGlyphs, chordGlyphs } from "./glyphs.js";
+import * as glyphs from "./glyphs.js";
+//import { headGlyphs, restGlyphs, tailGlyphs, timeGlyphs, chordGlyphs } from "./glyphs.js";
 
 const abs = Math.abs;
 
@@ -67,50 +68,50 @@ function create16thNoteBeams(stems, range) {
 }
 
 export default overload(get('type'), {
-    // Create clef
-    clef: (symbol) => symbol.clef === 'percussion' ?
-        undefined :
-        create('span', {
-            class: `${symbol.clef}-clef clef`,
-//            style: `font-size:2em;line-height:0.25em;`,
-            //data: { eventId: identify(symbol.event) },
-            data: { eventId: null },
-            viewBox: "0 0.4 5.2 14.6",
-//            preserveAspectRatio: "none",
-            html: "\uE050"
-        }),
+    clef: (symbol) => create('span', {
+        class: `${ symbol.clef }-clef clef`,
+        //data: { eventId: identify(symbol.event) },
+        data: { eventId: null },
+        html: glyphs[symbol.clef + 'Clef'] || ''
+    }),
 
-    // Create chord symbol
-    chord: (symbol) => create('p', {
-        class: "chord",
-        data: { beat: symbol.beat + 1, duration: symbol.duration, eventId: identify(symbol.event) },
+    chord: (symbol) => create('abbr', {
+        class: "chord-abbr",
+        title: "TODO - name of chord",
+        data: {
+            beat:     symbol.beat + 1,
+            duration: symbol.duration,
+            eventId:  identify(symbol.event)
+        },
         html: symbol.root + (chordGlyphs[symbol.extension] ? chordGlyphs[symbol.extension] : symbol.extension)
     }),
 
     timesig: (symbol) => create('span', {
         class: "timesig",
-        html: `<span style="font-size:1.5em;line-height:1em;">${timeGlyphs[symbol.numerator]}</span>
-            <span style="font-size:1.5em;line-height:1em;">${timeGlyphs[symbol.denominator]}</span>`,
         data: { eventId: identify(symbol.event) },
+        html: `<sup>${ glyphs['timeSig' + symbol.numerator] }</sup><sub>${ glyphs['timeSig' + symbol.denominator] }</sub>`
     }),
 
     lyric: (symbol) => create('p', {
         class: "lyric",
-        data: { beat: symbol.beat + 1, duration: symbol.duration, eventId: identify(symbol.event) },
+        data: {
+            beat:     symbol.beat + 1,
+            duration: symbol.duration,
+            eventId:  identify(symbol.event)
+        },
         html: symbol.value
     }),
 
-    // Create accidental
     acci: (symbol) => create('span', {
         class: "acci",
-//        style: `font-size:2em;line-height:0.25em;`,
         data: symbol.beat === undefined ?
             { pitch: symbol.pitch } :
             { beat: symbol.beat + 1, pitch: symbol.pitch, part: symbol.part, eventId: identify(symbol.event) },
-        html: symbol.value === 1 ? '\uE262' : symbol.value === -1 ? '\uE260' : '\uE261'
+        html: symbol.value === 1 ? glyphs.acciSharp :
+            symbol.value === -1 ? glyphs.acciFlat :
+            glyphs.acciNatural
     }),
 
-    // Create note head
     upledger: (symbol) => create('svg', {
         class: "up-ledge ledge",
         viewBox: `0 ${0.5 - symbol.rows} 4.4 ${symbol.rows}`,
@@ -129,25 +130,33 @@ export default overload(get('type'), {
         html: '<use x="0" y="-8" href="#ledges"></use>'
     }),
 
-    // Create note head
     head: (symbol) => create('span', {
         class: "head",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part, eventId: identify(symbol.event) },
-        html: symbol.head ? headGlyphs[symbol.head] : ![0.125, 0.375, 0.75, 1.5, 3, 6].includes(symbol.duration) ? headGlyphs[symbol.duration] : `${headGlyphs[symbol.duration]}<span>${headGlyphs["dot"]}</span>`
+        data: {
+            beat:     symbol.beat + 1,
+            pitch:    symbol.pitch,
+            duration: symbol.duration,
+            part:     symbol.part,
+            eventId:  identify(symbol.event)
+        },
+        html: `${ glyphs['head' + (symbol.duration + '').replace('.', '')] }`
     }),
 
-    // Create note stem
     stem: (symbol) => create('svg', {
         class: `${symbol.stemDirection}-stem stem`,
         viewBox: "0 0 2.7 7",
         // Stretch stems by height
         preserveAspectRatio: "none",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part },
+        data: {
+            beat:     symbol.beat + 1,
+            pitch:    symbol.pitch,
+            duration: symbol.duration,
+            part:     symbol.part
+        },
         style: `--beam-y: ${symbol.beamY === undefined ? 0 : symbol.beamY};`,
         html: '<use href="#stem' + symbol.stemDirection + '"></use>'
     }),
 
-    // Create note beam
     beam: (symbol) => create('svg', {
         // Beam is sloped down
         class: `${symbol.updown}-beam beam`,
@@ -162,33 +171,41 @@ export default overload(get('type'), {
         `
     }),
 
-    // Create note beam
     tie: (symbol) => create('svg', {
-        // Beam is sloped down
         class: `${symbol.updown}-tie tie`,
         viewBox: `0 0 1 1`,
         preserveAspectRatio: "none",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part },
-        /*style: 'grid-row-end: span ' + symbol.duration / 24 + ';' */
+        data: {
+            beat:     symbol.beat + 1,
+            pitch:    symbol.pitch,
+            duration: symbol.duration,
+            part:     symbol.part
+        },
         style: `height: 0.75em; align-self: ${symbol.updown === 'up' ? 'end' : 'start'};`,
         html: `<use href="#tie"></use>`
     }),
 
-    // Create note tail
     tail: (symbol) => create('span', {
         class: `${symbol.stemDirection}-tail tail`,
-//        style: `font-size:2em;line-height:0.25em;`,
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part, eventId: identify(symbol.event) },
-        html: tailGlyphs[symbol.stemDirection][symbol.duration]
+        data: {
+            beat: symbol.beat + 1,
+            pitch: symbol.pitch,
+            duration: symbol.duration,
+            part: symbol.part,
+            eventId: identify(symbol.event)
+        },
+        html: glyphs['tail' + (symbol.stemDirection === 'up' ? 'Up' : 'Down') + (symbol.duration + '').replace('.', '')]
     }),
 
-    // Create rest
     rest: (symbol) => create('span', {
         class: "rest",
-//        style: `font-size:2em;line-height:0.25em;`,
-        preserveAspectRatio: "xMidYMid slice",
-        data: { beat: symbol.beat + 1, pitch: symbol.pitch, duration: symbol.duration, part: symbol.part },
-        html: ![0.125, 0.375, 0.75, 1.5, 3, 6].includes(symbol.duration) ? restGlyphs[symbol.duration] : `${restGlyphs[symbol.duration]}<span>${restGlyphs["dot"]}</span>`
+        data: {
+            beat:     symbol.beat + 1,
+            pitch:    symbol.pitch,
+            duration: symbol.duration,
+            part:     symbol.part
+        },
+        html: `${ glyphs['rest' + (symbol.duration + '').replace('.', '')] }`
     }),
 
     default: (function (types) {

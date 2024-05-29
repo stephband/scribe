@@ -660,7 +660,7 @@ export default function eventsToSymbols(events, clef, keyname, meter, transpose)
     // don't end up running the keys matrix calculations on every note which
     // causes measurable delay.
     // TEMP: don't get keys for unpitched staves
-    const beatkeys = clef === 'drums' ?
+    const beatkeys = clef === 'drum' ?
         null :
         keysAtBeats(events);
 

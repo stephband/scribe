@@ -1,13 +1,9 @@
-.head {
-    stroke: none;
-    stroke-width: 0;
-    /*width:  0.3375em;*/
-    height: 0.125em;
-}
 
-div.head {
-    background-color: currentcolor;
-    border-radius: 50%;
-    transform: rotateZ(-26deg);
-    color: brown;
+.head {
+    /* Make it's box one stave space high */
+    line-height: 0.25em;
+    height: auto;
+    /* Set the click zone to roughly the same shape as the glyph,
+       assuming most heads are round-ish. */
+    border-radius: 40%;
 }

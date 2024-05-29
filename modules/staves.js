@@ -77,8 +77,8 @@ export const piano = {
     }
 };
 
-export const drums = {
-    clef: 'drums',
+export const drum = {
+    clef: 'drum',
 
     getSpelling: (key, event, transpose) => {
         if (event[1] === 'note') {
@@ -89,7 +89,7 @@ export const drums = {
 
         return toSpelling(key, event, transpose);
     },
-    slashedBlack:"\uE0CF", 
+    slashedBlack:"\uE0CF",
     xBlack:"\uE0A9",
     xOrnate: "\uE0AA",
     triangleUpBlack: "\uE0BE",

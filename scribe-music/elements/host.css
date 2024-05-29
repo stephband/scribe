@@ -2,20 +2,19 @@
 
 :host {
     /* Metrics */
-    --bar-line-size:     0.1rem;
+    --bar-line-size:     0.05rem;
     /* Compress column-gap below 800px viewport to fit more information
        on mobile (0.08vw becomes 0.04em at 800px viewport). */
-    --bar-column-gap:    min(0.08vw, 0.04em);
-    --bar-padding-left:  0.6em;
-    --bar-padding-right: 0.3em;
+    --bar-column-gap:    min(0.08vw, 0.02em);
+    --bar-padding-left:  0.3em;
+    --bar-padding-right: 0.15em;
     /* Accidentals are aligned right and have the intervening column-gap, and
        the --head-margin-left, negated so this is the actual accidental-head gap. */
     --acci-margin-left:  0;
-    --acci-margin-right: 0.25em;
-    --head-width:        0.3375em;
-    --head-margin-left:  0.25em;
-    --head-margin-right: 0.1em;
-    --stem-thickness:    0.06em;
+    --acci-margin-right: 0.125em;
+    --head-margin-left:  0.125em;
+    --head-margin-right: 0.05em;
+    --stem-thickness:    0.03em;
 
     --safari-bar-mask-color: white;
 

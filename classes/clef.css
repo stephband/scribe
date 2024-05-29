@@ -1,3 +1,13 @@
+
 .clef {
-    width: 0.75em;
+    line-height: 2em;
+    height: auto;
+}
+
+.alto-clef {
+    line-height: 1em;
+}
+
+.drum-clef {
+    line-height: 0.75em;
 }

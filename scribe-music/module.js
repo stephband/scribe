@@ -10,7 +10,7 @@ import { timesigToMeter, meterToTimesig } from '../modules/timesig.js';
 import * as staves       from '../modules/staves.js';
 //import createElement     from '../modules/create-element.js';
 import createBarElements from '../modules/create-bar-elements.js';
-import svgdefs           from '../modules/svgdefs.js';
+//import svgdefs           from '../modules/svgdefs.js';
 
 
 const assign = Object.assign;
@@ -26,7 +26,7 @@ stylesheet.each((url) => stylefns.forEach((fn) => fn(url)));
 /* Register <scribe-music> */
 
 export default define(element('scribe-music', {
-    shadow: `<link rel="stylesheet" href="${ shadowCSSUrl }" />` + svgdefs,
+    shadow: `<link rel="stylesheet" href="${ shadowCSSUrl }" />`,
 
     construct: function(shadow, internals) {
         // Listen to updates to ScribeMusic.stylesheet and update the link
@@ -87,7 +87,7 @@ export default define(element('scribe-music', {
         clef="treble"
         Choose the default clef to render. Not that if the rendered sequence
         contains clef events, they override this choice. Possible clefs are
-        `"treble"`, `"bass"`, `"piano"`, `"drums"`, `"percussion"`, `"chord"`.
+        `"treble"`, `"bass"`, `"piano"`, `"drum"`, `"percussion"`, `"chord"`.
         **/
         attribute: function(value) { this.clef = value; },
 
@@ -95,7 +95,7 @@ export default define(element('scribe-music', {
         .clef = "treble"
         Choose the default clef to render. Not that if the rendered sequence
         contains clef events, they override this choice. Possible clefs are
-        `"treble"`, `"bass"`, `"piano"`, `"drums"`, `"percussion"`, `"chord"`.
+        `"treble"`, `"bass"`, `"piano"`, `"drum"`, `"percussion"`, `"chord"`.
         **/
         get: function() {  return getInternals(this).clef.value; },
         set: function(value) {

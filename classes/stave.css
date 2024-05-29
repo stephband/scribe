@@ -2,7 +2,7 @@
 @import './stave/treble.css';
 @import './stave/bass.css';
 @import './stave/piano.css';
-@import './stave/drums.css';
+@import './stave/drum.css';
 @import './stave/percussion.css';
 
 /* Add a background line of white behind the start of the bar in Safari so that

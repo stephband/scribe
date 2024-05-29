@@ -2,8 +2,7 @@
 .stave {
     /* The SMuFL font spec says that a standard five-line stave is 1em high,
        making the stave line to stave line distance 0.25em, and a stave row 0.125em */
-    --y-size: 0.125em;
-    --stem-size: 7;
+    --stem-size: 0.875em;
 
     display: grid;
     row-gap: 0;
@@ -120,12 +119,12 @@
 
 .stave > .up-beam {
     position: relative;
-    top: calc(-1 * var(--stem-size) * 0.125em);
+    top: calc(-1 * var(--stem-size));
 }
 
 .stave > .down-beam {
     position: relative;
-    top: calc(var(--stem-size) * 0.125em);
+    top: var(--stem-size);
 }
 
 .stave > .rest {

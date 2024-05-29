@@ -1,83 +1,71 @@
 
-.chord {
-    font-size: 1.333333333em;
-    font-weight: 400;
-    letter-spacing: 0;
-    line-height: 1em;
-    margin: 0;
-    /* Just nudge them left 3px so their first character  really
-       aligns with any note head it is over */
-    position: relative;
-    left: -0.14em;
-}
+/* Chord symbols are awkward. Sizing and alignment of various glyphs varies
+   enormously between fonts. */
 
-.chord sup {
-    font-size: 0.92em;
-    vertical-align: 0.06em;
-}
-
-.chord sup.seven {
-    margin-left: 0.02em;
-}
-
-.chord sub {
-    font-size: 0.84em;
+.chord-abbr {
     vertical-align: baseline;
 }
 
-.chord .chord-brackets {
-    display: inline-block;
+.chord-abbr {
+    line-height: 1em;
+}
+
+.chord-abbr .chord-maj {
+    font-size: inherit;
+    vertical-align: 0em;
+}
+
+.chord-abbr .chord-min {
+    font-size: inherit;
+    vertical-align: 0.1875em;
+}
+
+.chord-abbr .chord-halfdim {
+    font-size: inherit;
+    vertical-align: 0.3125em;
+}
+
+.chord-abbr .chord-dim {
+    font-size: inherit;
+    vertical-align: 0.3125em;
+}
+
+.chord-abbr .chord-aug {
+    font-size: inherit;
+    vertical-align: 0.1875em;
+}
+
+.chord-abbr .chord-root,
+.chord-abbr .chord-bass {
+    font-size: 0.75em;
+}
+
+.chord-abbr .chord-bass {
+    vertical-align: -0.25em;
+}
+
+.chord-abbr .chord-flat {
+    vertical-align: 0.25em;
+    margin-left: 0.05em;
+}
+
+.chord-abbr .chord-sharp {
+    vertical-align: 0.333333333em;
+}
+
+.chord-abbr sup {
+    font-size: 0.5625em;
+    vertical-align: 0.333333333em;
+    margin-left: 0.04em;
+}
+
+.chord-abbr sub {
+    font-size: 0.5625em;
+    vertical-align: 0em;
+}
+
+.chord-abbr .chord-brackets {
+    font-size: 0.5em;
+    vertical-align: 0.4em;
     margin-left: 0.1em;
-    font-size: 0.84em;
-    vertical-align: 0.5em;
-
-    /*display: none;*/
 }
-
-.chord .halfdim {
-    vertical-align: 0.24em;
-}
-
-
-/* Accidentals are hard to get. Extended symbol fonts don't seem to
-work in Safari, text fonts do but don't render sharps and flats where
-Unicode requires. There follows a short interlude while we replace
-sharps and flats with other characters, or with images. Go for a pee. */
-
-.chord .sharp {
-    /* Replace sharp with before content hash */
-    display: inline-block;
-    width: 0.4em;
-    max-width: 0.4em;
-    padding-left: 0.4em;
-    white-space: nowrap;
-    overflow: hidden;
-}
-
-.chord .sharp::before {
-    content: '#';
-    display: inline-block;
-    margin-left: -0.4em;
-    width: 0.4em;
-}
-
-.chord .flat {
-    /* Replace flat with SVG. Annoyingly, it will now be difficult to change
-       its color. */
-    display: inline-block;
-    width: 0.36em;
-    max-width: 0.36em;
-    padding-left: 0.36em;
-    margin-left: 0.06em;
-    white-space: nowrap;
-    overflow: hidden;
-    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0.48 -4.2 1 9" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
-        <style>line{stroke:none;fill:currentcolor;}</style>\
-        <path transform="scale(0.054) translate(-606.4 -191)" d="M629.4297,136.6357c1.4404,0,2.5928,0.8643,3.3848,2.5923c0.5039,1.2959,0.792,2.8081,0.792,4.5366c0,5.04-1.9443,10.6567-5.7607,16.8491c-2.9521,4.8247-6.624,9.5771-11.1611,14.1855l0.5762-60.1255c1.0078-1.1519,2.0879-1.8003,3.2402-1.8003c0.2881,0,0.4326,0.0723,0.5762,0.0723l-0.2881,29.2344C622.877,138.5078,625.7578,136.6357,629.4297,136.6357z M625.9014,145.6367c-1.0801,0-2.376,1.0801-3.7441,3.168c-1.2959,1.9443-1.9443,3.3843-2.0156,4.3208l-0.1445,8.2085c4.9688-4.6802,7.4883-9.2168,7.4883-13.6094C627.4854,146.3564,626.9102,145.6367,625.9014,145.6367z"/>\
-    </svg>');
-    background-size: 0.32em 2.7em;
-    background-position: 0 0;
-}
-
-
-
