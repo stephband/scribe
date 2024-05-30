@@ -28,6 +28,7 @@ export const acciDoubleSharp = '&#xE263;';
 export const acciParensLeft  = '&#xE26A;';
 export const acciParensRight = '&#xE26B;';
 
+// https://w3c.github.io/smufl/latest/tables/noteheads.html
 // 200A is a unicode HAIR SPACE, it's needed to seperate head from dot in Jazz.
 // TODO: do other fonts need it tho?
 export const head0125  = '&#xE0A4;';
@@ -45,13 +46,14 @@ export const head6     = '&#xE0A2;&#x200A;&#xE1E7;';
 
 export const headBracketLeft         = '&#xE0F5;';
 export const headBracketRight        = '&#xE0F6;';
-export const headSlashedBlack2       = '&#xE0D0;';
-export const headDiamondBlack        = '&#xE0DB;';
-export const headDiamondBlackWide    = '&#xE0DC;';
-export const headXBlack              = '&#xE0A9;';
-export const headPlusBlack           = '&#xE0AF;';
+export const headSlashed2            = '&#xE0D0;';
+export const headDiamond             = '&#xE0DB;';
+export const headDiamondWide         = '&#xE0DC;';
+export const headX                   = '&#xE0A9;';
+export const headPlus                = '&#xE0AF;';
+export const headCircle              = '&#xE0E8;';
 export const headCircleX             = '&#xE0B3;';
-export const headTriangleUpBlack     = '&#xE0BE;';
+export const headTriangleUp          = '&#xE0BE;';
 export const headSlashVerticalEnds   = '&#xE100;';
 export const headSlashHorizontalEnds = '&#xE101;';
 

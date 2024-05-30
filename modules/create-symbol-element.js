@@ -184,7 +184,7 @@ export default overload(get('type'), {
             part:     symbol.part,
             eventId:  identify(symbol.event)
         },
-        html: `${ glyphs['head' + (symbol.duration + '').replace('.', '')] || '' }`
+        html: `${ symbol.head || glyphs['head' + (symbol.duration + '').replace('.', '')] || '' }`
     }),
 
     stem: (symbol) => create('svg', {

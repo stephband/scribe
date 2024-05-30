@@ -1,6 +1,7 @@
 
 import toSpelling from './event/to-spelling.js';
 import { toNoteName, toNoteNumber } from '../lib/midi/modules/note.js';
+import * as glyphs from './glyphs.js';
 
 const floor = Math.floor;
 
@@ -89,12 +90,6 @@ export const drum = {
 
         return toSpelling(key, event, transpose);
     },
-    slashedBlack:"\uE0CF",
-    xBlack:"\uE0A9",
-    xOrnate: "\uE0AA",
-    triangleUpBlack: "\uE0BE",
-    diamondBlack: "\uE0DB",
-    circledBlack: "\uE0E4",
 
     pitches: [
         null, /*  */
@@ -193,25 +188,25 @@ export const drum = {
     },
 
     heads: {
-        /*"C♯2":  "head[1]", /* Side Stick */
-        "B1": 1,
-        "D2": 1,
-        "E♭2":  "head[x]", /* Hand Clap */
-        "F♯2":  "xBlack", /* Closed Hi-Hat */
-        "G♯2":  "xBlack",
-        "A♭2":  "xBlack", /* Pedal Hi-Hat */
-        "B♭2":  "xCircle", /* Open Hi-Hat */
-        "C♯3":  "xCircle", /* Crash Cymbal 1 */
-        "E♭3":  "xBlack", /* Ride Cymbal 1 */
-        "E3":   "xCircle", /* Chinese Cymbal */
-        "F3":   "head[x]", /* Ride Bell */
-        "F♯3":  "head[x]", /* Tambourine */
-        "G3":   "xCircle", /* Splash Cymbal */
-        "G♯3":  "head[v]",
-        "A♭3":  "triangleUpBlack", /* Cowbell*/
-        "A3":   "xCircle", /* Crash Symbol 2 */
-        "B♭3":  "head[v]", /* Vibraslap */
-        "B3":   "xBlack", /* Ride Cymbal 2 */
+        "C♯2":  glyphs.headCircle,  /* Side Stick */
+        //"B1": 1,
+        //"D2": 1,
+        "E♭2":  glyphs.headX,          /* Hand Clap */
+        "F♯2":  glyphs.headX,          /* Closed Hi-Hat */
+        "G♯2":  glyphs.headX,
+        "A♭2":  glyphs.headX,          /* Pedal Hi-Hat */
+        "B♭2":  glyphs.headCircleX,    /* Open Hi-Hat */
+        "C♯3":  glyphs.headCircleX,    /* Crash Cymbal 1 */
+        "E♭3":  glyphs.headX,          /* Ride Cymbal 1 */
+        "E3":   glyphs.headCircleX,    /* Chinese Cymbal */
+        "F3":   glyphs.headX,          /* Ride Bell */
+        "F♯3":  glyphs.headX,          /* Tambourine */
+        "G3":   glyphs.headCircleX,    /* Splash Cymbal */
+        "G♯3":  glyphs.headTriangleUp,
+        "A♭3":  glyphs.headTriangleUp, /* Cowbell*/
+        "A3":   glyphs.headCircleX,    /* Crash Symbol 2 */
+        "B♭3":  glyphs.headTriangleUp, /* Vibraslap */
+        "B3":   glyphs.headX,          /* Ride Cymbal 2 */
 
         /*"C4":   "", /* Hi Bongo */
         /*"C♯4":  "", /* Low Bongo */
@@ -238,12 +233,17 @@ export const drum = {
         /*"B♭5":  "", /* Shaker */
     },
 
-    /** getHead(pitch, duration)
-    A stave may override symbols used as note heads. Returns an id of a symbol.
+    /** getHead(pitch, dynamic, duration)
+    A stave may override symbols used as note heads.
+    Returns a string or `undefined`.
     **/
 
     getHead: function(pitch, dynamic, duration) {
-        return dynamic < 0.02 ? this.heads[pitch]+"Ghost" : this.heads[pitch];
+        return dynamic < 0.02 ?
+            // Ghost note
+            glyphs.headBracketLeft + this.heads[pitch] + glyphs.headBracketRight :
+            // Full note
+            this.heads[pitch];
     },
 
     /** getPart(pitch)
