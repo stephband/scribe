@@ -15,7 +15,8 @@
 @import '../lib/bolt/classes/atoms.css';
 @import '../lib/bolt/classes/color.css';
 
-@import './fonts/jazz.css';
+@import '../fonts/jazz.css';
+
 @import './classes/header.css';
 @import './classes/zone.css';
 @import './classes/bar.css';

@@ -28,18 +28,20 @@ export const acciDoubleSharp = '&#xE263;';
 export const acciParensLeft  = '&#xE26A;';
 export const acciParensRight = '&#xE26B;';
 
+// 200A is a unicode HAIR SPACE, it's needed to seperate head from dot in Jazz.
+// TODO: do other fonts need it tho?
 export const head0125  = '&#xE0A4;';
-export const head01875 = '&#xE0A4;&#xE1E7;';
+export const head01875 = '&#xE0A4;&#x200A;&#xE1E7;';
 export const head025   = '&#xE0A4;';
-export const head0375  = '&#xE0A4;&#xE1E7;';
+export const head0375  = '&#xE0A4;&#x200A;&#xE1E7;';
 export const head05    = '&#xE0A4;';
-export const head075   = '&#xE0A4;&#xE1E7;';
+export const head075   = '&#xE0A4;&#x200A;&#xE1E7;';
 export const head1     = '&#xE0A4;';
-export const head15    = '&#xE0A4;&#xE1E7;';
+export const head15    = '&#xE0A4;&#x200A;&#xE1E7;';
 export const head2     = '&#xE0A3;';
-export const head3     = '&#xE0A3;&#xE1E7;';
+export const head3     = '&#xE0A3;&#x200A;&#xE1E7;';
 export const head4     = '&#xE0A2;';
-export const head6     = '&#xE0A2;&#xE1E7;';
+export const head6     = '&#xE0A2;&#x200A;&#xE1E7;';
 
 export const headBracketLeft         = '&#xE0F5;';
 export const headBracketRight        = '&#xE0F6;';
@@ -63,18 +65,20 @@ export const tailDown025  = '&#xE243;'
 export const tailUp0125   = '&#xE244;'
 export const tailDown0125 = '&#xE245;'
 
+// 200A is a unicode HAIR SPACE, it's needed to seperate rest from dot in Jazz.
+// TODO: do other fonts need it tho?
 export const rest0125  = '&#xE4E8;';
-export const rest01875 = '&#xE4E8;&#xE1E7;';
+export const rest01875 = '&#xE4E8;&#x200A;&#xE1E7;';
 export const rest025   = '&#xE4E7;';
-export const rest0375  = '&#xE4E7;&#xE1E7;';
+export const rest0375  = '&#xE4E7;&#x200A;&#xE1E7;';
 export const rest05    = '&#xE4E6;';
-export const rest075   = '&#xE4E6;&#xE1E7;';
+export const rest075   = '&#xE4E6;&#x200A;&#xE1E7;';
 export const rest1     = '&#xE4E5;';
-export const rest15    = '&#xE4E5;&#xE1E7;';
+export const rest15    = '&#xE4E5;&#x200A;&#xE1E7;';
 export const rest2     = '&#xE4E4;';
-export const rest3     = '&#xE4E4;&#xE1E7;';
+export const rest3     = '&#xE4E4;&#x200A;&#xE1E7;';
 export const rest4     = '&#xE4E3;';
-export const rest6     = '&#xE4E3;&#xE1E7;';
+export const rest6     = '&#xE4E3;&#x200A;&#xE1E7;';
 
 export const chordDiminished      = '&#xE870;';
 export const chordHalfDiminished  = '&#xE871;';
