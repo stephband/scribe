@@ -2,6 +2,8 @@
     justify-self: center;
     line-height: 0.75em;
     height: auto;
+    /* Don't allow extra glyphs, like augmentation dot, to drop onto new line */
+    white-space: nowrap;
 }
 
 .rest[data-duration="0.125"],

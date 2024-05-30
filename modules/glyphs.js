@@ -70,11 +70,11 @@ export const tailDown0125 = '&#xE245;'
 // 200A is a unicode HAIR SPACE, it's needed to seperate rest from dot in Jazz.
 // TODO: do other fonts need it tho?
 export const rest0125  = '&#xE4E8;';
-export const rest01875 = '&#xE4E8;&#x200A;&#xE1E7;';
+export const rest01875 = '&#xE4E8;&#xE1E7;';
 export const rest025   = '&#xE4E7;';
-export const rest0375  = '&#xE4E7;&#x200A;&#xE1E7;';
+export const rest0375  = '&#xE4E7;&#xE1E7;';
 export const rest05    = '&#xE4E6;';
-export const rest075   = '&#xE4E6;&#x200A;&#xE1E7;';
+export const rest075   = '&#xE4E6;&#xE1E7;';
 export const rest1     = '&#xE4E5;';
 export const rest15    = '&#xE4E5;&#x200A;&#xE1E7;';
 export const rest2     = '&#xE4E4;';

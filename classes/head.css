@@ -3,6 +3,8 @@
     /* Make it's box one stave space high */
     line-height: 0.25em;
     height: auto;
+    /* Don't allow extra glyphs, like augmentation dot, to drop onto new line */
+    white-space: nowrap;
     /* Set the click zone to roughly the same shape as the glyph,
        assuming most heads are round-ish. */
     border-radius: 40%;

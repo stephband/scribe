@@ -39,8 +39,14 @@ https://web.mit.edu/merolish/Public/drums.pdf
 }
 
 
-/* Selectors must match the importance of data-pitch selectors found on
-   the base class .stave, hence the double attribute selector. */
+/* Moved all pitched symbols to the central stave line. Selectors must match
+   the importance of data-pitch selectors found on the base class .stave, hence
+   the double attribute selector. */
 .percussion-stave > [data-pitch][data-pitch]  {
+    grid-row: stave-center;
+}
+
+.percussion-stave > .rest[data-duration="4"],
+.percussion-stave > .rest[data-duration="6"] {
     grid-row: stave-center;
 }

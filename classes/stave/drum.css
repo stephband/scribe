@@ -45,6 +45,11 @@ https://web.mit.edu/merolish/Public/drums.pdf
     grid-row: stave-upper;
 }
 
+.drum-stave > .rest[data-duration="4"],
+.drum-stave > .rest[data-duration="6"] {
+    grid-row: 11;
+}
+
 .drum-stave > .rest[data-part="feet"] {
     grid-row: stave-lower;
 }

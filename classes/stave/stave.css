@@ -132,6 +132,11 @@
     align-self: center;
 }
 
+.stave > .rest[data-duration="4"],
+.stave > .rest[data-duration="6"] {
+    grid-row: 12;
+}
+
 .stave > .tie,
 .stave > .down-tie {
     align-self: start;
