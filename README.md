@@ -10,6 +10,8 @@ renders notation as symbols in a CSS grid that displays as a bar and stave.
 
 There is a description of the CSS grid system in the blog post
 <a href="https://cruncher.ch/blog/printing-music-with-css-grid/">Printing Music with CSS Grid</a>.
+Many detials have changed since that post was written but the principal layout
+technique remains the same.
 
 
 ## Download
@@ -250,13 +252,19 @@ To check things are working serve this directory and navigate to
 depending on what you are using as a server).
 
 
+## Changes
+
+### 0.3.1
+
+- Adds support for <a href="https://www.smufl.org/fonts/">SMuFL fonts</a>
+
+
 ## Roadmap
 
 Asides from some immediate improvements I can make to Scribe 0.3, like
 tuning the autospeller and fixing the 1/16th-note beams and detecting and
 displaying tuplets, here are some longer-term features I would like to investigate:
 
-- <strong>Support for <a href="https://www.smufl.org/fonts/">SMuFL fonts</a></strong> – changing the font used for notation symbols. So far I have not been able to display their extended character sets reliably cross-browser.
 - <strong>Support for nested sequences</strong> – enabling multi-part tunes.
 - <strong>Split-stave rendering</strong> – placing multiple parts on one stave. The mechanics for this are already half in place – the drums stave and piano stave currently auto-split by pitch.
 - <strong>Multi-stave rendering</strong> – placing multiple parts on multiple, aligned, staves.
@@ -268,11 +276,11 @@ Developed at [Cruncher](https://cruncher.ch) by [Stephen Band](https://stephen.b
 
 Rich Sigler of Sigler Music Fonts [jazzfont.com](http://www.jazzfont.com/) very
 kindly granted permission to use JazzFont shapes as SVG paths in this project
-(although we have since moved to using the Finale Jazz font instead).
+(although Scribe now renders SMuFL fonts so SVG shapes are no longer used).
 
 Scribe logo/mascot by [Mariana Alt](https://www.mariana.lt/).
 
-Gavin Band dreamed up probabalistic key centre analysis.
+Gavin Band dreamt up probabalistic key centre analysis.
 
 ABC parser borrowed from [ABCjs](https://github.com/paulrosen/abcjs).
 
