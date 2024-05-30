@@ -1,5 +1,5 @@
-[submodule "fonts/petaluma"]
-	path = fonts/petaluma
+[submodule "fonts/Petaluma"]
+	path = fonts/Petaluma
 	url = https://github.com/steinbergmedia/petaluma.git
 [submodule "fonts/Bravura"]
 	path = fonts/Bravura
