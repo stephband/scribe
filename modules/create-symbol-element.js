@@ -73,71 +73,80 @@ const chordParts = {
     'sharp': `<span class="chord-sharp">${ glyphs.acciSharp }</span>`
 };
 
+const acciClasses = {
+    '2':  'acci acci-doublesharp',
+    '1':  'acci acci-sharp',
+    '0':  'acci acci-natural',
+    '-1': 'acci acci-flat',
+    '-2': 'acci acci-doubleflat'
+};
+
+const acciGlyphs = {
+    '2':  glyphs.acciDoubleSharp,
+    '1':  glyphs.acciSharp,
+    '0':  glyphs.acciNatural,
+    '-1': glyphs.acciFlat,
+    '-2': glyphs.acciDoubleFlat
+};
+
 export default overload(get('type'), {
     clef: (symbol) => create('span', {
         class: `${ symbol.clef }-clef clef`,
         //data: { eventId: identify(symbol.event) },
-        data: { eventId: null },
-        html: glyphs[symbol.clef + 'Clef'] || ''
+        html: glyphs[symbol.clef + 'Clef'] || '',
+        data: { eventId: null }
     }),
 
     chord: (symbol) => create('abbr', {
         class: "chord-abbr",
         title: "TODO - name of chord",
-        data: {
-            beat:     symbol.beat + 1,
-            duration: symbol.duration,
-            eventId:  identify(symbol.event)
-        },
         // Note that we must detect sharps before flats because HTML entities
         // contain hash symbols that can be interpreted as sharps
         html: '<span class="chord-root">' + symbol.root.replace(rsharp, chordParts.sharp).replace(rflat, chordParts.flat) + '</span>'
             + '<sup>' + symbol.extension.replace(rsharp, chordParts.sharp).replace(rflat, chordParts.flat) + '</sup>'
-            + (symbol.bass ? glyphs.chordBassSlash + '<span class="chord-bass">' + symbol.bass + '</span>' : '')
+            + (symbol.bass ? glyphs.chordBassSlash + '<span class="chord-bass">' + symbol.bass + '</span>' : ''),
+        data: {
+            beat:     symbol.beat + 1,
+            duration: symbol.duration,
+            eventId:  identify(symbol.event)
+        }
     }),
 
     timesig: (symbol) => create('span', {
         class: "timesig",
+        html: `<sup>${ glyphs['timeSig' + symbol.numerator] }</sup>
+            <sub>${ glyphs['timeSig' + symbol.denominator] }</sub>`,
         data: {
             eventId: identify(symbol.event)
-        },
-        html: `<sup>${ glyphs['timeSig' + symbol.numerator] }</sup>
-            <sub>${ glyphs['timeSig' + symbol.denominator] }</sub>`
+        }
     }),
 
     lyric: (symbol) => create('span', {
         class: "lyric",
         part:  "lyric",
+        html: symbol.value,
         data: {
             beat:     symbol.beat + 1,
             duration: symbol.duration,
             eventId:  identify(symbol.event)
-        },
-        html: symbol.value
+        }
     }),
 
     acci: (symbol) => create('span', {
-        class: "acci",
+        class: acciClasses[symbol.value] || 'acci',
+        html: acciGlyphs[symbol.value] || glyphs.acciNatural,
         data: symbol.beat === undefined ? { pitch: symbol.pitch } : {
             beat:    symbol.beat + 1,
             pitch:   symbol.pitch,
             part:    symbol.part,
             eventId: identify(symbol.event)
-        },
-        html: symbol.value === 1 ? glyphs.acciSharp :
-            symbol.value === -1 ? glyphs.acciFlat :
-            glyphs.acciNatural
+        }
     }),
 
     upledger: (symbol) => create('svg', {
         class: "up-ledge ledge",
         viewBox: `0 ${0.5 - symbol.rows} 4.4 ${symbol.rows}`,
         preserveAspectRatio: "xMidYMax",
-        data: {
-            beat:  symbol.beat + 1,
-            pitch: symbol.pitch,
-            part:  symbol.part
-        },
         style: `height: ${ symbol.rows * 0.125 }em;`,
         html: `<g transform="translate(0 -8)">
             <line x1="0" x2="4.4" y1="8" y2="8"></line>
@@ -149,18 +158,18 @@ export default overload(get('type'), {
             <line x1="0" x2="4.4" y1="4" y2="4"></line>
             <line x1="0" x2="4.4" y1="6" y2="6"></line>
             <line x1="0" x2="4.4" y1="8" y2="8"></line>
-        </g>`
+        </g>`,
+        data: {
+            beat:  symbol.beat + 1,
+            pitch: symbol.pitch,
+            part:  symbol.part
+        }
     }),
 
     downledger: (symbol) => create('svg', {
         class: "down-ledge ledge",
         viewBox: `0 -0.5 4.4 ${symbol.rows}`,
         preserveAspectRatio: "xMidYMin",
-        data: {
-            beat:  symbol.beat + 1,
-            pitch: symbol.pitch,
-            part:  symbol.part
-        },
         style: `height: ${ symbol.rows * 0.125 }em;`,
         html: `<g transform="translate(0 -8)">
             <line x1="0" x2="4.4" y1="8" y2="8"></line>
@@ -172,19 +181,24 @@ export default overload(get('type'), {
             <line x1="0" x2="4.4" y1="4" y2="4"></line>
             <line x1="0" x2="4.4" y1="6" y2="6"></line>
             <line x1="0" x2="4.4" y1="8" y2="8"></line>
-        </g>`
+        </g>`,
+        data: {
+            beat:  symbol.beat + 1,
+            pitch: symbol.pitch,
+            part:  symbol.part
+        }
     }),
 
     head: (symbol) => create('span', {
         class: "head",
+        html: `${ symbol.head || glyphs['head' + (symbol.duration + '').replace('.', '')] || '' }`,
         data: {
             beat:     symbol.beat + 1,
             pitch:    symbol.pitch,
             duration: symbol.duration,
             part:     symbol.part,
             eventId:  identify(symbol.event)
-        },
-        html: `${ symbol.head || glyphs['head' + (symbol.duration + '').replace('.', '')] || '' }`
+        }
     }),
 
     stem: (symbol) => create('svg', {
@@ -192,16 +206,16 @@ export default overload(get('type'), {
         viewBox: "0 0 2.7 7",
         // Stretch stems by height
         preserveAspectRatio: "none",
+        style: `--beam-y: ${ symbol.beamY === undefined ? 0 : symbol.beamY };`,
+        html: symbol.stemDirection === 'up' ?
+            '<line class="stem-path" x1="2.6" y1="0" x2="2.6" y2="6.6"></line>' :
+            '<line class="stem-path" x1="0.1" y1="0.4" x2="0.1" y2="7"></line>',
         data: {
             beat:     symbol.beat + 1,
             pitch:    symbol.pitch,
             duration: symbol.duration,
             part:     symbol.part
-        },
-        style: `--beam-y: ${ symbol.beamY === undefined ? 0 : symbol.beamY };`,
-        html: symbol.stemDirection === 'up' ?
-            '<line class="stem-path" x1="2.6" y1="0" x2="2.6" y2="6.6"></line>' :
-            '<line class="stem-path" x1="0.1" y1="0.4" x2="0.1" y2="7"></line>'
+        }
     }),
 
     beam: (symbol) => create('svg', {
@@ -209,55 +223,55 @@ export default overload(get('type'), {
         class: `${symbol.updown}-beam beam`,
         viewBox: `0 ${ (symbol.range > 0 ? -symbol.range : 0) - 0.5 } ${ symbol.stems.length - 1 } ${ abs(symbol.range) + 1 }`,
         preserveAspectRatio: "none",
-        data: {
-            beat:     symbol.beat + 1,
-            pitch:    symbol.pitch,
-            duration: symbol.duration,
-            part:     symbol.part
-        },
         /*style: 'grid-row-end: span ' + Math.ceil(1 - symbol.range),*/
         style: `height: ${ (abs(symbol.range) + 1) * 0.125 }em; align-self: ${ symbol.range > 0 ? 'end' : 'start' };`,
         html: `
             <path class="beam-path" d="M0,${ -0.5 * beamThickness } L${ symbol.stems.length - 1 },${ -symbol.range - 0.5 * beamThickness } L${ symbol.stems.length - 1 },${ -symbol.range + 0.5 * beamThickness } L0,${ 0.5 * beamThickness } Z"></path>
             ${ create16thNoteBeams(symbol.stems, symbol.range) }
-        `
+        `,
+        data: {
+            beat:     symbol.beat + 1,
+            pitch:    symbol.pitch,
+            duration: symbol.duration,
+            part:     symbol.part
+        }
     }),
 
     tie: (symbol) => create('svg', {
         class: `${ symbol.updown }-tie tie`,
         viewBox: `0 0 1 1`,
         preserveAspectRatio: "none",
+        style: `height: 0.75em; align-self: ${ symbol.updown === 'up' ? 'start' : 'end' };`,
+        html: `<path class="tie-path" transform="translate(0, 0.14) scale(1 0.6)" d="M0.979174733,0.0124875307 C0.650597814,1.1195554 0.135029714,1.00095361 0.0165376402,0.026468657 C0.0113570514,0.0135475362 0.00253387291,0.00218807553 0,0 C0.0977526897,1.29523004 0.656681642,1.37089992 1,2.43111793e-08 C0.991901367,2.43111797e-08 0.987703936,0.01248753 0.979174733,0.0124875307 Z M0.979174733,0.0124875307"></path>`,
         data: {
             beat:     symbol.beat + 1,
             pitch:    symbol.pitch,
             duration: symbol.duration,
             part:     symbol.part
-        },
-        style: `height: 0.75em; align-self: ${ symbol.updown === 'up' ? 'start' : 'end' };`,
-        html: `<path class="tie-path" transform="translate(0, 0.14) scale(1 0.6)" d="M0.979174733,0.0124875307 C0.650597814,1.1195554 0.135029714,1.00095361 0.0165376402,0.026468657 C0.0113570514,0.0135475362 0.00253387291,0.00218807553 0,0 C0.0977526897,1.29523004 0.656681642,1.37089992 1,2.43111793e-08 C0.991901367,2.43111797e-08 0.987703936,0.01248753 0.979174733,0.0124875307 Z M0.979174733,0.0124875307"></path>`
+        }
     }),
 
     tail: (symbol) => create('span', {
         class: `${symbol.stemDirection}-tail tail`,
+        html: glyphs['tail' + (symbol.stemDirection === 'up' ? 'Up' : 'Down') + (symbol.duration + '').replace('.', '')],
         data: {
             beat:     symbol.beat + 1,
             pitch:    symbol.pitch,
             duration: symbol.duration,
             part:     symbol.part,
             eventId:  identify(symbol.event)
-        },
-        html: glyphs['tail' + (symbol.stemDirection === 'up' ? 'Up' : 'Down') + (symbol.duration + '').replace('.', '')]
+        }
     }),
 
     rest: (symbol) => create('span', {
         class: "rest",
+        html: `${ glyphs['rest' + (symbol.duration + '').replace('.', '')] || '' }`,
         data: {
             beat:     symbol.beat + 1,
             pitch:    symbol.pitch,
             duration: symbol.duration,
             part:     symbol.part
-        },
-        html: `${ glyphs['rest' + (symbol.duration + '').replace('.', '')] || '' }`
+        }
     }),
 
     default: (function (types) {

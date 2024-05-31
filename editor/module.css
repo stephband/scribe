@@ -20,8 +20,12 @@
 @import './classes/header.css';
 @import './classes/zone.css';
 @import './classes/bar.css';
+@import './classes/acci.css';
+@import './classes/head.css';
+@import './classes/rest.css';
 @import './classes/action.css';
 @import './classes/color.css';
+
 
 @font-face {
     font-family: MartianMono;
@@ -76,7 +80,9 @@ label {
 }
 
 .bar > [data-event-id] {
+    /* Anything selectable has a data-event-id, layer them on top */
     cursor: pointer;
+    z-index: 3;
 }
 
 ::placeholder {

@@ -462,7 +462,7 @@ events({ type: 'pointerdown', device: 'mouse pen touch' }, document)
         });
     },
 
-    '.head': (head, e) => {
+    '[data-event-id]': (head, e) => {
         // Select head
         const id    = head.dataset.eventId;
         const event = findEvent(sequence.events, id);
