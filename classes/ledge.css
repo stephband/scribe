@@ -3,18 +3,18 @@
     overflow: hidden;
     width: 0.55em;
     vector-effect: non-scaling-stroke;
-    stroke:currentcolor;
-    stroke-width:0.05em;
-    stroke-linejoin:round;
-    stroke-linecap:round;
-    fill:none;
+    stroke: currentcolor;
+    stroke-width: 0.05em;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    fill: none;
 }
 
 .ledge line {
     vector-effect: non-scaling-stroke;
-    stroke:currentcolor;
-    stroke-width: 1.2px;
-    stroke-linejoin:round;
-    stroke-linecap:round;
-    fill:none;
+    stroke: currentcolor;
+    stroke-width: 0.015625em;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    fill: none;
 }

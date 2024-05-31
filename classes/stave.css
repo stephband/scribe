@@ -9,9 +9,8 @@
    when bars overlap to disguise Safari's rounding errors this bar hides the
    end of the previous bar. */
 
-/*
 :host(.safari) > .stave {
-    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -4.5 1 9" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
+    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -5 1 10" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
         <style>line{vector-effect:non-scaling-stroke;stroke:currentcolor;stroke-width:0.04em;stroke-linejoin:round;stroke-linecap:round;fill:none;}</style>\
         <line x1="0" x2="0" y1="-4" y2="4" style="stroke:white;stroke-width:0.375em;stroke-linecap:butt;"></line>\
         <line x1="0" x2="1" y1="4"  y2="4"></line>\
@@ -46,4 +45,3 @@
         <line x1="0" x2="1" y1="0"  y2="0"></line>\
     </svg>');
 }
-*/
