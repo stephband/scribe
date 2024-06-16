@@ -12,13 +12,11 @@ const abs = Math.abs;
 
 const $id = Symbol('scribe-id');
 
-//const eventMap = {};
 let id = 0;
 
 export function identify(event) {
     if (event[$id]) return event[$id];
     event[$id] = (++id + '');
-    //eventMap[id] = event;
     return event[$id];
 }
 
@@ -31,17 +29,17 @@ export function findEvent(events, id) {
 
 const beamThickness = 1.1;
 
-function renderBeam(range, stems, beam) {
+function renderBeam(range, heads, beam) {
     return `<path class="beam-path-16th beam-path" d="
-        M${beam[0]},              ${(-range * beam[0] / (stems.length - 1)) - 0.5 * beamThickness}
-        L${beam[beam.length - 1]},${(-range * beam[beam.length - 1] / (stems.length - 1)) - 0.5 * beamThickness}
-        L${beam[beam.length - 1]},${(-range * beam[beam.length - 1] / (stems.length - 1)) + 0.5 * beamThickness}
-        L${beam[0]},              ${(-range * beam[0] / (stems.length - 1)) + 0.5 * beamThickness}
+        M${beam[0]},              ${(-range * beam[0] / (heads.length - 1)) - 0.5 * beamThickness}
+        L${beam[beam.length - 1]},${(-range * beam[beam.length - 1] / (heads.length - 1)) - 0.5 * beamThickness}
+        L${beam[beam.length - 1]},${(-range * beam[beam.length - 1] / (heads.length - 1)) + 0.5 * beamThickness}
+        L${beam[0]},              ${(-range * beam[0] / (heads.length - 1)) + 0.5 * beamThickness}
     Z"></path>`;
 }
 
-function create16thNoteBeams(stems, range) {
-    const durations = stems.map(get('duration'));
+function create16thNoteBeams(heads, range) {
+    const durations = heads.map(get('duration'));
     let html = '';
     let n = -1;
     let beam;
@@ -55,14 +53,14 @@ function create16thNoteBeams(stems, range) {
         }
         // Render beam
         else if (beam) {
-            html += renderBeam(range, stems, beam);
+            html += renderBeam(range, heads, beam);
             beam = undefined;
         }
     }
 
     // Render beam
     if (beam) {
-        html += renderBeam(range, stems, beam);
+        html += renderBeam(range, heads, beam);
     }
 
     return html;
@@ -198,6 +196,7 @@ export default overload(get('type'), {
             duration: symbol.duration,
             part:     symbol.part,
             stem:     symbol.stemDirection === 'up' ? '1' : '-1',
+            beam:     symbol.beam && symbol.beam.map(identify).join(' '),
             eventId:  identify(symbol.event)
         }
     }),
@@ -205,13 +204,13 @@ export default overload(get('type'), {
     beam: (symbol) => create('svg', {
         // Beam is sloped down
         class: `${symbol.updown}-beam beam`,
-        viewBox: `0 ${ (symbol.range > 0 ? -symbol.range : 0) - 0.5 } ${ symbol.stems.length - 1 } ${ abs(symbol.range) + 1 }`,
+        viewBox: `0 ${ (symbol.range > 0 ? -symbol.range : 0) - 0.5 } ${ symbol.heads.length - 1 } ${ abs(symbol.range) + 1 }`,
         preserveAspectRatio: "none",
         /*style: 'grid-row-end: span ' + Math.ceil(1 - symbol.range),*/
         style: `height: ${ (abs(symbol.range) + 1) * 0.125 }em; align-self: ${ symbol.range > 0 ? 'end' : 'start' };`,
         html: `
-            <path class="beam-path" d="M0,${ -0.5 * beamThickness } L${ symbol.stems.length - 1 },${ -symbol.range - 0.5 * beamThickness } L${ symbol.stems.length - 1 },${ -symbol.range + 0.5 * beamThickness } L0,${ 0.5 * beamThickness } Z"></path>
-            ${ create16thNoteBeams(symbol.stems, symbol.range) }
+            <path class="beam-path" d="M0,${ -0.5 * beamThickness } L${ symbol.heads.length - 1 },${ -symbol.range - 0.5 * beamThickness } L${ symbol.heads.length - 1 },${ -symbol.range + 0.5 * beamThickness } L0,${ 0.5 * beamThickness } Z"></path>
+            ${ create16thNoteBeams(symbol.heads, symbol.range) }
         `,
         data: {
             beat:     symbol.beat + 1,

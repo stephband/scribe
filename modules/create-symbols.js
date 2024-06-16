@@ -129,7 +129,7 @@ function createBeam(symbols, stave, beam, n) {
             'up' :
             'down';
 
-    const stems = [];
+    const heads  = [];
     const buffer = [];
 
     // Loop backwards through beam splicing in stem symbols before
@@ -145,6 +145,8 @@ function createBeam(symbols, stave, beam, n) {
 
         head.stemDirection = stemDirection;
         head.tieDirection = stemDirection === 'up' ? 'down' : 'up';
+
+        heads.push(head);
 
         if (b < (beam.length - 1) / 2) {
             avgBeginLine += line / Math.floor(beam.length / 2);
@@ -162,56 +164,61 @@ function createBeam(symbols, stave, beam, n) {
                 stem.stemDirection === 'up' ? stem.pitch : head.pitch :
                 stem.stemDirection === 'up' ? head.pitch : stem.pitch;
         }
-        else {
+        /*else {
             stem = assign({}, head, {
                 type: 'stem'
             });
             stems.push(stem);
-        }
+        }*/
 
         if (head.tie === 'begin') {
             buffer.push(assign({}, head, {
-                type: 'tie',
-                beat: head.beat,
+                type:   'tie',
+                beat:   head.beat,
                 updown: head.tieDirection,
-                event: head.event
+                event:  head.event
             }));
         }
     }
 
     // Calculate where to put beam exactly
-    let begin = stems[0];
-    let end = stems[stems.length - 1];
+    let begin    = heads[0];
+    let end      = heads[heads.length - 1];
     let endRange = subtractStaveRows(stave, begin.pitch, end.pitch);
     let avgRange = avgEndLine - avgBeginLine;
     let range = abs(avgRange) > abs(0.75 * endRange) ?
         0.75 * endRange :
         avgRange;
 
-    stems.forEach((stem, i) => {
+    /*stems.forEach((stem, i) => {
         stem.beamY = stemDirection === 'down' ?
             -range * i / (stems.length - 1) + subtractStaveRows(stave, begin.pitch, stem.pitch) :
             range * i / (stems.length - 1) - subtractStaveRows(stave, begin.pitch, stem.pitch);
-    });
+    });*/
 
-    symbols.splice(i, 0, ...stems);
+    //symbols.splice(i, 0, ...stems);
+
+    // Update heads with info about the beam
+    const headEvents = heads.map(get('event'));
+    heads.forEach((head) => head.beam = headEvents);
+
 
     // Put the beam in front of the first head (??)
     symbols.splice(i, 0, assign({}, begin, {
         type: 'beam',
         // Push beam start into next grid column
-        beat: begin.beat,
+        beat:   begin.beat,
         duration: end.beat - begin.beat,
         //pitch:  begin.pitch,
-        range: range,
+        range:  range,
         updown: stemDirection,
-        stems: stems
+        heads:  heads
     }));
 
     symbols.splice(i, 0, ...buffer);
 
     // We just spliced a bunch of symbols in before index n
-    return stems.length + buffer.length + 1;
+    return buffer.length;
 }
 
 function createSymbols(symbols, bar) {

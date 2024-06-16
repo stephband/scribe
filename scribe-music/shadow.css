@@ -15,6 +15,27 @@
 @import '../classes/lyric.css';
 @import '../classes/svg.css';
 
+:host {
+    font-family: Jazz, JazzText, sans-serif;
+
+    /* Width of standard black note head */
+    --head-width: 0.3375;
+}
+
+:host .note {
+    --stem-size:       1;
+    --stem-thickness:  0.033;
+    /* Alignment of root of stem relative to baseline */
+    --stem-align-up:   0.03;
+    --stem-align-down: -0.04;
+}
+
+:host .x-head {
+    --stem-align-up:   0.14;
+    --stem-align-down: -0.12;
+}
+
+
 svg {
     fill: currentcolor;
     /*background-color: rgba(200, 180, 30, 0.5);*/

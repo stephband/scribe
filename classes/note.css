@@ -62,9 +62,9 @@
         /* Turn it upside down */
         rotate(180deg)
         /* Move it away from the grid line by half a stem thickness, and down by stem-start */
-        translate(calc(-0.5em * var(--stem-thickness)), calc(-1em * var(--stem-align-down)))
+        translate(calc(-0.5em * var(--stem-thickness)), calc(1em * var(--stem-align-down)))
         /* Make it stem-size big */
-        scale(1, calc(var(--stem-size) - var(--stem-align-down)));
+        scale(1, calc(var(--stem-size) + var(--stem-align-down)));
 }
 
 .note[data-duration^="3"] > .head::before,
@@ -119,6 +119,9 @@
 .note[data-duration^="0.18"][data-stem^="-"]::before,
 .note[data-duration^="0.12"][data-stem^="-"]::before,
 .note[data-duration^="0.08"][data-stem^="-"]::before { content: '\E245'; }
+
+/* Notes that are beamed get no flag */
+.note[data-beam]::before { content: none !important; }
 
 .note::after {
     /* Augmentation dot */
