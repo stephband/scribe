@@ -197,11 +197,7 @@ export default overload(get('type'), {
             part:     symbol.part,
             stem:     symbol.stemDirection === 'up' ? '1' : '-1',
             beam:     symbol.beam && symbol.beam.map(identify).join(' '),
-<<<<<<< HEAD
             event:    identify(symbol.event)
-=======
-            eventId:  identify(symbol.event)
->>>>>>> 2024-note-group
         }
     }),
 
