@@ -703,13 +703,13 @@ in their duration span. */
 
 .bar > .up-beam {
 	margin-left: calc(-1em * var(--stem-thickness));
-	margin-right: 0;
+	margin-right: calc(-1 * var(--bar-column-gap));
 	transform: translate(calc(1em * var(--head-width)), 0);
 }
 
 .bar > .down-beam {
 	margin-left:  0;
-	margin-right: calc(-1em * var(--stem-thickness));
+	margin-right: calc(-1em * var(--stem-thickness) - var(--bar-column-gap));
 	transform: none;
 }
 

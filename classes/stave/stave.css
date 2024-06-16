@@ -66,9 +66,9 @@
     align-self: center;
 }
 
-/*.stave > .head {
+.stave > .note {
     align-self: center;
-}*/
+}
 
 .stave > .chord {
     grid-row: chords;

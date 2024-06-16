@@ -22,6 +22,7 @@
     grid-auto-columns: min-content min-content;
     grid-auto-rows: 0.25em;
     grid-auto-flow: column;
+    height: 0.25em;
 }
 
 .note > * {
