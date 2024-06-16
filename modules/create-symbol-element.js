@@ -190,8 +190,8 @@ export default overload(get('type'), {
     }),
 
     head: (symbol) => create('span', {
-        class: "head",
-        html: `${ symbol.head || glyphs['head' + (symbol.duration + '').replace('.', '')] || '' }`,
+        class: "note",
+        html: `<span class="head">${ symbol.head || glyphs['head' + (symbol.duration + '').replace('.', '')] || '' }</span>`,
         data: {
             beat:     symbol.beat + 1,
             pitch:    symbol.pitch,
@@ -201,7 +201,7 @@ export default overload(get('type'), {
         }
     }),
 
-    stem: (symbol) => create('svg', {
+    /*stem: (symbol) => create('svg', {
         class: `${ symbol.stemDirection }-stem stem`,
         viewBox: "0 0 2.7 7",
         // Stretch stems by height
@@ -216,7 +216,7 @@ export default overload(get('type'), {
             duration: symbol.duration,
             part:     symbol.part
         }
-    }),
+    }),*/
 
     beam: (symbol) => create('svg', {
         // Beam is sloped down
@@ -251,6 +251,7 @@ export default overload(get('type'), {
         }
     }),
 
+    /*
     tail: (symbol) => create('span', {
         class: `${symbol.stemDirection}-tail tail`,
         html: glyphs['tail' + (symbol.stemDirection === 'up' ? 'Up' : 'Down') + (symbol.duration + '').replace('.', '')],
@@ -262,6 +263,7 @@ export default overload(get('type'), {
             eventId:  identify(symbol.event)
         }
     }),
+    */
 
     rest: (symbol) => create('span', {
         class: "rest",

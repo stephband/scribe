@@ -7,12 +7,10 @@
 @import '../classes/clef.css';
 @import '../classes/timesig.css';
 @import '../classes/chord.css';
-@import '../classes/head.css';
+@import '../classes/note.css';
 @import '../classes/ledge.css';
 @import '../classes/rest.css';
-@import '../classes/stem.css';
 @import '../classes/beam.css';
-@import '../classes/tail.css';
 @import '../classes/tie.css';
 @import '../classes/lyric.css';
 @import '../classes/svg.css';

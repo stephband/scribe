@@ -659,7 +659,7 @@ Bars are divided into:
 .bar > .acci[data-beat^="7.95"] { grid-column-start: 167; }
 
 /* Move up-tail into next column */
-.bar > .up-tail[data-beat^="1"]    { grid-column-start: 4; }
+/*.bar > .up-tail[data-beat^="1"]    { grid-column-start: 4; }
 .bar > .up-tail[data-beat^="1.04"] { grid-column-start: 5; }
 .bar > .up-tail[data-beat^="1.08"] { grid-column-start: 6; }
 .bar > .up-tail[data-beat^="1.12"] { grid-column-start: 7; }
@@ -826,44 +826,41 @@ Bars are divided into:
 .bar > .up-tail[data-beat^="7.83"] { grid-column-start: 166; }
 .bar > .up-tail[data-beat^="7.87"] { grid-column-start: 167; }
 .bar > .up-tail[data-beat^="7.91"] { grid-column-start: 168; }
-.bar > .up-tail[data-beat^="7.95"] { grid-column-start: 169; }
+.bar > .up-tail[data-beat^="7.95"] { grid-column-start: 169; }*/
 
-
-.bar > .head,
+.bar > .note,
+/*.bar > .head,
 .bar > .stem,
-.bar > .tail,
+.bar > .tail,*/
 .bar > .ledge {
 	grid-column-end: span 1;
 	justify-self: start;
 }
 
-.bar > .head,
+/*.bar > .head,
 .bar > .stem,
 .bar > .down-tail {
 	margin-left:  var(--head-margin-left);
-}
-/*
-.bar > .head {
+}*/
+/*.bar > .head {
 	margin-right: var(--head-margin-right);
-}
-*/
-.bar > .head:last-child {
+}*/
+/*.bar > .head:last-child {
 	margin-right: 0;
-}
+}*/
 
-.bar > .up-stem {
+/*.bar > .up-stem {
 	justify-self: end;
-}
+}*/
 
-.bar > .up-tail {
-	/* TODO move tail into note head group, where it will automatically add space? */
+/*.bar > .up-tail {
 	justify-self: start;
 	margin-left: calc(-1 * var(--bar-column-gap));
 }
 
 .bar > .down-tail {
 	margin-right: 0.09375em;
-}
+}*/
 
 .bar > .ledge {
 	width: auto;
