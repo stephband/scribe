@@ -197,26 +197,10 @@ export default overload(get('type'), {
             pitch:    symbol.pitch,
             duration: symbol.duration,
             part:     symbol.part,
+            stem:     symbol.stemDirection === 'up' ? '1' : '-1',
             eventId:  identify(symbol.event)
         }
     }),
-
-    /*stem: (symbol) => create('svg', {
-        class: `${ symbol.stemDirection }-stem stem`,
-        viewBox: "0 0 2.7 7",
-        // Stretch stems by height
-        preserveAspectRatio: "none",
-        style: `--beam-y: ${ symbol.beamY === undefined ? 0 : symbol.beamY };`,
-        html: symbol.stemDirection === 'up' ?
-            '<line class="stem-path" x1="2.6" y1="0" x2="2.6" y2="6.6"></line>' :
-            '<line class="stem-path" x1="0.1" y1="0.4" x2="0.1" y2="7"></line>',
-        data: {
-            beat:     symbol.beat + 1,
-            pitch:    symbol.pitch,
-            duration: symbol.duration,
-            part:     symbol.part
-        }
-    }),*/
 
     beam: (symbol) => create('svg', {
         // Beam is sloped down
@@ -250,20 +234,6 @@ export default overload(get('type'), {
             part:     symbol.part
         }
     }),
-
-    /*
-    tail: (symbol) => create('span', {
-        class: `${symbol.stemDirection}-tail tail`,
-        html: glyphs['tail' + (symbol.stemDirection === 'up' ? 'Up' : 'Down') + (symbol.duration + '').replace('.', '')],
-        data: {
-            beat:     symbol.beat + 1,
-            pitch:    symbol.pitch,
-            duration: symbol.duration,
-            part:     symbol.part,
-            eventId:  identify(symbol.event)
-        }
-    }),
-    */
 
     rest: (symbol) => create('span', {
         class: "rest",

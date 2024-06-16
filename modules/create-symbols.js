@@ -51,23 +51,6 @@ function toDuration(event) {
         event[4];
 }
 
-function insertTail(symbols, stave, i) {
-    const head = symbols[i];
-    const stemDirection = getStemDirection(stave.centerPitch, head);
-
-    // Splice stem and tail in before head
-    symbols.splice(i, 0, assign({}, head, {
-        type: 'stem',
-        stemDirection
-    }), assign({}, head, {
-        type: 'tail',
-        stemDirection
-    }));
-
-    // We just spliced two symbols in before index n
-    return 2;
-}
-
 const lines = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 
 function addStaveRows(n, row) {
@@ -134,7 +117,7 @@ function createBeam(symbols, stave, beam, n) {
             throw new Error('Last beam index (' + beam[0] + ') cant be greater than n (' + n + ')');
         }
 
-        return insertTail(symbols, stave, beam[0]);
+        return 0;
     }
 
     // Render stems and beam
