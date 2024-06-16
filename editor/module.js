@@ -345,7 +345,7 @@ export function highlightZones() {
 
         // Select elements identified by event
         body
-        .querySelectorAll('[data-event-id="' + identify(event) + '"]')
+        .querySelectorAll('[data-event="' + identify(event) + '"]')
         .forEach((element) => element.classList.add('selected'));
     });
 }
@@ -462,9 +462,9 @@ events({ type: 'pointerdown', device: 'mouse pen touch' }, document)
         });
     },
 
-    '[data-event-id]': (head, e) => {
+    '[data-event]': (head, e) => {
         // Select head
-        const id    = head.dataset.eventId;
+        const id    = head.dataset.event;
         const event = findEvent(sequence.events, id);
 
         // If head is in selection do nothing
@@ -481,7 +481,7 @@ events({ type: 'pointerdown', device: 'mouse pen touch' }, document)
 
 events('click', document)
 .each(delegate({
-    '.clef[data-event-id]': (button, e) => {
+    '.clef[data-event]': (button, e) => {
         const dialog  = document.getElementById('clef-dialog');
         //const eventId = button.dataset.eventId;
         //const event   = findEvent(sequence.events, eventId) || defaultClef;
@@ -498,9 +498,9 @@ events('click', document)
         dialog.showModal();
     },
 
-    '.keysig[data-event-id]': (button, e) => {
+    '.keysig[data-event]': (button, e) => {
         const dialog  = document.getElementById('clef-dialog');
-        const eventId = button.dataset.eventId;
+        const eventId = button.dataset.event;
         const event   = findEvent(sequence.events, eventId) || createEvent(0, 'key', 'C');
         const closes  = events('close', dialog)
             .each((e) => {
@@ -514,9 +514,9 @@ events('click', document)
         dialog.showModal();
     },
 
-    '.timesig[data-event-id]': (button, e) => {
+    '.timesig[data-event]': (button, e) => {
         const dialog  = document.getElementById('timesig-dialog');
-        const eventId = button.dataset.eventId;
+        const eventId = button.dataset.event;
         const event   = findEvent(sequence.events, eventId) || createEvent(0, 'meter', 4, 1);
         const closes  = events('close', dialog)
             .each((e) => {

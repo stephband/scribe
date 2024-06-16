@@ -1,5 +1,7 @@
 
+
 @import './fonts/jazz.css';
+
 @import './classes/accidental.css';
 @import './classes/stave.css';
 @import './classes/bar.css';
@@ -34,7 +36,7 @@
     --acci-margin-right: 0.125em;
     --head-margin-left:  0.125em;
     /*--head-margin-right: 0.05em;*/
-    --stem-thickness:    0.03em;
+    /*--stem-thickness:    0.03em;*/
 
     --safari-bar-mask-color: white;
 
