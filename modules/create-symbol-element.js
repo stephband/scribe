@@ -146,17 +146,12 @@ export default overload(get('type'), {
         viewBox: `0 ${0.5 - symbol.rows} 4.4 ${symbol.rows}`,
         preserveAspectRatio: "xMidYMax",
         style: `height: ${ symbol.rows * 0.125 }em;`,
-        html: `<g transform="translate(0 -8)">
-            <line x1="0" x2="4.4" y1="8" y2="8"></line>
-            <line x1="0" x2="4.4" y1="6" y2="6"></line>
-            <line x1="0" x2="4.4" y1="4" y2="4"></line>
-            <line x1="0" x2="4.4" y1="2" y2="2"></line>
+        html: `
+            <line x1="0" x2="4.4" y1="-6" y2="-6"></line>
+            <line x1="0" x2="4.4" y1="-4" y2="-4"></line>
+            <line x1="0" x2="4.4" y1="-2" y2="-2"></line>
             <line x1="0" x2="4.4" y1="0" y2="0"></line>
-            <line x1="0" x2="4.4" y1="2" y2="2"></line>
-            <line x1="0" x2="4.4" y1="4" y2="4"></line>
-            <line x1="0" x2="4.4" y1="6" y2="6"></line>
-            <line x1="0" x2="4.4" y1="8" y2="8"></line>
-        </g>`,
+        `,
         data: {
             beat:  symbol.beat + 1,
             pitch: symbol.pitch,
@@ -169,17 +164,12 @@ export default overload(get('type'), {
         viewBox: `0 -0.5 4.4 ${symbol.rows}`,
         preserveAspectRatio: "xMidYMin",
         style: `height: ${ symbol.rows * 0.125 }em;`,
-        html: `<g transform="translate(0 -8)">
-            <line x1="0" x2="4.4" y1="8" y2="8"></line>
+        html: `
             <line x1="0" x2="4.4" y1="6" y2="6"></line>
             <line x1="0" x2="4.4" y1="4" y2="4"></line>
             <line x1="0" x2="4.4" y1="2" y2="2"></line>
             <line x1="0" x2="4.4" y1="0" y2="0"></line>
-            <line x1="0" x2="4.4" y1="2" y2="2"></line>
-            <line x1="0" x2="4.4" y1="4" y2="4"></line>
-            <line x1="0" x2="4.4" y1="6" y2="6"></line>
-            <line x1="0" x2="4.4" y1="8" y2="8"></line>
-        </g>`,
+        `,
         data: {
             beat:  symbol.beat + 1,
             pitch: symbol.pitch,
