@@ -189,8 +189,8 @@ export default overload(get('type'), {
 
     head: (symbol) => create('span', {
         class: `${ symbol.stemDirection === 'up' ? 'up-note' : 'down-note' } note`,
-        html:  `<span class="head">${ symbol.head || glyphs['head' + (symbol.duration + '').replace('.', '')] || '' }</span>`,
         style: symbol.stemHeight && `--stem-height: ${ symbol.stemHeight };`,
+        html:  `<span class="head">${ symbol.head || glyphs['head' + (symbol.duration + '').replace('.', '')] || glyphs['head1'] }</span>`,
         data: {
             beat:     symbol.beat + 1,
             pitch:    symbol.pitch,

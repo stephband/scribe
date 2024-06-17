@@ -37,10 +37,13 @@ export const head05    = '&#xE0A4;';
 export const head075   = '&#xE0A4;';
 export const head1     = '&#xE0A4;';
 export const head15    = '&#xE0A4;';
+export const head175   = '&#xE0A4;';
 export const head2     = '&#xE0A3;';
 export const head3     = '&#xE0A3;';
+export const head35    = '&#xE0A3;';
 export const head4     = '&#xE0A2;';
 export const head6     = '&#xE0A2;';
+export const head7     = '&#xE0A2;';
 
 export const headBracketLeft         = '&#xE0F5;';
 export const headBracketRight        = '&#xE0F6;';
