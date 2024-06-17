@@ -677,7 +677,7 @@ in their duration span. */
 .bar > .rest[data-duration="1.5"],
 .bar > .rest[data-duration="1.75"] {
 	grid-column-end: span 1;
-	margin-left:  calc(var(--head-margin-left) + 0.015625em);
+	margin-left:  0.015625em;
 	margin-right: 0.015625em;
 }
 
@@ -717,15 +717,13 @@ in their duration span. */
 
 .bar > .chord {
 	justify-self: start;
-	/* Nudge just ahead of heads */
-	margin-left: var(--head-margin-left);
+	margin-left:  0;
 	margin-right: 0.25em;
 }
 
 .bar > .lyric {
 	justify-self: start;
-	/* Nudge just ahead of heads */
-	margin-left: var(--head-margin-left);
+	margin-left:  0;
 	margin-right: 0.25em;
 }
 
@@ -735,7 +733,7 @@ in their duration span. */
 	/* Make tie span from centre of one head to centre of next. A tie to the
 	   next bar ends in the bar end column. */
 	/* - column gap - half of head width */
-	margin-left: calc(var(--head-margin-left) + 0.3375em);
+	margin-left: calc(1em * var(--head-width));
 	/* - bar start gap - half of head width */
 	margin-right: -0.375em;
 	min-width: 0.5em;

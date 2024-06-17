@@ -19,13 +19,22 @@
     font-family: Jazz, JazzText, sans-serif;
 
     /* Width of standard black note head */
-    --head-width: 0.3375;
+    --head-width:        0.3375;
+    /* Space around accidentals */
     --acci-margin-left:  0.0875;
     --acci-margin-right: 0.0875;
+    /* Space around notes */
+    --note-margin-left:  0;
+    --note-margin-right: 0;
+    /* Space around rests */
+    --rest-margin-left:  0;
+    --rest-margin-right: 0;
 }
 
 :host .note {
+    /* Default height of stem */
     --stem-height:     1;
+    /* Thickness of stem */
     --stem-width:      0.033;
     /* Alignment of root of stem relative to baseline */
     --stem-align-up:   0.03;

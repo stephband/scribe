@@ -34,9 +34,6 @@
        the --head-margin-left, negated so this is the actual accidental-head gap. */
     --acci-margin-left:  0;
     --acci-margin-right: 0.125em;
-    --head-margin-left:  0.125em;
-    /*--head-margin-right: 0.05em;*/
-    /*--stem-width:    0.03em;*/
 
     --safari-bar-mask-color: white;
 
