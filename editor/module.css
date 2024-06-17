@@ -79,8 +79,8 @@ label {
     z-index: 3;
 }
 
-.bar > [data-event-id] {
-    /* Anything selectable has a data-event-id, layer them on top */
+.bar > [data-event] {
+    /* Anything selectable has a data-event attribute, layer them on top */
     cursor: pointer;
     z-index: 3;
 }

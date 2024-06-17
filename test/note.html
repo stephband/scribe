@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Scribe .note</title>
+
+    <meta charset="utf-8" />
+    <meta name="author" content="@stephband" />
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width" />
+
+    <script title="load">
+        document.documentElement.className += ' js loading';
+        // window.addEventListener('DOMContentLoaded', () => document.documentElement.classList.remove('content-loading'));
+        // Wait for other load handlers to run first - Bolt does a few things on
+        // load (eg. targetable scrolls) and we want them to run before the loading
+        // class is removed
+        window.addEventListener('load', () => window.requestAnimationFrame(() => document.documentElement.classList.remove('loading')));
+    </script>
+
+    <script title="debug">
+        window.DEBUG = true;
+    </script>
+
+    <link rel="stylesheet" href="../module.css">
+
+    <style>
+
+    @import '../fonts/bravura.css';
+
+    .grid {
+        display: grid;
+        justify-items: center;
+        align-items: center;
+    }
+
+    .bravura-test {
+        font-family: Bravura, BravuraText;
+    }
+
+    .jazz-test {
+        font-family: Jazz, JazzText;
+    }
+
+    .green  { background-color: #d4e926; }
+    .yellow { background-color: #f7c61a; }
+    .orange { background-color: #ff8d52; }
+    .red    { background-color: #ff4d32; }
+    </style>
+</head>
+<body>
+    <h1>Scribe Note</h1>
+
+    <section class="grid" style="font-size: 10em; margin-top: 1em; margin-bottom: 1em; font-family: Jazz, JazzText; column-gap: 0.375em; grid-template-columns: repeat(15, min-content);">
+        <span class="note" title="note" data-duration="1">
+            <span class="head">&#xE0A4;</span>
+        </span>
+
+        <span class="note" title="note" data-duration="1.75" data-stem="-1">
+            <span class="head">&#xE0A4;</span>
+        </span>
+
+        <span class="note" title="note" data-duration="0.75">
+            <span class="head">&#xE0A4;</span>
+        </span>
+
+        <span class="note" title="note" data-duration="0.5">
+            <span class="head">&#xE0F5;&#xE0A4;&#xE0F6;</span>
+        </span>
+
+        <span class="note" title="note" data-duration="0.75">
+            <span class="pre">&#xE0F5;</span>
+            <span class="head">&#xE0A4;</span>
+            <span class="post">&#xE0F6;</span>
+        </span>
+
+        <span class="note" title="note" data-stem="-1" data-duration="0.375">
+            <span class="head">&#xE0A4;</span>
+        </span>
+
+        <span class="note" title="note" data-stem="-1" data-duration="0.25">
+            <span class="head">&#xE0A4;</span>
+        </span>
+
+        <span class="note" title="note" data-stem="-1" data-duration="0.75">
+            <span class="head">&#xE0F5;&#xE0A4;&#xE0F6;</span>
+        </span>
+
+        <span class="note" title="note" data-duration="0.5">
+            <span class="head">&#xE0A9;</span>
+        </span>
+
+        <span class="note" title="note" data-stem="-1" style="--stem-align-down: 0.12;">
+            <span class="pre">&#xE0F5;</span>
+            <span class="head">&#xE0A9;</span>
+            <span class="post">&#xE0F6;</span>
+        </span>
+
+        <span class="note" title="note" style="--stem-align-up: 0.14;" data-duration="0.25">
+            <span class="pre">&#xE0F5;</span>
+            <span class="head">&#xE0A9;</span>
+            <span class="post">&#xE0F6;</span>
+        </span>
+
+        <span class="note" title="note" style="--stem-height: 1.2;" data-duration="0.25">
+            <span class="head">&#xE0A4;</span>
+        </span>
+
+        <span class="note" title="note" style="--stem-height: 1.8;" data-duration="0.375">
+            <span class="head">&#xE0A4;</span>
+        </span>
+
+        <span class="note" title="note" data-stem="-1" style="--stem-height: 1.8;" data-duration="0.25">
+            <span class="head">&#xE0A4;</span>
+        </span>
+    </section>
+
+    <section class="bravura grid" style="font-size: 6em; margin-top: 2em; margin-bottom: 1em; font-family: Bravura, BravuraText; column-gap: 0.375em; grid-template-columns: repeat(15, min-content);">
+        <span class="note" title="note" data-duration="1">
+            <span class="head">&#xE0A4;</span>
+        </span>
+
+        <span class="note" title="note" data-duration="1.75" data-stem="-1">
+            <span class="head">&#xE0A4;</span>
+        </span>
+
+        <span class="note" title="note" data-duration="0.75">
+            <span class="head">&#xE0A4;</span>
+        </span>
+
+        <span class="note" title="note" data-duration="0.5">
+            <span class="head">&#xE0F5;&#xE0A4;&#xE0F6;</span>
+        </span>
+
+        <span class="note" title="note" data-duration="0.75">
+            <span class="pre">&#xE0F5;</span>
+            <span class="head">&#xE0A4;</span>
+            <span class="post">&#xE0F6;</span>
+        </span>
+
+        <span class="note" title="note" data-stem="-1" data-duration="0.375">
+            <span class="head">&#xE0A4;</span>
+        </span>
+
+        <span class="note" title="note" data-stem="-1" data-duration="0.25">
+            <span class="head">&#xE0A4;</span>
+        </span>
+
+        <span class="note" title="note" data-stem="-1" data-duration="0.75">
+            <span class="head">&#xE0F5;&#xE0A4;&#xE0F6;</span>
+        </span>
+
+        <span class="note" title="note" data-duration="0.5">
+            <span class="head">&#xE0A9;</span>
+        </span>
+
+        <span class="note" title="note" data-stem="-1" style="--stem-align-down: 0.12;">
+            <span class="pre">&#xE0F5;</span>
+            <span class="head">&#xE0A9;</span>
+            <span class="post">&#xE0F6;</span>
+        </span>
+
+        <span class="note" title="note" style="--stem-align-up: 0.14;" data-duration="0.25">
+            <span class="pre">&#xE0F5;</span>
+            <span class="head">&#xE0A9;</span>
+            <span class="post">&#xE0F6;</span>
+        </span>
+
+        <span class="note" title="note" style="--stem-height: 1.2;" data-duration="0.25">
+            <span class="head">&#xE0A4;</span>
+        </span>
+
+        <span class="note" title="note" style="--stem-height: 1.8;" data-duration="0.25">
+            <span class="head">&#xE0A4;</span>
+        </span>
+
+        <span class="note" title="note" data-stem="-1" style="--stem-height: 1.8;" data-duration="0.25">
+            <span class="head">&#xE0A4;</span>
+        </span>
+    </section>
+</body>
+</html>

@@ -1,17 +1,17 @@
 
+
 @import './fonts/jazz.css';
+
 @import './classes/accidental.css';
 @import './classes/stave.css';
 @import './classes/bar.css';
 @import './classes/clef.css';
 @import './classes/timesig.css';
 @import './classes/chord.css';
-@import './classes/head.css';
 @import './classes/ledge.css';
 @import './classes/rest.css';
-@import './classes/stem.css';
 @import './classes/beam.css';
-@import './classes/tail.css';
+@import './classes/note.css';
 @import './classes/tie.css';
 @import './classes/lyric.css';
 @import './classes/svg.css';
@@ -34,9 +34,6 @@
        the --head-margin-left, negated so this is the actual accidental-head gap. */
     --acci-margin-left:  0;
     --acci-margin-right: 0.125em;
-    --head-margin-left:  0.125em;
-    /*--head-margin-right: 0.05em;*/
-    --stem-thickness:    0.03em;
 
     --safari-bar-mask-color: white;
 

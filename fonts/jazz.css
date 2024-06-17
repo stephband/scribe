@@ -13,6 +13,22 @@
     font-style: normal;
 }
 
-.jazz-font {
+.scribe-jazz {
     font-family: Jazz, JazzText;
+
+    /* Width of standard black note head */
+    --head-width: 0.3375;
+}
+
+.scribe-jazz .note {
+    --stem-height:       1;
+    --stem-width:  0.033;
+    /* Alignment of root of stem relative to baseline */
+    --stem-align-up:   0.03;
+    --stem-align-down: -0.04;
+}
+
+.scribe-jazz .x-head {
+    --stem-align-up:   0.14;
+    --stem-align-down: -0.12;
 }

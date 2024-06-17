@@ -7,15 +7,45 @@
 @import '../classes/clef.css';
 @import '../classes/timesig.css';
 @import '../classes/chord.css';
-@import '../classes/head.css';
+@import '../classes/note.css';
 @import '../classes/ledge.css';
 @import '../classes/rest.css';
-@import '../classes/stem.css';
 @import '../classes/beam.css';
-@import '../classes/tail.css';
 @import '../classes/tie.css';
 @import '../classes/lyric.css';
 @import '../classes/svg.css';
+
+:host {
+    font-family: Jazz, JazzText, sans-serif;
+
+    /* Width of standard black note head */
+    --head-width:        0.3375;
+    /* Space around accidentals */
+    --acci-margin-left:  0.0875;
+    --acci-margin-right: 0.0875;
+    /* Space around notes */
+    --note-margin-left:  0;
+    --note-margin-right: 0;
+    /* Space around rests */
+    --rest-margin-left:  0;
+    --rest-margin-right: 0;
+}
+
+:host .note {
+    /* Default height of stem */
+    --stem-height:     1;
+    /* Thickness of stem */
+    --stem-width:      0.033;
+    /* Alignment of root of stem relative to baseline */
+    --stem-align-up:   0.03;
+    --stem-align-down: -0.04;
+}
+
+:host .x-head {
+    --stem-align-up:   0.14;
+    --stem-align-down: -0.12;
+}
+
 
 svg {
     fill: currentcolor;

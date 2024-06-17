@@ -1,0 +1,162 @@
+
+:root,
+:host {
+    --stem-height:  1;
+    /* According to spec, a stems registration x=0 should be the centre of
+       the stem. And its advance width may not correspond to its thickness
+       at all, so we cannot use it's right-hand edge as any kind of
+       registration. All we have to go on is x=0 , so we must know (or more
+       frustratingly, guess at) its thickness to draw it in the correct
+       position... and this changes from font to font. This is the thickness
+       for Jazz font (by eye). */
+    --stem-width:  0.033;
+    /* y position of points where stem joins note head */
+    --stem-align-up:   0.03;
+    --stem-align-down: 0.04;
+}
+
+.note {
+    display: grid;
+    line-height: 0.25em;
+    white-space: nowrap;
+    grid-auto-columns: min-content min-content;
+    grid-auto-rows: 0.25em;
+    grid-auto-flow: column;
+    height: 0.25em;
+}
+
+.note > * {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.note > .pre {
+    margin-left: -0.1em;
+}
+
+.note > .post {
+    justify-self: end;
+    margin-right: -0.1em;
+}
+
+.note > .head {
+    position: relative;
+}
+
+
+/*
+Stems
+*/
+
+.note > .head::before {
+    /* Stem up */
+    position: absolute;
+    left: 100%;
+    transform-origin: 0 50%;
+    transform:
+        /* Move stem over note head so that right hand sides align, and down
+           by stem-align-up plus stem-start */
+        translate(calc(-0.5em * var(--stem-width)), calc(-1em * var(--stem-align-up)))
+        /* Make it stem-size big */
+        scale(1, calc(var(--stem-height) - var(--stem-align-up)));
+}
+
+.down-note > .head::before {
+    /* Stem down */
+    left: 0;
+    transform:
+        /* Turn it upside down */
+        rotate(180deg)
+        /* Move it away from the grid line by half a stem thickness, and down by stem-start */
+        translate(calc(-0.5em * var(--stem-width)), calc(1em * var(--stem-align-down)))
+        /* Make it stem-size big */
+        scale(1, calc(var(--stem-height) + var(--stem-align-down)));
+}
+
+.note[data-duration^="3"] > .head::before,
+.note[data-duration^="2"] > .head::before,
+.note[data-duration^="1"] > .head::before,
+.note[data-duration^="0"] > .head::before { content: '\E210'; }
+
+
+/*
+Flags
+*/
+
+.note::before {
+    /* Flag up */
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: start;
+    align-self: stretch;
+    /* Up flags for 16th notes and shorter come with a bit of stem, so they
+       must be superimposed on the actual stem by one stem thickness. This
+       is troublesome as we can't know what stem thickness is – it varies
+       from font to font. */
+    margin-left: calc(-1em * var(--stem-width));
+    transform: translate(0, calc(var(--stem-height) * -1em));
+}
+
+.down-note::before {
+    /* Flag down. Make it span 2 to avoid it making column 1 bigger than the
+       head */
+    grid-column: 1 / span 2;
+    /* Down flags also need a little adjustment. Annoying, because again,
+       stem thickness varies from font to font and we can't know what it is. */
+    margin-left: 0;
+    transform: translate(0, calc(var(--stem-height) * 1em));
+}
+
+/* Note durations 0.75, 0.5 and 0.3333 get an 8th note flag */
+.note[data-duration^="0.7"]::before,
+.note[data-duration^="0.5"]::before,
+.note[data-duration^="0.3"]::before                 { content: '\E240'; }
+.down-note[data-duration^="0.7"]::before,
+.down-note[data-duration^="0.5"]::before,
+.down-note[data-duration^="0.3"]::before { content: '\E241'; }
+
+/* Note durations 0.375, 0.25 and 0.1667 get a 16th note flag */
+.note[data-duration^="0.37"]::before,
+.note[data-duration^="0.2"]::before,
+.note[data-duration^="0.16"]::before                 { content: '\E242'; }
+.down-note[data-duration^="0.37"]::before,
+.down-note[data-duration^="0.2"]::before,
+.down-note[data-duration^="0.16"]::before { content: '\E243'; }
+
+/* Note durations 0.1875, 0.125 and 0.0833 get a 32nd note flag */
+.note[data-duration^="0.18"]::before,
+.note[data-duration^="0.12"]::before,
+.note[data-duration^="0.08"]::before                 { content: '\E244'; }
+.down-note[data-duration^="0.18"]::before,
+.down-note[data-duration^="0.12"]::before,
+.down-note[data-duration^="0.08"]::before { content: '\E245'; }
+
+/* Notes that are beamed get no flag */
+.note[data-beam]::before { content: none !important; }
+
+
+/*
+Dots
+*/
+
+.note::after {
+    grid-column: 2;
+    grid-row: 1;
+    /* Move it down a little */
+    transform: translate(0, 0.02em);
+}
+
+/* Note durations 6, 3, 1.5, 0.75, 0.375 and 0.1875 get an augmentation dot,
+   note durations 7, 3.5, 1.75, 0.875, 0.4375 and 0.21875 get two */
+.note[data-duration^="7"]::after    { content: '\200A\E1E7\E1E7'; }
+.note[data-duration^="6"]::after    { content: '\200A\E1E7'; }
+.note[data-duration^="3.5"]::after  { content: '\200A\E1E7\E1E7'; }
+.note[data-duration^="3"]::after    { content: '\200A\E1E7'; }
+.note[data-duration^="1.75"]::after { content: '\200A\E1E7\E1E7'; }
+.note[data-duration^="1.5"]::after  { content: '\200A\E1E7'; }
+.note[data-duration^="0.87"]::after { content: '\200A\E1E7\E1E7'; }
+.note[data-duration^="0.7"]::after  { content: '\200A\E1E7'; }
+.note[data-duration^="0.43"]::after { content: '\200A\E1E7\E1E7'; }
+.note[data-duration^="0.37"]::after { content: '\200A\E1E7'; }
+.note[data-duration^="0.21"]::after { content: '\200A\E1E7\E1E7'; }
+.note[data-duration^="0.18"]::after { content: '\200A\E1E7'; }
