@@ -190,13 +190,11 @@ function createBeam(symbols, stave, beam, n) {
         0.75 * endRange :
         avgRange;
 
-    /*stems.forEach((stem, i) => {
-        stem.beamY = stemDirection === 'down' ?
-            -range * i / (stems.length - 1) + subtractStaveRows(stave, begin.pitch, stem.pitch) :
-            range * i / (stems.length - 1) - subtractStaveRows(stave, begin.pitch, stem.pitch);
-    });*/
-
-    //symbols.splice(i, 0, ...stems);
+    heads.forEach((head, i) => {
+        head.stemHeight = stemDirection === 'down' ?
+            1 + 0.125 * (-range * i / (heads.length - 1) + subtractStaveRows(stave, begin.pitch, head.pitch)) :
+            1 + 0.125 * (range * i  / (heads.length - 1) - subtractStaveRows(stave, begin.pitch, head.pitch)) ;
+    });
 
     // Update heads with info about the beam
     const headEvents = heads.map(get('event'));
@@ -205,14 +203,13 @@ function createBeam(symbols, stave, beam, n) {
 
     // Put the beam in front of the first head (??)
     symbols.splice(i, 0, assign({}, begin, {
-        type: 'beam',
-        // Push beam start into next grid column
-        beat:   begin.beat,
+        type:     'beam',
+        beat:     begin.beat,
         duration: end.beat - begin.beat,
         //pitch:  begin.pitch,
-        range:  range,
-        updown: stemDirection,
-        heads:  heads
+        range:    range,
+        updown:   stemDirection,
+        heads:    heads
     }));
 
     symbols.splice(i, 0, ...buffer);
@@ -339,21 +336,14 @@ function createSymbols(symbols, bar) {
                     beam = [n];
                 }
             }
-            // Otherwise render the stem immediately
             else {
-                let stemDirection = getStemDirection(stave.centerPitch, head);
-                symbols.splice(n++, 0, assign({}, head, {
-                    type: 'stem',
-                    stemDirection
-                }));
-
                 if (head.tie === 'begin') {
+                    let stemDirection = getStemDirection(stave.centerPitch, head);
                     symbols.splice(n++, 0, assign({}, head, {
-                        type: 'tie',
-                        // Move tie into following grid column
-                        beat: head.beat,
+                        type:   'tie',
+                        beat:   head.beat,
                         updown: stemDirection === 'up' ? 'down' : 'up',
-                        event: head.event
+                        event:  head.event
                     }));
                 }
             }
@@ -362,11 +352,10 @@ function createSymbols(symbols, bar) {
             if (head.tie === 'begin' || head.tie === 'middle') {
                 let stemDirection = getStemDirection(stave.centerPitch, head);
                 symbols.splice(n++, 0, assign({}, head, {
-                    type: 'tie',
-                    // Move tie into following grid column
-                    beat: head.beat,
+                    type:   'tie',
+                    beat:   head.beat,
                     updown: stemDirection === 'up' ? 'down' : 'up',
-                    event: head.event
+                    event:  head.event
                 }));
             }
         }
@@ -381,11 +370,11 @@ function createSymbols(symbols, bar) {
     // If last event has not taken us to the end of the bar, insert rest
     if (beat < bar.duration) {
         symbols.push({
-            type: 'rest',
+            type:     'rest',
             beat,
             duration: bar.duration - beat,
-            pitch: '',
-            part: part
+            pitch:    '',
+            part:     part
         });
     }
 
@@ -442,11 +431,11 @@ function createBar(beat, stave, key, meter, tieheads) {
     // If meter change is on this beat push a timesig into symbols
     if (meter[0] === beat) {
         bar.symbols.push({
-            type: 'timesig',
-            beat: 0,
-            numerator: meter[2] / meter[3],
+            type:        'timesig',
+            beat:        0,
+            numerator:   meter[2] / meter[3],
             denominator: 4 / meter[3],
-            event: meter
+            event:       meter
         });
     }
 

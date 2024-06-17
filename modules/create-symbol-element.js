@@ -188,14 +188,14 @@ export default overload(get('type'), {
     }),
 
     head: (symbol) => create('span', {
-        class: "note",
-        html: `<span class="head">${ symbol.head || glyphs['head' + (symbol.duration + '').replace('.', '')] || '' }</span>`,
+        class: `${ symbol.stemDirection === 'up' ? 'up-note' : 'down-note' } note`,
+        html:  `<span class="head">${ symbol.head || glyphs['head' + (symbol.duration + '').replace('.', '')] || '' }</span>`,
+        style: symbol.stemHeight && `--stem-height: ${ symbol.stemHeight };`,
         data: {
             beat:     symbol.beat + 1,
             pitch:    symbol.pitch,
             duration: symbol.duration,
             part:     symbol.part,
-            stem:     symbol.stemDirection === 'up' ? '1' : '-1',
             beam:     symbol.beam && symbol.beam.map(identify).join(' '),
             event:    identify(symbol.event)
         }

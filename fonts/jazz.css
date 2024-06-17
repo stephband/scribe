@@ -21,8 +21,8 @@
 }
 
 .scribe-jazz .note {
-    --stem-size:       1;
-    --stem-thickness:  0.033;
+    --stem-height:       1;
+    --stem-width:  0.033;
     /* Alignment of root of stem relative to baseline */
     --stem-align-up:   0.03;
     --stem-align-down: -0.04;

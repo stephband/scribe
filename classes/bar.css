@@ -415,7 +415,7 @@ Bars are divided into:
     /* Accidentals must have column gap and head margin on their right negated
        before adding the proper margin, becuase they are aligned to the end of
        the column before their head. */
-    margin-right: calc(-1 * var(--bar-column-gap) - var(--head-margin-left) + var(--acci-margin-right));
+    margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right));
 }
 
 .bar > .acci:not([data-beat]) {
@@ -654,7 +654,7 @@ Bars are divided into:
 .bar > .ledge {
 	width: auto;
 	/* Make ledger take up same space as head */
-	margin-left:  calc(var(--head-margin-left) - 0.125em);
+	margin-left:  -0.125em;
 	margin-right: -0.125em;
 }
 
@@ -702,14 +702,14 @@ in their duration span. */
 }
 
 .bar > .up-beam {
-	margin-left: calc(-1em * var(--stem-thickness));
+	margin-left: calc(-1em * var(--stem-width));
 	margin-right: calc(-1 * var(--bar-column-gap));
 	transform: translate(calc(1em * var(--head-width)), 0);
 }
 
 .bar > .down-beam {
 	margin-left:  0;
-	margin-right: calc(-1em * var(--stem-thickness) - var(--bar-column-gap));
+	margin-right: calc(-1em * var(--stem-width) - var(--bar-column-gap));
 	transform: none;
 }
 
