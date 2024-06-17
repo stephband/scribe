@@ -642,8 +642,8 @@ export default function eventsToSymbols(events, clef, keyname, meter, transpose)
     // keynumber is on a continuous scale of fourths, so multiply by 7 semitones
     // to get chromatic number relative to C.
     const keynumber = toKeyNumber(keyname);
-    const keyscale = toKeyScale(keynumber * 7 + transpose);
-
+    const keyscale  = toKeyScale(keynumber * 7 + transpose);
+console.log(keyname, keynumber, keyscale);
     // TODO: this is a two-pass symbol generation, I wonder if we can get
     // it down to one?
     return createBars(events, beatkeys, stave, keyscale, meter, transpose)

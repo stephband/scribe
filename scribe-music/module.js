@@ -113,7 +113,7 @@ export default define(element('scribe-music', {
         Choose the key signature. Defaults to "C".
         **/
         attribute: function(value) {
-            this.key = value === '' ? 'C' : '';
+            this.key = value === '' ? 'C' : value;
         },
 
         /**
