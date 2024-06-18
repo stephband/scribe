@@ -89,9 +89,9 @@ const acciGlyphs = {
 
 export default overload(get('type'), {
     clef: (symbol) => create('span', {
-        class: `${ symbol.clef }-clef clef`,
+        class: `${ symbol.stave.type }-clef clef`,
         //data: { eventId: identify(symbol.event) },
-        html: glyphs[symbol.clef + 'Clef'] || '',
+        html: symbol.stave.clef,
         data: { event: null }
     }),
 

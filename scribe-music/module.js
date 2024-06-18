@@ -7,7 +7,7 @@ import createSymbols     from '../modules/create-symbols.js';
 import requestData       from '../modules/request-data.js';
 import parseSource       from '../modules/parse.js';
 import { timesigToMeter, meterToTimesig } from '../modules/timesig.js';
-import * as staves       from '../modules/staves.js';
+import Stave             from '../modules/stave.js';
 //import createElement     from '../modules/create-element.js';
 import createBarElements from '../modules/create-bar-elements.js';
 //import svgdefs           from '../modules/svgdefs.js';
@@ -99,10 +99,11 @@ export default define(element('scribe-music', {
         **/
         get: function() {  return getInternals(this).clef.value; },
         set: function(value) {
-            if (!staves[value]) {
+            if (!Stave[value]) {
                 console.warn('<scribe-music> Attempt to set invalid clef="' + value + '" ignored');
                 return;
             }
+
             getInternals(this).clef.value = value;
         }
     },

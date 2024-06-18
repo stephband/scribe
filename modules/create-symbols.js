@@ -1,6 +1,6 @@
 
-import by from '../lib/fn/modules/by.js';
-import get from '../lib/fn/modules/get.js';
+import by       from '../lib/fn/modules/by.js';
+import get      from '../lib/fn/modules/get.js';
 import overload from '../lib/fn/modules/overload.js';
 import { toNoteNumber, toRootName, toRootNumber } from '../lib/midi/modules/note.js';
 import toKeys from './sequence/to-keys.js';
@@ -8,7 +8,7 @@ import eventsAtBeat from './sequence/events-at-beat.js';
 import { keysAtBeats, keyFromBeatKeys } from './sequence/key-at-beat.js';
 import { transposeChord } from './event/chord.js';
 import { transposeScale } from './scale.js';
-import * as staves from './staves.js';
+import Stave from './stave.js';
 import { toKeyScale, toKeyNumber } from './keys.js';
 import { mod12, byGreater } from './maths.js';
 import { rflat, rsharp, rdoubleflat, rdoublesharp } from './regexp.js';
@@ -89,25 +89,6 @@ function addStaveRows(n, row) {
     return row;
 }
 
-function subtractStaveRows(stave, r1, r2) {
-    if (stave.getRowDiff) {
-        return stave.getRowDiff(r1, r2);
-    }
-
-    // Calculate diff for diatonic stave
-    const degree1 = r1[0];
-    // TODO Support -ve octave (and double figure octave?) numbers
-    const octave1 = parseInt(r1[r1.length - 1], 10);
-    const degree2 = r2[0];
-    const octave2 = parseInt(r2[r2.length - 1], 10);
-
-    let i1 = lines.indexOf(degree1);
-    let i2 = lines.indexOf(degree2);
-    let n = i2 - i1;
-
-    return n + (octave2 - octave1) * 7;
-}
-
 function createBeam(symbols, stave, beam, n) {
     const part = symbols[0].part;
 
@@ -124,7 +105,7 @@ function createBeam(symbols, stave, beam, n) {
     const stemDirection = symbols[beam[0]] && symbols[beam[0]].stemDirection ?
         symbols[beam[0]].stemDirection :
         (beam
-            .map((i) => subtractStaveRows(stave, stave.centerPitch, symbols[i].pitch))
+            .map((i) => stave.getRowDiff(stave.midLinePitch, symbols[i].pitch))
             .reduce((t, u) => t + u, 0) / beam.length) < 0 ?
             'up' :
             'down';
@@ -137,11 +118,11 @@ function createBeam(symbols, stave, beam, n) {
     let b = -1;
     let avgBeginLine = 0;
     let avgEndLine = 0;
-    let i, head, line, stem;
+    let i, head, line;
     while (beam[++b] !== undefined) {
         i = beam[b];
         head = symbols[i];
-        line = subtractStaveRows(stave, stave.centerPitch, head.pitch);
+        line = stave.getRowDiff(stave.midLinePitch, head.pitch);
 
         head.stemDirection = stemDirection;
         head.tieDirection = stemDirection === 'up' ? 'down' : 'up';
@@ -156,20 +137,7 @@ function createBeam(symbols, stave, beam, n) {
             avgEndLine += line / Math.floor(beam.length / 2);
         }
 
-        if (stem && stem.beat === head.beat) {
-            //let stemLine = subtractStaveRows('B4', head.pitch)
-            //let range =
-            stem.range = subtractStaveRows(stave, stem.pitch, head.pitch);
-            stem.pitch = stem.range < 0 ?
-                stem.stemDirection === 'up' ? stem.pitch : head.pitch :
-                stem.stemDirection === 'up' ? head.pitch : stem.pitch;
-        }
-        /*else {
-            stem = assign({}, head, {
-                type: 'stem'
-            });
-            stems.push(stem);
-        }*/
+        // TODO: group stems from notes of same part on same beat
 
         if (head.tie === 'begin') {
             buffer.push(assign({}, head, {
@@ -184,7 +152,7 @@ function createBeam(symbols, stave, beam, n) {
     // Calculate where to put beam exactly
     let begin    = heads[0];
     let end      = heads[heads.length - 1];
-    let endRange = subtractStaveRows(stave, begin.pitch, end.pitch);
+    let endRange = stave.getRowDiff(begin.pitch, end.pitch);
     let avgRange = avgEndLine - avgBeginLine;
     let range = abs(avgRange) > abs(0.75 * endRange) ?
         0.75 * endRange :
@@ -192,8 +160,8 @@ function createBeam(symbols, stave, beam, n) {
 
     heads.forEach((head, i) => {
         head.stemHeight = stemDirection === 'down' ?
-            1 + 0.125 * (-range * i / (heads.length - 1) + subtractStaveRows(stave, begin.pitch, head.pitch)) :
-            1 + 0.125 * (range * i  / (heads.length - 1) - subtractStaveRows(stave, begin.pitch, head.pitch)) ;
+            1 + 0.125 * (-range * i / (heads.length - 1) + stave.getRowDiff(begin.pitch, head.pitch)) :
+            1 + 0.125 * (range * i  / (heads.length - 1) - stave.getRowDiff(begin.pitch, head.pitch)) ;
     });
 
     // Update heads with info about the beam
@@ -286,7 +254,7 @@ function createSymbols(symbols, bar) {
         }
 
         // Up ledger lines
-        let ledgerrows = subtractStaveRows(bar.stave, bar.stave.topPitch, head.pitch);
+        let ledgerrows = stave.getRowDiff(stave.maxLinePitch, head.pitch) - 1;
 
         if (ledgerrows > 0) {
             symbols.splice(n++, 0, assign({}, head, {
@@ -297,7 +265,7 @@ function createSymbols(symbols, bar) {
 
         // Down ledger lines
         else {
-            ledgerrows = subtractStaveRows(bar.stave, head.pitch, bar.stave.bottomPitch);
+            ledgerrows = stave.getRowDiff(head.pitch, stave.minLinePitch) - 1;
             if (ledgerrows > 0) {
                 symbols.splice(n++, 0, assign({}, head, {
                     type: 'downledger',
@@ -513,7 +481,7 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
     bar.symbols.unshift({
         type: 'clef',
         beat: 0,
-        clef: stave.clef
+        stave
     });
 
     let n = -1;
@@ -571,7 +539,7 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
                 duration,
                 pitch,
                 transpose,
-                head: stave.getHead && stave.getHead(pitch, event[3], duration),
+                head: stave.getHead(pitch, event[3], duration),
                 event: event
             }, stave.getPart && stave.getPart(pitch));
 
@@ -624,17 +592,15 @@ export default function eventsToSymbols(events, clef, keyname, meter, transpose)
     events.sort(by(get(0)));
 
     // Get the stave controller
-    const stave = clef ?
-        staves[clef] :
-        staves.treble;
+    const stave = Stave.create(clef || 'treble');
 
-    // Create a map of keys at beats. Doing this here is n optimisation so we
+    // Create a map of keys at beats. Doing this here is an optimisation so we
     // don't end up running the keys matrix calculations on every note which
     // causes measurable delay.
-    // TEMP: don't get keys for unpitched staves
-    const beatkeys = clef === 'drum' ?
-        null :
-        keysAtBeats(events);
+    // TEMP: don't get keys for unpitched
+    const beatkeys = stave.pitched ?
+        keysAtBeats(events) :
+        null ;
 
     // Get the key scale from keyname. This scale is not a true
     // 'scale' in an internal-data sense as it may not begin with a 0, but it

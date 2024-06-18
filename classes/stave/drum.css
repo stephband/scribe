@@ -14,8 +14,8 @@ https://web.mit.edu/merolish/Public/drums.pdf
         [splash]   0.125em
         [crash2]   0.125em
         [crash]    0.125em
-        [hihat]    0.125em
-        [ride stave-top] 0.125em
+        [ride]     0.125em
+        [hihat stave-top] 0.125em
         [hightom]  0.125em
         [midtom stave-upper] 0.125em
         [snare]    0.125em
@@ -33,6 +33,7 @@ https://web.mit.edu/merolish/Public/drums.pdf
         0.125em
         [lyrics] 0.125em;
 }
+
 
 /* TEMP */
 .drum-stave > .ledge,
