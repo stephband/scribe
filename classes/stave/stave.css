@@ -40,11 +40,11 @@
     grid-row: G4;
 }
 
-.stave > .treble8up-clef {
+.stave > .treble-up-clef {
     grid-row: G5;
 }
 
-.stave > .treble8down-clef {
+.stave > .treble-down-clef {
     grid-row: G3;
 }
 

@@ -1,0 +1,46 @@
+.treble-up-stave {
+    grid-template-rows:
+        [A7] 0.125em
+        [G7] 0.125em
+        [F7 chords] 0.125em
+        [E7] 0.125em
+        [D7] 0.125em
+        [C7] 0.125em
+        [B6] 0.125em
+        [A6] 0.125em
+        [G6] 0.125em
+        [F6 stave-top] 0.125em
+        [E6] 0.125em
+        [D6] 0.125em
+        [C6] 0.125em
+        [B5 stave-center] 0.125em
+        [A5] 0.125em
+        [G5] 0.125em
+        [F5] 0.125em
+        [E5] 0.125em
+        [D5 stave-bottom] 0.125em
+        [C5] 0.125em
+        [B4] 0.125em
+        [A4] 0.125em
+        [G4] 0.125em
+        [F4] 0.125em
+        [E4] 0.125em
+        [D4] 0.125em
+        [C4 lyrics] 0.125em;
+}
+
+/* Map unoctaved pitches to stave lines for key signatures. */
+.treble-up-stave > [data-pitch="F♭"] { grid-row-start: F5; }
+.treble-up-stave > [data-pitch="C♭"] { grid-row-start: C6; }
+.treble-up-stave > [data-pitch="G♭"] { grid-row-start: G5; }
+.treble-up-stave > [data-pitch="D♭"] { grid-row-start: D6; }
+.treble-up-stave > [data-pitch="A♭"] { grid-row-start: A5; }
+.treble-up-stave > [data-pitch="E♭"] { grid-row-start: E6; }
+.treble-up-stave > [data-pitch="B♭"] { grid-row-start: B5; }
+.treble-up-stave > [data-pitch="F♯"] { grid-row-start: F6; }
+.treble-up-stave > [data-pitch="C♯"] { grid-row-start: C6; }
+.treble-up-stave > [data-pitch="G♯"] { grid-row-start: G6; }
+.treble-up-stave > [data-pitch="D♯"] { grid-row-start: D6; }
+.treble-up-stave > [data-pitch="A♯"] { grid-row-start: A5; }
+.treble-up-stave > [data-pitch="E♯"] { grid-row-start: E6; }
+.treble-up-stave > [data-pitch="B♯"] { grid-row-start: B5; }
