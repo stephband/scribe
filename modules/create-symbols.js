@@ -539,7 +539,7 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
                 duration,
                 pitch,
                 transpose,
-                head: stave.getHead && stave.getHead(pitch, event[3], duration),
+                head: stave.getHead(pitch, event[3], duration),
                 event: event
             }, stave.getPart && stave.getPart(pitch));
 
