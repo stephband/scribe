@@ -14,7 +14,6 @@ import { toNoteName, toNoteNumber } from '../lib/midi/modules/note.js';
 import createSymbols     from '../modules/create-symbols.js';
 import createBarElements from '../modules/create-bar-elements.js';
 import { identify, findEvent } from '../modules/create-symbol-element.js';
-import * as staves from '../modules/staves.js';
 import { timesigToMeter } from '../modules/timesig.js';
 
 import isTransposeable from '../modules/event/is-transposeable.js';

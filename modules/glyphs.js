@@ -1,7 +1,7 @@
 
 export const trebleClef      = '&#xE050;';
-export const treble8downClef = '&#xE052;';
-export const treble8upClef   = '&#xE053;';
+export const trebleDownClef  = '&#xE052;';
+export const trebleUpClef    = '&#xE053;';
 export const altoClef        = '&#xE05C;';
 export const bassClef        = '&#xE062;';
 export const drumClef        = '&#xE069;';
@@ -29,22 +29,9 @@ export const acciParensLeft  = '&#xE26A;';
 export const acciParensRight = '&#xE26B;';
 
 // https://w3c.github.io/smufl/latest/tables/noteheads.html
-export const head0125  = '&#xE0A4;';
-export const head01875 = '&#xE0A4;';
-export const head025   = '&#xE0A4;';
-export const head0375  = '&#xE0A4;';
-export const head05    = '&#xE0A4;';
-export const head075   = '&#xE0A4;';
-export const head1     = '&#xE0A4;';
-export const head15    = '&#xE0A4;';
-export const head175   = '&#xE0A4;';
-export const head2     = '&#xE0A3;';
-export const head3     = '&#xE0A3;';
-export const head35    = '&#xE0A3;';
-export const head4     = '&#xE0A2;';
-export const head6     = '&#xE0A2;';
-export const head7     = '&#xE0A2;';
-
+export const head1                   = '&#xE0A4;';
+export const head2                   = '&#xE0A3;';
+export const head4                   = '&#xE0A2;';
 export const headBracketLeft         = '&#xE0F5;';
 export const headBracketRight        = '&#xE0F6;';
 export const headSlashed2            = '&#xE0D0;';

@@ -17,7 +17,7 @@ function toElements(nodes, symbol) {
 
 function toBarElements(elements, bar) {
     elements.push(create('div', {
-        class: `${ bar.stave.clef }-stave stave bar`,
+        class: `${ bar.stave.type }-stave stave bar`,
         data: { beat: bar.beat, duration: bar.duration },
         children: bar.symbols.reduce(toElements, [])
     }));

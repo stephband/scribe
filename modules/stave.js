@@ -1,26 +1,51 @@
 
-import nothing from '../lib/fn/modules/nothing.js';
-import { toNoteOctave } from '../lib/midi/modules/note.js';
+import nothing        from '../lib/fn/modules/nothing.js';
+import { toNoteName, toNoteOctave } from '../lib/midi/modules/note.js';
+import toSpelling     from './event/to-spelling.js';
 import { rflatsharp } from './regexp.js';
-import * as glyphs from "./glyphs.js";
+import * as glyphs    from "./glyphs.js";
 
 const assign = Object.assign;
 
 
 /* Stave */
 
-export class Stave {
-    static from() {}
-    static of() {}
-
-    constructor() {
-
+export default class Stave {
+    /**
+    Stave.create(type)
+    Create a stave object by type.
+    **/
+    static create(type) {
+        return new Stave[type]();
     }
+
+    constructor() {}
+
+    /**
+    .clef
+    String containing single clef glyph.
+    **/
+    clef = '';
+
+    /**
+    .pitched
+    A boolean indicating whether this stave supports keys and transposition.
+    **/
+    pitched = true;
+
+    /**
+    .rows
+    An array of row names, from bottom to top of stave. Row names must correspond
+    to those defined for a given stave in CSS.
+    **/
+    rows = nothing;
 
     /**
     .getHead(pitch, dynamic, duration)
-    A stave may override symbols used as note heads. Returns a string, usually
-    containing a single unicode character.
+    Get the head used for a given `pitch`, `dynamic` and `duration`. For normal
+    chromatic staves only `duration` really matters, but percussion staves may
+    replace heads based on pitch and dynamics. Returns a string that (in most
+    cases) contains a single unicode character.
     **/
     getHead(pitch, dynamic, duration) {
             // Semibreve
@@ -36,23 +61,30 @@ export class Stave {
     }
 
     /**
-    .rows
-    An array of row names, from bottom to top of stave. Row names must correspond
-    to those defined for a given stave in CSS.
+    .minPitch, .maxPitch, .minLinePitch, .midLinePitch, .maxLinePitch
+    Minimum and maximum pitch names supported by the stave corresponding to the
+    first and last row names in `.rows`, and lower, middle and upper stave pitches
+    corresponding to the lower, middle and upper lines of the stave.
     **/
-    rows = nothing;
 
-    /**
-    .minPitch, .maxPitch
-    Minimum and maximum pitch names supported by the stave, corresponding to the
-    first and last row names in `.rows`.
-    **/
     get minPitch() {
         return this.rows[0];
     }
 
     get maxPitch() {
-        return this.rows[this.rows.length - 1];
+        return this.rows[27];
+    }
+
+    get minLinePitch() {
+        return this.rows[9];
+    }
+
+    get midLinePitch() {
+        return this.rows[13];
+    }
+
+    get maxLinePitch() {
+        return this.rows[17];
     }
 
     /**
@@ -63,13 +95,23 @@ export class Stave {
     **/
     movePitch(pitch, n) {
         // Chromatic transpose
-        const min = toNoteNumber(this.minPitch);
-        const max = toNoteNumber(this.maxPitch);
+        const min    = toNoteNumber(this.minPitch);
+        const max    = toNoteNumber(this.maxPitch);
         const number = toNoteNumber(pitch) + n;
         // Don't transpose outside the limits of the stave
         return number >= min && number <= max ?
             number :
             undefined ;
+    }
+
+    /**
+    .getPart(pitch)
+    **/
+    getPart(pitch) {
+        return {
+            stemDirection: 'up',
+            tieDirection:  'up'
+        };
     }
 
     /**
@@ -96,29 +138,51 @@ export class Stave {
     getSpelling() {
         return toSpelling.apply(this, arguments);
     }
+
+    yRatioToPitch(y) {
+        const n = floor(y * this.pitches.length);
+        return n < 0 ? this.pitches[0] :
+            n > this.pitches.length - 1 ? this.pitches[this.pitches.length - 1] :
+            this.pitches[n] ;
+    }
 }
 
-Stave.trebleOctaveUp = class TrebleUpStave extends Stave {
+class TrebleUpStave extends Stave {
+    type = 'treble-up';
+    clef = glyphs.trebleUpClef;
     rows = ['C4','D4','E4','F4','G4','A4','B4','C5','D5','E5','F5','G5','A5','B5','C6','D6','E6','F6','G6','A6','B6','C7','D7','E7','F7','G7','A7'];
 }
 
-Stave.treble = class TrebleStave extends Stave {
+class TrebleStave extends Stave {
+    type = 'treble';
+    clef = glyphs.trebleClef;
     rows = ['C3','D3','E3','F3','G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5','E5','F5','G5','A5','B5','C6','D6','E6','F6','G6','A6'];
 }
 
-Stave.trebleOctaveDown = class TrebleDownStave extends Stave {
+class TrebleDownStave extends Stave {
+    type = 'treble-down';
+    clef = glyphs.trebleDownClef;
     rows = ['C2','D2','E2','F2','G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5','E5','F5','G5','A5'];
 }
 
-Stave.tenor = class TenorStave extends Stave {
+class AltoStave extends Stave {
+    type = 'alto';
+    clef = glyphs.altoClef;
     rows = ['D2','E2','F2','G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5','E5','F5','G5','A5','B5'];
 }
 
-Stave.bass = class BassStave extends Stave {
+class BassStave extends Stave {
+    type = 'bass';
+    clef = glyphs.bassClef;
     rows = ['E1','F1','G1','A1','B1','C2','D2','E2','F2','G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5'];
 }
 
-Stave.drum = class DrumStave extends Stave {
+class DrumStave extends Stave {
+    type = 'drum';
+    clef = glyphs.drumClef;
+
+    pitched = false;
+
     rows = ['','','','','','','','pedal','bass2','bass1','floor2','floor1','lowtom','snare','midtom','hightom','ride','hihat','crash1','crash2','splash','','','',''];
 
     #heads = {
@@ -138,6 +202,22 @@ Stave.drum = class DrumStave extends Stave {
         58: glyphs.headTriangleUp, /* Vibraslap */
         59: glyphs.headX,          /* Ride Cymbal 2 */
     };
+
+    get maxPitch() {
+        return this.rows[25];
+    }
+
+    get minLinePitch() {
+        return this.rows[8];
+    }
+
+    get midLinePitch() {
+        return this.rows[12];
+    }
+
+    get maxLinePitch() {
+        return this.rows[16];
+    }
 
     getHead(pitch, dynamic, duration) {
         const number = toNoteNumber(pitch);
@@ -163,10 +243,29 @@ Stave.drum = class DrumStave extends Stave {
             tieDirection:  'up',
             centerRow:     'stave-upper'
         } ;
-    },
+    }
+
+    getSpelling(key, event, transpose) {
+        if (event[1] === 'note') {
+            // Use standard MIDI note names. We don't want any spelling happening
+            // on drum parts.
+            return toNoteName(toNoteNumber(event[2]));
+        }
+
+        return toSpelling(key, event, transpose);
+    }
+
+    yRatioToPitch(y) {
+        const i = floor(y * this.rows.length);
+        const j = i < 4 ? 4 : i > 17 ? 17 : i ;
+        return this.pitches[j];
+    }
 }
 
-Stave.percussion = class PercussionStave extends Stave {
+class PercussionStave extends Stave {
+    type = 'percussion';
+    clef = glyphs.percussionClef;
+
     #heads = {
         37: glyphs.headCircle,     /* Side Stick */
         39: glyphs.headX,          /* Hand Clap */
@@ -185,6 +284,26 @@ Stave.percussion = class PercussionStave extends Stave {
         59: glyphs.headX,          /* Ride Cymbal 2 */
     };
 
+    pitched = false;
+
+    rows = ['','','','','','','','','note','','','','','','','',''];
+
+    get maxPitch() {
+        return this.rows[17];
+    }
+
+    get minLinePitch() {
+        return this.rows[8];
+    }
+
+    get midLinePitch() {
+        return this.rows[8];
+    }
+
+    get maxLinePitch() {
+        return this.rows[8];
+    }
+
     getHead(pitch, dynamic, duration) {
         const number = toNoteNumber(pitch);
         const head   = this.#heads[number] || super.getHead(pitch, dynamic, duration);
@@ -194,4 +313,26 @@ Stave.percussion = class PercussionStave extends Stave {
             // Full note
             head;
     }
+
+    getSpelling(key, event, transpose) {
+        if (event[1] === 'note') {
+            // Use standard MIDI note names. We don't want any spelling happening
+            // on drum parts.
+            return toNoteName(toNoteNumber(event[2]));
+        }
+
+        return toSpelling(key, event, transpose);
+    }
 }
+
+
+// Register staves by type. These are the same string used by the clef attribute,
+// as in <scribe-music clef="type">, and accepted by Stave.create(type).
+
+Stave['treble']      = TrebleStave;
+Stave['treble-up']   = TrebleUpStave;
+Stave['treble-down'] = TrebleDownStave;
+Stave['alto']        = AltoStave;
+Stave['bass']        = BassStave;
+Stave['drum']        = DrumStave;
+Stave['percussion']  = PercussionStave;
