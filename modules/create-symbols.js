@@ -89,26 +89,6 @@ function addStaveRows(n, row) {
     return row;
 }
 
-function subtractStaveRows(stave, r1, r2) {
-    if (stave.getRowDiff) {
-        return stave.getRowDiff(r1, r2);
-    }
-
-    // Calculate diff for diatonic stave
-    const degree1 = r1[0];
-    // TODO Support -ve octave (and double figure octave?) numbers
-    const octave1 = parseInt(r1[r1.length - 1], 10);
-    const degree2 = r2[0];
-    const octave2 = parseInt(r2[r2.length - 1], 10);
-
-    let i1 = lines.indexOf(degree1);
-    let i2 = lines.indexOf(degree2);
-    let n = i2 - i1;
-
-    return n + (octave2 - octave1) * 7;
-}
-
-
 function createBeam(symbols, stave, beam, n) {
     const part = symbols[0].part;
 
@@ -125,12 +105,7 @@ function createBeam(symbols, stave, beam, n) {
     const stemDirection = symbols[beam[0]] && symbols[beam[0]].stemDirection ?
         symbols[beam[0]].stemDirection :
         (beam
-            .map((i) => {
-                const a = stave.getRowDiff(stave.midLinePitch, symbols[i].pitch);
-                const b = subtractStaveRows(stave, stave.centerPitch, symbols[i].pitch);
-console.log(a, b);
-                return a;
-            })
+            .map((i) => stave.getRowDiff(stave.midLinePitch, symbols[i].pitch))
             .reduce((t, u) => t + u, 0) / beam.length) < 0 ?
             'up' :
             'down';
@@ -148,7 +123,6 @@ console.log(a, b);
         i = beam[b];
         head = symbols[i];
         line = stave.getRowDiff(stave.midLinePitch, head.pitch);
-        //line = subtractStaveRows(stave, stave.centerPitch, head.pitch);
 
         head.stemDirection = stemDirection;
         head.tieDirection = stemDirection === 'up' ? 'down' : 'up';
@@ -163,21 +137,7 @@ console.log(a, b);
             avgEndLine += line / Math.floor(beam.length / 2);
         }
 
-        /*if (stem && stem.beat === head.beat) {
-            //let stemLine = subtractStaveRows('B4', head.pitch)
-            //let range =
-            stem.range = stave.getRowDiff(stem.pitch)
-            //stem.range = subtractStaveRows(stave, stem.pitch, head.pitch);
-            stem.pitch = stem.range < 0 ?
-                stem.stemDirection === 'up' ? stem.pitch : head.pitch :
-                stem.stemDirection === 'up' ? head.pitch : stem.pitch;
-        }
-        /*else {
-            stem = assign({}, head, {
-                type: 'stem'
-            });
-            stems.push(stem);
-        }*/
+        // TODO: group stems from notes of same part on same beat
 
         if (head.tie === 'begin') {
             buffer.push(assign({}, head, {
@@ -193,7 +153,6 @@ console.log(a, b);
     let begin    = heads[0];
     let end      = heads[heads.length - 1];
     let endRange = stave.getRowDiff(begin.pitch, end.pitch);
-    //let endRange = subtractStaveRows(stave, begin.pitch, end.pitch);
     let avgRange = avgEndLine - avgBeginLine;
     let range = abs(avgRange) > abs(0.75 * endRange) ?
         0.75 * endRange :
@@ -201,8 +160,8 @@ console.log(a, b);
 
     heads.forEach((head, i) => {
         head.stemHeight = stemDirection === 'down' ?
-            1 + 0.125 * (-range * i / (heads.length - 1) + stave.getRowDiff(begin.pitch, head.pitch)) : //subtractStaveRows(stave, begin.pitch, head.pitch)) :
-            1 + 0.125 * (range * i  / (heads.length - 1) - stave.getRowDiff(begin.pitch, head.pitch)) ; //subtractStaveRows(stave, begin.pitch, head.pitch)) ;
+            1 + 0.125 * (-range * i / (heads.length - 1) + stave.getRowDiff(begin.pitch, head.pitch)) :
+            1 + 0.125 * (range * i  / (heads.length - 1) - stave.getRowDiff(begin.pitch, head.pitch)) ;
     });
 
     // Update heads with info about the beam
@@ -296,7 +255,6 @@ function createSymbols(symbols, bar) {
 
         // Up ledger lines
         let ledgerrows = stave.getRowDiff(stave.maxLinePitch, head.pitch) - 1;
-        //subtractStaveRows(stave, stave.topPitch, head.pitch);
 
         if (ledgerrows > 0) {
             symbols.splice(n++, 0, assign({}, head, {
@@ -308,7 +266,6 @@ function createSymbols(symbols, bar) {
         // Down ledger lines
         else {
             ledgerrows = stave.getRowDiff(head.pitch, stave.minLinePitch) - 1;
-            //subtractStaveRows(bar.stave, head.pitch, bar.stave.bottomPitch);
             if (ledgerrows > 0) {
                 symbols.splice(n++, 0, assign({}, head, {
                     type: 'downledger',
