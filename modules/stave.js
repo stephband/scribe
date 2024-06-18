@@ -108,9 +108,12 @@ export default class Stave {
     .getPart(pitch)
     **/
     getPart(pitch) {
-        return {
+        return this.getRowDiff(this.midLinePitch, pitch) < 0 ? {
             stemDirection: 'up',
             tieDirection:  'up'
+        } : {
+            stemDirection: 'down',
+            tieDirection:  'down'
         };
     }
 
@@ -175,6 +178,26 @@ class BassStave extends Stave {
     type = 'bass';
     clef = glyphs.bassClef;
     rows = ['E1','F1','G1','A1','B1','C2','D2','E2','F2','G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5'];
+}
+
+class PianoStave extends Stave {
+    type = 'piano';
+    clef = glyphs.trebleClef;
+    rows = ['E1','F1','G1','A1','B1','C2','D2','E2','F2','G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5'];
+
+    // TODO: there should be four parts available, soprano alto, tenor bass?
+    getPart(pitch) {
+        // A part is an object of properties assigned to a symbol.
+        // Render anything below Bb3 on the lower part.
+        return /[012]$|[AC-G][b#♭♯𝄫𝄪]*3$/.test(pitch) ? {
+            part:        'lower',
+            centerPitch: 'D3',
+            centerRow:   'stave-lower'
+        } : {
+            centerPitch: 'B4',
+            centerRow:   'stave-upper'
+        } ;
+    }
 }
 
 class DrumStave extends Stave {

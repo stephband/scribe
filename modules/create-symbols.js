@@ -88,7 +88,7 @@ function addStaveRows(n, row) {
 
     return row;
 }
-/*
+
 function subtractStaveRows(stave, r1, r2) {
     if (stave.getRowDiff) {
         return stave.getRowDiff(r1, r2);
@@ -107,7 +107,7 @@ function subtractStaveRows(stave, r1, r2) {
 
     return n + (octave2 - octave1) * 7;
 }
-*/
+
 
 function createBeam(symbols, stave, beam, n) {
     const part = symbols[0].part;
@@ -125,7 +125,12 @@ function createBeam(symbols, stave, beam, n) {
     const stemDirection = symbols[beam[0]] && symbols[beam[0]].stemDirection ?
         symbols[beam[0]].stemDirection :
         (beam
-            .map((i) => stave.getRowDiff(stave.midLinePitch, symbols[i].pitch)) // subtractStaveRows(stave, stave.centerPitch, symbols[i].pitch)
+            .map((i) => {
+                const a = stave.getRowDiff(stave.midLinePitch, symbols[i].pitch);
+                const b = subtractStaveRows(stave, stave.centerPitch, symbols[i].pitch);
+console.log(a, b);
+                return a;
+            })
             .reduce((t, u) => t + u, 0) / beam.length) < 0 ?
             'up' :
             'down';
