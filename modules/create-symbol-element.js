@@ -136,6 +136,9 @@ export default overload(get('type'), {
     }),
 
     beam: (symbol) => create('svg', {
+        // 8th note beams can be rendered directly into the grid. Beams for shorter
+        // durations are rendered as a post process once this SVG is in the DOM and
+        // stem positions can be measured. See beam.js.
         class: `${symbol.direction}-beam beam`,
         viewBox: `0 ${ (symbol.range > 0 ? -symbol.range : 0) - 0.5 } ${ symbol.notes.length - 1 } ${ abs(symbol.range) + 1 }`,
         preserveAspectRatio: "none",

@@ -63,7 +63,6 @@ function createNoteBeams(svg, durations, i, range, duration) {
     }
 }
 
-
 export function renderBeam(svg) {
     const ids       = svg.dataset.events.split(/\s+/);
     const parent    = svg.parentElement;
