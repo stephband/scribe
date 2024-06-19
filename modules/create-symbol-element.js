@@ -4,67 +4,10 @@ import create from '../lib/dom/modules/create.js';
 import * as glyphs from "./glyphs.js";
 import { chordGlyphs } from "./glyphs.js";
 import { rflat, rsharp } from './regexp.js';
+import { identify } from './event.js';
+import { beamThickness } from './beam.js';
 
 const abs = Math.abs;
-
-
-/* Event ids */
-
-const $id = Symbol('scribe-id');
-
-let id = 0;
-
-export function identify(event) {
-    if (event[$id]) return event[$id];
-    event[$id] = (++id + '');
-    return event[$id];
-}
-
-export function findEvent(events, id) {
-    return events.find((event) => (event[$id] === id));
-}
-
-
-/* Beams */
-
-const beamThickness = 1.1;
-
-function renderBeam(range, heads, beam) {
-    return `<path class="beam-path-16th beam-path" d="
-        M${beam[0]},              ${(-range * beam[0] / (heads.length - 1)) - 0.5 * beamThickness}
-        L${beam[beam.length - 1]},${(-range * beam[beam.length - 1] / (heads.length - 1)) - 0.5 * beamThickness}
-        L${beam[beam.length - 1]},${(-range * beam[beam.length - 1] / (heads.length - 1)) + 0.5 * beamThickness}
-        L${beam[0]},              ${(-range * beam[0] / (heads.length - 1)) + 0.5 * beamThickness}
-    Z"></path>`;
-}
-
-function create16thNoteBeams(heads, range) {
-    const durations = heads.map(get('duration'));
-    let html = '';
-    let n = -1;
-    let beam;
-
-    while (durations[++n]) {
-        if (durations[n] < 0.5 && durations[n].toFixed(2) !== '0.33') {
-            // Push to existing beam
-            if (beam) { beam.push(n); }
-            // Or start new beam
-            else { beam = [n]; }
-        }
-        // Render beam
-        else if (beam) {
-            html += renderBeam(range, heads, beam);
-            beam = undefined;
-        }
-    }
-
-    // Render beam
-    if (beam) {
-        html += renderBeam(range, heads, beam);
-    }
-
-    return html;
-}
 
 const chordParts = {
     'flat':  `<span class="chord-flat">${ glyphs.acciFlat }</span>`,
@@ -177,36 +120,33 @@ export default overload(get('type'), {
         }
     }),
 
-    note: (symbol) => create('span', {
+    note: (symbol) => create('data', {
         class: `${ symbol.stemDirection === 'up' ? 'up-note' : 'down-note' } note`,
         style: symbol.stemHeight && `--stem-height: ${ symbol.stemHeight };`,
         html:  symbol.stave.getNoteHTML(symbol.pitch, symbol.dynamic, symbol.duration),
+        //value: symbol.event.join(' '),
         data: {
             beat:     symbol.beat + 1,
             pitch:    symbol.pitch,
             duration: symbol.duration,
             part:     symbol.part,
-            beam:     symbol.beam && symbol.beam.map(identify).join(' '),
+            beam:     symbol.beam && identify(symbol.beam[0]),
             event:    identify(symbol.event)
         }
     }),
 
     beam: (symbol) => create('svg', {
-        // Beam is sloped down
-        class: `${symbol.updown}-beam beam`,
-        viewBox: `0 ${ (symbol.range > 0 ? -symbol.range : 0) - 0.5 } ${ symbol.heads.length - 1 } ${ abs(symbol.range) + 1 }`,
+        class: `${symbol.direction}-beam beam`,
+        viewBox: `0 ${ (symbol.range > 0 ? -symbol.range : 0) - 0.5 } ${ symbol.notes.length - 1 } ${ abs(symbol.range) + 1 }`,
         preserveAspectRatio: "none",
-        /*style: 'grid-row-end: span ' + Math.ceil(1 - symbol.range),*/
         style: `height: ${ (abs(symbol.range) + 1) * 0.125 }em; align-self: ${ symbol.range > 0 ? 'end' : 'start' };`,
-        html: `
-            <path class="beam-path" d="M0,${ -0.5 * beamThickness } L${ symbol.heads.length - 1 },${ -symbol.range - 0.5 * beamThickness } L${ symbol.heads.length - 1 },${ -symbol.range + 0.5 * beamThickness } L0,${ 0.5 * beamThickness } Z"></path>
-            ${ create16thNoteBeams(symbol.heads, symbol.range) }
-        `,
+        html: `<path class="beam-path" d="M0,${ -0.5 * beamThickness } L${ symbol.notes.length - 1 },${ -symbol.range - 0.5 * beamThickness } L${ symbol.notes.length - 1 },${ -symbol.range + 0.5 * beamThickness } L0,${ 0.5 * beamThickness } Z"></path>`,
         data: {
             beat:     symbol.beat + 1,
             pitch:    symbol.pitch,
             duration: symbol.duration,
-            part:     symbol.part
+            part:     symbol.part,
+            events:   symbol.events.map(identify).join(' ')
         }
     }),
 

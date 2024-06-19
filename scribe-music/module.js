@@ -2,12 +2,14 @@
 import Signal            from '../lib/fn/modules/signal.js';
 import create            from '../lib/dom/modules/create.js';
 import element, { getInternals } from '../lib/dom/modules/element.js';
+import events            from '../lib/dom/modules/events.js';
 import { toRootName, toRootNumber } from '../lib/midi/modules/note.js';
 import createSymbols     from '../modules/create-symbols.js';
 import requestData       from '../modules/request-data.js';
 import parseSource       from '../modules/parse.js';
 import { timesigToMeter, meterToTimesig } from '../modules/timesig.js';
 import Stave             from '../modules/stave.js';
+import { renderBeam }    from '../modules/beam.js';
 //import createElement     from '../modules/create-element.js';
 import createBarElements from '../modules/create-bar-elements.js';
 //import svgdefs           from '../modules/svgdefs.js';
@@ -21,6 +23,17 @@ const shadowCSSUrl = import.meta.url.replace(/\/[^\/]*\.js/, '/shadow.css');
 const stylesheet = Signal.of();
 const stylefns   = [];
 stylesheet.each((url) => stylefns.forEach((fn) => fn(url)));
+
+/* Element resizing */
+const resizes = new ResizeObserver((entries) => {
+    for (const entry of entries) {
+        // Render beams
+        getInternals(entry.target)
+        .shadowRoot
+        .querySelectorAll('.beam')
+        .forEach(renderBeam);
+    }
+});
 
 
 /* Register <scribe-music> */
@@ -73,13 +86,23 @@ export default define(element('scribe-music', {
             // Clear the shadow DOM of bars and put new elements in it
             shadow.querySelectorAll('.bar').forEach((element) => element.remove());
             shadow.append.apply(shadow, elements);
+
+            // Render beams
+            shadow.querySelectorAll('.beam').forEach(renderBeam);
         });
+
+        // Update beams on load and resize
+        resizes.observe(this, { box: 'content-box' });
 
         // If there is no src use text content as data
         if (!this.src) {
             const source = this.textContent.trim();
             internals.data.value = parseSource(this.type, source);
         }
+    },
+
+    disconnect: function() {
+        resizes.unobserve(this);
     }
 }, {
     clef: {

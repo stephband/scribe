@@ -30,6 +30,14 @@
     grid-row: 1;
 }
 
+.up-note > * {
+    justify-self: end;
+}
+
+.down-note > * {
+    justify-self: start;
+}
+
 .note > .pre {
     margin-left: -0.1em;
 }
@@ -40,6 +48,7 @@
 }
 
 .note > .head {
+    justify-self: end;
     position: relative;
 }
 

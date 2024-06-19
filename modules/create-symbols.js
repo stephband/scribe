@@ -170,15 +170,17 @@ function createBeam(symbols, stave, beam, n) {
 
 
     // Put the beam in front of the first head (??)
-    symbols.splice(i, 0, assign({}, begin, {
-        type:     'beam',
-        beat:     begin.beat,
-        duration: end.beat - begin.beat,
-        //pitch:  begin.pitch,
-        range:    range,
-        updown:   stemDirection,
-        heads:    heads
-    }));
+    symbols.splice(i, 0, {
+        type:      'beam',
+        beat:      begin.beat,
+        pitch:     begin.pitch,
+        part:      begin.part,
+        duration:  end.beat - begin.beat,
+        range:     range,
+        direction: stemDirection,
+        notes:     heads,
+        events:    begin.beam
+    });
 
     symbols.splice(i, 0, ...buffer);
 

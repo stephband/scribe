@@ -13,7 +13,7 @@ import { toNoteName, toNoteNumber } from '../lib/midi/modules/note.js';
 
 import createSymbols     from '../modules/create-symbols.js';
 import createBarElements from '../modules/create-bar-elements.js';
-import { identify, findEvent } from '../modules/create-symbol-element.js';
+import { identify, find } from '../modules/event.js';
 import { timesigToMeter } from '../modules/timesig.js';
 
 import isTransposeable from '../modules/event/is-transposeable.js';
@@ -464,7 +464,7 @@ events({ type: 'pointerdown', device: 'mouse pen touch' }, document)
     '[data-event]': (head, e) => {
         // Select head
         const id    = head.dataset.event;
-        const event = findEvent(sequence.events, id);
+        const event = find(sequence.events, id);
 
         // If head is in selection do nothing
         if (selection.includes(event)) return;
@@ -483,7 +483,7 @@ events('click', document)
     '.clef[data-event]': (button, e) => {
         const dialog  = document.getElementById('clef-dialog');
         //const eventId = button.dataset.eventId;
-        //const event   = findEvent(sequence.events, eventId) || defaultClef;
+        //const event   = find(sequence.events, eventId) || defaultClef;
         const closes  = events('close', dialog)
             .each((e) => {
                 closes.stop();
@@ -500,7 +500,7 @@ events('click', document)
     '.keysig[data-event]': (button, e) => {
         const dialog  = document.getElementById('clef-dialog');
         const eventId = button.dataset.event;
-        const event   = findEvent(sequence.events, eventId) || createEvent(0, 'key', 'C');
+        const event   = find(sequence.events, eventId) || createEvent(0, 'key', 'C');
         const closes  = events('close', dialog)
             .each((e) => {
                 closes.stop();
@@ -516,7 +516,7 @@ events('click', document)
     '.timesig[data-event]': (button, e) => {
         const dialog  = document.getElementById('timesig-dialog');
         const eventId = button.dataset.event;
-        const event   = findEvent(sequence.events, eventId) || createEvent(0, 'meter', 4, 1);
+        const event   = find(sequence.events, eventId) || createEvent(0, 'meter', 4, 1);
         const closes  = events('close', dialog)
             .each((e) => {
                 closes.stop();
