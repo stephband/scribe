@@ -379,29 +379,9 @@ class DrumStave extends Stave {
     }
 }
 
-class PercussionStave extends Stave {
+class PercussionStave extends DrumStave {
     type = 'percussion';
     clef = glyphs.percussionClef;
-
-    #heads = {
-        37: glyphs.headCircle,     /* Side Stick */
-        39: glyphs.headX,          /* Hand Clap */
-        42: glyphs.headX,          /* Closed Hi-Hat */
-        44: glyphs.headX,          /* Pedal Hi-Hat */
-        46: glyphs.headCircleX,    /* Open Hi-Hat */
-        49: glyphs.headCircleX,    /* Crash Cymbal 1 */
-        51: glyphs.headX,          /* Ride Cymbal 1 */
-        52: glyphs.headCircleX,    /* Chinese Cymbal */
-        53: glyphs.headX,          /* Ride Bell */
-        54: glyphs.headX,          /* Tambourine */
-        55: glyphs.headCircleX,    /* Splash Cymbal */
-        56: glyphs.headTriangleUp, /* Cowbell */
-        57: glyphs.headCircleX,    /* Crash Symbol 2 */
-        58: glyphs.headTriangleUp, /* Vibraslap */
-        59: glyphs.headX           /* Ride Cymbal 2 */
-    };
-
-    pitched = false;
 
     rows = ['','','','','','','','','note','','','','','','','',''];
 
@@ -421,28 +401,20 @@ class PercussionStave extends Stave {
         return this.rows[8];
     }
 
-    getNoteHTML(pitch, dynamic, duration) {
-        const number = toNoteNumber(pitch);
-        const head   = this.#heads[number] || super.getNoteHTML(pitch, dynamic, duration);
-        // Ghost note gets brackets
-        return dynamic < 0.02 ?
-            glyphs.headBracketLeft + `<span class="head">${ head }</span>` + glyphs.headBracketRight :
-            `<span class="head">${ head }</span>`;
+    getPart(pitch) {
+        // Stem direction by drum or cymbal ??
+        return [35, 36, 37, 38, 40, 41, 43, 44, 45, 47, 50].includes(toNoteNumber(pitch)) ? {
+            stemDirection: 'down',
+            tieDirection:  'down'
+        } : {
+            stemDirection: 'up',
+            tieDirection:  'up'
+        } ;
     }
 
     getRowDiff(pitch1, pitch2) {
         // All notes display on one line
         return 0;
-    }
-
-    getSpelling(key, event, transpose) {
-        if (event[1] === 'note') {
-            // Use standard MIDI note names. We don't want any spelling happening
-            // on drum parts.
-            return toNoteName(toNoteNumber(event[2]));
-        }
-
-        return toSpelling(key, event, transpose);
     }
 }
 
