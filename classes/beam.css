@@ -7,10 +7,18 @@
     fill: black;
 }
 
-.up-beam > .beam-path-16th {
+.up-beam > .beam-path-16 {
     transform: translateY(1.6666667px);
 }
 
-.down-beam > .beam-path-16th {
+.up-beam > .beam-path-32 {
+    transform: translateY(3.3333333px);
+}
+
+.down-beam > .beam-path-16 {
     transform: translateY(-1.6666667px);
+}
+
+.down-beam > .beam-path-32 {
+    transform: translateY(-3.3333333px);
 }

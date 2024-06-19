@@ -9,22 +9,30 @@ function getDataDuration(note) {
     return parseFloat(note.dataset.duration);
 }
 
-function renderPathData(range, notes, beam) {
-    return `M${beam[0]},              ${(-range * beam[0] / (notes.length - 1)) - 0.5 * beamThickness}
-        L${beam[beam.length - 1]},${(-range * beam[beam.length - 1] / (notes.length - 1)) - 0.5 * beamThickness}
-        L${beam[beam.length - 1]},${(-range * beam[beam.length - 1] / (notes.length - 1)) + 0.5 * beamThickness}
-        L${beam[0]},              ${(-range * beam[0] / (notes.length - 1)) + 0.5 * beamThickness}
+function removeBeamPaths(svg) {
+    const childNodes = svg.childNodes;
+    while (childNodes.length > 1) {
+        svg.removeChild(svg.lastChild);
+    }
+}
+
+function renderPathData(range, notesLength, beam) {
+    return `M${beam[0]}, ${ (-range * beam[0] / (notesLength - 1)) - 0.5 * beamThickness }
+        L${beam[beam.length - 1]},${ (-range * beam[beam.length - 1] / (notesLength - 1)) - 0.5 * beamThickness }
+        L${beam[beam.length - 1]},${ (-range * beam[beam.length - 1] / (notesLength - 1)) + 0.5 * beamThickness }
+        L${beam[0]}, ${ (-range * beam[0] / (notesLength - 1)) + 0.5 * beamThickness }
         Z`;
 }
 
-function create16thNoteBeams(svg, notes, range) {
-    const durations = notes.map(getDataDuration);
-    let html = '';
-    let n = -1;
+function createNoteBeams(svg, durations, i, range, duration) {
+    // Don't render anything shorter than 32nd note beams
+    if (duration < 0.125) return;
+
+    let n = i - 1;
     let beam;
 
     while (durations[++n]) {
-        if (durations[n] < 0.5 && durations[n].toFixed(2) !== '0.33') {
+        if (durations[n] <= duration) {
             // Push to existing beam
             if (beam) { beam.push(n); }
             // Or start new beam
@@ -33,9 +41,12 @@ function create16thNoteBeams(svg, notes, range) {
         // Render beam
         else if (beam) {
             svg.appendChild(create('path', {
-                class: 'beam-path-16th beam-path',
-                d: renderPathData(range, notes, beam)
+                // Remember duration is the duration of the beam above this one
+                class: `beam-path-${ 4 / duration } beam-path`,
+                d: renderPathData(range, durations.length, beam)
             }));
+
+            createNoteBeams(svg, durations, beam[0], range, duration / 2);
             beam = undefined;
         }
     }
@@ -43,26 +54,26 @@ function create16thNoteBeams(svg, notes, range) {
     // Render beam
     if (beam) {
         svg.appendChild(create('path', {
-            class: 'beam-path-16th beam-path',
-            d: renderPathData(range, notes, beam)
+            class: `beam-path-${ 4 / duration } beam-path`,
+            d: renderPathData(range, durations.length, beam)
         }));
-    }
 
-    return html;
+        createNoteBeams(svg, durations, beam[0], range, duration / 2);
+        beam = undefined;
+    }
 }
 
 
 export function renderBeam(svg) {
-    const ids    = svg.dataset.events.split(/\s+/);
-    const parent = svg.parentElement;
-    const notes  = ids.map((id) => parent.querySelector('.note[data-event="' + id + '"]'));
-    const box = svg.viewBox.baseVal;
+    const ids       = svg.dataset.events.split(/\s+/);
+    const parent    = svg.parentElement;
+    const notes     = ids.map((id) => parent.querySelector('.note[data-event="' + id + '"]'));
+    const durations = notes.map(getDataDuration);
+    const box       = svg.viewBox.baseVal;
     const range =
         box.y < -0.5 ? box.y + 0.5 :
         box.height - 1;
-    const html = create16thNoteBeams(svg, notes, -range);
 
-    svg.append(html);
-
-    //console.log(html);
+    removeBeamPaths(svg);
+    createNoteBeams(svg, durations, 0, -range, 0.25);
 }
