@@ -41,15 +41,16 @@ export default class Stave {
     rows = nothing;
 
     /**
-    .getHead(pitch, dynamic, duration)
-    Get the head used for a given `pitch`, `dynamic` and `duration`. For normal
-    chromatic staves only `duration` really matters, but percussion staves may
-    replace heads based on pitch and dynamics. Returns a string that (in most
-    cases) contains a single unicode character.
+    .getNoteHTML(pitch, dynamic, duration)
+    Get the HTML content used for a note of given `pitch`, `dynamic` and
+    `duration`. For normal chromatic staves only `duration` really matters, but
+    percussion staves may replace heads based on pitch and dynamics.
     **/
-    getHead(pitch, dynamic, duration) {
+
+    getNoteHTML(pitch, dynamic, duration) {
+        const head =
             // Semibreve
-        return duration >= 4 ? glyphs.head4 :
+            duration >= 4 ? glyphs.head4 :
             // Triplet semibreve
             Math.fround(duration) === Math.fround(2.666666667) ? glyphs.head4 :
             // Minim
@@ -58,6 +59,8 @@ export default class Stave {
             Math.fround(duration) === Math.fround(1.333333333) ? glyphs.head2 :
             // Everything else
             glyphs.head1 ;
+
+        return `<span class="head">${ head }</span>`;
     }
 
     /**
@@ -322,14 +325,14 @@ class DrumStave extends Stave {
         return this.rows[16];
     }
 
-    getHead(pitch, dynamic, duration) {
+    getNoteHTML(pitch, dynamic, duration) {
         const number = toNoteNumber(pitch);
-        const head   = this.#heads[number] || super.getHead(pitch, dynamic, duration);
+        const head   = this.#heads[number] || super.getNoteHTML(pitch, dynamic, duration);
+
+        // Ghost note gets brackets
         return dynamic < 0.02 ?
-            // Ghost note gets brackets
-            glyphs.headBracketLeft + head + glyphs.headBracketRight :
-            // Full note
-            head;
+            glyphs.headBracketLeft + `<span class="head">${ head }</span>` + glyphs.headBracketRight :
+            `<span class="head">${ head }</span>`;
     }
 
     getPart(pitch) {
@@ -418,14 +421,13 @@ class PercussionStave extends Stave {
         return this.rows[8];
     }
 
-    getHead(pitch, dynamic, duration) {
+    getNoteHTML(pitch, dynamic, duration) {
         const number = toNoteNumber(pitch);
-        const head   = this.#heads[number] || super.getHead(pitch, dynamic, duration);
+        const head   = this.#heads[number] || super.getNoteHTML(pitch, dynamic, duration);
+        // Ghost note gets brackets
         return dynamic < 0.02 ?
-            // Ghost note gets brackets
-            glyphs.headBracketLeft + head + glyphs.headBracketRight :
-            // Full note
-            head;
+            glyphs.headBracketLeft + `<span class="head">${ head }</span>` + glyphs.headBracketRight :
+            `<span class="head">${ head }</span>`;
     }
 
     getRowDiff(pitch1, pitch2) {

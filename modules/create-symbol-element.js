@@ -177,10 +177,10 @@ export default overload(get('type'), {
         }
     }),
 
-    head: (symbol) => create('span', {
+    note: (symbol) => create('span', {
         class: `${ symbol.stemDirection === 'up' ? 'up-note' : 'down-note' } note`,
         style: symbol.stemHeight && `--stem-height: ${ symbol.stemHeight };`,
-        html:  `<span class="head">${ symbol.head || glyphs['head' + (symbol.duration + '').replace('.', '')] || glyphs['head1'] }</span>`,
+        html:  symbol.stave.getNoteHTML(symbol.pitch, symbol.dynamic, symbol.duration),
         data: {
             beat:     symbol.beat + 1,
             pitch:    symbol.pitch,

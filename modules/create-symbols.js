@@ -212,7 +212,7 @@ function createSymbols(symbols, bar) {
         endBeat = head.beat + head.duration;
 
         // We are only interested in notes
-        if (head.type !== 'head') continue;
+        if (head.type !== 'note') continue;
 
         // Rest
         // Insert rest if head beat is greater than beat
@@ -342,7 +342,8 @@ function createSymbols(symbols, bar) {
             beat,
             duration: bar.duration - beat,
             pitch:    '',
-            part:     part
+            part:     part,
+            stave
         });
     }
 
@@ -403,7 +404,8 @@ function createBar(beat, stave, key, meter, tieheads) {
             beat:        0,
             numerator:   meter[2] / meter[3],
             denominator: 4 / meter[3],
-            event:       meter
+            event:       meter,
+            stave
         });
     }
 
@@ -421,18 +423,18 @@ function createBar(beat, stave, key, meter, tieheads) {
             bar.symbols.push(assign({}, head, {
                 beat: 0,
                 duration: bar.duration,
-                head: stave.getHead && stave.getHead(head.pitch, event[3], bar.duration),
-                tie: 'middle'
-            }, stave.getPart && stave.getPart(head.pitch)));
+                tie: 'middle',
+                stave
+            }, stave.getPart(head.pitch)));
         }
         else {
             // Event ends in this bar
             bar.symbols.push(assign({}, head, {
                 beat: 0,
                 duration,
-                head: stave.getHead && stave.getHead(head.pitch, event[3], duration),
-                tie: 'end'
-            }, stave.getPart && stave.getPart(head.pitch)));
+                tie:  'end',
+                stave
+            }, stave.getPart(head.pitch)));
 
             // Remove event from tieheads, as it has ended
             tieheads.splice(m, 1);
@@ -534,14 +536,15 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
         if (event[1] === 'note') {
             let pitch = stave.getSpelling(key, event, transpose);
             let head = assign({
-                type: 'head',
+                type: 'note',
                 beat,
                 duration,
+                dynamic: event[3],
                 pitch,
                 transpose,
-                head: stave.getHead(pitch, event[3], duration),
-                event: event
-            }, stave.getPart && stave.getPart(pitch));
+                event,
+                stave
+            }, stave.getPart(pitch));
 
             // Stick it in symbols
             bar.symbols.push(head);
@@ -561,7 +564,8 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
                 // value: stave.getSpelling(key, event, transpose) + event[3],
                 root: stave.getSpelling(key, event, transpose),
                 extension: event[3],
-                event: event
+                event,
+                stave
             });
         }
         else {
@@ -570,7 +574,8 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
                 beat,
                 duration,
                 value: event[2],
-                event: event
+                event,
+                stave
             });
         }
     }
