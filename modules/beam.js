@@ -1,5 +1,6 @@
 
 import create from '../lib/dom/modules/create.js';
+import rect   from '../lib/dom/modules/rect.js';
 
 /* Beams */
 
@@ -16,15 +17,15 @@ function removeBeamPaths(svg) {
     }
 }
 
-function renderPathData(range, notesLength, beam) {
-    return `M${beam[0]}, ${ (-range * beam[0] / (notesLength - 1)) - 0.5 * beamThickness }
-        L${beam[beam.length - 1]},${ (-range * beam[beam.length - 1] / (notesLength - 1)) - 0.5 * beamThickness }
-        L${beam[beam.length - 1]},${ (-range * beam[beam.length - 1] / (notesLength - 1)) + 0.5 * beamThickness }
-        L${beam[0]}, ${ (-range * beam[0] / (notesLength - 1)) + 0.5 * beamThickness }
+function renderPathData(range, xs, beam) {
+    return `M${xs[beam[0]]}, ${ -range * xs[beam[0]] - 0.5 * beamThickness }
+        L${xs[beam[beam.length - 1]]},${ -range * xs[beam[beam.length - 1]] - 0.5 * beamThickness }
+        L${xs[beam[beam.length - 1]]},${ -range * xs[beam[beam.length - 1]] + 0.5 * beamThickness }
+        L${xs[beam[0]]}, ${ -range * xs[beam[0]] + 0.5 * beamThickness }
         Z`;
 }
 
-function createNoteBeams(svg, durations, i, range, duration) {
+function createBeamPaths(svg, durations, xs, i, range, duration) {
     // Don't render anything shorter than 32nd note beams
     if (duration < 0.125) return;
 
@@ -43,10 +44,10 @@ function createNoteBeams(svg, durations, i, range, duration) {
             svg.appendChild(create('path', {
                 // Remember duration is the duration of the beam above this one
                 class: `beam-path-${ 4 / duration } beam-path`,
-                d: renderPathData(range, durations.length, beam)
+                d: renderPathData(range, xs, beam)
             }));
 
-            createNoteBeams(svg, durations, beam[0], range, duration / 2);
+            createBeamPaths(svg, durations, xs, beam[0], range, duration / 2);
             beam = undefined;
         }
     }
@@ -55,10 +56,10 @@ function createNoteBeams(svg, durations, i, range, duration) {
     if (beam) {
         svg.appendChild(create('path', {
             class: `beam-path-${ 4 / duration } beam-path`,
-            d: renderPathData(range, durations.length, beam)
+            d: renderPathData(range, xs, beam)
         }));
 
-        createNoteBeams(svg, durations, beam[0], range, duration / 2);
+        createBeamPaths(svg, durations, xs, beam[0], range, duration / 2);
         beam = undefined;
     }
 }
@@ -73,6 +74,11 @@ export function renderBeam(svg) {
         box.y < -0.5 ? box.y + 0.5 :
         box.height - 1;
 
+    const boxes  = notes.map(rect);
+    const firstX = boxes[0].x;
+    const lastX  = boxes[boxes.length - 1].x;
+    const xs     = boxes.map((box) => (box.x - firstX) / (lastX - firstX));
+
     removeBeamPaths(svg);
-    createNoteBeams(svg, durations, 0, -range, 0.25);
+    createBeamPaths(svg, durations, xs, 0, -range, 0.25);
 }

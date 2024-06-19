@@ -140,10 +140,10 @@ export default overload(get('type'), {
         // durations are rendered as a post process once this SVG is in the DOM and
         // stem positions can be measured. See beam.js.
         class: `${symbol.direction}-beam beam`,
-        viewBox: `0 ${ (symbol.range > 0 ? -symbol.range : 0) - 0.5 } ${ symbol.notes.length - 1 } ${ abs(symbol.range) + 1 }`,
+        viewBox: `0 ${ (symbol.range > 0 ? -symbol.range : 0) - 0.5 } 1 ${ abs(symbol.range) + 1 }`,
         preserveAspectRatio: "none",
         style: `height: ${ (abs(symbol.range) + 1) * 0.125 }em; align-self: ${ symbol.range > 0 ? 'end' : 'start' };`,
-        html: `<path class="beam-path" d="M0,${ -0.5 * beamThickness } L${ symbol.notes.length - 1 },${ -symbol.range - 0.5 * beamThickness } L${ symbol.notes.length - 1 },${ -symbol.range + 0.5 * beamThickness } L0,${ 0.5 * beamThickness } Z"></path>`,
+        html: `<path class="beam-path" d="M0,${ -0.5 * beamThickness } L1,${ -symbol.range - 0.5 * beamThickness } L1,${ -symbol.range + 0.5 * beamThickness } L0,${ 0.5 * beamThickness } Z"></path>`,
         data: {
             beat:     symbol.beat + 1,
             pitch:    symbol.pitch,
