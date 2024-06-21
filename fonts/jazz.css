@@ -28,7 +28,7 @@
     --stem-align-down: -0.04;
 }
 
-.scribe-jazz .x-head {
+.scribe-jazz .head[data-glyph="headX"] {
     --stem-align-up:   0.14;
     --stem-align-down: -0.12;
 }

@@ -41,9 +41,9 @@
     --stem-align-down: -0.04;
 }
 
-:host .x-head {
-    --stem-align-up:   0.14;
-    --stem-align-down: -0.12;
+:host .head[data-glyph="headX"] {
+    --stem-align-up:   0.18;
+    --stem-align-down: -0.14;
 }
 
 

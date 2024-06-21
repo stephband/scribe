@@ -48,19 +48,19 @@ export default class Stave {
     **/
 
     getNoteHTML(pitch, dynamic, duration) {
-        const head =
+        const name =
             // Semibreve
-            duration >= 4 ? glyphs.head4 :
+            duration >= 4 ? 'head4' :
             // Triplet semibreve
-            Math.fround(duration) === Math.fround(2.666666667) ? glyphs.head4 :
+            Math.fround(duration) === Math.fround(2.666666667) ? 'head4' :
             // Minim
-            duration >= 2 ? glyphs.head2 :
+            duration >= 2 ? 'head2' :
             // Triplet minim
-            Math.fround(duration) === Math.fround(1.333333333) ? glyphs.head2 :
+            Math.fround(duration) === Math.fround(1.333333333) ? 'head2' :
             // Everything else
-            glyphs.head1 ;
+            'head1' ;
 
-        return `<span class="head">${ head }</span>`;
+        return `<span class="head" data-glyph="${ name }">${ glyphs[name] }</span>`;
     }
 
     /**
@@ -226,23 +226,23 @@ class DrumStave extends Stave {
         'splash-cymbal',
     '','','',''];
 
-    #heads = {
-        31: glyphs.headX,          // Sticks
-        37: glyphs.headCircle,     // Side Stick
-        39: glyphs.headX,          // Hand Clap
-        42: glyphs.headX,          // Closed Hi-Hat
-        44: glyphs.headX,          // Pedal Hi-Hat
-        46: glyphs.headCircleX,    // Open Hi-Hat
-        49: glyphs.headCircleX,    // Crash Cymbal 1
-        51: glyphs.headX,          // Ride Cymbal 1
-        52: glyphs.headCircleX,    // Chinese Cymbal
-        53: glyphs.headDiamond,    // Ride Bell
-        54: glyphs.headX,          // Tambourine
-        55: glyphs.headX,          // Splash Cymbal
-        56: glyphs.headTriangleUp, // Cowbell
-        57: glyphs.headCircleX,    // Crash Symbol 2
-        58: glyphs.headTriangleUp, // Vibraslap
-        59: glyphs.headX           // Ride Cymbal 2
+    #headnames = {
+        31: 'headX',          // Sticks
+        37: 'headCircle',     // Side Stick
+        39: 'headX',          // Hand Clap
+        42: 'headX',          // Closed Hi-Hat
+        44: 'headX',          // Pedal Hi-Hat
+        46: 'headCircleX',    // Open Hi-Hat
+        49: 'headCircleX',    // Crash Cymbal 1
+        51: 'headX',          // Ride Cymbal 1
+        52: 'headCircleX',    // Chinese Cymbal
+        53: 'headDiamond',    // Ride Bell
+        54: 'headX',          // Tambourine
+        55: 'headX',          // Splash Cymbal
+        56: 'headTriangleUp', // Cowbell
+        57: 'headCircleX',    // Crash Symbol 2
+        58: 'headTriangleUp', // Vibraslap
+        59: 'headX'           // Ride Cymbal 2
     };
 
     #rows = {
@@ -327,12 +327,16 @@ class DrumStave extends Stave {
 
     getNoteHTML(pitch, dynamic, duration) {
         const number = toNoteNumber(pitch);
-        const head   = this.#heads[number] || super.getNoteHTML(pitch, dynamic, duration);
+        const name   = this.#headnames[number];
+        const head   = glyphs[name];
+        const html   = name ?
+            `<span class="head" data-glyph="${ name }">${ head }</span>` :
+             super.getNoteHTML(pitch, dynamic, duration) ;
 
         // Ghost note gets brackets
         return dynamic < 0.02 ?
-            glyphs.headBracketLeft + `<span class="head">${ head }</span>` + glyphs.headBracketRight :
-            `<span class="head">${ head }</span>`;
+            glyphs.headBracketLeft + html + glyphs.headBracketRight :
+            html ;
     }
 
     getPart(pitch) {

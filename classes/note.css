@@ -1,7 +1,10 @@
 
 :root,
 :host {
-    --stem-height:  1;
+    /* Width of head of duration 1 */
+    --head-width:      0.3375;
+    /* Default height of stem. Overridden note-by-note where notes are beamed */
+    --stem-height:     1;
     /* According to spec, a stems registration x=0 should be the centre of
        the stem. And its advance width may not correspond to its thickness
        at all, so we cannot use it's right-hand edge as any kind of
@@ -9,10 +12,16 @@
        frustratingly, guess at) its thickness to draw it in the correct
        position... and this changes from font to font. This is the thickness
        for Jazz font (by eye). */
-    --stem-width:  0.033;
-    /* y position of points where stem joins note head */
+    --stem-width:      0.033;
+    /* Alignment of root of stem relative to baseline - y position of point
+       where stem joins note head */
     --stem-align-up:   0.03;
-    --stem-align-down: 0.04;
+    --stem-align-down: -0.04;
+}
+
+.head[data-glyph="headX"] {
+    --stem-align-up:   0.18;
+    --stem-align-down: -0.14;
 }
 
 .note {
@@ -20,6 +29,7 @@
     line-height: 0.25em;
     white-space: nowrap;
     grid-auto-columns: min-content min-content;
+    grid-auto-columns: calc(1em * var(--head-width)) min-content;
     grid-auto-rows: 0.25em;
     grid-auto-flow: column;
     height: 0.25em;
@@ -48,8 +58,12 @@
 }
 
 .note > .head {
-    justify-self: end;
     position: relative;
+}
+
+.note > .head[data-glyph="headX"] {
+    width: 100%;
+    text-align: center;
 }
 
 
@@ -76,7 +90,7 @@ Stems
     transform:
         /* Turn it upside down */
         rotate(180deg)
-        /* Move it away from the grid line by half a stem thickness, and down by stem-start */
+        /* Move it away from the grid line by half a stem thickness, and down by stem-align-down */
         translate(calc(-0.5em * var(--stem-width)), calc(1em * var(--stem-align-down)))
         /* Make it stem-size big */
         scale(1, calc(var(--stem-height) + var(--stem-align-down)));
