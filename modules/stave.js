@@ -38,8 +38,9 @@ class BassStave extends Stave {
 }
 
 
-// Register staves by type. These are the same string used by the clef attribute,
-// as in <scribe-music clef="type">, and accepted by Stave.create(type).
+// Register staves by type. Types are the same string used by the clef attribute,
+// as in <scribe-music clef="treble">. Create a stave by type with:
+// Stave.create(type);
 
 Stave['treble']      = TrebleStave;
 Stave['treble-up']   = TrebleUpStave;
@@ -49,5 +50,12 @@ Stave['bass']        = BassStave;
 Stave['piano']       = PianoStave;
 Stave['drum']        = DrumStave;
 Stave['percussion']  = PercussionStave;
+
+
+/**
+Stave.create(type)
+Create a stave object by type.
+**/
+Stave.create = (type) => new Stave[type]();
 
 export default Stave;

@@ -11,14 +11,6 @@ const assign = Object.assign;
 /* Stave */
 
 export default class Stave {
-    /**
-    Stave.create(type)
-    Create a stave object by type.
-    **/
-    static create(type) {
-        return new Stave[type]();
-    }
-
     constructor() {}
 
     /**
