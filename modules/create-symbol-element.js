@@ -56,14 +56,16 @@ export default overload(get('type'), {
         }
     }),
 
-    timesig: (symbol) => create('span', {
-        class: "timesig",
-        html: `<sup>${ glyphs['timeSig' + symbol.numerator] }</sup>
-            <sub>${ glyphs['timeSig' + symbol.denominator] }</sub>`,
-        data: {
-            event: identify(symbol.event)
-        }
-    }),
+    timesig: (symbol) => symbol.stave.getTimeSigHTML ?
+        create('fragment', symbol.stave.getTimeSigHTML(symbol.numerator, symbol.denominator, identify(symbol.event))) :
+        create('span', {
+            class: "timesig",
+            html: `<sup>${ glyphs['timeSig' + symbol.numerator] }</sup>
+                <sub>${ glyphs['timeSig' + symbol.denominator] }</sub>`,
+            data: {
+                event: identify(symbol.event)
+            }
+        }),
 
     lyric: (symbol) => create('span', {
         class: "lyric",

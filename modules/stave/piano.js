@@ -24,6 +24,17 @@ export default class PianoStave extends Stave {
         }</span>`;
     }
 
+    getTimeSigHTML(numerator, denominator, eventId) {
+        return `<span class="timesig" data-event="${ eventId }" data-part="upper">
+            <sup>${ glyphs['timeSig' + numerator] }</sup>
+            <sub>${ glyphs['timeSig' + denominator] }</sub>
+        </span>
+        <span class="timesig" data-event="${ eventId }" data-part="lower">
+            <sup>${ glyphs['timeSig' + numerator] }</sup>
+            <sub>${ glyphs['timeSig' + denominator] }</sub>
+        </span>`;
+    }
+
     // TODO: there should be four parts available, soprano alto, tenor bass?
     getPart(pitch) {
         // A part is an object of properties assigned to a symbol.
