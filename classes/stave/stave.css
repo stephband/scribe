@@ -40,6 +40,10 @@
     grid-row: G4;
 }
 
+.stave > .piano-clef {
+    grid-row: G4;
+}
+
 .stave > .treble-up-clef {
     grid-row: G5;
 }

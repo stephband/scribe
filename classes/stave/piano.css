@@ -69,15 +69,13 @@
 }
 
 .piano-stave > .rest,
-.piano-stave > .timesig,
-.piano-stave > .clef {
+.piano-stave > .timesig {
     /* The default part is the upper part */
     grid-row: stave-upper;
 }
 
 .piano-stave > .rest[data-part="lower"],
-.piano-stave > .timesig[data-part="lower"],
-.piano-stave > .clef[data-part="lower"] {
+.piano-stave > .timesig[data-part="lower"] {
     grid-row: stave-lower;
 }
 

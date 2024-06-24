@@ -31,12 +31,15 @@ const acciGlyphs = {
 };
 
 export default overload(get('type'), {
-    clef: (symbol) => create('span', {
-        class: `${ symbol.stave.type }-clef clef`,
-        //data: { eventId: identify(symbol.event) },
-        html: symbol.stave.clef,
-        data: { event: null }
-    }),
+    clef: (symbol) => symbol.stave.getClefHTML ?
+        // For support for piano stave treble and bass clef
+        create('fragment', symbol.stave.getClefHTML()) :
+        create('span', {
+            class: `${ symbol.stave.type }-clef clef`,
+            //data: { eventId: identify(symbol.event) },
+            html: symbol.stave.clef
+            //data: { symbol.event }
+        }),
 
     chord: (symbol) => create('abbr', {
         class: "chord-abbr",
