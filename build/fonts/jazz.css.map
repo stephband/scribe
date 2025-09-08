@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../fonts/jazz.css"],
+  "sourcesContent": ["\n@font-face {\n    font-family: Jazz;\n    src: url('../fonts/Jazz/finalejazz-webfont.woff2') format('woff2');\n    font-weight: normal;\n    font-style: normal;\n}\n\n@font-face {\n    font-family: JazzText;\n    src: url('../fonts/JazzText/finalejazztext-webfont.woff2') format('woff2');\n    font-weight: normal;\n    font-style: normal;\n}\n\n.scribe-jazz {\n    font-family: Jazz, JazzText;\n\n    /* Width of standard black note head */\n    --head-width: 0.3375;\n}\n\n.scribe-jazz .note {\n    --stem-height:       1;\n    --stem-width:  0.033;\n    /* Alignment of root of stem relative to baseline */\n    --stem-align-up:   0.03;\n    --stem-align-down: -0.04;\n}\n\n.scribe-jazz .head[data-glyph=\"headX\"] {\n    --stem-align-up:   0.14;\n    --stem-align-down: -0.12;\n}\n"],
+  "mappings": ";;;;AACA,WACI,YAAa,KACb,IAAK,+CAA8C,OAAO,SAC1D,YAAa,IACb,WAAY,MAChB,CAEA,WACI,YAAa,SACb,IAAK,uDAAsD,OAAO,SAClE,YAAa,IACb,WAAY,MAChB,CAEA,CAAC,YACG,YAAa,IAAI,CAAE,SAGnB,cAAc,KAClB,CAEA,CAPC,YAOY,CAAC,KACV,eAAqB,EACrB,cAAe,KAEf,iBAAmB,IACnB,mBAAmB,IACvB,CAEA,CAfC,YAeY,CAAC,IAAI,CAAC,kBACf,iBAAmB,IACnB,mBAAmB,IACvB",
+  "names": []
+}

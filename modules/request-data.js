@@ -1,7 +1,7 @@
 
-import cache          from '../lib/fn/modules/cache-by-key.js';
-import overload       from '../lib/fn/modules/overload.js';
-import { requestGet } from '../lib/dom/modules/request.js';
+import cache          from 'fn/cache-by-key.js';
+import overload       from 'fn/overload.js';
+import { requestGet } from 'dom/request.js';
 import parse          from './parse.js';
 
 const requestData = cache(requestGet);

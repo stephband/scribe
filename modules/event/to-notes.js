@@ -9,9 +9,9 @@ toScale([0, 'chord', 'Gm7', 1, 1]) // [0, 2, 4, 5, 7, 9, 10]
 ```
 **/
 
-import get              from '../../lib/fn/modules/get.js';
-import overload         from '../../lib/fn/modules/overload.js';
-import { toNoteNumber } from '../../lib/midi/modules/note.js';
+import get              from 'fn/get.js';
+import overload         from 'fn/overload.js';
+import { toNoteNumber } from 'midi/note.js';
 import { toChordNotes } from './chord.js';
 
 

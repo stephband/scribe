@@ -1,8 +1,8 @@
 .treble-stave {
     grid-template-rows:
         [A6] 0.125em
-        [G6] 0.125em
-        [F6 chords] 0.125em
+        [G6 chords] 0.125em
+        [F6] 0.125em
         [E6] 0.125em
         [D6] 0.125em
         [C6] 0.125em

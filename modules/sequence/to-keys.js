@@ -1,5 +1,5 @@
 
-import sum          from '../../lib/fn/modules/sum.js';
+import sum          from 'fn/sum.js';
 import toBeats      from '../sequence/to-beats.js';
 import toNotes      from '../event/to-notes.js';
 import keys         from '../keys.js';

@@ -6,6 +6,7 @@ scribe-music {
 }
 
 scribe-music::after {
+    /* Control spread of last line */
     content: '';
     flex: 6 1;
 }

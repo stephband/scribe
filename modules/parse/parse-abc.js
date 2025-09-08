@@ -4,7 +4,7 @@ parseABC()
 A quick-and-dirty interface with abcjs's parser. Please clean me up.
 **/
 
-import matches   from '../../lib/fn/modules/matches.js';
+import matches   from 'fn/matches.js';
 import ABCParser from '../../lib/abcjs/modules/parse/abc_parse.js';
 
 const parser = new ABCParser();

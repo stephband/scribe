@@ -1,6 +1,6 @@
 
-import create from '../lib/dom/modules/create.js';
-import rect   from '../lib/dom/modules/rect.js';
+import create from 'dom/create.js';
+import rect   from 'dom/rect.js';
 
 /* Beams */
 

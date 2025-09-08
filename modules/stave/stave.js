@@ -1,6 +1,6 @@
 
-import nothing        from '../../lib/fn/modules/nothing.js';
-import { toNoteName, toNoteNumber, toNoteOctave } from '../../lib/midi/modules/note.js';
+import nothing        from 'fn/nothing.js';
+import { toNoteName, toNoteNumber, toNoteOctave } from 'midi/note.js';
 import toSpelling     from '../event/to-spelling.js';
 import { rflatsharp } from '../regexp.js';
 import * as glyphs    from "../glyphs.js";

@@ -1,6 +1,6 @@
-import get from '../lib/fn/modules/get.js';
-import overload from '../lib/fn/modules/overload.js';
-import create from '../lib/dom/modules/create.js';
+import get from 'fn/get.js';
+import overload from 'fn/overload.js';
+import create from 'dom/create.js';
 import * as glyphs from "./glyphs.js";
 import { chordGlyphs } from "./glyphs.js";
 import { rflat, rsharp } from './regexp.js';
@@ -42,7 +42,7 @@ export default overload(get('type'), {
         }),
 
     chord: (symbol) => create('abbr', {
-        class: "chord-abbr",
+        class: "chord chord-abbr",
         title: "TODO - name of chord",
         // Note that we must detect sharps before flats because HTML entities
         // contain hash symbols that can be interpreted as sharps

@@ -1,5 +1,5 @@
 
-import get from '../../lib/fn/modules/get.js';
+import get from 'fn/get.js';
 import { byGreater } from '../maths.js';
 
 const beats = [];

@@ -1,6 +1,6 @@
 
-import nothing from '../../lib/fn/modules/nothing.js';
-import { noteNames, toNoteNumber, toRootNumber, toNoteOctave } from '../../lib/midi/modules/note.js';
+import nothing from 'fn/nothing.js';
+import { noteNames, toNoteNumber, toRootNumber, toNoteOctave } from 'midi/note.js';
 import { mod12 } from '../maths.js';
 import keys from '../keys.js';
 

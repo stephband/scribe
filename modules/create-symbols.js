@@ -1,8 +1,8 @@
 
-import by       from '../lib/fn/modules/by.js';
-import get      from '../lib/fn/modules/get.js';
-import overload from '../lib/fn/modules/overload.js';
-import { toNoteNumber, toRootName, toRootNumber } from '../lib/midi/modules/note.js';
+import by       from 'fn/by.js';
+import get      from 'fn/get.js';
+import overload from 'fn/overload.js';
+import { toNoteNumber, toRootName, toRootNumber } from 'midi/note.js';
 import toKeys from './sequence/to-keys.js';
 import eventsAtBeat from './sequence/events-at-beat.js';
 import { keysAtBeats, keyFromBeatKeys } from './sequence/key-at-beat.js';
@@ -49,44 +49,6 @@ function toDuration(event) {
     return event[1] === 'lyric' ?
         event[3] :
         event[4];
-}
-
-const lines = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
-
-function addStaveRows(n, row) {
-    if (n < 0) {
-        while (n++) {
-            const line = row[0];
-            const octave = parseInt(row[row.length - 1], 10);
-
-            // Are we switching octave down the way ?
-            if (line === lines[0]) {
-                row = lines[lines.length - 1] + (octave - 1);
-            }
-            else {
-                const l = lines.indexOf(line);
-                row = lines[l - 1] + octave;
-            }
-        }
-
-        return row;
-    }
-
-    while (n--) {
-        const line = row[0];
-        const octave = parseInt(row[row.length - 1], 10);
-
-        // Are we switching octave up the way ?
-        if (line === lines[lines.length - 1]) {
-            row = lines[0] + (octave + 1);
-        }
-        else {
-            const l = lines.indexOf(line);
-            row = lines[l + 1] + octave;
-        }
-    }
-
-    return row;
 }
 
 function createBeam(symbols, stave, beam, n) {

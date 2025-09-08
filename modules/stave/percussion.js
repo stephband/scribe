@@ -1,5 +1,5 @@
 
-import { toNoteNumber } from '../../lib/midi/modules/note.js';
+import { toNoteNumber } from 'midi/note.js';
 import * as glyphs from "../glyphs.js";
 import DrumStave from './drum.js';
 

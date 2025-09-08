@@ -1,5 +1,5 @@
 
-import overload from '../lib/fn/modules/overload.js';
+import overload from 'fn/overload.js';
 import { transposeScale, transposeScale4ths } from './scale.js';
 
 export default [

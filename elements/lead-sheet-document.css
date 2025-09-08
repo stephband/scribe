@@ -2,11 +2,32 @@ html, body { margin: 0; padding: 0; }
 body { padding: 1rem; }
 a { color: #FE267E; text-decoration: none; }
 a:hover, a:focus-visible { text-decoration: underline; }
-header { display: grid; grid-template-columns: 1fr auto 1fr; }
+header { display: grid; grid-template-columns: 1fr auto 1fr; grid-template-rows:; }
 header > * { grid-row: 1; margin: 0; }
-header > h1 { font-size: 3em; grid-column: 2; justify-self: center; align-self: end; }
-header > form { font-size: 1.2rem; grid-column: 3; justify-self: end; align-self: end; }
-header > .author { font-size: 1.2rem; grid-column: 1; justify-self: start; align-self: end; }
+header > h1 { font-size: 3em; line-height: 2em; grid-column: 2; justify-self: center; align-self: baseline; }
+header > form { font-size: 1.2rem; line-height: 2em; grid-column: 3; justify-self: end; align-self: baseline; }
+header > .author { font-size: 1.2rem; grid-column: 1; justify-self: start; align-self: baseline; }
 header + scribe-music { margin-top: 3em; }
 scribe-music { font-size: 1.2rem; }
-select { font-family: ScribeText; font-size: 1.2em; border: 0; }
+label { display: inline-block; }
+select {
+    font-family: inherit;
+    font-size: inherit;
+    height: auto;
+
+    /* Knock selects out of system rendering look */
+    border: 0;
+    background: transparent;
+    background-image: none;
+    border-image: none;
+    appearance: none;
+}
+
+select:focus {
+    /* Make option text the same size as system menus when select is open */
+    font-family: system-ui, ui-sans-serif, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 400;
+}
+
+label + select { margin-left: 0.25em; }

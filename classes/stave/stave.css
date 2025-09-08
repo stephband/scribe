@@ -72,7 +72,7 @@
 
 .stave > .chord {
     grid-row: chords;
-    align-self: end;
+    align-self: center;
     margin-top: 0;
     margin-bottom: 0;
 }

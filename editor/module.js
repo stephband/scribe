@@ -1,15 +1,15 @@
 
 import '../lib/bolt/elements/dialog.js';
 
-import get      from '../lib/fn/modules/get.js';
-import id       from '../lib/fn/modules/id.js';
-import noop     from '../lib/fn/modules/noop.js';
-import overload from '../lib/fn/modules/overload.js';
-import create   from '../lib/dom/modules/create.js';
-import delegate from '../lib/dom/modules/delegate.js';
-import events   from '../lib/dom/modules/events.js';
-import rect     from '../lib/dom/modules/rect.js';
-import { toNoteName, toNoteNumber } from '../lib/midi/modules/note.js';
+import get      from 'fn/get.js';
+import id       from 'fn/id.js';
+import noop     from 'fn/noop.js';
+import overload from 'fn/overload.js';
+import create   from 'dom/create.js';
+import delegate from 'dom/delegate.js';
+import events   from 'dom/events.js';
+import rect     from 'dom/rect.js';
+import { toNoteName, toNoteNumber } from 'midi/note.js';
 
 import createSymbols     from '../modules/create-symbols.js';
 import createBarElements from '../modules/create-bar-elements.js';
@@ -157,7 +157,7 @@ export function changeZoneDuration(duration) {
 
 // Keys
 
-import keyboard from '../lib/dom/modules/keyboard.js';
+import keyboard from 'dom/keyboard.js';
 
 let timer;
 

@@ -8,9 +8,13 @@ DEBUG=
 #	deno run --allow-read --allow-env --allow-net --allow-write --allow-run --unstable ./lib/literal/deno/make-literal.js ./ debug
 
 modules:
+	@rm -f deno.lock
 	rm -rf ./build
-	deno run --allow-read --allow-env --allow-net --allow-write --allow-run ./lib/fn/deno/make-modules.js build \
+
+	deno run --allow-read --allow-write --allow-net --allow-env --allow-run --no-lock --reload --config ./deno.json https://cdn.jsdelivr.net/gh/stephband/fn@master/deno/make-modules.js ./build/ \
 		module.js \
+		scribe-music/module.js
+	deno run --allow-read --allow-write --allow-net --allow-env --allow-run --no-lock --reload --config ./deno.json https://cdn.jsdelivr.net/gh/stephband/fn@master/deno/make-css.js ./build/ \
 		module.css \
 		fonts/ash.css \
 		fonts/bravura.css \
@@ -18,6 +22,7 @@ modules:
 		fonts/jazz.css \
 		fonts/leipzig.css \
 		fonts/petaluma.css \
-		scribe-music/module.js \
 		scribe-music/module.css \
 		scribe-music/shadow.css
+
+	@rm -f deno.lock

@@ -1,6 +1,6 @@
 
-import by      from '../../lib/fn/modules/by.js';
-import get     from '../../lib/fn/modules/get.js';
+import by      from 'fn/by.js';
+import get     from 'fn/get.js';
 import toBeats from './to-beats.js';
 import toKeys  from './to-keys.js';
 

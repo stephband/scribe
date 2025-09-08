@@ -1,9 +1,10 @@
 
-import Signal            from '../lib/fn/modules/signal.js';
-import create            from '../lib/dom/modules/create.js';
-import element, { getInternals } from '../lib/dom/modules/element.js';
-import events            from '../lib/dom/modules/events.js';
-import { toRootName, toRootNumber } from '../lib/midi/modules/note.js';
+import Signal                    from 'fn/signal.js';
+import create                    from 'dom/create.js';
+import element, { getInternals } from 'dom/element.js';
+import events                    from 'dom/events.js';
+import { toRootName, toRootNumber } from 'midi/note.js';
+
 import createSymbols     from '../modules/create-symbols.js';
 import requestData       from '../modules/request-data.js';
 import parseSource       from '../modules/parse.js';
@@ -22,7 +23,7 @@ const define = Object.defineProperties;
 const shadowCSSUrl = import.meta.url.replace(/\/[^\/]*\.js/, '/shadow.css');
 const stylesheet = Signal.of();
 const stylefns   = [];
-stylesheet.each((url) => stylefns.forEach((fn) => fn(url)));
+//stylesheet.each((url) => stylefns.forEach((fn) => fn(url)));
 
 /* Element resizing */
 const resizes = new ResizeObserver((entries) => {
@@ -67,9 +68,18 @@ export default define(element('scribe-music', {
             this.classList.add('safari');
         }
 
-        // Compute signal listens to changs
-        Signal.from(() => (
-            internals.data.value && createBarElements(createSymbols(
+        // Update beams on load and resize
+        resizes.observe(this, { box: 'content-box' });
+
+        // If there is no src use text content as data
+        if (!this.src) {
+            const source = this.textContent.trim();
+            internals.data.value = parseSource(this.type, source);
+        }
+
+        // Listens to changes
+        return Signal.frame(() => {
+            const elements = internals.data.value && createBarElements(createSymbols(
                 // Events from data
                 internals.data.value.events,
                 // Clef is a string
@@ -80,9 +90,8 @@ export default define(element('scribe-music', {
                 internals.meter.value,
                 // Transpose is a number
                 internals.transpose.value
-            ))
-        ))
-        .each((elements) => {
+            ));
+
             // Clear the shadow DOM of bars and put new elements in it
             shadow.querySelectorAll('.bar').forEach((element) => element.remove());
             shadow.append.apply(shadow, elements);
@@ -90,15 +99,6 @@ export default define(element('scribe-music', {
             // Render beams
             shadow.querySelectorAll('.beam').forEach(renderBeam);
         });
-
-        // Update beams on load and resize
-        resizes.observe(this, { box: 'content-box' });
-
-        // If there is no src use text content as data
-        if (!this.src) {
-            const source = this.textContent.trim();
-            internals.data.value = parseSource(this.type, source);
-        }
     },
 
     disconnect: function() {
