@@ -173,8 +173,8 @@
                 'embed': (button, e) => {
                     const embedSection = document.getElementById('embed-section');
                     const sequence = getData();
-                    document.getElementById('json').textContent = `<link rel="stylesheet" href="https://stephen.band/scribe/build/scribe-music/module.css" />
-<script type="module" src="https://stephen.band/scribe/build/scribe-music/module.js"><\/script>
+                    document.getElementById('json').textContent = `<link rel="stylesheet" href="https://stephen.band/scribe/build/scribe-music/element.css" />
+<script type="module" src="https://stephen.band/scribe/build/scribe-music/element.js"><\/script>
 <scribe-music clef="treble" meter="4/4">${ JSON.stringify(sequence) }</scribe-music>`;
                     activate(embedSection);
                 },
