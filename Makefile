@@ -13,7 +13,7 @@ modules:
 
 	deno run --allow-read --allow-write --allow-net --allow-env --allow-run --no-lock --reload --config ./deno.json https://cdn.jsdelivr.net/gh/stephband/fn@master/deno/make-modules.js ./build/ \
 		module.js \
-		scribe-music/module.js
+		scribe-music/element.js
 	deno run --allow-read --allow-write --allow-net --allow-env --allow-run --no-lock --reload --config ./deno.json https://cdn.jsdelivr.net/gh/stephband/fn@master/deno/make-css.js ./build/ \
 		module.css \
 		fonts/ash.css \
@@ -22,7 +22,7 @@ modules:
 		fonts/jazz.css \
 		fonts/leipzig.css \
 		fonts/petaluma.css \
-		scribe-music/module.css \
+		scribe-music/element.css \
 		scribe-music/shadow.css
 
 	@rm -f deno.lock
