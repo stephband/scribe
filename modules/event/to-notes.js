@@ -11,14 +11,14 @@ toScale([0, 'chord', 'Gm7', 1, 1]) // [0, 2, 4, 5, 7, 9, 10]
 
 import get              from 'fn/get.js';
 import overload         from 'fn/overload.js';
-import { toNoteNumber } from 'midi/note.js';
+import { toRootNumber } from 'midi/note.js';
 import { toChordNotes } from './chord.js';
 
 
 export default overload(get(1), {
     // Only chords and notes have scale
-    chord:   (event) => toChordNotes(event[2]),
-    note:    (event) => [toNoteNumber(event[2]) % 12],
+    chord:   (event) => toChordNotes(event[2], event[3]),
+    note:    (event) => [toRootNumber(event[2])],
     // TODO: But perhaps sequences should recusively pass back its current scale ???
     //sequence: (event) => return event[4],
     default: (event) => []

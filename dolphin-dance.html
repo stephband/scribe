@@ -10,10 +10,11 @@
 
     <script type="importmap">{
         "imports": {
-            "bolt/": "https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/",
-            "dom/":  "https://cdn.jsdelivr.net/gh/stephband/dom@1.4.1/modules/",
-            "fn/":   "https://cdn.jsdelivr.net/gh/stephband/fn@1.5.1/modules/",
-            "midi/": "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.0/modules/"
+            "bolt/":     "https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/",
+            "dom/":      "https://cdn.jsdelivr.net/gh/stephband/dom@1.4.1/modules/",
+            "fn/":       "https://cdn.jsdelivr.net/gh/stephband/fn@1.5.1/modules/",
+            "midi/":     "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.0/modules/",
+            "sequence/": "https://cdn.jsdelivr.net/gh/soundio/sequence@0.0.2/modules/"
         }
     }</script>
 
@@ -29,7 +30,7 @@
 
     <!-- Import <scribe-music> -->
     <link rel="stylesheet" href="./build/scribe-music/element.css" />
-    <script type="module" src="./build/scribe-music/element.js"></script>
+    <script type="module" src="./scribe-music/element.js"></script>
     <link rel="stylesheet" href="./elements/lead-sheet-document.css" />
     <style>
     body {
@@ -40,6 +41,9 @@
     </style>
 
     <script type="module">
+    import transpose from 'sequence/events/transpose.js';
+    window.transpose = transpose;
+
     document.body.addEventListener('change', function(e) {
         if (e.target.name === 'transpose') {
             const scribe = document.body.querySelector('scribe-music');

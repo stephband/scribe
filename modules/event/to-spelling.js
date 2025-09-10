@@ -34,6 +34,12 @@ export default function toSpelling(keynumber, event, transpose = 0) {
             o = '';
         }
     }
+    else if (event[1] === 'chord') {
+        // pitch is root name like "C"
+        n = toRootNumber(event[2]) + transpose;
+        a = key.spellings[mod12(n)];
+        o = '';
+    }
     else {
         // pitch is a number
         n = event[2] + transpose;

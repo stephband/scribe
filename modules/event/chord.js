@@ -54,6 +54,9 @@ const chordNotes = {
     '-♭6':      [0, 2, 3, 5, 7, 8],
     'ø':        [0, 3, 6, 10],
 
+    // Harmonic minor
+    '7♭9♭13':   [0, 1, 4, 5, 7, 8, 10],
+
     // Melodic minor
     '-∆':       [0, 2, 3, 5, 7, 9, 11],
     '13sus♭9':  [0, 1, 5, 7, 9, 10],
@@ -63,13 +66,23 @@ const chordNotes = {
     '7♭13':     [0, 2, 4, 7, 8, 10],
     'ø(9)':     [0, 2, 3, 6, 10],
     '7alt':     [0, 1, 3, 4, 6, 8, 10],
-    '∆♭6':      [0, 4, 7, 8, 11]
+    //'∆♭6':      [0, 4, 7, 8, 11],
+
+    // Harmonic major
+    '∆♭6':      [0, 2, 4, 7, 8, 11],
+
+    // Diminished
+    '7♭9':      [0, 1, 3, 4, 6, 7, 9, 10],
+    'º':        [0, 2, 3, 5, 6, 8, 9, 11],
+
+    // Whole tone
+    '7+':       [0, 2, 4, 6, 8, 10]
 };
 
 
 // Map functions
 
-export function normaliseChordName(str) {
+export function normaliseExtensionName(str) {
     return str.replace(/(maj)|(min)/, ($0, $1, $2) => {
         return $1 ? '∆' : $2 ? '-' : '' ;
     });
@@ -81,7 +94,7 @@ export function toRoot(str) {
 }
 
 export function toExtension(str) {
-    const chordName = normaliseChordName(str);
+    const chordName = normaliseExtensionName(str);
     return (rchord.exec(chordName) || empty)[2];
 }
 
@@ -98,12 +111,17 @@ export function toKey(str) {
     return keys[mod12(toRoot(str) - toMode(str))];
 }
 
-export function toChordNotes(str) {
-    const root  = toRoot(str);
-    const ext   = toExtension(str);
-    return chordNotes[ext] ? chordNotes[ext]
-        .map((n) => mod12(n + root))
-        .sort(byGreater) :
+export function toChordNotes(root, extension, bass) {
+    const r = toRootNumber(root);
+    const e = normaliseExtensionName(extension);
+    // Ignore bass note for now: TODO
+    //const b = toRootNumber(bass);
+    return chordNotes[e] ?
+        // If r is not 0 transpose the mode
+        r ? chordNotes[e].map((n) => mod12(n + r)).sort(byGreater) :
+        // Otherwise return the mode as-is
+        chordNotes[e] :
+        // No mode found
         [] ;
 }
 

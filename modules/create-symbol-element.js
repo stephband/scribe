@@ -30,6 +30,8 @@ const acciGlyphs = {
     '-2': glyphs.acciDoubleFlat
 };
 
+const rextensionparts = /^(∆|-|ø|7|\+)?(alt|sus|maj|min|dim|aug)?(.*)$/;
+
 export default overload(get('type'), {
     clef: (symbol) => symbol.stave.getClefHTML ?
         // For support for piano stave treble and bass clef
@@ -41,20 +43,28 @@ export default overload(get('type'), {
             //data: { symbol.event }
         }),
 
-    chord: (symbol) => create('abbr', {
-        class: "chord chord-abbr",
-        title: "TODO - name of chord",
-        // Note that we must detect sharps before flats because HTML entities
-        // contain hash symbols that can be interpreted as sharps
-        html: '<span class="chord-root">' + symbol.root.replace(rsharp, chordParts.sharp).replace(rflat, chordParts.flat) + '</span>'
-            + '<sup>' + symbol.extension.replace(rsharp, chordParts.sharp).replace(rflat, chordParts.flat) + '</sup>'
-            + (symbol.bass ? glyphs.chordBassSlash + '<span class="chord-bass">' + symbol.bass + '</span>' : ''),
-        data: {
-            beat:     symbol.beat + 1,
-            duration: symbol.duration,
-            event:  identify(symbol.event)
-        }
-    }),
+    chord: (symbol) => {
+        const parts = rextensionparts.exec(symbol.extension);
+
+        return create('abbr', {
+            class: "chord chord-abbr",
+            title: "TODO - name of chord",
+            // Note that we must detect sharps before flats because HTML entities
+            // contain hash symbols that can be interpreted as sharps
+            html: '<span class="chord-root">' + symbol.root.replace(rsharp, chordParts.sharp).replace(rflat, chordParts.flat) + '</span>'
+                + '<span class="chord-ext">'
+                + (parts[1] ? '<span class="chord-ext-' + parts[1] + '">' + parts[1] + '</span>' : '')
+                + (parts[2] ? '<sub>' + parts[2] + '</sub>' : '')
+                + (parts[3] ? '<sup>' + parts[3].replace(rsharp, chordParts.sharp).replace(rflat, chordParts.flat) + '</sup>' : '')
+                + '</span>'
+                + (symbol.bass ? glyphs.chordBassSlash + '<span class="chord-bass">' + symbol.bass + '</span>' : ''),
+            data: {
+                beat:     symbol.beat + 1,
+                duration: symbol.duration,
+                event:  identify(symbol.event)
+            }
+        });
+    },
 
     timesig: (symbol) => symbol.stave.getTimeSigHTML ?
         create('fragment', symbol.stave.getTimeSigHTML(symbol.numerator, symbol.denominator, identify(symbol.event))) :

@@ -6,6 +6,7 @@
     vertical-align: baseline;
     text-decoration: none;
     line-height: 1em;
+    /*letter-spacing: 0.002em;*/
 }
 
 .chord-abbr .chord-maj {
@@ -34,6 +35,7 @@
 }
 
 .chord-abbr .chord-root,
+.chord-abbr .chord-ext,
 .chord-abbr .chord-bass {
     font-size: 0.75em;
 }
@@ -43,7 +45,7 @@
 }
 
 .chord-abbr .chord-flat {
-    vertical-align: 0.25em;
+    vertical-align: 0.3em;
     margin-left: 0.05em;
 }
 
@@ -52,18 +54,40 @@
 }
 
 .chord-abbr sup {
-    font-size: 0.5625em;
+    font-size: 0.75em;
     vertical-align: 0.333333333em;
     margin-left: 0.04em;
 }
 
 .chord-abbr sub {
-    font-size: 0.5625em;
-    vertical-align: 0em;
+    font-size: 0.8em;
+    vertical-align: 0;
 }
 
 .chord-abbr .chord-brackets {
-    font-size: 0.5em;
+    font-size: 0.66666667em;
     vertical-align: 0.4em;
     margin-left: 0.1em;
 }
+
+.chord-ext-∆ {
+    font-size: 0.875em;
+    vertical-align: 0;
+}
+
+.chord-ext-7 {
+    font-size: 0.875em;
+    vertical-align: 0.125em;
+}
+
+.chord-ext-- {
+    font-size: 1.125em;
+    vertical-align: 0;
+}
+
+.chord-ext-ø {
+    font-size: 1em;
+    vertical-align: 0.15em;
+}
+
+

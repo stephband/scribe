@@ -525,7 +525,6 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
                 beat,
                 duration,
                 transpose,
-                // value: stave.getSpelling(key, event, transpose) + event[3],
                 root: stave.getSpelling(key, event, transpose),
                 extension: event[3],
                 event,
