@@ -8,7 +8,7 @@ header > h1 { font-size: 3em; line-height: 2em; grid-column: 2; justify-self: ce
 header > form { font-size: 1.2rem; line-height: 2em; grid-column: 3; justify-self: end; align-self: baseline; }
 header > .author { font-size: 1.2rem; grid-column: 1; justify-self: start; align-self: baseline; }
 header + scribe-music { margin-top: 3em; }
-scribe-music { font-size: 1.2rem; }
+scribe-music { font-size: 1.125rem; }
 label { display: inline-block; }
 select {
     font-family: inherit;

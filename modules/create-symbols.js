@@ -429,7 +429,7 @@ function createBar(beat, stave, key, meter, tieheads) {
     };
 
     // If meter change is on this beat push a timesig into symbols
-    if (meter[0] === beat) {
+    /*if (meter[0] === beat) {
         bar.symbols.push({
             type:        'timesig',
             beat:        0,
@@ -438,7 +438,7 @@ function createBar(beat, stave, key, meter, tieheads) {
             event:       meter,
             stave
         });
-    }
+    }*/
 
     // Push tied heads into symbols
     let m = -1;
@@ -509,6 +509,7 @@ function createBars(events, beatkeys, stave, meter, transpose) {
     let event;
     while (event = events[++n]) {
         if (event[1] === 'key') {
+console.log('kEY');
             if (event[0] !== bar.beat) {
                 new TypeError('Scribe: "key" event must occur at bar start – event [' + event.join(', ') + '] is on beat ' + (event[0] - bar.beat) + ' of bar');
             }
@@ -543,6 +544,18 @@ function createBars(events, beatkeys, stave, meter, transpose) {
             if (event[0] !== bar.beat) {
                 new TypeError('Scribe: "meter" event must occur at bar start – event [' + event.join(', ') + '] is on beat ' + (event[0] - bar.beat) + ' of bar');
             }
+
+            if (event[0] === bar.beat) {
+                bar.symbols.push({
+                    type:        'timesig',
+                    beat:        0,
+                    numerator:   event[2] / event[3],
+                    denominator: 4 / event[3],
+                    event:       event,
+                    stave
+                });
+            }
+
             // TODO! INSERT TIME SIG.
             continue;
         }
@@ -640,12 +653,12 @@ function createBars(events, beatkeys, stave, meter, transpose) {
     return bars;
 }
 
-function keyEventAtStart(events) {
-    // Assume events is sorted, search through initial events to find key
-    let n = -1, event;
-    while ((event = events[++n]) && event[0] <= 0) {
-        if (event[1] === 'key') return event;
-    }
+function isInitialMeterEvent(event) {
+    return event[0] <= 0 && event[1] === 'meter';
+}
+
+function isInitialKeyEvent(event) {
+    return event[0] <= 0 && event[1] === 'key';
 }
 
 const priorities = {
@@ -670,15 +683,18 @@ function byRenderOrder(b, a) {
 }
 
 export default function eventsToSymbols(events, clef, keyname, meter, transpose) {
-    //console.log(events, clef, keyname, meter, transpose);
+    // TODO, WARNING! This mutates events! We probably oughta clone events first.
 
-    // Transpose events before generating keys??
-    events.sort(byRenderOrder);
+    // If events contains no initial meter and meter is set, insert a meter event
+    const meterEvent = events.find(isInitialMeterEvent);
+    if (!meterEvent && meter) events.unshift([0, 'meter', meter[2], meter[3]]);
 
     // If events contains no initial key and keyname is set, insert a key event
-    // TODO, WARNING! This mutates events! We probably oughta clone events first.
-    const keyEvent = keyEventAtStart(events);
-    if (!keyEvent) events.unshift([0, 'key', keyname]);
+    const keyEvent = events.find(isInitialKeyEvent);
+    if (!keyEvent && keyname) events.unshift([0, 'key', keyname]);
+
+    // Sort into the proper order for rendering
+    events.sort(byRenderOrder);
 
     // Get the stave controller
     const stave = Stave.create(clef || 'treble');

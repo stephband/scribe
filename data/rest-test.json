@@ -2,7 +2,8 @@
     "name": "Test key, rest and tie",
     "author": { "name": "Stephen Band" },
     "events": [
-        [0,"key","Bb"],
+        [0,"key","Eb"],
+        [0,"meter",4,1],
         [3.5, "note", "Db4", 0.5, 1.5]
     ]
 }

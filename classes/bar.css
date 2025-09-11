@@ -403,7 +403,7 @@ Bars are divided into:
     justify-self: start;
     grid-column: 1 / span 1;
     margin-left: 0;
-    margin-right: 0.15em;
+    margin-right: 0.5em;
 
     --timesig-gap: 0.5em;
 }

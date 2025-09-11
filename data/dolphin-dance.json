@@ -2,6 +2,8 @@
 "name": "Dolphin Dance",
 "author": { "name": "Herbie Hancock" },
 "events":[
+[0,"key","Eb"],
+[0,"meter",4,1],
 [0,"chord",3,"∆",4],
 [2,"note",67,0.25,0.5],
 [2.5,"note",68,0.25,0.5],
