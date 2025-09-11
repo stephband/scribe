@@ -60,7 +60,7 @@
 }
 
 .chord-abbr sub {
-    font-size: 0.8em;
+    font-size: 0.75em;
     vertical-align: 0;
 }
 
@@ -76,8 +76,8 @@
 }
 
 .chord-ext-7 {
-    font-size: 0.875em;
-    vertical-align: 0.125em;
+    font-size: 0.833333333em;
+    vertical-align: 0.166666667em;
 }
 
 .chord-ext-- {

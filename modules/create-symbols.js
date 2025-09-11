@@ -1,5 +1,5 @@
 
-import by       from 'fn/by.js';
+//import by       from 'fn/by.js';
 import get      from 'fn/get.js';
 import overload from 'fn/overload.js';
 import { toNoteNumber, toRootName, toRootNumber } from 'midi/note.js';
@@ -23,6 +23,17 @@ const fathercharles = [
     // Battle Ends And Down Goes Charles' Father
     'B♭', 'E♭', 'A♭', 'D♭', 'G♭', 'C♭', 'F♭'
 ];
+
+const meterDivisions = {
+    // 4/4
+    '4,1': [2],
+    // 6/8
+    '6,0.5': [1.5],
+    //
+    default: []
+};
+
+const restDurations = [0.125, 0.25, 0.375, 0.5, 0.75, 0.875, 1, 1.5, 1.75, 2, 3, 4, 6, 8];
 
 function byFatherCharlesPitch(a, b) {
     const ai = fathercharles.indexOf(a.pitch);
@@ -165,6 +176,9 @@ function createSymbols(symbols, bar) {
         return accidentals;
     }, {});
 
+    const divisions = meterDivisions[bar.meter.slice(2).join(',')]
+        || meterDivisions.default;
+
     let beat = 0;
     let n = -1;
     let head;
@@ -172,22 +186,48 @@ function createSymbols(symbols, bar) {
     let endBeat;
 
     while (head = symbols[++n]) {
-        endBeat = head.beat + head.duration;
-
         // We are only interested in notes
         if (head.type !== 'note') continue;
+
+        endBeat = head.beat + head.duration;
 
         // Rest
         // Insert rest if head beat is greater than beat
         if (head.beat > beat) {
             // [beat, 'rest', pitch (currently unused), duration]
-            symbols.splice(n++, 0, {
+            let duration = head.beat - beat;
+
+            // Does rest cross an invisible meter division?
+            let d = -1;
+            // Find next meter division after beat
+            while (divisions[++d] && divisions[d] <= beat);
+            // If duration crosses division truncate rest up to division
+            if (beat + duration > divisions[d]) duration = divisions[d] - beat;
+
+            // Clamp rest duration to permissable rest symbol durations
+            let r = restDurations.length;
+            while (restDurations[--r] > duration);
+            duration = restDurations[r];
+
+            // Where beat does not fall on a 2^n division clamp it to next
+            // smallest. This is what stops [0, note, 0.5], [1.5, note, 0.5]
+            // from rendering with a single quarter rest between them, but
+            // rather two eighth rests.
+            let p = 4;
+            while ((p *= 0.5) && beat % p);
+            if (p < duration) duration = p;
+
+            // Create rest symbol
+            symbols.splice(n, 0, {
                 beat,
                 type: 'rest',
                 pitch: '',
                 part: part,
-                duration: head.beat - beat
+                duration
             });
+
+            beat += duration;
+            continue;
         }
 
         // Update beat
@@ -440,13 +480,6 @@ function createBars(events, beatkeys, stave, meter, transpose) {
     let n = -1;
     let event;
     while (event = events[++n]) {
-        if (event[1] === 'meter') {
-            if (event[0] !== bar.beat) {
-                new TypeError('Scribe: "meter" event must occur at bar start – event [' + event.join(', ') + '] is on beat ' + (event[0] - bar.beat) + ' of bar');
-            }
-            continue;
-        }
-
         if (event[1] === 'key') {
             if (event[0] !== bar.beat) {
                 new TypeError('Scribe: "key" event must occur at bar start – event [' + event.join(', ') + '] is on beat ' + (event[0] - bar.beat) + ' of bar');
@@ -475,6 +508,14 @@ function createBars(events, beatkeys, stave, meter, transpose) {
                 .sort(byFatherCharlesPitch)
             );
 
+            continue;
+        }
+
+        if (event[1] === 'meter') {
+            if (event[0] !== bar.beat) {
+                new TypeError('Scribe: "meter" event must occur at bar start – event [' + event.join(', ') + '] is on beat ' + (event[0] - bar.beat) + ' of bar');
+            }
+            // TODO! INSERT TIME SIG.
             continue;
         }
 
@@ -579,30 +620,55 @@ function keyEventAtStart(events) {
     }
 }
 
+const priorities = {
+    // The higher the priority, the earlier the event is ordered when
+    // sorting events
+    key: 2,
+    meter: 1,
+    default: 0
+};
+
+function getPriority(event) {
+    return priorities[event[1]] || priorities.default;
+}
+
+function byRenderOrder(b, a) {
+        // a is before b
+    return a[0] < b[0] ? 1 :
+        // a is after b
+        a[0] > b[0] ? -1 :
+        // a and b are at the same time, prioritise by event type
+        getPriority(a) - getPriority(b) ;
+}
+
 export default function eventsToSymbols(events, clef, keyname, meter, transpose) {
     //console.log(events, clef, keyname, meter, transpose);
 
     // Transpose events before generating keys??
-    events.sort(by(get(0)));
+    events.sort(byRenderOrder);
+
+    // If events contains no initial key and keyname is set, insert a key event
+    // TODO, WARNING! This mutates events! We probably oughta clone events first.
+    const keyEvent = keyEventAtStart(events);
+    if (!keyEvent) events.unshift([0, 'key', keyname]);
 
     // Get the stave controller
     const stave = Stave.create(clef || 'treble');
 
     // Create a map of keys at beats. Doing this here is an optimisation so we
-    // don't end up running the keys matrix calculations on every note which
+    // don't end up running the keys matrix calculations on every note, which
     // causes measurable delay.
     // TEMP: don't get keys for unpitched
     const beatkeys = stave.pitched ?
         keysAtBeats(events) :
         null ;
 
-    // If events contains no initial key, and keyname is set, insert a key event.
-    // TODO, WARNING! This mutates events! We probably oughta clone events first.
-    const keyEvent = keyEventAtStart(events);
-    if (!keyEvent) events.unshift([0, 'key', keyname]);
-
     // TODO: this is a two-pass symbol generation, I wonder if we can get
     // it down to one?
-    return createBars(events, beatkeys, stave, meter, transpose)
+    const bb =  createBars(events, beatkeys, stave, meter, transpose)
         .map(createBarSymbols);
+
+    console.log(bb);
+
+    return bb;
 }

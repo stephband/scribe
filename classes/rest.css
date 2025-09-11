@@ -37,3 +37,8 @@
     margin-left: 0.625em;
     margin-right: 0.625em;
 }
+
+.rest[data-duration="6"] {
+    margin-left: 0.575em;
+    margin-right: 0.575em;
+}
