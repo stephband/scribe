@@ -25,11 +25,15 @@ const fathercharles = [
 ];
 
 const meterDivisions = {
+    // 3/4
+    '3,1': [1],
     // 4/4
     '4,1': [2],
+    // 2/2
+    '2,2': [2],
     // 6/8
     '6,0.5': [1.5],
-    //
+    // Default to no divisions
     default: []
 };
 
@@ -709,10 +713,6 @@ export default function eventsToSymbols(events, clef, keyname, meter, transpose)
 
     // TODO: this is a two-pass symbol generation, I wonder if we can get
     // it down to one?
-    const bb =  createBars(events, beatkeys, stave, meter, transpose)
+    return createBars(events, beatkeys, stave, meter, transpose)
         .map(createBarSymbols);
-
-    console.log(bb);
-
-    return bb;
 }
