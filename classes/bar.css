@@ -690,9 +690,11 @@ in their duration span. */
 .bar > .rest[data-duration="7"],
 .bar > .rest[data-duration="8"] {
 	justify-self: center;
-	margin-left: 1.25em;
-	margin-right: 1.25em;
+	margin-left: 0.75em;
+	margin-right: 0.75em;
 }
+
+.bar > .rest[data-duration="1"] + .rest[data-duration="2"] { margin-left: 0.5em; }
 
 /* Beams */
 

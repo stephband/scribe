@@ -160,9 +160,48 @@ function createBeam(symbols, stave, beam, n) {
     return buffer.length;
 }
 
+function createRest(durations, divisions, endbeat, part, tobeat, beat) {
+    // [beat, 'rest', pitch (currently unused), duration]
+    let duration = tobeat - beat;
+
+    // Does rest cross an invisible meter division?
+    let d = -1;
+
+    // If the beat and tobeat don't both fall on start, end or a division...
+    if (!(beat === 0 || divisions.includes(beat)) || !(tobeat === endbeat || divisions.includes(tobeat))) {
+        // Find next meter division after beat
+        while (divisions[++d] && divisions[d] <= beat);
+        // If duration crosses division truncate rest up to division
+        if (beat + duration > divisions[d]) duration = divisions[d] - beat;
+    }
+
+    // Clamp rest duration to permissable rest symbol durations
+    let r = restDurations.length;
+    while (restDurations[--r] > duration);
+    duration = restDurations[r];
+
+    // Where beat does not fall on a 2^n division clamp it to next
+    // smallest. This is what stops [0, note, 0.5], [1.5, note, 0.5]
+    // from rendering with a single quarter rest between them, but
+    // rather two eighth rests.
+    let p = 8;
+    while ((p *= 0.5) && beat % p);
+    // TODO: Something not quite right about this logic
+    if (p < duration) duration = p;
+
+    // Create rest symbol
+    return {
+        beat,
+        type: 'rest',
+        pitch: '',
+        part,
+        duration
+    };
+}
+
 function createSymbols(symbols, bar) {
     // All events in symbols have the same part
-    const part = symbols[0] && symbols[0].part;
+    const part  = symbols[0] && symbols[0].part;
     const stave = bar.stave;
 
     // Populate accidentals with key signature sharps and flats
@@ -191,42 +230,15 @@ function createSymbols(symbols, bar) {
 
         endBeat = head.beat + head.duration;
 
-        // Rest
         // Insert rest if head beat is greater than beat
         if (head.beat > beat) {
-            // [beat, 'rest', pitch (currently unused), duration]
-            let duration = head.beat - beat;
-
-            // Does rest cross an invisible meter division?
-            let d = -1;
-            // Find next meter division after beat
-            while (divisions[++d] && divisions[d] <= beat);
-            // If duration crosses division truncate rest up to division
-            if (beat + duration > divisions[d]) duration = divisions[d] - beat;
-
-            // Clamp rest duration to permissable rest symbol durations
-            let r = restDurations.length;
-            while (restDurations[--r] > duration);
-            duration = restDurations[r];
-
-            // Where beat does not fall on a 2^n division clamp it to next
-            // smallest. This is what stops [0, note, 0.5], [1.5, note, 0.5]
-            // from rendering with a single quarter rest between them, but
-            // rather two eighth rests.
-            let p = 4;
-            while ((p *= 0.5) && beat % p);
-            if (p < duration) duration = p;
-
             // Create rest symbol
-            symbols.splice(n, 0, {
-                beat,
-                type: 'rest',
-                pitch: '',
-                part: part,
-                duration
-            });
+            const rest = createRest(restDurations, divisions, bar.duration, part, head.beat, beat);
+            symbols.splice(n, 0, rest);
 
-            beat += duration;
+            // Update beat to end of rest
+            beat += rest.duration;
+
             continue;
         }
 
@@ -338,16 +350,13 @@ function createSymbols(symbols, bar) {
         beam = undefined;
     }
 
-    // If last event has not taken us to the end of the bar, insert rest
-    if (beat < bar.duration) {
-        symbols.push({
-            type:     'rest',
-            beat,
-            duration: bar.duration - beat,
-            pitch:    '',
-            part:     part,
-            stave
-        });
+    // If last event has not taken us to the end of the bar, insert rests
+    while (beat < bar.duration) {
+        // Create rest symbol
+        const rest = createRest(restDurations, divisions, bar.duration, part, bar.duration, beat);
+        symbols.splice(n++, 0, rest);
+        // Update beat to end of rest
+        beat += rest.duration;
     }
 
     return symbols;
