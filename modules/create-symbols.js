@@ -9,14 +9,13 @@ import { keysAtBeats, keyFromBeatKeys } from './sequence/key-at-beat.js';
 import { transposeChord } from './event/chord.js';
 import { transposeScale } from './scale.js';
 import Stave from './stave.js';
-import { toKeyScale, toKeyNumber } from './keys.js';
+import { toKeyScale, toKeyNumber, cScale } from './keys.js';
 import { mod12, byGreater } from './maths.js';
 import { rflat, rsharp, rdoubleflat, rdoublesharp } from './regexp.js';
 
 
 const assign = Object.assign;
 const { abs, ceil, floor } = Math;
-const cScale = [0, 2, 4, 5, 7, 9, 11];
 
 const fathercharles = [
     // Father Charles Goes Down And Ends Battle,
@@ -418,7 +417,7 @@ const accidentals = {
     '2': '𝄪'
 };
 
-function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
+function createBars(events, beatkeys, stave, meter, transpose) {
     // A buffer of head symbols to be tied to symbols in the next bar
     const tieheads = [];
     // An array of bar objects
@@ -428,20 +427,8 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
     meter = events0.find((event) => event[1] === 'meter') || meter;
 
     // First bar. Where meter is at beat 0, also inserts a time signature.
-    let bar = createBar(0, stave, keyscale, meter, tieheads);
+    let bar = createBar(0, stave, cScale, meter, tieheads);
     bars.push(bar);
-
-    // Add key signature, in front of any time signature
-    bar.symbols.unshift.apply(bar.symbols, keyscale
-        .map((n, i) => (n - cScale[i] && {
-            // No beat for key signature accidentals
-            type: 'acci',
-            pitch: toRootName(cScale[i]) + accidentals[n - cScale[i]],
-            value: n - cScale[i]
-        }))
-        .filter((o) => !!o)
-        .sort(byFatherCharlesPitch)
-    );
 
     // Add clef in front of keysig
     bar.symbols.unshift({
@@ -457,6 +444,37 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
             if (event[0] !== bar.beat) {
                 new TypeError('Scribe: "meter" event must occur at bar start – event [' + event.join(', ') + '] is on beat ' + (event[0] - bar.beat) + ' of bar');
             }
+            continue;
+        }
+
+        if (event[1] === 'key') {
+            if (event[0] !== bar.beat) {
+                new TypeError('Scribe: "key" event must occur at bar start – event [' + event.join(', ') + '] is on beat ' + (event[0] - bar.beat) + ' of bar');
+            }
+
+            // Get the key scale from keyname. This scale is not a true
+            // 'scale' in an internal-data sense as it may not begin with a 0, but it
+            // maps naturals to accidentals when compared against the C scale. Remember
+            // keynumber is on a continuous scale of fourths, so multiply by 7 semitones
+            // to get chromatic number relative to C.
+            const keynumber = toKeyNumber(event[2]);
+            const keyscale  = toKeyScale(keynumber * 7 + transpose);
+
+            // Update the bar's key
+            bar.key = keyscale;
+
+            // Add key signature, TODO! Must go in front of any time signature
+            bar.symbols.push.apply(bar.symbols, keyscale
+                .map((n, i) => (n - cScale[i] && {
+                    // No beat for key signature accidentals
+                    type: 'acci',
+                    pitch: toRootName(cScale[i]) + accidentals[n - cScale[i]],
+                    value: n - cScale[i]
+                }))
+                .filter((o) => !!o)
+                .sort(byFatherCharlesPitch)
+            );
+
             continue;
         }
 
@@ -485,7 +503,7 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
 
             // Create the next bar. Where meter is at the new bar beat, also
             // creates a time signature.
-            bar = createBar(bar.beat + bar.duration, stave, keyscale, meter, tieheads);
+            bar = createBar(bar.beat + bar.duration, stave, bar.key, meter, tieheads);
             bars.push(bar);
         }
 
@@ -546,11 +564,19 @@ function createBars(events, beatkeys, stave, keyscale, meter, transpose) {
     // There are still tied notes to symbolise
     while (tieheads.length) {
         // Create the next bar
-        bar = createBar(bar.beat + bar.duration, stave, keyscale, meter, tieheads);
+        bar = createBar(bar.beat + bar.duration, stave, bar.key, meter, tieheads);
         bars.push(bar);
     }
 
     return bars;
+}
+
+function keyEventAtStart(events) {
+    // Assume events is sorted, search through initial events to find key
+    let n = -1, event;
+    while ((event = events[++n]) && event[0] <= 0) {
+        if (event[1] === 'key') return event;
+    }
 }
 
 export default function eventsToSymbols(events, clef, keyname, meter, transpose) {
@@ -570,16 +596,13 @@ export default function eventsToSymbols(events, clef, keyname, meter, transpose)
         keysAtBeats(events) :
         null ;
 
-    // Get the key scale from keyname. This scale is not a true
-    // 'scale' in an internal-data sense as it may not begin with a 0, but it
-    // maps naturals to accidentals when compared against the C scale. Remember
-    // keynumber is on a continuous scale of fourths, so multiply by 7 semitones
-    // to get chromatic number relative to C.
-    const keynumber = toKeyNumber(keyname);
-    const keyscale  = toKeyScale(keynumber * 7 + transpose);
+    // If events contains no initial key, and keyname is set, insert a key event.
+    // TODO, WARNING! This mutates events! We probably oughta clone events first.
+    const keyEvent = keyEventAtStart(events);
+    if (!keyEvent) events.unshift([0, 'key', keyname]);
 
     // TODO: this is a two-pass symbol generation, I wonder if we can get
     // it down to one?
-    return createBars(events, beatkeys, stave, keyscale, meter, transpose)
+    return createBars(events, beatkeys, stave, meter, transpose)
         .map(createBarSymbols);
 }

@@ -20,7 +20,7 @@ export default [
 ];
 
 
-const cScale = [0,2,4,5,7,9,11];
+export const cScale = [0,2,4,5,7,9,11];
 
 const keynumbers = {
     'F♭': -8,
@@ -46,10 +46,22 @@ const keynumbers = {
     'B♯':  12
 };
 
+const accidentals = {
+    'bb': '𝄫',
+    'b': '♭',
+    '':  '',
+    '#':  '♯',
+    '##':  '𝄪'
+};
+
+function normaliseKeyName(name) {
+    return name.replace(/[#b]{1,2}$/, ($0) => accidentals[$0]);
+}
+
 export function toKeyNumber(keyname) {
     return typeof keyname === 'number' ?
         keyname :
-        keynumbers[keyname] ;
+        keynumbers[normaliseKeyName(keyname)] ;
 }
 
 export function toKeyScale(key) {

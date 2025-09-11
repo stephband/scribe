@@ -1,0 +1,8 @@
+{
+    "name": "Test key, rest and tie",
+    "author": { "name": "Stephen Band" },
+    "events": [
+        [0,"key","Bb"],
+        [7.5, "note", "Db5", 0.5, 1.5]
+    ]
+}
