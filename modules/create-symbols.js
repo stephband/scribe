@@ -66,10 +66,28 @@ function createBeam(symbols, stave, beam, n) {
 
     // Not enough stems for a beam, give it a tail
     if (beam.length === 1) {
-        if (beam[0] >= n) {
+        const i = beam[0];
+
+        if (i >= n) {
             throw new Error('Last beam index (' + beam[0] + ') cant be greater than n (' + n + ')');
         }
 
+        const head = symbols[i];
+
+        // If head starts a tie insert the tie now, in front of the head
+        if (head.tie === 'begin') {
+            symbols.splice(i, 0, assign({}, head, {
+                type:   'tie',
+                beat:   head.beat,
+                updown: head.stemDirection === 'up' ? 'down' : 'up',
+                event:  head.event
+            }));
+
+            // We inserted a symbol, advance n by 1
+            return 1;
+        }
+
+        // We didn't do anything
         return 0;
     }
 
@@ -97,7 +115,7 @@ function createBeam(symbols, stave, beam, n) {
         line = stave.getRowDiff(stave.midLinePitch, head.pitch);
 
         head.stemDirection = stemDirection;
-        head.tieDirection = stemDirection === 'up' ? 'down' : 'up';
+        head.tieDirection  = stemDirection === 'up' ? 'down' : 'up';
 
         heads.push(head);
 
@@ -116,6 +134,7 @@ function createBeam(symbols, stave, beam, n) {
                 type:   'tie',
                 beat:   head.beat,
                 updown: head.tieDirection,
+                //updown: stemDirection === 'up' ? 'down' : 'up',
                 event:  head.event
             }));
         }
@@ -222,13 +241,13 @@ function createSymbols(symbols, bar) {
     let n = -1;
     let head;
     let beam;
-    let endBeat;
+    //let endBeat;
 
     while (head = symbols[++n]) {
         // We are only interested in notes
         if (head.type !== 'note') continue;
 
-        endBeat = head.beat + head.duration;
+        //endBeat = head.beat + head.duration;
 
         // Insert rest if head beat is greater than beat
         if (head.beat > beat) {
@@ -243,7 +262,7 @@ function createSymbols(symbols, bar) {
         }
 
         // Update beat
-        if (endBeat > beat) beat = endBeat;
+        if (head.beat + head.duration > beat) beat = head.beat + head.duration;
 
         // Accidental
         // Determine accidental

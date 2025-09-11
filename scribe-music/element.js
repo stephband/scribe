@@ -21,9 +21,6 @@ const define = Object.defineProperties;
 
 /* ScribeMusic.stylesheet */
 const shadowCSSUrl = new URL('shadow.css', import.meta.url);
-
-console.log('XXXXX', shadowCSSUrl);
-
 const stylesheet = Signal.of();
 const stylefns   = [];
 //stylesheet.each((url) => stylefns.forEach((fn) => fn(url)));
