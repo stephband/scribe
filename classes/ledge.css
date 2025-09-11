@@ -13,7 +13,7 @@
 .ledge line {
     vector-effect: non-scaling-stroke;
     stroke: currentcolor;
-    stroke-width: 0.015625em;
+    stroke-width: 0.03125em;
     stroke-linejoin: round;
     stroke-linecap: round;
     fill: none;
