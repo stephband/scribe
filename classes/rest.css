@@ -2,7 +2,7 @@
     justify-self: center;
     line-height: 0.75em;
     height: auto;
-    /* Don't allow extra glyphs, like augmentation dot, to drop onto new line */
+    /* Don't allow extra glyphs, like augmentation dots, to wrap */
     white-space: nowrap;
 }
 

@@ -1,0 +1,16 @@
+:root,
+:host {
+    /* Width of head of duration 1 */
+    --head-width: 0.3375;
+}
+
+.head {
+    /* Guarantee that multi-char heads, like those with augmentation dots,
+       don't wrap */
+    white-space: nowrap;
+}
+
+.head[data-glyph="headX"] {
+    --stem-align-up:   0.18;
+    --stem-align-down: -0.14;
+}

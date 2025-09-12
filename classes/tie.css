@@ -1,12 +1,23 @@
 .tie {
     /*background: rgba(220, 180, 20, 0.4);*/
     min-width: 2em;
-}
-
-.up-tie > use {
-    transform: scale(1, -1) translateY(-1px);
+    height: 0.5em;
 }
 
 .down-tie {
+    /*background-color: lightblue;*/
+}
 
+.down-tie > path {
+    transform-origin: center center;
+    transform: translateY(0.05px) scale(1, 0.9);
+}
+
+.up-tie {
+    /*background-color: yellow;*/
+}
+
+.up-tie > path {
+    transform-origin: center center;
+    transform: translateY(-0.05px) scale(1, -0.9);
 }

@@ -1,6 +1,12 @@
 
 .head {
+    /* Heads are enormous as they are dictated by the size of their font
+       content - use after content to define a hit zone */
     pointer-events: none;
+
+    /* Guarantee that multi-char heads, like those with augmentation dots,
+       don't wrap */
+    white-space: nowrap;
 }
 
 .head::after {
