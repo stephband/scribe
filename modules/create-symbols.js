@@ -163,7 +163,6 @@ function createBeam(symbols, stave, beam, n) {
     const headEvents = heads.map(get('event'));
     heads.forEach((head) => head.beam = headEvents);
 
-
     // Put the beam in front of the first head (??)
     symbols.splice(i, 0, {
         type:      'beam',
@@ -180,7 +179,7 @@ function createBeam(symbols, stave, beam, n) {
     symbols.splice(i, 0, ...buffer);
 
     // We just spliced a bunch of symbols in before index n
-    return buffer.length;
+    return 1 + buffer.length;
 }
 
 function createRest(durations, divisions, endbeat, part, tobeat, beat) {
@@ -513,7 +512,6 @@ function createBars(events, beatkeys, stave, meter, transpose) {
     let event;
     while (event = events[++n]) {
         if (event[1] === 'key') {
-console.log('kEY');
             if (event[0] !== bar.beat) {
                 new TypeError('Scribe: "key" event must occur at bar start – event [' + event.join(', ') + '] is on beat ' + (event[0] - bar.beat) + ' of bar');
             }
