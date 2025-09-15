@@ -188,7 +188,8 @@ Bars are divided into:
 }
 
 /* Column 1 is clef/key/timesig */
-/* Column 2 is for anything that inhabits a previous column to a note head. */
+/* Column 2 is for anything that inhabits a previous column to a note head,
+   such as an accidental. */
 .bar > [data-beat^="1"]    { grid-column-start: 3; }
 .bar > [data-beat^="1.04"] { grid-column-start: 4; }
 .bar > [data-beat^="1.08"] { grid-column-start: 5; }

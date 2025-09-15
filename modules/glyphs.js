@@ -71,6 +71,7 @@ export const rest4     = '&#xE4E3;';
 export const rest6     = '&#xE4E3;&#x200A;&#xE1E7;';
 
 export const chordDiminished      = '&#xE870;';
+export const chordDiminishedSmall = '&#xF4D8;';
 export const chordHalfDiminished  = '&#xE871;';
 export const chordAugmented       = '&#xE872;';
 export const chordMajorSeventh    = '&#xE873;';
@@ -97,6 +98,7 @@ export const chordGlyphs = {
     "∆♯5": "\uE873\uED625",
     "7alt": "7alt",
     "°": "\uE870",
+    "dim": "\uE870",
     "7♭9": "7\uED60",
     "+7": "\uE8727",
 };

@@ -73,6 +73,7 @@ const chordNotes = {
 
     // Diminished
     '7♭9':      [0, 1, 3, 4, 6, 7, 9, 10],
+    '7♯9':      [0, 1, 3, 4, 6, 7, 9, 10],
     'º':        [0, 2, 3, 5, 6, 8, 9, 11],
 
     // Whole tone
@@ -83,8 +84,11 @@ const chordNotes = {
 // Map functions
 
 export function normaliseExtensionName(str) {
-    return str.replace(/(maj)|(min)/, ($0, $1, $2) => {
-        return $1 ? '∆' : $2 ? '-' : '' ;
+    return str.replace(/(maj)|(min)|(dim)/, ($0, $maj, $min, $dim) => {
+        return $maj ? '∆' :
+            $min ? '-' :
+            $dim ? 'º' :
+            '' ;
     });
 }
 

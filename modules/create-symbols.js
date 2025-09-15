@@ -11,8 +11,8 @@ import { transposeScale } from './scale.js';
 import Stave from './stave.js';
 import { toKeyScale, toKeyNumber, cScale } from './keys.js';
 import { mod12, byGreater } from './maths.js';
+import quantise from './quantise.js';
 import { rflat, rsharp, rdoubleflat, rdoublesharp } from './regexp.js';
-
 
 const assign = Object.assign;
 const { abs, ceil, floor } = Math;
@@ -37,7 +37,13 @@ const meterDivisions = {
     default: []
 };
 
+const quantiseBeats = [0, 2/24, 3/24, 4/24, 6/24, 8/24, 9/24, 10/24, 12/24, 14/24, 15/24, 16/24, 18/24, 20/24, 21/24, 22/24, 1];
+
 const restDurations = [0.125, 0.25, 0.375, 0.5, 0.75, 0.875, 1, 1.5, 1.75, 2, 3, 4, 6, 8];
+
+function round(d, n) {
+    return Math.round(n / d) * d;
+}
 
 function byFatherCharlesPitch(a, b) {
     const ai = fathercharles.indexOf(a.pitch);
@@ -591,7 +597,7 @@ function createBars(events, beatkeys, stave, meter, transpose) {
             bars.push(bar);
         }
 
-        const beat = event[0] - bar.beat;
+        const beat = quantise(quantiseBeats, 1, event[0] - bar.beat);
         const key = beatkeys && keyFromBeatKeys(beatkeys, event[0]);
 
         // Truncate duration to bar end
