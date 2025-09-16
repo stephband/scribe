@@ -216,7 +216,8 @@ export default define(element('scribe-music', {
         - `"text/plain"`
         - `"application/json"`
         **/
-        writable: true
+        writable: true,
+        value: 'application/json'
     },
 
     /**
@@ -229,7 +230,17 @@ export default define(element('scribe-music', {
         set: function(src) {
             const internals = getInternals(this);
             internals.src = src;
-            requestData(this.type, src).then((data) => this.data = data);
+            const url = new URL(src, window.location);
+
+            // src points to a hash in current document
+            if (window.location.origin === url.origin && window.location.pathname === url.pathname) {
+                const script = this.getRootNode().getElementById(url.hash.slice(1));
+                if (!script) throw new Error('<scribe-music> src script "' + src + '" not found in document');
+                this.data = JSON.parse(script.textContent);
+            }
+            else {
+                requestData(this.type, url.href).then((data) => this.data = data);
+            }
         },
         default:   null
     },

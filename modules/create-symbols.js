@@ -13,6 +13,7 @@ import { toKeyScale, toKeyNumber, cScale } from './keys.js';
 import { mod12, byGreater } from './maths.js';
 import quantise from './quantise.js';
 import { rflat, rsharp, rdoubleflat, rdoublesharp } from './regexp.js';
+import { getBarDivisions, getDivision } from './bar.js';
 
 const assign = Object.assign;
 const { abs, ceil, floor } = Math;
@@ -23,19 +24,6 @@ const fathercharles = [
     // Battle Ends And Down Goes Charles' Father
     'B♭', 'E♭', 'A♭', 'D♭', 'G♭', 'C♭', 'F♭'
 ];
-
-const meterDivisions = {
-    // 3/4
-    '3,1': [1],
-    // 4/4
-    '4,1': [2],
-    // 2/2
-    '2,2': [2],
-    // 6/8
-    '6,0.5': [1.5],
-    // Default to no divisions
-    default: []
-};
 
 const quantiseBeats = [0, 2/24, 3/24, 4/24, 6/24, 8/24, 9/24, 10/24, 12/24, 14/24, 15/24, 16/24, 18/24, 20/24, 21/24, 22/24, 1];
 
@@ -58,13 +46,6 @@ function getStemDirection(centerPitch, head) {
             'up');
 }
 
-function isAfterBreak(breaks, b1, b2) {
-    let n = -1;
-    while (breaks[++n] && breaks[n] <= b1);
-    // If breaks[n] is undefined, returns false, which is what we want
-    return b2 >= breaks[n];
-}
-
 function toDuration(event) {
     return event[1] === 'lyric' ?
         event[3] :
@@ -78,14 +59,12 @@ function createBeam(symbols, stave, beam, n) {
     if (beam.length === 1) {
         const i = beam[0];
 
-        if (i >= n) {
-            throw new Error('Last beam index (' + beam[0] + ') cant be greater than n (' + n + ')');
-        }
+        if (i >= n) throw new Error('Last beam index (' + beam[0] + ') cant be greater than n (' + n + ')');
 
         const head = symbols[i];
 
         // If head starts a tie insert the tie now, in front of the head
-        if (head.tie === 'begin') {
+        if (head.tie === 'begin' || head.tie === 'middle') {
             symbols.splice(i, 0, assign({}, head, {
                 type:   'tie',
                 beat:   head.beat,
@@ -243,8 +222,7 @@ function createSymbols(symbols, bar) {
         return accidentals;
     }, {});
 
-    const divisions = meterDivisions[bar.meter.slice(2).join(',')]
-        || meterDivisions.default;
+    const divisions = getBarDivisions(bar.meter);
 
     let beat = 0;
     let n = -1;
@@ -323,8 +301,10 @@ function createSymbols(symbols, bar) {
             if (head.duration >= 1
                 // or head is a triplet quarter note
                 || head.duration.toFixed(2) === '0.67'
-                // or head crosses a bar break
-                || isAfterBreak(bar.breaks, symbols[beam[beam.length - 1]].beat, head.beat)
+                // or head starts at a division
+                || bar.divisions.includes(head.beat)
+                // or head starts after a new division
+                || getDivision(bar.divisions, symbols[beam[beam.length - 1]].beat, head.beat)
             ) {
                 // Close the current beam
                 n += createBeam(symbols, bar.stave, beam, n);
@@ -348,7 +328,7 @@ function createSymbols(symbols, bar) {
                 }
             }
             else {
-                if (head.tie === 'begin') {
+                if (head.tie === 'begin' || head.tie === 'middle') {
                     let stemDirection = getStemDirection(stave.centerPitch, head);
                     symbols.splice(n++, 0, assign({}, head, {
                         type:   'tie',
@@ -427,10 +407,7 @@ function createBar(beat, stave, key, meter, tieheads) {
     const bar = {
         beat: beat,
         duration: meter[2],
-        // TODO do something about breaks
-        breaks: meter[2] === 4 ? [2] :
-            meter[2] === 3 ? [1, 2]
-                : [2],
+        divisions: getBarDivisions(meter),
         symbols: [],
         stave: stave,
         key: key,
@@ -472,7 +449,7 @@ function createBar(beat, stave, key, meter, tieheads) {
             bar.symbols.push(assign({}, head, {
                 beat: 0,
                 duration,
-                tie:  'end',
+                tie: 'end',
                 stave
             }, stave.getPart(head.pitch)));
 
@@ -597,17 +574,53 @@ function createBars(events, beatkeys, stave, meter, transpose) {
             bars.push(bar);
         }
 
-        const beat = quantise(quantiseBeats, 1, event[0] - bar.beat);
-        const key = beatkeys && keyFromBeatKeys(beatkeys, event[0]);
-
-        // Truncate duration to bar end
-        const duration = event[0] + toDuration(event) > bar.beat + bar.duration ?
-            bar.beat + bar.duration - event[0] :
-            toDuration(event);
+        const key       = beatkeys && keyFromBeatKeys(beatkeys, event[0]);
+        const startBeat = quantise(quantiseBeats, 1, event[0] - bar.beat);
+        const stopBeat  = quantise(quantiseBeats, 1, event[0] + toDuration(event) - bar.beat);
 
         if (event[1] === 'note') {
-            let pitch = stave.getSpelling(key, event, transpose);
-            let head = assign({
+            const pitch = stave.getSpelling(key, event, transpose);
+            const part  = stave.getPart(pitch);
+
+            let beat  = startBeat;
+            let division, tie;
+
+            // If note start and stop beats do not fall on multiples of meter
+            // denominator...
+            if ((startBeat !== 0 && startBeat % bar.meter[3] !== 0) ||
+                (stopBeat < bar.duration && stopBeat % bar.meter[3] !== 0)) {
+
+                // ...and note crosses bar divisions...
+                while (division = getDivision(bar.divisions, beat, stopBeat)) {
+                    const duration = division - beat;
+
+                    const head = assign({
+                        type: 'note',
+                        beat,
+                        duration,
+                        dynamic: event[3],
+                        pitch,
+                        transpose,
+                        event,
+                        stave,
+                        tie: tie ? 'middle' : 'begin'
+                    }, part);
+
+                    // Stick it in symbols
+                    bar.symbols.push(head);
+
+                    // Update state of note
+                    beat += duration;
+                    tie = true;
+                }
+            }
+
+            // Does note cross into next bar?
+            const duration = stopBeat > bar.duration ?
+                bar.duration - beat :
+                stopBeat - beat ;
+
+            const head = assign({
                 type: 'note',
                 beat,
                 duration,
@@ -616,21 +629,26 @@ function createBars(events, beatkeys, stave, meter, transpose) {
                 transpose,
                 event,
                 stave
-            }, stave.getPart(pitch));
+            }, part);
 
             // Stick it in symbols
             bar.symbols.push(head);
 
             // If it's longer than the bar stick it in tieheads buffer
-            if (event[4] > duration) {
-                head.tie = 'begin';
+            if (stopBeat > bar.duration) {
+                head.tie = tie ? 'middle' : 'begin';
                 tieheads.push(head);
             }
         }
         else if (event[1] === 'chord') {
+            // Does chord cross into next bar? The symbol should not
+            const duration = stopBeat > bar.duration ?
+                bar.duration - startBeat :
+                stopBeat - startBeat ;
+
             bar.symbols.push({
                 type: 'chord',
-                beat,
+                beat: startBeat,
                 duration,
                 transpose,
                 root: stave.getSpelling(key, event, transpose),
@@ -640,9 +658,14 @@ function createBars(events, beatkeys, stave, meter, transpose) {
             });
         }
         else {
+            // Does chord cross into next bar? The symbol should not
+            const duration = stopBeat > bar.duration ?
+                bar.duration - startBeat :
+                stopBeat - startBeat ;
+
             bar.symbols.push({
                 type: 'lyric',
-                beat,
+                beat: startBeat,
                 duration,
                 value: event[2],
                 event,

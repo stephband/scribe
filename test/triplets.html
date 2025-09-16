@@ -8,9 +8,120 @@
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width" />
 
-    <script title="debug">window.DEBUG = true;</script>
+    <script type="importmap">{
+        "imports": {
+            "bolt/":     "https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/",
+            "dom/":      "https://cdn.jsdelivr.net/gh/stephband/dom@1.4.1/modules/",
+            "fn/":       "https://cdn.jsdelivr.net/gh/stephband/fn@1.5.1/modules/",
+            "midi/":     "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.0/modules/",
+            "sequence/": "https://cdn.jsdelivr.net/gh/soundio/sequence@0.0.2/modules/"
+        }
+    }</script>
+
+    <script title="load">
+        document.documentElement.className += ' js loading';
+        // window.addEventListener('DOMContentLoaded', () => document.documentElement.classList.remove('content-loading'));
+        // Wait for other load handlers to run first - Bolt does a few things on
+        // load (eg. targetable scrolls) and we want them to run before the loading
+        // class is removed
+        window.addEventListener('load', () => window.requestAnimationFrame(() => document.documentElement.classList.remove('loading')));
+        window.DEBUG = true;
+    </script>
+
+    <!-- Import <scribe-music> -->
+    <link rel="stylesheet" href="../scribe-music/element.css" />
+    <script type="module" src="../scribe-music/element.js"></script>
+    <link rel="stylesheet" href="../elements/lead-sheet-document.css" />
+    <style>
+    body {
+        font-family: Jazz, JazzText;
+        letter-spacing: 0.004em;
+        word-spacing: 0.125em;
+    }
+    </style>
 </head>
 <body>
-    <script type="module" src="./triplets.js"></script>
+    <h3>Ties</h3>
+
+    <scribe-music clef="treble" src="#ties-0">
+        <script type="application/json" id="ties-0">{
+            "events": [
+                [0, "meter", 4, 1],
+                [0, "note", "G4", 0.1, 3]
+            ]
+        }</script>
+    </scribe-music>
+
+    <scribe-music clef="treble" src="#ties-1">
+        <script type="application/json" id="ties-1">{
+            "events": [
+                [0,   "meter", 4, 1],
+                [0.5, "note", "G4", 0.1, 3]
+            ]
+        }</script>
+    </scribe-music>
+
+    <scribe-music clef="treble" src="#ties-2">
+        <script type="application/json" id="ties-2">{
+            "events": [
+                [0,   "meter", 4, 1],
+                [1,   "note", "G4", 0.1, 3]
+            ]
+        }</script>
+    </scribe-music>
+
+    <scribe-music clef="treble" src="#ties-3">
+        <script type="application/json" id="ties-3">{
+            "events": [
+                [0,   "meter", 4, 1],
+                [1.5, "note", "G4", 0.1, 3]
+            ]
+        }</script>
+    </scribe-music>
+
+    <scribe-music clef="treble" src="#ties-4">
+        <script type="application/json" id="ties-4">{
+            "events": [
+                [0,   "meter", 4, 1],
+                [2, "note", "G4", 0.1, 3]
+            ]
+        }</script>
+    </scribe-music>
+
+    <scribe-music clef="treble" src="#ties-5">
+        <script type="application/json" id="ties-5">{
+            "events": [
+                [0,   "meter", 4, 1],
+                [2.5, "note", "G4", 0.1, 3]
+            ]
+        }</script>
+    </scribe-music>
+
+    <scribe-music clef="treble" src="#ties-6">
+        <script type="application/json" id="ties-6">{
+            "events": [
+                [0, "meter", 4, 1],
+                [3, "note", "G4", 0.1, 3]
+            ]
+        }</script>
+    </scribe-music>
+
+    <scribe-music clef="treble" src="#ties-7">
+        <script type="application/json" id="ties-7">{
+            "events": [
+                [0,   "meter", 4, 1],
+                [3.5, "note", "G4", 0.1, 3]
+            ]
+        }</script>
+    </scribe-music>
+
+    <scribe-music clef="treble" src="#ties-8">
+        <script type="application/json" id="ties-8">{
+            "events": [
+                [0, "meter", 4, 1],
+                [4, "note", "G4", 0.1, 3]
+            ]
+        }</script>
+    </scribe-music>
 </body>
 </html>
