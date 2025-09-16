@@ -41,3 +41,14 @@ export function getDivision(divisions, b1, b2) {
         divisions[n] :
         undefined ;
 }
+
+export function getLastDivision(divisions, b1, b2) {
+    let n = divisions.length;
+    while (divisions[--n] && divisions[n] >= b2);
+
+    // If divisions[n] is undefined, comparison evaluates to false, which is
+    // what we want
+    return b1 < divisions[n] ?
+        divisions[n] :
+        undefined ;
+}

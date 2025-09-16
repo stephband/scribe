@@ -13,7 +13,7 @@ import { toKeyScale, toKeyNumber, cScale } from './keys.js';
 import { mod12, byGreater } from './maths.js';
 import quantise from './quantise.js';
 import { rflat, rsharp, rdoubleflat, rdoublesharp } from './regexp.js';
-import { getBarDivisions, getDivision } from './bar.js';
+import { getBarDivisions, getDivision, getLastDivision } from './bar.js';
 
 const assign = Object.assign;
 const { abs, ceil, floor } = Math;
@@ -585,34 +585,56 @@ function createBars(events, beatkeys, stave, meter, transpose) {
             let beat  = startBeat;
             let division, tie;
 
-            // If note start and stop beats do not fall on multiples of meter
-            // denominator...
-            if ((startBeat !== 0 && startBeat % bar.meter[3] !== 0) ||
-                (stopBeat < bar.duration && stopBeat % bar.meter[3] !== 0)) {
+            // If note does not start on a meter multiple and crosses a
+            // bar division...
+            if (startBeat !== 0
+                && startBeat % bar.meter[3] !== 0
+                && (division = getDivision(bar.divisions, beat, stopBeat))
+            ) {
+                const duration = division - beat;
 
-                // ...and note crosses bar divisions...
-                while (division = getDivision(bar.divisions, beat, stopBeat)) {
-                    const duration = division - beat;
+                // Stick it in symbols
+                bar.symbols.push(assign({
+                    type: 'note',
+                    beat,
+                    duration,
+                    dynamic: event[3],
+                    pitch,
+                    transpose,
+                    event,
+                    stave,
+                    tie: tie ? 'middle' : 'begin'
+                }, part));
 
-                    const head = assign({
-                        type: 'note',
-                        beat,
-                        duration,
-                        dynamic: event[3],
-                        pitch,
-                        transpose,
-                        event,
-                        stave,
-                        tie: tie ? 'middle' : 'begin'
-                    }, part);
+                // Update state of note
+                beat += duration;
+                tie = true;
+            }
 
-                    // Stick it in symbols
-                    bar.symbols.push(head);
+            // If rest of note does not stop on a meter multiple and crosses a
+            // bar division...
+            if (stopBeat < bar.duration
+                && stopBeat % bar.meter[3] !== 0
+                && (division = getLastDivision(bar.divisions, beat, stopBeat))
+            ) {
+                const duration = division - beat;
 
-                    // Update state of note
-                    beat += duration;
-                    tie = true;
-                }
+                // Stick it in symbols
+                bar.symbols.push(assign({
+                    type: 'note',
+                    beat,
+                    duration,
+                    dynamic: event[3],
+                    pitch,
+                    transpose,
+                    event,
+                    stave,
+                    tie: tie ? 'middle' : 'begin'
+                }, part));
+
+                // Update state of note
+                beat += duration;
+                tie = true;
             }
 
             // Does note cross into next bar?
