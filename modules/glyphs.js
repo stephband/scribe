@@ -70,8 +70,16 @@ export const rest3     = '&#xE4E4;&#x200A;&#xE1E7;';
 export const rest4     = '&#xE4E3;';
 export const rest6     = '&#xE4E3;&#x200A;&#xE1E7;';
 
+export const tuplet0   = '&#xE880;';
+export const tuplet1   = '&#xE881;';
+export const tuplet2   = '&#xE882;';
 export const tuplet3   = '&#xE883;';
+export const tuplet4   = '&#xE884;';
+export const tuplet5   = '&#xE885;';
 export const tuplet6   = '&#xE886;';
+export const tuplet7   = '&#xE887;';
+export const tuplet8   = '&#xE888;';
+export const tuplet9   = '&#xE889;';
 
 export const chordDiminished      = '&#xE870;';
 export const chordDiminishedSmall = '&#xF4D8;';
