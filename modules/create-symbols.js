@@ -26,9 +26,28 @@ const fathercharles = [
     'B♭', 'E♭', 'A♭', 'D♭', 'G♭', 'C♭', 'F♭'
 ];
 
+/* When dealing with rounding errors we only really need beat grid-level
+   precision, our display grid has 24 slots so slot beat ± 1/48 is enough */
+const beatPrecision = 1/48;
+
+/* There are 24 slots in our display grid which allows for even spacing of
+   symbols down to 32nd-note triplet level, or twelve things per beat, as well
+   as 32nd-note level, or 8 things per beat. So some slots, like 1/24, go unused
+   (although they are used by accidentals, which are placed in slots preceding
+   note heads). */
 const quantiseBeats = [0, 2/24, 3/24, 4/24, 6/24, 8/24, 9/24, 10/24, 12/24, 14/24, 15/24, 16/24, 18/24, 20/24, 21/24, 22/24, 1];
 
-const restDurations = [0.125, 0.25, 1/3, 0.375, 0.5, 2/3, 0.75, 0.875, 1, 1.5, 1.75, 2, 3, 4, 6, 8];
+/* Allowable rest durations. Do we really want to allow double-dotted rests? */
+const restDurations = [
+         1/12,
+    1/8, 1/6,  6/32, // 7/32,
+    1/4, 1/3,  6/16, // 7/16,
+    1/2, 2/3,  6/8,  // 7/8,
+    1,   4/3,  6/4,  // 7/4,
+    2,   8/3,  3,    // 7/2
+    4,         6,
+    8
+];
 
 function round(d, n) {
     return Math.round(n / d) * d;
@@ -182,7 +201,8 @@ function createRest(durations, divisions, endbeat, part, tobeat, beat) {
 
     // Clamp rest duration to permissable rest symbol durations
     let r = restDurations.length;
-    while (restDurations[--r] + Number.EPSILON > duration);
+    // Employ beatPrecision to work around rounding errors
+    while (restDurations[--r] + beatPrecision > duration);
     duration = restDurations[r + 1];
 
     // Where beat does not fall on a 2^n division clamp it to next
@@ -575,7 +595,7 @@ function createBars(events, beatkeys, stave, meter, transpose, config) {
         const key       = beatkeys && keyFromBeatKeys(beatkeys, event[0]);
         const startBeat = quantise(quantiseBeats, 1, event[0] - bar.beat);
         const stopBeat  = quantise(quantiseBeats, 1, event[0] + toDuration(event) - bar.beat);
-console.log(startBeat, quantiseBeats);
+
         if (event[1] === 'note') {
             const pitch = stave.getSpelling(key, event, transpose);
             const part  = stave.getPart(pitch);
