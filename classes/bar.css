@@ -697,6 +697,17 @@ in their duration span. */
 
 .bar > .rest[data-duration="1"] + .rest[data-duration="2"] { margin-left: 0.5em; }
 
+
+/* Tuplets */
+
+.bar > .tuplet {
+    grid-row: 6;
+    text-align: center;
+    justify-self: stretch;
+    align-self: center;
+}
+
+
 /* Beams */
 
 .bar > .beam {

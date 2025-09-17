@@ -70,6 +70,9 @@ export const rest3     = '&#xE4E4;&#x200A;&#xE1E7;';
 export const rest4     = '&#xE4E3;';
 export const rest6     = '&#xE4E3;&#x200A;&#xE1E7;';
 
+export const tuplet3   = '&#xE883;';
+export const tuplet6   = '&#xE886;';
+
 export const chordDiminished      = '&#xE870;';
 export const chordDiminishedSmall = '&#xF4D8;';
 export const chordHalfDiminished  = '&#xE871;';

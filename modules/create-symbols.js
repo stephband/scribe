@@ -260,6 +260,18 @@ function createSymbols(symbols, bar) {
             const rest = createRest(restDurations, divisions, bar.duration, part, head.beat, beat);
             symbols.splice(n, 0, rest);
 
+            // Is it a triplet rest?
+            if (rest.duration.toFixed(2) === '0.67'
+                || rest.duration.toFixed(2) === '0.33') {
+                console.log('TRIPLET');
+                symbols.splice(++n, 0, {
+                    beat: rest.beat,
+                    type: 'triplet',
+                    duration: 3 * rest.duration,
+                    part
+                });
+            }
+
             // Update beat to end of rest
             beat += rest.duration;
 

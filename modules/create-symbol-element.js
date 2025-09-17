@@ -190,6 +190,16 @@ export default overload(get('type'), {
         }
     }),
 
+    triplet: (symbol) => create('span', {
+        class: "tuplet",
+        html: glyphs.tuplet3,
+        data: {
+            beat:     symbol.beat + 1,
+            duration: symbol.duration,
+            part:     symbol.part
+        }
+    }),
+
     rest: (symbol) => create('span', {
         class: "rest",
         html: restGlyphs[symbol.duration.toFixed(2)]

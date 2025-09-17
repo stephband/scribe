@@ -1,0 +1,15 @@
+
+.tuplet {}
+
+.tuplet::before,
+.tuplet::after {
+    vertical-align: -0.125em;
+}
+
+.tuplet::before {
+    content: '- ';
+}
+
+.tuplet::after {
+    content: ' -';
+}
