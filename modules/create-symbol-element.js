@@ -30,6 +30,15 @@ const acciGlyphs = {
     '-2': glyphs.acciDoubleFlat
 };
 
+const restGlyphs = {
+    // Triplet rests
+    '1.33': glyphs.rest2,
+    '0.67': glyphs.rest1,
+    '0.33': glyphs.rest05,
+    '0.17': glyphs.rest025,
+    '0.08': glyphs.rest0125
+};
+
 const rextensionparts = /^(∆|-|ø|7|\+)?(alt|sus|maj|min|dim|aug)?(.*)$/;
 
 export default overload(get('type'), {
@@ -183,13 +192,16 @@ export default overload(get('type'), {
 
     rest: (symbol) => create('span', {
         class: "rest",
-        html: `${ glyphs['rest' + (symbol.duration + '').replace('.', '')] || '' }`,
+        html: restGlyphs[symbol.duration.toFixed(2)]
+            || glyphs['rest' + (symbol.duration + '').replace('.', '')]
+            || '',
         data: {
             beat:     symbol.beat + 1,
             pitch:    symbol.pitch,
             duration: symbol.duration,
             part:     symbol.part
-        }
+        },
+        'aria-hidden': 'true'
     }),
 
     default: (function (types) {

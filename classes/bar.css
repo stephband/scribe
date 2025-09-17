@@ -669,15 +669,15 @@ in their duration span. */
 	justify-self: start;
 }
 
-.bar > .rest[data-duration="0.125"],
-.bar > .rest[data-duration="0.25"],
-.bar > .rest[data-duration="0.375"],
-.bar > .rest[data-duration="0.5"],
-.bar > .rest[data-duration="0.75"],
-.bar > .rest[data-duration="0.875"],
+/* Anything shorter than a quarter rest */
+.bar > .rest[data-duration^="."],
+.bar > .rest[data-duration^="0."],
+/* A quarter rest */
 .bar > .rest[data-duration="1"],
-.bar > .rest[data-duration="1.5"],
-.bar > .rest[data-duration="1.75"] {
+/* A dotted quarter rest */
+.bar > .rest[data-duration^="1.5"],
+/* A double dotted quarter rest */
+.bar > .rest[data-duration^="1.75"] {
 	grid-column-end: span 1;
 	margin-left:  0.015625em;
 	margin-right: 0.015625em;

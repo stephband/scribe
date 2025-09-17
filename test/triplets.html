@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>&lt;scribe-music&gt;</title>
+
+    <meta charset="utf-8" />
+    <meta name="author" content="@stephband" />
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width" />
+
+    <script type="importmap">{
+        "imports": {
+            "bolt/":     "https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/",
+            "dom/":      "https://cdn.jsdelivr.net/gh/stephband/dom@1.4.1/modules/",
+            "fn/":       "https://cdn.jsdelivr.net/gh/stephband/fn@1.5.1/modules/",
+            "midi/":     "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.0/modules/",
+            "sequence/": "https://cdn.jsdelivr.net/gh/soundio/sequence@0.0.2/modules/"
+        }
+    }</script>
+
+    <script title="load">
+        document.documentElement.className += ' js loading';
+        // window.addEventListener('DOMContentLoaded', () => document.documentElement.classList.remove('content-loading'));
+        // Wait for other load handlers to run first - Bolt does a few things on
+        // load (eg. targetable scrolls) and we want them to run before the loading
+        // class is removed
+        window.addEventListener('load', () => window.requestAnimationFrame(() => document.documentElement.classList.remove('loading')));
+        window.DEBUG = true;
+    </script>
+
+    <!-- Import <scribe-music> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/atoms.css" />
+    <link rel="stylesheet" href="../scribe-music/element.css" />
+    <script type="module" src="../scribe-music/element.js"></script>
+    <link rel="stylesheet" href="../elements/lead-sheet-document.css" />
+    <style>
+    body {
+        font-family: Jazz, JazzText;
+        letter-spacing: 0.004em;
+        word-spacing: 0.125em;
+    }
+    </style>
+</head>
+<body>
+    <section class="grid dense-grid" style="row-gap: 0;">
+        <h3 class="x1">Triplets</h3>
+
+        <scribe-music class="x1" clef="treble" src="#triplet-quarter-1">
+            <script type="application/json" id="triplet-quarter-1">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [0, "note", 69, 0.1, 0.6667]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1" clef="treble" src="#triplet-quarter-2">
+            <script type="application/json" id="triplet-quarter-2">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [0.6667, "note", 69, 0.1, 0.6667]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1" clef="treble" src="#triplet-quarter-3">
+            <script type="application/json" id="triplet-quarter-3">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [1.3333, "note", 69, 0.1, 0.6667]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1" clef="treble" src="#triplet-quarter-4">
+            <script type="application/json" id="triplet-quarter-4">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [0,      "note", 69, 0.1, 0.6667],
+                    [0.6667, "note", 69, 0.1, 0.6667]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1" clef="treble" src="#triplet-quarter-5">
+            <script type="application/json" id="triplet-quarter-5">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [0.6667, "note", 69, 0.1, 0.6667],
+                    [1.3333, "note", 69, 0.1, 0.6667]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1" clef="treble" src="#triplet-quarter-6">
+            <script type="application/json" id="triplet-quarter-6">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [0,      "note", 69, 0.1, 0.6667],
+                    [0.6667, "note", 69, 0.1, 0.6667],
+                    [1.3333, "note", 69, 0.1, 0.6667]
+                ]
+            }</script>
+        </scribe-music>
+
+
+        <h3 class="x2">Duplets</h3>
+
+        <scribe-music class="x2" clef="treble" src="#duplet-quarter-1">
+            <script type="application/json" id="duplet-quarter-1">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [0, "note", 69, 0.1, 1]
+                ]
+            }</script>
+        </scribe-music>
+
+        <!--scribe-music class="x2" clef="treble" src="#duplet-quarter-2">
+            <script type="application/json" id="duplet-quarter-2">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [1, "note", 69, 0.1, 1]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x2" clef="treble" src="#duplet-quarter-6">
+            <script type="application/json" id="duplet-quarter-6">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [0, "note", 69, 0.1, 1],
+                    [1, "note", 69, 0.1, 1]
+                ]
+            }</script>
+        </scribe-music-->
+    </section>
+</body>
+</html>
