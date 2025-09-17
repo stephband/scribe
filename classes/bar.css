@@ -734,16 +734,10 @@ in their duration span. */
 .bar > .tie {
 	justify-self: stretch;
 
-	/* Make tie span from centre of one head to centre of next. A tie to the
-	   next bar ends in the bar end column. */
-	/* - column gap - half of head width */
-	margin-left: calc(1em * var(--head-width));
-	/* - bar start gap - half of head width */
-    /* TODO: We only want this for x-bar ties! Uh-oh */
-	/*margin-right: -0.375em;*/
+	/* Make tie span from end of one head to start of next. */
+	margin-left: calc(1.125em * var(--head-width));
 	min-width: 0.5em;
 }
-
 
 .bar[data-duration="1"] > .tie[data-beat^="1"][data-duration^="1"],
 .bar[data-duration="1"] > .tie[data-beat^="1.25"][data-duration^="0.75"],

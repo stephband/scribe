@@ -14,6 +14,7 @@ import { mod12, byGreater } from './maths.js';
 import quantise from './quantise.js';
 import { rflat, rsharp, rdoubleflat, rdoublesharp } from './regexp.js';
 import { getBarDivisions, getDivision, getLastDivision } from './bar.js';
+import config from './config.js';
 
 const assign = Object.assign;
 const { abs, ceil, floor } = Math;
@@ -471,7 +472,7 @@ const accidentals = {
     '2': '𝄪'
 };
 
-function createBars(events, beatkeys, stave, meter, transpose) {
+function createBars(events, beatkeys, stave, meter, transpose, config) {
     // A buffer of head symbols to be tied to symbols in the next bar
     const tieheads = [];
     // An array of bar objects
@@ -668,12 +669,16 @@ function createBars(events, beatkeys, stave, meter, transpose) {
                 bar.duration - startBeat :
                 stopBeat - startBeat ;
 
+            let root = stave.getSpelling(key, event, transpose);
+            if (root === 'C♭' && config.spellChordRootCFlatAsB) root = 'B';
+            if (root === 'E♯' && config.spellChordRootESharpAsF) root = 'F';
+
             bar.symbols.push({
                 type: 'chord',
                 beat: startBeat,
                 duration,
                 transpose,
-                root: stave.getSpelling(key, event, transpose),
+                root,
                 extension: event[3],
                 event,
                 stave
@@ -762,6 +767,6 @@ export default function eventsToSymbols(events, clef, keyname, meter, transpose)
 
     // TODO: this is a two-pass symbol generation, I wonder if we can get
     // it down to one?
-    return createBars(events, beatkeys, stave, meter, transpose)
+    return createBars(events, beatkeys, stave, meter, transpose, config)
         .map(createBarSymbols);
 }
