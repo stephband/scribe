@@ -160,9 +160,9 @@ export default overload(get('type'), {
     }),
 
     beam: (symbol) => create('svg', {
-        // 8th note beams can be rendered directly into the grid. Beams for shorter
-        // durations are rendered as a post process once this SVG is in the DOM and
-        // stem positions can be measured. See beam.js.
+        // 8th note beams can be rendered directly into the grid. Beams for
+        // shorter durations are rendered as a post process once this SVG is in
+        // the DOM and stem positions can be measured. See beam.js.
         class: `${symbol.direction}-beam beam`,
         viewBox: `0 ${ (symbol.range > 0 ? -symbol.range : 0) - 0.5 } 1 ${ abs(symbol.range) + 1 }`,
         preserveAspectRatio: "none",
@@ -190,11 +190,13 @@ export default overload(get('type'), {
         }
     }),
 
-    triplet: (symbol) => create('span', {
+    tuplet: (symbol) => create('span', {
+        junk: (console.log('TUPLET', symbol)),
         class: "tuplet",
-        html: glyphs.tuplet3,
+        html: glyphs['tuplet' + symbol.number],
         data: {
             beat:     symbol.beat + 1,
+            pitch:    symbol.pitch,
             duration: symbol.duration,
             part:     symbol.part
         }

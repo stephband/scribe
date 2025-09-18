@@ -2,7 +2,7 @@
 //import by       from 'fn/by.js';
 import get      from 'fn/get.js';
 import overload from 'fn/overload.js';
-import { toNoteNumber, toRootName, toRootNumber } from 'midi/note.js';
+import { toNoteName, toNoteNumber, toRootName, toRootNumber } from 'midi/note.js';
 import toKeys from './sequence/to-keys.js';
 import eventsAtBeat from './sequence/events-at-beat.js';
 import { keysAtBeats, keyFromBeatKeys } from './sequence/key-at-beat.js';
@@ -224,6 +224,53 @@ function createRest(durations, divisions, endbeat, part, tobeat, beat) {
     };
 }
 
+function getTupletCentrePitch(stave, { beat, duration, number, heads }) {
+    // Decide on tuplet pitch, effectively vertical row position
+    const centreBeat = beat + 0.5 * duration;
+
+    // Encourage lowest pitch to be 1 octave below top line, ensuring
+    // triplet (with appropriate styling) always sits above the top line
+    const lowestPitchNumber = toNoteNumber(stave.maxLinePitch) - 12;
+
+    let h = heads.length;
+    let head, centreNumber;
+
+    // Scan backwards through heads until last head before centre beat
+    while ((head = heads[--h]) && head.beat > centreBeat);
+    ++h;
+
+    // Scan backwards through heads that cross centre beat, get highest pitch
+    while ((head = heads[--h]) && head.beat + head.duration > centreBeat) {
+        const number = toNoteNumber(head.pitch);
+        if (!centreNumber || number > centreNumber) centreNumber = number;
+    }
+
+    // Scan forwards from first head finding highest pitch beginning head
+    let firstNumber = lowestPitchNumber;
+    h = -1;
+    while ((head = heads[++h]) && head.beat < beatPrecision) {
+        const number = toNoteNumber(head.pitch);
+        if (!firstNumber || number > firstNumber) firstNumber = number;
+    }
+
+    // Scan backwards from last head finding highest pitch ending head
+    let lastNumber = lowestPitchNumber;
+    h = heads.length;
+    while ((head = heads[--h]) && head.beat > beat + duration - (duration / number) - beatPrecision) {
+        const pitch = toNoteNumber(head.pitch);
+        if (!lastNumber || pitch > lastNumber) lastNumber = pitch;
+    }
+
+    if (firstNumber && lastNumber) {
+        const avgNumber   = Math.ceil((firstNumber + lastNumber) / 2);
+        const avgPitch    = toNoteName(avgNumber);
+        if (avgNumber > centreNumber) centreNumber = avgNumber;
+    }
+
+console.log(centreBeat, centreNumber, firstNumber, lastNumber, heads);
+    return toNoteName(centreNumber);
+}
+
 function createSymbols(symbols, bar) {
     // All events in symbols have the same part
     const part  = symbols[0] && symbols[0].part;
@@ -246,13 +293,11 @@ function createSymbols(symbols, bar) {
     let n = -1;
     let head;
     let beam;
-    //let endBeat;
+    let tuplet;
 
     while (head = symbols[++n]) {
         // We are only interested in notes
         if (head.type !== 'note') continue;
-
-        //endBeat = head.beat + head.duration;
 
         // Insert rest if head beat is greater than beat
         if (head.beat > beat) {
@@ -263,19 +308,38 @@ function createSymbols(symbols, bar) {
             // Is it a triplet rest?
             if (rest.duration.toFixed(2) === '0.67'
                 || rest.duration.toFixed(2) === '0.33') {
-                console.log('TRIPLET');
-                symbols.splice(++n, 0, {
+
+                tuplet = {
                     beat: rest.beat,
-                    type: 'triplet',
+                    type: 'tuplet',
+                    number: 3,
                     duration: 3 * rest.duration,
+                    heads: [],
                     part
-                });
+                };
+
+                symbols.splice(++n, 0, tuplet);
             }
 
             // Update beat to end of rest
             beat += rest.duration;
-
             continue;
+        }
+
+        // Are we in tuplet state
+        if (tuplet) {
+            // If this head is within tuplet duration add it to tuplet heads
+            if (head.beat < tuplet.beat + tuplet.duration) {
+                tuplet.heads.push(head);
+            }
+            // Otherwise close the tuplet
+            else {
+                // TODO: decide on stem direction for all tuplet notes
+                tuplet.pitch = getTupletCentrePitch(stave, tuplet);
+
+                // End tuplet state
+                tuplet = undefined;
+            }
         }
 
         // Update beat
@@ -388,7 +452,16 @@ function createSymbols(symbols, bar) {
         beam = undefined;
     }
 
-    // If last event has not taken us to the end of the bar, insert rests
+    // Are we in tuplet state
+    if (tuplet) {
+        // TODO: decide on stem direction for all tuplet notes
+        tuplet.pitch = getTupletCentrePitch(stave, tuplet);
+
+        // End tuplet state
+        tuplet = undefined;
+    }
+
+// If last event has not taken us to the end of the bar, insert rests
     while (beat < bar.duration) {
         // Create rest symbol
         const rest = createRest(restDurations, divisions, bar.duration, part, bar.duration, beat);

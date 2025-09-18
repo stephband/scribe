@@ -55,5 +55,5 @@
        every font, approximative. */
     align-self: center;
     position: relative;
-    top: 0.16666667em;
+    top: calc(0.16666667em - 1.25em);
 }

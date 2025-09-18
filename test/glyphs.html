@@ -168,7 +168,7 @@
             // Font row
             return entries.filter(([name]) => name !== "chordGlyphs").reduce((html, [name, char], i) => {
                 // Char column
-                return html + `<span class="${ font }-font" style="grid-column:${ i + 1 };grid-row:${ r + 1 };" title="${ name }">${ char }</span>`;
+                return html + `<span class="${ font }-font" style="grid-column:${ i + 1 };grid-row:${ r + 1 };" title="${ font.charAt(0).toUpperCase() + font.slice(1) } – ${ name }">${ char }</span>`;
             }, html);
         }, '');
 
