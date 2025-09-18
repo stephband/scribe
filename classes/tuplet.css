@@ -21,11 +21,11 @@
     background-clip: content-box;
     border-top: 0.05em solid currentcolor;
     border-radius: 0.03em;
-    height: 0.25em;
+    height: 0.21875em;
     transform: skew(0, var(--angle));
     /* Center tuplet bracket to text. */
     position: relative;
-    top: -0.06667em;
+    top: -0.075em;
 }
 
 .tuplet::before {

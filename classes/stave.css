@@ -49,15 +49,15 @@
 }
 
 .stave > .tuplet {
-    grid-row: 4;
+    grid-row: stave-center;
     /* Do some work to center tuplet vertically in stave row, where normally the
        baseline is in the center of the stave row. This may not be the same for
        every font, approximative. */
     align-self: center;
     position: relative;
-    top: calc(0.16666667em - 1.25em);
+    top: calc(0.175em - 1.25em);
 }
 
 .stave > .down-tuplet {
-    top: calc(0.16666667em - 0.875em);
+    top: calc(0.175em - 0.875em);
 }

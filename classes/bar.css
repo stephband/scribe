@@ -847,11 +847,9 @@ in their duration span. */
     margin-right: -0.375em;
 }
 
-/* Tuplets should extend a little beyond their last head, but not all the way
-   to the end of their duration. Review these values tho. */
-.bar > .tuplet[data-duration^="0.25"] { grid-column-end: span 5; }
-.bar > .tuplet[data-duration^="0.5"]  { grid-column-end: span 10; }
-.bar > .tuplet[data-duration^="1"]    { grid-column-end: span 20; }
+/* Tuplets should extend a little beyond their last head, but the long ones
+   should perhaps not extend all the way to the end of their duration. Review
+   these values tho. */
 .bar > .tuplet[data-duration^="2"]    { grid-column-end: span 40; }
 .bar > .tuplet[data-duration^="4"]    { grid-column-end: span 80; }
 .bar > .tuplet[data-duration^="8"]    { grid-column-end: span 160; }
