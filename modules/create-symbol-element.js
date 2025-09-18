@@ -191,15 +191,15 @@ export default overload(get('type'), {
     }),
 
     tuplet: (symbol) => create('span', {
-        junk: (console.log('TUPLET', symbol)),
-        class: "tuplet",
+        class: `${ symbol.down ? 'down' : 'up' }-tuplet tuplet`,
         html: glyphs['tuplet' + symbol.number],
         data: {
             beat:     symbol.beat + 1,
             pitch:    symbol.pitch,
             duration: symbol.duration,
             part:     symbol.part
-        }
+        },
+        style: `--angle: ${ symbol.angle }deg;`
     }),
 
     rest: (symbol) => create('span', {

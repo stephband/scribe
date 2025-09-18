@@ -224,7 +224,9 @@ function createRest(durations, divisions, endbeat, part, tobeat, beat) {
     };
 }
 
-function getTupletCentrePitch(stave, { beat, duration, number, heads }) {
+function closeTuplet(stave, tuplet) {
+    const { beat, duration, number, heads } = tuplet;
+
     // Decide on tuplet pitch, effectively vertical row position
     const centreBeat = beat + 0.5 * duration;
 
@@ -261,14 +263,17 @@ function getTupletCentrePitch(stave, { beat, duration, number, heads }) {
         if (!lastNumber || pitch > lastNumber) lastNumber = pitch;
     }
 
-    if (firstNumber && lastNumber) {
-        const avgNumber   = Math.ceil((firstNumber + lastNumber) / 2);
-        const avgPitch    = toNoteName(avgNumber);
-        if (avgNumber > centreNumber) centreNumber = avgNumber;
-    }
+    const avgNumber   = Math.ceil((firstNumber + lastNumber) / 2);
+    const avgPitch    = toNoteName(avgNumber);
+    if (avgNumber > centreNumber) centreNumber = avgNumber;
 
-console.log(centreBeat, centreNumber, firstNumber, lastNumber, heads);
-    return toNoteName(centreNumber);
+    tuplet.pitch = toNoteName(centreNumber);
+    tuplet.angle = -3 * Math.sqrt(lastNumber - firstNumber);
+    tuplet.down  = tuplet.heads.every(isStemDown);
+}
+
+function isStemDown(symbol) {
+    return symbol.stemDirection === 'down';
 }
 
 function createSymbols(symbols, bar) {
@@ -335,7 +340,7 @@ function createSymbols(symbols, bar) {
             // Otherwise close the tuplet
             else {
                 // TODO: decide on stem direction for all tuplet notes
-                tuplet.pitch = getTupletCentrePitch(stave, tuplet);
+                closeTuplet(stave, tuplet);
 
                 // End tuplet state
                 tuplet = undefined;
@@ -455,7 +460,7 @@ function createSymbols(symbols, bar) {
     // Are we in tuplet state
     if (tuplet) {
         // TODO: decide on stem direction for all tuplet notes
-        tuplet.pitch = getTupletCentrePitch(stave, tuplet);
+        closeTuplet(stave, tuplet);
 
         // End tuplet state
         tuplet = undefined;
