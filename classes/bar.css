@@ -671,7 +671,12 @@ in their duration span. */
 
 /* Anything shorter than a quarter rest */
 .bar > .rest[data-duration^="."],
-.bar > .rest[data-duration^="0."],
+.bar > .rest[data-duration^="0."] {
+    grid-column-end: span 1;
+    margin-left:  0.03125em;
+    margin-right: 0.03125em;
+}
+
 /* A quarter rest */
 .bar > .rest[data-duration="1"],
 /* A dotted quarter rest */
@@ -679,8 +684,8 @@ in their duration span. */
 /* A double dotted quarter rest */
 .bar > .rest[data-duration^="1.75"] {
 	grid-column-end: span 1;
-	margin-left:  0.015625em;
-	margin-right: 0.015625em;
+	margin-left:  0.0625em;
+    margin-right: 0.0625em;
 }
 
 .bar > .rest[data-duration^="1.33"] {
