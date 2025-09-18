@@ -31,6 +31,7 @@
 .tuplet::before {
     content: '';
     border-left: 0.05em solid currentcolor;
+    border-top-left-radius: 0.05em;
     /* Move transform origin to tuplet centre, to the right of before */
     transform-origin: calc(100% + 0.2333em) 50%;
 }
@@ -38,6 +39,7 @@
 .tuplet::after {
     content: '';
     border-right: 0.05em solid currentcolor;
+    border-top-right-radius: 0.05em;
     /* Move transform origin to tuplet centre, to the left of after */
     transform-origin: -0.2333em 50%;
 }
