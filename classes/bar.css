@@ -701,8 +701,6 @@ in their duration span. */
 /* Tuplets */
 
 .bar > .tuplet {
-    grid-row: 6;
-    text-align: center;
     justify-self: stretch;
     align-self: center;
 }

@@ -18,9 +18,9 @@ export default class PianoStave extends Stave {
 
     getClefHTML() {
         return `<span class="treble-clef clef">${
-            glyphs.trebleClef
+            glyphs.clefTreble
         }</span><span class="bass-clef clef">${
-            glyphs.bassClef
+            glyphs.clefBass
         }</span>`;
     }
 

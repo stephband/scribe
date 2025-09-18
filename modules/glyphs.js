@@ -1,11 +1,11 @@
 
-export const trebleClef      = '&#xE050;';
-export const trebleDownClef  = '&#xE052;';
-export const trebleUpClef    = '&#xE053;';
-export const altoClef        = '&#xE05C;';
-export const bassClef        = '&#xE062;';
-export const drumClef        = '&#xE069;';
-export const percussionClef  = '&#xE069;';
+export const clefTreble      = '&#xE050;';
+export const clefTrebleDown  = '&#xE052;';
+export const clefTrebleUp    = '&#xE053;';
+export const clefAlto        = '&#xE05C;';
+export const clefBass        = '&#xE062;';
+export const clefDrum        = '&#xE069;';
+export const clefPercussion  = '&#xE069;';
 
 export const timeSig0         = '&#xE080;';
 export const timeSig1         = '&#xE081;';
@@ -70,6 +70,29 @@ export const rest3     = '&#xE4E4;&#x200A;&#xE1E7;';
 export const rest4     = '&#xE4E3;';
 export const rest6     = '&#xE4E3;&#x200A;&#xE1E7;';
 
+// These are only supported in Bravura, Petaluma font...
+/*export const braceBegin = '&#xE000';
+export const braceEnd   = '&#xE001';
+export const bracket    = '&#xE002';
+export const bracketTop       = '&#xE003';
+export const bracketBottom    = '&#xE004';
+export const bracketEndTop    = '&#xE005';
+export const bracketEndBottom = '&#xE006';*/
+
+export const barLine = '&#xE030';
+// These are only supported in Bravura, Leipzig, Petaluma...
+/*export const barLineDouble = '&#xE031';
+export const barLineEnd    = '&#xE032';
+export const barLineBegin  = '&#xE033';
+export const barLineHeavy  = '&#xE034';*/
+// Not supported by Ash, Broadway, use a fallback font with support
+export const barRepeatBegin = '&#xE040';
+export const barRepeatEnd   = '&#xE041';
+export const barRepeatEndBegin = '&#xE042';
+export const barRepeatDots = '&#xE043';
+
+export const coda = '&#xE048';
+
 export const tuplet0   = '&#xE880;';
 export const tuplet1   = '&#xE881;';
 export const tuplet2   = '&#xE882;';
@@ -81,8 +104,27 @@ export const tuplet7   = '&#xE887;';
 export const tuplet8   = '&#xE888;';
 export const tuplet9   = '&#xE889;';
 
+// Not supported by any font
+/*export const beamBegin   = '&#xE8E0;';
+export const beamEnd     = '&#xE8E1;';
+export const tieBegin    = '&#xE8E2;';
+export const tieEnd      = '&#xE8E3;';
+export const slurBegin   = '&#xE8E4;';
+export const slurEnd     = '&#xE8E5;';
+export const phraseBegin = '&#xE8E6;';
+export const phraseEnd   = '&#xE8E7;';*/
+
+// These are not aligned to baseline, they are intended for text content
+export const tupletBracketBegin = '&#xE1FE;';
+export const tupletBracket3     = '&#xE1FF;';
+export const tupletBracketEnd   = '&#xE200;';
+export const tupletBracketBeginLongStem = '&#xE201;';
+export const tupletBracket3LongStem     = '&#xE202;';
+export const tupletBracketEndLongStem   = '&#xE203;';
+
 export const chordDiminished      = '&#xE870;';
-export const chordDiminishedSmall = '&#xF4D8;';
+// Not supported in Jazz, Ash, Broadway, Leipzig
+/*export const chordDiminishedSmall = '&#xF4D8;';*/
 export const chordHalfDiminished  = '&#xE871;';
 export const chordAugmented       = '&#xE872;';
 export const chordMajorSeventh    = '&#xE873;';

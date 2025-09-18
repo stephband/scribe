@@ -6,7 +6,7 @@ import Stave       from './stave.js';
 
 export default class DrumStave extends Stave {
     type = 'drum';
-    clef = glyphs.drumClef;
+    clef = glyphs.clefDrum;
 
     pitched = false;
 

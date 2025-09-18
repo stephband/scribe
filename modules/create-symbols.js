@@ -27,7 +27,7 @@ const fathercharles = [
 ];
 
 /* When dealing with rounding errors we only really need beat grid-level
-   precision, our display grid has 24 slots so slot beat ± 1/48 is enough */
+   precision, our display grid has 24 slots so slot beat ± 1/48 is plenty */
 const beatPrecision = 1/48;
 
 /* There are 24 slots in our display grid which allows for even spacing of

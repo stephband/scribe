@@ -24,6 +24,8 @@
     <link rel="stylesheet" href="../module.css">
 
     <style>
+        @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/atoms.css';
+
         @import '../fonts/ash.css';
         @import '../fonts/bravura.css';
         @import '../fonts/broadway.css';
@@ -74,7 +76,8 @@
             margin-right: 0.25em;
         }
 
-        .ash-test {
+        .ash-test,
+        .ash-font {
             font-family: Ash, AshText;
         }
 
@@ -82,7 +85,8 @@
             content: 'Ash';
         }
 
-        .bravura-test {
+        .bravura-test,
+        .bravura-font {
             font-family: Bravura, BravuraText;
         }
 
@@ -90,7 +94,8 @@
             content: 'Bravura';
         }
 
-        .broadway-test {
+        .broadway-test,
+        .broadway-font {
             font-family: Broadway, BroadwayText;
         }
 
@@ -98,7 +103,8 @@
             content: 'Broadway';
         }
 
-        .jazz-test {
+        .jazz-test,
+        .jazz-font {
             font-family: Jazz, JazzText;
         }
 
@@ -106,7 +112,8 @@
             content: 'Jazz';
         }
 
-        .petaluma-test {
+        .petaluma-test,
+        .petaluma-font {
             font-family: Petaluma, PetalumaText;
         }
 
@@ -114,7 +121,8 @@
             content: 'Petaluma';
         }
 
-        .leipzig-test {
+        .leipzig-test,
+        .leipzig-font {
             font-family: Leipzig;
         }
 
@@ -136,9 +144,42 @@
             position: relative;
             top: -0.75em;
         }
+
+        .test-grid {
+            font-size: 2em;
+            column-gap: 1px;
+            row-gap: 1px;
+            width: auto;
+            grid-auto-columns: auto;
+        }
+
+        .test-grid > span {
+            align-self: baseline;
+            white-space: nowrap;
+        }
     </style>
+
+    <script type="module">
+        import * as glyphs from '../modules/glyphs.js';
+
+        const element = document.getElementById('glyphs');
+        const entries = Object.entries(glyphs);
+        const html    = ['jazz', 'ash', 'bravura', 'broadway', 'leipzig', 'petaluma'].reduce((html, font, r) => {
+            // Font row
+            return entries.filter(([name]) => name !== "chordGlyphs").reduce((html, [name, char], i) => {
+                // Char column
+                return html + `<span class="${ font }-font" style="grid-column:${ i + 1 };grid-row:${ r + 1 };" title="${ name }">${ char }</span>`;
+            }, html);
+        }, '');
+
+        element.innerHTML = html;
+    </script>
 </head>
 <body>
+    <section class="test-grid grid" id="glyphs">
+
+    </section>
+
     <h1>Scribe Glyphs</h1>
     <p>From the SMuFL spec at <a href="https://w3c.github.io/smufl/latest/index.html">w3c.github.io/smufl/latest/index.html</a>,
     and its <a href="https://w3c.github.io/smufl/latest/specification/scoring-metrics-glyph-registration.html">description

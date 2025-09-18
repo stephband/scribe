@@ -47,3 +47,13 @@
         <line x1="0" x2="1" y1="0"  y2="0"></line>\
     </svg>');
 }
+
+.stave > .tuplet {
+    grid-row: 4;
+    /* Do some work to center tuplet vertically in stave row, where normally the
+       baseline is in the center of the stave row. This may not be the same for
+       every font, approximative. */
+    align-self: center;
+    position: relative;
+    top: 0.16666667em;
+}

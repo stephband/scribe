@@ -6,7 +6,7 @@ import DrumStave from './drum.js';
 
 export default class PercussionStave extends DrumStave {
     type = 'percussion';
-    clef = glyphs.percussionClef;
+    clef = glyphs.clefPercussion;
 
     rows = ['','','','','','','','','note','','','','','','','',''];
 
