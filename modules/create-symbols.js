@@ -777,8 +777,10 @@ function createBars(events, beatkeys, stave, meter, transpose, config) {
                 stopBeat - startBeat ;
 
             let root = stave.getSpelling(key, event, transpose);
-            if (root === 'C♭' && config.spellChordRootCFlatAsB) root = 'B';
+            if (root === 'C♭' && config.spellChordRootCFlatAsB)  root = 'B';
             if (root === 'E♯' && config.spellChordRootESharpAsF) root = 'F';
+            if (root === 'B♯' && config.spellChordRootBSharpAsC) root = 'C';
+            if (root === 'F♭' && config.spellChordRootFFlatAsE)  root = 'E';
 
             bar.symbols.push({
                 type: 'chord',

@@ -1,4 +1,6 @@
 export default {
-    spellChordRootCFlatAsB: true,
-    spellChordRootESharpAsF: true
+    spellChordRootCFlatAsB:  true,
+    spellChordRootBSharpAsC: true,
+    spellChordRootESharpAsF: true,
+    spellChordRootFFlatAsE:  true
 }
