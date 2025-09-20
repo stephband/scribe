@@ -858,3 +858,25 @@ in their duration span. */
 .bar > .tuplet[data-duration^="2"]    { grid-column-end: span 40; }
 .bar > .tuplet[data-duration^="4"]    { grid-column-end: span 80; }
 .bar > .tuplet[data-duration^="8"]    { grid-column-end: span 160; }
+
+
+/* Double bar line */
+
+.bar > .barline {
+    grid-column: -1;
+    white-space: nowrap;
+}
+
+.bar > .barcount {
+    display: inline-block;
+    font-family: system-ui;
+    font-size: 0.3125em;
+    line-height: 0.8em;
+    grid-column: bar-begin;
+    grid-row: barcount / span 2;
+    white-space: nowrap;
+    position: relative;
+    left: calc(var(--bar-padding-left) * -7);
+    width: 2em;
+    text-align: center;
+}

@@ -3,6 +3,7 @@
 import get      from 'fn/get.js';
 import overload from 'fn/overload.js';
 import { toNoteName, toNoteNumber, toRootName, toRootNumber } from 'midi/note.js';
+import SequenceIterator from 'sequence/sequence.js';
 import toKeys from './sequence/to-keys.js';
 import eventsAtBeat from './sequence/events-at-beat.js';
 import { keysAtBeats, keyFromBeatKeys } from './sequence/key-at-beat.js';
@@ -579,14 +580,14 @@ const accidentals = {
     '2': '𝄪'
 };
 
-function createBars(events, beatkeys, stave, meter, transpose, config) {
+function createBars(iterator, beatkeys, stave, meter, transpose, config) {
     // A buffer of head symbols to be tied to symbols in the next bar
     const tieheads = [];
     // An array of bar objects
     const bars = [];
 
-    const events0 = eventsAtBeat(events, 0);
-    meter = events0.find((event) => event[1] === 'meter') || meter;
+    // Experimental measure for automatic double bar line insertion
+    let firstFullBarOfSequence = false;
 
     // First bar. Where meter is at beat 0, also inserts a time signature.
     let bar = createBar(0, stave, cScale, meter, tieheads);
@@ -601,7 +602,10 @@ function createBars(events, beatkeys, stave, meter, transpose, config) {
 
     let n = -1;
     let event;
-    while (event = events[++n]) {
+    while (event = iterator.next().value) {
+
+console.log(event[0], event);
+
         if (event[1] === 'key') {
             if (event[0] !== bar.beat) {
                 new TypeError('Scribe: "key" event must occur at bar start – event [' + event.join(', ') + '] is on beat ' + (event[0] - bar.beat) + ' of bar');
@@ -649,7 +653,17 @@ function createBars(events, beatkeys, stave, meter, transpose, config) {
                 });
             }
 
-            // TODO! INSERT TIME SIG.
+            // TODO: Not sure this is really necessary, I think bar should have meter properties
+            bar.meter = event;
+            continue;
+        }
+
+        if (event[1] === 'sequence') {
+            if (event[0] > 0) {
+                // Insert double bar line
+                firstFullBarOfSequence = true;
+            }
+
             continue;
         }
 
@@ -661,10 +675,11 @@ function createBars(events, beatkeys, stave, meter, transpose, config) {
             continue;
         }
 
+        // NOT NOW POSSIBLE!!
         // Event is in a future bar
         while (event[0] >= bar.beat + bar.duration) {
             // Pick up meter for next bar
-            if (event[0] === bar.beat + bar.duration) {
+            /*if (event[0] === bar.beat + bar.duration) {
                 let m = n - 1;
                 while (events[++m] && events[m][0] === event[0]) {
                     if (events[m][1] === 'meter') {
@@ -674,11 +689,31 @@ function createBars(events, beatkeys, stave, meter, transpose, config) {
                         // is at the end of a line
                     }
                 }
+            }*/
+
+            if (firstFullBarOfSequence) {
+                // Put a double bar line at the end of the existing bar
+                bar.symbols.push({
+                    type: 'doublebarline',
+                    stave
+                });
             }
 
             // Create the next bar. Where meter is at the new bar beat, also
             // creates a time signature.
             bar = createBar(bar.beat + bar.duration, stave, bar.key, meter, tieheads);
+
+            if (firstFullBarOfSequence) {
+                // Put a bar count indicator at the start of the bar
+                bar.symbols.push({
+                    type: 'barcount',
+                    text: bars.length + 1,
+                    stave
+                });
+
+                firstFullBarOfSequence = false;
+            }
+
             bars.push(bar);
         }
 
@@ -817,6 +852,12 @@ function createBars(events, beatkeys, stave, meter, transpose, config) {
         bars.push(bar);
     }
 
+    // Push double bar line at very end of piece
+    bar.symbols.push({
+        type: 'doublebarline',
+        stave
+    });
+
     return bars;
 }
 
@@ -849,8 +890,9 @@ function byRenderOrder(b, a) {
         getPriority(a) - getPriority(b) ;
 }
 
-export default function eventsToSymbols(events, clef, keyname, meter, transpose) {
+export default function eventsToSymbols(sequence, clef, keyname, meter, transpose) {
     // TODO, WARNING! This mutates events! We probably oughta clone events first.
+    const events = sequence.events;
 
     // If events contains no initial meter and meter is set, insert a meter event
     const meterEvent = events.find(isInitialMeterEvent);
@@ -860,8 +902,10 @@ export default function eventsToSymbols(events, clef, keyname, meter, transpose)
     const keyEvent = events.find(isInitialKeyEvent);
     if (!keyEvent && keyname) events.unshift([0, 'key', keyname]);
 
+    const iterator = new SequenceIterator(sequence);
+
     // Sort into the proper order for rendering
-    events.sort(byRenderOrder);
+    //events.sort(byRenderOrder);
 
     // Get the stave controller
     const stave = Stave.create(clef || 'treble');
@@ -876,6 +920,6 @@ export default function eventsToSymbols(events, clef, keyname, meter, transpose)
 
     // TODO: this is a two-pass symbol generation, I wonder if we can get
     // it down to one?
-    return createBars(events, beatkeys, stave, meter, transpose, config)
+    return createBars(iterator, beatkeys, stave, meter, transpose, config)
         .map(createBarSymbols);
 }

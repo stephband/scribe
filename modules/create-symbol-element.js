@@ -86,6 +86,16 @@ export default overload(get('type'), {
             }
         }),
 
+    barcount: (symbol) => create('span', {
+        html: symbol.text,
+        class: "barcount"
+    }),
+
+    doublebarline: (symbol) => create('span', {
+        html: glyphs.barLine + '&#x200A;' + glyphs.barLine,
+        class: "barline"
+    }),
+
     lyric: (symbol) => create('span', {
         class: "lyric",
         part:  "lyric",

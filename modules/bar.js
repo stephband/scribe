@@ -23,7 +23,7 @@ Gets bar divisions from `meter` event.
 **/
 
 export function getBarDivisions(meter) {
-    return barDivisions[meter.slice(2).join(',')] || nothing;
+    return barDivisions[meter[2] + ',' + meter[3]] || nothing;
 }
 
 /**

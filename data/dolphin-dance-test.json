@@ -1,0 +1,27 @@
+{
+"name": "Dolphin Dance",
+"author": { "name": "Herbie Hancock" },
+"events": [
+    [0,"key","Eb"],
+    [0,"meter",4,1],
+    [0,  "sequence", 1, 0, 1],
+    [12, "note",    60, 1, 1],
+    [16, "sequence", 2, 8, 1]
+],
+
+"sequences": [{
+    "id": 1,
+    "name": "Intro",
+    "events": [
+        [0,"chord",3,"∆",4],
+        [2,"note",67,0.25,0.5]
+    ]
+}, {
+    "id": 2,
+    "name": "Head",
+    "events": [
+        [16,"chord",0,"-",4],
+        [18,"note",63,0.25,0.5]
+    ]
+}]
+}

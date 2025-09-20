@@ -61,3 +61,8 @@
 .stave > .down-tuplet {
     top: calc(0.175em - 0.875em);
 }
+
+.bar > .barline {
+    grid-row: bottom;
+    align-self: center;
+}

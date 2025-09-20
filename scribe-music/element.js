@@ -81,7 +81,7 @@ export default define(element('scribe-music', {
         return Signal.frame(() => {
             const elements = internals.data.value && createBarElements(createSymbols(
                 // Events from data
-                internals.data.value.events,
+                internals.data.value,
                 // Clef is a string
                 internals.clef.value,
                 // Key name
@@ -239,7 +239,8 @@ export default define(element('scribe-music', {
                 this.data = JSON.parse(script.textContent);
             }
             else {
-                requestData(this.type, url.href).then((data) => this.data = data);
+                requestData(this.type, url.href)
+                .then((data) => this.data = data);
             }
         },
         default:   null
