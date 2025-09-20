@@ -603,6 +603,13 @@ function createBars(sequence, beatkeys, stave, meter, transpose, config) {
     let n = -1;
     let event;
     for (event of sequence) {
+        /*if (event[1] === 'symbol') {
+            bar.symbols.push({
+                type: 'symbol' + event[2],
+                stave
+            });
+        }*/
+
         if (event[1] === 'key') {
             if (event[0] !== bar.beat) {
                 new TypeError('Scribe: "key" event must occur at bar start – event [' + event.join(', ') + '] is on beat ' + (event[0] - bar.beat) + ' of bar');
@@ -658,7 +665,7 @@ function createBars(sequence, beatkeys, stave, meter, transpose, config) {
         if (event[1] === 'sequence') {
             if (event[0] > 0) {
                 // Insert double bar line
-                firstFullBarOfSequence = true;
+                firstFullBarOfSequence = event.sequence;
             }
 
             continue;

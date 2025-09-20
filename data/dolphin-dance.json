@@ -2,17 +2,19 @@
 "name": "Dolphin Dance",
 "author": { "name": "Herbie Hancock" },
 "events": [
-    [0,  "sequence", 1, 0, 1],
-    [12, "note",    50, 1, 1],
-    [16, "sequence", 2, 8, 1]
+    [0, "key", "Eb"],
+    [0, "meter", 4, 1],
+
+    [0,   "sequence", 1, 0, 1],
+    [0,   "note",     80, 1, 1],
+    [16,  "sequence", 2, 8, 1],
+    [160, "sequence", 3, 0, 1]
 ],
 
 "sequences": [{
     "id": 1,
     "name": "Intro",
     "events": [
-        [0,"key","Eb"],
-        [0,"meter",4,1],
         [0,"chord",3,"∆",4],
         [2,"note",67,0.25,0.5],
         [2.5,"note",68,0.25,0.5],
@@ -144,6 +146,16 @@
         [147,"note",70,0.25,0.5],
         [147.5,"note",65,0.25,3.5],
         [148,"chord",7,"7alt",4]
+    ]
+}, {
+    "id": 3,
+    "name": "Coda",
+    "events": [
+        [0, "symbol", "coda"],
+        [0, "chord",4,"-7",4],
+        [4, "chord",4,"-♭6",4],
+        [8, "chord",4,"-7",4],
+        [12,"chord",4,"-♭6",4]
     ]
 }],
 

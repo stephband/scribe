@@ -86,6 +86,11 @@ export default overload(get('type'), {
             }
         }),
 
+    coda: (symbol) => create('p', {
+        html: glyphs.coda,
+        class: "coda"
+    }),
+
     barcount: (symbol) => create('span', {
         html: symbol.text,
         class: "barcount"
