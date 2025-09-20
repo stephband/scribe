@@ -3,7 +3,7 @@
 import get      from 'fn/get.js';
 import overload from 'fn/overload.js';
 import { toNoteName, toNoteNumber, toRootName, toRootNumber } from 'midi/note.js';
-import SequenceIterator from 'sequence/sequence.js';
+import SequenceIterator, { Sequence } from 'sequence/sequence.js';
 import toKeys from './sequence/to-keys.js';
 import eventsAtBeat from './sequence/events-at-beat.js';
 import { keysAtBeats, keyFromBeatKeys } from './sequence/key-at-beat.js';
@@ -580,7 +580,7 @@ const accidentals = {
     '2': '𝄪'
 };
 
-function createBars(iterator, beatkeys, stave, meter, transpose, config) {
+function createBars(sequence, beatkeys, stave, meter, transpose, config) {
     // A buffer of head symbols to be tied to symbols in the next bar
     const tieheads = [];
     // An array of bar objects
@@ -602,10 +602,7 @@ function createBars(iterator, beatkeys, stave, meter, transpose, config) {
 
     let n = -1;
     let event;
-    while (event = iterator.next().value) {
-
-console.log(event[0], event);
-
+    for (event of sequence) {
         if (event[1] === 'key') {
             if (event[0] !== bar.beat) {
                 new TypeError('Scribe: "key" event must occur at bar start – event [' + event.join(', ') + '] is on beat ' + (event[0] - bar.beat) + ' of bar');
@@ -890,9 +887,9 @@ function byRenderOrder(b, a) {
         getPriority(a) - getPriority(b) ;
 }
 
-export default function eventsToSymbols(sequence, clef, keyname, meter, transpose) {
+export default function eventsToSymbols(data, clef, keyname, meter, transpose) {
     // TODO, WARNING! This mutates events! We probably oughta clone events first.
-    const events = sequence.events;
+    const events = data.events;
 
     // If events contains no initial meter and meter is set, insert a meter event
     const meterEvent = events.find(isInitialMeterEvent);
@@ -902,10 +899,8 @@ export default function eventsToSymbols(sequence, clef, keyname, meter, transpos
     const keyEvent = events.find(isInitialKeyEvent);
     if (!keyEvent && keyname) events.unshift([0, 'key', keyname]);
 
-    const iterator = new SequenceIterator(sequence);
-
-    // Sort into the proper order for rendering
-    //events.sort(byRenderOrder);
+    // Create sequence object
+    const sequence = new Sequence(events, data.sequences, data.name);
 
     // Get the stave controller
     const stave = Stave.create(clef || 'treble');
@@ -920,6 +915,6 @@ export default function eventsToSymbols(sequence, clef, keyname, meter, transpos
 
     // TODO: this is a two-pass symbol generation, I wonder if we can get
     // it down to one?
-    return createBars(iterator, beatkeys, stave, meter, transpose, config)
+    return createBars(sequence, beatkeys, stave, meter, transpose, config)
         .map(createBarSymbols);
 }
