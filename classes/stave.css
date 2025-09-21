@@ -62,6 +62,15 @@
     top: calc(0.175em - 0.875em);
 }
 
+.stave > .coda {
+    margin: 0;
+    margin-left: calc(-1 * var(--bar-padding-left) - 0.5em);
+    margin-right: 0.25em;
+    grid-column: bar-begin;
+    grid-row: chords;
+    align-self: center;
+}
+
 .bar > .barline {
     grid-row: bottom;
     align-self: center;

@@ -86,7 +86,7 @@ export default overload(get('type'), {
             }
         }),
 
-    coda: (symbol) => create('p', {
+    symbolcoda: (symbol) => create('p', {
         html: glyphs.coda,
         class: "coda"
     }),

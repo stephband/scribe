@@ -867,16 +867,20 @@ in their duration span. */
     white-space: nowrap;
 }
 
+.bar {
+    position: relative;
+}
+
 .bar > .barcount {
-    display: inline-block;
+    position: absolute;
+    grid-column: auto;
+    grid-row: auto;
+    left: -1em;
+    top: calc(50% + 2.4em);
+    width: 2em;
     font-family: system-ui;
     font-size: 0.3125em;
     line-height: 0.8em;
-    grid-column: bar-begin;
-    grid-row: barcount / span 2;
-    white-space: nowrap;
-    position: relative;
-    left: calc(var(--bar-padding-left) * -7);
-    width: 2em;
     text-align: center;
+    white-space: nowrap;
 }
