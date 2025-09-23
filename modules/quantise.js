@@ -32,5 +32,5 @@ export default function quantise(grid, amount, beat) {
         grid[n]);
 
     // Apply scaled quantisation to nearest entry
-    return beat - amount * (-togap < fromgap ? togap : fromgap);
+    return beat - amount * (-togap < fromgap ? togap : fromgap) ;
 }

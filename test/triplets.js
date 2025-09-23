@@ -1,5 +1,7 @@
 console.log('TRIPLETS');
 
+import round from '../modules/maths/round.js';
+
 const tests = [
     [[0.75]],
 
@@ -67,18 +69,6 @@ const tests = [
 const abs = Math.abs;
 
 const quantisations = new Set();
-
-function ceilPowerOf2(n) {
-    return 2 ** Math.ceil(Math.log2(n));
-}
-
-function floorPowerOf2(n) {
-    return 2 ** Math.floor(Math.log2(n));
-}
-
-function round(d, n) {
-    return Math.round(n / d) * d;
-}
 
 tests.forEach((events, i) => {
     console.log('events ' + events.length + ' – times ' + events.join(' ') + ' –––––––––––––––––––');

@@ -15,6 +15,8 @@ import { mod12, byGreater } from './maths.js';
 import quantise from './quantise.js';
 import { rflat, rsharp, rdoubleflat, rdoublesharp } from './regexp.js';
 import { getBarDivisions, getDivision, getLastDivision } from './bar.js';
+import detectTuplets from './tuplets.js';
+import { round, equal, gte, lte, lt, gt } from './maths/float.js';
 import config from './config.js';
 
 const assign = Object.assign;
@@ -29,7 +31,7 @@ const fathercharles = [
 
 /* When dealing with rounding errors we only really need beat grid-level
    precision, our display grid has 24 slots so slot beat ± 1/48 is plenty */
-const beatPrecision = 1/48;
+const precision = 1/48;
 
 /* There are 24 slots in our display grid which allows for even spacing of
    symbols down to 32nd-note triplet level, or twelve things per beat, as well
@@ -38,21 +40,27 @@ const beatPrecision = 1/48;
    note heads). */
 const quantiseBeats = [0, 2/24, 3/24, 4/24, 6/24, 8/24, 9/24, 10/24, 12/24, 14/24, 15/24, 16/24, 18/24, 20/24, 21/24, 22/24, 1];
 
-/* Allowable rest durations. Do we really want to allow double-dotted rests? */
-const restDurations = [
-         1/12,
-    1/8, 1/6,  6/32, // 7/32,
-    1/4, 1/3,  6/16, // 7/16,
-    1/2, 2/3,  6/8,  // 7/8,
-    1,   4/3,  6/4,  // 7/4,
-    2,   8/3,  3,    // 7/2
-    4,         6,
+const headDurations = [
+    1/8, 6/32, 7/32,
+    1/4, 6/16, 7/16,
+    1/2, 6/8,  7/8,
+    1,   6/4,  7/4,
+    2,   6/2,  7/2,
+    4,   6,    7,
     8
 ];
 
-function round(d, n) {
-    return Math.round(n / d) * d;
-}
+/* Allowable rest durations. Do we really want to allow double-dotted rests? */
+const restDurations = [
+         /*1/12,*/
+    1/8, /*1/6, */ 6/32, // 7/32,
+    1/4, /*1/3, */ 6/16, // 7/16,
+    1/2, /*2/3, */ 6/8,  // 7/8,
+    1,   /*4/3, */ 6/4,  // 7/4,
+    2,   /*8/3, */ 3,    // 7/2
+    4,             6,
+    8
+];
 
 function byFatherCharlesPitch(a, b) {
     const ai = fathercharles.indexOf(a.pitch);
@@ -202,8 +210,8 @@ function createRest(durations, divisions, endbeat, part, tobeat, beat) {
 
     // Clamp rest duration to permissable rest symbol durations
     let r = restDurations.length;
-    // Employ beatPrecision to work around rounding errors
-    while (restDurations[--r] + beatPrecision > duration);
+    // Employ precision to work around rounding errors
+    while (restDurations[--r] + precision > duration);
     duration = restDurations[r + 1];
 
     // Where beat does not fall on a 2^n division clamp it to next
@@ -226,7 +234,7 @@ function createRest(durations, divisions, endbeat, part, tobeat, beat) {
 }
 
 function closeTuplet(stave, tuplet) {
-    const { beat, duration, number, heads } = tuplet;
+    const { beat, duration, divisor, symbols } = tuplet;
 
     // Decide on tuplet pitch, effectively vertical row position
     const centreBeat = beat + 0.5 * duration;
@@ -235,42 +243,42 @@ function closeTuplet(stave, tuplet) {
     // triplet (with appropriate styling) always sits above the top line
     const lowestPitchNumber = toNoteNumber(stave.maxLinePitch) - 12;
 
-    let h = heads.length;
-    let head, centreNumber;
+    let h = symbols.length;
+    let symbol, centreNumber;
 
-    // Scan backwards through heads until last head before centre beat
-    while ((head = heads[--h]) && head.beat > centreBeat);
+    // Scan backwards through symbols until last symbol before centre beat
+    while ((symbol = symbols[--h]) && symbol.beat > centreBeat);
     ++h;
 
-    // Scan backwards through heads that cross centre beat, get highest pitch
-    while ((head = heads[--h]) && head.beat + head.duration > centreBeat) {
-        const number = toNoteNumber(head.pitch);
+    // Scan backwards through symbols that cross centre beat, get highest pitch
+    while ((symbol = symbols[--h]) && symbol.beat + symbol.duration > centreBeat) {
+        const number = toNoteNumber(symbol.pitch);
         if (!centreNumber || number > centreNumber) centreNumber = number;
     }
 
-    // Scan forwards from first head finding highest pitch beginning head
+    // Scan forwards from first symbol finding highest pitch beginning head
     let firstNumber = lowestPitchNumber;
     h = -1;
-    while ((head = heads[++h]) && head.beat < beatPrecision) {
-        const number = toNoteNumber(head.pitch);
+    while ((symbol = symbols[++h]) && symbol.beat < precision) {
+        const number = toNoteNumber(symbol.pitch);
         if (!firstNumber || number > firstNumber) firstNumber = number;
     }
 
-    // Scan backwards from last head finding highest pitch ending head
+    // Scan backwards from last symbol finding highest pitch ending symbol
     let lastNumber = lowestPitchNumber;
-    h = heads.length;
-    while ((head = heads[--h]) && head.beat > beat + duration - (duration / number) - beatPrecision) {
-        const pitch = toNoteNumber(head.pitch);
+    h = symbols.length;
+    while ((symbol = symbols[--h]) && symbol.beat > beat + duration - (duration / divisor) - precision) {
+        const pitch = toNoteNumber(symbol.pitch);
         if (!lastNumber || pitch > lastNumber) lastNumber = pitch;
     }
 
-    const avgNumber   = Math.ceil((firstNumber + lastNumber) / 2);
-    const avgPitch    = toNoteName(avgNumber);
+    const avgNumber = Math.ceil((firstNumber + lastNumber) / 2);
+    const avgPitch  = toNoteName(avgNumber);
     if (avgNumber > centreNumber) centreNumber = avgNumber;
 
     tuplet.pitch = toNoteName(centreNumber);
     tuplet.angle = -3 * Math.sqrt(lastNumber - firstNumber);
-    tuplet.down  = tuplet.heads.every(isStemDown);
+    tuplet.down  = tuplet.symbols.every(isStemDown);
 }
 
 function isStemDown(symbol) {
@@ -294,62 +302,85 @@ function createSymbols(symbols, bar) {
     }, {});
 
     const divisions = getBarDivisions(bar.meter);
+    const heads = symbols.filter((symbol) => symbol.type === 'note');
 
     let beat = 0;
     let n = -1;
     let head;
     let beam;
     let tuplet;
+    let data;
 
     while (head = symbols[++n]) {
-        // We are only interested in notes
         if (head.type !== 'note') continue;
 
+        // If beat has moved beyond tuplet close tuplet
+        if (tuplet && gte(beat, tuplet.beat + tuplet.duration, precision)) {
+            // TODO: decide on stem direction for all tuplet notes
+            closeTuplet(stave, tuplet);
+            // End tuplet state
+            tuplet = undefined;
+        }
+
+        // Where we are not currently in tuplet mode detect tuplets
+        if (!tuplet && (data = detectTuplets(bar.duration - beat, heads, beat)) && data.divisor !== 2) {
+            tuplet = assign({
+                type: 'tuplet',
+                symbols: [],
+                part
+            }, data);
+
+            symbols.splice(n, 0, tuplet);
+            continue;
+        }
+
         // Insert rest if head beat is greater than beat
-        if (head.beat > beat) {
-            // Create rest symbol
-            const rest = createRest(restDurations, divisions, bar.duration, part, head.beat, beat);
-            symbols.splice(n, 0, rest);
+        if (gt(head.beat, beat, precision)) {
+            let rest;
 
-            // Is it a triplet rest?
-            if (rest.duration.toFixed(2) === '0.67'
-                || rest.duration.toFixed(2) === '0.33') {
-
-                tuplet = {
-                    beat: rest.beat,
-                    type: 'tuplet',
-                    number: 3,
-                    duration: 3 * rest.duration,
-                    heads: [],
-                    part
-                };
-
-                symbols.splice(++n, 0, tuplet);
+            // There are tuplets ahead
+            if (tuplet) {
+                // And beat is at or beyond tuplet time
+                if (gte(beat, tuplet.beat, precision)) {
+                    rest = {
+                        beat,
+                        type: 'rest',
+                        pitch: '',
+                        part,
+                        duration: tuplet.duration / tuplet.divisor
+                    };
+                    tuplet.symbols.push(rest);
+                }
+                // Add rests up to tuplet
+                else {
+                    // Create rest symbol
+                    rest = createRest(restDurations, divisions, bar.duration, part, tuplet.beat, beat);
+                }
+            }
+            else {
+                // Create rest symbol
+                rest = createRest(restDurations, divisions, bar.duration, part, head.beat, beat);
             }
 
-            // Update beat to end of rest
+            symbols.splice(n, 0, rest);
             beat += rest.duration;
             continue;
         }
 
-        // Are we in tuplet state
         if (tuplet) {
-            // If this head is within tuplet duration add it to tuplet heads
-            if (head.beat < tuplet.beat + tuplet.duration) {
-                tuplet.heads.push(head);
-            }
-            // Otherwise close the tuplet
-            else {
-                // TODO: decide on stem direction for all tuplet notes
-                closeTuplet(stave, tuplet);
-
-                // End tuplet state
-                tuplet = undefined;
-            }
+            // Quantise head duration to multiple of tuplet duration
+            //head.duration = round(tuplet.duration / tuplet.divisor, head.duration);
+            // Push head into tuplet symbols
+            tuplet.symbols.push(head);
+        }
+        else {
+            head.beat = round(1/24, head.beat);
+            // Quantize head duration, round to remove rounding errors, ironically
+            head.duration = round(1/8, quantise(headDurations, 1, head.duration));
         }
 
         // Update beat
-        if (head.beat + head.duration > beat) beat = head.beat + head.duration;
+        if (gt(head.beat + head.duration, beat, precision)) beat = head.beat + head.duration;
 
         // Accidental
         // Determine accidental
@@ -363,7 +394,7 @@ function createSymbols(symbols, bar) {
         if (
             // If head is not a tied head from a previous bar - they
             // don't require accidentals,
-            !(head.beat === 0 && head.tie && head.tie !== 'begin')
+            !(equal(head.beat, 0, precision) && head.tie && head.tie !== 'begin')
             // and if it has changed from the bars current accidentals
             && acci !== accidentals[line]
         ) {
@@ -458,22 +489,37 @@ function createSymbols(symbols, bar) {
         beam = undefined;
     }
 
-    // Are we in tuplet state
-    if (tuplet) {
-        // TODO: decide on stem direction for all tuplet notes
-        closeTuplet(stave, tuplet);
+    // If last event has not taken us to the end of the bar, insert rests
+    while (lt(beat, bar.duration, precision)) {
+        if (tuplet) {
+            // Beat has moved beyond tuplet duration
+            if (gte(beat, tuplet.beat + tuplet.duration, precision)) {
+                closeTuplet(stave, tuplet);
+                // End tuplet state
+                tuplet = undefined;
+            }
+            else {
+                const rest = {
+                    beat,
+                    type: 'rest',
+                    pitch: '',
+                    part,
+                    duration: tuplet.duration / tuplet.divisor
+                };
 
-        // End tuplet state
-        tuplet = undefined;
-    }
-
-// If last event has not taken us to the end of the bar, insert rests
-    while (beat < bar.duration) {
-        // Create rest symbol
-        const rest = createRest(restDurations, divisions, bar.duration, part, bar.duration, beat);
-        symbols.splice(n++, 0, rest);
-        // Update beat to end of rest
-        beat += rest.duration;
+                //createRest([tuplet.duration / tuplet.divisor], [], tuplet.beat + tuplet.duration, part, head.beat, beat);
+                tuplet.symbols.push(rest);
+                symbols.splice(n++, 0, rest);
+                beat += rest.duration;
+                continue;
+            }
+        }
+        else {
+            // Create rest symbol
+            const rest = createRest(restDurations, divisions, bar.duration, part, bar.duration, beat);
+            symbols.splice(n++, 0, rest);
+            beat += rest.duration;
+        }
     }
 
     return symbols;
@@ -495,9 +541,7 @@ function createBarSymbols(bar) {
 
     // If there are no parts we must nonetheless render a rest
     // TODO: render rest for each part, even tho there are no parts here?
-    if (parts.length === 0) {
-        parts[0] = [];
-    }
+    if (parts.length === 0) parts[0] = [];
 
     // Fill each parts with accidentals, rests, beams, tieheads
     parts.forEach((part) => createSymbols(part, bar, state.clef.stemDirectionNote));

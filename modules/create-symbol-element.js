@@ -207,11 +207,11 @@ export default overload(get('type'), {
 
     tuplet: (symbol) => create('span', {
         class: `${ symbol.down ? 'down' : 'up' }-tuplet tuplet`,
-        html: glyphs['tuplet' + symbol.number],
+        html: glyphs['tuplet' + symbol.divisor],
         data: {
             beat:     symbol.beat + 1,
             pitch:    symbol.pitch,
-            duration: symbol.duration,
+            duration: symbol.duration.toFixed(2),
             part:     symbol.part
         },
         style: `--angle: ${ symbol.angle }deg;`
