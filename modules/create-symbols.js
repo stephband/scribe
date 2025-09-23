@@ -711,37 +711,8 @@ function createBars(sequence, beatkeys, stave, meter, transpose, config) {
             continue;
         }
 
-        /*if (event[1] !== 'note' && event[1] !== 'chord' && event[1] !== 'lyric') {
-            if (window.DEBUG && !eventNameLogs[event[1]]) {
-                eventNameLogs[event[1]] = true;
-                console.log('Scribe "' + event[1] + '" events ignored');
-            }
-            continue;
-        }*/
-
         // Event is in a future bar
         while (event[0] >= bar.beat + bar.duration) {
-            // Pick up meter for next bar
-            /*if (event[0] === bar.beat + bar.duration) {
-                let m = n - 1;
-                while (events[++m] && events[m][0] === event[0]) {
-                    if (events[m][1] === 'meter') {
-                        meter = events[m];
-                        // TODO: We may want to add an advisory timesig to the
-                        // end of the current bar, to be displayed when this bar
-                        // is at the end of a line
-                    }
-                }
-            }
-
-            if (firstFullBarOfSequence) {
-                // Put a double bar line at the end of the existing bar
-                bar.symbols.push({
-                    type: 'doublebarline',
-                    stave
-                });
-            }*/
-
             // Create the next bar. Where meter is at the new bar beat, also
             // creates a time signature.
             bar = createBar(bar.beat + bar.duration, stave, bar.key, meter, tieheads);

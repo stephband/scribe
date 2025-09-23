@@ -17,7 +17,6 @@ function score(wavelength, beat) {
 
 
 const outA = {};
-
 function detect(divisor, duration, heads, beat) {
     outA.score = 0;
     outA.count = 0;
@@ -53,7 +52,6 @@ function detect(divisor, duration, heads, beat) {
 
 
 const outB = {};
-
 function detectTuplet(duration, heads, beat) {
     outB.score    = 0;
     outB.duration = 0;
@@ -82,7 +80,6 @@ function detectTuplet(duration, heads, beat) {
 
 
 const outC = {};
-
 export default function detectTuplets(duration, heads, beat) {
     // Reset accumulator
     outC.score    = 0;
