@@ -1,5 +1,6 @@
 
-/* An imperfect tuplet detector based on a score derived from a cosine. */
+/* An imperfect tuplet detector based on a score derived from a cosine.
+   TODO: These loops surely could be more elegantly written. Recursive, even. */
 
 import { floorPowerOf2 } from './maths/power-of-2.js';
 
@@ -75,7 +76,7 @@ function detectTuplet(duration, heads, beat) {
         }
     }
 
-    return outB.score ? outB : undefined ;
+    return outB;
 }
 
 
@@ -95,6 +96,7 @@ export default function detectTuplets(duration, heads, beat) {
         let position = -d;
         position: while ((position += d) < duration) {
             const data = detectTuplet(d, heads, beat + position);
+//console.log(beat + position, d, data.divisor, data.score, data.count, heads.map((h) => h.beat).join());
             if (data && data.count) {
                 if (data.score >= score) {
                     score = data.score;

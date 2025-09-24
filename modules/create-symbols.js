@@ -744,8 +744,8 @@ function createBars(sequence, beatkeys, stave, transpose, config) {
         }
 
         const key       = beatkeys && keyFromBeatKeys(beatkeys, event[0]);
-        const startBeat = quantise(quantiseBeats, 1, event[0] - bar.beat);
-        const stopBeat  = quantise(quantiseBeats, 1, event[0] + toDuration(event) - bar.beat);
+        const startBeat = /*quantise(quantiseBeats, 1, */event[0] - bar.beat/*)*/;
+        const stopBeat  = /*quantise(quantiseBeats, 1, */event[0] + toDuration(event) - bar.beat/*)*/;
 
         if (event[1] === 'note') {
             const pitch = stave.getSpelling(key, event, transpose);
