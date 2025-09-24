@@ -16,7 +16,7 @@ import { mod12, byGreater } from './maths.js';
 import quantise from './quantise.js';
 import { rflat, rsharp, rdoubleflat, rdoublesharp } from './regexp.js';
 import { getBarDivisions, getDivision, getLastDivision } from './bar.js';
-import detectTuplets from './tuplets.js';
+import detectTuplets from './tuplet.js';
 import { round, equal, gte, lte, lt, gt } from './maths/float.js';
 import config from './config.js';
 
@@ -324,7 +324,7 @@ function createSymbols(symbols, bar) {
         }
 
         // Where we are not currently in tuplet mode detect tuplets
-        if (!tuplet && (data = detectTuplets(bar.duration - beat, heads, beat)) && data.divisor !== 2) {
+        if (!tuplet && (data = detectTuplets(heads, beat, bar.duration - beat)) && (console.log(data), true) && data.divisor !== 2) {
             tuplet = assign({
                 type: 'tuplet',
                 symbols: [],
@@ -492,6 +492,8 @@ function createSymbols(symbols, bar) {
 
     // If last event has not taken us to the end of the bar, insert rests
     while (lt(beat, bar.duration, precision)) {
+        //console.log(beat);
+
         if (tuplet) {
             // Beat has moved beyond tuplet duration
             if (gte(beat, tuplet.beat + tuplet.duration, precision)) {
@@ -507,8 +509,6 @@ function createSymbols(symbols, bar) {
                     part,
                     duration: tuplet.duration / tuplet.divisor
                 };
-
-                //createRest([tuplet.duration / tuplet.divisor], [], tuplet.beat + tuplet.duration, part, head.beat, beat);
                 tuplet.symbols.push(rest);
                 symbols.splice(n++, 0, rest);
                 beat += rest.duration;
@@ -516,6 +516,8 @@ function createSymbols(symbols, bar) {
             }
         }
         else {
+            // Needed if no pre quantise
+            //beat = round(1/24, beat);
             // Create rest symbol
             const rest = createRest(restDurations, divisions, bar.duration, part, bar.duration, beat);
             symbols.splice(n++, 0, rest);
@@ -744,8 +746,8 @@ function createBars(sequence, beatkeys, stave, transpose, config) {
         }
 
         const key       = beatkeys && keyFromBeatKeys(beatkeys, event[0]);
-        const startBeat = /*quantise(quantiseBeats, 1, */event[0] - bar.beat/*)*/;
-        const stopBeat  = /*quantise(quantiseBeats, 1, */event[0] + toDuration(event) - bar.beat/*)*/;
+        const startBeat = quantise(quantiseBeats, 1, event[0] - bar.beat);
+        const stopBeat  = quantise(quantiseBeats, 1, event[0] + toDuration(event) - bar.beat);
 
         if (event[1] === 'note') {
             const pitch = stave.getSpelling(key, event, transpose);
