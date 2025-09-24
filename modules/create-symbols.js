@@ -1,6 +1,7 @@
 
 //import by       from 'fn/by.js';
 import get      from 'fn/get.js';
+import nothing  from 'fn/nothing.js';
 import overload from 'fn/overload.js';
 import { toNoteName, toNoteNumber, toRootName, toRootNumber } from 'midi/note.js';
 import Sequence from 'sequence/sequence.js';
@@ -301,7 +302,7 @@ function createSymbols(symbols, bar) {
         return accidentals;
     }, {});
 
-    const divisions = getBarDivisions(bar.meter);
+    const divisions = bar.divisions;
     const heads = symbols.filter((symbol) => symbol.type === 'note');
 
     let beat = 0;
@@ -556,35 +557,23 @@ function createBarSymbols(bar) {
     return bar;
 }
 
-function createBar(beat, stave, key, meter, tieheads) {
+function createBar(beat, stave, key, duration, divisor, divisions, tieheads) {
     const bar = {
-        beat: beat,
-        duration: meter[2],
-        divisions: getBarDivisions(meter),
-        symbols: [],
-        stave: stave,
-        key: key,
-        meter: meter
+        beat,
+        stave,
+        key,
+        duration,
+        divisor,
+        divisions,
+        symbols: []
     };
-
-    // If meter change is on this beat push a timesig into symbols
-    /*if (meter[0] === beat) {
-        bar.symbols.push({
-            type:        'timesig',
-            beat:        0,
-            numerator:   meter[2] / meter[3],
-            denominator: 4 / meter[3],
-            event:       meter,
-            stave
-        });
-    }*/
 
     // Push tied heads into symbols
     let m = -1;
     let head, event;
     while ((head = tieheads[++m])
         && (event = head.event)
-        && event[0] < bar.beat + meter[2]
+        && lt(event[0], bar.beat + bar.duration)
     ) {
         const duration = event[0] + event[4] - bar.beat;
 
@@ -624,7 +613,7 @@ const accidentals = {
     '2': '𝄪'
 };
 
-function createBars(sequence, beatkeys, stave, meter, transpose, config) {
+function createBars(sequence, beatkeys, stave, transpose, config) {
     // A buffer of head symbols to be tied to symbols in the next bar
     const tieheads = [];
     // An array of bar objects
@@ -635,7 +624,7 @@ function createBars(sequence, beatkeys, stave, meter, transpose, config) {
     let sequenceEndBeat;
 
     // First bar. Where meter is at beat 0, also inserts a time signature.
-    let bar = createBar(0, stave, cScale, meter, tieheads);
+    let bar = createBar(0, stave, cScale, Infinity, 1, nothing, tieheads);
     bars.push(bar);
 
     // Add clef in front of keysig
@@ -696,7 +685,9 @@ function createBars(sequence, beatkeys, stave, meter, transpose, config) {
             }
 
             // TODO: Not sure this is really necessary, I think bar should have meter properties
-            bar.meter = event;
+            bar.duration  = event[2];
+            bar.divisor   = event[3];
+            bar.divisions = getBarDivisions(event);
             continue;
         }
 
@@ -715,7 +706,7 @@ function createBars(sequence, beatkeys, stave, meter, transpose, config) {
         while (event[0] >= bar.beat + bar.duration) {
             // Create the next bar. Where meter is at the new bar beat, also
             // creates a time signature.
-            bar = createBar(bar.beat + bar.duration, stave, bar.key, meter, tieheads);
+            bar = createBar(bar.beat + bar.duration, stave, bar.key, bar.duration, bar.divisor, bar.divisions, tieheads);
 
             if (sequenceEndBeat && sequenceEndBeat > bar.beat && sequenceEndBeat <= bar.beat + bar.duration) {
                 // Put a double bar line at the end of the existing bar
@@ -766,7 +757,7 @@ function createBars(sequence, beatkeys, stave, meter, transpose, config) {
             // If note does not start on a meter multiple and crosses a
             // bar division...
             if (startBeat !== 0
-                && startBeat % bar.meter[3] !== 0
+                && !equal(0, startBeat % bar.divisor)
                 && (division = getDivision(bar.divisions, beat, stopBeat))
             ) {
                 const duration = division - beat;
@@ -792,7 +783,7 @@ function createBars(sequence, beatkeys, stave, meter, transpose, config) {
             // If rest of note does not stop on a meter multiple and crosses a
             // bar division...
             if (stopBeat < bar.duration
-                && stopBeat % bar.meter[3] !== 0
+                && !equal(0, stopBeat % bar.divisor)
                 && (division = getLastDivision(bar.divisions, beat, stopBeat))
             ) {
                 const duration = division - beat;
@@ -883,7 +874,7 @@ function createBars(sequence, beatkeys, stave, meter, transpose, config) {
     // There are still tied notes to symbolise
     while (tieheads.length) {
         // Create the next bar
-        bar = createBar(bar.beat + bar.duration, stave, bar.key, meter, tieheads);
+        bar = createBar(bar.beat + bar.duration, stave, bar.key, bar.duration, bar.divisor, bar.divisions, tieheads);
         bars.push(bar);
     }
 
@@ -952,6 +943,6 @@ export default function eventsToSymbols(data, clef, keyname, meter, transpose) {
 
     // TODO: this is a two-pass symbol generation, I wonder if we can get
     // it down to one?
-    return createBars(sequence, beatkeys, stave, meter, transpose, config)
+    return createBars(sequence, beatkeys, stave, transpose, config)
         .map(createBarSymbols);
 }
