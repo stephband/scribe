@@ -2,7 +2,7 @@
 /* An imperfect tuplet detector based on rating note start and stops against
    a cosine of various beatlengths. */
 
-import { floorPowerOf2 } from './maths/power-of-2.js';
+import { floorPowerOf2 } from './number/power-of-2.js';
 
 
 const assign   = Object.assign;

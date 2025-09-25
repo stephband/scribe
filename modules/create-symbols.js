@@ -17,7 +17,9 @@ import quantise from './quantise.js';
 import { rflat, rsharp, rdoubleflat, rdoublesharp } from './regexp.js';
 import { getBarDivisions, getDivision, getLastDivision } from './bar.js';
 import detectTuplets from './tuplet.js';
-import { round, equal, gte, lte, lt, gt } from './maths/float.js';
+import { round, equal, gte, lte, lt, gt } from './number/float.js';
+import push from './object/push.js';
+import every from './object/every.js';
 import config from './config.js';
 
 const assign = Object.assign;
@@ -62,6 +64,7 @@ const restDurations = [
     4,             6,
     8
 ];
+
 
 function byFatherCharlesPitch(a, b) {
     const ai = fathercharles.indexOf(a.pitch);
@@ -279,7 +282,7 @@ function closeTuplet(stave, tuplet) {
 
     tuplet.pitch = toNoteName(centreNumber);
     tuplet.angle = -3 * Math.sqrt(lastNumber - firstNumber);
-    tuplet.down  = tuplet.symbols.every(isStemDown);
+    tuplet.down  = every(tuplet, isStemDown);
 }
 
 function isStemDown(symbol) {
@@ -350,7 +353,8 @@ function createSymbols(symbols, bar) {
                         part,
                         duration: tuplet.duration / tuplet.divisor
                     };
-                    tuplet.symbols.push(rest);
+
+                    push(tuplet, rest);
                 }
                 // Add rests up to tuplet
                 else {
@@ -372,7 +376,7 @@ function createSymbols(symbols, bar) {
             // Quantise head duration to multiple of tuplet duration
             //head.duration = round(tuplet.duration / tuplet.divisor, head.duration);
             // Push head into tuplet symbols
-            tuplet.symbols.push(head);
+            push(tuplet, head);
         }
         else {
             head.beat = round(1/24, head.beat);
@@ -509,7 +513,7 @@ function createSymbols(symbols, bar) {
                     part,
                     duration: tuplet.duration / tuplet.divisor
                 };
-                tuplet.symbols.push(rest);
+                push(tuplet, rest);
                 symbols.splice(n++, 0, rest);
                 beat += rest.duration;
                 continue;
