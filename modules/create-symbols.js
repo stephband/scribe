@@ -324,7 +324,7 @@ function createSymbols(symbols, bar) {
         }
 
         // Where we are not currently in tuplet mode detect tuplets
-        if (!tuplet && (data = detectTuplets(heads, beat, bar.duration - beat)) && (console.log(data), true) && data.divisor !== 2) {
+        if (!tuplet && (data = detectTuplets(heads, beat, bar.duration - beat)) && data.divisor !== 2) {
             tuplet = assign({
                 type: 'tuplet',
                 symbols: [],
