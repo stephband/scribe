@@ -26,6 +26,10 @@ export function getBarDivisions(meter) {
     return barDivisions[meter[2] + ',' + meter[3]] || nothing;
 }
 
+export function getDivisions(duration, divisor) {
+    return barDivisions[duration + ',' + divisor] || nothing;
+}
+
 /**
 getDivision(divisions, b1, b2)
 Gets first bar division from `divisions` where `b1` is before and `b2` after or

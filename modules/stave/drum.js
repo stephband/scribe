@@ -155,6 +155,23 @@ export default class DrumStave extends Stave {
         } ;
     }
 
+    parts = [{
+        part:      'drums',
+        stemup:    false,
+        tieup:     false,
+        centerRow: 'stave-lower',
+    }, {
+        part:      'cymbals',
+        stemup:    true,
+        tieup:     true,
+        centerRow: 'stave-upper'
+    }];
+
+    getPartIndex(pitch) {
+        // Split drums stave into drums and cymbals parts
+        return [35, 36, 37, 38, 40, 41, 43, 44, 45, 47, 50].includes(toNoteNumber(pitch)) ? 1 : 0 ;
+    }
+
     getRowDiff(pitch1, pitch2) {
         const number1 = toNoteNumber(pitch1);
         const number2 = toNoteNumber(pitch2);

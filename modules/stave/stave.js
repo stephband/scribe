@@ -112,6 +112,12 @@ export default class Stave {
         };
     }
 
+    parts = [{}];
+
+    getPartIndex(pitch) {
+        return 0;
+    }
+
     /**
     .getRowDiff(pitch1, pitch2)
     Given two pitches `pitch1` and `pitch2`, returns the difference in rows
