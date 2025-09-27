@@ -202,7 +202,8 @@ export default function createBars(sequence, stave, settings = config) {
     let events = [];
     let ties   = [];
     let parts  = {};
-    let duration, divisor, event, key, sequenceEvent;
+    let key    = cScale;
+    let duration, divisor, event, sequenceEvent;
 
     // Extract events from sequence iterator
     for (event of sequence) {

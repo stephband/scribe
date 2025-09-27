@@ -261,7 +261,7 @@ function createRest(durations, divisions, endbeat, part, tobeat, beat) {
     let r = restDurations.length;
     // Employ precision to work around rounding errors
     while (restDurations[--r] + precision > duration);
-    duration = restDurations[r + 1];
+    duration = restDurations[r + 1] || restDurations[restDurations.length - 1];
 
     // Where beat does not fall on a 2^n division clamp it to next
     // smallest. This is what stops [0, note, 0.5], [1.5, note, 0.5]
@@ -284,7 +284,7 @@ function createRest(durations, divisions, endbeat, part, tobeat, beat) {
 function createRests(symbols, restDurations, bar, part, beat, tobeat) {
     // Insert rests frombeat - tobeat
     while (gt(tobeat, beat, precision)) {
-        const rest = createRest(restDurations, bar.divisions, bar.duration, part, tobeat, beat);
+        const rest = createRest(restDurations, bar.divisions, bar.duration || 100, part, tobeat, beat);
         symbols.push(rest);
         beat += rest.duration;
     }
