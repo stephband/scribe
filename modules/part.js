@@ -4,13 +4,11 @@ import get      from 'fn/get.js';
 import nothing  from 'fn/nothing.js';
 import overload from 'fn/overload.js';
 import { toNoteName, toNoteNumber, toRootName, toRootNumber } from 'midi/note.js';
-import Sequence from 'sequence/sequence.js';
 import toKeys from './sequence/to-keys.js';
 import eventsAtBeat from './sequence/events-at-beat.js';
 import { keysAtBeats, keyFromBeatKeys } from './sequence/key-at-beat.js';
 import { transposeChord } from './event/chord.js';
 import { transposeScale } from './scale.js';
-import Stave from './stave.js';
 import { toKeyScale, toKeyNumber, cScale } from './keys.js';
 import { mod12, byGreater } from './maths.js';
 import quantise from './quantise.js';
@@ -18,19 +16,13 @@ import { rflat, rsharp, rdoubleflat, rdoublesharp } from './regexp.js';
 import { getBarDivisions, getDivision, getLastDivision } from './bar.js';
 import detectTuplets from './tuplet.js';
 import { round, equal, gte, lte, lt, gt } from './number/float.js';
-import push from './object/push.js';
-import every from './object/every.js';
+import push   from './object/push.js';
+import every  from './object/every.js';
 import config from './config.js';
 
 const assign = Object.assign;
 const { abs, ceil, floor, min, max } = Math;
 
-const fathercharles = [
-    // Father Charles Goes Down And Ends Battle,
-    'F♯', 'C♯', 'G♯', 'D♯', 'A♯', 'E♯', 'B♯',
-    // Battle Ends And Down Goes Charles' Father
-    'B♭', 'E♭', 'A♭', 'D♭', 'G♭', 'C♭', 'F♭'
-];
 
 /* When dealing with rounding errors we only really need beat grid-level
    precision, our display grid has 24 slots so slot beat ± 1/48 is plenty */
@@ -66,11 +58,6 @@ const restDurations = [
 ];
 
 
-function byFatherCharlesPitch(a, b) {
-    const ai = fathercharles.indexOf(a.pitch);
-    const bi = fathercharles.indexOf(b.pitch);
-    return ai > bi ? 1 : ai < bi ? -1 : 0;
-}
 
 function toDuration(event) {
     return event[1] === 'lyric' ?
@@ -344,8 +331,8 @@ function createAccidental(symbols, part, accidentals, event, beat) {
         symbols.push(assign({}/*, head*/, {
             type: 'acci',
             beat,
-            value: acci || 0,
-            part
+            part,
+            value: acci || 0
         }));
     }
 }
@@ -490,25 +477,10 @@ function createHeads(symbols, bar, part, durations, cluster) {
 }
 
 
+/* Symbols from events */
 
-
-export function createBarSymbols() {
-    // Add key signature, TODO! Must go in front of any time signature
-    bar.symbols.push.apply(bar.symbols, keyscale
-        .map((n, i) => (n - cScale[i] && {
-            // No beat for key signature accidentals
-            type: 'acci',
-            pitch: toRootName(cScale[i]) + accidentals[n - cScale[i]],
-            value: n - cScale[i]
-        }))
-        .filter((o) => !!o)
-        .sort(byFatherCharlesPitch)
-    )
-}
-
-export function createPartSymbols(bar, stave, key, accidentals, part, events) {
+export function createPartSymbols(symbols, bar, stave, key, accidentals, part, events, settings = config) {
     const divisions = bar.divisions;
-    const symbols   = [];
     const cluster   = [];
 
     let beat = 0;
