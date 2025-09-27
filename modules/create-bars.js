@@ -6,7 +6,7 @@ import join       from './object/join.js';
 import toStopBeat from './event/to-stop-beat.js';
 import { getDivisions }  from './bar.js';
 import { toKeyScale, toKeyNumber, cScale } from './keys.js';
-import { createPartSymbols } from './part.js';
+import { createPartSymbols } from './create-part.js';
 import config     from './config.js';
 
 
