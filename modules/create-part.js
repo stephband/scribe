@@ -393,8 +393,17 @@ function getAverageStop(bar, events) {
     return min(bar.duration, (t / events.length) - bar.beat);
 }
 
+function toStemup(stave, pitches) {
+    const minPitch = getMinPitch(pitches);
+    const maxPitch = getMaxPitch(pitches);
+    const minDiff  = stave.getRowDiff(stave.midLinePitch, minPitch);
+    const maxDiff  = stave.getRowDiff(stave.midLinePitch, maxPitch);
+    return maxDiff + minDiff < 0;
+}
+
 function createDupletHeads(bar, stave, part, durations, startBeat, stopBeat, events, pitches) {
     const symbols = [];
+    const stemup  = toStemup(stave, pitches);
 
     let beat = startBeat;
     let n, event;
@@ -415,6 +424,7 @@ function createDupletHeads(bar, stave, part, durations, startBeat, stopBeat, eve
             pitch: pitches[n],
             duration,
             part,
+            stemup,
             stave,
             //tie: tie ? 'middle' : 'begin',
             event
@@ -440,6 +450,7 @@ function createDupletHeads(bar, stave, part, durations, startBeat, stopBeat, eve
             pitch: pitches[n],
             duration,
             part,
+            stemup,
             stave,
             event,
             //tie: tie ? 'middle' : 'begin'
@@ -462,6 +473,7 @@ function createDupletHeads(bar, stave, part, durations, startBeat, stopBeat, eve
         pitch: pitches[n],
         duration,
         part,
+        stemup,
         stave,
         event
     }));
@@ -472,6 +484,7 @@ function createDupletHeads(bar, stave, part, durations, startBeat, stopBeat, eve
 function createTupletHeads(bar, stave, part, tuplet, beat, events, pitches) {
     const symbols  = [];
     const duration = tuplet.duration / tuplet.divisor;
+    const stemup   = toStemup(stave, pitches);
 
     let n = -1;
     let event, symbol;
@@ -482,9 +495,9 @@ function createTupletHeads(bar, stave, part, tuplet, beat, events, pitches) {
             pitch: pitches[n],
             duration,
             part,
+            stemup,
             stave,
-            event,
-            //tie: isLongerThanTuplet ? 'begin' : undefined
+            event
         };
 
         push(tuplet, symbol);
