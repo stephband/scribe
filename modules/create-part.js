@@ -126,62 +126,77 @@ function closeBeam(symbols, stave, part, beam) {
     // Not enough notes groups for a beam
     if (!beam[1]) return symbols;
 
-    const startBeat  = beam[0][0].beat;
-    const stopBeat   = last(beam)[0].beat;
-    const beamLength = lengthOf(beam);
+    const startBeat  = beam[0].beat;
+    const stopBeat   = last(beam).beat;
     const duration   = stopBeat - startBeat;
-    const stemup     = part.stemup === undefined ?
+    const stemup = part.stemup === undefined ?
         // Calculate average diff from mid line
-        calcAvgMidOffset(stave, stave.midLinePitch, beam) > 0 :
+        toStemup(stave, map(get('pitch'), beam)) :
         // Get stem direction from part
         part.stemup ;
 
+    // Get max and min pitches at each beat of beam
+    const pitches = [];
+    let n = -1, note;
+    let count = 0;
+    while (note = beam[++n]) {
+        let pitch = note.pitch;
+        while (beam[++n] && eq(beam[n].beat, note.beat, p24)) {
+            if (stemup) {
+                if (toNoteNumber(beam[n].pitch) > toNoteNumber(pitch)) {
+                    pitch = beam[n].pitch;
+                }
+            }
+            else {
+                if (toNoteNumber(beam[n].pitch) < toNoteNumber(pitch)) {
+                    pitch = beam[n].pitch;
+                }
+            }
+        }
+        --n;
+        pitches.push(pitch);
+        ++count;
+    }
+
+    const beamLength = lengthOf(beam);
     let avgBeginLine = 0;
     let avgEndLine = 0;
-    let n = -1, notes;
-    while (notes = beam[++n]) {
-        // Beams may contain rests
-        if (!notes.length) continue;
+    let line;
 
-        const pitches = notes.map(get('pitch'));
-        const pitch   = stemup ?
-            getMaxPitch(pitches) :
-            getMinPitch(pitches) ;
-        // TODO
-        const line = 60; //stave.getRowDiff(pitch, minPitch);
+    n = -1;
+    while (pitches[++n]) {
+        line = stave.getRowDiff(stave.midLinePitch, pitches[n]);
 
-        // Middle of beam index
-        const b = 0.5 * (beamLength - 1);
-
-        if (n < b) {
-            avgBeginLine += line / Math.floor(beamLength / 2);
-        }
-        else if (n > b) {
-            avgEndLine += line / Math.floor(beamLength / 2);
+        if (n < (count - 1) / 2) {
+            avgBeginLine += line / Math.floor(count / 2);
         }
 
-//        push(symbol, notes);
+        else if (n > (count - 1) / 2) {
+            avgEndLine += line / Math.floor(count / 2);
+        }
     }
 
     // Calculate where to put beam exactly
-/*    let begin    = heads[0];
-    let end      = heads[heads.length - 1];
+    let begin    = beam[0];
+    let end      = last(beam);
     let endRange = stave.getRowDiff(begin.pitch, end.pitch);
     let avgRange = avgEndLine - avgBeginLine;
     let range = abs(avgRange) > abs(0.75 * endRange) ?
         0.75 * endRange :
         avgRange;
 
-    heads.forEach((head, i) => {
-        head.stemHeight = stemDirection === 'down' ?
-            1 + 0.125 * (-range * i / (heads.length - 1) + stave.getRowDiff(begin.pitch, head.pitch)) :
-            1 + 0.125 * (range * i  / (heads.length - 1) - stave.getRowDiff(begin.pitch, head.pitch)) ;
-    });*/
+    // Mark notes as beamed
+    n = -1;
+    while (note = beam[++n]) {
+        note.stemup = stemup;
+        note.beam   = beam;
+        note.stemHeight = stemup ?
+            1 + 0.125 * (range * n  / (count - 1) - stave.getRowDiff(begin.pitch, note.pitch)) :
+            1 + 0.125 * (-range * n / (count - 1) + stave.getRowDiff(begin.pitch, note.pitch)) ;
+    }
 
-    // TEMP
-    return symbols;
+    assign(beam, { pitch: begin.pitch, duration, stemup, range });
 
-    assign(beam, { duration, stemup });
     symbols.push(beam);
     return symbols;
 }
@@ -606,7 +621,8 @@ export function createPartSymbols(symbols, bar, stave, key = 0, accidentals = {}
             createAccidentals(symbols, stave, part, accidentals, beat, notes, pitches);
 
             if (tuplet) {
-                nextBeat = beat + tuplet.duration / tuplet.divisor;
+                duration = tuplet.duration / tuplet.divisor;
+                nextBeat = beat + duration;
                 heads = createTupletHeads(bar, stave, part, tuplet, beat, notes, pitches);
 
                 // If beat has arrived at end of tuplet close tuplet
@@ -623,7 +639,7 @@ export function createPartSymbols(symbols, bar, stave, key = 0, accidentals = {}
                     round(0.125, event[0] - bar.beat) :
                     bar.duration ;
 
-                let duration = nextBeat - beat;
+                duration = nextBeat - beat;
                 let i = notes.length;
                 while (i--) {
                     let stopBeat     = toStopBeat(bar.beat, notes[i]);
@@ -643,9 +659,8 @@ export function createPartSymbols(symbols, bar, stave, key = 0, accidentals = {}
 
             // Push head symbols into symbols
             symbols.push.apply(symbols, heads);
-
+console.log(duration);
             // Insert beams
-
             // If head is a quarter note or longer or a triplet quarter note
             if (gte(duration, 1, p24) || eq(duration, 0.6667, p24)) {
                 // If there is a beam, close it
@@ -656,8 +671,8 @@ export function createPartSymbols(symbols, bar, stave, key = 0, accidentals = {}
             }
             // Collect notes in beams array
             else {
-                if (beam) push(beam, heads);
-                else beam = { type: 'beam', beat, part, 0: heads };
+                if (beam) push(beam, ...heads);
+                else beam = assign({ type: 'beam', beat, part }, heads);
             }
 
             // Insert ties
@@ -683,7 +698,7 @@ export function createPartSymbols(symbols, bar, stave, key = 0, accidentals = {}
         // If beam close it
         if (beam && beam[0]) {
             // Close the current beam
-            closeBeam(symbols, bar.stave, beam, n);
+            closeBeam(symbols, stave, part, beam);
             beam = undefined;
         }
 

@@ -1,8 +1,8 @@
 /* Array-like functions that operate on plain objects */
 
 export default function push(object, value) {
-    let n = -1;
+    let n = -1, a = 0;;
     while (object[++n] !== undefined);
-    object[n] = value;
+    while (arguments[++a] !== undefined) object[n++] = arguments[a];
     return object;
 }

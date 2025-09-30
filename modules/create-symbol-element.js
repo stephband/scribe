@@ -174,7 +174,7 @@ export default overload(get('type'), {
             pitch:    symbol.pitch,
             duration: truncate(symbol.duration),
             part:     symbol.part,
-            beam:     symbol.beam && identify(symbol.beam[0]),
+            beam:     symbol.beam && identify(symbol.beam),
             event:    identify(symbol.event)
         }
     }),
@@ -183,7 +183,7 @@ export default overload(get('type'), {
         // 8th note beams can be rendered directly into the grid. Beams for
         // shorter durations are rendered as a post process once this SVG is in
         // the DOM and stem positions can be measured. See beam.js.
-        class: `${symbol.direction}-beam beam`,
+        class: `${ symbol.stemup ? 'up' : 'down' }-beam beam`,
         viewBox: `0 ${ (symbol.range > 0 ? -symbol.range : 0) - 0.5 } 1 ${ abs(symbol.range) + 1 }`,
         preserveAspectRatio: "none",
         style: `height: ${ (abs(symbol.range) + 1) * 0.125 }em; align-self: ${ symbol.range > 0 ? 'end' : 'start' };`,
@@ -193,7 +193,7 @@ export default overload(get('type'), {
             pitch:    symbol.pitch,
             duration: truncate(symbol.duration),
             part:     symbol.part,
-            events:   map(identify, symbol).join(' ')
+            events:   map((symbol) => identify(symbol.event), symbol).join(' ')
         }
     }),
 
