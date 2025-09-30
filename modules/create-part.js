@@ -68,12 +68,14 @@ const restDurations = [
 
 
 function getMinPitch(pitches) {
-    let n = -1;
-    let l, o, pitch;
+    const [name, letter, acc, octave] = rpitch.exec(pitches[0]);
+    let o = octave;
+    let l = toRootNumber(letter);
+    let pitch = pitches[0];
+    let n = 0;
     while (pitches[++n]) {
         const [name, letter, acc, octave] = rpitch.exec(pitches[n]);
-        if (!(o < octave)
-         || !(l < toRootNumber(letter))) {
+        if (octave < o || toRootNumber(letter) < l) {
             l = toRootNumber(letter);
             o = octave;
             pitch = pitches[n];
@@ -83,12 +85,14 @@ function getMinPitch(pitches) {
 }
 
 function getMaxPitch(pitches) {
-    let n = -1;
-    let l, o, pitch;
+    const [name, letter, acc, octave] = rpitch.exec(pitches[0]);
+    let o = octave;
+    let l = toRootNumber(letter);
+    let pitch = pitches[0];
+    let n = 0;
     while (pitches[++n]) {
         const [name, letter, acc, octave] = rpitch.exec(pitches[n]);
-        if (!(o > octave)
-         || !(l > toRootNumber(letter))) {
+        if (octave > o || toRootNumber(letter) > l) {
             o = octave;
             l = toRootNumber(letter);
             pitch = pitches[n];
@@ -191,6 +195,16 @@ function openTuplet() {
 
 function closeTuplet(stave, tuplet) {
     const { beat, duration, divisor } = tuplet;
+    let symbol, n;
+
+    // Stem direction
+    const pitches = [];
+    n = -1;
+    while (symbol = tuplet[++n]) if (symbol.type === 'note') pitches.push(symbol.pitch);
+
+    const stemup  = toStemup(stave, pitches);
+    n = -1;
+    while (symbol = tuplet[++n]) if (symbol.type === 'note') symbol.stemup = stemup;
 
     // Decide on tuplet pitch, effectively vertical row position
     const centreBeat = beat + 0.5 * duration;
@@ -199,9 +213,8 @@ function closeTuplet(stave, tuplet) {
     // triplet (with appropriate styling) always sits above the top line
     const lowestPitchNumber = toNoteNumber(stave.maxLinePitch) - 12;
 
+    let centreNumber;
     let h = lengthOf(tuplet);
-    let symbol, centreNumber;
-
     // Scan backwards through tuplet until last symbol before centre beat
     while ((symbol = tuplet[--h]) && symbol.beat > centreBeat);
     ++h;
@@ -398,7 +411,7 @@ function toStemup(stave, pitches) {
     const maxPitch = getMaxPitch(pitches);
     const minDiff  = stave.getRowDiff(stave.midLinePitch, minPitch);
     const maxDiff  = stave.getRowDiff(stave.midLinePitch, maxPitch);
-    return maxDiff + minDiff < 0;
+    return maxDiff + minDiff < -1;
 }
 
 function createDupletHeads(bar, stave, part, durations, startBeat, stopBeat, events, pitches) {
