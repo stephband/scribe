@@ -706,6 +706,8 @@ in their duration span. */
     margin-right: 0.03125em;
 }
 
+/* Triplet quarter rest */
+.bar > .rest[data-duration="0.66"],
 /* A quarter rest */
 .bar > .rest[data-duration="1"],
 /* A dotted quarter rest */
