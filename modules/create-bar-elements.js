@@ -15,7 +15,20 @@ function toElements(nodes, symbol) {
     return nodes;
 }
 
-function toBarElements(elements, bar) {
+export function toBarElements(bar) {
+    return create('div', {
+        class: `${ bar.stave.type }-stave stave bar`,
+        data: { beat: bar.beat, duration: bar.duration },
+        children: bar.symbols.reduce(toElements, [])
+    });
+}
+
+
+
+
+// OLD ?
+
+function toBarElementsXX(bar) {
     elements.push(create('div', {
         class: `${ bar.stave.type }-stave stave bar`,
         data: { beat: bar.beat, duration: bar.duration },
@@ -26,5 +39,5 @@ function toBarElements(elements, bar) {
 }
 
 export default function createBarElements(symbols) {
-    return symbols.reduce(toBarElements, []);
+    return symbols.reduce(toBarElementsXX, []);
 }

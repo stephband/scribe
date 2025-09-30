@@ -6,6 +6,7 @@ import { chordGlyphs } from "./glyphs.js";
 import { rflat, rsharp } from './regexp.js';
 import { identify } from './event.js';
 import { beamThickness } from './beam.js';
+import map from './object/map.js';
 
 const abs = Math.abs;
 
@@ -70,7 +71,7 @@ export default overload(get('type'), {
             data: {
                 beat:     symbol.beat + 1,
                 duration: symbol.duration,
-                event:  identify(symbol.event)
+                event:    identify(symbol.event)
             }
         });
     },
@@ -188,7 +189,7 @@ export default overload(get('type'), {
             pitch:    symbol.pitch,
             duration: symbol.duration,
             part:     symbol.part,
-            events:   symbol.events.map(identify).join(' ')
+            events:   map(identify, symbol).join(' ')
         }
     }),
 

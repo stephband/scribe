@@ -3,6 +3,7 @@ import nothing from 'fn/nothing.js';
 import { noteNames, toNoteNumber, toRootNumber, toNoteOctave } from 'midi/note.js';
 import { mod12 } from '../maths.js';
 import keys from '../keys.js';
+import { rpitch } from '../pitch.js';
 
 const accidentals = {
     '-2': '𝄫',
@@ -12,14 +13,13 @@ const accidentals = {
     '2':  '𝄪'
 };
 
-const rpitch = /^[A-G][b#♭♯𝄫𝄪]?(-?\d)?$/;
 
 export default function toSpelling(keynumber, event, transpose = 0) {
     const key = keys[mod12(keynumber + transpose)];
     let n, a, o;
 
     if (typeof event[2] === 'string') {
-        let [notename, octave] = rpitch.exec(event[2]) || [event[2]];
+        let [notename, letter, accidental, octave] = rpitch.exec(event[2]) || [event[2]];
 
         if (octave) {
             // pitch is note name like "C4", deconstruct it and put it back together

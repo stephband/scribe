@@ -19,7 +19,7 @@ function getScore(wavelength, beat) {
     return 0.5 * (1 + Math.cos(2 * Math.PI * beat / wavelength));
 }
 
-function scoreTupletAtBeat(duration, divisor, beat, heads, n) {
+function scoreTupletAtBeat(duration, divisor, beat, events, n) {
     const tupletDuration = duration / divisor;
 
     let score = 0;
@@ -28,45 +28,46 @@ function scoreTupletAtBeat(duration, divisor, beat, heads, n) {
 
     // Events before a quarter tuplet are considered the first of a tuplet group
     --n;
-    while (heads[++n] !== undefined && heads[n].beat - beat < tupletDuration / 4) {
+    while (events[++n] !== undefined && events[n][0] - beat < tupletDuration / 4) {
         // Score event start only, as we do not want to be influenced by duration
-        score += getScore(tupletDuration, heads[n].beat - beat);
-        count += 1;
+// NO, DONT SCORE BEAT 0
+//        score += getScore(tupletDuration, events[n][0] - beat);
+//        count += 1;
         // One less hole than divisor because there's definitely a note in position 0
         b = 1;
     }
 
     // Scan through events up to duration beat less a quarter tuplet
     --n;
-    while (heads[++n] !== undefined && heads[n].beat - beat < duration - tupletDuration / 4) {
+    while (events[++n] !== undefined && events[n][0] - beat < duration - tupletDuration / 4) {
         // Detect and reject large tuplet groups with holes. Admittedly a
         // little arbitrary.
         if (divisor > 4) {
-            a = Math.round((heads[n].beat - beat) / tupletDuration);
+            a = Math.round((events[n][0] - beat) / tupletDuration);
             // Has a more than incremented by 1 over b?
             if (a > b + 1) return -1;
             b = a;
         }
 
         // Score event start
-        score += getScore(tupletDuration, heads[n].beat - beat);
+        score += getScore(tupletDuration, events[n][0] - beat);
         count += 1;
 
         // Ignore event stops beyond duration, events may be longer than tuplet
-        if (heads[n].beat + heads[n].duration - beat > duration) continue;
+        if (events[n][0] + events[n][4] - beat > duration) continue;
 
         // Score event stop
-        score += stopFactor * getScore(tupletDuration, heads[n].beat + heads[n].duration - beat);
+        score += stopFactor * getScore(tupletDuration, events[n][0] + events[n][4] - beat);
         count += stopFactor;
     }
 
     return count ? score / count : 0 ;
 }
 
-function detectTupletOverDuration(tuplet, duration, heads, n, startbeat, divisors) {
+function detectTupletOverDuration(tuplet, duration, events, n, startbeat, divisors) {
     // n is the index of the first event we are interested in. Set beat from
     // the floored multiple of duration up to this event's beat
-    const beat = duration * Math.floor((heads[n].beat - startbeat) / duration) + startbeat;
+    const beat = duration * Math.floor((events[n][0] - startbeat) / duration) + startbeat;
 
     // Find greatest divisor producing tuplets longer than minTupletDuration
     let d = divisors.length;
@@ -77,9 +78,10 @@ function detectTupletOverDuration(tuplet, duration, heads, n, startbeat, divisor
     let divisor, s;
     while (divisor = divisors[--d]) {
         // Score tuplet by duration and divisor
-        s = scoreTupletAtBeat(duration, divisor, beat, heads, n);
-
+        s = scoreTupletAtBeat(duration, divisor, beat, events, n);
+//console.log(duration, divisor, beat, s);
         if (s >= score) {
+//console.log('YEAH');
             score = s;
             tuplet.beat     = beat;
             tuplet.duration = duration;
@@ -87,9 +89,9 @@ function detectTupletOverDuration(tuplet, duration, heads, n, startbeat, divisor
         }
 
         // If first head occurs at or after half a duration of beat
-        if (heads[n].beat >= beat + 0.5 * duration) {
+        if (events[n][0] >= beat + 0.5 * duration) {
             // Score tuplet offset by half a duration
-            s = scoreTupletAtBeat(duration, divisor, beat + 0.5 * duration, heads, n);
+            s = scoreTupletAtBeat(duration, divisor, beat + 0.5 * duration, events, n);
 
             if (s >= score) {
                 score = s;
@@ -103,15 +105,15 @@ function detectTupletOverDuration(tuplet, duration, heads, n, startbeat, divisor
     return tuplet;
 }
 
-export default function detectTuplet(heads, beat, duration) {
+export default function detectTuplet(events, beat, duration) {
     let n = -1;
 
     // Ignore events up to start `beat`. Beat must be a power of 2 or multiple
     // of here, so this should not be subject to floating point rounding errors
-    while (heads[++n] !== undefined && heads[n].beat < beat);
+    while (events[++n] !== undefined && events[n][0] < beat);
 
     // If we have found no event, quick out
-    if (!heads[n]) return;
+    if (!events[n]) return;
 
     const tuplet = {};
 
@@ -121,7 +123,7 @@ export default function detectTuplet(heads, beat, duration) {
     // Loop upward through power of 2 durations, short to long
     let d = 1/8;
     while ((d *= 2) && d <= duration) {
-        detectTupletOverDuration(tuplet, d, heads, n, beat, tupletDivisors);
+        detectTupletOverDuration(tuplet, d, events, n, beat, tupletDivisors);
     }
 
     return score > 0 && tuplet;

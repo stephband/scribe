@@ -15,18 +15,25 @@ import quantise from './quantise.js';
 import { rflat, rsharp, rdoubleflat, rdoublesharp } from './regexp.js';
 import { getBarDivisions, getDivision, getLastDivision } from './bar.js';
 import detectTuplets from './tuplet.js';
-import { round, equal, gte, lte, lt, gt } from './number/float.js';
-import push   from './object/push.js';
-import every  from './object/every.js';
-import config from './config.js';
+import { round, eq, gte, lte, lt, gt } from './number/float.js';
+import { averagePowerOf2, roundPowerOf2, ceilPowerOf2 } from './number/power-of-2.js';
+import push       from './object/push.js';
+import every      from './object/every.js';
+import last       from './object/last.js';
+import lengthOf   from './object/length-of.js';
+import map        from './object/map.js';
+import toDuration from './event/to-duration.js';
+import { rpitch } from './pitch.js';
+import config     from './config.js';
 
 const assign = Object.assign;
 const { abs, ceil, floor, min, max } = Math;
 
 
 /* When dealing with rounding errors we only really need beat grid-level
-   precision, our display grid has 24 slots so slot beat ± 1/48 is plenty */
-const precision = 1/48;
+   precision, our display grid has 24 slots but we only need to compare the
+   smallest possible note values, 32nd notes, or ±1/16 precision */
+const p16 = 1/16;
 
 /* There are 24 slots in our display grid which allows for even spacing of
    symbols down to 32nd-note triplet level, or twelve things per beat, as well
@@ -45,6 +52,8 @@ const headDurations = [
     8
 ];
 
+const minDuration = headDurations[0];
+
 /* Allowable rest durations. Do we really want to allow double-dotted rests? */
 const restDurations = [
          /*1/12,*/
@@ -58,99 +67,100 @@ const restDurations = [
 ];
 
 
+function getMinPitch(pitches) {
+    let n = -1;
+    let l, o, pitch;
+    while (pitches[++n]) {
+        const [name, letter, acc, octave] = rpitch.exec(pitches[n]);
+        if (!(o < octave)
+         || !(l < toRootNumber(letter))) {
+            l = toRootNumber(letter);
+            o = octave;
+            pitch = pitches[n];
+        }
+    }
+    return pitch;
+}
 
-function toDuration(event) {
-    return event[1] === 'lyric' ?
-        event[3] :
-        event[4];
+function getMaxPitch(pitches) {
+    let n = -1;
+    let l, o, pitch;
+    while (pitches[++n]) {
+        const [name, letter, acc, octave] = rpitch.exec(pitches[n]);
+        if (!(o > octave)
+         || !(l > toRootNumber(letter))) {
+            o = octave;
+            l = toRootNumber(letter);
+            pitch = pitches[n];
+        }
+    }
+    return pitch;
 }
 
 
 /* Beams */
 
-function openBeam() {
-
+function calcAvgMidOffset(stave, pitch, beam) {
+    let avgDiff = 0;
+    let g = -1;
+    let count = 0;
+    let notes;
+    while (notes = beam[++g]) {
+        if (!notes.length) continue;
+        const pitches  = map(get('pitch'), notes);
+        const minPitch = getMinPitch(pitches);
+        const maxPitch = getMaxPitch(pitches);
+        const minDiff  = stave.getRowDiff(pitch, minPitch);
+        const maxDiff  = stave.getRowDiff(pitch, maxPitch);
+        avgDiff += 0.5 * minDiff + 0.5 * maxDiff;
+        count += 1;
+    }
+    return avgDiff / count;
 }
 
-function closeBeam(symbols, stave, beam, n) {
-    const part = symbols[0].part;
+function closeBeam(symbols, stave, part, beam) {
+    // Not enough notes groups for a beam
+    if (!beam[1]) return symbols;
 
-    // Not enough stems for a beam, give it a tail
-    if (beam.length === 1) {
-        const i = beam[0];
+    const startBeat  = beam[0][0].beat;
+    const stopBeat   = last(beam)[0].beat;
+    const beamLength = lengthOf(beam);
+    const duration   = stopBeat - startBeat;
+    const stemup     = part.stemup === undefined ?
+        // Calculate average diff from mid line
+        calcAvgMidOffset(stave, stave.midLinePitch, beam) > 0 :
+        // Get stem direction from part
+        part.stemup ;
 
-        if (i >= n) throw new Error('Last beam index (' + beam[0] + ') cant be greater than n (' + n + ')');
-
-        const head = symbols[i];
-
-        // If head starts a tie insert the tie now, in front of the head
-        if (head.tie === 'begin' || head.tie === 'middle') {
-            symbols.splice(i, 0, assign({}, head, {
-                type:   'tie',
-                beat:   head.beat,
-                updown: head.stemDirection === 'up' ? 'down' : 'up',
-                event:  head.event
-            }));
-
-            // We inserted a symbol, advance n by 1
-            return 1;
-        }
-
-        // We didn't do anything
-        return 0;
-    }
-
-    // Render stems and beam
-    const stemDirection = symbols[beam[0]] && symbols[beam[0]].stemDirection ?
-        symbols[beam[0]].stemDirection :
-        (beam
-            .map((i) => stave.getRowDiff(stave.midLinePitch, symbols[i].pitch))
-            .reduce((t, u) => t + u, 0) / beam.length) < 0 ?
-            'up' :
-            'down';
-
-    const heads  = [];
-    const buffer = [];
-
-    // Loop backwards through beam splicing in stem symbols before
-    // the heads, all with the winning stem direction
-    let b = -1;
     let avgBeginLine = 0;
     let avgEndLine = 0;
-    let i, head, line;
-    while (beam[++b] !== undefined) {
-        i = beam[b];
-        head = symbols[i];
-        line = stave.getRowDiff(stave.midLinePitch, head.pitch);
+    let n = -1, notes;
+    while (notes = beam[++n]) {
+        // Beams may contain rests
+        if (!notes.length) continue;
 
-        head.stemDirection = stemDirection;
-        head.tieDirection  = stemDirection === 'up' ? 'down' : 'up';
+        const pitches = notes.map(get('pitch'));
+        const pitch   = stemup ?
+            getMaxPitch(pitches) :
+            getMinPitch(pitches) ;
+        // TODO
+        const line = 60; //stave.getRowDiff(pitch, minPitch);
 
-        heads.push(head);
+        // Middle of beam index
+        const b = 0.5 * (beamLength - 1);
 
-        if (b < (beam.length - 1) / 2) {
-            avgBeginLine += line / Math.floor(beam.length / 2);
+        if (n < b) {
+            avgBeginLine += line / Math.floor(beamLength / 2);
+        }
+        else if (n > b) {
+            avgEndLine += line / Math.floor(beamLength / 2);
         }
 
-        else if (b > (beam.length - 1) / 2) {
-            avgEndLine += line / Math.floor(beam.length / 2);
-        }
-
-        // TODO: group stems from notes of same part on same beat
-
-        if (head.tie === 'begin') {
-            buffer.push(assign({}, head, {
-                type:   'tie',
-                beat:   head.beat,
-                updown: head.tieDirection,
-                //updown: stemDirection === 'up' ? 'down' : 'up',
-                event:  head.event
-            }));
-        }
+//        push(symbol, notes);
     }
 
     // Calculate where to put beam exactly
-    let begin    = heads[0];
+/*    let begin    = heads[0];
     let end      = heads[heads.length - 1];
     let endRange = stave.getRowDiff(begin.pitch, end.pitch);
     let avgRange = avgEndLine - avgBeginLine;
@@ -162,29 +172,14 @@ function closeBeam(symbols, stave, beam, n) {
         head.stemHeight = stemDirection === 'down' ?
             1 + 0.125 * (-range * i / (heads.length - 1) + stave.getRowDiff(begin.pitch, head.pitch)) :
             1 + 0.125 * (range * i  / (heads.length - 1) - stave.getRowDiff(begin.pitch, head.pitch)) ;
-    });
+    });*/
 
-    // Update heads with info about the beam
-    const headEvents = heads.map(get('event'));
-    heads.forEach((head) => head.beam = headEvents);
+    // TEMP
+    return symbols;
 
-    // Put the beam in front of the first head (??)
-    symbols.splice(i, 0, {
-        type:      'beam',
-        beat:      begin.beat,
-        pitch:     begin.pitch,
-        part:      begin.part,
-        duration:  end.beat - begin.beat,
-        range:     range,
-        direction: stemDirection,
-        notes:     heads,
-        events:    begin.beam
-    });
-
-    symbols.splice(i, 0, ...buffer);
-
-    // We just spliced a bunch of symbols in before index n
-    return 1 + buffer.length;
+    assign(beam, { duration, stemup });
+    symbols.push(beam);
+    return symbols;
 }
 
 
@@ -195,7 +190,7 @@ function openTuplet() {
 }
 
 function closeTuplet(stave, tuplet) {
-    const { beat, duration, divisor, symbols } = tuplet;
+    const { beat, duration, divisor } = tuplet;
 
     // Decide on tuplet pitch, effectively vertical row position
     const centreBeat = beat + 0.5 * duration;
@@ -204,15 +199,15 @@ function closeTuplet(stave, tuplet) {
     // triplet (with appropriate styling) always sits above the top line
     const lowestPitchNumber = toNoteNumber(stave.maxLinePitch) - 12;
 
-    let h = symbols.length;
+    let h = lengthOf(tuplet);
     let symbol, centreNumber;
 
-    // Scan backwards through symbols until last symbol before centre beat
-    while ((symbol = symbols[--h]) && symbol.beat > centreBeat);
+    // Scan backwards through tuplet until last symbol before centre beat
+    while ((symbol = tuplet[--h]) && symbol.beat > centreBeat);
     ++h;
 
-    // Scan backwards through symbols that cross centre beat, get highest pitch
-    while ((symbol = symbols[--h]) && symbol.beat + symbol.duration > centreBeat) {
+    // Scan backwards through tuplet that cross centre beat, get highest pitch
+    while ((symbol = tuplet[--h]) && symbol.beat + symbol.duration > centreBeat) {
         const number = toNoteNumber(symbol.pitch);
         if (!centreNumber || number > centreNumber) centreNumber = number;
     }
@@ -220,15 +215,15 @@ function closeTuplet(stave, tuplet) {
     // Scan forwards from first symbol finding highest pitch beginning head
     let firstNumber = lowestPitchNumber;
     h = -1;
-    while ((symbol = symbols[++h]) && symbol.beat < precision) {
+    while ((symbol = tuplet[++h]) && symbol.beat < p16) {
         const number = toNoteNumber(symbol.pitch);
         if (!firstNumber || number > firstNumber) firstNumber = number;
     }
 
     // Scan backwards from last symbol finding highest pitch ending symbol
     let lastNumber = lowestPitchNumber;
-    h = symbols.length;
-    while ((symbol = symbols[--h]) && symbol.beat > beat + duration - (duration / divisor) - precision) {
+    h = tuplet.length;
+    while ((symbol = tuplet[--h]) && symbol.beat > beat + duration - (duration / divisor) - p16) {
         const pitch = toNoteNumber(symbol.pitch);
         if (!lastNumber || pitch > lastNumber) lastNumber = pitch;
     }
@@ -245,7 +240,7 @@ function closeTuplet(stave, tuplet) {
 
 /* Rests */
 
-function createRest(durations, divisions, endbeat, part, tobeat, beat) {
+function createRest(durations, divisions, endbeat, stave, part, tobeat, beat) {
     // [beat, 'rest', pitch (currently unused), duration]
     let duration = tobeat - beat;
 
@@ -258,10 +253,10 @@ function createRest(durations, divisions, endbeat, part, tobeat, beat) {
     }
 
     // Clamp rest duration to permissable rest symbol durations
-    let r = restDurations.length;
-    // Employ precision to work around rounding errors
-    while (restDurations[--r] + precision > duration);
-    duration = restDurations[r + 1] || restDurations[restDurations.length - 1];
+    let r = durations.length;
+    // Employ p16 to work around rounding errors
+    while (durations[--r] + p16 > duration);
+    duration = durations[r + 1] || durations[durations.length - 1];
 
     // Where beat does not fall on a 2^n division clamp it to next
     // smallest. This is what stops [0, note, 0.5], [1.5, note, 0.5]
@@ -276,15 +271,16 @@ function createRest(durations, divisions, endbeat, part, tobeat, beat) {
     return {
         type: 'rest',
         beat,
-        part,
-        duration
+        duration,
+        stave,
+        part
     };
 }
 
-function createRests(symbols, restDurations, bar, part, beat, tobeat) {
+function createRests(symbols, durations, bar, stave, part, beat, tobeat) {
     // Insert rests frombeat - tobeat
-    while (gt(tobeat, beat, precision)) {
-        const rest = createRest(restDurations, bar.divisions, bar.duration || 100, part, tobeat, beat);
+    while (gt(tobeat, beat, p16)) {
+        const rest = createRest(durations, bar.divisions, bar.duration || 100, stave, part, tobeat, beat);
         symbols.push(rest);
         beat += rest.duration;
     }
@@ -297,7 +293,7 @@ function createRests(symbols, restDurations, bar, part, beat, tobeat) {
 
 function getStemDirection(centerPitch, head) {
     return head && head.stemDirection || (
-        toNoteNumber(centerPitch) < toNoteNumber(head.pitch) ?
+        toNoteNumber(centerPitch) < toNoteNumber(event[2]) ?
             'down' :
             'up');
 }
@@ -309,121 +305,120 @@ function isStemDown(symbol) {
 
 /* Accidentals */
 
-function createAccidental(symbols, part, accidentals, event, beat) {
-    const name = typeof event[2] === 'string' ? event[2] : toNoteName(event.pitch);
+function createAccidental(symbols, stave, part, accidentals, beat, event, pitch) {
     const acci =
-        rsharp.test(name) ? 1 :
-        rflat.test(name) ? -1 :
+        rsharp.test(pitch) ? 1 :
+        rflat.test(pitch) ? -1 :
         undefined ;
 
     // Line name is note name + octave (no # or b)
-    const line = name[0] + name.slice(-1);
+    const line = pitch[0] + pitch.slice(-1);
 
     if (
         // If head is not a tied head from a previous bar - they
         // don't require accidentals,
-        !lt(event[0], 0, precision)
+// TODO        !lt(event[0], 0, p16)
         // and if it has changed from the bars current accidentals
-        && acci !== accidentals[line]
+        acci !== accidentals[line]
     ) {
         // Alter current state of bar accidentals
         accidentals[line] = acci;
         symbols.push(assign({}/*, head*/, {
             type: 'acci',
             beat,
+            pitch,
             part,
+            stave,
+            event,
             value: acci || 0
         }));
     }
 }
 
-function createAccidentals(symbols, part, accidentals, cluster, beat) {
+function createAccidentals(symbols, stave, part, accidentals, beat, notes, pitches) {
     let n = -1;
-    while (cluster[++n]) createAccidental(symbols, part, accidentals, cluster[n], beat);
+    while (pitches[++n]) createAccidental(symbols, stave, part, accidentals, beat, notes[n], pitches[n]);
     return beat;
 }
 
 
 /* Ledger lines */
 
-function toMinPitch(n, event) {
-    const number = toNoteNumber(event[2]);
-    return number < n ? number : n ;
+function getPitches(stave, key, events) {
+    const pitches = {};
+    let n = -1;
+    let event;
+    while (event = events[++n]) pitches[n] = stave.getSpelling(key, event);
+    return pitches;
 }
 
-function toMaxPitch(n, event) {
-    const number = toNoteNumber(event[2]);
-    return number > n ? number : n ;
-}
-
-function createLedgers(symbols, bar, stave, cluster, beat) {
-    // TODO: Quantize this!!!!
-    const midNumber = toNoteNumber(stave.midLinePitch);
-
+function createLedgers(symbols, bar, stave, beat, pitches) {
     // Down ledger lines
-    const minPitch = cluster.reduce(toMinPitch, midNumber);
-    let rows = stave.getRowDiff(stave.maxLinePitch, toNoteName(minPitch)) - 1;
+    const minPitch = getMinPitch(pitches);
+    let rows = stave.getRowDiff(minPitch, stave.minLinePitch) - 1;
     if (rows < 0) symbols.push(assign({}, {
         type: 'downledger',
         beat,
-        rows
+        rows: -rows,
+        stave
     }));
 
     // Up ledger lines
-    const maxPitch = cluster.reduce(toMaxPitch, midNumber);
-    rows = stave.getRowDiff(stave.maxLinePitch, toNoteName(maxPitch)) - 1;
+    const maxPitch = getMaxPitch(pitches);
+    rows = stave.getRowDiff(stave.maxLinePitch, maxPitch) - 1;
     if (rows > 0) symbols.push(assign({}, {
         type: 'upledger',
         beat,
-        rows
+        rows,
+        stave
     }));
 }
 
 
 /* Heads */
 
-function createHeads(symbols, bar, part, durations, cluster) {
-    symbols.push.apply(symbols, cluster.map((event) => ({
-        type: 'head',
-        beat: max(0, event[0] - bar.beat),
-        part
-    })));
+function getAverageStart(bar, events) {
+    let event;
+    let n = -1;
+    let t = 0;
+    while (event = events[++n]) t += event[0];
+    return max(0, (t / events.length) - bar.beat);
+}
 
-    // TEMP
-    const tobeat = cluster[0][0] + cluster[0][4] - bar.beat;
-    return tobeat;
+function getAverageStop(bar, events) {
+    let event;
+    let n = -1;
+    let t = 0;
+    while (event = events[++n]) t += event[0] + event[4];
+    return min(bar.duration, (t / events.length) - bar.beat);
+}
 
+function createDupletHeads(bar, stave, part, durations, startBeat, stopBeat, events, pitches) {
+    const symbols = [];
 
-
-    // Create note head(s) for cluster
-    const pitch = stave.getSpelling(key, event, 0);
-    const props = stave.parts[part];
-
-
-
-    //let beat  = startBeat;
+    let beat = startBeat;
+    let n, event;
     let division, tie;
 
     // If note does not start on a meter multiple and crosses a
     // bar division...
     if (startBeat !== 0
-        && !equal(0, startBeat % bar.divisor)
+        && !eq(0, startBeat % bar.divisor)
         && (division = getDivision(bar.divisions, beat, stopBeat))
     ) {
         const duration = division - beat;
 
-        // Stick it in symbols
-        symbols.push(assign({
+        n = -1;
+        while (event = events[++n]) symbols.push({
             type: 'note',
             beat,
+            pitch: pitches[n],
             duration,
-            dynamic: event[3],
-            pitch,
-            transpose,
-            event,
+            part,
             stave,
-            tie: tie ? 'middle' : 'begin'
-        }, part));
+            //tie: tie ? 'middle' : 'begin',
+            event
+        });
 
         // Update state of note
         beat += duration;
@@ -433,23 +428,22 @@ function createHeads(symbols, bar, part, durations, cluster) {
     // If rest of note does not stop on a meter multiple and crosses a
     // bar division...
     if (stopBeat < bar.duration
-        && !equal(0, stopBeat % bar.divisor)
+        && !eq(0, stopBeat % bar.divisor)
         && (division = getLastDivision(bar.divisions, beat, stopBeat))
     ) {
         const duration = division - beat;
 
-        // Stick it in symbols
-        symbols.push(assign({
+        n = -1;
+        while (event = events[++n]) symbols.push(assign({
             type: 'note',
             beat,
+            pitch: pitches[n],
             duration,
-            dynamic: event[3],
-            pitch,
-            transpose,
-            event,
+            part,
             stave,
-            tie: tie ? 'middle' : 'begin'
-        }, part));
+            event,
+            //tie: tie ? 'middle' : 'begin'
+        }));
 
         // Update state of note
         beat += duration;
@@ -461,47 +455,91 @@ function createHeads(symbols, bar, part, durations, cluster) {
         bar.duration - beat :
         stopBeat - beat ;
 
-    const head = assign({
+    n = -1;
+    while (event = events[++n]) symbols.push(assign({
         type: 'note',
         beat,
+        pitch: pitches[n],
         duration,
-        dynamic: event[3],
-        pitch,
-        transpose,
-        event,
-        stave
-    }, part);
+        part,
+        stave,
+        event
+    }));
 
-    // Stick it in symbols
-    symbols.push(head);
+    return symbols;
+}
+
+function createTupletHeads(bar, stave, part, tuplet, beat, events, pitches) {
+    const symbols  = [];
+    const duration = tuplet.duration / tuplet.divisor;
+
+    let n = -1;
+    let event, symbol;
+    while (event = events[++n]) {
+        symbol = {
+            type: 'note',
+            beat,
+            pitch: pitches[n],
+            duration,
+            part,
+            stave,
+            event,
+            //tie: isLongerThanTuplet ? 'begin' : undefined
+        };
+
+        push(tuplet, symbol);
+        symbols.push(symbol);
+    }
+
+    return symbols;
 }
 
 
-/* Symbols from events */
+/* Ties */
 
-export function createPartSymbols(symbols, bar, stave, key, accidentals, part, events, settings = config) {
-    const divisions = bar.divisions;
-    const cluster   = [];
+function createTie(symbols, part, beat, stopBeat, event, pitch) {
+    const duration = stopBeat - beat;
+
+    symbols.push({
+        type:   'tie',
+        beat,
+        pitch,
+        duration,
+        part,
+        stave
+        //updown: head.stemDirection === 'up' ? 'down' : 'up',
+        //event
+    });
+
+    return symbols;
+}
+
+
+/* Symbols */
+
+function toStopBeat(beat, event) {
+    return event[0] + event[4] - beat;
+}
+
+export function createPartSymbols(symbols, bar, stave, key = 0, accidentals = {}, part, events, settings = config) {
+    const notes = [];
 
     let beat = 0;
     let n = -1;
-    let tuplet;
-    let beam;
-    let event;
+    let event, duration, tuplet, beam;
 
-    while (event = events[++n]) {
-        // Collect concurrent notes into cluster
-        cluster.push(event);
-        while (events[++n] && lte(events[n][0], max(event[0], bar.beat), precision)) cluster.push(events[n]);
-        --n;
+    // Ignore events that stop before beat 0, an extra cautious measure because
+    // events should already start with events at beat 0
+    while ((event = events[++n]) && lte(event[0] + event[4] - bar.beat, beat, p16));
+    --n;
 
-        // If beat has moved beyond tuplet close tuplet
-        if (tuplet && gte(beat, tuplet.beat + tuplet.duration, precision)) {
-            // TODO: decide on stem direction for all tuplet notes
-            closeTuplet(stave, tuplet);
-            // End tuplet state
-            tuplet = undefined;
+    while (lt(beat, bar.duration)) {
+        // Fill notes with events playing during beat, and leave event as the
+        // next event after beat
+        while ((event = events[++n]) && lte(event[0] - bar.beat, beat, p16)) {
+            notes.push(event);
         }
+        --n;
 
         // If we are not currently in tuplet mode detect the next tuplet
         if (!tuplet) {
@@ -510,134 +548,153 @@ export function createPartSymbols(symbols, bar, stave, key, accidentals, part, e
 
             if (data && data.divisor !== 2) {
                 // Create tuplet symbol
-                tuplet = assign({ type: 'tuplet', part }, data, { beat: data.beat - bar.beat });
+                tuplet = assign({ type: 'tuplet', part, stave }, data, { beat: data.beat - bar.beat });
                 // Push rests up to tuplet start
-                beat = createRests(symbols, restDurations, bar, part, beat, data.beat - bar.beat);
+                beat = createRests(symbols, restDurations, bar, stave, part, beat, data.beat - bar.beat);
                 // Push tuplet
                 symbols.push(tuplet);
             }
         }
 
-        if (tuplet) {
-            beat = createRests(symbols, [tuplet.duration / tuplet.divisor], bar, part, beat, max(0, event[0] - bar.beat));
-            // push(tuplet, rest);
-            createAccidentals(symbols, part, accidentals, cluster, beat);
-            createLedgers(symbols, bar, stave, cluster, beat);
-            beat = createHeads(symbols, bar, part, [tuplet.duration / tuplet.divisor], cluster);
-
-            // OLD
-            // Quantise head duration to multiple of tuplet duration
-            //head.duration = round(tuplet.duration / tuplet.divisor, head.duration);
-        }
-        else {
-            beat = createRests(symbols, restDurations, bar, part, beat, max(0, event[0] - bar.beat));
-            createAccidentals(symbols, part, accidentals, cluster, beat);
-            createLedgers(symbols, bar, stave, cluster, beat);
-            beat = createHeads(symbols, bar, part, headDurations, cluster);
-
-            // OLD
-            //head.beat = round(1/24, head.beat);
-            // Quantize head duration, round to remove rounding errors, ironically
-            //head.duration = round(1/8, quantise(headDurations, 1, head.duration));
+        // If there's a beam and beat is on a division close it
+        if (beam && bar.divisions.find((division) => eq(beat, division, p16))
+            // or head started after a new division
+            // || getDivision(bar.divisions, , beat)
+        ) {
+            closeBeam(symbols, stave, part, beam);
+            beam = undefined;
         }
 
-        cluster.length = 0;
+        // Insert heads
 
+        if (notes.length) {
+            const pitches = getPitches(stave, key, notes);
+            let nextBeat, heads;
 
-        // Beam
-        if (beam && beam.length) {
-            // If head is a quarter note or longer
-            if (head.duration >= 1
-                // or head is a triplet quarter note
-                || head.duration.toFixed(2) === '0.67'
-                // or head starts at a division
-                || bar.divisions.includes(head.beat)
-                // or head starts after a new division
-                || getDivision(bar.divisions, symbols[beam[beam.length - 1]].beat, head.beat)
-            ) {
-                // Close the current beam
-                n += closeBeam(symbols, bar.stave, beam, n);
-                beam = undefined;
-            }
-        }
+            // Create ledgers and accidentals
+            //createLedgers(symbols, bar, stave, beat, pitches);
+            createAccidentals(symbols, stave, part, accidentals, beat, notes, pitches);
 
+            if (tuplet) {
+                nextBeat = beat + tuplet.duration / tuplet.divisor;
+                heads = createTupletHeads(bar, stave, part, tuplet, beat, notes, pitches);
 
-        continue;
-
-
-        // Stem and tieheads. We must wait for stems to be decided before rendering
-        // tieheads as their up/down direction is dependent.
-        if (head.duration < 4) {
-            // Is this head less than 1 beat, and not 1 triplet beat, long?
-            // Wait for it to be beamed.
-            if (head.duration < 1 && head.duration.toFixed(2) !== '0.67') {
-                if (beam) {
-                    // Keep index of head
-                    beam.push(n);
-                }
-                else {
-                    // Create new beam
-                    beam = [n];
+                // If beat has arrived at end of tuplet close tuplet
+                if (gte(nextBeat, tuplet.beat + tuplet.duration, p16)) {
+                    closeTuplet(stave, tuplet);
+                    // Update next beat to the probably less error-prone
+                    nextBeat = tuplet.beat + tuplet.duration;
+                    tuplet = undefined;
                 }
             }
             else {
-                if (head.tie === 'begin' || head.tie === 'middle') {
-                    let stemDirection = getStemDirection(stave.centerPitch, head);
-                    symbols.splice(n++, 0, assign({}, head, {
-                        type:   'tie',
-                        beat:   head.beat,
-                        updown: stemDirection === 'up' ? 'down' : 'up',
-                        event:  head.event
-                    }));
+                // Set next beat to rounded next event ... ????
+                nextBeat = event ?
+                    round(0.125, event[0] - bar.beat) :
+                    bar.duration ;
+
+                let duration = nextBeat - beat;
+                let i = notes.length;
+                while (i--) {
+                    let stopBeat     = round(0.125, toStopBeat(bar.beat, notes[i]));
+                    let stopDuration = max(stopBeat - beat, minDuration);
+
+                    // If stop duration is significantly shorter than next
+                    // duration render a shorter duration
+                    if (stopDuration - minDuration < 0.75 * (duration - minDuration)) {
+console.log('SHORTEN', stopDuration, duration);
+                        nextBeat     = stopBeat;
+                        duration = stopDuration;
+                    }
+                }
+
+                heads = createDupletHeads(bar, stave, part, headDurations, beat, nextBeat, notes, pitches);
+            }
+
+            // Push head symbols into symbols
+            symbols.push.apply(symbols, heads);
+
+            // Insert beams
+
+            // If head is a quarter note or longer or a triplet quarter note
+            if (gte(duration, 1, p16) || eq(duration, 0.6667, p16)) {
+                // If there is a beam, close it
+                if (beam) {
+                    closeBeam(symbols, stave, part, beam);
+                    beam = undefined;
                 }
             }
-        }
-        else {
-            if (head.tie === 'begin' || head.tie === 'middle') {
-                let stemDirection = getStemDirection(stave.centerPitch, head);
-                symbols.splice(n++, 0, assign({}, head, {
-                    type:   'tie',
-                    beat:   head.beat,
-                    updown: stemDirection === 'up' ? 'down' : 'up',
-                    event:  head.event
-                }));
+            // Collect notes in beams array
+            else {
+                if (beam) push(beam, heads);
+                else beam = { type: 'beam', beat, part, 0: heads };
             }
+
+            // Insert ties
+
+            let i = notes.length;
+            while (i--) {
+                let stopBeat = toStopBeat(bar.beat, notes[i]);
+                // Remove notes that end before or near next beat
+                if (lte(stopBeat, nextBeat, p16)) notes.splice(i, 1);
+                // Add tie to remaining notes
+                else createTie(symbols, part, beat, nextBeat, notes[i], pitches[i]);
+            }
+
+            // Update beat
+            beat = nextBeat;
+            continue;
         }
-    }
 
+        // Insert rests
 
+        // If beam close it
+        if (beam && beam[0]) {
+            // Close the current beam
+            closeBeam(symbols, bar.stave, beam, n);
+            beam = undefined;
+        }
 
-
-
-
-
-
-
-
-
-    // Close the current beam
-    if (beam && beam.length) {
-        n += closeBeam(symbols, bar.stave, beam, n);
-        beam = undefined;
-    }
-
-    // Beat is not yet at the end of the bar, insert rests
-    while (lt(beat, bar.duration, precision)) {
-        // If beat has moved beyond tuplet close tuplet
-        if (tuplet && gte(beat, tuplet.beat + tuplet.duration, precision)) {
-            // TODO: decide on stem direction for all tuplet notes
-            closeTuplet(stave, tuplet);
-            // End tuplet state
-            tuplet = undefined;
+        if (tuplet && gt(tuplet.beat, beat, p16)) {
+            // Create rests up to tuplet
+            createRests(symbols, restDurations, bar, stave, part, beat, tuplet.beat);
+            beat = tuplet.beat;
+            continue;
         }
 
         if (tuplet) {
-            beat = createRests(symbols, [tuplet.duration / tuplet.divisor], bar, part, beat, tuplet.beat + tuplet.duration);
-            // push(tuplet, rest);
+            // Create tuplet rest
+            const stopBeat = beat + tuplet.duration / tuplet.divisor;
+            duration = tuplet.duration / tuplet.divisor;
+            symbols.push({ type: 'rest', beat, duration, stave, part });
+            beat += duration;
+            // If beat has arrived at end of tuplet close tuplet
+            if (gte(beat, tuplet.beat + tuplet.duration, p16)) {
+                closeTuplet(stave, tuplet);
+                tuplet = undefined;
+                // Keep beat sane
+                beat = round(0.125, beat);
+            }
+            continue;
         }
-        else {
-            beat = createRests(symbols, restDurations, bar, part, beat, bar.duration);
+
+        if (event) {
+            // Create rests up to next event
+            const stopBeat = round(0.125, event[0] - bar.beat);
+            createRests(symbols, restDurations, bar, stave, part, beat, stopBeat);
+            beat = stopBeat;
+            continue;
         }
+
+        // Fill rest of bar with rests
+        createRests(symbols, restDurations, bar, stave, part, beat, bar.duration);
+        beat = bar.duration;
+    }
+
+    // If there's still a beam close it
+    if (beam) {
+        closeBeam(symbols, stave, part, beam);
+        beam = undefined;
     }
 
     return symbols;

@@ -16,6 +16,10 @@
     line-height: 0.625em;
 }
 
+.rest[data-duration^="0.66"] {
+    margin-left: 0.1875em;
+}
+
 .rest[data-duration="2"],
 .rest[data-duration="3"],
 .rest[data-duration="4"],

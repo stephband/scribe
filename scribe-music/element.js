@@ -5,16 +5,12 @@ import element, { getInternals } from 'dom/element.js';
 import events                    from 'dom/events.js';
 import { toRootName, toRootNumber } from 'midi/note.js';
 
-import createSymbols     from '../modules/create-symbols.js';
 import requestData       from '../modules/request-data.js';
 import parseSource       from '../modules/parse.js';
 import { timesigToMeter, meterToTimesig } from '../modules/timesig.js';
 import Stave             from '../modules/stave.js';
 import { renderBeam }    from '../modules/beam.js';
-//import createElement     from '../modules/create-element.js';
-import createBarElements from '../modules/create-bar-elements.js';
-//import svgdefs           from '../modules/svgdefs.js';
-
+import render            from '../modules/render.js';
 
 const assign = Object.assign;
 const define = Object.defineProperties;
@@ -79,7 +75,7 @@ export default define(element('scribe-music', {
 
         // Listens to changes
         return Signal.frame(() => {
-            const elements = internals.data.value && createBarElements(createSymbols(
+            const elements = internals.data.value && render(
                 // Events from data
                 internals.data.value,
                 // Clef is a string
@@ -90,7 +86,7 @@ export default define(element('scribe-music', {
                 internals.meter.value,
                 // Transpose is a number
                 internals.transpose.value
-            ));
+            );
 
             // Clear the shadow DOM of bars and put new elements in it
             shadow.querySelectorAll('.bar').forEach((element) => element.remove());

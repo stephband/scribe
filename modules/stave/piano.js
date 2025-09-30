@@ -1,5 +1,4 @@
 
-import toSpelling  from '../event/to-spelling.js';
 import * as glyphs from "../glyphs.js";
 import Stave       from './stave.js';
 

@@ -7,6 +7,7 @@ import toStopBeat from './event/to-stop-beat.js';
 import { getDivisions }  from './bar.js';
 import { toKeyScale, toKeyNumber, cScale } from './keys.js';
 import { createPartSymbols } from './create-part.js';
+import createBarElements from './create-bar-elements.js';
 import config     from './config.js';
 
 
@@ -45,10 +46,6 @@ function createBarSymbols(symbols, bar, stave, key, events, config) {
 
     while (event = events[++n]) switch (event[1]) {
         case "key": {
-            if (event[0] !== bar.beat) {
-                throw new TypeError('Scribe: "key" event must occur at bar start – event [' + event.join(', ') + '] is on beat ' + (event[0] - bar.beat) + ' of bar');
-            }
-
             // Get the key scale from keyname. This scale is not a true
             // 'scale' in an internal-data sense as it may not begin with a 0, but it
             // maps naturals to accidentals when compared against the C scale. Remember
@@ -63,7 +60,8 @@ function createBarSymbols(symbols, bar, stave, key, events, config) {
                     // No beat for key signature accidentals
                     type: 'acci',
                     pitch: toRootName(cScale[i]) + accidentals[n - cScale[i]],
-                    value: n - cScale[i]
+                    value: n - cScale[i],
+                    stave
                 }))
                 .filter((o) => !!o)
                 .sort(byFatherCharlesPitch)
@@ -77,7 +75,9 @@ function createBarSymbols(symbols, bar, stave, key, events, config) {
                 type:        'timesig',
                 beat:        0,
                 numerator:   event[2] / event[3],
-                denominator: 4 / event[3]
+                denominator: 4 / event[3],
+                stave,
+                event
             });
 
             break;
@@ -85,7 +85,8 @@ function createBarSymbols(symbols, bar, stave, key, events, config) {
 
         case "symbol": {
             symbols.push({
-                type: 'symbol' + event[2]
+                type: 'symbol' + event[2],
+                stave
             });
 
             break;
@@ -150,7 +151,7 @@ function createBarSymbols(symbols, bar, stave, key, events, config) {
     return symbols;
 }
 
-function createBar(beat, duration, divisor, stave, key, events, parts, sequence, config) {
+function createBar(count, beat, duration, divisor, stave, key, events, parts, sequence, config) {
     const symbols = [];
 
     // Track end of sequence and shove in a double bar line
@@ -165,18 +166,26 @@ function createBar(beat, duration, divisor, stave, key, events, parts, sequence,
         type: 'bar',
         beat,
         duration,
-        //stave,
         //key,
         divisor,
         divisions: getDivisions(duration, divisor),
+        stave,
+        count,
         symbols
     };
 
     // Populate symbols with events
     createBarSymbols(symbols, bar, stave, key, events, config);
 
+    // Get the key scale from keyname. This scale is not a true
+    // 'scale' in an internal-data sense as it may not begin with a 0, but it
+    // maps naturals to accidentals when compared against the C scale. Remember
+    // keynumber is on a continuous scale of fourths, so multiply by 7 semitones
+    // to get chromatic number relative to C.
+    const scale = toKeyScale(key * 7);
+
     // Populate accidentals with key signature sharps and flats
-    const accidentals = key.reduce((accidentals, n, i) => {
+    const accidentals = scale.reduce((accidentals, n, i) => {
         const acci = n - cScale[i];
         if (acci !== 0) {
             const name = toRootName(cScale[i]);
@@ -197,12 +206,12 @@ function createBar(beat, duration, divisor, stave, key, events, parts, sequence,
 
 export default function createBars(sequence, stave, settings = config) {
     const bars = [];
+    const ties = [];
 
     let beat   = 0;
     let events = [];
-    let ties   = [];
     let parts  = {};
-    let key    = cScale;
+    let key    = 0;
     let duration, divisor, event, sequenceEvent;
 
     // Extract events from sequence iterator
@@ -210,9 +219,9 @@ export default function createBars(sequence, stave, settings = config) {
         // If event is beyond current duration create bars
         while (event[0] >= beat + duration) {
             // Close current bar, push to bars
-            bars.push(createBar(beat, duration, divisor, stave, key, events, parts, sequenceEvent, settings));
+            bars.push(createBar(bars.length, beat, duration, divisor, stave, key, events, parts, sequenceEvent, settings));
 
-            // Update beat, start new arrays
+            // Update beat, start new accumulators
             beat = beat + duration;
             events = [];
             parts  = {};
@@ -245,13 +254,7 @@ export default function createBars(sequence, stave, settings = config) {
                     new TypeError('Scribe: "key" event must occur at bar start – event [' + event.join(', ') + '] is on beat ' + (event[0] - beat) + ' of bar');
                 }
 
-                // Get the key scale from keyname. This scale is not a true
-                // 'scale' in an internal-data sense as it may not begin with a 0, but it
-                // maps naturals to accidentals when compared against the C scale. Remember
-                // keynumber is on a continuous scale of fourths, so multiply by 7 semitones
-                // to get chromatic number relative to C.
-                const keynumber = toKeyNumber(event[2]);
-                key = toKeyScale(keynumber * 7);
+                key = toKeyNumber(event[2]);
             }
 
             case "meter": {
@@ -274,7 +277,7 @@ export default function createBars(sequence, stave, settings = config) {
     // There are still events with long durations to symbolise into bars
     while (ties.length) {
         // Close current bar, push to bars
-        bars.push(createBar(beat, duration, divisor, stave, key, events, parts));
+        bars.push(createBar(bars.length, beat, duration, divisor, stave, key, events, parts));
 
         // Update beat, start new arrays
         beat = beat + duration;
@@ -290,7 +293,7 @@ export default function createBars(sequence, stave, settings = config) {
     }
 
     // Close final bar, push to bars
-    bars.push(createBar(beat, duration, divisor, stave, key, events, parts));
+    bars.push(createBar(bars.length, beat, duration, divisor, stave, key, events, parts));
 
     // Return bars
     return bars;

@@ -56,7 +56,7 @@ export default class Stave {
     }
 
     /**
-    .minPitch, .maxPitch, .minLinePitch, .midLinePitch, .maxLinePitch
+    .minPitch, .midPitch, .maxPitch, .minLinePitch, .midLinePitch, .maxLinePitch
     Minimum and maximum pitch names supported by the stave corresponding to the
     first and last row names in `.rows`, and lower, middle and upper stave pitches
     corresponding to the lower, middle and upper lines of the stave.
@@ -64,6 +64,10 @@ export default class Stave {
 
     get minPitch() {
         return this.rows[0];
+    }
+
+    get midPitch() {
+        return this.rows[13];
     }
 
     get maxPitch() {
