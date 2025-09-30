@@ -165,7 +165,7 @@ export default overload(get('type'), {
     }),
 
     note: (symbol) => create('data', {
-        class: `${ symbol.stemDirection === 'up' ? 'up-note' : 'down-note' } note`,
+        class: `${ symbol.stemup ? 'up-note' : 'down-note' } note`,
         style: symbol.stemHeight && `--stem-height: ${ symbol.stemHeight };`,
         html:  symbol.stave.getNoteHTML(symbol.pitch, symbol.dynamic, symbol.duration),
         //value: symbol.event.join(' '),
