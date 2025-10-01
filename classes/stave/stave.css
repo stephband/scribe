@@ -14,16 +14,23 @@
 
     /* Render the stave as a background image */
     background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -5 1 10" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
-        <style>line{vector-effect:non-scaling-stroke;stroke:currentcolor;stroke-width:0.04em;stroke-linejoin:round;stroke-linecap:round;fill:none;}</style>\
+        <style>line{vector-effect:non-scaling-stroke;stroke:currentcolor;stroke-width:0.04em;stroke-linejoin:round;stroke-linecap:butt;fill:none;}</style>\
         <line x1="0" x2="1" y1="4" y2="4"></line>\
         <line x1="0" x2="1" y1="2" y2="2"></line>\
         <line x1="0" x2="1" y1="0" y2="0"></line>\
         <line x1="0" x2="1" y1="-2" y2="-2"></line>\
         <line x1="0" x2="1" y1="-4" y2="-4"></line>\
+        <line x1="0" x2="0" y1="4" y2="-4" style="stroke-width:0.12em;"></line>\
+        <line x1="1" x2="1" y1="4" y2="-4" style="stroke-width:0.12em;"></line>\
     </svg>');
     background-repeat: repeat-x;
     background-size: 100% 1.25em;
     background-position: 0 50%;
+}
+
+.stave::before {
+    /* Clef */
+    align-self: center;
 }
 
 .stave > svg {

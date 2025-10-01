@@ -158,6 +158,7 @@ Bars are divided into:
 		[bar-end];
 }
 
+/*
 .bar::before,
 .bar::after {
 	content: '';
@@ -180,11 +181,24 @@ Bars are divided into:
 	justify-self: end;
 	margin-right: calc(-1 * var(--bar-padding-right));
 }
+*/
 
 .safari .bar::after,
 :host(.safari) > .bar::after {
 	/* Overlap bar lines to disguise Safari rounding errors */
 	margin-right: calc(-0.5 * var(--bar-line-size, 1px) - var(--bar-padding-right));
+}
+
+
+.bar::before {
+    /* Position clef */
+    grid-column: 1;
+    justify-self: start;
+    width: auto;
+}
+
+.bar + .bar::before {
+    content: none;
 }
 
 /* Column 1 is clef/key/timesig */
@@ -469,6 +483,7 @@ Bars are divided into:
     --clef-acci-gap: 0.9em;
 }
 
+.bar > .timesig,
 .bar > .clef + .timesig,
 .bar > .clef + .timesig + .timesig {
     --clef-timesig: 1em;
