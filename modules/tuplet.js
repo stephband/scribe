@@ -6,7 +6,7 @@ import { floorPowerOf2 } from './number/power-of-2.js';
 
 
 const assign   = Object.assign;
-const tupletDivisors = [2, 3, 5, 7, 9];
+const tupletDivisors = [2, 3, 5, 6, 7, 9];
 const minTupletDuration = 1/12;
 
 // The importance of stop beats as compared to start beats
@@ -44,7 +44,7 @@ function scoreTupletAtBeat(duration, divisor, beat, events, n) {
         // little arbitrary.
         if (divisor > 4) {
             a = Math.round((events[n][0] - beat) / tupletDuration);
-            // Has a more than incremented by 1 over b?
+            // Has a more than incremented by 1 over b? We have a hole
             if (a > b + 1) return -1;
             b = a;
         }
@@ -60,6 +60,9 @@ function scoreTupletAtBeat(duration, divisor, beat, events, n) {
         score += stopFactor * getScore(tupletDuration, events[n][0] + events[n][4] - beat);
         count += stopFactor;
     }
+
+    // Detect holes
+    if (divisor > 4 && a !== divisor - 1) return -1;
 
     return count ? score / count : 0 ;
 }
