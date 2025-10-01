@@ -201,6 +201,11 @@ function createBar(count, beat, duration, divisor, stave, key, events, parts, se
         createPartSymbols(symbols, bar, stave, key, accidentals, name, parts[name], config);
     }
 
+    // If no part was rendered at least render a rest
+    if (!name) {
+        createPartSymbols(symbols, bar, stave, key, accidentals, '0', [], config);
+    }
+
     return bar;
 }
 

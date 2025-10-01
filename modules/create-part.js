@@ -125,12 +125,16 @@ function getMaxPitch(pitches) {
 
 /* Stems */
 
-function stemFromPitches(stave, pitches) {
-    const minPitch = getMinPitch(pitches);
-    const maxPitch = getMaxPitch(pitches);
+function stemFromMinMaxPitches(stave, minPitch, maxPitch) {
     const minDiff  = stave.getRowDiff(stave.midLinePitch, minPitch);
     const maxDiff  = stave.getRowDiff(stave.midLinePitch, maxPitch);
     return maxDiff + minDiff < -1;
+}
+
+function stemFromPitches(stave, pitches) {
+    const minPitch = getMinPitch(pitches);
+    const maxPitch = getMaxPitch(pitches);
+    return stemFromMinMaxPitches(stave, minPitch, maxPitch);
 }
 
 function stemFromSymbols(stave, symbols) {
@@ -472,10 +476,6 @@ function createTie(symbols, stave, part, beat, stopBeat, event, pitch) {
 
 /* Symbols */
 
-function toStopBeat(beat, event) {
-    return event[0] + event[4] - beat;
-}
-
 function createTupletSymbols(symbols, bar, stave, key, accidentals, part, settings, beat, duration, divisor, notes, events, n) {
     const tuplet   = { type: 'tuplet', beat, duration, divisor, part, stave };
     const division = duration / divisor;
@@ -506,7 +506,7 @@ function createTupletSymbols(symbols, bar, stave, key, accidentals, part, settin
         const minPitch = getMinPitch(pitches);
         const maxPitch = getMaxPitch(pitches);
         const stemup   = part.stemup === undefined ?
-            stemFromPitches(stave, pitches) :
+            stemFromMinMaxPitches(stave, minPitch, maxPitch) :
             part.stemup ;
 
         const stopBeat = min(
@@ -544,17 +544,17 @@ function createTupletSymbols(symbols, bar, stave, key, accidentals, part, settin
         createAccidentals(symbols, stave, part, accidentals, beat, notes, pitches);
 
         n = -1;
-        while (event = events[++n]) symbols.push({
+        while (notes[++n]) symbols.push({
             type: 'note',
             beat,
             pitch: pitches[n],
             duration,
             part,
             stemup,
-            high: pitches[n] === maxPitch,
-            low:  pitches[n] === minPitch,
+            top:    pitches[n] === maxPitch,
+            bottom: pitches[n] === minPitch,
             stave,
-            event
+            event: notes[n]
         });
 
         // Push note symbols on to tuplet
@@ -662,7 +662,7 @@ if (stopBeat <= beat) {
         const minPitch = getMinPitch(pitches);
         const maxPitch = getMaxPitch(pitches);
         const stemup   = part.stemup === undefined ?
-            stemFromPitches(stave, pitches) :
+            stemFromMinMaxPitches(stave, minPitch, maxPitch) :
             part.stemup ;
 
         // Create ledgers and accidentals
@@ -704,7 +704,7 @@ if (stopBeat <= beat) {
         };
 
         n = -1;
-        while (event = events[++n]) symbols.push({
+        while (notes[++n]) symbols.push({
             type: 'note',
             beat,
             pitch: pitches[n],
@@ -714,7 +714,7 @@ if (stopBeat <= beat) {
             high: pitches[n] === maxPitch,
             low:  pitches[n] === minPitch,
             stave,
-            event
+            event: notes[n]
         });
 
         // Push note symbols on to beam
