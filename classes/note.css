@@ -23,7 +23,7 @@
     line-height: 0.25em;
     white-space: nowrap;
     grid-auto-columns: min-content min-content;
-    grid-auto-columns: calc(1em * var(--head-width)) min-content;
+/*    grid-auto-columns: calc(1em * var(--head-width)) min-content; */
     grid-auto-rows: 0.25em;
     grid-auto-flow: column;
     height: 0.25em;
@@ -125,40 +125,40 @@ Flags
 }
 
 /* Note durations 0.75, 0.5, and 0.3333 get an 8th note flag */
-.note[data-duration^="0.7"]::before,
-.note[data-duration^="0.5"]::before,
-.note[data-duration^="0.4"]::before,
-.note[data-duration^="0.3"]::before,
-.note[data-duration^="0.28"]::before      { content: '\E240'; }
-.down-note[data-duration^="0.7"]::before,
-.down-note[data-duration^="0.5"]::before,
-.down-note[data-duration^="0.4"]::before,
-.down-note[data-duration^="0.3"]::before,
-.down-note[data-duration^="0.28"]::before { content: '\E241'; }
+.up-note.top-note[data-duration^="0.7"]::before,
+.up-note.top-note[data-duration^="0.5"]::before,
+.up-note.top-note[data-duration^="0.4"]::before,
+.up-note.top-note[data-duration^="0.3"]::before,
+.up-note.top-note[data-duration^="0.28"]::before      { content: '\E240'; }
+.down-note.bottom-note[data-duration^="0.7"]::before,
+.down-note.bottom-note[data-duration^="0.5"]::before,
+.down-note.bottom-note[data-duration^="0.4"]::before,
+.down-note.bottom-note[data-duration^="0.3"]::before,
+.down-note.bottom-note[data-duration^="0.28"]::before { content: '\E241'; }
 
 /* Note durations 0.375, 0.25 and 0.1667 get a 16th note flag */
-.note[data-duration^="0.37"]::before,
-.note[data-duration^="0.25"]::before,
-.note[data-duration="0.2"]::before,
-.note[data-duration^="0.16"]::before,
-.note[data-duration^="0.14"]::before      { content: '\E242'; }
-.down-note[data-duration^="0.37"]::before,
-.down-note[data-duration^="0.25"]::before,
-.down-note[data-duration="0.2"]::before,
-.down-note[data-duration^="0.16"]::before,
-.down-note[data-duration^="0.14"]::before { content: '\E243'; }
+.up-note.top-note[data-duration^="0.37"]::before,
+.up-note.top-note[data-duration^="0.25"]::before,
+.up-note.top-note[data-duration="0.2"]::before,
+.up-note.top-note[data-duration^="0.16"]::before,
+.up-note.top-note[data-duration^="0.14"]::before      { content: '\E242'; }
+.down-note.bottom-note[data-duration^="0.37"]::before,
+.down-note.bottom-note[data-duration^="0.25"]::before,
+.down-note.bottom-note[data-duration="0.2"]::before,
+.down-note.bottom-note[data-duration^="0.16"]::before,
+.down-note.bottom-note[data-duration^="0.14"]::before { content: '\E243'; }
 
 /* Note durations 0.1875, 0.125 and 0.0833 get a 32nd note flag */
-.note[data-duration^="0.18"]::before,
-.note[data-duration^="0.12"]::before,
-.note[data-duration^="0.11"]::before,
-.note[data-duration="0.1"]::before,
-.note[data-duration^="0.08"]::before      { content: '\E244'; }
-.down-note[data-duration^="0.18"]::before,
-.down-note[data-duration^="0.12"]::before,
-.down-note[data-duration^="0.11"]::before,
-.down-note[data-duration="0.1"]::before,
-.down-note[data-duration^="0.08"]::before { content: '\E245'; }
+.up-note.top-note[data-duration^="0.18"]::before,
+.up-note.top-note[data-duration^="0.12"]::before,
+.up-note.top-note[data-duration^="0.11"]::before,
+.up-note.top-note[data-duration="0.1"]::before,
+.up-note.top-note[data-duration^="0.08"]::before      { content: '\E244'; }
+.down-note.bottom-note[data-duration^="0.18"]::before,
+.down-note.bottom-note[data-duration^="0.12"]::before,
+.down-note.bottom-note[data-duration^="0.11"]::before,
+.down-note.bottom-note[data-duration="0.1"]::before,
+.down-note.bottom-note[data-duration^="0.08"]::before { content: '\E245'; }
 
 /* Notes that are beamed get no flag */
 .note[data-beam]::before { content: none !important; }

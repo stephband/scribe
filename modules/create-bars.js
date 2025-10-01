@@ -103,7 +103,7 @@ function createBarSymbols(symbols, bar, stave, key, events, config) {
 
             symbols.push({
                 type: 'chord',
-                beat: startBeat,
+                beat,
                 // Does chord cross into next bar? The symbol should not
                 duration: event[0] + event[4] > bar.beat + bar.duration ?
                     bar.duration - beat :
@@ -138,7 +138,7 @@ function createBarSymbols(symbols, bar, stave, key, events, config) {
             // Put a double bar line at the end of bar
             symbols.push({ type: 'doublebarline', stave, event });
             // Put a bar count indicator at the start of the next bar TODO: How???
-            symbols.push({ type: 'barcount', text: bars.length + 1, stave });
+            symbols.push({ type: 'barcount', text: bar.count, stave });
             break;
         }
 
@@ -219,7 +219,7 @@ export default function createBars(sequence, stave, settings = config) {
         // If event is beyond current duration create bars
         while (event[0] >= beat + duration) {
             // Close current bar, push to bars
-            bars.push(createBar(bars.length, beat, duration, divisor, stave, key, events, parts, sequenceEvent, settings));
+            bars.push(createBar(bars.length + 1, beat, duration, divisor, stave, key, events, parts, sequenceEvent, settings));
 
             // Update beat, start new accumulators
             beat = beat + duration;

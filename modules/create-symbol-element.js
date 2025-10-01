@@ -128,44 +128,26 @@ export default overload(get('type'), {
         }
     }),
 
-    upledger: (symbol) => create('svg', {
-        class: "up-ledge ledge",
-        viewBox: `0 ${0.5 - symbol.rows} 4.4 ${symbol.rows}`,
-        preserveAspectRatio: "xMidYMax",
-        style: `height: ${ symbol.rows * 0.125 }em;`,
-        html: `
-            <line x1="0" x2="4.4" y1="-6" y2="-6"></line>
-            <line x1="0" x2="4.4" y1="-4" y2="-4"></line>
-            <line x1="0" x2="4.4" y1="-2" y2="-2"></line>
-            <line x1="0" x2="4.4" y1="0" y2="0"></line>
-        `,
-        data: {
-            beat:  truncate(symbol.beat + 1),
-            pitch: symbol.pitch,
-            part:  symbol.part
-        }
-    }),
-
-    downledger: (symbol) => create('svg', {
-        class: "down-ledge ledge",
-        viewBox: `0 -0.5 4.4 ${symbol.rows}`,
+    ledge: (symbol) => create('svg', {
+        class:   `${ symbol.rows < 0 ? 'up' : 'down' }-ledge ledge`,
+        viewBox: `0 -0.5 4.4 ${abs(symbol.rows)}`,
         preserveAspectRatio: "xMidYMin",
-        style: `height: ${ symbol.rows * 0.125 }em;`,
+        style: `height: ${ abs(symbol.rows) * 0.125 }em;`,
         html: `
-            <line x1="0" x2="4.4" y1="6" y2="6"></line>
-            <line x1="0" x2="4.4" y1="4" y2="4"></line>
-            <line x1="0" x2="4.4" y1="2" y2="2"></line>
             <line x1="0" x2="4.4" y1="0" y2="0"></line>
+            <line x1="0" x2="4.4" y1="2" y2="2"></line>
+            <line x1="0" x2="4.4" y1="4" y2="4"></line>
+            <line x1="0" x2="4.4" y1="6" y2="6"></line>
+            <line x1="0" x2="4.4" y1="8" y2="8"></line>
         `,
         data: {
             beat:  truncate(symbol.beat + 1),
-            pitch: symbol.pitch,
-            part:  symbol.part
+            pitch: symbol.pitch
         }
     }),
 
     note: (symbol) => create('data', {
-        class: `${ symbol.stemup ? 'up-note' : 'down-note' } note`,
+        class: `${ symbol.stemup ? 'up-note' : 'down-note' } ${ symbol.high ? 'top-note' : '' } ${ symbol.low ? 'bottom-note' : '' } note`,
         style: symbol.stemHeight ? `--stem-height: ${ symbol.stemHeight };` : undefined,
         html:  symbol.stave.getNoteHTML(symbol.pitch, symbol.dynamic, symbol.duration),
         //value: symbol.event.join(' '),
@@ -198,7 +180,7 @@ export default overload(get('type'), {
     }),
 
     tie: (symbol) => create('svg', {
-        class: `${ symbol.updown }-tie tie`,
+        class: `${ symbol.stemup ? 'down' : 'up' }-tie tie`,
         viewBox: `0 0 1 1`,
         preserveAspectRatio: "none",
         html: `<path class="tie-path" transform="translate(0, 0.14) scale(1 0.6)" d="M0.979174733,0.0124875307 C0.650597814,1.1195554 0.135029714,1.00095361 0.0165376402,0.026468657 C0.0113570514,0.0135475362 0.00253387291,0.00218807553 0,0 C0.0977526897,1.29523004 0.656681642,1.37089992 1,2.43111793e-08 C0.991901367,2.43111797e-08 0.987703936,0.01248753 0.979174733,0.0124875307 Z M0.979174733,0.0124875307"></path>`,
@@ -211,7 +193,7 @@ export default overload(get('type'), {
     }),
 
     tuplet: (symbol) => create('span', {
-        class: `${ symbol.down ? 'down' : 'up' }-tuplet tuplet`,
+        class: `${ symbol.stemup ? 'up' : 'down' }-tuplet tuplet`,
         html: glyphs['tuplet' + symbol.divisor],
         data: {
             beat:     truncate(symbol.beat + 1),

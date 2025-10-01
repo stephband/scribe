@@ -61,7 +61,7 @@
        every font, approximative. */
     align-self: center;
     position: relative;
-    top: calc(0.175em - 1.25em);
+    top: calc(0.175em - 1.3125em);
 }
 
 .stave > .down-tuplet {

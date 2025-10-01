@@ -23,7 +23,7 @@
     --head-width:        0.3375;
     /* Space around accidentals */
     --acci-margin-left:  0.0875;
-    --acci-margin-right: 0.0875;
+    --acci-margin-right: 0.0625;
     /* Space around notes */
     --note-margin-left:  0;
     --note-margin-right: 0;

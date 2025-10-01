@@ -6,7 +6,7 @@ import { floorPowerOf2 } from './number/power-of-2.js';
 
 
 const assign   = Object.assign;
-const tupletDivisors = [2, 3, 5, 6, 7, 9];
+const tupletDivisors = [2, 3, 4, 5, 6, 7, 9];
 const minTupletDuration = 1/12;
 
 // The importance of stop beats as compared to start beats
@@ -67,7 +67,7 @@ function scoreTupletAtBeat(duration, divisor, beat, events, n) {
     return count ? score / count : 0 ;
 }
 
-function detectTupletOverDuration(tuplet, duration, events, n, startbeat, divisors) {
+function detectTupletOverDuration(tuplet, duration, events, n, startbeat, divisors, stopBeat) {
     // n is the index of the first event we are interested in. Set beat from
     // the floored multiple of duration up to this event's beat
     const beat = duration * Math.floor((events[n][0] - startbeat) / duration) + startbeat;
@@ -92,7 +92,7 @@ function detectTupletOverDuration(tuplet, duration, events, n, startbeat, diviso
         }
 
         // If first head occurs at or after half a duration of beat
-        if (events[n][0] >= beat + 0.5 * duration) {
+        if (events[n][0] >= beat + 0.5 * duration && beat + 1.5 * duration < stopBeat) {
             // Score tuplet offset by half a duration
             s = scoreTupletAtBeat(duration, divisor, beat + 0.5 * duration, events, n);
 
@@ -126,7 +126,7 @@ export default function detectTuplet(events, beat, duration) {
     // Loop upward through power of 2 durations, short to long
     let d = 1/8;
     while ((d *= 2) && d <= duration) {
-        detectTupletOverDuration(tuplet, d, events, n, beat, tupletDivisors);
+        detectTupletOverDuration(tuplet, d, events, n, beat, tupletDivisors, beat + duration);
     }
 
     return score > 0 && tuplet;

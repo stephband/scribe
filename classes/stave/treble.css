@@ -31,7 +31,7 @@
 
 .treble-stave::before {
     /* Treble clef */
-    content: '\E050' !important;
+    content: '\E050';
     grid-row: G4;
 }
 
