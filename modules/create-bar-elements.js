@@ -42,11 +42,3 @@ export default function createBarElements(symbols) {
     return symbols.reduce(toBarElementsXX, []);
 }
 
-
-
-
-
-
-
-
-

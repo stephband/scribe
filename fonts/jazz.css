@@ -32,3 +32,8 @@
     --stem-align-up:   0.14;
     --stem-align-down: -0.12;
 }
+
+.scribe-jazz .note[data-duration^="0.1"] {
+    /* Temporarily mark notes that should have a 32nd flag, but dont in Jazz font */
+    color: red !important;
+}

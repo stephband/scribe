@@ -14,7 +14,7 @@
             "dom/":      "https://cdn.jsdelivr.net/gh/stephband/dom@1.4.1/modules/",
             "fn/":       "https://cdn.jsdelivr.net/gh/stephband/fn@1.5.1/modules/",
             "midi/":     "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.0/modules/",
-            "sequence/": "https://cdn.jsdelivr.net/gh/soundio/sequence@0.0.8/modules/"
+            "sequence/": "https://cdn.jsdelivr.net/gh/soundio/sequence@0.0.9/modules/"
         }
     }</script-->
 
@@ -50,8 +50,165 @@
         word-spacing: 0.125em;
     }
     </style>
+    <script type="module">
+
+    </script>
 </head>
 <body>
+    <section class="grid dense-grid" style="row-gap: 0;">
+        <h3 class="x1">32nds</h3>
+
+        <scribe-music class="x2 7x" clef="treble" src="#duration-1" debug>
+            <script type="application/json" id="duration-1">{
+                "events": [
+                    [0, "meter", 3, 1],
+                    [0,      "note", 60, 0.1, 0.125],
+                    [3.125,  "note", 60, 0.1, 0.125],
+                    [6.25,   "note", 60, 0.1, 0.125],
+                    [9.375,  "note", 60, 0.1, 0.125],
+                    [12.5,   "note", 60, 0.1, 0.125],
+                    [15.625, "note", 60, 0.1, 0.125],
+                    [18.75,  "note", 60, 0.1, 0.125],
+                    [21.875, "note", 60, 0.1, 0.125],
+                    [25,     "note", 60, 0.1, 0.125]
+                ]
+            }</script>
+        </scribe-music>
+
+        <h3 class="x1">16ths</h3>
+
+        <scribe-music class="x2 7x" clef="treble" src="#duration-2" debug>
+            <script type="application/json" id="duration-2">{
+                "events": [
+                    [0, "meter", 3, 1],
+                    [0,      "note", 60, 0.1, 0.25],
+                    [3.125,  "note", 60, 0.1, 0.25],
+                    [6.25,   "note", 60, 0.1, 0.25],
+                    [9.375,  "note", 60, 0.1, 0.25],
+                    [12.5,   "note", 60, 0.1, 0.25],
+                    [15.625, "note", 60, 0.1, 0.25],
+                    [18.75,  "note", 60, 0.1, 0.25],
+                    [21.875, "note", 60, 0.1, 0.25],
+                    [25,     "note", 60, 0.1, 0.25]
+                ]
+            }</script>
+        </scribe-music>
+
+        <h3 class="x1">Dotted 16ths</h3>
+
+        <scribe-music class="x2 7x" clef="treble" src="#duration-3" debug>
+            <script type="application/json" id="duration-3">{
+                "events": [
+                    [0, "meter", 3, 1],
+                    [0,      "note", 60, 0.1, 0.375],
+                    [3.125,  "note", 60, 0.1, 0.375],
+                    [6.25,   "note", 60, 0.1, 0.375],
+                    [9.375,  "note", 60, 0.1, 0.375],
+                    [12.5,   "note", 60, 0.1, 0.375],
+                    [15.625, "note", 60, 0.1, 0.375],
+                    [18.75,  "note", 60, 0.1, 0.375],
+                    [21.875, "note", 60, 0.1, 0.375],
+                    [25,     "note", 60, 0.1, 0.375]
+                ]
+            }</script>
+        </scribe-music>
+
+        <h3 class="x1">8ths</h3>
+
+        <scribe-music class="x2 7x" clef="treble" src="#duration-4" debug>
+            <script type="application/json" id="duration-4">{
+                "events": [
+                    [0, "meter", 3, 1],
+                    [0,      "note", 60, 0.1, 0.5],
+                    [3.125,  "note", 60, 0.1, 0.5],
+                    [6.25,   "note", 60, 0.1, 0.5],
+                    [9.375,  "note", 60, 0.1, 0.5],
+                    [12.5,   "note", 60, 0.1, 0.5],
+                    [15.625, "note", 60, 0.1, 0.5],
+                    [18.75,  "note", 60, 0.1, 0.5],
+                    [21.875, "note", 60, 0.1, 0.5],
+                    [25,     "note", 60, 0.1, 0.5]
+                ]
+            }</script>
+        </scribe-music>
+
+        <h3 class="x1">Dotted 8ths</h3>
+
+        <scribe-music class="x2 7x" clef="treble" src="#duration-5" debug>
+            <script type="application/json" id="duration-5">{
+                "events": [
+                    [0, "meter", 3, 1],
+                    [0,      "note", 60, 0.1, 0.75],
+                    [3.125,  "note", 60, 0.1, 0.75],
+                    [6.25,   "note", 60, 0.1, 0.75],
+                    [9.375,  "note", 60, 0.1, 0.75],
+                    [12.5,   "note", 60, 0.1, 0.75],
+                    [15.625, "note", 60, 0.1, 0.75],
+                    [18.75,  "note", 60, 0.1, 0.75],
+                    [21.875, "note", 60, 0.1, 0.75],
+                    [25,     "note", 60, 0.1, 0.75]
+                ]
+            }</script>
+        </scribe-music>
+
+        <h3 class="x1">Quarter notes</h3>
+
+        <scribe-music class="x2 7x" clef="treble" src="#duration-6" debug>
+            <script type="application/json" id="duration-6">{
+                "events": [
+                    [0, "meter", 3, 1],
+                    [0,      "note", 60, 0.1, 1],
+                    [3.125,  "note", 60, 0.1, 1],
+                    [6.25,   "note", 60, 0.1, 1],
+                    [9.375,  "note", 60, 0.1, 1],
+                    [12.5,   "note", 60, 0.1, 1],
+                    [15.625, "note", 60, 0.1, 1],
+                    [18.75,  "note", 60, 0.1, 1],
+                    [21.875, "note", 60, 0.1, 1],
+                    [25,     "note", 60, 0.1, 1]
+                ]
+            }</script>
+        </scribe-music>
+
+        <h3 class="x1">Dotted quarters</h3>
+
+        <scribe-music class="x2 7x" clef="treble" src="#duration-7" debug>
+            <script type="application/json" id="duration-7">{
+                "events": [
+                    [0, "meter", 3, 1],
+                    [0,      "note", 60, 0.1, 1.5],
+                    [3.125,  "note", 60, 0.1, 1.5],
+                    [6.25,   "note", 60, 0.1, 1.5],
+                    [9.375,  "note", 60, 0.1, 1.5],
+                    [12.5,   "note", 60, 0.1, 1.5],
+                    [15.625, "note", 60, 0.1, 1.5],
+                    [18.75,  "note", 60, 0.1, 1.5],
+                    [21.875, "note", 60, 0.1, 1.5],
+                    [25,     "note", 60, 0.1, 1.5]
+                ]
+            }</script>
+        </scribe-music>
+
+        <h3 class="x1">Minims</h3>
+
+        <scribe-music class="x2 7x" clef="treble" src="#duration-8" debug>
+            <script type="application/json" id="duration-8">{
+                "events": [
+                    [0, "meter", 3, 1],
+                    [0,      "note", 60, 0.1, 2],
+                    [3.125,  "note", 60, 0.1, 2],
+                    [6.25,   "note", 60, 0.1, 2],
+                    [9.375,  "note", 60, 0.1, 2],
+                    [12.5,   "note", 60, 0.1, 2],
+                    [15.625, "note", 60, 0.1, 2],
+                    [18.75,  "note", 60, 0.1, 2],
+                    [21.875, "note", 60, 0.1, 2],
+                    [25,     "note", 60, 0.1, 2]
+                ]
+            }</script>
+        </scribe-music>
+    </section>
+
     <section class="grid dense-grid" style="row-gap: 0;">
         <h3 class="x1 2x">Ties</h3>
 

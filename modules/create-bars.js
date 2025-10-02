@@ -24,11 +24,11 @@ export default function createBars(sequence, stave, settings = config) {
     let events = [];
     let parts  = {};
     let key    = 0;
+    let stopBeat = 0;
     let duration, divisor, event, sequenceEvent;
 
     // Extract events from sequence iterator
     for (event of sequence) {
-console.log('EVENT', event[1], event[2]);
         // If event is beyond current duration create bars
         while (event[0] >= beat + duration) {
             // Close current bar, push to bars
@@ -53,12 +53,23 @@ console.log('EVENT', event[1], event[2]);
                 pushEventToPart(stave, parts, event);
                 // If event extends beyond bar push it into ties
                 if (toStopBeat(event) > beat + duration) ties.push(event);
+
+                if (stopBeat < toStopBeat(event)) {
+                    stopBeat = event[0] + getDuration(event);
+                }
+
                 break;
             }
 
             case "sequence": {
-                if (event.sequence !== sequence) console.log('SEQUENCE NOT TOP LEVEL');
-                sequenceEvent = event;
+                if (event.events === sequence.events) {
+                    sequenceEvent = event;
+                }
+
+                if (stopBeat < toStopBeat(event)) {
+                    stopBeat = toStopBeat(event);
+                }
+
                 break;
             }
 
@@ -103,6 +114,17 @@ console.log('EVENT', event[1], event[2]);
             // If event does not extend beyond bar remove it from ties
             if (toStopBeat(event) < beat + duration) ties.splice(t--, 1);
         }
+    }
+
+    // Make sure we render up to full duration of note or sequence events
+    while (beat < stopBeat - duration) {
+        // Close current bar, push to bars
+        bars.push(createBar(bars.length, beat, duration, divisor, stave, key, events, parts));
+
+        // Update beat, start new arrays
+        beat = beat + duration;
+        events = [];
+        parts  = {};
     }
 
     // Close final bar, push to bars

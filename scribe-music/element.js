@@ -50,6 +50,7 @@ export default define(element('scribe-music', {
         internals.key       = Signal.of('C');
         internals.meter     = Signal.of([-4, "meter", 4, 1]);
         internals.transpose = Signal.of(0);
+        internals.debug     = Signal.of(false);
 
         /* Safari has some rounding errors to overcome... */
         internals.isSafari = navigator.userAgent.includes('AppleWebKit/')
@@ -94,6 +95,26 @@ export default define(element('scribe-music', {
 
             // Render beams
             shadow.querySelectorAll('.beam').forEach(renderBeam);
+
+            // DEBUG
+
+            // Does bar contain symbols that add up to longer than bar?
+            if (internals.debug.value) {
+                shadow.querySelectorAll('.bar').forEach((bar) => {
+                    const duration = parseFloat(bar.dataset.duration);
+                    let total = 0;
+                    let b, d;
+                    bar.querySelectorAll('.rest[data-duration], .note[data-duration]').forEach((element) => {
+                        // Ignore notes that are at same beat as previous notes
+                        if (b !== parseFloat(element.dataset.beat)) {
+                            b = parseFloat(element.dataset.beat);
+                            d = parseFloat(element.dataset.duration);
+                            total += d;
+                        }
+                    });
+                    if (total > duration) bar.style.color = 'red';
+                });
+            }
         });
     },
 
@@ -249,6 +270,12 @@ export default define(element('scribe-music', {
         get: function() { return getInternals(this).data.value; },
         set: function(data) { getInternals(this).data.value = data; },
         default: null
+    },
+
+    debug: {
+        attribute: function(value) { this.debug = value !== null; },
+        get: function() { return getInternals(this).debug.value; },
+        set: function(value) { getInternals(this).debug.value = !!value; }
     }
 }, null, 'github.com/stephband/scribe/'), {
     // Define ScribeMusic.styleheet as the stylesheet signal

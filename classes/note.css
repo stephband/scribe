@@ -93,7 +93,9 @@ Stems
 .note[data-duration^="3"] > .head::before,
 .note[data-duration^="2"] > .head::before,
 .note[data-duration^="1"] > .head::before,
-.note[data-duration^="0"] > .head::before { content: '\E210'; }
+.note[data-duration^="0"] > .head::before {
+    content: '\E210';
+}
 
 
 /*
@@ -179,8 +181,8 @@ Dots
    note durations 7, 3.5, 1.75, 0.875, 0.4375 and 0.21875 get two */
 .note[data-duration^="7"]::after    { content: '\200A\E1E7\E1E7'; }
 .note[data-duration^="6"]::after    { content: '\200A\E1E7'; }
-.note[data-duration="3.5"]::after  { content: '\200A\E1E7\E1E7'; }
-.note[data-duration="3"]::after    { content: '\200A\E1E7'; }
+.note[data-duration="3.5"]::after   { content: '\200A\E1E7\E1E7'; }
+.note[data-duration="3"]::after     { content: '\200A\E1E7'; }
 .note[data-duration^="1.75"]::after { content: '\200A\E1E7\E1E7'; }
 .note[data-duration^="1.5"]::after  { content: '\200A\E1E7'; }
 .note[data-duration^="0.87"]::after { content: '\200A\E1E7\E1E7'; }
@@ -189,3 +191,10 @@ Dots
 .note[data-duration^="0.37"]::after { content: '\200A\E1E7'; }
 .note[data-duration^="0.21"]::after { content: '\200A\E1E7\E1E7'; }
 .note[data-duration^="0.18"]::after { content: '\200A\E1E7'; }
+
+
+
+.note[data-duration^="0.1"] {
+    /* Temporarily mark notes that should have a 32nd flag, but dont in Jazz font */
+    color: orange !important;
+}

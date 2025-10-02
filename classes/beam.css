@@ -1,10 +1,10 @@
 .beam {
     vector-effect: non-scaling-stroke;
-    stroke: black;
+    stroke: currentColor;
     stroke-width: 0;
     stroke-linejoin: round;
     stroke-linecap: round;
-    fill: black;
+    fill: currentColor;
 }
 
 .up-beam > .beam-path-16 {

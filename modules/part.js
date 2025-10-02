@@ -17,6 +17,8 @@ import { getDivision } from './bar.js';
 import detectTuplets from './tuplet.js';
 import { round, eq, gte, lte, lt, gt } from './number/float.js';
 import { averagePowerOf2, roundPowerOf2, floorPowerOf2, ceilPowerOf2 } from './number/power-of-2.js';
+import floorTo     from './number/floor-to.js';
+import ceilTo      from './number/ceil-to.js';
 import push        from './object/push.js';
 import every       from './object/every.js';
 import last        from './object/last.js';
@@ -565,7 +567,7 @@ export function createPart(symbols, bar, stave, key = 0, accidentals = {}, part,
     let beat = 0;
     let n = -1;
     let event, duration, beam;
-
+let k = 0;
     // Ignore events that stop before beat 0, an extra cautious measure because
     // events array should already start with events at beat 0
     while ((event = events[++n]) && lte(event[0] + event[4] - bar.beat, beat, p24));
@@ -645,31 +647,71 @@ if (stopBeat <= beat) {
         createLedges(symbols, stave, beat, pitches);
         createAccidentals(symbols, stave, part, accidentals, beat, notes, pitches);
 
-        // Determine notes stop beat
-        const stopBeat = min(
-            // Max stop beat of notes
-            notes.reduce(toMaxStopBeat, 0) - bar.beat,
-            // Start beat of next event, if it exists, or end of bar
-            event ? round(0.125, event[0]) - bar.beat : bar.duration,
-            // Beat at end of tuplet
-            bar.duration
-        );
 
-        // Find bar division that notes cross, if any
-        const division = getDivision(bar.divisions, beat, stopBeat);
+// Note duration heuristics ------------------ what a polava -------------------
 
-        // Determine notes duration
-        let duration = (division
-            && !(beat === 0 || eq(0, beat % bar.divisor. p24))
-            && !(stopBeat === bar.duration || eq(0, stopBeat % bar.divisor, p24))
-        ) ?
-            division - beat :
-            stopBeat - beat ;
+        // Max stop beat of notes
+        let stopBeat = notes.reduce(toMaxStopBeat, 0) - bar.beat;
+
+        // Start beat of next event, if it exists
+        let eventBeat = event && round(0.125, event[0]) - bar.beat;
+
+        // If stop beat is truncated by event beat
+        if (eventBeat < stopBeat) {
+            stopBeat = eventBeat;
+        }
+        // If stop beat is near divisor round it up
+        else if (stopBeat % bar.divisor > 0.6) {
+            stopBeat = Math.ceil(stopBeat / bar.divisor) * bar.divisor;
+        }
+        // If duration is less than a beat and near a power of 2 duration
+        else if (stopBeat - beat < 1 && stopBeat - beat > 0.5 * ceilPowerOf2(stopBeat - beat)) {
+            stopBeat = ceilPowerOf2(stopBeat - beat) + beat;
+        }
+        // Round it
+        else {
+            stopBeat = round(0.125, stopBeat);
+        }
+
+        // If stop beat is truncated by bar
+        if (bar.duration < stopBeat) {
+            stopBeat = bar.duration;
+        }
 
         // Limit duration to permissible head durations
-        let d = -1;
-        while (headDurations[++d] && headDurations[d] <= duration);
-        duration = headDurations[--d];
+        let duration = floorTo(headDurations, stopBeat - beat) || headDuration[0];
+
+        // Update stopBeat accordingly
+        stopBeat = beat + duration;
+
+if (!duration || !stopBeat) {
+    console.log('We have a problem. Stopping bar render.');
+    console.log('DURATION ', duration, stopBeat);
+    break;
+}
+
+        // Find bar division that notes cross, if any
+        const division = getDivision(bar.divisions, beat, beat + duration);
+
+/*
+console.log(beat, division, bar.divisor,
+    beat === 0,
+    eq(0, beat % bar.divisor, p24),
+    stopBeat === bar.duration,
+    eq(0, stopBeat % bar.divisor, p24)
+);
+*/
+
+        // Limit duration by division
+        if (division
+            && (!(beat === 0 || eq(0, beat % bar.divisor, p24))
+            || !(stopBeat === bar.duration || eq(0, stopBeat % bar.divisor, p24))
+        )) {
+            duration = floorTo(headDurations, division - beat);
+        }
+
+// -----------------------------------------------------------------------------
+
 
         // If duration is a quarter note or longer close beam
         if (duration >= 1) {

@@ -1,0 +1,144 @@
+
+TODO! CONVERT THIS TO JS TESTS!!
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>&lt;scribe-music&gt;</title>
+
+    <meta charset="utf-8" />
+    <meta name="author" content="@stephband" />
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width" />
+
+    <script type="importmap">{
+        "imports": {
+            "bolt/":     "https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/",
+            "dom/":      "https://cdn.jsdelivr.net/gh/stephband/dom@1.4.1/modules/",
+            "fn/":       "https://cdn.jsdelivr.net/gh/stephband/fn@1.5.1/modules/",
+            "midi/":     "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.0/modules/",
+            "sequence/": "https://cdn.jsdelivr.net/gh/soundio/sequence@0.0.9/modules/"
+        }
+    }</script>
+
+    <script title="load">
+        document.documentElement.className += ' js loading';
+        // window.addEventListener('DOMContentLoaded', () => document.documentElement.classList.remove('content-loading'));
+        // Wait for other load handlers to run first - Bolt does a few things on
+        // load (eg. targetable scrolls) and we want them to run before the loading
+        // class is removed
+        window.addEventListener('load', () => window.requestAnimationFrame(() => document.documentElement.classList.remove('loading')));
+        window.DEBUG = true;
+    </script>
+
+    <!-- Import <scribe-music> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/atoms.css" />
+    <link rel="stylesheet" href="../scribe-music/element.css" />
+    <script type="module" src="../scribe-music/element.js"></script>
+    <link rel="stylesheet" href="../elements/lead-sheet-document.css" />
+    <script type="module">
+        import detectTuplets from '../modules/tuplet.js';
+
+        console.log('Nothing');
+        console.log(detectTuplets(4, []));
+
+        console.log('Crotchets');
+        console.log(detectTuplets(4, [[0]]));
+
+        console.log('Duplets');
+        console.log(detectTuplets(4, [[0], [0.5]]));
+        console.log(detectTuplets(4, [     [0.5]]));
+
+        console.log('Triplets');
+        console.log(detectTuplets(4, [[0], [0.33]]));
+        console.log(detectTuplets(4, [[0], [0.333], [0.667]]));
+        console.log(detectTuplets(4, [     [0.333], [0.667]]));
+        console.log(detectTuplets(4, [[0], [0.333]         ]));
+        console.log(detectTuplets(4, [     [0.333]         ]));
+        console.log(detectTuplets(4, [[0], [0.333], [0.7]]));
+        console.log(detectTuplets(4, [[0.1], [0.3], [0.7]]), 'Human');
+
+        console.log(detectTuplets(4, [[0], [0.667]         ]));
+        console.log(detectTuplets(4, [[0], [0.667], [1.333]]));
+        console.log(detectTuplets(4, [     [0.667], [1.333]]));
+        console.log(detectTuplets(4, [              [1.333]]));
+
+        console.log('Quadruplets');
+        console.log(detectTuplets(4, [[0], [0.25]]));
+        console.log(detectTuplets(4, [[0], [0.25], [0.5]]));
+        console.log(detectTuplets(4, [[0], [0.25], [0.5], [0.75]]));
+        console.log(detectTuplets(4, [     [0.25], [0.5], [0.75]]));
+        console.log(detectTuplets(4, [[0],         [0.5], [0.75]]));
+        console.log(detectTuplets(4, [[0], [0.25],        [0.75]]));
+        console.log(detectTuplets(4, [[0], [0.25], [0.5]        ]));
+        console.log(detectTuplets(4, [             [0.5], [0.75]]));
+        console.log(detectTuplets(4, [[0],                [0.75]]));
+        console.log(detectTuplets(4, [[0], [0.25]               ]));
+        console.log(detectTuplets(4, [     [0.25], [0.5]        ]));
+        console.log(detectTuplets(4, [     [0.25],        [0.75]]));
+        console.log(detectTuplets(4, [     [0.25]               ]));
+        console.log(detectTuplets(4, [                    [0.75]]));
+        console.log(detectTuplets(4, [[0], [0.29], [0.52], [0.7]]), 'Human');
+
+        console.log('Quintuplets');
+        console.log(detectTuplets(4, [[0], [1/5]]));
+        console.log(detectTuplets(4, [[0], [1/5], [2/5]]));
+        console.log(detectTuplets(4, [[0], [1/5], [2/5], [3/5]]));
+        console.log(detectTuplets(4, [[0], [1/5], [2/5], [3/5], [4/5]]));
+        console.log(detectTuplets(4, [     [1/5], [2/5], [3/5], [4/5]]));
+        console.log(detectTuplets(4, [[0],        [2/5], [3/5], [4/5]]));
+        console.log(detectTuplets(4, [[0], [1/5],        [3/5], [4/5]]));
+        console.log(detectTuplets(4, [[0], [1/5], [2/5],        [4/5]]));
+        console.log(detectTuplets(4, [[0], [1/5], [2/5], [3/5]       ]));
+        console.log(detectTuplets(4, [            [2/5], [3/5], [4/5]]));
+        console.log(detectTuplets(4, [[0],               [3/5], [4/5]]));
+        console.log(detectTuplets(4, [[0], [1/5],               [4/5]]));
+        console.log(detectTuplets(4, [[0], [1/5], [2/5],             ]));
+        console.log(detectTuplets(4, [     [1/5], [2/5], [3/5]       ]));
+        console.log(detectTuplets(4, [                   [3/5], [4/5]]));
+        console.log(detectTuplets(4, [[0],                      [4/5]]));
+        console.log(detectTuplets(4, [[0], [1/5]                     ]));
+        console.log(detectTuplets(4, [     [1/5], [2/5]              ]));
+        console.log(detectTuplets(4, [            [2/5], [3/5]       ]));
+        console.log(detectTuplets(4, [     [1/5]                     ]));
+        console.log(detectTuplets(4, [            [2/5]              ]));
+        console.log(detectTuplets(4, [                   [3/5]       ]));
+        console.log(detectTuplets(4, [                          [4/5]]));
+
+        console.log('Septuplets');
+        console.log(detectTuplets(4, [[0], [1/7]]));
+        console.log(detectTuplets(4, [[0], [1/7], [2/7]]));
+        console.log(detectTuplets(4, [[0], [1/7], [2/7], [3/7]]));
+        console.log(detectTuplets(4, [[0], [1/7], [2/7], [3/7], [4/7]]));
+        console.log(detectTuplets(4, [[0], [1/7], [2/7], [3/7], [4/7], [5/7]]));
+        console.log(detectTuplets(4, [[0], [1/7], [2/7], [3/7], [4/7], [5/7], [6/7]]));
+        console.log(detectTuplets(4, [     [1/7], [2/7], [3/7], [4/7], [5/7], [6/7]]));
+        console.log(detectTuplets(4, [[0],        [2/7], [3/7], [4/7], [5/7], [6/7]]));
+        console.log(detectTuplets(4, [[0], [1/7],        [3/7], [4/7], [5/7], [6/7]]));
+        console.log(detectTuplets(4, [[0], [1/7], [2/7],        [4/7], [5/7], [6/7]]));
+        console.log(detectTuplets(4, [[0], [1/7], [2/7], [3/7],        [5/7], [6/7]]));
+        console.log(detectTuplets(4, [[0], [1/7], [2/7], [3/7], [4/7],        [6/7]]));
+        console.log(detectTuplets(4, [[0], [1/7], [2/7], [3/7], [4/7], [5/7]       ]));
+        console.log(detectTuplets(4, [            [2/7], [3/7], [4/7], [5/7], [6/7]]));
+        console.log(detectTuplets(4, [[0],               [3/7], [4/7], [5/7], [6/7]]));
+        console.log(detectTuplets(4, [[0], [1/7],               [4/7], [5/7], [6/7]]));
+        console.log(detectTuplets(4, [[0], [1/7], [2/7],               [5/7], [6/7]]));
+        console.log(detectTuplets(4, [[0], [1/7], [2/7], [3/7],               [6/7]]));
+        console.log(detectTuplets(4, [[0], [1/7], [2/7], [3/7], [4/7],             ]));
+        console.log(detectTuplets(4, [     [1/7], [2/7], [3/7], [4/7], [5/7]       ]));
+    </script>
+
+    <style>
+    body {
+        font-family: Jazz, JazzText;
+        letter-spacing: 0.004em;
+        word-spacing: 0.125em;
+    }
+    </style>
+</head>
+<body>
+    <h3 class="x1 2x">Tuplets</h3>
+</body>
+</html>
