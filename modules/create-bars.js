@@ -55,7 +55,7 @@ export default function createBars(sequence, stave, settings = config) {
                 if (toStopBeat(event) > beat + duration) ties.push(event);
 
                 if (stopBeat < toStopBeat(event)) {
-                    stopBeat = event[0] + getDuration(event);
+                    stopBeat = toStopBeat(event);
                 }
 
                 break;
@@ -117,6 +117,8 @@ export default function createBars(sequence, stave, settings = config) {
     }
 
     // Make sure we render up to full duration of note or sequence events
+    // TODO: Surely we can find a more elegant way of doing this... do we really
+    // still need the ties array? Can we not get rid of the loop above?
     while (beat < stopBeat - duration) {
         // Close current bar, push to bars
         bars.push(createBar(bars.length, beat, duration, divisor, stave, key, events, parts));
