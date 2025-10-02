@@ -13,7 +13,7 @@ import { toKeyScale, toKeyNumber, cScale } from './keys.js';
 import { mod12, byGreater } from './maths.js';
 import quantise from './quantise.js';
 import { rflat, rsharp, rdoubleflat, rdoublesharp } from './regexp.js';
-import { getBarDivisions, getDivision, getLastDivision } from './bar.js';
+import { getDivision } from './bar.js';
 import detectTuplets from './tuplet.js';
 import { round, eq, gte, lte, lt, gt } from './number/float.js';
 import { averagePowerOf2, roundPowerOf2, floorPowerOf2, ceilPowerOf2 } from './number/power-of-2.js';
@@ -357,20 +357,6 @@ function createRests(symbols, durations, bar, stave, part, beat, tobeat) {
 }
 
 
-/* Stems */
-
-function getStemDirection(centerPitch, head) {
-    return head && head.stemDirection || (
-        toNoteNumber(centerPitch) < toNoteNumber(event[2]) ?
-            'down' :
-            'up');
-}
-
-function isStemDown(symbol) {
-    return symbol.stemDirection === 'down';
-}
-
-
 /* Accidentals */
 
 function createAccidental(symbols, stave, part, accidentals, beat, event, pitch) {
@@ -412,7 +398,7 @@ function createAccidentals(symbols, stave, part, accidentals, beat, notes, pitch
 
 /* Ledger lines */
 
-function createLedges(symbols, bar, stave, beat, pitches) {
+function createLedges(symbols, stave, beat, pitches) {
     // Up ledger lines
     let pitch = getMaxPitch(pitches);
     let rows  = stave.getRowDiff(pitch, stave.maxLinePitch) + 1;
@@ -437,6 +423,7 @@ function createLedges(symbols, bar, stave, beat, pitches) {
 
 /* Heads */
 
+/*
 function getAverageStart(bar, events) {
     let event;
     let n = -1;
@@ -452,31 +439,12 @@ function getAverageStop(bar, events) {
     while (event = events[++n]) t += event[0] + event[4];
     return min(bar.duration, (t / events.length) - bar.beat);
 }
-
-
-/* Ties */
-
-function createTie(symbols, stave, part, beat, stopBeat, event, pitch) {
-    const duration = stopBeat - beat;
-
-    symbols.push({
-        type:   'tie',
-        beat,
-        pitch,
-        duration,
-        part,
-        stave
-        //updown: head.stemDirection === 'up' ? 'down' : 'up',
-        //event
-    });
-
-    return symbols;
-}
+*/
 
 
 /* Symbols */
 
-function createTupletSymbols(symbols, bar, stave, key, accidentals, part, settings, beat, duration, divisor, notes, events, n) {
+function createTuplet(symbols, bar, stave, key, accidentals, part, settings, beat, duration, divisor, notes, events, n) {
     const tuplet   = { type: 'tuplet', beat, duration, divisor, part, stave };
     const division = duration / divisor;
     const stopBeat = beat + duration;
@@ -540,21 +508,21 @@ function createTupletSymbols(symbols, bar, stave, key, accidentals, part, settin
         };
 
         // Create ledgers and accidentals
-        createLedges(symbols, bar, stave, beat, pitches);
+        createLedges(symbols, stave, beat, pitches);
         createAccidentals(symbols, stave, part, accidentals, beat, notes, pitches);
 
-        n = -1;
-        while (notes[++n]) symbols.push({
+        let p = -1;
+        while (notes[++p]) symbols.push({
             type: 'note',
             beat,
-            pitch: pitches[n],
+            pitch: pitches[p],
             duration,
             part,
             stemup,
-            top:    pitches[n] === maxPitch,
-            bottom: pitches[n] === minPitch,
+            top:    pitches[p] === maxPitch,
+            bottom: pitches[p] === minPitch,
             stave,
-            event: notes[n]
+            event: notes[p]
         });
 
         // Push note symbols on to tuplet
@@ -563,13 +531,21 @@ function createTupletSymbols(symbols, bar, stave, key, accidentals, part, settin
         if (beam) push(beam, ...symbols.slice(-1 * notes.length));
 
         // Remove notes or insert ties
-        let i = notes.length;
-        while (i--) {
-            let stopBeat = getStopBeat(notes[i]) - bar.beat;
+        p = notes.length;
+        while (p--) {
+            let stopBeat = getStopBeat(notes[p]) - bar.beat;
             // Remove notes that end before or near next division, we're done with them
-            if (lte(stopBeat, beat + duration + 0.5 * division, p24)) notes.splice(i, 1);
+            if (lte(stopBeat, beat + duration + 0.5 * division, p24)) notes.splice(p, 1);
             // Add tie to remaining notes
-            else createTie(symbols, stave, part, beat, beat + duration, notes[i], pitches[i]);
+            else symbols.push({
+                type:   'tie',
+                beat,
+                pitch: pitches[p],
+                duration,
+                stemup,
+                part,
+                event: notes[p]
+            });
         }
 
         // Update beat
@@ -583,7 +559,7 @@ function createTupletSymbols(symbols, bar, stave, key, accidentals, part, settin
     return n;
 }
 
-export function createPartSymbols(symbols, bar, stave, key = 0, accidentals = {}, part, events, settings = config) {
+export function createPart(symbols, bar, stave, key = 0, accidentals = {}, part, events, settings = config) {
     const notes = [];
 
     let beat = 0;
@@ -616,7 +592,7 @@ export function createPartSymbols(symbols, bar, stave, key = 0, accidentals = {}
                 beam = undefined;
             }
             // Render tuplet
-            n = createTupletSymbols(symbols, bar, stave, key, accidentals, part, settings, tuplet.beat - bar.beat, tuplet.duration, tuplet.divisor, notes, events, n);
+            n = createTuplet(symbols, bar, stave, key, accidentals, part, settings, tuplet.beat - bar.beat, tuplet.duration, tuplet.divisor, notes, events, n);
             // Update beat
             beat = tuplet.beat + tuplet.duration;
             //
@@ -666,7 +642,7 @@ if (stopBeat <= beat) {
             part.stemup ;
 
         // Create ledgers and accidentals
-        createLedges(symbols, bar, stave, beat, pitches);
+        createLedges(symbols, stave, beat, pitches);
         createAccidentals(symbols, stave, part, accidentals, beat, notes, pitches);
 
         // Determine notes stop beat
@@ -683,12 +659,17 @@ if (stopBeat <= beat) {
         const division = getDivision(bar.divisions, beat, stopBeat);
 
         // Determine notes duration
-        const duration = (division && (
-                (beat !== 0 && !eq(0, beat % bar.divisor)) ||
-                (stopBeat < bar.duration && !eq(0, stopBeat % bar.divisor))
-            )) ?
+        let duration = (division
+            && !(beat === 0 || eq(0, beat % bar.divisor. p24))
+            && !(stopBeat === bar.duration || eq(0, stopBeat % bar.divisor, p24))
+        ) ?
             division - beat :
             stopBeat - beat ;
+
+        // Limit duration to permissible head durations
+        let d = -1;
+        while (headDurations[++d] && headDurations[d] <= duration);
+        duration = headDurations[--d];
 
         // If duration is a quarter note or longer close beam
         if (duration >= 1) {
@@ -703,40 +684,40 @@ if (stopBeat <= beat) {
             part
         };
 
-        n = -1;
-        while (notes[++n]) symbols.push({
+        let p = -1;
+        while (notes[++p]) symbols.push({
             type: 'note',
             beat,
-            pitch: pitches[n],
+            pitch: pitches[p],
             duration,
             part,
             stemup,
-            high: pitches[n] === maxPitch,
-            low:  pitches[n] === minPitch,
+            top:    pitches[p] === maxPitch,
+            bottom: pitches[p] === minPitch,
             stave,
-            event: notes[n]
+            event:  notes[p]
         });
 
         // Push note symbols on to beam
         if (beam) push(beam, ...symbols.slice(-1 * notes.length));
 
         // Remove notes or insert ties
-        let i = notes.length;
-        while (i--) {
-            let stopBeat = getStopBeat(notes[i]) - bar.beat;
+        p = notes.length;
+        while (p--) {
+            let stopBeat = getStopBeat(notes[p]) - bar.beat;
             // Remove notes that end before or near next beat
             // TODO! This has to match the rounding heuristic in the duration
             // shortening thing somehow
-            if (lte(stopBeat, beat + duration, p24)) notes.splice(i, 1);
+            if (lte(stopBeat, beat + duration, p24)) notes.splice(p, 1);
             // Add tie to remaining notes
             else symbols.push({
                 type:   'tie',
                 beat,
-                pitch: pitches[i],
+                pitch: pitches[p],
                 duration,
                 stemup,
                 part,
-                stave
+                event: notes[p]
             });
         }
 

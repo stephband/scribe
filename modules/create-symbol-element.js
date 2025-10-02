@@ -168,7 +168,7 @@ export default overload(get('type'), {
         class: `${ symbol.stemup ? 'up' : 'down' }-beam beam`,
         viewBox: `0 ${ (symbol.range > 0 ? -symbol.range : 0) - 0.5 } 1 ${ abs(symbol.range) + 1 }`,
         preserveAspectRatio: "none",
-        style: `height: ${ (abs(symbol.range) + 1) * 0.125 }em; align-self: ${ symbol.range > 0 ? 'end' : 'start' };`,
+        style: `height: ${ (abs(symbol.range) + 0.5) * 0.125 }em; align-self: ${ symbol.range > 0 ? 'end' : 'start' };`,
         html: `<path class="beam-path" d="M0,${ -0.5 * beamThickness } L1,${ -symbol.range - 0.5 * beamThickness } L1,${ -symbol.range + 0.5 * beamThickness } L0,${ 0.5 * beamThickness } Z"></path>`,
         data: {
             beat:     truncate(symbol.beat + 1),
