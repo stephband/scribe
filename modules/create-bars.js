@@ -28,6 +28,7 @@ export default function createBars(sequence, stave, settings = config) {
 
     // Extract events from sequence iterator
     for (event of sequence) {
+console.log('EVENT', event[1], event[2]);
         // If event is beyond current duration create bars
         while (event[0] >= beat + duration) {
             // Close current bar, push to bars
