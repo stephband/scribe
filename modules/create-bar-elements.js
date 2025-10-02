@@ -17,7 +17,7 @@ function toElements(nodes, symbol) {
 
 export function toBarElements(bar) {
     return create('div', {
-        class: `${ bar.stave.type }-stave stave bar`,
+        class: `${ bar.stave.type }-stave stave ${ bar.error ? 'error ': '' }bar`,
         data: { beat: bar.beat, duration: bar.duration, count: bar.count },
         children: bar.symbols.reduce(toElements, [])
     });

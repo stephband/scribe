@@ -628,8 +628,8 @@ let k = 0;
 
 if (stopBeat <= beat) {
     console.log(`Problem at bar ${ bar.count }, moving to next bar`);
-    beat = bar.duration;
-    continue;
+    bar.error = 'Stop beat has ended up less than beat';
+    break;
 }
             createRests(symbols, restDurations, bar, stave, part, beat, stopBeat);
             beat = stopBeat;
@@ -687,6 +687,7 @@ if (stopBeat <= beat) {
 if (!duration || !stopBeat) {
     console.log('We have a problem. Stopping bar render.');
     console.log('DURATION ', duration, stopBeat);
+    bar.error = 'Bad duration';
     break;
 }
 

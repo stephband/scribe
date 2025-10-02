@@ -13,6 +13,9 @@
 	padding-right: var(--bar-padding-right);
 }
 
+.bar.error {
+    color: red !important;
+}
 
 /* Beat grids
 Bars are divided into:
