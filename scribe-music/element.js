@@ -112,7 +112,7 @@ export default define(element('scribe-music', {
                             total += d;
                         }
                     });
-                    if (total > duration) bar.style.color = 'red';
+                    if (total > duration) bar.classList.add('error');
                 });
             }
         });
