@@ -14,7 +14,7 @@ function isInitialKeyEvent(event) {
     return event[0] <= 0 && event[1] === 'key';
 }
 
-export default function render(data, clef, keyname, meter, transpose) {
+export default function render(data, clef, keyname, meter, transpose, settings = config) {
     // TODO, WARNING! This mutates events! We probably oughta clone events first.
     const events = data.events;
 
@@ -41,5 +41,5 @@ export default function render(data, clef, keyname, meter, transpose) {
 
     // TODO: this is a two-pass symbol generation, I wonder if we can get
     // it down to one?
-    return createBars(sequence, stave, config).map(toBarElements);
+    return createBars(sequence, stave, settings).map(toBarElements);
 }

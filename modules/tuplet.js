@@ -19,12 +19,19 @@ function getScore(wavelength, beat) {
     return 0.5 * (1 + Math.cos(2 * Math.PI * beat / wavelength));
 }
 
+const data = {};
+
 function scoreTupletAtBeat(duration, divisor, beat, events, n) {
     const tupletDuration = duration / divisor;
 
     let score = 0;
     let count = 0;
-    let a, b = 0;
+
+    // Rhythm is a binary representation of the rhythm where 1 means there are
+    // events in the first division, 10 means there events in the second
+    // division, 100 events in the third and 111 events in all three, etc.
+    let rhythm = 0;
+    let s, r;
 
     // Events before a quarter tuplet are considered the first of a tuplet group
     --n;
@@ -33,20 +40,22 @@ function scoreTupletAtBeat(duration, divisor, beat, events, n) {
 // NO, DONT SCORE BEAT 0
 //        score += getScore(tupletDuration, events[n][0] - beat);
 //        count += 1;
-        // One less hole than divisor because there's definitely a note in position 0
-        b = 1;
+        // Plug hole because there's definitely a note in position 0
+        rhythm = 1;
     }
 
     // Scan through events up to duration beat less a quarter tuplet
     --n;
     while (events[++n] !== undefined && events[n][0] - beat < duration - tupletDuration / 4) {
-        // Detect and reject large tuplet groups with holes. Admittedly a
-        // little arbitrary.
-        if (divisor > 4) {
-            a = Math.round((events[n][0] - beat) / tupletDuration);
-            // Has a more than incremented by 1 over b? We have a hole
-            if (a > b + 1) return -1;
-            b = a;
+        // Rhythmic division number in binary is 2^division
+        s = Math.round((events[n][0] - beat) / tupletDuration);
+        r = 1 << s;
+        // If we have not already filled this division
+        if (r > rhythm) {
+            // Reject large tuplet groups with holes
+            if (divisor > 4 && r > rhythm << 1) return;
+            // Add division to rhythm
+            rhythm += r;
         }
 
         // Score event start
@@ -62,9 +71,13 @@ function scoreTupletAtBeat(duration, divisor, beat, events, n) {
     }
 
     // Detect holes
-    if (divisor > 4 && a !== divisor - 1) return -1;
+    if (divisor > 4 && s !== divisor - 1) return;
+    if (!count) return;
 
-    return count ? score / count : 0 ;
+    data.score  = score / count;
+    data.rhythm = rhythm;
+
+    return data;
 }
 
 function detectTupletOverDuration(tuplet, duration, events, n, startbeat, divisors, stopBeat) {
@@ -78,29 +91,32 @@ function detectTupletOverDuration(tuplet, duration, events, n, startbeat, diviso
     ++d;
 
     // Loop through lower divisors, keep that with the highest score
-    let divisor, s;
+    let divisor, data;
     while (divisor = divisors[--d]) {
         // Score tuplet by duration and divisor
-        s = scoreTupletAtBeat(duration, divisor, beat, events, n);
+        data = scoreTupletAtBeat(duration, divisor, beat, events, n);
+
 //console.log(duration, divisor, beat, s);
-        if (s >= score) {
+        if (data && data.score >= score) {
 //console.log('YEAH');
-            score = s;
+            score = data.score;
             tuplet.beat     = beat;
             tuplet.duration = duration;
             tuplet.divisor  = divisor;
+            tuplet.rhythm   = data.rhythm;
         }
 
         // If first head occurs at or after half a duration of beat
         if (events[n][0] >= beat + 0.5 * duration && beat + 1.5 * duration < stopBeat) {
             // Score tuplet offset by half a duration
-            s = scoreTupletAtBeat(duration, divisor, beat + 0.5 * duration, events, n);
+            data = scoreTupletAtBeat(duration, divisor, beat + 0.5 * duration, events, n);
 
-            if (s >= score) {
-                score = s;
+            if (data && data.score >= score) {
+                score = data.score;
                 tuplet.beat     = beat + 0.5 * duration;
                 tuplet.duration = duration;
                 tuplet.divisor  = divisor;
+                tuplet.rhythm   = data.rhythm;
             }
         }
     }

@@ -16,3 +16,7 @@ export function roundPowerOf2(n) {
 export function averagePowerOf2(...values) {
     return 2 ** (values.map(Math.log2).reduce(sum, 0) / values.length);
 }
+
+export function isPowerOf2(n) {
+    return n > 0 && (n & (n - 1)) === 0;
+}

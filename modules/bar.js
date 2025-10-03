@@ -91,7 +91,7 @@ function byFatherCharlesPitch(a, b) {
     return ai > bi ? 1 : ai < bi ? -1 : 0;
 }
 
-function createBarSymbols(symbols, bar, stave, key, events, config) {
+function createBarSymbols(symbols, bar, stave, key, events, settings) {
     let n = -1;
     let event;
 
@@ -147,10 +147,10 @@ function createBarSymbols(symbols, bar, stave, key, events, config) {
             const beat = event[0] - bar.beat;
             let root = stave.getSpelling(key, event);
 
-            if (root === 'C♭' && config.spellChordRootCFlatAsB)  root = 'B';
-            if (root === 'E♯' && config.spellChordRootESharpAsF) root = 'F';
-            if (root === 'B♯' && config.spellChordRootBSharpAsC) root = 'C';
-            if (root === 'F♭' && config.spellChordRootFFlatAsE)  root = 'E';
+            if (root === 'C♭' && settings.spellChordRootCFlatAsB)  root = 'B';
+            if (root === 'E♯' && settings.spellChordRootESharpAsF) root = 'F';
+            if (root === 'B♯' && settings.spellChordRootBSharpAsC) root = 'C';
+            if (root === 'F♭' && settings.spellChordRootFFlatAsE)  root = 'E';
 
             symbols.push({
                 type: 'chord',
@@ -202,7 +202,7 @@ function createBarSymbols(symbols, bar, stave, key, events, config) {
     return symbols;
 }
 
-export function createBar(count, beat, duration, divisor, stave, key, events, parts, sequence, config) {
+export function createBar(count, beat, duration, divisor, stave, key, events, parts, sequence, settings = config) {
     const symbols = [];
 
     // Track end of sequence and shove in a double bar line
@@ -249,12 +249,12 @@ export function createBar(count, beat, duration, divisor, stave, key, events, pa
     // Populate symbols with parts
     let name;
     for (name in parts) {
-        createPart(symbols, bar, stave, key, accidentals, name, parts[name], config);
+        createPart(symbols, bar, stave, key, accidentals, name, parts[name], settings);
     }
 
     // If no part was rendered at least render a rest
     if (!name) {
-        createPart(symbols, bar, stave, key, accidentals, '0', [], config);
+        createPart(symbols, bar, stave, key, accidentals, '0', [], settings);
     }
 
     return bar;

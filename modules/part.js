@@ -16,7 +16,7 @@ import { rflat, rsharp, rdoubleflat, rdoublesharp } from './regexp.js';
 import { getDivision } from './bar.js';
 import detectTuplets from './tuplet.js';
 import { round, eq, gte, lte, lt, gt } from './number/float.js';
-import { averagePowerOf2, roundPowerOf2, floorPowerOf2, ceilPowerOf2 } from './number/power-of-2.js';
+import { averagePowerOf2, roundPowerOf2, floorPowerOf2, ceilPowerOf2, isPowerOf2 } from './number/power-of-2.js';
 import floorTo     from './number/floor-to.js';
 import ceilTo      from './number/ceil-to.js';
 import push        from './object/push.js';
@@ -423,37 +423,28 @@ function createLedges(symbols, stave, beat, pitches) {
 }
 
 
-/* Heads */
-
-/*
-function getAverageStart(bar, events) {
-    let event;
-    let n = -1;
-    let t = 0;
-    while (event = events[++n]) t += event[0];
-    return max(0, (t / events.length) - bar.beat);
-}
-
-function getAverageStop(bar, events) {
-    let event;
-    let n = -1;
-    let t = 0;
-    while (event = events[++n]) t += event[0] + event[4];
-    return min(bar.duration, (t / events.length) - bar.beat);
-}
-*/
-
-
 /* Symbols */
 
-function createTuplet(symbols, bar, stave, key, accidentals, part, settings, beat, duration, divisor, notes, events, n) {
-    const tuplet   = { type: 'tuplet', beat, duration, divisor, part, stave };
+function createTuplet(symbols, bar, stave, key, accidentals, part, settings, beat, duration, divisor, rhythm, notes, events, n) {
+    // Check if we are to interpret swung 8ths or 16ths as straight 8ths or 16ths.
+    // Rhythm is a binary representation of filled divisions where 1 (1) means
+    // an event in the first division, 10 (2) an event in the second division,
+    // 100 (4) an event in the third, and 101 (5) events in first and third, etc.
+    if ((settings.swingAsStraight8ths && duration === 1 || settings.swingAsStraight16ths && duration === 0.5)
+        && divisor === 3
+        && (rhythm === 4 || rhythm === 5)
+    ) {
+        divisor = 2;
+    }
+
     const division = duration / divisor;
     const stopBeat = beat + duration;
+    const tuplet   = { type: 'tuplet', beat, duration, divisor, part, stave };
 
     let event, beam;
 
-    symbols.push(tuplet);
+    // If divisor is not power of two push tuplet symbol
+    if (!isPowerOf2(divisor)) symbols.push(tuplet);
 
     // While beat is before end of tuplet
     while (lt(beat, stopBeat, p24)) {
@@ -584,19 +575,19 @@ let k = 0;
         }
 
         // If we are not currently in tuplet mode detect the next tuplet
-        const tuplet = detectTuplets(events, beat, bar.duration - beat);
-        if (tuplet && tuplet.divisor !== 2 && tuplet.divisor !== 4) {
+        const data = detectTuplets(events, beat, bar.duration - beat);
+        if (data && data.divisor !== 2 && data.divisor !== 4) {
             // Create rests up to tuplet
-            if (gt(tuplet.beat, beat, p24)) createRests(symbols, restDurations, bar, stave, part, beat, tuplet.beat);
+            if (gt(data.beat, beat, p24)) createRests(symbols, restDurations, bar, stave, part, beat, data.beat);
             // Close beam TODO dont close beam
             if (beam) {
                 closeBeam(symbols, stave, part, beam);
                 beam = undefined;
             }
             // Render tuplet
-            n = createTuplet(symbols, bar, stave, key, accidentals, part, settings, tuplet.beat - bar.beat, tuplet.duration, tuplet.divisor, notes, events, n);
+            n = createTuplet(symbols, bar, stave, key, accidentals, part, settings, data.beat - bar.beat, data.duration, data.divisor, data.rhythm, notes, events, n);
             // Update beat
-            beat = tuplet.beat + tuplet.duration;
+            beat = data.beat + data.duration;
             //
             continue;
         }

@@ -11,6 +11,7 @@ import { timesigToMeter, meterToTimesig } from '../modules/timesig.js';
 import Stave             from '../modules/stave.js';
 import { renderBeam }    from '../modules/beam.js';
 import render            from '../modules/render.js';
+import config            from '../modules/config.js';
 
 const assign = Object.assign;
 const define = Object.defineProperties;
@@ -50,6 +51,8 @@ export default define(element('scribe-music', {
         internals.key       = Signal.of('C');
         internals.meter     = Signal.of([-4, "meter", 4, 1]);
         internals.transpose = Signal.of(0);
+        internals.swingAsStraight8ths  = Signal.of(config.swingAsStraight8ths);
+        internals.swingAsStraight16ths = Signal.of(config.swingAsStraight16ths);
         internals.debug     = Signal.of(false);
 
         /* Safari has some rounding errors to overcome... */
@@ -86,7 +89,12 @@ export default define(element('scribe-music', {
                 // Create an initial [0, "meter", ...] event
                 internals.meter.value,
                 // Transpose is a number
-                internals.transpose.value
+                internals.transpose.value,
+                // Settings
+                assign({}, config, {
+                    swingAsStraight8ths:  internals.swingAsStraight8ths.value,
+                    swingAsStraight16ths: internals.swingAsStraight16ths.value
+                })
             );
 
             // Clear the shadow DOM of bars and put new elements in it
@@ -270,6 +278,14 @@ export default define(element('scribe-music', {
         get: function() { return getInternals(this).data.value; },
         set: function(data) { getInternals(this).data.value = data; },
         default: null
+    },
+
+    swing8ths: {
+        attribute: function(value) { getInternals(this).swingAsStraight8ths.value = value !== null; }
+    },
+
+    swing16ths: {
+        attribute: function(value) { getInternals(this).swingAsStraight16ths.value = value !== null; }
     },
 
     debug: {
