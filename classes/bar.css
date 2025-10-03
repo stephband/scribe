@@ -936,3 +936,10 @@ in their duration span. */
     text-align: center;
     white-space: nowrap;
 }
+
+
+.bar > .BARREPEAT {
+    justify-self: center;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}

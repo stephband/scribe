@@ -101,7 +101,14 @@ export const bracketBottom    = '&#xE004';
 export const bracketEndTop    = '&#xE005';
 export const bracketEndBottom = '&#xE006';*/
 
-export const barLine = '&#xE030';
+export const barLine    = '&#xE030';
+export const barRepeat1 = '&#xE500;';
+export const barRepeat2 = '&#xE501;';
+export const barRepeat4 = '&#xE502;';
+export const barRepeatSlash = '&#xE504;';
+export const barRepeatUpperDot = '&#xE503;';
+export const barRepeatLowerDot = '&#xE505;';
+
 // These are only supported in Bravura, Leipzig, Petaluma...
 /*export const barLineDouble = '&#xE031';
 export const barLineEnd    = '&#xE032';

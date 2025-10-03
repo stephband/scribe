@@ -47,6 +47,14 @@ function truncate(number) {
 }
 
 export default overload(get('type'), {
+    'bar-repeat': (symbol) => create('span', {
+        class: 'BARREPEAT',
+        html: glyphs.barRepeat1,
+        data: {
+            duration: 4
+        }
+    }),
+
     clef: (symbol) => symbol.stave.getClefHTML ?
         // For support for piano stave treble and bass clef
         create('fragment', symbol.stave.getClefHTML()) :

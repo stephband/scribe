@@ -204,7 +204,7 @@ function createBarSymbols(symbols, bar, stave, key, events, settings) {
 
 export function createBar(count, beat, duration, divisor, stave, key, events, parts, sequence, settings = config) {
     const symbols = [];
-console.log('createBar', count);
+
     // Track end of sequence and shove in a double bar line
     if (sequence) {
         const sequenceStop = toStopBeat(sequence);

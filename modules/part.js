@@ -555,12 +555,10 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
 export function createPart(symbols, bar, stave, key = 0, accidentals = {}, part, events, settings = config) {
     const notes = [];
 
-console.log(bar.count, 'CREATE PART', bar.beat, events, events.map((e) => e[0] - bar.beat).join(','));
-
     let beat = 0;
     let n = -1;
     let event, duration, beam;
-let k = 0;
+
     // Ignore events that stop before beat 0, an extra cautious measure because
     // events array should already start with events at beat 0
     while ((event = events[++n]) && lte(event[0] + event[4] - bar.beat, beat, p24));

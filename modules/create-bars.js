@@ -16,6 +16,13 @@ function pushEventToPart(stave, parts, event) {
     parts[partIndex].push(event);
 }
 
+
+function ignoreKeys(key, value) {
+    if (key === "stave" || key === "rows" || key === "event" || key === "sequence") return undefined;
+    return value;
+}
+
+
 export default function createBars(sequence, stave, settings = config) {
     const bars = [];
     const ties = [];
@@ -25,14 +32,47 @@ export default function createBars(sequence, stave, settings = config) {
     let parts  = {};
     let key    = 0;
     let stopBeat = 0;
-    let duration, divisor, event, sequenceEvent;
+    let json, duration, divisor, event, sequenceEvent;
 
     // Extract events from sequence iterator
     for (event of sequence) {
         // If event is beyond current duration create bars
         while (event[0] >= beat + duration) {
+
+            const bar = createBar(bars.length + 1, beat, duration, divisor, stave, key, events, parts, sequenceEvent, settings);
+
+
+
+
+
+
+if (json) {
+    const clone = bar.symbols.filter((symbol) => symbol.type !== 'clef' && symbol.type !== 'timesig');
+    const barJSON = JSON.stringify(clone, ignoreKeys);
+
+    if(json === barJSON) {
+        bar.symbols = [{
+            type: 'bar-repeat',
+            value: 1
+        }];
+    }
+    else {
+        json = barJSON;
+    }
+}
+else {
+    const clone = bar.symbols.filter((symbol) => symbol.type !== 'clef' && symbol.type !== 'timesig');
+    const barJSON = JSON.stringify(clone, ignoreKeys);
+    json = barJSON;
+}
+
+
+
+
+
+
             // Close current bar, push to bars
-            bars.push(createBar(bars.length + 1, beat, duration, divisor, stave, key, events, parts, sequenceEvent, settings));
+            bars.push(bar);
 
             // Update beat, start new accumulators
             beat = beat + duration;

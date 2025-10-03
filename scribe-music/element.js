@@ -282,11 +282,11 @@ export default define(element('scribe-music', {
         default: null
     },
 
-    swing8ths: {
+    swing: {
         attribute: function(value) { getInternals(this).swingAsStraight8ths.value = value !== null; }
     },
 
-    swing16ths: {
+    shuffle: {
         attribute: function(value) { getInternals(this).swingAsStraight16ths.value = value !== null; }
     },
 
