@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>&lt;scribe-music&gt;</title>
+
+    <meta charset="utf-8" />
+    <meta name="author" content="@stephband" />
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width" />
+
+    <!--script type="importmap">{
+        "imports": {
+            "bolt/":     "https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/",
+            "dom/":      "https://cdn.jsdelivr.net/gh/stephband/dom@1.4.1/modules/",
+            "fn/":       "https://cdn.jsdelivr.net/gh/stephband/fn@1.5.1/modules/",
+            "midi/":     "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.0/modules/",
+            "sequence/": "https://cdn.jsdelivr.net/gh/soundio/sequence@0.0.9/modules/"
+        }
+    }</script-->
+
+    <script type="importmap">{
+        "imports": {
+            "bolt/":     "/bolt/",
+            "dom/":      "/dom/modules/",
+            "fn/":       "/fn/modules/",
+            "midi/":     "/midi/modules/",
+            "sequence/": "/sequence/modules/"
+        }
+    }</script>
+
+    <script title="load">
+        document.documentElement.className += ' js loading';
+        // window.addEventListener('DOMContentLoaded', () => document.documentElement.classList.remove('content-loading'));
+        // Wait for other load handlers to run first - Bolt does a few things on
+        // load (eg. targetable scrolls) and we want them to run before the loading
+        // class is removed
+        window.addEventListener('load', () => window.requestAnimationFrame(() => document.documentElement.classList.remove('loading')));
+        window.DEBUG = true;
+    </script>
+
+    <!-- Import <scribe-music> -->
+    <link rel="stylesheet" href="/bolt/classes/atoms.css" />
+    <link rel="stylesheet" href="../scribe-music/element.css" />
+    <script type="module" src="../scribe-music/element.js"></script>
+    <link rel="stylesheet" href="../elements/lead-sheet-document.css" />
+    <style>
+    body {
+        font-family: Jazz, JazzText;
+        letter-spacing: 0.004em;
+        word-spacing: 0.125em;
+    }
+    </style>
+    <script type="module">
+
+    </script>
+</head>
+<body>
+    <section class="grid dense-grid" style="row-gap: 0;">
+        <h3 class="x1 2x">Problematic rhythms</h3>
+
+        <scribe-music class="x1" clef="treble" src="#rhythm-1" debug>
+            <script type="application/json" id="rhythm-1">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [0.5,   "note",70,0.25,0.5],
+                    [1.3333,"note",69,0.25,0.3333],
+                    [1.6667,"note",68,0.25,0.3333]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x2" clef="treble" src="#rhythm-2" debug>
+            <script type="application/json" id="rhythm-2">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [4.5,   "note",70,0.25,0.5],
+                    [5.3333,"note",69,0.25,0.3333],
+                    [5.6667,"note",68,0.25,0.3333]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1" clef="treble" src="#rhythm-3" debug>
+            <script type="application/json" id="rhythm-3">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [0.6667,"note",70,0.25,0.5],
+                    [1.3333,"note",69,0.25,0.3333],
+                    [1.6667,"note",68,0.25,0.3333]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x2" clef="treble" src="#rhythm-4" debug>
+            <script type="application/json" id="rhythm-4">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [4.6667,"note",70,0.25,0.5],
+                    [5.3333,"note",69,0.25,0.3333],
+                    [5.6667,"note",68,0.25,0.3333]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1" clef="treble" src="#rhythm-5" debug swing8ths>
+            <script type="application/json" id="rhythm-5">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [0.6667,"note",70,0.25,0.5],
+                    [1.3333,"note",69,0.25,0.3333],
+                    [1.6667,"note",68,0.25,0.3333]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x2" clef="treble" src="#rhythm-6" debug swing8ths>
+            <script type="application/json" id="rhythm-6">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [4.6667,"note",70,0.25,0.5],
+                    [5.3333,"note",69,0.25,0.3333],
+                    [5.6667,"note",68,0.25,0.3333]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1" clef="treble" src="#rhythm-7" debug>
+            <script type="application/json" id="rhythm-7">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [0.6667,"note",70,0.25,0.6667],
+                    [1.3333,"note",69,0.25,0.3333],
+                    [1.6667,"note",68,0.25,0.3333]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x2" clef="treble" src="#rhythm-8" debug>
+            <script type="application/json" id="rhythm-8">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [4.6667,"note",70,0.25,0.6667],
+                    [5.3333,"note",69,0.25,0.3333],
+                    [5.6667,"note",68,0.25,0.3333]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1" clef="treble" src="#rhythm-9" debug swing8ths>
+            <script type="application/json" id="rhythm-9">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [0.6667,"note",70,0.25,0.6667],
+                    [1.3333,"note",69,0.25,0.3333],
+                    [1.6667,"note",68,0.25,0.3333]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x2" clef="treble" src="#rhythm-10" debug swing8ths>
+            <script type="application/json" id="rhythm-10">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [4.6667,"note",70,0.25,0.6667],
+                    [5.3333,"note",69,0.25,0.3333],
+                    [5.6667,"note",68,0.25,0.3333]
+                ]
+            }</script>
+        </scribe-music>
+
+        <!---->
+    </section>
+</body>
+</html>

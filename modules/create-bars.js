@@ -101,7 +101,7 @@ export default function createBars(sequence, stave, settings = config) {
     // There are still events with long durations to symbolise into bars
     while (ties.length) {
         // Close current bar, push to bars
-        bars.push(createBar(bars.length, beat, duration, divisor, stave, key, events, parts, sequenceEvent, settings));
+        bars.push(createBar(bars.length + 1, beat, duration, divisor, stave, key, events, parts, sequenceEvent, settings));
 
         // Update beat, start new arrays
         beat = beat + duration;
@@ -121,7 +121,7 @@ export default function createBars(sequence, stave, settings = config) {
     // still need the ties array? Can we not get rid of the loop above?
     while (beat < stopBeat - duration) {
         // Close current bar, push to bars
-        bars.push(createBar(bars.length, beat, duration, divisor, stave, key, events, parts, sequenceEvent, settings));
+        bars.push(createBar(bars.length + 1, beat, duration, divisor, stave, key, events, parts, sequenceEvent, settings));
 
         // Update beat, start new arrays
         beat = beat + duration;
@@ -130,7 +130,7 @@ export default function createBars(sequence, stave, settings = config) {
     }
 
     // Close final bar, push to bars
-    bars.push(createBar(bars.length, beat, duration, divisor, stave, key, events, parts, sequenceEvent, settings));
+    bars.push(createBar(bars.length + 1, beat, duration, divisor, stave, key, events, parts, sequenceEvent, settings));
 
     // Return bars
     return bars;

@@ -20,6 +20,9 @@
     flex-wrap: wrap;
     flex-direction: row;
     column-gap: 0;
+
+    /* Make sure bars do not stretch vertically */
+    align-items: start;
 }
 
 

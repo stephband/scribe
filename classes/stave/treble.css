@@ -29,11 +29,12 @@
         [C3 lyrics] 0.125em;
 }
 
+/*
 .treble-stave::before {
-    /* Treble clef */
     content: '\E050';
     grid-row: G4;
 }
+*/
 
 .treble-stave > .lyric {
     align-self: end;

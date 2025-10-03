@@ -555,6 +555,8 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
 export function createPart(symbols, bar, stave, key = 0, accidentals = {}, part, events, settings = config) {
     const notes = [];
 
+console.log(bar.count, 'CREATE PART', bar.beat, events, events.map((e) => e[0] - bar.beat).join(','));
+
     let beat = 0;
     let n = -1;
     let event, duration, beam;
@@ -575,10 +577,10 @@ let k = 0;
         }
 
         // If we are not currently in tuplet mode detect the next tuplet
-        const data = detectTuplets(events, beat, bar.duration - beat);
+        const data = detectTuplets(events, bar.beat + beat, bar.duration - beat);
         if (data && data.divisor !== 2 && data.divisor !== 4) {
             // Create rests up to tuplet
-            if (gt(data.beat, beat, p24)) createRests(symbols, restDurations, bar, stave, part, beat, data.beat);
+            if (gt(data.beat - bar.beat, beat, p24)) createRests(symbols, restDurations, bar, stave, part, beat, data.beat - bar.beat);
             // Close beam TODO dont close beam
             if (beam) {
                 closeBeam(symbols, stave, part, beam);
@@ -587,7 +589,7 @@ let k = 0;
             // Render tuplet
             n = createTuplet(symbols, bar, stave, key, accidentals, part, settings, data.beat - bar.beat, data.duration, data.divisor, data.rhythm, notes, events, n);
             // Update beat
-            beat = data.beat + data.duration;
+            beat = data.beat - bar.beat + data.duration;
             //
             continue;
         }
@@ -618,7 +620,7 @@ let k = 0;
             const stopBeat = round(0.125, event[0] - bar.beat);
 
 if (stopBeat <= beat) {
-    console.log(`Problem at bar ${ bar.count }, moving to next bar`);
+    console.log(`Problem at bar ${ bar.count }, moving to next bar ${ beat } ${ stopBeat }`);
     bar.error = 'Stop beat has ended up less than beat';
     break;
 }

@@ -51,8 +51,8 @@ export default define(element('scribe-music', {
         internals.key       = Signal.of('C');
         internals.meter     = Signal.of([-4, "meter", 4, 1]);
         internals.transpose = Signal.of(0);
-        internals.swingAsStraight8ths  = Signal.of(config.swingAsStraight8ths);
-        internals.swingAsStraight16ths = Signal.of(config.swingAsStraight16ths);
+        internals.swingAsStraight8ths  = Signal.of(false);
+        internals.swingAsStraight16ths = Signal.of(false);
         internals.debug     = Signal.of(false);
 
         /* Safari has some rounding errors to overcome... */
@@ -120,7 +120,9 @@ export default define(element('scribe-music', {
                             total += d;
                         }
                     });
-                    if (total > duration) bar.classList.add('error');
+                    if (Math.round(total / 0.0625) !== Math.round(duration / 0.0625)) {
+                        bar.classList.add('error');
+                    }
                 });
             }
         });

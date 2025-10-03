@@ -45,6 +45,28 @@ export const headTriangleUp          = '&#xE0BE;';
 export const headSlashVerticalEnds   = '&#xE100;';
 export const headSlashHorizontalEnds = '&#xE101;';
 
+// https://w3c.github.io/smufl/latest/tables/individual-notes.html
+export const note2Up      = '&#xE1D3;';
+export const note1Up      = '&#xE1D5;';
+export const note05Up     = '&#xE1D7;';
+export const note025Up    = '&#xE1D9;';
+export const note0125Up   = '&#xE1DB;';
+export const note2Down    = '&#xE1D4;';
+export const note1Down    = '&#xE1D6;';
+export const note05Down   = '&#xE1D8;';
+export const note025Down  = '&#xE1DA;';
+export const note0125Down = '&#xE1DC;';
+export const augmentationDot = '&#xE1E7;';
+
+// https://w3c.github.io/smufl/latest/tables/metronome-marks.html
+export const metNote2Up    = '&#xECA3;';
+export const metNote1Up    = '&#xECA5;';
+export const metNote05Up   = '&#xECA7;';
+export const metNote2Down  = '&#xECA4;';
+export const metNote1Down  = '&#xECA6;';
+export const metNote05Down = '&#xECA8;';
+export const metDot        = '&#xECB7;';
+
 export const graceNoteStemUp   = '&#xE560;';
 export const graceNoteStemDown = '&#xE561;';
 
@@ -114,14 +136,6 @@ export const slurEnd     = '&#xE8E5;';
 export const phraseBegin = '&#xE8E6;';
 export const phraseEnd   = '&#xE8E7;';*/
 
-// These are not aligned to baseline, they are intended for text content
-export const tupletBracketBegin = '&#xE1FE;';
-export const tupletBracket3     = '&#xE1FF;';
-export const tupletBracketEnd   = '&#xE200;';
-export const tupletBracketBeginLongStem = '&#xE201;';
-export const tupletBracket3LongStem     = '&#xE202;';
-export const tupletBracketEndLongStem   = '&#xE203;';
-
 export const chordDiminished      = '&#xE870;';
 // Not supported in Jazz, Ash, Broadway, Leipzig
 /*export const chordDiminishedSmall = '&#xF4D8;';*/
@@ -155,3 +169,28 @@ export const chordGlyphs = {
     "7♭9": "7\uED60",
     "+7": "\uE8727",
 };
+
+/* These glyphs are not aligned to centted baseline as other musical symbols
+   are - these are intended for use in paragraph text content */
+
+export const textNoteShort        = '&#xE1F0;';
+export const textNoteLong         = '&#xE1F1;';
+export const textNote8Short       = '&#xE1F2;';
+export const textNote8Long        = '&#xE1F3;';
+export const textNote16Short      = '&#xE1F4;';
+export const textNote16Long       = '&#xE1F5;';
+export const textBeam8Short       = '&#xE1F7;';
+export const textBeam8Long        = '&#xE1F8;';
+export const textBeam16Short      = '&#xE1F9;';
+export const textBeam16Long       = '&#xE1FA;';
+export const textDot              = '&#xE1FC;';
+export const textTie              = '&#xE1FD;';
+export const textTupletBeginShort = '&#xE1FE';
+export const textTuplet3Short     = '&#xE1FF';
+export const textTupletEndShort   = '&#xE200';
+export const textTupletBeginLong  = '&#xE201';
+export const textTuplet3Long      = '&#xE202';
+export const textTupletEndLong    = '&#xE203';
+
+
+

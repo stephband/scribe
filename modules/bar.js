@@ -204,7 +204,7 @@ function createBarSymbols(symbols, bar, stave, key, events, settings) {
 
 export function createBar(count, beat, duration, divisor, stave, key, events, parts, sequence, settings = config) {
     const symbols = [];
-
+console.log('createBar', count);
     // Track end of sequence and shove in a double bar line
     if (sequence) {
         const sequenceStop = toStopBeat(sequence);
@@ -242,6 +242,13 @@ export function createBar(count, beat, duration, divisor, stave, key, events, pa
         count,
         symbols
     };
+
+    // Add clef in front of keysig
+    bar.symbols.push({
+        type: 'clef',
+        beat: 0,
+        stave
+    });
 
     // Populate symbols with events
     createBarSymbols(symbols, bar, stave, key, events, config);

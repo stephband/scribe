@@ -11,6 +11,9 @@
 	column-gap:    var(--bar-column-gap);
 	padding-left:  var(--bar-padding-left);
 	padding-right: var(--bar-padding-right);
+
+    /* Default alignment to prevent bar stretching vertically in a flexbox */
+    align-self: start;
 }
 
 .bar.error {
@@ -192,16 +195,16 @@ Bars are divided into:
 	margin-right: calc(-0.5 * var(--bar-line-size, 1px) - var(--bar-padding-right));
 }
 
-
+/*
 .bar::before {
-    /* Position clef */
     grid-column: 1;
     justify-self: start;
     width: auto;
 }
+*/
 
-.bar + .bar::before {
-    content: none;
+.bar + .bar > .clef {
+    display: none;
 }
 
 /* Column 1 is clef/key/timesig */

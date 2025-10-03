@@ -15,12 +15,14 @@ function toElements(nodes, symbol) {
     return nodes;
 }
 
-export function toBarElements(bar) {
-    return create('div', {
+export function toBarElements(elements, bar) {
+    elements.push(create('div', {
         class: `${ bar.stave.type }-stave stave ${ bar.error ? 'error ': '' }bar`,
         data: { beat: bar.beat, duration: bar.duration, count: bar.count },
         children: bar.symbols.reduce(toElements, [])
-    });
+    }));
+
+    return elements;
 }
 
 

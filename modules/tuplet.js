@@ -138,12 +138,12 @@ export default function detectTuplet(events, beat, duration) {
 
     // Reset score. Use a module-scoped variable, process is synchronous
     score = 0;
-
+console.group('DETECT', beat, duration, events.map((e) => e[0] - beat).join(','));
     // Loop upward through power of 2 durations, short to long
     let d = 1/8;
     while ((d *= 2) && d <= duration) {
         detectTupletOverDuration(tuplet, d, events, n, beat, tupletDivisors, beat + duration);
     }
-
+console.groupEnd();
     return score > 0 && tuplet;
 }

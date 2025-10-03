@@ -1,0 +1,10 @@
+
+.instruction {
+    /* Instruction happens outside of bar, make it fill full width of flex box */
+    width: 100%;
+    margin: 0;
+    font-size: 0.8125em;
+    /* This metric sits the baseline on the bottom of the box */
+    height: 1em;
+    line-height: 2em;
+}

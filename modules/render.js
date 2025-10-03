@@ -1,10 +1,12 @@
 
-import Sequence   from 'sequence/sequence.js';
-import Stave      from '../modules/stave.js';
+import create      from 'dom/create.js';
+import Sequence    from 'sequence/sequence.js';
+import Stave       from '../modules/stave.js';
 import { keysAtBeats, keyFromBeatKeys } from './sequence/key-at-beat.js';
-import createBars from './create-bars.js';
+import createBars  from './create-bars.js';
 import { toBarElements } from './create-bar-elements.js';
-import config     from './config.js';
+import * as glyphs from './glyphs.js';
+import config      from './config.js';
 
 function isInitialMeterEvent(event) {
     return event[0] <= 0 && event[1] === 'meter';
@@ -13,6 +15,17 @@ function isInitialMeterEvent(event) {
 function isInitialKeyEvent(event) {
     return event[0] <= 0 && event[1] === 'key';
 }
+
+/* Glyphs for triplet mark d d = d 3 d, instead of saying Swing 8ths, for example
+text = glyphs.textNoteShort
+    + glyphs.textBeam8Short
+    + glyphs.textNote8Short
+    + '='
+    + glyphs.textNoteShort
+    + ' '
+    + glyphs.textTuplet3Long
+    + glyphs.note05Up
+*/
 
 export default function render(data, clef, keyname, meter, transpose, settings = config) {
     // TODO, WARNING! This mutates events! We probably oughta clone events first.
@@ -39,7 +52,16 @@ export default function render(data, clef, keyname, meter, transpose, settings =
         keysAtBeats(Array.from(sequence)) :
         null ;
 
-    // TODO: this is a two-pass symbol generation, I wonder if we can get
-    // it down to one?
-    return createBars(sequence, stave, settings).map(toBarElements);
+    const elements = [];
+
+    // Concat instructions line together from settings and tempo
+    const instructions = [];
+    if (settings.swingAsStraight8ths)  instructions.push('Swing 8ths');
+    if (settings.swingAsStraight16ths) instructions.push('Swing 16ths');
+    if (instructions.length) elements.push(create('p', {
+        class: 'instruction',
+        html: instructions.join(', ')
+    }));
+
+    return createBars(sequence, stave, settings).reduce(toBarElements, elements);
 }

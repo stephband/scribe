@@ -1,6 +1,7 @@
 
 @import './elements/host.css';
 
+@import '../classes/instruction.css';
 @import '../classes/accidental.css';
 @import '../classes/stave.css';
 @import '../classes/bar.css';
