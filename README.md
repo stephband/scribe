@@ -3,35 +3,90 @@
 
 # Scribe
 
-Scribe renders music notation in HTML.
+Responsive music notation for the web.
 
 Scribe takes a sequence of events – notes, chords, meter changes and so on – and
-renders notation as symbols in a CSS grid that displays as a bar and stave.
-
-There is a description of the CSS grid system in the blog post
-<a href="https://cruncher.ch/blog/printing-music-with-css-grid/">Printing Music with CSS Grid</a>.
-Many detials have changed since that post was written but the principal layout
-technique remains the same.
+renders notation as elements in a CSS grid layout representing bars and staves.
 
 
-## Download
+## Examples
 
-Scribe 0.3 is a rewrite, and does not yet have a release build.
-Development builds are kept in the `build/` folder.
+- <a href="https://the-dots.app">the-dots.app</a>
 
 
 ## `<scribe-music>`
 
-Scribe 0.3 is a rewrite, and this custom element is the test bed. To try out the
-development version of the element, import the css and register the element:
+Import the CSS and JS, and register the `<scribe-music>` element:
 
 ```html
-<link rel="stylesheet" href="https://stephen.band/scribe/build/scribe-music/element.css" />
-<script type="module" src="https://stephen.band/scribe/build/scribe-music/element.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/stephband/scribe@0.4.0/build/scribe-music/element.css" />
+<script type="module" src="https://cdn.jsdelivr.net/gh/stephband/scribe@0.4.0/build/scribe-music/element.js"></script>
 ```
 
-Now the `<scribe-music>` element renders music notation from data found in
-it's content:
+The `<scribe-music>` element renders music notation from data imported from a
+JSON file in its `src` attribute:
+
+```html
+<scribe-music src="/path/to/json"></scribe-music>
+```
+
+Alternatively the `src` attribute may reference JSON already in the document:
+
+```html
+<!-- In the head -->
+<script type="application/json" id="music">{
+    "events": [...]
+}</script>
+
+<!-- In the body -->
+<scribe-music src="#music"></scribe-music>
+```
+
+
+## Scribe data
+
+Scribe consumes <a href="https://github.com/soundio/music-json/">Sequence JSON</a>.
+Here's an example of a simple Sequence document that plays 2 notes in 4/4 time:
+
+```json
+{
+    "name": "Doorbell",
+    "author": { "name": "stephband" },
+    "events": [
+        [0, "meter", 4, 1],
+        [0, "sequence", 1, 0, 4]
+    ],
+    "sequences": [{
+        "id": 1,
+        "events": [
+            [0, "note", "C5", 0.1, 2],
+            [2, "note", "G4", 0.1, 2]
+        ]
+    }]
+}
+```
+
+Events are described in arrays that start with `[beat, type, ...]`. Each event
+type has its own structure. Scribe supports these event types:
+
+| beat   | type         | 2 | 3 | 4 | 5 |
+| :----- | :----------- | :--- | :--- | :--- |
+| `beat` | `"chord"`    | `root` | `mode` | `duration` | `bass` |
+| `beat` | `"lyric"`    | `text` | `duration` |  |  |
+| `beat` | `"note"`     | `pitch` | `dynamic` | `duration` |  |
+| `beat` | `"meter"`    | `duration` | `divisor` |  |  |
+| `beat` | `"rate"`     | `number` |  |  |  |
+| `beat` | `"sequence"` | `id` | `-` | `duration` | `transforms...` |
+| `beat` | `"key"`      | `notename` |  |  |  |
+| `beat` | `"clef"`     | `clefname` |  |  |  |
+
+Sequences are described in the `"sequences"` array. Scribe considers top-level
+sequence events to denote musical structure, and renders double bar lines at the
+end of a top-level sequence. Beyond that sequences are arbitrarily nestable, and
+may be organised however you see fit.
+
+Scribe also parses a shorthand version of this format intended for quick hand
+authoring, basically Sequence JSON structure with all the JSON syntax removed.
 
 ```html
 <scribe-music type="sequence" clef="treble" meter="4/4">
@@ -42,51 +97,7 @@ it's content:
 </scribe-music>
 ```
 
-Or imported from a file in its `src` attribute:
-
-```html
-<scribe-music type="application/json" src="/path/to/json"></scribe-music>
-```
-
-Or set on it's data property:
-
-```js
-let scribe = document.body.querySelector('scribe-music');
-
-scribe.data = {
-    name:      'My Song',
-    events:    [...]
-};
-```
-
-Scribe consumes <a href="https://github.com/soundio/music-json/">Sequence JSON</a>
-(and data objects of the same structure). Events are described by arrays of data in
-the `.events` array:
-
-```js
-scribe.data = {
-    events: [
-        [0, "note", "G4", 0.2, 3]
-    ]
-};
-```
-
-Each event type has its own structure. Scribe 0.3 supports these event types:
-
-| beat   | type         | 2 | 3 | 4 |
-| :----- | :----------- | :--- | :--- | :--- |
-| `beat` | `"chord"`    | `root` | `mode` | `duration` |
-| `beat` | `"note"`     | `pitch` | `dynamic` | `duration` |
-| `beat` | `"meter"`    | `duration` | `divisor` |  |
-| `beat` | `"rate"`     | `number` |  |  |
-| `beat` | `"key"`      | `notename` |  |  |
-| `beat` | `"clef"`     | `clefname` |  |  |
-
-Scribe 0.3 also parses a shorthand version of this format intended for quick hand authoring,
-as in the first example above, which is basically Sequence JSON structure with all the JSON
-syntax – commas and brackets and quotemarks – removed.
-
-Scribe 0.3 also parses ABC (thanks to the parser from [ABCjs](https://github.com/paulrosen/abcjs)).
+<!--Scribe 0.3 also parses ABC (thanks to the parser from [ABCjs](https://github.com/paulrosen/abcjs)).-->
 
 
 ### `type="json"`
@@ -96,14 +107,14 @@ Mimetype or type of data to fetch from `src` or to parse from text content.
 Scribe supports 3 types of data:
 
 - "application/json", or just "json"
-- "text/x-abc", or just "abc"
+<!-- - "text/x-abc", or just "abc" -->
 - "sequence"
 
 
 ### `src="url"`
 
 Both an attribute and a property.
-The URL of a file containing sequence data in JSON or ABC.
+The URL of a JSON file, or a hash reference to a script element in the document.
 
 
 ### `clef="treble"`
@@ -118,7 +129,7 @@ The name of the clef, one of `"treble"`, `"treble-up"`, `"treble-down"`, `"alto"
 
 ```js
 let scribe = document.body.querySelector('scribe-music');
-scribe.clef = "bass";
+console.log(scribe.clef) // "bass";
 ```
 
 
@@ -140,8 +151,8 @@ scribe.key = "B♭";
 
 There is no provision for choosing a 'minor' key. Declare its relative major.
 
-The key is the key signature pre-transpose. If `scribe.transpose` is something other
-than `0`, the key signature is transposed.
+The key is the key signature pre-transposition. If `scribe.transpose` is something
+other than `0`, the key signature is transposed.
 
 
 ### `meter="4/4"`
@@ -161,7 +172,6 @@ let scribe = document.body.querySelector('scribe-music');
 scribe.meter = "3/4";
 ```
 
-
 ### `transpose="0"`
 
 Both an attribute and a property.
@@ -177,11 +187,13 @@ let scribe = document.body.querySelector('scribe-music');
 scribe.transpose = 2;
 ```
 
+### `swing`
+
+A boolean attribute. Displays swung and triplet 8ths as straight 8ths.
 
 ### `.data`
 
-Property only.
-Set a `.data` object, structured as a <a href="https://github.com/soundio/music-json/#sequence">Sequence</a>, to render it.
+Set a `.data` object, structured as a <a href="https://github.com/soundio/music-json/#sequence">Sequence</a>.
 
 ```js
 let scribe = document.body.querySelector('scribe-music');
@@ -252,11 +264,40 @@ To check things are working serve this directory and navigate to
 depending on what you are using as a server).
 
 
+## Research
+
+There is a discussion of using CSS grid layout for rendering music notation
+in the blog post <a href="https://cruncher.ch/blog/printing-music-with-css-grid/">Printing Music with CSS Grid</a>.
+Scribe's internals have changed since that post was written but the principal
+layout technique remains the same.
+
+
 ## Changes
 
-### 0.3.1
+### 0.4.x – The Lead Sheet
+
+Version 0.4 is capable of rendering a reasonable lead sheet. Features:
+
+- Supports multiple concurrent notes
+- Supports multiple parts per stave
+- Supports sequence events, top-level sequence events denote musical structure
+- Supports arbitrary nesting of sequences and transforms
+- Tuplet detection up to nonuplets
+- Automatic bar repeat symbols for repeated identical bars
+- Setting `settings.swingAsStraight8ths` makes 8th tuplets display as straight 8ths
+- Setting `settings.swingAsStraight16ths` makes 16th tuplets display as straight 16ths
+- `<scribe-music>` `swing` attribute corresponds to `.swingAsStraight8ths`
+
+### 0.3.x –
+
+- Triplet detection and rendering
+- Supports nested sequences to level 2 nesting
+- Bar divisions, note, beam and rest splitting on divisions
+
+### 0.3.1 – SMuFL
 
 - Adds support for <a href="https://www.smufl.org/fonts/">SMuFL fonts</a>
+- Proof of concept
 
 
 ## Roadmap
@@ -265,7 +306,6 @@ Asides from some immediate improvements I can make to Scribe 0.3, like
 tuning the autospeller and fixing the 1/16th-note beams and detecting and
 displaying tuplets, here are some longer-term features I would like to investigate:
 
-- <strong>Support for nested sequences</strong> – enabling multi-part tunes.
 - <strong>Split-stave rendering</strong> – placing multiple parts on one stave. The mechanics for this are already half in place – the drums stave and piano stave currently auto-split by pitch.
 - <strong>Multi-stave rendering</strong> – placing multiple parts on multiple, aligned, staves.
 
