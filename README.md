@@ -301,11 +301,12 @@ Regressions
 
 - Broken spelling
 
-### 0.3.x –
+### 0.3.x – The Bar
 
 - Triplet detection and rendering
 - Supports nested sequences to level 2 nesting
 - Bar divisions, note, beam and rest splitting on divisions
+- In-bar and cross-bar ties
 
 ### 0.3.1 – SMuFL
 
@@ -317,8 +318,8 @@ Regressions
 Developed at [Cruncher](https://cruncher.ch) by [Stephen Band](https://stephen.band).
 
 Rich Sigler of Sigler Music Fonts [jazzfont.com](http://www.jazzfont.com/) very
-kindly granted permission to use JazzFont shapes as SVG paths in this project
-(although Scribe now renders SMuFL fonts so SVG shapes are no longer used).
+kindly granted permission to use JazzFont shapes as SVG paths in this project.
+Scribe now renders SMuFL fonts so SVG shapes are no longer used.
 
 Scribe logo/mascot by [Mariana Alt](https://www.mariana.lt/).
 
