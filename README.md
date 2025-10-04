@@ -67,7 +67,7 @@ Here's an example of the horn part for So What as a sequence document:
         ]
     }, {
         "id": 2,
-        "name": "Horn phrase",
+        "name": "Horns",
         "events": [
             [0, "chord", "D", "-7", 32],
             [2,    "note", "B4", 0.1, 1.6],
