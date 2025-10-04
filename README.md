@@ -28,43 +28,68 @@ JSON data imported via its `src` attribute:
 Alternatively the `src` attribute may reference JSON already in the document:
 
 ```html
-<!-- In the head -->
+<!-- Head -->
 <script type="application/json" id="music">{
     "events": [...]
 }</script>
 
-<!-- In the body -->
-<scribe-music src="#music"></scribe-music>
+<!-- Body -->
+<scribe-music src="#music" swing></scribe-music>
 ```
 
 
 ## Scribe data
 
 Scribe consumes <a href="https://github.com/soundio/music-json/">Sequence JSON</a>.
-Here's an example of a simple Sequence document that plays 2 notes in 4/4 time:
+Here's an example of the horn lead sheet for So What:
 
 ```json
 {
-    "name": "Doorbell",
-    "author": { "name": "stephband" },
+    "name": "So What",
+    "author": { "name": "Miles Davis" },
     "events": [
-        [0, "meter", 4, 1],
-        [0, "sequence", 1, 0, 4]
+        [0,  "key", "C"],
+        [0,  "meter", 4, 1],
+        [0,  "sequence", 1, 0, 32],
+        [32, "sequence", 1, 0, 32],
+        [64, "sequence", 1, 0, 32, "transpose", 1],
+        [96, "sequence", 1, 0, 32]
     ],
+
     "sequences": [{
         "id": 1,
+        "name": "Section",
         "events": [
-            [0, "note", "C5", 0.1, 2],
-            [2, "note", "G4", 0.1, 2]
+            [0,  "sequence", 2, 0,  8],
+            [8,  "sequence", 2, 0,  8],
+            [16, "sequence", 2, 0,  8],
+            [24, "sequence", 2, 0,  8]
+        ]
+    }, {
+        "id": 2,
+        "name": "Horns",
+        "events": [
+            [0, "chord", "D", "-7", 32],
+            [2,    "note", "B4", 0.1, 1.6],
+            [2,    "note", "G4", 0.1, 1.6],
+            [2,    "note", "D4", 0.1, 1.6],
+            [2,    "note", "A3", 0.1, 1.6],
+            [3.6,  "note", "A4", 0.1, 0.4],
+            [3.6,  "note", "F4", 0.1, 0.4],
+            [3.6,  "note", "C4", 0.1, 0.4],
+            [3.6,  "note", "G3", 0.1, 0.4]
         ]
     }]
 }
 ```
 
+The only property a sequence document actually requires is an `"events"` array.
+
 ### Events
 
-Events are described in arrays that start with `[beat, type, ...]`. Each event
-type has its own structure. Scribe supports these event types:
+Events are described in the `"events"` array. Each event is an array that starts
+with `[beat, type, ...]`. Each event type carries some data. Scribe supports
+these event types:
 
 | beat   | type         | 2 | 3 | 4 | 5 |
 | :----- | :----------- | :--- | :--- | :--- |
@@ -75,16 +100,19 @@ type has its own structure. Scribe supports these event types:
 | `beat` | `"rate"`     | `number` |  |  |  |
 | `beat` | `"sequence"` | `id` | `-` | `duration` | `transforms...` |
 | `beat` | `"key"`      | `notename` |  |  |  |
-| `beat` | `"clef"`     | `clefname` |  |  |  |
 
 Unrecognised event types are ignored.
 
 ### Sequences
 
-Sequences are described in the `"sequences"` array. Scribe considers top-level
-sequence events to denote musical structure, and renders double bar lines at the
-end of a top-level sequence. Beyond that sequences are arbitrarily nestable, and
-may be organised however you see fit.
+Sequences are described in the `"sequences"` array, and sequence events refer to
+them by id. Child sequences have the same structure as parent sequences. They are
+arbitrarily nestable. Sequence events may refer their own sequences or to any of
+the sequences found in their parents.
+
+Scribe considers the top-level sequence to describe musical structure. Meter and
+key events from nested sequences are ignored.
+
 
 <!--
 Scribe also parses a shorthand version of this format intended for quick hand
@@ -293,6 +321,7 @@ Version 0.4 is capable of rendering a reasonable lead sheet. Features:
 - Supports arbitrary nesting of sequences and transforms
 - Tuplet detection up to nonuplets
 - Automatic bar repeat symbols for repeated identical bars
+- Adds config object
 - Setting `settings.swingAsStraight8ths` makes 8th tuplets display as straight 8ths
 - Setting `settings.swingAsStraight16ths` makes 16th tuplets display as straight 16ths
 - `<scribe-music>` `swing` attribute corresponds to `.swingAsStraight8ths`
@@ -301,7 +330,7 @@ Regressions
 
 - Broken spelling
 
-### 0.3.x – The Bar
+### 0.3.x – Experimental features
 
 - Triplet detection and rendering
 - Supports nested sequences to level 2 nesting
