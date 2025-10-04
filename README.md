@@ -88,6 +88,8 @@ Which renders as:
 
 <img src="https://stephen.band/scribe/assets/images/so-what.png" alt="Scribe rendered music for So What" style="width: 100%; height: auto;" />
 
+Here's another example: <a href="https://stephen.band/scribe/dolphin-dance">Dolphin Dance</a>.
+
 The only property a sequence document actually requires is an `"events"` array.
 
 ### Events
@@ -250,7 +252,7 @@ let mySong = JSON.stringify(scribe.data);
 
 
 ---
-
+<!--
 ## Sequence format
 
 The `"sequence"` format is intended for quick hand-authoring, and not as an export format.
@@ -285,7 +287,7 @@ The same is true for chords.
 1 A4  0.2 1
 4 D4  0.2 1
 ```
-
+-->
 ## Develop
 
 ### Clone
@@ -310,7 +312,7 @@ make modules
 
 ## Research
 
-There is a discussion of using CSS grid layout for rendering music notation
+There is a discussion about using CSS grid layout for rendering music notation
 in the blog post <a href="https://cruncher.ch/blog/printing-music-with-css-grid/">Printing Music with CSS Grid</a>.
 Scribe's internals have changed since that post was written but the principal
 layout technique remains the same.
