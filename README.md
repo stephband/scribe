@@ -105,14 +105,15 @@ Unrecognised event types are ignored.
 
 ### Sequences
 
-Sequences are described in the `"sequences"` array, and sequence events refer to
-them by id. Child sequences have the same structure as parent sequences. Sequence
-events may refer their own sequences or to any sequence found in their parents.
-Sequences are arbitrarily nestable.
+Sequences are described in the `"sequences"` array, and `"sequence"` events refer
+to them by id. Child sequences have the same structure as parent sequences. Events
+may refer to sequences in the same sequence or to any sequence found in their parent
+chain. Sequences are arbitrarily nestable.
 
 Scribe considers the top-level sequence to describe musical structure by
 convention. In the example above the top-level sequence contains the key, meter
-and musical sections as `"sequence"` events.
+and musical sections as `"sequence"` events. Scribe renders double bar lines at
+the end of each of these.
 
 
 <!--
