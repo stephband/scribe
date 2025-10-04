@@ -11,7 +11,7 @@ interprets and renders notation in HTML and CSS.
 
 ## `<scribe-music>`
 
-To install the scribe music custom element, import the CSS and JS from the CDN:
+To use the `<scribe-music>` custom element, import the CSS and JS from the CDN:
 
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/stephband/scribe@0.4.0/build/scribe-music/element.css" />
