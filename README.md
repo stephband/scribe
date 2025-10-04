@@ -37,6 +37,7 @@ Alternatively the `src` attribute may reference JSON already in the document:
 <scribe-music src="#so-what" swing></scribe-music>
 ```
 
+<!--Here's another example: <a href="https://stephen.band/scribe/dolphin-dance">Dolphin Dance</a>.-->
 
 ## Scribe data
 
@@ -87,8 +88,6 @@ as a sequence document:
 Which renders as:
 
 <img src="https://stephen.band/scribe/assets/images/so-what.png" alt="Scribe rendered music for So What" style="width: 100%; height: auto;" />
-
-Here's another example: <a href="https://stephen.band/scribe/dolphin-dance">Dolphin Dance</a>.
 
 The only property a sequence document actually requires is an `"events"` array.
 
