@@ -6,17 +6,12 @@
 Responsive music notation for the web.
 
 Scribe takes a sequence of events – notes, chords, meter changes and so on – and
-renders notation as elements in a CSS grid layout representing bars and staves.
-
-
-## Examples
-
-- <a href="https://the-dots.app">the-dots.app</a>
+interprets and renders notation in HTML and CSS.
 
 
 ## `<scribe-music>`
 
-To try out the scribe music custom element, import the CSS and JS from the CDN:
+To install the scribe music custom element, import the CSS and JS from the CDN:
 
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/stephband/scribe@0.4.0/build/scribe-music/element.css" />
@@ -66,6 +61,8 @@ Here's an example of a simple Sequence document that plays 2 notes in 4/4 time:
 }
 ```
 
+### Events
+
 Events are described in arrays that start with `[beat, type, ...]`. Each event
 type has its own structure. Scribe supports these event types:
 
@@ -79,6 +76,10 @@ type has its own structure. Scribe supports these event types:
 | `beat` | `"sequence"` | `id` | `-` | `duration` | `transforms...` |
 | `beat` | `"key"`      | `notename` |  |  |  |
 | `beat` | `"clef"`     | `clefname` |  |  |  |
+
+Unrecognised event types are ignored.
+
+### Sequences
 
 Sequences are described in the `"sequences"` array. Scribe considers top-level
 sequence events to denote musical structure, and renders double bar lines at the
