@@ -10,12 +10,7 @@ import createBarElements from './create-bar-elements.js';
 import config     from './config.js';
 
 
-function pushEventToPart(stave, parts, event) {
-    const partIndex  = stave.getPartIndex(event[2]);
-    const partEvents = parts[partIndex] || (parts[partIndex] = []);
-    parts[partIndex].push(event);
-}
-
+/* Bar repeats */
 
 function ignoreKeys(key, value) {
     if (key === "stave" || key === "event" || key === "sequence" || key === "beam") return undefined;
@@ -27,6 +22,16 @@ function jsonifyBar(bar) {
     return JSON.stringify(clone, ignoreKeys);
 }
 
+function replaceWithRepeat(bar, count) {
+    bar.symbols = bar.symbols
+        .filter((symbol) => symbol.type === 'doublebarline' || symbol.type === 'clef')
+        .concat([{
+            type: 'BARREPEAT',
+            count,
+            duration: bar.duration
+        }]);
+}
+
 function detectBarRepeats(bars, jsons, bar) {
     const json = jsonifyBar(bar);
 
@@ -34,67 +39,55 @@ function detectBarRepeats(bars, jsons, bar) {
         case 1: break;
         case 2: break;
         case 3: {
-            /* When jsons reaches 2 check for two single bar repeats, or three bars
-               of the same materiel. Lop off a couple of bars at this point and replace
-               the last couple with double bar repeat symbols. Do not truncate jsons,
-               we want it to keep getting longer such that it hits case 7 repeatedly
-               from now on. */
-            if (json === jsons[0] && json === jsons[1] && bar.symbols.filter((symbol) => symbol.type !== 'clef' && symbol.type !== 'timesig').find((symbol) => symbol.type !== 'rest')) {
-                bar.symbols = [{
-                    type: 'BARREPEAT',
-                    value: 1
-                }];
-
-                bars[bars.length - 1].symbols = bars[bars.length - 1].symbols.filter((symbol) => symbol.type === 'doublebarline' || symbol.type === 'clef').concat([{
-                    type: 'BARREPEAT',
-                    value: 1
-                }]);
-
-                bars[bars.length - 2].symbols = bars[bars.length - 2].symbols.filter((symbol) => symbol.type === 'doublebarline' || symbol.type === 'clef').concat([{
-                    type: 'BARREPEAT',
-                    value: 1
-                }]);
+            // When jsons reaches 3 check for 3 bar repeats, or 4 identical bars
+            if (json === jsons[0] && json === jsons[1] && json === jsons[2] && bar.symbols.filter((symbol) => symbol.type !== 'clef' && symbol.type !== 'timesig').find((symbol) => symbol.type !== 'rest')) {
+                // Replace the last three bars with single bar repeat symbols
+                replaceWithRepeat(bars[bars.length - 2], 1);
+                replaceWithRepeat(bars[bars.length - 1], 1);
+                replaceWithRepeat(bar, 1);
+            }
+            else if (json !== jsons[1] || jsons[0] !== jsons[2]) {
+                // There is no double bar repeat cooking so go back to testing
+                // for single bar repeats in case 3
+                jsons.length = 2;
             }
 
             break;
         }
 
         case 4: {
-            /* If all are equal two single bar repeats were already inserted
-               in case 2. Add another. */
+            // If all are equal two single bar repeats were already inserted
+            // in case 3. Lucky us. Add another.
             if (json === jsons[0] && json === jsons[1] && json === jsons[2] && json === jsons[3]) {
-                bar.symbols = bar.symbols.filter((symbol) => symbol.type === 'doublebarline' || symbol.type === 'clef').concat([{
-                    type: 'BARREPEAT',
-                    value: 1
-                }]);
-
-                // Prevent jsons climbing into double bar repeat territory
+                // Replace the last bar with a single bar repeat symbol
+                replaceWithRepeat(bar, 1);
+                // Come back to case 4 on the next iteration
                 jsons.length = 3;
+            }
+            else if (json !== jsons[1] || jsons[0] !== jsons[2] || json !== jsons[3]) {
+                // There is no double bar repeat cooking and we got here we know
+                // we've been bar repeat mode (do we?), go back to testing for
+                // single bar repeats
+                jsons.length = 2;
             }
 
             break;
         }
 
-        case 4: break;
         case 5: {
-            /* When jsons reaches 5 check for two double bar repeats, or six bars of
-               the same materiel. Lop off a couple of bars at this point and replace
-               the last couple with double bar repeat symbols. Do not truncate jsons,
-               we want it to keep getting longer such that it hits case 7 repeatedly
-               from now on. */
+            // When jsons reaches 5 check for two double bar repeats, or six
+            // bars of identical materiel
             if (json === jsons[1] && json === jsons[3] && jsons[0] === jsons[2] && jsons[0] === jsons[4]) {
-                bar.symbols = bar.symbols.filter((symbol) => symbol.type === 'doublebarline' || symbol.type === 'clef').concat([{
-                    type: 'BARREPEAT',
-                    value: 2
-                }]);
-
-                // Lop off the previous bar
+                // Lop off the previous 2 bars
                 bars.length -= 2;
-
-                bars[bars.length - 1].symbols = bars[bars.length - 1].symbols.filter((symbol) => symbol.type === 'doublebarline' || symbol.type === 'clef').concat([{
-                    type: 'BARREPEAT',
-                    value: 2
-                }]);
+                // Replace the last 2 bars with two bars of double bar repeat
+                // symbol
+                replaceWithRepeat(bars[bars.length - 1], 2);
+                replaceWithRepeat(bar, 2);
+            }
+            else {
+                // Go back to testing case 5 ?? What about single repeats?
+                jsons.length = 4;
             }
 
             break;
@@ -102,17 +95,14 @@ function detectBarRepeats(bars, jsons, bar) {
 
         case 6: break;
         case 7: {
-            /* Double bars have already been added, determine whether we add another. */
+            // Double bars have already been added, determine whether we add another
             if (json === jsons[1] && json === jsons[3] && jsons[0] === jsons[2] && jsons[0] === jsons[4]) {
-                bar.symbols = bar.symbols.filter((symbol) => symbol.type === 'doublebarline' || symbol.type === 'clef').concat([{
-                    type: 'BARREPEAT',
-                    value: 2
-                }]);
-
                 // Lop off the previous bar
                 bars.length -= 1;
-
-                // Prevent another double from happening on the very next bar
+                // Replace last bar with a double bar symbol
+                replaceWithRepeat(bar, 2);
+                // Prevent another double from happening on the very next bar,
+                // go back to case 6, thus case 7 in two iterations
                 jsons.length = 5;
             }
             else {
@@ -125,9 +115,17 @@ function detectBarRepeats(bars, jsons, bar) {
     }
 
     jsons.unshift(json);
-    while (jsons.length > 7) jsons.pop();
+    while (jsons.length > 8) jsons.pop();
 }
 
+
+/* Bars */
+
+function pushEventToPart(stave, parts, event) {
+    const partIndex  = stave.getPartIndex(event[2]);
+    const partEvents = parts[partIndex] || (parts[partIndex] = []);
+    parts[partIndex].push(event);
+}
 
 export default function createBars(sequence, stave, settings = config) {
     const bars = [];
@@ -242,7 +240,6 @@ export default function createBars(sequence, stave, settings = config) {
         const bar = createBar(bars.length + 1, beat, duration, divisor, stave, key, events, parts, sequenceEvent, settings);
         detectBarRepeats(bars, jsons, bar);
         bars.push(bar);
-
 
         // Update beat, start new arrays
         beat = beat + duration;
