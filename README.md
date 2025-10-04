@@ -16,15 +16,15 @@ renders notation as elements in a CSS grid layout representing bars and staves.
 
 ## `<scribe-music>`
 
-Import the CSS and JS, and register the `<scribe-music>` element:
+To try out the scribe music custom element, import the CSS and JS from the CDN:
 
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/stephband/scribe@0.4.0/build/scribe-music/element.css" />
 <script type="module" src="https://cdn.jsdelivr.net/gh/stephband/scribe@0.4.0/build/scribe-music/element.js"></script>
 ```
 
-The `<scribe-music>` element renders music notation from data imported from a
-JSON file in its `src` attribute:
+The `<scribe-music>` element is now registered. It renders music notation from
+JSON data imported via its `src` attribute:
 
 ```html
 <scribe-music src="/path/to/json"></scribe-music>
@@ -85,6 +85,7 @@ sequence events to denote musical structure, and renders double bar lines at the
 end of a top-level sequence. Beyond that sequences are arbitrarily nestable, and
 may be organised however you see fit.
 
+<!--
 Scribe also parses a shorthand version of this format intended for quick hand
 authoring, basically Sequence JSON structure with all the JSON syntax removed.
 
@@ -251,6 +252,8 @@ The same is true for chords.
 
 ## Develop
 
+### Clone
+
 To install Scribe locally clone the repo and update the submodules:
 
 ```
@@ -260,9 +263,14 @@ git submodule update --init
 ```
 
 To check things are working serve this directory and navigate to
-`host://scribe-music/index.html` (obviously `host://` needs to be replaced
-depending on what you are using as a server).
+`http://localhost/scribe-music/index.html` (obviously `localhost` needs to be
+replaced depending on what you are using as a server).
 
+### Build
+
+```cli
+make modules
+```
 
 ## Research
 
@@ -288,6 +296,10 @@ Version 0.4 is capable of rendering a reasonable lead sheet. Features:
 - Setting `settings.swingAsStraight16ths` makes 16th tuplets display as straight 16ths
 - `<scribe-music>` `swing` attribute corresponds to `.swingAsStraight8ths`
 
+Regressions
+
+- Broken spelling
+
 ### 0.3.x –
 
 - Triplet detection and rendering
@@ -298,17 +310,6 @@ Version 0.4 is capable of rendering a reasonable lead sheet. Features:
 
 - Adds support for <a href="https://www.smufl.org/fonts/">SMuFL fonts</a>
 - Proof of concept
-
-
-## Roadmap
-
-Asides from some immediate improvements I can make to Scribe 0.3, like
-tuning the autospeller and fixing the 1/16th-note beams and detecting and
-displaying tuplets, here are some longer-term features I would like to investigate:
-
-- <strong>Split-stave rendering</strong> – placing multiple parts on one stave. The mechanics for this are already half in place – the drums stave and piano stave currently auto-split by pitch.
-- <strong>Multi-stave rendering</strong> – placing multiple parts on multiple, aligned, staves.
-
 
 ## Credits
 
