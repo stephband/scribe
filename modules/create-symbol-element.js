@@ -47,12 +47,10 @@ function truncate(number) {
 }
 
 export default overload(get('type'), {
-    'bar-repeat': (symbol) => create('span', {
+    'BARREPEAT': (symbol) => create('span', {
         class: 'BARREPEAT',
-        html: glyphs.barRepeat1,
-        data: {
-            duration: 4
-        }
+        html: glyphs['barRepeat' + symbol.value],
+        data: { duration: 4 }
     }),
 
     clef: (symbol) => symbol.stave.getClefHTML ?

@@ -90,7 +90,7 @@ export default define(element('scribe-music', {
                 internals.meter.value,
                 // Transpose is a number
                 internals.transpose.value,
-                // Settings
+                // Override settings from attributes
                 assign({}, config, {
                     swingAsStraight8ths:  internals.swingAsStraight8ths.value,
                     swingAsStraight16ths: internals.swingAsStraight16ths.value
@@ -112,6 +112,11 @@ export default define(element('scribe-music', {
                     const duration = parseFloat(bar.dataset.duration);
                     let total = 0;
                     let b, d;
+
+                    if (bar.querySelector('.BARREPEAT')) {
+                        return;
+                    }
+
                     bar.querySelectorAll('.rest[data-duration], .note[data-duration]').forEach((element) => {
                         // Ignore notes that are at same beat as previous notes
                         if (b !== parseFloat(element.dataset.beat)) {

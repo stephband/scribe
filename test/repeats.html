@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>&lt;scribe-music&gt;</title>
+
+    <meta charset="utf-8" />
+    <meta name="author" content="@stephband" />
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width" />
+
+    <!--script type="importmap">{
+        "imports": {
+            "bolt/":     "https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/",
+            "dom/":      "https://cdn.jsdelivr.net/gh/stephband/dom@1.4.1/modules/",
+            "fn/":       "https://cdn.jsdelivr.net/gh/stephband/fn@1.5.1/modules/",
+            "midi/":     "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.0/modules/",
+            "sequence/": "https://cdn.jsdelivr.net/gh/soundio/sequence@0.0.9/modules/"
+        }
+    }</script-->
+
+    <script type="importmap">{
+        "imports": {
+            "bolt/":     "/bolt/",
+            "dom/":      "/dom/modules/",
+            "fn/":       "/fn/modules/",
+            "midi/":     "/midi/modules/",
+            "sequence/": "/sequence/modules/"
+        }
+    }</script>
+
+    <script title="load">
+        document.documentElement.className += ' js loading';
+        // window.addEventListener('DOMContentLoaded', () => document.documentElement.classList.remove('content-loading'));
+        // Wait for other load handlers to run first - Bolt does a few things on
+        // load (eg. targetable scrolls) and we want them to run before the loading
+        // class is removed
+        window.addEventListener('load', () => window.requestAnimationFrame(() => document.documentElement.classList.remove('loading')));
+        window.DEBUG = true;
+    </script>
+
+    <!-- Import <scribe-music> -->
+    <link rel="stylesheet" href="/bolt/classes/atoms.css" />
+    <link rel="stylesheet" href="../scribe-music/element.css" />
+    <script type="module" src="../scribe-music/element.js"></script>
+    <link rel="stylesheet" href="../elements/lead-sheet-document.css" />
+    <style>
+    body {
+        font-family: Jazz, JazzText;
+        letter-spacing: 0.004em;
+        word-spacing: 0.125em;
+    }
+    </style>
+</head>
+<body>
+    <section class="grid dense-grid" style="row-gap: 0;">
+        <scribe-music class="x1" clef="treble" src="#loop-1">
+            <script type="application/json" id="loop-1">{
+                "events": [
+                    [0,  "meter", 4, 1],
+                    [0,  "note", 69, 0.1, 0.6667],
+                    [4,  "note", 69, 0.1, 0.6667]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1" clef="treble" src="#loop-2">
+            <script type="application/json" id="loop-2">{
+                "events": [
+                    [0,  "meter", 4, 1],
+                    [0,  "note", 69, 0.1, 0.6667],
+                    [4,  "note", 69, 0.1, 0.6667],
+                    [8,  "note", 69, 0.1, 0.6667]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1" clef="treble" src="#loop-3">
+            <script type="application/json" id="loop-3">{
+                "events": [
+                    [0,  "meter", 4, 1],
+                    [0,  "note", 69, 0.1, 0.6667],
+                    [4,  "note", 69, 0.1, 0.6667],
+                    [8,  "note", 69, 0.1, 0.6667],
+                    [12, "note", 69, 0.1, 0.6667]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1" clef="treble" src="#loop-4">
+            <script type="application/json" id="loop-4">{
+                "events": [
+                    [0,  "meter", 4, 1],
+                    [0,  "note", 69, 0.1, 0.6667],
+                    [4,  "note", 69, 0.1, 0.6667],
+                    [8,  "note", 69, 0.1, 0.6667],
+                    [12, "note", 69, 0.1, 0.6667],
+                    [16, "note", 69, 0.1, 4],
+                    [20, "note", 69, 0.1, 0.6667],
+                    [24, "note", 69, 0.1, 0.6667],
+                    [28, "note", 69, 0.1, 0.6667],
+                    [32, "note", 69, 0.1, 0.6667],
+                    [36, "note", 69, 0.1, 4]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1" clef="treble" src="#loop-5">
+            <script type="application/json" id="loop-5">{
+                "events": [
+                    [0,  "meter", 4, 1],
+                    [0,  "note", 69, 0.1, 0.6667],
+                    [5,  "note", 69, 0.1, 0.6667],
+                    [8,  "note", 69, 0.1, 0.6667],
+                    [13, "note", 69, 0.1, 0.6667]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1" clef="treble" src="#loop-6">
+            <script type="application/json" id="loop-6">{
+                "events": [
+                    [0,  "meter", 4, 1],
+                    [0,  "note", 69, 0.1, 0.6667],
+                    [5,  "note", 69, 0.1, 0.6667],
+                    [8,  "note", 69, 0.1, 0.6667],
+                    [13, "note", 69, 0.1, 0.6667],
+                    [16, "note", 69, 0.1, 0.6667],
+                    [21, "note", 69, 0.1, 0.6667]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1" clef="treble" src="#loop-7">
+            <script type="application/json" id="loop-7">{
+                "events": [
+                    [0,  "meter", 4, 1],
+                    [0,  "note", 69, 0.1, 0.6667],
+                    [5,  "note", 69, 0.1, 0.6667],
+                    [8,  "note", 69, 0.1, 0.6667],
+                    [13, "note", 69, 0.1, 0.6667],
+                    [16, "note", 69, 0.1, 0.6667],
+                    [21, "note", 69, 0.1, 0.6667],
+                    [24, "note", 69, 0.1, 4],
+                    [28, "note", 69, 0.1, 0.6667],
+                    [33, "note", 69, 0.1, 0.6667],
+                    [36, "note", 69, 0.1, 0.6667],
+                    [41, "note", 69, 0.1, 0.6667],
+                    [44, "note", 69, 0.1, 0.6667],
+                    [49, "note", 69, 0.1, 0.6667],
+                    [52, "note", 69, 0.1, 4]
+                ]
+            }</script>
+        </scribe-music>
+    </section>
+</body>
+</html>
