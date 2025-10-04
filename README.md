@@ -29,12 +29,12 @@ Alternatively the `src` attribute may reference JSON already in the document:
 
 ```html
 <!-- Head -->
-<script type="application/json" id="music">{
+<script type="application/json" id="so-what">{
     "events": [...]
 }</script>
 
 <!-- Body -->
-<scribe-music src="#music" swing></scribe-music>
+<scribe-music src="#so-what" swing></scribe-music>
 ```
 
 
