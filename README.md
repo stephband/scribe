@@ -41,7 +41,7 @@ Alternatively the `src` attribute may reference JSON already in the document:
 ## Scribe data
 
 Scribe consumes <a href="https://github.com/soundio/music-json/">Sequence JSON</a>.
-Here's an example of the horn part for So What:
+Here's an example of the horn part for So What as a sequence document:
 
 ```json
 {
@@ -60,14 +60,14 @@ Here's an example of the horn part for So What:
         "id": 1,
         "name": "Section",
         "events": [
-            [0,  "sequence", 2, 0,  8],
-            [8,  "sequence", 2, 0,  8],
-            [16, "sequence", 2, 0,  8],
-            [24, "sequence", 2, 0,  8]
+            [0,  "sequence", 2, 0, 8],
+            [8,  "sequence", 2, 0, 8],
+            [16, "sequence", 2, 0, 8],
+            [24, "sequence", 2, 0, 8]
         ]
     }, {
         "id": 2,
-        "name": "Horns",
+        "name": "Horn phrase",
         "events": [
             [0, "chord", "D", "-7", 32],
             [2,    "note", "B4", 0.1, 1.6],
@@ -106,12 +106,13 @@ Unrecognised event types are ignored.
 ### Sequences
 
 Sequences are described in the `"sequences"` array, and sequence events refer to
-them by id. Child sequences have the same structure as parent sequences. They are
-arbitrarily nestable. Sequence events may refer their own sequences or to any of
-the sequences found in their parents.
+them by id. Child sequences have the same structure as parent sequences. Sequence
+events may refer their own sequences or to any sequence found in their parents.
+Sequences are arbitrarily nestable.
 
-Scribe considers the top-level sequence to describe musical structure. Meter and
-key events from nested sequences are ignored.
+Scribe considers the top-level sequence to describe musical structure by
+convention. In the example above the top-level sequence contains the key, meter
+and musical sections as `"sequence"` events.
 
 
 <!--
