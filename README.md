@@ -83,7 +83,7 @@ Here's an example of the horn part for So What as a sequence document:
 }
 ```
 
-<img src="./assets/images/so-what.png" alt="Scribe rendered music for So What" />
+<img src="https://stephen.band/scribe/assets/images/so-what.png" alt="Scribe rendered music for So What" />
 
 The only property a sequence document actually requires is an `"events"` array.
 
