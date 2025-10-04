@@ -1,7 +1,4 @@
 
-/* An imperfect tuplet detector based on rating note start and stops against
-   a cosine of various beatlengths. */
-
 import { floorPowerOf2 } from './number/power-of-2.js';
 
 
@@ -26,7 +23,6 @@ function scoreTupletAtBeat(duration, divisor, beat, events, n) {
 
     let score = 0;
     let count = 0;
-
     // Rhythm is a binary representation of the rhythm where 1 means there are
     // events in the first division, 10 means there events in the second
     // division, 100 events in the third and 111 events in all three, etc.
@@ -96,9 +92,7 @@ function detectTupletOverDuration(tuplet, duration, events, n, startbeat, diviso
         // Score tuplet by duration and divisor
         data = scoreTupletAtBeat(duration, divisor, beat, events, n);
 
-//console.log(duration, divisor, beat, s);
         if (data && data.score >= score) {
-//console.log('YEAH');
             score = data.score;
             tuplet.beat     = beat;
             tuplet.duration = duration;
@@ -124,6 +118,21 @@ function detectTupletOverDuration(tuplet, duration, events, n, startbeat, diviso
     return tuplet;
 }
 
+
+/**
+detectTuplet(events, beat, duration)
+Detects tuplet and duplet rhythms. Returns a data object with the properties:
+
+```js
+{
+    beat:     // Start beat of tuplet
+    duration: // Duration of tuplet
+    divisor:  // Number of divisions in tuplet
+    rhythm:   // A binary number describing rhythmic divisions
+}
+```
+**/
+
 export default function detectTuplet(events, beat, duration) {
     let n = -1;
 
@@ -136,7 +145,8 @@ export default function detectTuplet(events, beat, duration) {
 
     const tuplet = {};
 
-    // Reset score. Use a module-scoped variable, process is synchronous
+    // Reset score. Use a module-scoped variable, safe because whole process
+    // is synchronous
     score = 0;
 
     // Loop upward through power of 2 durations, short to long
