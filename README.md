@@ -41,7 +41,8 @@ Alternatively the `src` attribute may reference JSON already in the document:
 ## Scribe data
 
 Scribe consumes <a href="https://github.com/soundio/music-json/">Sequence JSON</a>.
-Here's an example of the horn part for So What as a sequence document:
+Here's an example of the horn part for <a href="https://www.youtube.com/watch?v=ylXk1LBvIqU&list=RDylXk1LBvIqU">So What</a>
+as a sequence document:
 
 ```json
 {
