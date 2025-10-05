@@ -191,10 +191,3 @@ Dots
 .note[data-duration^="0.37"]::after { content: '\200A\E1E7'; }
 .note[data-duration^="0.21"]::after { content: '\200A\E1E7\E1E7'; }
 .note[data-duration^="0.18"]::after { content: '\200A\E1E7'; }
-
-
-
-.note[data-duration^="0.1"] {
-    /* Temporarily mark notes that should have a 32nd flag, but dont in Jazz font */
-    color: orange !important;
-}

@@ -14,8 +14,8 @@ interprets and renders notation in HTML and CSS.
 To use the `<scribe-music>` custom element, import the CSS and JS from the CDN:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/stephband/scribe@0.4.0/build/scribe-music/element.css" />
-<script type="module" src="https://cdn.jsdelivr.net/gh/stephband/scribe@0.4.0/build/scribe-music/element.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/stephband/scribe@0.4.1/build/scribe-music/element.css" />
+<script type="module" src="https://cdn.jsdelivr.net/gh/stephband/scribe@0.4.1/build/scribe-music/element.js"></script>
 ```
 
 The `<scribe-music>` element is now registered. It renders music notation from
