@@ -1,6 +1,9 @@
 
 @import './elements/host.css';
 
+@import '../attributes/data-beat.css';
+@import '../attributes/data-duration.css';
+
 @import '../classes/instruction.css';
 @import '../classes/accidental.css';
 @import '../classes/stave.css';
