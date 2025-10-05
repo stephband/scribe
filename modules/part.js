@@ -577,10 +577,11 @@ export function createPart(symbols, bar, stave, key = 0, accidentals = {}, part,
             closeBeam(symbols, stave, part, beam);
             beam = undefined;
         }
-
+console.log(beat);
         // If we are not currently in tuplet mode detect the next tuplet
         const data = detectTuplets(events, bar.beat + beat, bar.duration - beat);
         if (data && data.divisor !== 2 && data.divisor !== 4) {
+console.log(beat, 'TUPLET DETECTED', data.beat, data.duration, data.divisor, data.rhythm);
             // Create rests up to tuplet
             if (gt(data.beat - bar.beat, beat, p24)) createRests(symbols, restDurations, bar, stave, part, beat, data.beat - bar.beat);
             // Close beam TODO dont close beam

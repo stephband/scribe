@@ -437,4 +437,5 @@ in their duration span. */
     justify-self: center;
     margin-left: 0.5em;
     margin-right: 0.5em;
+    grid-column-end: span calc(var(--columns-per-beat) * var(--duration));
 }

@@ -45,12 +45,20 @@ function scoreTupletAtBeat(duration, divisor, beat, events, n) {
     while (events[++n] !== undefined && events[n][0] - beat < duration - tupletDuration / 4) {
         // Rhythmic division number in binary is 2^division
         s = Math.round((events[n][0] - beat) / tupletDuration);
+
+        // An event has rounded up to the next beat, which means it's probably
+        // not part of this tuplet at all, which means this tuplet is not a tuplet
+        // TODO: this case would be better handled by scoring using a full cos
+        // rather than a half cos, I reckon
+        if (s === divisor) return -1;
+
         r = 1 << s;
         // If we have not already filled this division
         if (r > rhythm) {
             // Reject large tuplet groups with holes
             if (divisor > 4 && r > rhythm << 1) return;
             // Add division to rhythm
+console.log(beat, duration, divisor, events[n][0] - beat, 'Add r', s, r);
             rhythm += r;
         }
 
@@ -92,8 +100,11 @@ function detectTupletOverDuration(tuplet, duration, events, n, startbeat, diviso
         // Score tuplet by duration and divisor
         data = scoreTupletAtBeat(duration, divisor, beat, events, n);
 
-        if (data && data.score >= score) {
+        if (data && data.score >= score && data.score > 0.5) {
             score = data.score;
+
+console.log(startbeat, duration, divisor, score, data.rhythm);
+
             tuplet.beat     = beat;
             tuplet.duration = duration;
             tuplet.divisor  = divisor;

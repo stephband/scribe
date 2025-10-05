@@ -1,6 +1,7 @@
 import get from 'fn/get.js';
 import overload from 'fn/overload.js';
 import create from 'dom/create.js';
+import { toNoteNumber } from 'midi/note.js';
 import * as glyphs from "./glyphs.js";
 import { chordGlyphs } from "./glyphs.js";
 import { rflat, rsharp } from './pitch.js';
@@ -156,7 +157,7 @@ export default overload(get('type'), {
         class: `${ symbol.stemup ? 'up-note' : 'down-note' } ${ symbol.top ? 'top-note' : '' } ${ symbol.bottom ? 'bottom-note' : '' } note`,
         style: symbol.stemHeight ? `--stem-height: ${ symbol.stemHeight };` : undefined,
         html:  symbol.stave.getNoteHTML(symbol.pitch, symbol.dynamic, symbol.duration),
-        //value: symbol.event.join(' '),
+        title: `${ symbol.pitch } (${ toNoteNumber(symbol.pitch) })`,
         data: {
             beat:     truncate(symbol.beat),
             pitch:    symbol.pitch,
