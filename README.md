@@ -334,16 +334,13 @@ Version 0.4 is capable of rendering a reasonable lead sheet. Features:
 - Supports arbitrary nesting of sequences and transforms
 - Tuplet detection up to nonuplets
 - Automatic bar repeat symbols for repeated identical bars
+- New probablistic key-to-spelling detector
 - Adds config object
 - Setting `settings.swingAsStraight8ths` makes 8th tuplets display as straight 8ths
 - Setting `settings.swingAsStraight16ths` makes 16th tuplets display as straight 16ths
 - `<scribe-music>` `swing` attribute corresponds to `.swingAsStraight8ths`
 
-Regressions
-
-- Broken spelling
-
-### 0.3.x – Experimental features
+### 0.3.x – Proof of concept
 
 - Triplet detection and rendering
 - Supports nested sequences to level 2 nesting
