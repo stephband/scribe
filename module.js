@@ -1,6 +1,6 @@
 
-import render from '../modules/render.js';
-import config from '../modules/config.js';
+import render from './modules/render.js';
+import config from './modules/config.js';
 
 export default class Scribe {
     constructor(sequence) {

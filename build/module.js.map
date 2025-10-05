@@ -1,7 +1,7 @@
 {
   "version": 3,
-  "sources": [],
-  "sourcesContent": [],
-  "mappings": "",
-  "names": []
+  "sources": ["../module.js"],
+  "sourcesContent": ["\nimport render from './modules/render.js';\nimport config from './modules/config.js';\n\nexport default class Scribe {\n    constructor(sequence) {\n\n    }\n\n    static from(sequence) {\n        return new Scribe(sequence);\n    }\n}\n"],
+  "mappings": ";;;;oCAIA,IAAqBA,EAArB,MAAqBC,CAAO,CACxB,YAAYC,EAAU,CAEtB,CAEA,OAAO,KAAKA,EAAU,CAClB,OAAO,IAAID,EAAOC,CAAQ,CAC9B,CACJ",
+  "names": ["Scribe", "_Scribe", "sequence"]
 }
