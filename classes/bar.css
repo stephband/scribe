@@ -200,12 +200,12 @@ in their duration span. */
 
 .bar > .rest {
 	justify-self: start;
+    grid-column-end: span 1;
 }
 
 /* Anything shorter than a quarter rest */
 .bar > .rest[data-duration^="."],
 .bar > .rest[data-duration^="0."] {
-    grid-column-end: span 1;
     margin-left:  0.03125em;
     margin-right: 0.03125em;
 }
@@ -218,7 +218,6 @@ in their duration span. */
 .bar > .rest[data-duration^="1.5"],
 /* A double dotted quarter rest */
 .bar > .rest[data-duration^="1.75"] {
-	grid-column-end: span 1;
 	margin-left:  0.0625em;
     margin-right: 0.0625em;
 }
@@ -227,6 +226,8 @@ in their duration span. */
     justify-self: center;
     margin-left: 0.5em;
     margin-right: 0.5em;
+    /* Make 2 beat rest span its durations */
+    grid-column-end: span calc(round(var(--columns-per-beat) * var(--duration)) - 1);
 }
 
 .bar > .rest[data-duration="2"],
@@ -239,25 +240,16 @@ in their duration span. */
 	justify-self: center;
 	margin-left: 0.75em;
 	margin-right: 0.75em;
+    /* Make 2 beat rests and longer span their durations */
+    grid-column-end: span calc(round(var(--columns-per-beat) * var(--duration)) - 1);
 }
 
-.bar > .rest[data-duration="1"] + .rest[data-duration="2"] { margin-left: 0.5em; }
+.bar > .rest[data-duration="1"] + .rest[data-duration="2"] {
+    margin-left: 0.5em;
+}
 
 
 /* Tuplets */
-
-/* Tuplets */
-
-[data-divisor="2"]  { --divisor: 2; }
-[data-divisor="3"]  { --divisor: 3; }
-[data-divisor="4"]  { --divisor: 4; }
-[data-divisor="5"]  { --divisor: 5; }
-[data-divisor="6"]  { --divisor: 6; }
-[data-divisor="7"]  { --divisor: 7; }
-[data-divisor="8"]  { --divisor: 8; }
-[data-divisor="9"]  { --divisor: 9; }
-[data-divisor="10"] { --divisor: 10; }
-[data-divisor="11"] { --divisor: 11; }
 
 .bar > .tuplet {
     justify-self: stretch;
@@ -279,6 +271,7 @@ in their duration span. */
 	justify-self: stretch;
 	width: auto;
 	max-width: none;
+    /* Beams span all the way from one head to another */
     grid-column-end: span calc(round(nearest, var(--duration) * var(--columns-per-beat)));
 }
 
@@ -315,6 +308,7 @@ in their duration span. */
 	/* Make tie span from end of one head to start of next. */
 	margin-left: calc(1.125em * var(--head-width));
 	min-width: 0.5em;
+    /* Ties span from one head to another minus the accidentals column */
     grid-column-end: span calc(round(var(--duration) * var(--columns-per-beat)) - 1);
 }
 

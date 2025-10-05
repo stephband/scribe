@@ -1,5 +1,5 @@
 
-/* Converts data-beat values to --beat variables */
+/* Converts data-beat attribute to --beat variable */
 
 [data-beat^="0"]    { --beat: 0; }
 [data-beat^="0.08"] { --beat: 0.0833333333; }

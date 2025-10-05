@@ -2,6 +2,7 @@
 @import './elements/host.css';
 
 @import '../attributes/data-beat.css';
+@import '../attributes/data-divisor.css';
 @import '../attributes/data-duration.css';
 
 @import '../classes/instruction.css';

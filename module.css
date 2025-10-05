@@ -3,6 +3,7 @@
 @import './fonts/jazz.css';
 
 @import './attributes/data-beat.css';
+@import './attributes/data-divisor.css';
 @import './attributes/data-duration.css';
 
 @import './classes/accidental.css';

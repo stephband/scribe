@@ -1,4 +1,6 @@
 
+/* Converts data-duration attribute to --duration variable */
+
 [data-duration^="0.083"] { --duration: 0.0833333333; } /* Triplet over 0.25 */
 [data-duration^="0.1"]   { --duration: 0.1; }          /* Quintuplet over 0.5 */
 [data-duration^="0.11"]  { --duration: 0.1111111111; } /* Nonuplet over 1 */
