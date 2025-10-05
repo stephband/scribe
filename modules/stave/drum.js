@@ -1,6 +1,6 @@
 
 import { toNoteName, toNoteNumber } from 'midi/note.js';
-import toSpelling  from '../event/to-spelling.js';
+import { spellRoot, spellPitch }    from '../spelling.js';
 import * as glyphs from "../glyphs.js";
 import Stave       from './stave.js';
 
@@ -184,14 +184,14 @@ export default class DrumStave extends Stave {
         return row2 - row1;
     }
 
-    getSpelling(key, event, transpose) {
+    getSpelling(key, event) {
         if (event[1] === 'note') {
             // Use standard MIDI note names. We don't want any spelling happening
             // on drum parts.
             return toNoteName(toNoteNumber(event[2]));
         }
 
-        return toSpelling(key, event, transpose);
+        return spellPitch(key, event[2]);
     }
 
     yRatioToPitch(y) {

@@ -8,13 +8,23 @@
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width" />
 
-    <script type="importmap">{
+    <!--script type="importmap">{
         "imports": {
             "bolt/":     "https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/",
             "dom/":      "https://cdn.jsdelivr.net/gh/stephband/dom@1.4.1/modules/",
             "fn/":       "https://cdn.jsdelivr.net/gh/stephband/fn@1.5.1/modules/",
             "midi/":     "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.0/modules/",
             "sequence/": "https://cdn.jsdelivr.net/gh/soundio/sequence@0.0.9/modules/"
+        }
+    }</script-->
+
+    <script type="importmap">{
+        "imports": {
+            "bolt/":     "/bolt/",
+            "dom/":      "/dom/modules/",
+            "fn/":       "/fn/modules/",
+            "midi/":     "/midi/modules/",
+            "sequence/": "/sequence/modules/"
         }
     }</script>
 
@@ -29,8 +39,8 @@
     </script>
 
     <!-- Import <scribe-music> -->
-    <link rel="stylesheet" href="./build/scribe-music/element.css" />
-    <script type="module" src="./build/scribe-music/element.js"></script>
+    <link rel="stylesheet" href="./scribe-music/element.css" />
+    <script type="module" src="./scribe-music/element.js"></script>
     <link rel="stylesheet" href="./elements/lead-sheet-document.css" />
     <style>
     body {

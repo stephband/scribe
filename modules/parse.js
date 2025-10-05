@@ -1,4 +1,4 @@
-import parseABC          from './parse/parse-abc.js';
+//import parseABC          from './parse/parse-abc.js';
 import parseSequenceText from './parse/parse-sequence-text.js';
 
 
@@ -30,11 +30,13 @@ export default function parseSource(type, source) {
         source ;
     }
     // Data is ABC
+/*
     else if (type === 'abc' || type === 'text/x-abc') {
         // Strip space following line breaks
         const music = parseABC(source.replace(/\n\s+/g, '\n'));
         return music.sequences[0];
     }
+*/
     // Data is step sequence text
     else if (type === 'sequence' || type === 'text/plain') {
         return { events: parseSequenceText(source) };

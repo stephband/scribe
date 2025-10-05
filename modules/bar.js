@@ -1,7 +1,8 @@
 import nothing from 'fn/nothing.js';
-import { toRootName } from 'midi/note.js';
+import { toRootName, toRootNumber } from 'midi/note.js';
 import toStopBeat from './event/to-stop-beat.js';
-import { toKeyScale, toKeyNumber, cScale } from './keys.js';
+import { toKeyScale, keyWeightsForEvent, chooseKeyFromWeights } from './keys.js';
+import { major } from './scale.js';
 import { createPart } from './part.js';
 import config     from './config.js';
 
@@ -70,7 +71,7 @@ export function getLastDivision(divisions, b1, b2) {
 
 const ignoreTypes = [];
 
-const accidentals = {
+const accidentalChars = {
     '-2': '𝄫',
     '-1': '♭',
     '0': '',
@@ -91,7 +92,23 @@ function byFatherCharlesPitch(a, b) {
     return ai > bi ? 1 : ai < bi ? -1 : 0;
 }
 
-function createBarSymbols(symbols, bar, stave, key, events, settings) {
+function updateAccidentals(accidentals, key) {
+    const scale = toKeyScale(key);
+
+    scale.reduce((accidentals, n, i) => {
+        const acci = n - major[i];
+        if (acci !== 0) {
+            const name = toRootName(major[i]);
+            let n = 10;
+            while (n--) accidentals[name + n] = acci;
+        }
+        return accidentals;
+    }, accidentals);
+
+    return accidentals;
+}
+
+function createBarSymbols(symbols, bar, stave, key, accidentals, events, settings) {
     let n = -1;
     let event;
 
@@ -102,22 +119,25 @@ function createBarSymbols(symbols, bar, stave, key, events, settings) {
             // maps naturals to accidentals when compared against the C scale. Remember
             // keynumber is on a continuous scale of fourths, so multiply by 7 semitones
             // to get chromatic number relative to C.
-            const keynumber = toKeyNumber(event[2]);
-            const keyscale  = toKeyScale(keynumber * 7);
+            const key      = toRootNumber(event[2]);
+            const keyscale = toKeyScale(key);
+
+            updateAccidentals(accidentals, key);
 
             // Add key signature
             symbols.push.apply(symbols, keyscale
-                .map((n, i) => (n - cScale[i] && {
+                .map((n, i) => (n - major[i] && {
                     // No beat for key signature accidentals
                     type: 'acci',
-                    pitch: toRootName(cScale[i]) + accidentals[n - cScale[i]],
-                    value: n - cScale[i],
+                    pitch: toRootName(major[i]) + accidentalChars[n - major[i]],
+                    value: n - major[i],
                     stave
                 }))
                 .filter((o) => !!o)
                 .sort(byFatherCharlesPitch)
             );
 
+            bar.key = key;
             break;
         }
 
@@ -144,8 +164,11 @@ function createBarSymbols(symbols, bar, stave, key, events, settings) {
         }
 
         case "chord": {
-            const beat = event[0] - bar.beat;
-            let root = stave.getSpelling(key, event);
+            const beat       = event[0] - bar.beat;
+            const keyWeights = keyWeightsForEvent(events, n, key);
+            const keyNumber  = chooseKeyFromWeights(keyWeights);
+
+            let root = stave.getSpelling(keyNumber, event);
 
             if (root === 'C♭' && settings.spellChordRootCFlatAsB)  root = 'B';
             if (root === 'E♯' && settings.spellChordRootESharpAsF) root = 'F';
@@ -218,24 +241,17 @@ export function createBar(count, beat, duration, divisor, stave, key, events, pa
     // maps naturals to accidentals when compared against the C scale. Remember
     // keynumber is on a continuous scale of fourths, so multiply by 7 semitones
     // to get chromatic number relative to C.
-    const scale = toKeyScale(key * 7);
+    //const scale = toKeyScale(key * 7);
+//console.log('KEY', toRootName(key), 'scale', scale);
 
     // Populate accidentals with key signature sharps and flats
-    const accidentals = scale.reduce((accidentals, n, i) => {
-        const acci = n - cScale[i];
-        if (acci !== 0) {
-            const name = toRootName(cScale[i]);
-            let n = 10;
-            while (n--) accidentals[name + n] = acci;
-        }
-        return accidentals;
-    }, {});
+    const accidentals = updateAccidentals({}, key);
 
     const bar = {
         type: 'bar',
         beat,
         duration,
-        //key,
+        key,
         divisor,
         divisions: getDivisions(duration, divisor),
         stave,
@@ -251,7 +267,7 @@ export function createBar(count, beat, duration, divisor, stave, key, events, pa
     });
 
     // Populate symbols with events
-    createBarSymbols(symbols, bar, stave, key, events, config);
+    createBarSymbols(symbols, bar, stave, key, accidentals, events, config);
 
     // Populate symbols with parts
     let name;

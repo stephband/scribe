@@ -85,16 +85,21 @@ as a sequence document:
 }
 ```
 
-Which renders as:
+The main sequence plays the "Section" sequence four times, 32 beats (or 8 bars) per
+section, with the third section transposed up 1 semitone. The "Section" sequence
+plays the "Horns" phrase four times, 8 beats (or 2 bars) per phrase. That renders as:
 
 <img src="https://stephen.band/scribe/assets/images/so-what.png" alt="Scribe rendered music for So What" style="width: 100%; height: auto;" />
 
-The only property a sequence document actually requires is an `"events"` array.
+Scribe detects when bars are repeated and automatically inserts bar repeat
+symbols.
+
+The only property actually required by a sequence is an `"events"` array.
 
 ### Events
 
 Events are described in the `"events"` array. Each event is an array that starts
-with `[beat, type, ...]`. Each event type carries some data. Scribe supports
+with `[beat, type, ...]` and each type carries some data. Scribe supports
 these event types:
 
 | beat   | type         | 2 | 3 | 4 | 5 |

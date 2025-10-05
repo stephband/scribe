@@ -5,7 +5,6 @@ import { toNoteName, toNoteNumber, toRootName, toRootNumber } from 'midi/note.js
 import join       from './object/join.js';
 import toStopBeat from './event/to-stop-beat.js';
 import { createBar }  from './bar.js';
-import { toKeyScale, toKeyNumber, cScale } from './keys.js';
 import createBarElements from './create-bar-elements.js';
 import config     from './config.js';
 
@@ -147,6 +146,7 @@ export default function createBars(sequence, stave, settings = config) {
             const bar = createBar(bars.length + 1, beat, duration, divisor, stave, key, events, parts, sequenceEvent, settings);
             detectBarRepeats(bars, jsons, bar);
             bars.push(bar);
+            key = bar.key;
 
             // Update beat, start new accumulators
             beat = beat + duration;
@@ -167,32 +167,14 @@ export default function createBars(sequence, stave, settings = config) {
                 pushEventToPart(stave, parts, event);
                 // If event extends beyond bar push it into ties
                 if (toStopBeat(event) > beat + duration) ties.push(event);
-
-                if (stopBeat < toStopBeat(event)) {
-                    stopBeat = toStopBeat(event);
-                }
-
+                if (stopBeat < toStopBeat(event)) stopBeat = toStopBeat(event);
                 break;
             }
 
             case "sequence": {
-                if (event.events === sequence.events) {
-                    sequenceEvent = event;
-                }
-
-                if (stopBeat < toStopBeat(event)) {
-                    stopBeat = toStopBeat(event);
-                }
-
+                if (event.events === sequence.events) sequenceEvent = event;
+                if (stopBeat < toStopBeat(event)) stopBeat = toStopBeat(event);
                 break;
-            }
-
-            case "key": {
-                if (event[0] !== beat) {
-                    new TypeError('Scribe: "key" event must occur at bar start – event [' + event.join(', ') + '] is on beat ' + (event[0] - beat) + ' of bar');
-                }
-
-                key = toKeyNumber(event[2]);
             }
 
             case "meter": {

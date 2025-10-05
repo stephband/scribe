@@ -4,15 +4,8 @@ import get      from 'fn/get.js';
 import nothing  from 'fn/nothing.js';
 import overload from 'fn/overload.js';
 import { toNoteName, toNoteNumber, toRootName, toRootNumber } from 'midi/note.js';
-import toKeys from './sequence/to-keys.js';
-import eventsAtBeat from './sequence/events-at-beat.js';
-import { keysAtBeats, keyFromBeatKeys } from './sequence/key-at-beat.js';
-import { transposeChord } from './event/chord.js';
-import { transposeScale } from './scale.js';
-import { toKeyScale, toKeyNumber, cScale } from './keys.js';
-import { mod12, byGreater } from './maths.js';
-import quantise from './quantise.js';
-import { rflat, rsharp, rdoubleflat, rdoublesharp } from './regexp.js';
+import { keyWeightsForEvent, chooseKeyFromWeights } from './keys.js';
+import { rflat, rsharp, rdoubleflat, rdoublesharp } from './pitch.js';
 import { getDivision } from './bar.js';
 import detectTuplets from './tuplet.js';
 import { round, eq, gte, lte, lt, gt } from './number/float.js';
@@ -79,11 +72,22 @@ function toMaxStopBeat(n, event) {
     return max(n, getStopBeat(event));
 }
 
-function getPitches(stave, key, events) {
+function getPitches(stave, key, notes, events, i) {
+    if (notes[0] !== events[i + 1]) {
+        console.log(i, notes, events);
+        throw new Error('HELP ' + i);
+    }
+
     const pitches = {};
     let n = -1;
-    let event;
-    while (event = events[++n]) pitches[n] = stave.getSpelling(key, event);
+    let note;
+    while (note = notes[++n]) {
+        const keyWeights = keyWeightsForEvent(events, ++i, key);
+        const keyNumber  = chooseKeyFromWeights(keyWeights);
+
+        pitches[n] = stave.getSpelling(keyNumber, note);
+        //console.log(toRootName(keyNumber), pitches[n]);
+    }
     return pitches;
 }
 
@@ -463,7 +467,7 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
         }
 
         // Insert heads
-        const pitches  = getPitches(stave, key, notes);
+        const pitches  = getPitches(stave, key, notes, events, n - notes.length);
         const minPitch = getMinPitch(pitches);
         const maxPitch = getMaxPitch(pitches);
         const stemup   = part.stemup === undefined ?
@@ -627,7 +631,7 @@ if (stopBeat <= beat) {
             continue;
         }
 
-        const pitches  = getPitches(stave, key, notes);
+        const pitches  = getPitches(stave, key, notes, events, n - notes.length);
         const minPitch = getMinPitch(pitches);
         const maxPitch = getMaxPitch(pitches);
         const stemup   = part.stemup === undefined ?

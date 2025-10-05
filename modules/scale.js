@@ -1,5 +1,8 @@
 
-import { byGreater, mod12 } from './maths.js';
+import mod12 from './number/mod-12.js';
+import { byGreater } from './maths.js';
+
+export const major = [0,2,4,5,7,9,11];
 
 /**
 transposeScale(notes, tranpose)

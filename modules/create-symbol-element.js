@@ -3,7 +3,7 @@ import overload from 'fn/overload.js';
 import create from 'dom/create.js';
 import * as glyphs from "./glyphs.js";
 import { chordGlyphs } from "./glyphs.js";
-import { rflat, rsharp } from './regexp.js';
+import { rflat, rsharp } from './pitch.js';
 import { identify } from './event.js';
 import { beamThickness } from './beam.js';
 import map from './object/map.js';
@@ -68,7 +68,7 @@ export default overload(get('type'), {
 
         return create('abbr', {
             class: "chord chord-abbr",
-            title: "TODO - name of chord",
+            title: "",
             // Note that we must detect sharps before flats because HTML entities
             // contain hash symbols that can be interpreted as sharps
             html: '<span class="chord-root">' + symbol.root.replace(rsharp, chordParts.sharp).replace(rflat, chordParts.flat) + '</span>'

@@ -2,7 +2,6 @@
 import create      from 'dom/create.js';
 import Sequence    from 'sequence/sequence.js';
 import Stave       from '../modules/stave.js';
-import { keysAtBeats, keyFromBeatKeys } from './sequence/key-at-beat.js';
 import createBars  from './create-bars.js';
 import { toBarElements } from './create-bar-elements.js';
 import * as glyphs from './glyphs.js';
@@ -45,16 +44,10 @@ export default function render(data, clef, keyname, meter, transpose, settings =
     // Get the stave controller
     const stave = Stave.create(clef || 'treble');
 
-    // Create a map of keys at beats. Doing this here is an optimisation so we
-    // don't end up running the keys matrix calculations on every note, which
-    // causes measurable delay.
-    const beatkeys = stave.pitched ?
-        keysAtBeats(Array.from(sequence)) :
-        null ;
-
     const elements = [];
 
     // Concat instructions line together from settings and tempo
+    /*
     const instructions = [];
     if (settings.swingAsStraight8ths)  instructions.push('Swing 8ths');
     if (settings.swingAsStraight16ths) instructions.push('Swing 16ths');
@@ -62,6 +55,7 @@ export default function render(data, clef, keyname, meter, transpose, settings =
         class: 'instruction',
         html: instructions.join(', ')
     }));
+    */
 
     return createBars(sequence, stave, settings).reduce(toBarElements, elements);
 }

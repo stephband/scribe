@@ -1,8 +1,8 @@
 
 import nothing        from 'fn/nothing.js';
 import { toNoteName, toNoteNumber, toNoteOctave } from 'midi/note.js';
-import toSpelling     from '../event/to-spelling.js';
-import { rflatsharp } from '../regexp.js';
+import { spellRoot, spellPitch } from '../spelling.js';
+import { rflatsharp } from '../pitch.js';
 import * as glyphs    from "../glyphs.js";
 
 const assign = Object.assign;
@@ -143,8 +143,10 @@ export default class Stave {
     .getSpelling()
     Gets spelling of a given pitch. Returns a pitch name string.
     **/
-    getSpelling() {
-        return toSpelling.apply(this, arguments);
+    getSpelling(key, event) {
+        return event[1] === 'chord' ?
+            spellRoot(key, event[2]) :
+            spellPitch(key, event[2]) ;
     }
 
     yRatioToPitch(y) {
