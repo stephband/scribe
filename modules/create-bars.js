@@ -5,7 +5,6 @@ import { toNoteName, toNoteNumber, toRootName, toRootNumber } from 'midi/note.js
 import join       from './object/join.js';
 import toStopBeat from './event/to-stop-beat.js';
 import { createBar }  from './bar.js';
-import createBarElements from './create-bar-elements.js';
 import config     from './config.js';
 
 

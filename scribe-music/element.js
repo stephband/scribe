@@ -50,6 +50,8 @@ export default define(element('scribe-music', {
         internals.clef      = Signal.of('treble');
         internals.key       = Signal.of('C');
         internals.meter     = Signal.of([-4, "meter", 4, 1]);
+        internals.beat      = Signal.of(0);
+        internals.duration  = Signal.of(Infinity);
         internals.transpose = Signal.of(0);
         internals.swingAsStraight8ths  = Signal.of(false);
         internals.swingAsStraight16ths = Signal.of(false);
@@ -88,8 +90,12 @@ export default define(element('scribe-music', {
                 internals.key.value,
                 // Create an initial [0, "meter", ...] event
                 internals.meter.value,
+                // Duration is a number
+                internals.duration.value,
                 // Transpose is a number
                 internals.transpose.value,
+                // Beat is a number
+                internals.beat.value,
                 // Override settings from attributes
                 assign({}, config, {
                     swingAsStraight8ths:  internals.swingAsStraight8ths.value,
@@ -209,6 +215,44 @@ export default define(element('scribe-music', {
         **/
         get: function() { return meterToTimesig(getInternals(this).meter.value); },
         set: function(value) { getInternals(this).meter.value = assign([0], timesigToMeter(value)); }
+    },
+
+    beat: {
+        /**
+        beat="0"
+        Sets beat that notation is rendered from.
+        **/
+        attribute: function(value) { this.beat = value; },
+
+        /**
+        .beat = 0
+        Sets beat that notation is rendered from.
+        **/
+        get: function() { return getInternals(this).beat.value; },
+        set: function(value) {
+            getInternals(this).beat.value = typeof value === 'number' ?
+                value :
+                parseFloat(value) ;
+        }
+    },
+
+    duration: {
+        /**
+        duration="0"
+        Sets duration of notation, in beats.
+        **/
+        attribute: function(value) { this.duration = value; },
+
+        /**
+        .duration = 0
+        Sets duration of notation, in beats.
+        **/
+        get: function() { return getInternals(this).duration.value; },
+        set: function(value) {
+            getInternals(this).duration.value = typeof value === 'number' ?
+                value :
+                parseFloat(value) ;
+        }
     },
 
     transpose: {

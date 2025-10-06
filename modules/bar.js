@@ -119,6 +119,7 @@ function createBarSymbols(symbols, bar, stave, key, accidentals, events, setting
             // maps naturals to accidentals when compared against the C scale. Remember
             // keynumber is on a continuous scale of fourths, so multiply by 7 semitones
             // to get chromatic number relative to C.
+console.log('KEY', event);
             const key      = toRootNumber(event[2]);
             const keyscale = toKeyScale(key);
 

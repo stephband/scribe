@@ -1,9 +1,9 @@
 
 import create      from 'dom/create.js';
-import Sequence    from 'sequence/sequence.js';
+import { SequenceIterator } from 'sequence/sequence.js';
 import Stave       from '../modules/stave.js';
 import createBars  from './create-bars.js';
-import { toBarElements } from './create-bar-elements.js';
+import createSymbolElement from './create-symbol-element.js';
 import * as glyphs from './glyphs.js';
 import config      from './config.js';
 
@@ -13,6 +13,22 @@ function isInitialMeterEvent(event) {
 
 function isInitialKeyEvent(event) {
     return event[0] <= 0 && event[1] === 'key';
+}
+
+function toElements(nodes, symbol) {
+    const element = createSymbolElement(symbol);
+    if (element) { nodes.push(element); }
+    return nodes;
+}
+
+export function toBarElements(elements, bar) {
+    elements.push(create('div', {
+        class: `${ bar.stave.type }-stave stave ${ bar.error ? 'error ': '' }bar`,
+        data: { beat: bar.beat, duration: bar.duration, count: bar.count },
+        children: bar.symbols.reduce(toElements, [])
+    }));
+
+    return elements;
 }
 
 /* Glyphs for triplet mark d d = d 3 d, instead of saying Swing 8ths, for example
@@ -26,7 +42,7 @@ text = glyphs.textNoteShort
     + glyphs.note05Up
 */
 
-export default function render(data, clef, keyname, meter, transpose, settings = config) {
+export default function render(data, clef, keyname, meter, duration = Infinity, transpose = 0, displace = 0, settings = config) {
     // TODO, WARNING! This mutates events! We probably oughta clone events first.
     const events = data.events;
 
@@ -38,13 +54,16 @@ export default function render(data, clef, keyname, meter, transpose, settings =
     const keyEvent = events.find(isInitialKeyEvent);
     if (!keyEvent && keyname) events.unshift([0, 'key', keyname]);
 
-    // Create sequence object
-    const sequence = new Sequence(events, data.sequences, data.name);
-
     // Get the stave controller
     const stave = Stave.create(clef || 'treble');
 
-    const elements = [];
+    // Make transforms list
+    const transforms = [];
+    if (transpose) transforms.push("transpose", transpose);
+    if (displace)  transforms.push("displace", displace);
+
+    // Create sequence object
+    const sequence = new SequenceIterator(events, data.sequences, 0, duration, transforms);
 
     // Concat instructions line together from settings and tempo
     /*
@@ -57,5 +76,5 @@ export default function render(data, clef, keyname, meter, transpose, settings =
     }));
     */
 
-    return createBars(sequence, stave, settings).reduce(toBarElements, elements);
+    return createBars(sequence, stave, settings).reduce(toBarElements, []);
 }

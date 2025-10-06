@@ -690,7 +690,7 @@ if (stopBeat <= beat) {
 
         // Start beat of next event, if it exists
         let eventBeat = event && round(0.125, event[0]) - bar.beat;
-console.log(bar.beat, beat, 'NOTES', stopBeat, eventBeat);
+//console.log(bar.beat, beat, 'NOTES', stopBeat, eventBeat);
 
         // If notes are truncated by next event
         if (lte(eventBeat, stopBeat, p24)) {
