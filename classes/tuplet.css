@@ -11,6 +11,13 @@
     column-gap: 0.133333em;
     justify-items: stretch;
     align-items: baseline;
+    margin-left: calc(-2em * var(--stem-width));
+    margin-right: calc(-2em * var(--stem-width));
+}
+
+.up-tuplet[data-rhythm^="1"] {
+    /* Move the left position by one head width to center number on beam */
+    margin-left: calc(1em * var(--head-width) - 3em * var(--stem-width));
 }
 
 .tuplet::before,
@@ -42,6 +49,22 @@
     border-top-right-radius: 0.05em;
     /* Move transform origin to tuplet centre, to the left of after */
     transform-origin: -0.2333em 50%;
+}
+
+.up-tuplet[data-duration^="0."][data-rhythm^="111"],
+.up-tuplet[data-duration="1"][data-rhythm^="111"] {
+    /* Center tuplet numbers on top of beams. A tuplet is definitely beamed if
+       its duration is 1 or less and its rhythm is full of 1s.  */
+    grid-template-columns: min-content;
+    justify-content: center;
+}
+
+.up-tuplet[data-duration^="0."][data-rhythm^="111"]::before,
+.up-tuplet[data-duration^="0."][data-rhythm^="111"]::after,
+.up-tuplet[data-duration="1"][data-rhythm^="111"]::before,
+.up-tuplet[data-duration="1"][data-rhythm^="111"]::after {
+    /* Remove tuplet brackets from beamed tuplets */
+    content: none;
 }
 
 /*

@@ -207,7 +207,8 @@ export default overload(get('type'), {
             pitch:    symbol.pitch,
             duration: truncate(symbol.duration),
             divisor:  symbol.divisor,
-            rhythm:   symbol.rhythm,
+            // Rhythm is a binary number
+            rhythm:   symbol.rhythm.toString(2).split('').reverse().join(''),
             part:     symbol.part
         },
         style: `--angle: ${ symbol.angle }deg;`

@@ -2,21 +2,31 @@
 import { floorPowerOf2 } from './number/power-of-2.js';
 
 
-const assign   = Object.assign;
+const assign = Object.assign;
+
+// Tuplet divisors detected by the algorithm.
 const tupletDivisors = [2, 3, 4, 5, 6, 7, 9];
+
+// Tuplets producing notes shorter than this duration are ignored.
 const minTupletDuration = 1/12;
 
-// The importance of stop beats as compared to start beats
-const stopFactor = 0.4;
+// Tolerance is the minimum score a rhythm must make before being counted as a
+// tuplet. Where all events fall exactly on tuplet divisions a rhythm scores 1.
+// Where all events fall exactly between tuplet divisions a rhythm scores -1.
+// Between these two limits is a range. Rhythms below tolerance are rejected.
+const tolerance = 0.25;
 
+// The importance of stop beats as compared to start beats.
+const stopInfluence = 0.2;
+
+
+const data = {};
 let score = 0;
 
 
 function getScore(wavelength, beat) {
-    return 0.5 * (1 + Math.cos(2 * Math.PI * beat / wavelength));
+    return Math.cos(2 * Math.PI * beat / wavelength);
 }
-
-const data = {};
 
 function scoreTupletAtBeat(duration, divisor, beat, events, n) {
     const tupletDuration = duration / divisor;
@@ -29,14 +39,18 @@ function scoreTupletAtBeat(duration, divisor, beat, events, n) {
     let rhythm = 0;
     let s, r;
 
+    // Did previous event cross into - tie into - tuplet? Mark rhythm as
+    // occupying division 0
+    if (events[n - 1] && events[n - 1][0] + events[n - 1][4] > beat + 0.125) {
+        rhythm = 1;
+    }
+
     // Events before a quarter tuplet are considered the first of a tuplet group
     --n;
     while (events[++n] !== undefined && events[n][0] - beat < tupletDuration / 4) {
-        // Score event start only, as we do not want to be influenced by duration
-// NO, DONT SCORE BEAT 0
-//        score += getScore(tupletDuration, events[n][0] - beat);
-//        count += 1;
-        // Plug hole because there's definitely a note in position 0
+        // There's definitely a note in position 0. We're not going to score it,
+        // as division 0 does not in itself make a tuplet. But we do want to
+        // mark it as a populated division.
         rhythm = 1;
     }
 
@@ -45,20 +59,13 @@ function scoreTupletAtBeat(duration, divisor, beat, events, n) {
     while (events[++n] !== undefined && events[n][0] - beat < duration - tupletDuration / 4) {
         // Rhythmic division number in binary is 2^division
         s = Math.round((events[n][0] - beat) / tupletDuration);
-
-        // An event has rounded up to the next beat, which means it's probably
-        // not part of this tuplet at all, which means this tuplet is not a tuplet
-        // TODO: this case would be better handled by scoring using a full cos
-        // rather than a half cos, I reckon
-        if (s === divisor) return -1;
-
         r = 1 << s;
         // If we have not already filled this division
-        if (r > rhythm) {
+        if (s < divisor && r > rhythm) {
             // Reject large tuplet groups with holes
             if (divisor > 4 && r > rhythm << 1) return;
             // Add division to rhythm
-console.log(beat, duration, divisor, events[n][0] - beat, 'Add r', s, r);
+//console.log(beat, duration, divisor, events[n][0] - beat, 'Add r', s, r);
             rhythm += r;
         }
 
@@ -70,15 +77,17 @@ console.log(beat, duration, divisor, events[n][0] - beat, 'Add r', s, r);
         if (events[n][0] + events[n][4] - beat > duration) continue;
 
         // Score event stop
-        score += stopFactor * getScore(tupletDuration, events[n][0] + events[n][4] - beat);
-        count += stopFactor;
+        score += stopInfluence * getScore(tupletDuration, events[n][0] + events[n][4] - beat);
+        count += stopInfluence;
     }
 
     // Detect holes
     if (divisor > 4 && s !== divisor - 1) return;
     if (!count) return;
-
-    data.score  = score / count;
+//console.log(beat, duration, divisor, score, score / (count + 1));
+    // Favour higher counts by adding 1 to count
+    // TODO: Keep this weird number under review!
+    data.score  = score / (count + 1);
     data.rhythm = rhythm;
 
     return data;
@@ -100,11 +109,8 @@ function detectTupletOverDuration(tuplet, duration, events, n, startbeat, diviso
         // Score tuplet by duration and divisor
         data = scoreTupletAtBeat(duration, divisor, beat, events, n);
 
-        if (data && data.score >= score && data.score > 0.5) {
+        if (data && data.score >= score && data.score) {
             score = data.score;
-
-console.log(startbeat, duration, divisor, score, data.rhythm);
-
             tuplet.beat     = beat;
             tuplet.duration = duration;
             tuplet.divisor  = divisor;
@@ -156,9 +162,9 @@ export default function detectTuplet(events, beat, duration) {
 
     const tuplet = {};
 
-    // Reset score. Use a module-scoped variable, safe because whole process
-    // is synchronous
-    score = 0;
+    // Reset score. Use a module-scoped variable, safe only because whole
+    // process is synchronous
+    score = tolerance;
 
     // Loop upward through power of 2 durations, short to long
     let d = 1/8;
@@ -166,5 +172,5 @@ export default function detectTuplet(events, beat, duration) {
         detectTupletOverDuration(tuplet, d, events, n, beat, tupletDivisors, beat + duration);
     }
 
-    return score > 0 && tuplet;
+    return score > tolerance && tuplet;
 }
