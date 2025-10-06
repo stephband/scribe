@@ -125,7 +125,7 @@ function createBarSymbols(symbols, bar, stave, key, accidentals, events, setting
             updateAccidentals(accidentals, key);
 
             // Add key signature
-            symbols.push.apply(symbols, keyscale
+/*            symbols.push.apply(symbols, keyscale
                 .map((n, i) => (n - major[i] && {
                     // No beat for key signature accidentals
                     type: 'acci',
@@ -136,7 +136,7 @@ function createBarSymbols(symbols, bar, stave, key, accidentals, events, setting
                 .filter((o) => !!o)
                 .sort(byFatherCharlesPitch)
             );
-
+*/
             bar.key = key;
             break;
         }
@@ -211,8 +211,6 @@ function createBarSymbols(symbols, bar, stave, key, accidentals, events, setting
         case "sequence": {
             // Put a double bar line at the end of bar
             symbols.push({ type: 'doublebarline', stave, event });
-            // Put a bar count indicator at the start of the next bar TODO: How???
-            symbols.push({ type: 'barcount', text: bar.count, stave });
             break;
         }
 
@@ -260,11 +258,11 @@ export function createBar(count, beat, duration, divisor, stave, key, events, pa
     };
 
     // Add clef in front of keysig
-    bar.symbols.push({
+    /*bar.symbols.push({
         type: 'clef',
         beat: 0,
         stave
-    });
+    });*/
 
     // Populate symbols with events
     createBarSymbols(symbols, bar, stave, key, accidentals, events, config);

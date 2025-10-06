@@ -35,6 +35,17 @@
     /* Space around rests */
     --rest-margin-left:  0;
     --rest-margin-right: 0;
+
+    --clef-width: 4.5em;
+
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--clef-width) 1fr;
+    grid-template-rows: min-content;
+    align-content: start;
+    justify-content: stretch;
+    height: auto;
+    padding-top: 1em;
 }
 
 :host .note {
@@ -52,6 +63,72 @@
     --stem-align-down: -0.14;
 }
 
+:host > .side {
+    position: absolute;
+    top: 0;
+    bottm: 0;
+    left: 0;
+    min-width: var(--clef-width);
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: stretch;
+    align-self: stretch;
+    max-height: 100%;
+}
+
+
+
+.side {
+    z-index: 2;
+    align-content: start;
+    height: 100%;
+    overflow: hidden;
+}
+
+.side > .bar {
+    width: 100%;
+}
+
+.side > .bar + .bar > .clef {
+    display: block;
+}
+
+:host > .main {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: stretch;
+    align-self: stretch;
+}
+
+.main {
+    padding-left: var(--bar-line-size, 1px);
+
+    display: block;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    column-gap: 0;
+    align-content: start;
+
+    /* Make sure bars do not stretch vertically */
+    align-items: start;
+    z-index: 1;
+}
+
+.main(.safari) {
+    /* Bar lines, ::before and ::after on .bar, are placed outside of the bar
+       so that the overlap overcomes bar to bar rounding errors in Safari,
+       causing 1px white gap. But this means we need to pad the container by
+       the same amount. */
+    padding-right: var(--bar-line-size, 1px);
+}
+
+.main > .bar {
+    flex: 1 1;
+    /* Make bar lines overlap */
+    margin-left: calc(-1 * var(--bar-line-size, 1px));
+}
+
 
 svg {
     fill: currentcolor;
@@ -61,3 +138,65 @@ svg {
 svg > path {
     fill: inherit;
 }
+
+.side-bar {
+    max-height: cqh;
+    width: 2.125em;
+}
+
+
+
+
+.main .bar {
+    flex-basis: auto;
+    min-width: calc((100cqw - var(--clef-width)) / 3);
+    max-width: calc((100cqw - var(--clef-width)) / 1);
+}
+
+@container host (min-width: 500px) {
+    .main .bar {
+        min-width: calc((100cqw - var(--clef-width)) / 3);
+        max-width: calc((100cqw - var(--clef-width)) / 1);
+    }
+}
+
+@container host (min-width: 740px) {
+    .main .bar {
+        min-width: calc((100cqw - var(--clef-width)) / 4);
+        max-width: calc((100cqw - var(--clef-width)) / 2);
+    }
+}
+
+@container host (min-width: 1024px) {
+    .main .bar {
+        min-width: calc((100cqw - var(--clef-width)) / 6);
+        max-width: calc((100cqw - var(--clef-width)) / 4);
+    }
+}
+
+@container host (min-width: 1320px) {
+    .main .bar {
+        min-width: calc((100cqw - var(--clef-width)) / 8);
+        max-width: calc((100cqw - var(--clef-width)) / 6);
+    }
+}
+
+@container host (min-width: 1680px) {
+    .main .bar {
+        min-width: calc((100cqw - var(--clef-width)) / 10);
+        max-width: calc((100cqw - var(--clef-width)) / 8);
+    }
+}
+
+@container host (min-width: 1920px) {
+    .main .bar {
+        min-width: calc((100cqw - var(--clef-width)) / 12);
+        max-width: calc((100cqw - var(--clef-width)) / 10);
+    }
+}
+
+
+
+
+
+

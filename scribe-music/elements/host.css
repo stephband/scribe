@@ -13,30 +13,6 @@
 
     --safari-bar-mask-color: white;
 
-    padding-left: var(--bar-line-size, 1px);
-
-    display: block;
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    column-gap: 0;
-
-    /* Make sure bars do not stretch vertically */
-    align-items: start;
-}
-
-
-
-:host(.safari) {
-    /* Bar lines, ::before and ::after on .bar, are placed outside of the bar
-       so that the overlap overcomes bar to bar rounding errors in Safari,
-       causing 1px white gap. But this means we need to pad the container by
-       the same amount. */
-    padding-right: var(--bar-line-size, 1px);
-}
-
-:host > .bar {
-    flex: 1 1;
-    /* Make bar lines overlap */
-    margin-left: calc(-1 * var(--bar-line-size, 1px));
+    container-type: inline-size;
+    container-name: host;
 }

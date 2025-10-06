@@ -37,7 +37,78 @@ const resizes = new ResizeObserver((entries) => {
 /* Register <scribe-music> */
 
 export default define(element('scribe-music', {
-    shadow: `<link rel="stylesheet" href="${ shadowCSSUrl }" />`,
+    shadow: `
+        <link rel="stylesheet" href="${ shadowCSSUrl }" />
+        <div class="side" id="side">
+            <div class="treble-stave open-stave stave side-bar bar">
+                <span class="treble-clef clef"></span>
+                <span data-pitch="B♭" class="acci acci-flat"></span>
+                <span data-pitch="E♭" class="acci acci-flat"></span>
+                <span data-pitch="A♭" class="acci acci-flat"></span>
+            </div>
+            <div class="treble-stave open-stave stave side-bar bar">
+                <span class="treble-clef clef"></span>
+                <span data-pitch="B♭" class="acci acci-flat"></span>
+                <span data-pitch="E♭" class="acci acci-flat"></span>
+                <span data-pitch="A♭" class="acci acci-flat"></span>
+            </div>
+            <div class="treble-stave open-stave stave side-bar bar">
+                <span class="treble-clef clef"></span>
+                <span data-pitch="B♭" class="acci acci-flat"></span>
+                <span data-pitch="E♭" class="acci acci-flat"></span>
+                <span data-pitch="A♭" class="acci acci-flat"></span>
+            </div>
+            <div class="treble-stave open-stave stave side-bar bar">
+                <span class="treble-clef clef"></span>
+                <span data-pitch="B♭" class="acci acci-flat"></span>
+                <span data-pitch="E♭" class="acci acci-flat"></span>
+                <span data-pitch="A♭" class="acci acci-flat"></span>
+            </div>
+            <div class="treble-stave open-stave stave side-bar bar">
+                <span class="treble-clef clef"></span>
+                <span data-pitch="B♭" class="acci acci-flat"></span>
+                <span data-pitch="E♭" class="acci acci-flat"></span>
+                <span data-pitch="A♭" class="acci acci-flat"></span>
+            </div>
+            <div class="treble-stave open-stave stave side-bar bar">
+                <span class="treble-clef clef"></span>
+                <span data-pitch="B♭" class="acci acci-flat"></span>
+                <span data-pitch="E♭" class="acci acci-flat"></span>
+                <span data-pitch="A♭" class="acci acci-flat"></span>
+            </div>
+            <div class="treble-stave open-stave stave side-bar bar">
+                <span class="treble-clef clef"></span>
+                <span data-pitch="B♭" class="acci acci-flat"></span>
+                <span data-pitch="E♭" class="acci acci-flat"></span>
+                <span data-pitch="A♭" class="acci acci-flat"></span>
+            </div>
+            <div class="treble-stave open-stave stave side-bar bar">
+                <span class="treble-clef clef"></span>
+                <span data-pitch="B♭" class="acci acci-flat"></span>
+                <span data-pitch="E♭" class="acci acci-flat"></span>
+                <span data-pitch="A♭" class="acci acci-flat"></span>
+            </div>
+            <div class="treble-stave open-stave stave side-bar bar">
+                <span class="treble-clef clef"></span>
+                <span data-pitch="B♭" class="acci acci-flat"></span>
+                <span data-pitch="E♭" class="acci acci-flat"></span>
+                <span data-pitch="A♭" class="acci acci-flat"></span>
+            </div>
+            <div class="treble-stave open-stave stave side-bar bar">
+                <span class="treble-clef clef"></span>
+                <span data-pitch="B♭" class="acci acci-flat"></span>
+                <span data-pitch="E♭" class="acci acci-flat"></span>
+                <span data-pitch="A♭" class="acci acci-flat"></span>
+            </div>
+            <div class="treble-stave open-stave stave side-bar bar">
+                <span class="treble-clef clef"></span>
+                <span data-pitch="B♭" class="acci acci-flat"></span>
+                <span data-pitch="E♭" class="acci acci-flat"></span>
+                <span data-pitch="A♭" class="acci acci-flat"></span>
+            </div>
+        </div>
+        <div class="main" id="main"></div>
+    `,
 
     construct: function(shadow, internals) {
         // Listen to updates to ScribeMusic.stylesheet and update the link
@@ -103,9 +174,11 @@ export default define(element('scribe-music', {
                 })
             );
 
+            const main = shadow.getElementById('main');
+
             // Clear the shadow DOM of bars and put new elements in it
-            shadow.querySelectorAll('.bar').forEach((element) => element.remove());
-            shadow.append.apply(shadow, elements);
+            main.querySelectorAll('.bar').forEach((element) => element.remove());
+            main.append.apply(main, elements);
 
             // Render beams
             shadow.querySelectorAll('.beam').forEach(renderBeam);
@@ -114,7 +187,7 @@ export default define(element('scribe-music', {
 
             // Does bar contain symbols that add up to longer than bar?
             if (internals.debug.value) {
-                shadow.querySelectorAll('.bar').forEach((bar) => {
+                main.querySelectorAll('.bar').forEach((bar) => {
                     const duration = parseFloat(bar.dataset.duration);
                     let total = 0;
                     let b, d;

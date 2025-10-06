@@ -118,13 +118,14 @@
     /* If they are preceded by a stave, move them right */
     --clef-acci-gap: 0.9em;
 }
-
+/*
 .bar > .timesig,
 .bar > .clef + .timesig,
 .bar > .clef + .timesig + .timesig {
     --clef-timesig: 1em;
     margin-left: var(--clef-timesig);
 }
+*/
 
 .bar > .drum-clef + .timesig,
 .bar > .percussion-clef + .timesig {
@@ -425,6 +426,21 @@ in their duration span. */
     grid-row: auto;
     left: -1em;
     top: calc(50% + 2.4em);
+    width: 2em;
+    font-family: system-ui;
+    font-size: 0.3125em;
+    line-height: 0.8em;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.bar::before {
+    content: attr(data-count);
+    position: absolute;
+    grid-column: auto;
+    grid-row: auto;
+    left: -1em;
+    top: calc(50% + 2.1em);
     width: 2em;
     font-family: system-ui;
     font-size: 0.3125em;
