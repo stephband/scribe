@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>&lt;scribe-music&gt;</title>
+
+    <meta charset="utf-8" />
+    <meta name="author" content="@stephband" />
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width" />
+
+    <!--script type="importmap">{
+        "imports": {
+            "bolt/":     "https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/",
+            "dom/":      "https://cdn.jsdelivr.net/gh/stephband/dom@1.4.1/modules/",
+            "fn/":       "https://cdn.jsdelivr.net/gh/stephband/fn@1.5.1/modules/",
+            "midi/":     "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.0/modules/",
+            "sequence/": "https://cdn.jsdelivr.net/gh/soundio/sequence@0.0.11/modules/"
+        }
+    }</script-->
+
+    <script type="importmap">{
+        "imports": {
+            "bolt/":     "/bolt/",
+            "dom/":      "/dom/modules/",
+            "fn/":       "/fn/modules/",
+            "midi/":     "/midi/modules/",
+            "sequence/": "/sequence/modules/"
+        }
+    }</script>
+
+    <script title="load">
+        document.documentElement.className += ' js loading';
+        // window.addEventListener('DOMContentLoaded', () => document.documentElement.classList.remove('content-loading'));
+        // Wait for other load handlers to run first - Bolt does a few things on
+        // load (eg. targetable scrolls) and we want them to run before the loading
+        // class is removed
+        window.addEventListener('load', () => window.requestAnimationFrame(() => document.documentElement.classList.remove('loading')));
+        window.DEBUG = true;
+    </script>
+
+    <!-- Import <scribe-music> -->
+    <link rel="stylesheet" href="./scribe-music/element.css" />
+    <script type="module" src="./scribe-music/element.js"></script>
+    <link rel="stylesheet" href="./elements/lead-sheet-document.css" />
+    <style>
+    body {
+        font-family: Jazz, JazzText;
+        letter-spacing: 0.004em;
+        word-spacing: 0.125em;
+    }
+    </style>
+
+    <script type="module">
+    import transpose from 'sequence/events/transpose.js';
+    window.transpose = transpose;
+
+    document.body.addEventListener('change', function(e) {
+        if (e.target.name === 'transpose') {
+            const scribe = document.body.querySelector('scribe-music');
+            scribe.transpose = e.target.value;
+            return;
+        }
+
+        if (e.target.name === 'clef') {
+            const scribe = document.body.querySelector('scribe-music');
+            scribe.clef = e.target.value;
+            return;
+        }
+    });
+    </script>
+</head>
+<body>
+
+
+Scribe 0.5
+Scribe is a new, modern way to display music on the web, packaged in a custom element you can drop into a web page.
+
+
+Fluid and responsive
+Scribe notation embraces the flow of the web, making it highly readable. It adapts to the constraints of your device with a fluidity that no other notation solution manages.
+(Several figures at different widths)
+
+
+Highly styleable
+Scribe is layed out in CSS using flex and grid, and sized relative to font-size. With a little CSS know-how it is highly customisable.
+(Some music multiplied onto a background image, compact)
+
+
+SMuFL compliant fonts
+Scribe employs standard SMuFL fonts to render musical symbols. It comes packaged and tested with 5 openly licensed SMuFL fonts out of the bag.
+(4 examples, several bars in each font)
+
+
+6 Staves
+Comes with 6 stave types – treble, bass, piano, violin, drum and percussion staves. Plus, staves are extensible – it is possible to define your own.
+
+
+Try it out in a web page
+
+
+Download Scribe
+
+
+Writing a Scribe document
+
+
+About the author
+Stephen is a saxophonist and
+</body>
+</html>

@@ -5,3 +5,52 @@
     box-sizing: border-box;
     background-repeat: no-repeat;
 }
+
+:host {
+    container-type: inline-size;
+    container-name: host;
+}
+
+
+.bar {
+    flex-basis: auto !important;
+    flex-basis: 33cqw !important;
+}
+
+@container host (min-width: 500px) {
+    .bar {
+        min-width: 21cqw;
+    }
+}
+
+@container host (min-width: 740px) {
+    .bar {
+        flex-basis: 25cqw !important;
+        min-width: 16.6667cqw;
+    }
+}
+
+@container host (min-width: 1024px) {
+    .bar {
+        flex-basis: 16.6666cqw !important;
+        min-width: 12.5cqw;
+        background: yellow;
+    }
+}
+
+@container host (min-width: 1320px) {
+    .bar {
+        flex-basis: 12.5cqw !important;
+        min-width: 10cqw;
+        background: lime;
+    }
+}
+
+@container host (min-width: 1680px) {
+    .bar {
+        flex-basis: 10cqw !important;
+        min-width: 9cqw;
+        background: aquamarine;
+    }
+}
+
