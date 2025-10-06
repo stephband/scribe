@@ -604,11 +604,10 @@ export function createPart(symbols, bar, stave, key = 0, accidentals = {}, part,
         // If we are not currently in tuplet mode detect the next tuplet
         const data = detectTuplets(events, bar.beat + beat, bar.duration - beat);
 
-//if (data) console.log(bar.beat, beat, data.beat, data.duration, data.divisor, data.rhythm, n, events);
+//if (data) console.log(bar.beat, beat, n, event, 'TUPLETS', data.beat, data.duration, 'divisor', data.divisor, data.rhythm, n, events);
 //else console.log(bar.beat, beat, 'DUPLETS', n, events);
 
         if (data && data.divisor !== 2 && data.divisor !== 4) {
-//console.log(bar.beat, beat, 'TUPLET DETECTED', data.beat, data.duration, data.divisor, data.rhythm);
             // Create rests up to tuplet
             if (gt(data.beat - bar.beat, beat, p24)) createRests(symbols, restDurations, bar, stave, part, beat, data.beat - bar.beat);
             // Close beam TODO dont close beam

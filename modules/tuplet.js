@@ -1,4 +1,5 @@
 
+import getStopBeat from './event/to-stop-beat.js';
 import { floorPowerOf2 } from './number/power-of-2.js';
 
 
@@ -41,7 +42,7 @@ function scoreTupletAtBeat(duration, divisor, beat, events, n) {
 
     // Did previous event cross into - tie into - tuplet? Mark rhythm as
     // occupying division 0
-    if (events[n - 1] && events[n - 1][0] + events[n - 1][4] > beat + 0.125) {
+    if (events[n - 1] && getStopBeat(events[n - 1]) > beat + 0.125) {
         rhythm = 1;
     }
 
@@ -94,9 +95,13 @@ function scoreTupletAtBeat(duration, divisor, beat, events, n) {
 }
 
 function detectTupletOverDuration(tuplet, duration, events, n, startbeat, divisors, stopBeat) {
-    // n is the index of the first event we are interested in. Set beat from
-    // the floored multiple of duration up to this event's beat
-    const beat = duration * Math.floor((events[n][0] - startbeat) / duration) + startbeat;
+    // n is the index of the first event we are interested in, but there may be an
+    // event that started before startbeat and is still playing, in which case...
+    const beat = events[n - 1] && getStopBeat(events[n - 1]) > startbeat + 0.125 ?
+        // Analyse from startbeat on
+        startbeat :
+        // Analyse from the floored multiple of duration up to this event's beat
+        duration * Math.floor((events[n][0] - startbeat) / duration) + startbeat ;
 
     // Find greatest divisor producing tuplets longer than minTupletDuration
     let d = divisors.length;
