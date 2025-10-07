@@ -6,6 +6,7 @@ import { rflatsharp } from '../pitch.js';
 import * as glyphs    from "../glyphs.js";
 
 const assign = Object.assign;
+const { round } = Math;
 
 
 /* Stave */
@@ -56,7 +57,7 @@ export default class Stave {
     }
 
     /**
-    .minPitch, .midPitch, .maxPitch, .minLinePitch, .midLinePitch, .maxLinePitch
+    .minPitch, .bottomPitch, .centerPitch, .topPitch, .maxPitch
     Minimum and maximum pitch names supported by the stave corresponding to the
     first and last row names in `.rows`, and lower, middle and upper stave pitches
     corresponding to the lower, middle and upper lines of the stave.
@@ -66,24 +67,20 @@ export default class Stave {
         return this.rows[0];
     }
 
-    get midPitch() {
-        return this.rows[13];
+    get bottomPitch() {
+        return this.rows[round(0.5 * this.rows.length) - 4];
+    }
+
+    get centerPitch() {
+        return this.rows[round(0.5 * this.rows.length)];
+    }
+
+    get topPitch() {
+        return this.rows[round(0.5 * this.rows.length) + 4];
     }
 
     get maxPitch() {
-        return this.rows[27];
-    }
-
-    get minLinePitch() {
-        return this.rows[9];
-    }
-
-    get midLinePitch() {
-        return this.rows[13];
-    }
-
-    get maxLinePitch() {
-        return this.rows[17];
+        return this.rows[this.rows.length - 1];
     }
 
     /**
@@ -106,20 +103,16 @@ export default class Stave {
     /**
     .getPart(pitch)
     **/
+
+    parts = [{
+        name:   'main',
+        top:    'stave-top',
+        center: 'stave-center',
+        bottom: 'stave-bottom'
+    }];
+
     getPart(pitch) {
-        return this.getRowDiff(this.midLinePitch, pitch) < 0 ? {
-            stemDirection: 'up',
-            tieDirection:  'up'
-        } : {
-            stemDirection: 'down',
-            tieDirection:  'down'
-        };
-    }
-
-    parts = [{}];
-
-    getPartIndex(pitch) {
-        return 0;
+        return this.parts[0];
     }
 
     /**
@@ -149,6 +142,10 @@ export default class Stave {
             spellPitch(key, event[2]) ;
     }
 
+    /**
+    .yRatioToPitch(y)
+    Used for converting pointer movements to pitch changes.
+    **/
     yRatioToPitch(y) {
         const n = floor(y * this.pitches.length);
         return n < 0 ? this.pitches[0] :

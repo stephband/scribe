@@ -4,6 +4,7 @@
 .bar {
     --columns-per-beat: 24;
     --column-beat-0: 3;
+    --barline-thickness: 0.04em;
 
 	display: grid;
 	grid-auto-columns: 0px;
@@ -31,6 +32,18 @@
         repeat(calc(var(--duration) * var(--columns-per-beat) + 1), minmax(max-content, auto))
         max-content
         [bar-end];
+}
+
+.bar::after {
+    content: '';
+    grid-column: -1;
+    grid-row: stave-top / stave-bottom;
+    align-self: stretch;
+    justify-self: end;
+    margin-top: calc(0.0625em - 0.5 * var(--barline-thickness));
+    margin-bottom: calc(0.0625em - 0.5 * var(--barline-thickness));
+    width: var(--barline-thickness);
+    background: currentcolor;
 }
 
 .bar.error {
@@ -443,18 +456,23 @@ in their duration span. */
 }
 
 .bar::before {
+    /* Bar count */
     content: attr(data-count);
     position: absolute;
-    grid-column: auto;
-    grid-row: auto;
-    left: -1em;
-    top: calc(50% + 2.1em);
+    grid-column: 1;
+    grid-row: barcount;
+    left: calc(-1 * var(--bar-padding-left) / 0.3125 - 1em);/* - 1em / 0.3125);*/
+    top: 0;
     width: 2em;
     font-family: system-ui;
     font-size: 0.3125em;
     line-height: 0.8em;
     text-align: center;
     white-space: nowrap;
+}
+
+.bar:first-child::before {
+    display: none;
 }
 
 

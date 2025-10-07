@@ -14,28 +14,29 @@ export default class PercussionStave extends DrumStave {
         return this.rows[17];
     }
 
-    get minLinePitch() {
+    get bottomPitch() {
         return this.rows[8];
     }
 
-    get midLinePitch() {
+    get centerPitch() {
         return this.rows[8];
     }
 
-    get maxLinePitch() {
+    get topPitch() {
         return this.rows[8];
     }
 
-    getPart(pitch) {
-        // Stem direction by drum or cymbal ??
-        return [35, 36, 37, 38, 40, 41, 43, 44, 45, 47, 50].includes(toNoteNumber(pitch)) ? {
-            stemDirection: 'down',
-            tieDirection:  'down'
-        } : {
-            stemDirection: 'up',
-            tieDirection:  'up'
-        } ;
-    }
+    parts = {
+        drums: {
+            name: 'drums',
+            stemup: false
+        },
+
+        cymbals: {
+            name: 'cymbals',
+            stemup: true
+        }
+    };
 
     getRowDiff(pitch1, pitch2) {
         // All notes display on one line

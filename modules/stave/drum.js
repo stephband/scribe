@@ -114,15 +114,15 @@ export default class DrumStave extends Stave {
         return this.rows[25];
     }
 
-    get minLinePitch() {
+    get bottomPitch() {
         return this.rows[8];
     }
 
-    get midLinePitch() {
+    get centerPitch() {
         return this.rows[12];
     }
 
-    get maxLinePitch() {
+    get topPitch() {
         return this.rows[16];
     }
 
@@ -140,7 +140,7 @@ export default class DrumStave extends Stave {
             html ;
     }
 
-    getPart(pitch) {
+    /*getPart(pitch) {
         // Split drums stave into drums and cymbals parts
         return [35, 36, 37, 38, 40, 41, 43, 44, 45, 47, 50].includes(toNoteNumber(pitch)) ? {
             part:          'drums',
@@ -153,25 +153,25 @@ export default class DrumStave extends Stave {
             tieDirection:  'up',
             centerRow:     'stave-upper'
         } ;
-    }
+    }*/
 
     parts = {
         drums: {
             name:   'drums',
-            row:    'drums',
             stemup: false
         },
 
         cymbals: {
             name:   'cymbals',
-            row:    'cymbals',
             stemup: true
         }
     };
 
-    getPartIndex(pitch) {
+    getPart(pitch) {
         // Split drums stave into drums and cymbals parts
-        return [35, 36, 37, 38, 40, 41, 43, 44, 45, 47, 50].includes(toNoteNumber(pitch)) ? 'drums' : 'cymbals' ;
+        return [35, 36, 37, 38, 40, 41, 43, 44, 45, 47, 50].includes(toNoteNumber(pitch)) ?
+            this.parts.drums :
+            this.parts.cymbals ;
     }
 
     getRowDiff(pitch1, pitch2) {

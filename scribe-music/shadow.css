@@ -13,6 +13,7 @@
 @import '../classes/timesig.css';
 @import '../classes/chord.css';
 @import '../classes/note.css';
+@import '../classes/head.css';
 @import '../classes/ledge.css';
 @import '../classes/rest.css';
 @import '../classes/tuplet.css';

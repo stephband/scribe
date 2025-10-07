@@ -268,14 +268,16 @@ export function createBar(count, beat, duration, divisor, stave, key, events, pa
     createBarSymbols(symbols, bar, stave, key, accidentals, events, config);
 
     // Populate symbols with parts
-    let name;
-    for (name in parts) {
-        const part = stave.parts[name];
-        createPart(symbols, bar, stave, key, accidentals, part, parts[name], settings);
+    let index;
+    for (index in stave.parts) {
+        const part   = stave.parts[index];
+        const events = parts[part.name] || [];
+        createPart(symbols, bar, stave, key, accidentals, part, events, settings);
     }
 
     // If no part was rendered at least render a rest
-    if (!name) {
+    if (!index) {
+        console.log('Stave has no parts defined SHOULD NOT BE');
         createPart(symbols, bar, stave, key, accidentals, '0', [], settings);
     }
 

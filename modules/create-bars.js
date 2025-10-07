@@ -120,9 +120,9 @@ function detectBarRepeats(bars, jsons, bar) {
 /* Bars */
 
 function pushEventToPart(stave, parts, event) {
-    const partIndex  = stave.getPartIndex(event[2]);
-    const partEvents = parts[partIndex] || (parts[partIndex] = []);
-    parts[partIndex].push(event);
+    const part = stave.getPart(event[2]);
+    const partEvents = parts[part.name] || (parts[part.name] = []);
+    parts[part.name].push(event);
 }
 
 export default function createBars(sequence, stave, settings = config) {

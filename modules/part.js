@@ -131,9 +131,9 @@ function getMaxPitch(pitches) {
 
 /* Stems */
 
-function stemFromMinMaxPitches(stave, minPitch, maxPitch) {
-    const minDiff  = stave.getRowDiff(stave.midLinePitch, minPitch);
-    const maxDiff  = stave.getRowDiff(stave.midLinePitch, maxPitch);
+function stemFromMinMaxPitches(stave, part, minPitch, maxPitch) {
+    const minDiff  = stave.getRowDiff(part.centerPitch || stave.centerPitch, minPitch);
+    const maxDiff  = stave.getRowDiff(part.centerPitch || stave.centerPitch, maxPitch);
     return maxDiff + minDiff < -1;
 }
 
@@ -205,7 +205,7 @@ function closeBeam(symbols, stave, part, beam) {
 
     n = -1;
     while (pitches[++n]) {
-        line = stave.getRowDiff(stave.midLinePitch, pitches[n]);
+        line = stave.getRowDiff(stave.centerPitch, pitches[n]);
 
         if (n < (pitches.length - 1) / 2) {
             avgBeginLine += line / Math.floor(pitches.length / 2);
@@ -340,10 +340,10 @@ function createAccidentals(symbols, bar, stave, part, accidentals, beat, notes, 
 
 /* Ledger lines */
 
-function createLedges(symbols, stave, beat, pitches) {
+function createLedges(symbols, stave, part, beat, pitches) {
     // Up ledger lines
     let pitch = getMaxPitch(pitches);
-    let rows  = stave.getRowDiff(pitch, stave.maxLinePitch) + 1;
+    let rows  = stave.getRowDiff(pitch, part.topPitch || stave.topPitch) + 1;
     if (rows < 0) symbols.push({
         type: 'ledge',
         beat,
@@ -353,7 +353,7 @@ function createLedges(symbols, stave, beat, pitches) {
 
     // Down ledger lines
     pitch = getMinPitch(pitches);
-    rows  = stave.getRowDiff(pitch, stave.minLinePitch) - 1;
+    rows  = stave.getRowDiff(pitch, part.bottomPitch || stave.bottomPitch) - 1;
     if (rows > 0)  symbols.push({
         type: 'ledge',
         beat,
@@ -384,7 +384,7 @@ function closeTuplet(stave, part, tuplet) {
 
     // Encourage lowest pitch to be 1 octave below top line, ensuring
     // triplet (with appropriate styling) always sits above the top line
-    const lowestPitchNumber = toNoteNumber(stave.maxLinePitch) - 12;
+    const lowestPitchNumber = toNoteNumber(stave.topPitch) - 12;
 
     let centreNumber;
     let h = lengthOf(tuplet);
@@ -511,7 +511,7 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
         };
 
         // Create ledgers and accidentals
-        createLedges(symbols, stave, beat, pitches);
+        createLedges(symbols, stave, part, beat, pitches);
         createAccidentals(symbols, bar, stave, part, accidentals, beat, notes, pitches);
 
         let p = -1;
@@ -674,11 +674,11 @@ if (stopBeat <= beat) {
         const minPitch = getMinPitch(pitches);
         const maxPitch = getMaxPitch(pitches);
         const stemup   = part.stemup === undefined ?
-            stemFromMinMaxPitches(stave, minPitch, maxPitch) :
+            stemFromMinMaxPitches(stave, part, minPitch, maxPitch) :
             part.stemup ;
 console.log(part);
         // Create ledgers and accidentals
-        createLedges(symbols, stave, beat, pitches);
+        createLedges(symbols, stave, part, beat, pitches);
         createAccidentals(symbols, bar, stave, part, accidentals, beat, notes, pitches);
 
 

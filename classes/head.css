@@ -14,3 +14,7 @@
     --stem-align-up:   0.18;
     --stem-align-down: -0.14;
 }
+
+.head[data-glyph="headDiamond"] {
+    margin-left: 0.04em;
+}

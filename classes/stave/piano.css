@@ -87,18 +87,23 @@
 }
 
 .piano-stave > .rest,
-.piano-stave > .timesig {
-    /* The default part is the upper part */
-    grid-row: stave-upper;
+.piano-stave > .timesig,
+.piano-stave > .rest[data-part="rh"],
+.piano-stave > .timesig[data-part="rh"] {
+    grid-row: B4;
 }
 
-.piano-stave > .rest[data-part="lower"],
-.piano-stave > .timesig[data-part="lower"] {
-    grid-row: stave-lower;
+.piano-stave > .rest[data-part="lh"],
+.piano-stave > .timesig[data-part="lh"] {
+    grid-row: D3;
 }
 
 .piano-stave > .lyric {
     align-self: center;
+}
+
+.bar.piano-stave::before {
+    grid-row: D2;
 }
 
 /* Map unoctaved pitches to stave lines for key signatures. */
