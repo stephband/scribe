@@ -37,6 +37,14 @@
     color: red !important;
 }
 
+.bar > .stave-svg {
+    color: green;
+    background: rgba(210, 160, 80, 0.2);
+    grid-row: 9 / span 9;
+    grid-column: 1 / span 24;
+    align-self: stretch;
+}
+
 .bar > [data-beat] {
     /* Place symbol with a beat in its beat column */
     grid-column-start: calc(var(--column-beat-0) + round(var(--beat) * var(--columns-per-beat)));

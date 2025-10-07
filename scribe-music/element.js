@@ -39,7 +39,7 @@ const resizes = new ResizeObserver((entries) => {
 export default define(element('scribe-music', {
     shadow: `
         <link rel="stylesheet" href="${ shadowCSSUrl }" />
-        <div class="side" id="side">
+        <!--div class="side" id="side">
             <div class="treble-stave open-stave stave side-bar bar">
                 <span class="treble-clef clef"></span>
                 <span data-pitch="B♭" class="acci acci-flat"></span>
@@ -106,8 +106,7 @@ export default define(element('scribe-music', {
                 <span data-pitch="E♭" class="acci acci-flat"></span>
                 <span data-pitch="A♭" class="acci acci-flat"></span>
             </div>
-        </div>
-        <div class="main" id="main"></div>
+        </div-->
     `,
 
     construct: function(shadow, internals) {
@@ -174,11 +173,11 @@ export default define(element('scribe-music', {
                 })
             );
 
-            const main = shadow.getElementById('main');
+            //const barsElement = shadow.getElementById('bars');
 
             // Clear the shadow DOM of bars and put new elements in it
-            main.querySelectorAll('.bar').forEach((element) => element.remove());
-            main.append.apply(main, elements);
+            shadow.querySelectorAll('.bar').forEach((element) => element.remove());
+            shadow.append.apply(shadow, elements);
 
             // Render beams
             shadow.querySelectorAll('.beam').forEach(renderBeam);
@@ -187,7 +186,7 @@ export default define(element('scribe-music', {
 
             // Does bar contain symbols that add up to longer than bar?
             if (internals.debug.value) {
-                main.querySelectorAll('.bar').forEach((bar) => {
+                shadow.querySelectorAll('.bar').forEach((bar) => {
                     const duration = parseFloat(bar.dataset.duration);
                     let total = 0;
                     let b, d;

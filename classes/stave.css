@@ -10,7 +10,7 @@
 /* Add a background line of white behind the start of the bar in Safari so that
    when bars overlap to disguise Safari's rounding errors this bar hides the
    end of the previous bar. */
-
+/*
 :host(.safari) > .stave {
     background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -5 1 10" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
         <style>line{vector-effect:non-scaling-stroke;stroke:currentcolor;stroke-width:0.04em;stroke-linejoin:round;stroke-linecap:round;fill:none;}</style>\
@@ -53,6 +53,7 @@
         <line x1="1" x2="1" y1="2" y2="-2" style="stroke-width:0.12em;"></line>\
     </svg>');
 }
+*/
 
 .stave > .tuplet {
     grid-row: stave-center;

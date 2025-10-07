@@ -130,7 +130,7 @@ export default overload(get('type'), {
         data: symbol.beat === undefined ? { pitch: symbol.pitch } : {
             beat:  truncate(symbol.beat),
             pitch: symbol.pitch,
-            part:  symbol.part,
+            part:  symbol.part.name,
             event: identify(symbol.event)
         }
     }),
@@ -157,12 +157,12 @@ export default overload(get('type'), {
         class: `${ symbol.stemup ? 'up-note' : 'down-note' } ${ symbol.top ? 'top-note' : '' } ${ symbol.bottom ? 'bottom-note' : '' } note`,
         style: symbol.stemHeight ? `--stem-height: ${ symbol.stemHeight };` : undefined,
         html:  symbol.stave.getNoteHTML(symbol.pitch, symbol.dynamic, symbol.duration),
-        title: `${ symbol.pitch } (${ toNoteNumber(symbol.pitch) })`,
+        title: `${ symbol.pitch } (${ toNoteNumber(symbol.pitch) }) ${ symbol.part.name }`,
         data: {
             beat:     truncate(symbol.beat),
             pitch:    symbol.pitch,
             duration: truncate(symbol.duration),
-            part:     symbol.part,
+            part:     symbol.part.name,
             beam:     symbol.beam && identify(symbol.beam),
             event:    identify(symbol.event)
         }
@@ -181,7 +181,7 @@ export default overload(get('type'), {
             beat:     truncate(symbol.beat),
             pitch:    symbol.pitch,
             duration: truncate(symbol.duration),
-            part:     symbol.part,
+            part:     symbol.part.name,
             events:   map((symbol) => identify(symbol.event), symbol).join(' ')
         }
     }),
@@ -195,7 +195,7 @@ export default overload(get('type'), {
             beat:     truncate(symbol.beat),
             pitch:    symbol.pitch,
             duration: truncate(symbol.duration),
-            part:     symbol.part
+            part:     symbol.part.name
         }
     }),
 
@@ -209,7 +209,7 @@ export default overload(get('type'), {
             divisor:  symbol.divisor,
             // Rhythm is a binary number
             rhythm:   symbol.rhythm.toString(2).split('').reverse().join(''),
-            part:     symbol.part
+            part:     symbol.part.name
         },
         style: `--angle: ${ symbol.angle }deg;`
     }),
@@ -223,7 +223,7 @@ export default overload(get('type'), {
             beat:     truncate(symbol.beat),
             pitch:    symbol.pitch,
             duration: truncate(symbol.duration),
-            part:     symbol.part
+            part:     symbol.part.name
         },
         'aria-hidden': 'true'
     }),

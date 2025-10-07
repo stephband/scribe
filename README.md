@@ -175,6 +175,13 @@ let scribe = document.body.querySelector('scribe-music');
 console.log(scribe.clef) // "bass";
 ```
 
+### `layout="compact"`
+
+The layout attribute can have one of the values `"compact"` (the default),
+`"regular"` or `"spaced"`. Layout does nothing JavaScript-y, it simply sets the
+`flex-basis` and `min/max-width` of the bars for more regular spacing inside
+their container.
+
 
 ### `key="C"`
 
@@ -194,8 +201,8 @@ scribe.key = "B♭";
 
 There is no provision for choosing a 'minor' key. Declare its relative major.
 
-The key is the key signature pre-transposition. If `scribe.transpose` is something
-other than `0`, the key signature is transposed.
+The key is the key signature pre-transposition. If `transpose` is something
+other than `0`, the key signature is also transposed.
 
 
 ### `meter="4/4"`

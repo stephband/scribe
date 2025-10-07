@@ -39,72 +39,169 @@
     </script>
 
     <!-- Import <scribe-music> -->
-    <link rel="stylesheet" href="./scribe-music/element.css" />
-    <script type="module" src="./scribe-music/element.js"></script>
-    <link rel="stylesheet" href="./elements/lead-sheet-document.css" />
+    <link rel="stylesheet" href="./build/scribe-music/element.css" />
+    <script type="module" src="./build/scribe-music/element.js"></script>
+
     <style>
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/elements/html.css';
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/atoms.css';
+
+    @import './build/scribe-music/element.css';
+    @import './fonts/ash.css';
+    @import './fonts/bravura.css';
+    @import './fonts/broadway.css';
+    @import './fonts/leipzig.css';
+    @import './fonts/petaluma.css';
+
     body {
-        font-family: Jazz, JazzText;
-        letter-spacing: 0.004em;
-        word-spacing: 0.125em;
+        font-family: system-ui, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .ash-font      { font-family: Ash, AshText; }
+    .bravura-font  { font-family: Bravura, BravuraText; }
+    .broadway-font { font-family: Broadway, BroadwayText; }
+    .jazz-font     { font-family: Jazz, JazzText; }
+    .petaluma-font { font-family: Petaluma, PetalumaText; }
+    .leipzig-font  { font-family: Leipzig; }
+
+    .font-section {
+        color: color(display-p3 0.451 0.656 0.797);
+        background-color: color(display-p3 0.075 0.342 0.397);
+        background-image: linear-gradient(340deg, color(display-p3 0.075 0.342 0.397), color(display-p3 0.113 0.181 0.252));
+    }
+
+    .font-section > scribe-music {
+        font-size: calc(0.75vw + 0.5rem);
+    }
+
+    .stave-section > scribe-music {
+        font-size: calc(1.125vw + 0.75rem);
     }
     </style>
 
-    <script type="module">
-    import transpose from 'sequence/events/transpose.js';
-    window.transpose = transpose;
+    <script type="application/json" id="test">{
+        "events": [
+            [0, "key",   0],
+            [0, "meter", 3, 1.5],
+            [0, "sequence", 1, 0, 6]
+        ],
 
-    document.body.addEventListener('change', function(e) {
-        if (e.target.name === 'transpose') {
-            const scribe = document.body.querySelector('scribe-music');
-            scribe.transpose = e.target.value;
-            return;
-        }
+        "sequences": [{
+            "id": 1,
+            "name": "Phrase 1",
+            "events": [
+                [0,    "chord", "C", "∆", 3],
+                [0,    "note", "E5", 0.1, 1],
+                [0,    "note", "C2", 0.1, 1.5],
+                [0,    "lyric", "A", 1],
+                [1,    "note", "E5", 0.1, 0.5],
+                [1,    "lyric", "fond", 0.5],
+                [1.5,  "note", "G5", 0.1, 1.5],
+                [1.5,  "lyric", "kiss", 1.5],
 
-        if (e.target.name === 'clef') {
-            const scribe = document.body.querySelector('scribe-music');
-            scribe.clef = e.target.value;
-            return;
-        }
-    });
-    </script>
+                [3,    "chord", "F", "∆", 1.5],
+                [3,    "note", "A4", 0.1, 1],
+                [3,    "lyric", "then", 1],
+                [4,    "note", "G4", 0.1, 0.5],
+                [4,    "lyric", "we", 0.5],
+
+                [4.5,  "chord", "A", "-7", 1.5],
+                [4.5,  "note", "A4", 0.1, 0.25],
+                [4.5,  "lyric", "sev –", 0.25],
+                [4.75, "note", "C5", 0.1, 1.25],
+                [4.75, "lyric", "er", 1.25]
+            ]
+        }]
+    }</script>
+
+    <script type="application/json" id="fare-thee">{
+        "events": [
+            [0, "key",   0],
+            [0, "meter", 3, 1.5],
+            [0, "sequence", 1, 0, 6]
+        ],
+
+        "sequences": [{
+            "id": 1,
+            "name": "Phrase 2",
+            "events": [
+                [0,    "chord", "F", "∆", 1.5],
+                [0,    "note", "A5", 0.1, 1],
+                [0,    "note", "C2", 0.1, 1.5],
+                [0,    "lyric", "Fare", 1],
+                [1,    "note", "A5", 0.1, 0.5],
+                [1,    "lyric", "thee", 0.5],
+
+                [1.5,  "chord", "D", "-7", 1],
+                [1.5,  "note", "C6", 0.1, 1],
+                [1.5,  "lyric", "well", 1],
+                [2.5,  "note", "D6", 0.1, 0.5],
+                [2.5,  "lyric", "and", 0.5],
+
+                [3,    "chord", "G", "7sus", 1.5],
+                [3,    "note", "G5", 0.1, 1],
+                [3,    "lyric", "then", 1],
+                [4,    "note", "A5", 0.1, 0.5],
+                [4,    "lyric", "for –", 0.5],
+
+                [4.5,  "chord", "C", "∆", 1.5],
+                [4.5,  "note", "E5", 0.1, 0.5],
+                [4.5,  "lyric", "ev –", 0.5],
+                [5, "note", "G5", 0.1, 1],
+                [5, "lyric", "er", 1]
+            ]
+        }]
+    }</script>
 </head>
 <body>
+    <section class="9x-grid grid" style="padding: 3em; --y-gap: 0em;">
+        <h1 class="x2 6x">Scribe <span class="font-08">0.4</span></h1>
+        <p class="x2 6x">Scribe is a new, modern way to display music on the web, packaged in a custom element you can drop into a web page.</p>
+    </section>
 
+    <section class="9x-grid grid" style="padding: 3em; --y-gap: 0em;">
+        <h2 class="x2 6x">Fluid and responsive</h2>
+        <p class="x2 6x">Scribe notation embraces the flow of the web, making it highly readable. It adapts to the constraints of your device with a fluidity that no other notation solution manages.
+        (Several figures at different widths)</p>
+    </section>
 
-Scribe 0.5
-Scribe is a new, modern way to display music on the web, packaged in a custom element you can drop into a web page.
+    <section class="9x-grid grid" style="padding: 3em; --y-gap: 0em;">
+        <h2 class="x2 6x">Highly styleable</h2>
 
+        <p class="x2 6x">Scribe is layed out in CSS using flex and grid, and sized relative to font-size. With a little CSS know-how it is highly customisable.
+        (Some music multiplied onto a background image, compact)</p>
+    </section>
 
-Fluid and responsive
-Scribe notation embraces the flow of the web, making it highly readable. It adapts to the constraints of your device with a fluidity that no other notation solution manages.
-(Several figures at different widths)
+    <section class="font-section 9x-grid grid" style="padding: 3em; --y-gap: 0em;">
+        <h2 class="x2 6x">SMuFL compliant fonts</h2>
+        <p class="x2 6x">Scribe uses <a href="https://w3c.github.io/smufl/latest/">SMuFL fonts</a> to render musical symbols. It comes packaged and tested with 5 openly licensed SMuFL fonts out of the bag.
+        (4 examples, several bars in each font)</p>
 
+        <scribe-music class="x1 3x y3 2y petaluma-font no-wrap" clef="piano" src="#test"></scribe-music>
+        <scribe-music class="x5 3x y4 2y bravura-font no-wrap" clef="piano" src="#fare-thee"></scribe-music>
+        <scribe-music class="x2 3x y6 2y broadway-font no-wrap" clef="piano" src="#test"></scribe-music>
+        <scribe-music class="x6 3x y7 2y ash-font no-wrap" clef="piano" src="#test"></scribe-music>
+    </section>
 
-Highly styleable
-Scribe is layed out in CSS using flex and grid, and sized relative to font-size. With a little CSS know-how it is highly customisable.
-(Some music multiplied onto a background image, compact)
+    <section class="stave-section 9x-grid grid" style="padding: 3em; --y-gap: 0em;">
+        <h2 class="x2 6x">6 Staves</h2>
+        <p class="x2 6x">Comes with 6 stave types – treble, bass, piano, violin, drum and percussion staves. Plus, staves are extensible – it is possible to define your own.</p>
+        <scribe-music class="x3 2x y3 jazz-font no-wrap" clef="drum" src="./data/drum-pattern.json"></scribe-music>
+    </section>
 
+    <section class="stave-section 9x-grid grid" style="padding: 3em; --y-gap: 0em;">
+        <h2 class="x2 6x">Try it out in a web page</h2>
+    </section>
 
-SMuFL compliant fonts
-Scribe employs standard SMuFL fonts to render musical symbols. It comes packaged and tested with 5 openly licensed SMuFL fonts out of the bag.
-(4 examples, several bars in each font)
+    <section class="stave-section 9x-grid grid" style="padding: 3em; --y-gap: 0em;">
+        <h2 class="x2 6x">Writing a Scribe document</h2>
+    </section>
 
-
-6 Staves
-Comes with 6 stave types – treble, bass, piano, violin, drum and percussion staves. Plus, staves are extensible – it is possible to define your own.
-
-
-Try it out in a web page
-
-
-Download Scribe
-
-
-Writing a Scribe document
-
-
-About the author
-Stephen is a saxophonist and
+    <footer>
+        About the author
+        Stephen is a saxophonist and
+    </footer>
 </body>
 </html>

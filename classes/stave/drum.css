@@ -9,23 +9,23 @@ https://web.mit.edu/merolish/Public/drums.pdf
     grid-template-rows:
         0.125em
         0.125em
-        [chords] 0.125em
+        [chords]      0.125em
         0.125em
-        [splash]   0.125em
-        [crash2]   0.125em
-        [crash]    0.125em
-        [ride]     0.125em
-        [hihat stave-top] 0.125em
-        [hightom]  0.125em
+        [splash]      0.125em
+        [crash2]      0.125em
+        [crash]       0.125em
+        [ride]        0.125em
+        [hihat stave-top cymbals] 0.125em
+        [hightom]     0.125em
         [midtom stave-upper] 0.125em
-        [snare]    0.125em
+        [snare]       0.125em
         [lowtom stave-center] 0.125em
-        [floortom] 0.125em
+        [floortom]    0.125em
         [lowfloortom] 0.125em
-        [kick]     0.125em
-        [kick2 stave-lower] 0.125em
+        [kick]        0.125em
+        [kick2 stave-lower drums] 0.125em
         [hihatpedal stave-bottom] 0.125em
-        [foot]     0.125em
+        [foot]        0.125em
         0.125em
         0.125em
         0.125em
@@ -51,8 +51,12 @@ https://web.mit.edu/merolish/Public/drums.pdf
     grid-row: 11;
 }
 
-.drum-stave > .rest[data-part="feet"] {
-    grid-row: stave-lower;
+.drum-stave > .rest[data-part="drums"] {
+    grid-row: drums;
+}
+
+.drum-stave > .rest[data-part="cymbals"] {
+    grid-row: cymbals;
 }
 
 /* Selectors must match the importance of data-pitch selectors found on

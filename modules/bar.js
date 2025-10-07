@@ -270,7 +270,8 @@ export function createBar(count, beat, duration, divisor, stave, key, events, pa
     // Populate symbols with parts
     let name;
     for (name in parts) {
-        createPart(symbols, bar, stave, key, accidentals, name, parts[name], settings);
+        const part = stave.parts[name];
+        createPart(symbols, bar, stave, key, accidentals, part, parts[name], settings);
     }
 
     // If no part was rendered at least render a rest
