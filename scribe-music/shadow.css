@@ -115,37 +115,7 @@
     display: block;
 }
 
-:host > .bars {
-    grid-column: 2;
-    grid-row: 1;
-    justify-self: stretch;
-    align-self: stretch;
-}
-
-.bars {
-    padding-left: var(--bar-line-size, 1px);
-
-    display: block;
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    column-gap: 0;
-    align-content: start;
-
-    /* Make sure bars do not stretch vertically */
-    align-items: start;
-    z-index: 1;
-}
-
-.bars(.safari) {
-    /* Bar lines, ::before and ::after on .bar, are placed outside of the bar
-       so that the overlap overcomes bar to bar rounding errors in Safari,
-       causing 1px white gap. But this means we need to pad the container by
-       the same amount. */
-    padding-right: var(--bar-line-size, 1px);
-}
-
-.bars > .bar {
+:host > .bar {
     flex: 1 0 auto;
     /* Make bar lines overlap */
     margin-left: calc(-1 * var(--bar-line-size, 1px));
@@ -169,79 +139,79 @@ svg > path {
 
 /* Regular layout */
 
-:host([layout="regular"]) .bars .bar,
-:host([layout="spaced"]) .bars .bar  {
+:host([layout="regular"]) > .bar,
+:host([layout="spaced"]) > .bar  {
     min-width: calc((100cqw - var(--signature-width)) / 3);
     max-width: calc((100cqw - var(--signature-width)) / 1);
 }
 
 @container host (min-width: 32em) {
-    :host([layout="regular"]) .bars .bar {
+    :host([layout="regular"]) > .bar {
         min-width: calc((100cqw - var(--signature-width)) / 3);
         max-width: calc((100cqw - var(--signature-width)) / 1);
     }
 
-    :host([layout="spaced"]) .bars .bar {
+    :host([layout="spaced"]) > .bar {
         min-width: calc((100cqw - var(--signature-width)) / 3);
         max-width: calc((100cqw - var(--signature-width)) / 1);
     }
 }
 
 @container host (min-width: 48em) {
-    :host([layout="regular"]) .bars .bar {
+    :host([layout="regular"]) > .bar {
         min-width: calc((100cqw - var(--signature-width)) / 4);
         max-width: calc((100cqw - var(--signature-width)) / 2);
     }
 
-    :host([layout="spaced"]) .bars .bar {
+    :host([layout="spaced"]) > .bar {
         min-width: calc((100cqw - var(--signature-width)) / 4);
         max-width: calc((100cqw - var(--signature-width)) / 2);
     }
 }
 
 @container host (min-width: 64em) {
-    :host([layout="regular"]) .bars .bar {
+    :host([layout="regular"]) > .bar {
         min-width: calc((100cqw - var(--signature-width)) / 6);
         max-width: calc((100cqw - var(--signature-width)) / 4);
     }
 
-    :host([layout="spaced"]) .bars .bar {
+    :host([layout="spaced"]) > .bar {
         min-width: calc((100cqw - var(--signature-width)) / 6);
         max-width: calc((100cqw - var(--signature-width)) / 4);
     }
 }
 
 @container host (min-width: 80em) {
-    :host([layout="regular"]) .bars .bar {
+    :host([layout="regular"]) > .bar {
         min-width: calc((100cqw - var(--signature-width)) / 8);
         max-width: calc((100cqw - var(--signature-width)) / 6);
     }
 
-    :host([layout="spaced"]) .bars .bar {
+    :host([layout="spaced"]) > .bar {
         min-width: calc((100cqw - var(--signature-width)) / 8);
         max-width: calc((100cqw - var(--signature-width)) / 6);
     }
 }
 
 @container host (min-width: 100em) {
-    :host([layout="regular"]) .bars .bar {
+    :host([layout="regular"]) > .bar {
         min-width: calc((100cqw - var(--signature-width)) / 10);
         max-width: calc((100cqw - var(--signature-width)) / 8);
     }
 
-    :host([layout="spaced"]) .bars .bar {
+    :host([layout="spaced"]) > .bar {
         min-width: calc((100cqw - var(--signature-width)) / 10);
         max-width: calc((100cqw - var(--signature-width)) / 8);
     }
 }
 
 @container host (min-width: 120em) {
-    :host([layout="regular"]) .bars .bar {
+    :host([layout="regular"]) > .bar {
         min-width: calc((100cqw - var(--signature-width)) / 12);
         max-width: calc((100cqw - var(--signature-width)) / 10);
     }
 
-    :host([layout="spaced"]) .bars .bar {
+    :host([layout="spaced"]) > .bar {
         min-width: calc((100cqw - var(--signature-width)) / 12);
         max-width: calc((100cqw - var(--signature-width)) / 10);
     }

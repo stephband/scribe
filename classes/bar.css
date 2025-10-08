@@ -47,7 +47,7 @@
     background: currentcolor;
 }
 
-.end-bar::after {
+.end-bar[data-duration]::after {
     width: 0.11em;
     border-left: var(--barline-thickness) solid currentcolor;
     border-right: var(--barline-thickness) solid currentcolor;

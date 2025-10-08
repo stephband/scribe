@@ -59,6 +59,15 @@
         padding: 0;
     }
 
+    pre {
+        font-family: MartianMono, monospace;
+    }
+
+    .orange-fg { font-weight: 600; color: oklch(0.54 0.19 41.4); }
+    .yellow-fg { font-weight: 600; color: oklch(0.62 0.15 95.97); }
+    .lime-fg   { color: oklch(0.2 0.11 297.09); }
+
+
     .ash-font      { font-family: Ash, AshText; }
     .bravura-font  { font-family: Bravura, BravuraText; }
     .broadway-font { font-family: Broadway, BroadwayText; }
@@ -89,6 +98,29 @@
     h4.broadway-font,
     h4.jazz-font,
     h4.petaluma-font { height: 1.5em; line-height: 2em; }
+
+    .header-section > pre {
+        margin-top: 3em;
+    }
+
+    .header-section > scribe-music {
+        margin-top: 3em;
+    }
+
+    .style-section {
+        min-height: 50vw;
+        color: white;
+        background-color: #414c73;
+        background-image: url('./assets/images/trees.avif');
+        background-position: 0% 43%;
+        background-size: 120%;
+    }
+
+    .style-section > scribe-music {
+        font-size: calc(1.5vw + 1rem);
+        color: #8c637b;
+        mix-blend-mode: color-dodge;
+    }
 
     .font-section {
         color: color(display-p3 0.451 0.656 0.797);
@@ -314,25 +346,32 @@
     }</script>
 </head>
 <body>
-    <section class="9x-grid grid" style="padding: 3em; --y-gap: 0em;">
+    <header class="header-section 9x-grid grid" style="padding: 3em; --y-gap: 0em;">
         <h1 class="x2 6x">Scribe <span class="font-08">0.4</span></h1>
-        <p class="x2 6x">Scribe is a new, modern way to display music on the web, packaged in a custom element you can drop into a web page.</p>
-    </section>
+        <p class="x2 6x">
+            Scribe is a new way of displaying music notation using web technologies, packaged in a custom element you can drop into a document.
+            It is perfect for embedding examples into tutorials, for publishing music to be read on a phone at a gig, or for live feedback of, say, MIDI input.
+        </p>
+        <pre class="x2"><span class="orange-fg">&lt;scribe-music</span> <span class="yellow-fg">src="</span><span class="lime-fg">./blue-in-green.json</span><span class="orange-fg">"&gt;&lt;/scribe-music&gt;</span></pre>
+        <scribe-music class="x1 9x" clef="treble" src="./data/blue-in-green.json"></scribe-music>
+    </header>
 
     <section class="9x-grid grid" style="padding: 3em; --y-gap: 0em;">
         <h2 class="x2 6x">Fluid and responsive</h2>
-        <p class="x2 6x">Scribe notation embraces the flow of the web, making it highly readable. It adapts to the constraints of your device with a fluidity that no other notation solution manages.
-        (Several figures at different widths)</p>
+        <p class="x2 6x">
+        Scribe notation embraces the flow of the web, making it highly readable. It adapts to the constraints of your device with a fluidity that no other notation solution manages.
+        </p>
     </section>
 
-    <section class="9x-grid grid" style="padding: 3em; --y-gap: 0em;">
+    <section class="style-section 9x-grid grid y-start-grid" style="padding: 3em; --y-gap: 0em;">
         <h2 class="x2 6x">Highly styleable</h2>
-        <p class="x2 6x">Scribe is layed out using flex and grid, and sized in relative font sizes, and because it's all CSS it's highly&nbsp;customisable.</p>
+        <p class="x2 6x">Scribe is laid out using flex and grid, and sized in relative font sizes, and because it's all CSS it's highly&nbsp;customisable, in ways that other notation solutions simply can never be.</p>
         <scribe-music class="x2 no-wrap" clef="drum" src="./data/drum-pattern.json"></scribe-music>
+        <pre class="x2">mix-blend-mode: color-dodge;</pre>
     </section>
 
     <section class="font-section 9x-grid grid" style="padding: 3em;">
-        <h2 class="x2 6x">SMuFL compliant fonts</h2>
+        <h2 class="x2 6x">SMuFL fonts</h2>
         <p class="x2 6x">
             Scribe supports <a href="https://w3c.github.io/smufl/latest/">SMuFL fonts</a>, W3C-standardised fonts for rendering musical symbols.
             It comes tested with 5 openly licensed SMuFL fonts out of the box.
