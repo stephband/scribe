@@ -61,6 +61,10 @@
     padding-bottom: 1em;
 }
 
+:host([clef="drum"]) {
+    --signature-width: 1em;
+}
+
 :host .note {
     /* Default height of stem */
     --stem-height:     1;
