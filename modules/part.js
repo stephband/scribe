@@ -137,19 +137,19 @@ function stemFromMinMaxPitches(stave, part, minPitch, maxPitch) {
     return maxDiff + minDiff < -1;
 }
 
-function stemFromPitches(stave, pitches) {
+function stemFromPitches(stave, part, pitches) {
     const minPitch = getMinPitch(pitches);
     const maxPitch = getMaxPitch(pitches);
-    return stemFromMinMaxPitches(stave, minPitch, maxPitch);
+    return stemFromMinMaxPitches(stave, part, minPitch, maxPitch);
 }
 
-function stemFromSymbols(stave, symbols) {
+function stemFromSymbols(stave, part, symbols) {
     const pitches = [];
     let n = -1, symbol;
     while (symbol = symbols[++n]) {
         if (symbol.type === 'note') pitches.push(symbol.pitch);
     }
-    return stemFromPitches(stave, pitches);
+    return stemFromPitches(stave, part, pitches);
 }
 
 
@@ -167,7 +167,7 @@ function closeBeam(symbols, stave, part, beam) {
     const duration   = stopBeat - startBeat;
     const stemup = part.stemup === undefined ?
         // Calculate stem up or down
-        stemFromPitches(stave, map(get('pitch'), beam)) :
+        stemFromPitches(stave, part, map(get('pitch'), beam)) :
         // Get stem direction from part
         part.stemup ;
 
@@ -370,7 +370,7 @@ function closeTuplet(stave, part, tuplet) {
 
     // Stem direction
     const stemup = part.stemup === undefined ?
-        stemFromSymbols(stave, tuplet) :
+        stemFromSymbols(stave, part, tuplet) :
         part.stemup ;
 
     // Apply stem direction to notes
@@ -477,7 +477,7 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
         const minPitch = getMinPitch(pitches);
         const maxPitch = getMaxPitch(pitches);
         const stemup   = part.stemup === undefined ?
-            stemFromMinMaxPitches(stave, minPitch, maxPitch) :
+            stemFromMinMaxPitches(stave, part, minPitch, maxPitch) :
             part.stemup ;
 
         const stopBeat = min(

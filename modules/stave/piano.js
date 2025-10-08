@@ -34,25 +34,47 @@ export default class PianoStave extends Stave {
         </span>`;
     }
 
-    parts = {
-        rh: {
-            name:        'rh',
-            topPitch:    'F5',
-            centerPitch: 'B4',
-            bottomPitch: 'E4'
-        },
-
-        lh: {
-            name:        'lh',
-            topPitch:    'A3',
-            centerPitch: 'D3',
-            bottomPitch: 'G2'
-        }
-    };
+    parts = [{
+        name:        'lh',
+        topPitch:    'A3',
+        centerPitch: 'D3',
+        bottomPitch: 'G2',
+        DEFAULT: true
+    }, {
+        name:        'rh',
+        topPitch:    'F5',
+        centerPitch: 'B4',
+        bottomPitch: 'E4',
+        DEFAULT: true
+    }, {
+        name:        'soprano',
+        topPitch:    'F5',
+        centerPitch: 'B4',
+        bottomPitch: 'E4',
+        stemup: true
+    }, {
+        name:        'alto',
+        topPitch:    'F5',
+        centerPitch: 'B4',
+        bottomPitch: 'E4',
+        stemup: false
+    }, {
+        name:        'tenor',
+        topPitch:    'A3',
+        centerPitch: 'D3',
+        bottomPitch: 'G2',
+        stemup: true
+    }, {
+        name:        'bass',
+        topPitch:    'A3',
+        centerPitch: 'D3',
+        bottomPitch: 'G2',
+        stemup: false
+    }];
 
     getPart(pitch) {
         return /[012]$|[AC-G][b#♭♯𝄫𝄪]*3$/.test(pitch) ?
-            this.parts.lh :
-            this.parts.rh ;
+            this.parts[0] :
+            this.parts[1] ;
     }
 }

@@ -172,7 +172,7 @@
 
 .stave > .rest[data-duration="4"],
 .stave > .rest[data-duration="6"] {
-    grid-row: 12;
+    grid-row: 13;
 }
 
 .stave > .tie,

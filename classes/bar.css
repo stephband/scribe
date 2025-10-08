@@ -42,9 +42,26 @@
     justify-self: end;
     margin-top: calc(0.0625em - 0.5 * var(--barline-thickness));
     margin-bottom: calc(0.0625em - 0.5 * var(--barline-thickness));
+    margin-right: calc(-1 * var(--bar-padding-right));
     width: var(--barline-thickness);
     background: currentcolor;
 }
+
+.end-bar::after {
+    width: 0.11em;
+    border-left: var(--barline-thickness) solid currentcolor;
+    border-right: var(--barline-thickness) solid currentcolor;
+    background: transparent;
+}
+
+/*
+.end-bar:last-child::after {
+    width: 0.17em;
+    border-left: var(--barline-thickness) solid currentcolor;
+    border-right: calc(2 * var(--barline-thickness)) solid currentcolor;
+    background: transparent;
+}
+*/
 
 .bar.error {
     color: red !important;
@@ -455,7 +472,14 @@ in their duration span. */
     white-space: nowrap;
 }
 
-.bar::before {
+.bar > .BARREPEAT {
+    justify-self: center;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    grid-column-end: span calc(var(--columns-per-beat) * var(--duration));
+}
+
+.end-bar + .bar::before {
     /* Bar count */
     content: attr(data-count);
     position: absolute;
@@ -471,14 +495,7 @@ in their duration span. */
     white-space: nowrap;
 }
 
-.bar:first-child::before {
+.bar:first-child::before,
+:not(.bar) + .bar::before {
     display: none;
-}
-
-
-.bar > .BARREPEAT {
-    justify-self: center;
-    margin-left: 0.5em;
-    margin-right: 0.5em;
-    grid-column-end: span calc(var(--columns-per-beat) * var(--duration));
 }

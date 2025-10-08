@@ -140,21 +140,6 @@ export default class DrumStave extends Stave {
             html ;
     }
 
-    /*getPart(pitch) {
-        // Split drums stave into drums and cymbals parts
-        return [35, 36, 37, 38, 40, 41, 43, 44, 45, 47, 50].includes(toNoteNumber(pitch)) ? {
-            part:          'drums',
-            stemDirection: 'down',
-            tieDirection:  'down',
-            centerRow:     'stave-lower',
-        } : {
-            // part: 'cymbals' Leave part undefined to group with main render
-            stemDirection: 'up',
-            tieDirection:  'up',
-            centerRow:     'stave-upper'
-        } ;
-    }*/
-
     parts = {
         drums: {
             name:   'drums',

@@ -210,7 +210,8 @@ function createBarSymbols(symbols, bar, stave, key, accidentals, events, setting
 
         case "sequence": {
             // Put a double bar line at the end of bar
-            symbols.push({ type: 'doublebarline', stave, event });
+            // symbols.push({ type: 'doublebarline', stave, event });
+            bar.doubleBarLine = true;
             break;
         }
 
@@ -268,17 +269,20 @@ export function createBar(count, beat, duration, divisor, stave, key, events, pa
     createBarSymbols(symbols, bar, stave, key, accidentals, events, config);
 
     // Populate symbols with parts
-    let index;
+    let index, p = 0;
     for (index in stave.parts) {
         const part   = stave.parts[index];
         const events = parts[part.name] || [];
+        // Dont render anything if this is not a default part and there are no events
+        if (!part.DEFAULT && !events.length) continue;
         createPart(symbols, bar, stave, key, accidentals, part, events, settings);
+        ++p;
     }
 
-    // If no part was rendered at least render a rest
-    if (!index) {
+    // But if no part was rendered at least render rests
+    if (!p) {
         console.log('Stave has no parts defined SHOULD NOT BE');
-        createPart(symbols, bar, stave, key, accidentals, '0', [], settings);
+        createPart(symbols, bar, stave, key, accidentals, stave.parts[0], [], settings);
     }
 
     return bar;

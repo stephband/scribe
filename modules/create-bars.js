@@ -37,16 +37,21 @@ function detectBarRepeats(bars, jsons, bar) {
         case 1: break;
         case 2: break;
         case 3: {
+            // If bars have no events of interest they are just rests, we don't
+            // want to bar repeat rest bars
+            if (json === '[]' && jsons[0] === '[]') {
+                jsons.length = 0;
+            }
             // When jsons reaches 3 check for 3 bar repeats, or 4 identical bars
-            if (json === jsons[0] && json === jsons[1] && json === jsons[2] && bar.symbols.filter((symbol) => symbol.type !== 'clef' && symbol.type !== 'timesig').find((symbol) => symbol.type !== 'rest')) {
+            else if (json === jsons[0] && json === jsons[1] && json === jsons[2] && bar.symbols.filter((symbol) => symbol.type !== 'clef' && symbol.type !== 'timesig').find((symbol) => symbol.type !== 'rest')) {
                 // Replace the last three bars with single bar repeat symbols
                 replaceWithRepeat(bars[bars.length - 2], 1);
                 replaceWithRepeat(bars[bars.length - 1], 1);
                 replaceWithRepeat(bar, 1);
             }
             else if (json !== jsons[1] || jsons[0] !== jsons[2]) {
-                // There is no double bar repeat cooking so go back to testing
-                // for single bar repeats in case 3
+                // There is no double bar repeat cooking return to testing for
+                // single bar repeats
                 jsons.length = 2;
             }
 
@@ -120,7 +125,12 @@ function detectBarRepeats(bars, jsons, bar) {
 /* Bars */
 
 function pushEventToPart(stave, parts, event) {
-    const part = stave.getPart(event[2]);
+    const part = event.target ?
+        // TEMP Experimental parts syphoner - but is this the way to do it?
+        stave.parts[event.target] :
+        // Stave decides on part automatically
+        stave.getPart(event[2]) ;
+
     const partEvents = parts[part.name] || (parts[part.name] = []);
     parts[part.name].push(event);
 }

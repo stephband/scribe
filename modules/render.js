@@ -23,7 +23,7 @@ function toElements(nodes, symbol) {
 
 export function toBarElements(elements, bar) {
     elements.push(create('div', {
-        class: `${ bar.stave.type }-stave stave ${ bar.error ? 'error ': '' }bar`,
+        class: `${ bar.stave.type }-stave stave ${ bar.doubleBarLine ? 'end-bar ' : '' }bar${ bar.error ? ' error ': '' }`,
         data: { beat: bar.beat, duration: bar.duration, count: bar.count },
         children: bar.symbols.reduce(toElements, [])
     }));
