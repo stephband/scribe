@@ -1,9 +1,12 @@
+
+const { abs, EPSILON } = Math;
+
 export function round(d, n) {
     return Math.round(n / d) * d;
 }
 
-export function eq(a, b, precision = Math.EPSILON) {
-    return a !== undefined && (a === b || Math.abs(a - b) < precision);
+export function eq(a, b, precision = EPSILON) {
+    return a !== undefined && (a === b || abs(a - b) < precision);
 }
 
 export function lte(a, b, precision) {

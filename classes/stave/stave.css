@@ -119,6 +119,25 @@
     grid-row-end: span 1;
     align-self: center;
 }
+
+.stave > .ledge {
+    /* Stretch ledge from one named row to another plus 1 */
+    align-self: stretch;
+    height: auto;
+    overflow: hidden;
+}
+
+.stave > .up-ledge   {
+    grid-row-end: stave-top !important;
+    margin-bottom: 0.125em;
+}
+
+.stave > .down-ledge {
+    grid-row-start: stave-bottom !important;
+    position: relative;
+    top: 0.125em;
+}
+
 /*
 .stave > .stem {
     align-self: center;
@@ -132,18 +151,6 @@
 .stave > .down-stem {
     align-self: start;
     margin-top: 0.0625em;
-}
-
-.stave > .ledge {
-    overflow: hidden;
-}
-
-.stave > .up-ledge {
-    align-self: start;
-}
-
-.stave > .down-ledge {
-    align-self: end;
 }
 
 /*.stave > .tail {
@@ -271,3 +278,5 @@
 .stave > [data-pitch^="E"][data-pitch$="-1"] { grid-row: E-1; }
 .stave > [data-pitch^="D"][data-pitch$="-1"] { grid-row: D-1; }
 .stave > [data-pitch^="C"][data-pitch$="-1"] { grid-row: C-1; }
+
+

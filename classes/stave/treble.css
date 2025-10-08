@@ -1,6 +1,6 @@
 .treble-stave {
     grid-template-rows:
-        [high] 0.0625em
+        [max] 0.0625em
         [A6] 0.125em
         [G6 chords] 0.125em
         [F6] 0.125em
@@ -27,8 +27,8 @@
         [F3] 0.125em
         [E3] 0.125em
         [D3] 0.125em
-        [C3 lyrics] 0.125em
-        [low] 0.0625em;
+        [C3] 0.125em
+        [min lyrics] 0.0625em;
 }
 
 /*
@@ -42,7 +42,8 @@
     align-self: end;
 }
 
-/* Map unoctaved pitches to stave lines for key signatures. */
+/* Key signature */
+
 .treble-stave > [data-pitch="F♭"] { grid-row-start: F4; }
 .treble-stave > [data-pitch="C♭"] { grid-row-start: C5; }
 .treble-stave > [data-pitch="G♭"] { grid-row-start: G4; }

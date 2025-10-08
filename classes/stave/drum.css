@@ -7,7 +7,7 @@ https://web.mit.edu/merolish/Public/drums.pdf
 
 .drum-stave {
     grid-template-rows:
-        0.125em
+        [max] 0.0625em
         0.125em
         [chords]      0.125em
         0.125em
@@ -31,7 +31,7 @@ https://web.mit.edu/merolish/Public/drums.pdf
         0.125em
         0.125em
         0.125em
-        [lyrics] 0.125em;
+        [max lyrics] 0.0625em;
 }
 
 

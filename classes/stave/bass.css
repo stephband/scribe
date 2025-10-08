@@ -1,5 +1,6 @@
 .bass-stave {
     grid-template-rows:
+        [max] 0.0625em
         [C5] 0.125em
         [B4] 0.125em
         [A4 chords] 0.125em
@@ -26,7 +27,8 @@
         [A1] 0.125em
         [G1] 0.125em
         [F1] 0.125em
-        [E1 lyrics] 0.125em;
+        [E1] 0.125em
+        [min lyrics] 0.0625em;
 }
 
 /* Map unoctaved pitches to stave lines for key signatures. */

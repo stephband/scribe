@@ -1,6 +1,5 @@
 
 import getStopBeat from './event/to-stop-beat.js';
-import { floorPowerOf2 } from './number/power-of-2.js';
 
 
 const assign = Object.assign;

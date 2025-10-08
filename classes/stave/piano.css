@@ -1,7 +1,8 @@
 
 .piano-stave {
+    /* Total 6em height */
     grid-template-rows:
-        [B6] 0.125em
+        [max] 0.0625em
         [A6] 0.125em
         [G6] 0.125em
         [F6 chords] 0.125em
@@ -49,7 +50,7 @@
         [F1] 0.125em
         [E1] 0.125em
         [D1] 0.125em
-        [C1] 0.125em;
+        [min] 0.0625em;
 
     /*background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -14.5 1 29" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
         <style>line{vector-effect:non-scaling-stroke;stroke:currentcolor;stroke-width:0.04em;stroke-linejoin:round;stroke-linecap:round;fill:none;}</style>\

@@ -9,9 +9,10 @@ import { rflat, rsharp, rdoubleflat, rdoublesharp } from './pitch.js';
 import { getDivision } from './bar.js';
 import detectTuplets from './tuplet.js';
 import { round, eq, gte, lte, lt, gt } from './number/float.js';
-import { averagePowerOf2, roundPowerOf2, floorPowerOf2, ceilPowerOf2, isPowerOf2 } from './number/power-of-2.js';
+import { averagePowerOf2, roundPowerOf2, floorPow2, ceilPowerOf2, isPowerOf2 } from './number/power-of-2.js';
 import floorTo     from './number/floor-to.js';
 import ceilTo      from './number/ceil-to.js';
+import grainPow2   from './number/grain-pow-2.js';
 import push        from './object/push.js';
 import every       from './object/every.js';
 import last        from './object/last.js';
@@ -343,7 +344,8 @@ function createAccidentals(symbols, bar, stave, part, accidentals, beat, notes, 
 function createLedges(symbols, stave, part, beat, pitches) {
     // Up ledger lines
     let pitch = getMaxPitch(pitches);
-    let rows  = stave.getRowDiff(pitch, part.topPitch || stave.topPitch) + 1;
+    // Ledges begin two rows away from topPitch, which is the top line
+    let rows  = stave.getRowDiff(pitch, part.topPitch || stave.topPitch);
     if (rows < 0) symbols.push({
         type: 'ledge',
         beat,
@@ -353,7 +355,8 @@ function createLedges(symbols, stave, part, beat, pitches) {
 
     // Down ledger lines
     pitch = getMinPitch(pitches);
-    rows  = stave.getRowDiff(pitch, part.bottomPitch || stave.bottomPitch) - 1;
+    // Ledges begin two rows away from bottomPitch, which is the bottom line
+    rows  = stave.getRowDiff(pitch, part.bottomPitch || stave.bottomPitch) - 2;
     if (rows > 0)  symbols.push({
         type: 'ledge',
         beat,
@@ -686,6 +689,21 @@ if (stopBeat <= beat) {
 
         // Max stop beat of notes
         let stopBeat = notes.reduce(toMaxStopBeat, 0) - bar.beat;
+
+        // Some analysis of beats...
+        const minGrain = 0.125;
+        const maxGrain = floorPow2(bar.divisor);
+        // Last division
+        const div1     = floor(beat / bar.divisor) * bar.divisor;
+        // Granularity from last division
+        const grain1   = grainPow2(minGrain, maxGrain, beat - div1);
+        // Last division
+        const div2     = floor(stopBeat / bar.divisor) * bar.divisor;
+        // Granularity from last division
+        const grain2   = grainPow2(minGrain, maxGrain, stopBeat - div2);
+
+console.log('Grain beat', div1, beat, grain1, 'stop beat', div2, stopBeat, grain2, 'bar.divisor', bar.divisor);
+
 
         // Start beat of next event, if it exists
         let eventBeat = event && round(0.125, event[0]) - bar.beat;

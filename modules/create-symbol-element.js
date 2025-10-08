@@ -137,15 +137,19 @@ export default overload(get('type'), {
 
     ledge: (symbol) => create('svg', {
         class:   `${ symbol.rows < 0 ? 'up' : 'down' }-ledge ledge`,
-        viewBox: `0 -0.5 4.4 ${abs(symbol.rows)}`,
+        viewBox: symbol.rows < 0 ?
+            // Up ledge
+            `0 ${ 9 + symbol.rows - 0.5 } 4.8 ${ abs(symbol.rows) }` :
+            // Down ledge
+            `0 -0.5 4.8 ${ abs(symbol.rows) }` ,
         preserveAspectRatio: "xMidYMin",
-        style: `height: ${ abs(symbol.rows) * 0.125 }em;`,
+        //style: `height: ${ abs(symbol.rows) * 0.125 }em;`,
         html: `
-            <line x1="0" x2="4.4" y1="0" y2="0"></line>
-            <line x1="0" x2="4.4" y1="2" y2="2"></line>
-            <line x1="0" x2="4.4" y1="4" y2="4"></line>
-            <line x1="0" x2="4.4" y1="6" y2="6"></line>
-            <line x1="0" x2="4.4" y1="8" y2="8"></line>
+            <line x1="0" x2="4.8" y1="0" y2="0"></line>
+            <line x1="0" x2="4.8" y1="2" y2="2"></line>
+            <line x1="0" x2="4.8" y1="4" y2="4"></line>
+            <line x1="0" x2="4.8" y1="6" y2="6"></line>
+            <line x1="0" x2="4.8" y1="8" y2="8"></line>
         `,
         data: {
             beat:  truncate(symbol.beat),

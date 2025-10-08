@@ -350,7 +350,7 @@
         <h1 class="x2 6x">Scribe <span class="font-08">0.4</span></h1>
         <p class="x2 6x">
             Scribe is a new way of displaying music notation using web technologies, packaged in a custom element you can drop into a document.
-            It is perfect for embedding examples into tutorials, for publishing music to be read on a phone at a gig, or for live feedback of, say, MIDI input.
+            It is perfect for embedding examples into tutorials, for publishing music to be read on a phone at a gig, or for live feedback of, say, MIDI input in a web app.
         </p>
         <pre class="x2"><span class="orange-fg">&lt;scribe-music</span> <span class="yellow-fg">src="</span><span class="lime-fg">./blue-in-green.json</span><span class="orange-fg">"&gt;&lt;/scribe-music&gt;</span></pre>
         <scribe-music class="x1 9x" clef="treble" src="./data/blue-in-green.json"></scribe-music>
@@ -359,13 +359,14 @@
     <section class="9x-grid grid" style="padding: 3em; --y-gap: 0em;">
         <h2 class="x2 6x">Fluid and responsive</h2>
         <p class="x2 6x">
-        Scribe notation embraces the flow of the web, making it highly readable. It adapts to the constraints of your device with a fluidity that no other notation solution manages.
+        Scribe is laid out using flex and grid, sized in relative font sizes, and generally embraces the flow of the web, making it readable.
+        And because it's all CSS it's highly&nbsp;customisable.
         </p>
     </section>
 
     <section class="style-section 9x-grid grid y-start-grid" style="padding: 3em; --y-gap: 0em;">
         <h2 class="x2 6x">Highly styleable</h2>
-        <p class="x2 6x">Scribe is laid out using flex and grid, and sized in relative font sizes, and because it's all CSS it's highly&nbsp;customisable, in ways that other notation solutions simply can never be.</p>
+        <p class="x2 6x">Scribe is laid out using flex and grid, and sized in relative font sizes, and because it's all CSS it's highly&nbsp;customisable, in ways that image-based notation renderers can't match.</p>
         <scribe-music class="x2 no-wrap" clef="drum" src="./data/drum-pattern.json"></scribe-music>
         <pre class="x2">mix-blend-mode: color-dodge;</pre>
     </section>
