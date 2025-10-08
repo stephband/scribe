@@ -109,7 +109,7 @@ export default class Stave {
         top:    'stave-top',
         center: 'stave-center',
         bottom: 'stave-bottom',
-        default: true
+        DEFAULT: true
     }];
 
     getPart(pitch) {

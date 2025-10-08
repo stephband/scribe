@@ -65,16 +65,20 @@ export default function render(data, clef, keyname, meter, duration = Infinity, 
     // Create sequence object
     const sequence = new SequenceIterator(events, data.sequences, 0, duration, transforms);
 
-    // Concat instructions line together from settings and tempo
-    /*
-    const instructions = [];
-    if (settings.swingAsStraight8ths)  instructions.push('Swing 8ths');
-    if (settings.swingAsStraight16ths) instructions.push('Swing 16ths');
-    if (instructions.length) elements.push(create('p', {
-        class: 'instruction',
-        html: instructions.join(', ')
-    }));
-    */
 
-    return createBars(sequence, stave, settings).reduce(toBarElements, []);
+    // TEMP
+    // Quick and dirty way of rendering clefs into left hand side bar
+    const sidebar = create('div', {
+        class: `${ stave.type }-stave stave bar`,
+        children: [createSymbolElement({ type: 'clef', stave })]
+    });
+    const column = create('div', {
+        id: 'side',
+        class: 'side'
+    });
+    let n = 12;
+    while (n--) column.appendChild(sidebar.cloneNode(true));
+
+
+    return createBars(sequence, stave, settings).reduce(toBarElements, [column]);
 }

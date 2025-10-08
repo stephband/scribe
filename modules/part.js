@@ -676,7 +676,7 @@ if (stopBeat <= beat) {
         const stemup   = part.stemup === undefined ?
             stemFromMinMaxPitches(stave, part, minPitch, maxPitch) :
             part.stemup ;
-console.log(part);
+
         // Create ledgers and accidentals
         createLedges(symbols, stave, part, beat, pitches);
         createAccidentals(symbols, bar, stave, part, accidentals, beat, notes, pitches);

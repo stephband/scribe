@@ -34,7 +34,7 @@
         [bar-end];
 }
 
-.bar::after {
+.bar[data-duration]::after {
     content: '';
     grid-column: -1;
     grid-row: stave-top / stave-bottom;

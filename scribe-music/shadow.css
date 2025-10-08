@@ -37,11 +37,11 @@
     --rest-margin-left:  0;
     --rest-margin-right: 0;
 
-    --clef-width: 4.5em;
+    --signature-width: 2em;
 
     position: relative;
     /*display: grid;
-    grid-template-columns: var(--clef-width) 1fr;
+    grid-template-columns: var(--signature-width) 1fr;
     grid-template-rows: min-content;
     align-content: start;
     justify-content: stretch;*/
@@ -76,12 +76,17 @@
     --stem-align-down: -0.14;
 }
 
+:host {
+    padding-left: var(--signature-width);
+}
+
 :host > .side {
     position: absolute;
     top: 0;
     bottm: 0;
     left: 0;
-    min-width: var(--clef-width);
+    padding-top: 1em;
+    min-width: var(--signature-width);
     grid-column: 1;
     grid-row: 1;
     justify-self: stretch;
@@ -162,79 +167,79 @@ svg > path {
 
 :host([layout="regular"]) .bars .bar,
 :host([layout="spaced"]) .bars .bar  {
-    min-width: calc((100cqw - var(--clef-width)) / 3);
-    max-width: calc((100cqw - var(--clef-width)) / 1);
+    min-width: calc((100cqw - var(--signature-width)) / 3);
+    max-width: calc((100cqw - var(--signature-width)) / 1);
 }
 
 @container host (min-width: 32em) {
     :host([layout="regular"]) .bars .bar {
-        min-width: calc((100cqw - var(--clef-width)) / 3);
-        max-width: calc((100cqw - var(--clef-width)) / 1);
+        min-width: calc((100cqw - var(--signature-width)) / 3);
+        max-width: calc((100cqw - var(--signature-width)) / 1);
     }
 
     :host([layout="spaced"]) .bars .bar {
-        min-width: calc((100cqw - var(--clef-width)) / 3);
-        max-width: calc((100cqw - var(--clef-width)) / 1);
+        min-width: calc((100cqw - var(--signature-width)) / 3);
+        max-width: calc((100cqw - var(--signature-width)) / 1);
     }
 }
 
 @container host (min-width: 48em) {
     :host([layout="regular"]) .bars .bar {
-        min-width: calc((100cqw - var(--clef-width)) / 4);
-        max-width: calc((100cqw - var(--clef-width)) / 2);
+        min-width: calc((100cqw - var(--signature-width)) / 4);
+        max-width: calc((100cqw - var(--signature-width)) / 2);
     }
 
     :host([layout="spaced"]) .bars .bar {
-        min-width: calc((100cqw - var(--clef-width)) / 4);
-        max-width: calc((100cqw - var(--clef-width)) / 2);
+        min-width: calc((100cqw - var(--signature-width)) / 4);
+        max-width: calc((100cqw - var(--signature-width)) / 2);
     }
 }
 
 @container host (min-width: 64em) {
     :host([layout="regular"]) .bars .bar {
-        min-width: calc((100cqw - var(--clef-width)) / 6);
-        max-width: calc((100cqw - var(--clef-width)) / 4);
+        min-width: calc((100cqw - var(--signature-width)) / 6);
+        max-width: calc((100cqw - var(--signature-width)) / 4);
     }
 
     :host([layout="spaced"]) .bars .bar {
-        min-width: calc((100cqw - var(--clef-width)) / 6);
-        max-width: calc((100cqw - var(--clef-width)) / 4);
+        min-width: calc((100cqw - var(--signature-width)) / 6);
+        max-width: calc((100cqw - var(--signature-width)) / 4);
     }
 }
 
 @container host (min-width: 80em) {
     :host([layout="regular"]) .bars .bar {
-        min-width: calc((100cqw - var(--clef-width)) / 8);
-        max-width: calc((100cqw - var(--clef-width)) / 6);
+        min-width: calc((100cqw - var(--signature-width)) / 8);
+        max-width: calc((100cqw - var(--signature-width)) / 6);
     }
 
     :host([layout="spaced"]) .bars .bar {
-        min-width: calc((100cqw - var(--clef-width)) / 8);
-        max-width: calc((100cqw - var(--clef-width)) / 6);
+        min-width: calc((100cqw - var(--signature-width)) / 8);
+        max-width: calc((100cqw - var(--signature-width)) / 6);
     }
 }
 
 @container host (min-width: 100em) {
     :host([layout="regular"]) .bars .bar {
-        min-width: calc((100cqw - var(--clef-width)) / 10);
-        max-width: calc((100cqw - var(--clef-width)) / 8);
+        min-width: calc((100cqw - var(--signature-width)) / 10);
+        max-width: calc((100cqw - var(--signature-width)) / 8);
     }
 
     :host([layout="spaced"]) .bars .bar {
-        min-width: calc((100cqw - var(--clef-width)) / 10);
-        max-width: calc((100cqw - var(--clef-width)) / 8);
+        min-width: calc((100cqw - var(--signature-width)) / 10);
+        max-width: calc((100cqw - var(--signature-width)) / 8);
     }
 }
 
 @container host (min-width: 120em) {
     :host([layout="regular"]) .bars .bar {
-        min-width: calc((100cqw - var(--clef-width)) / 12);
-        max-width: calc((100cqw - var(--clef-width)) / 10);
+        min-width: calc((100cqw - var(--signature-width)) / 12);
+        max-width: calc((100cqw - var(--signature-width)) / 10);
     }
 
     :host([layout="spaced"]) .bars .bar {
-        min-width: calc((100cqw - var(--clef-width)) / 12);
-        max-width: calc((100cqw - var(--clef-width)) / 10);
+        min-width: calc((100cqw - var(--signature-width)) / 12);
+        max-width: calc((100cqw - var(--signature-width)) / 10);
     }
 }
 

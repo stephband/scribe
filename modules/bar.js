@@ -125,7 +125,7 @@ function createBarSymbols(symbols, bar, stave, key, accidentals, events, setting
             updateAccidentals(accidentals, key);
 
             // Add key signature
-/*            symbols.push.apply(symbols, keyscale
+            symbols.push.apply(symbols, keyscale
                 .map((n, i) => (n - major[i] && {
                     // No beat for key signature accidentals
                     type: 'acci',
@@ -136,7 +136,7 @@ function createBarSymbols(symbols, bar, stave, key, accidentals, events, setting
                 .filter((o) => !!o)
                 .sort(byFatherCharlesPitch)
             );
-*/
+
             bar.key = key;
             break;
         }
