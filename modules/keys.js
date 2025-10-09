@@ -1,6 +1,6 @@
 
 import overload           from 'fn/overload.js';
-import { toNoteNumber, toRootNumber } from 'midi/note.js';
+import { toNoteNumber, toRootNumber, toRootName } from 'midi/note.js';
 import { isChordEvent, isNoteEvent } from 'sequence/event.js';
 import toStopBeat         from './event/to-stop-beat.js';
 import { transposeScale } from './scale.js';
@@ -64,7 +64,7 @@ const extensions = {
 
 const degreeWeights = Float32Array.of(
 //  Root b9   9    min3 maj3 11   #11  5    b6   13   7    maj7
-    0.9, 0.9, 0.8, 1,   1,   0.8, 0.8, 0.8, 0.9, 1,   1,   1
+    1,   0.9, 0.8, 1,   1,   0.8, 0.8, 1,   0.9, 1,   1,   1
 );
 
 const modulationWeights = [
@@ -80,7 +80,7 @@ const modulationWeights = [
     (0         + 1/11  + 0),    // #11
     (5/6       + 0     + 0),    // 5
     (2/6       + 0     + 1/5),  // b6
-    (3/6       + 1/9   + 0),    // 13
+    (3/6       + 1/8   + 0),    // 13
     (4/6       + 0     + 0),    // 7
     (1/6       + 0     + 0)     // maj7
 ];
@@ -113,13 +113,26 @@ function keysContainingNote(number) {
     const keys = new Float32Array(12);
     let n = toRootNumber(number + 2);
     let i = 7;
-    while (i--) keys[n = toRootNumber(n + 5)] = 1;
+    while (i--) {
+        n = toRootNumber(n + 5);
+        keys[n] = 1;
+    }
     return keys;
 }
 
 function multiplyWeights(weights1, weights2, factor) {
+//const a = Array.from(weights1, (weight) => weight === 0 ? '     ' : weight.toFixed(3)).join(' ');
+
     let n = weights1.length;
     while (n--) weights1[n] *= (1 - factor) + factor * weights2[n];
+/*
+console.log('x weights', factor, '\n'
+    + Array.from({ length: 12 }, (n, i) => (toRootName(i) + '       ').slice(0, 5)).join(' ') + '\n'
+    + a + '\n'
+    + Array.from(weights2, (weight) => weight === 0 ? '     ' : weight.toFixed(3)).join(' ') + '\n'
+    + Array.from(weights1, (weight) => weight === 0 ? '     ' : weight.toFixed(3)).join(' ')
+);
+*/
     return weights1;
 }
 
@@ -148,7 +161,7 @@ const types = {
         let n = notes.length, probs;
         while (n--) {
             probs = keysContainingNote(notes[n]);
-            multiplyWeights(weights, probs, influence
+            multiplyWeights(weights, probs, (influence / notes.length)
                 // Weight notes based on chord degree
                 * degreeWeights[degrees[n]]
             );
@@ -182,14 +195,16 @@ export function keyWeightsForEvent(events, n, currentKey) {
 
         // Events that are playing concurrently
         if (stopBeat > beat) {
+//console.log('STOPBEAT', event[1]);
             // Fairly influential 0.5
             fn(weights, event, 0.5);
         }
         // Notes that recently stopped
         else if (event[1] === 'note' && beat - stopBeat < 3) {
             if ((1 - (beat - stopBeat) / 3) > 1) throw new Error('Influence should never be > 1 ' + beat + ' ' + stopBeat);
+//console.log('RECENT NOTE', event[2], 0.25 * (1 - (beat - stopBeat) / 3));
             // Weight by distance from stopBeat to beat
-            fn(weights, event, 0.25 * (1 - (beat - stopBeat) / 3));
+            fn(weights, event, 0.25 * (1 - (beat - event[0]) / 3));
         }
     }
 
@@ -201,7 +216,7 @@ export function keyWeightsForEvent(events, n, currentKey) {
         const fn = types[event[1]];
         if (!fn) continue;
         if ((1 - (event[0] - beat) / 2) > 1) throw new Error('Influence should never be > 1 ' + beat + ' ' + stopBeat);
-
+//console.log('FUTURE NOTE', event[2], 0.3 * (1 - (event[0] - beat) / 2));
         // Weight by distance to startBeat from beat
         fn(weights, event, 0.3 * (1 - (event[0] - beat) / 2));
     }

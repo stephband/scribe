@@ -136,8 +136,9 @@ function pushEventToPart(stave, parts, event) {
 }
 
 export default function createBars(sequence, stave, settings = config) {
-    const bars = [];
-    const ties = [];
+    const scribeEvents = [];
+    const bars  = [];
+    const ties  = [];
     const jsons = [];
 
     let beat   = 0;
@@ -149,6 +150,13 @@ export default function createBars(sequence, stave, settings = config) {
 
     // Extract events from sequence iterator
     for (event of sequence) {
+        // Store all events for the key analyser. We know event is an object at
+        // this point, as the iterator emits transformed objects, so use the
+        // event to pass the info down
+        event.scribeIndex  = scribeEvents.length;
+        event.scribeEvents = scribeEvents;
+        scribeEvents.push(event);
+
         // If event is beyond current duration create bars
         while (event[0] >= beat + duration) {
             // Close current bar, push to bars

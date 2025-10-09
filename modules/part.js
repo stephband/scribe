@@ -73,22 +73,18 @@ function toMaxStopBeat(n, event) {
     return max(n, getStopBeat(event));
 }
 
-function getPitches(stave, key, notes, events, i) {
-    if (notes[0] !== events[i + 1]) {
-        console.log(i, notes, events);
-        throw new Error('HELP ' + i);
-    }
-
+function getPitches(stave, key, notes) {
     const pitches = {};
     let n = -1;
     let note;
     while (note = notes[++n]) {
-        const keyWeights = keyWeightsForEvent(events, ++i, key);
+        const events     = note.scribeEvents;
+        const index      = note.scribeIndex;
+        const keyWeights = keyWeightsForEvent(events, index, key);
         const keyNumber  = chooseKeyFromWeights(keyWeights);
-
         pitches[n] = stave.getSpelling(keyNumber, note);
-        //console.log(toRootName(keyNumber), pitches[n]);
     }
+
     return pitches;
 }
 
@@ -476,7 +472,7 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
         }
 
         // Insert heads
-        const pitches  = getPitches(stave, key, notes, events, n - notes.length);
+        const pitches  = getPitches(stave, key, notes);
         const minPitch = getMinPitch(pitches);
         const maxPitch = getMaxPitch(pitches);
         const stemup   = part.stemup === undefined ?
@@ -673,7 +669,7 @@ if (stopBeat <= beat) {
             continue;
         }
 
-        const pitches  = getPitches(stave, key, notes, events, n - notes.length);
+        const pitches  = getPitches(stave, key, notes);
         const minPitch = getMinPitch(pitches);
         const maxPitch = getMaxPitch(pitches);
         const stemup   = part.stemup === undefined ?
