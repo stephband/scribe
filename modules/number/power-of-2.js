@@ -1,7 +1,7 @@
 
 import sum from 'fn/sum.js';
 
-export function ceilPowerOf2(n) {
+export function ceilPow2(n) {
     return 2 ** Math.ceil(Math.log2(n));
 }
 

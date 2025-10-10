@@ -1,5 +1,6 @@
 
-import create      from 'dom/create.js';
+import create         from 'dom/create.js';
+import { toRootName } from 'midi/note.js';
 import { SequenceIterator } from 'sequence/sequence.js';
 import Stave       from '../modules/stave.js';
 import createBars  from './create-bars.js';
@@ -24,7 +25,7 @@ function toElements(nodes, symbol) {
 export function toBarElements(elements, bar) {
     elements.push(create('div', {
         class: `${ bar.stave.type }-stave stave ${ bar.doubleBarLine ? 'end-bar ' : '' }bar${ bar.error ? ' error ': '' }`,
-        data: { beat: bar.beat, duration: bar.duration, count: bar.count },
+        data: { beat: bar.beat, duration: bar.duration, count: bar.count, key: toRootName(bar.key) },
         children: bar.symbols.reduce(toElements, [])
     }));
 
@@ -65,20 +66,27 @@ export default function render(data, clef, keyname, meter, duration = Infinity, 
     // Create sequence object
     const sequence = new SequenceIterator(events, data.sequences, 0, duration, transforms);
 
+    // Create bar elements
+    const bars = createBars(sequence, stave, settings).reduce(toBarElements, []);
 
-    // TEMP
+    // TEMP get keysig and stick it in side bar and do some style stuff
+    const bar0   = bars[0];
+    const keysig = bar0.querySelectorAll('.acci:not([data-beat])');
     // Quick and dirty way of rendering clefs into left hand side bar
     const sidebar = create('div', {
-        class: `${ stave.type }-stave stave bar`,
-        children: [createSymbolElement({ type: 'clef', stave })]
+        class: `${ stave.type }-stave signature-stave stave`,
+        children: [createSymbolElement({ type: 'clef', stave }), ...keysig],
+        data: { key: bar0.dataset.key }
     });
     const column = create('div', {
         id: 'side',
-        class: 'side'
+        class: 'side',
+        data: { key: bar0.dataset.key }
     });
-    let n = 12;
+    let n = 24;
     while (n--) column.appendChild(sidebar.cloneNode(true));
-
-
-    return createBars(sequence, stave, settings).reduce(toBarElements, [column]);
+console.log('BBBB', bars);
+    // Return array of elements
+    bars.unshift(column);
+    return bars;
 }

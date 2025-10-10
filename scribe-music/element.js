@@ -1,5 +1,6 @@
 
 import Signal                    from 'fn/signal.js';
+import rect                      from 'dom/rect.js';
 import create                    from 'dom/create.js';
 import element, { getInternals } from 'dom/element.js';
 import events                    from 'dom/events.js';
@@ -105,11 +106,17 @@ export default define(element('scribe-music', {
                 })
             );
 
-            //const barsElement = shadow.getElementById('bars');
-
             // Clear the shadow DOM of bars and put new elements in it
-            shadow.querySelectorAll('.bar').forEach((element) => element.remove());
+            shadow.querySelectorAll('.side, .bar').forEach((element) => element.remove());
             shadow.append.apply(shadow, elements);
+            if (!elements) return;
+
+            // Apply padding and clef/signature column size
+            const side  = shadow.getElementById('side');
+            const key   = side.children[0].querySelectorAll('.acci');
+            const fontSize = parseFloat(getComputedStyle(this).fontSize);
+            const style = create('style', ':host { --signature-width: ' + (3.5 + key.length * 0.3).toFixed(4) + 'em; }');
+            shadow.appendChild(style);
 
             // Render beams
             shadow.querySelectorAll('.beam').forEach(renderBeam);

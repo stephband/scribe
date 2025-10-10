@@ -1,5 +1,4 @@
 
-//import by       from 'fn/by.js';
 import get      from 'fn/get.js';
 import nothing  from 'fn/nothing.js';
 import overload from 'fn/overload.js';
@@ -8,8 +7,8 @@ import { keyWeightsForEvent, chooseKeyFromWeights } from './keys.js';
 import { rflat, rsharp, rdoubleflat, rdoublesharp } from './pitch.js';
 import { getDivision } from './bar.js';
 import detectTuplets from './tuplet.js';
-import { round, eq, gte, lte, lt, gt } from './number/float.js';
-import { averagePowerOf2, roundPowerOf2, floorPow2, ceilPowerOf2, isPowerOf2 } from './number/power-of-2.js';
+import { round as roundTo, eq, gte, lte, lt, gt } from './number/float.js';
+import { averagePowerOf2, roundPowerOf2, floorPow2, ceilPow2, isPowerOf2 } from './number/power-of-2.js';
 import floorTo     from './number/floor-to.js';
 import ceilTo      from './number/ceil-to.js';
 import grainPow2   from './number/grain-pow-2.js';
@@ -23,44 +22,13 @@ import { rpitch }  from './pitch.js';
 import config      from './config.js';
 
 const assign = Object.assign;
-const { abs, ceil, floor, min, max, sqrt } = Math;
-
+const { abs, ceil, floor, min, max, sqrt, round } = Math;
 
 /* When dealing with rounding errors we only really need beat grid-level
    precision, our display grid has 24 slots but we only need to compare the
    smallest possible note values, 32nd notes, or ±1/16 precision */
+const p16 = 1/16;
 const p24 = 1/24;
-
-/* There are 24 slots in our display grid which allows for even spacing of
-   symbols down to 32nd-note triplet level, or twelve things per beat, as well
-   as 32nd-note level, or 8 things per beat. So some slots, like 1/24, go unused
-   (although they are used by accidentals, which are placed in slots preceding
-   note heads). */
-const quantiseBeats = [0, 2/24, 3/24, 4/24, 6/24, 8/24, 9/24, 10/24, 12/24, 14/24, 15/24, 16/24, 18/24, 20/24, 21/24, 22/24, 1];
-
-const headDurations = [
-    1/8, 6/32, 7/32,
-    1/4, 6/16, 7/16,
-    1/2, 6/8,  7/8,
-    1,   6/4,  7/4,
-    2,   6/2,  7/2,
-    4,   6,    7,
-    8
-];
-
-const minDuration = headDurations[0];
-
-/* Allowable rest durations. Do we really want to allow double-dotted rests? */
-const restDurations = [
-         /*1/12,*/
-    1/8, /*1/6, */ 6/32, // 7/32,
-    1/4, /*1/3, */ 6/16, // 7/16,
-    1/2, /*2/3, */ 6/8,  // 7/8,
-    1,   /*4/3, */ 6/4,  // 7/4,
-    2,   /*8/3, */ 3,    // 7/2
-    4,             6,
-    8
-];
 
 
 /* Events */
@@ -177,7 +145,7 @@ function closeBeam(symbols, stave, part, beam) {
         let pitch = note.pitch;
 
         // Find highest or lowest pitch at beat of note
-        while (beam[++n] && eq(beam[n].beat, note.beat, p24)) {
+        while (beam[++n] && eq(beam[n].beat, note.beat, p16)) {
             if (stemup) {
                 if (toNoteNumber(beam[n].pitch) > toNoteNumber(pitch)) {
                     pitch = beam[n].pitch;
@@ -248,8 +216,8 @@ function closeBeam(symbols, stave, part, beam) {
 
 /* Rests */
 
-function createRest(durations, divisions, endbeat, stave, part, tobeat, beat) {
-    // [beat, 'rest', pitch (currently unused), duration]
+function createRest(durations, bar, stave, part, stopBeat, beat) {
+/*    // [beat, 'rest', pitch (currently unused), duration]
     let duration = tobeat - beat;
 
     // If the beat and tobeat don't both fall on start, end or a division...
@@ -262,8 +230,8 @@ function createRest(durations, divisions, endbeat, stave, part, tobeat, beat) {
 
     // Clamp rest duration to permissable rest symbol durations
     let r = durations.length;
-    // Employ p24 to work around rounding errors
-    while (durations[--r] + p24 > duration);
+    // Employ p16 to work around rounding errors
+    while (durations[--r] + p16 > duration);
     duration = durations[r + 1] || durations[durations.length - 1];
 
     // Where beat does not fall on a 2^n division clamp it to next
@@ -274,12 +242,13 @@ function createRest(durations, divisions, endbeat, stave, part, tobeat, beat) {
     while ((p *= 0.5) && beat % p);
     // TODO: Something not quite right about this logic
     if (p < duration) duration = p;
+*/
 
     // Create rest symbol
     return {
         type: 'rest',
         beat,
-        duration,
+        duration: fitDuration(durations, bar, beat, stopBeat, beat, stopBeat),
         stave,
         part
     };
@@ -287,8 +256,8 @@ function createRest(durations, divisions, endbeat, stave, part, tobeat, beat) {
 
 function createRests(symbols, durations, bar, stave, part, beat, tobeat) {
     // Insert rests frombeat - tobeat
-    while (gt(tobeat, beat, p24)) {
-        const rest = createRest(durations, bar.divisions, bar.duration || 100, stave, part, tobeat, beat);
+    while (gt(tobeat, beat, p16)) {
+        const rest = createRest(durations, bar, stave, part, tobeat, beat);
         symbols.push(rest);
         beat += rest.duration;
     }
@@ -310,7 +279,7 @@ function createAccidental(symbols, bar, stave, part, accidentals, beat, event, p
 
     if (
         // If event started before this bar we don't require an accidental
-        gte(event[0], bar.beat, p24)
+        gte(event[0], bar.beat, p16)
         // and if it has changed from the bars current accidentals
         && acci !== accidentals[line]
     ) {
@@ -400,7 +369,7 @@ function closeTuplet(stave, part, tuplet) {
     // Scan forwards from first symbol finding highest pitch beginning head
     let firstNumber = lowestPitchNumber;
     h = -1;
-    while ((symbol = tuplet[++h]) && symbol.beat < beat + p24) {
+    while ((symbol = tuplet[++h]) && symbol.beat < beat + p16) {
         const number = toNoteNumber(symbol.pitch);
         if (!firstNumber || number > firstNumber) firstNumber = number;
     }
@@ -408,7 +377,7 @@ function closeTuplet(stave, part, tuplet) {
     // Scan backwards from last symbol finding highest pitch ending symbol
     let lastNumber = lowestPitchNumber;
     h = lengthOf(tuplet);
-    while ((symbol = tuplet[--h]) && symbol.beat > beat + duration - (duration / divisor) - p24) {
+    while ((symbol = tuplet[--h]) && symbol.beat > beat + duration - (duration / divisor) - p16) {
         const number = toNoteNumber(symbol.pitch);
         if (!lastNumber || number > lastNumber) lastNumber = number;
     }
@@ -456,10 +425,10 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
     if (!isPowerOf2(divisor)) symbols.push(tuplet);
 
     // While beat is before end of tuplet
-    while (lt(beat, stopBeat, p24)) {
+    while (lt(beat, stopBeat, p16)) {
         // Fill notes with events playing during beat, and leave event as the
         // next event after beat
-        while ((event = events[++n]) && lte(event[0] - bar.beat, beat + 0.5 * division, p24)) {
+        while ((event = events[++n]) && lte(event[0] - bar.beat, beat + 0.5 * division, p16)) {
             notes.push(event);
         }
         --n;
@@ -492,11 +461,11 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
             // Min duration is 1 tuplet division
             division,
             // Distance to stop beat rounded to nearest division
-            round(division, stopBeat - beat)
+            roundTo(division, stopBeat - beat)
         );
 
         // Manage beam
-        if (gt(duration, 0.5, p24)) {
+        if (gt(duration, 0.5, p16)) {
             // If there is a beam, close it
             if (beam) {
                 closeBeam(symbols, stave, part, beam);
@@ -537,7 +506,7 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
         while (p--) {
             let stopBeat = getStopBeat(notes[p]) - bar.beat;
             // Remove notes that end before or near next division, we're done with them
-            if (lte(stopBeat, beat + duration + 0.5 * division, p24)) notes.splice(p, 1);
+            if (lte(stopBeat, beat + duration + 0.5 * division, p16)) notes.splice(p, 1);
             // Add tie to remaining notes
             else symbols.push({
                 type:   'tie',
@@ -560,7 +529,7 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
 
     return n;
 }
-
+/*
 function durationToDivisor(durations, bar, beat, duration) {
     // Truncate event until it does end on a bar division or bar end
     let h = durations.length;
@@ -572,27 +541,168 @@ function durationToDivisor(durations, bar, beat, duration) {
 
     // Scan backwards and return when a duration takes us to bar divisor or stop
     while (d = durations[--h]) {
-        if (eq(beat + d, bar.duration, p24) || eq(0, (beat + d) % bar.divisor, p24)) {
+        if (eq(beat + d, bar.duration, p16) || eq(0, (beat + d) % bar.divisor, p16)) {
             return d;
         }
     }
 }
+*/
+function fitDottedDuration(min, duration) {
+    let grain = 2 * ceilPow2(duration);
+    while ((grain /= 2) > min / 2) {
+        if (1.75 * grain === duration) return 1.75 * grain;
+        if (1.5  * grain === duration) return 1.5  * grain;
+        if (grain <= duration) return grain;
+    }
+    return min;
+}
+
+function fitRoundedUpDuration(min, duration, maxDuration) {
+    maxDuration = maxDuration || Infinity;
+    let grain = 4 * ceilPow2(duration);
+    while ((grain /= 2) > min / 2) {
+        if (grain <= duration * 2 && grain <= maxDuration) return grain;
+    }
+    return min;
+}
+
+function fitDuration(durations, bar, startBeat, stopBeat, beat, eventBeat) {
+    // Some analysis of beats...
+    const minGrain = 0.125;
+    const maxGrain = floorPow2(bar.divisor);
+    const div1     = floor(beat / bar.divisor) * bar.divisor;
+    const grain    = grainPow2(minGrain, maxGrain, beat - div1);
+    const div2     = floor(stopBeat / bar.divisor) * bar.divisor;
+    const division = div1 + bar.divisor < stopBeat && div1 + bar.divisor;
+
+    // Decision tree
+    // Beat is on a divisor
+    if (beat === div1) {
+        // TODO: Something
+        if (eventBeat) {}
+        // Beat to stop beat is a valid head duration
+        if (durations.indexOf(stopBeat - beat) !== -1) return stopBeat - beat;
+        // If beat to last division is a valid duration
+        if (durations.indexOf(div2 - beat) !== -1) return div2 - beat;
+        // Beat to divisor
+        if (division) return division - beat;
+console.log(beat, 'huh', stopBeat - beat, eventBeat - beat);
+        //
+        return fitRoundedUpDuration(0.125, stopBeat - beat, eventBeat - beat);
+    }
+    // Stop beat is on a divisor
+    else if (eq(stopBeat, div2, p16)) {
+        // If beat to stop beat is a valid head duration
+        if (durations.indexOf(stopBeat - beat) !== -1) return stopBeat - beat;
+        // Otherwise up to the nearest division
+        if (division && durations.indexOf(division - beat) !== -1) return division - beat;
+        // Otherwise fill the grain
+        return grain;
+    }
+    else {
+        const quadDuration = 4 * grain;
+        const quadIndex    = ((beat - div1) % quadDuration) / grain;
+
+        if (quadIndex === 1) {
+            // If this note takes us up to note at 0001 render the duration 0--0
+            if (beat + 2 * grain === eventBeat) return 2 * grain;
+
+            // Is event inside the quadruplet?
+            if (beat + 3 * grain >= eventBeat) {
+                console.log('Next event beat is inside quaduplet');
+            }
+
+            // Grain is less than 1
+            return grain < 1 ?
+                // If stop beat is greater than half of three grains render duration 0---
+                stopBeat >= beat + grain * 3/2 ? 3 * grain :
+                // Otherwise render duration 0-00
+                stopBeat >= beat + grain ? grain :
+                // Stop beat is smaller than grain, fit an appropriate duration
+                fitDottedDuration(0.125, stopBeat - beat) :
+            // Grain is 1 or greater and
+                // stop beat is after 3 grains render 0---
+                stopBeat >=  beat + grain * 3 ? grain * 3 :
+                // Stop beat is after 2 grains render 0--0
+                stopBeat >=  beat + grain * 2 ? grain * 2 :
+                // Stop beat is after 1 grain render  0-00
+                stopBeat > beat + grain ? grain :
+                // Stop beat is shorter than a grain
+                fitDottedDuration(0.125, stopBeat - beat) ;
+        }
+
+            // stop beat is after 4th grain render 000-
+        return stopBeat > beat + grain ? grain :
+            // Stop beat is shorter than grain
+            fitDottedDuration(0.125, stopBeat - beat) ;
+    }
+/*
+    //console.log(bar.beat, beat, 'NOTES', stopBeat, eventBeat);
+
+    // If notes are truncated by next event
+    if (lte(eventBeat, stopBeat, p16)) {
+        stopBeat = eventBeat;
+    }
+    // If event beat is less then some multiplier of the duration of notes
+    else if (eventBeat - beat < 1.5 * (stopBeat - beat)) {
+        stopBeat = eventBeat;
+    }
+    // If stop beat is near divisor round it up ??????
+    else if (stopBeat % bar.divisor > 0.6) {
+        stopBeat = Math.ceil(stopBeat / bar.divisor) * bar.divisor;
+    }
+    // If duration is less than a beat and near a power of 2 duration
+    else if (stopBeat - beat < 1 && stopBeat - beat > 0.5 * ceilPow2(stopBeat - beat)) {
+        stopBeat = ceilPow2(stopBeat - beat) + beat;
+    }
+    // Round it
+    else {
+        stopBeat = roundTo(0.125, stopBeat);
+    }
+
+    // If stop beat has ended up after bar end truncate it
+    if (stopBeat > bar.duration) stopBeat = bar.duration;
+
+    const division = getDivision(bar.divisions, beat, stopBeat);
+
+        // Truncate stopBeat to divisor or bar end based on permissable durations
+    let duration = division ? durationToDivisor(headDurations, bar, beat, stopBeat - beat) :
+        // Or truncate duration to next lowest duration
+        floorTo(headDurations, stopBeat - beat)
+        // Or set it to the minimum duration
+        || headDurations[0] ;
+
+    // Update stopBeat accordingly
+    stopBeat = beat + duration;
+
+    // Limit duration by division
+    if (division
+        && (!(beat === 0 || eq(0, beat % bar.divisor, p16))
+        || !(stopBeat === bar.duration || eq(0, stopBeat % bar.divisor, p16))
+    )) {
+        duration = floorTo(headDurations, division - beat);
+    }
+
+    return duration;
+*/
+}
 
 export function createPart(symbols, bar, stave, key = 0, accidentals = {}, part, events, settings = config) {
     const notes = [];
+    const { headDurations, restDurations } = settings;
 
     let beat = 0;
     let n = -1;
     let event, duration, beam;
 
-    // Ignore events that stop before beat 0, an extra cautious measure because
+    // Ignore events that stop before beat 0. An extra cautious measure because
     // events array should already start with events at beat 0
-    while ((event = events[++n]) && lte(event[0] + event[4] - bar.beat, beat, p24));
+    while ((event = events[++n]) && lte(event[0] + event[4] - bar.beat, beat, p16));
     --n;
 
-    while (lt(beat, bar.duration, p24)) {
+    while (lt(beat, bar.duration, p16)) {
         // If there's a beam and beat is on a division close it
-        if (beam && bar.divisions.find((division) => eq(beat, division, p24))
+        if (beam && bar.divisions.find((division) => eq(beat, division, p16))
             // or head started after a new division
             // || getDivision(bar.divisions, , beat)
         ) {
@@ -605,10 +715,11 @@ export function createPart(symbols, bar, stave, key = 0, accidentals = {}, part,
 
 //if (data) console.log(bar.beat, beat, n, event, 'TUPLETS', data.beat, data.duration, 'divisor', data.divisor, data.rhythm, n, events);
 //else console.log(bar.beat, beat, 'DUPLETS', n, events);
+//if (data) console.log(bar.count, beat, 'Rhythm', data.duration, data.divisor, data.rhythm.toString(2).split('').reverse().join(''));
 
         if (data && data.divisor !== 2 && data.divisor !== 4) {
             // Create rests up to tuplet
-            if (gt(data.beat - bar.beat, beat, p24)) createRests(symbols, restDurations, bar, stave, part, beat, data.beat - bar.beat);
+            if (gt(data.beat - bar.beat, beat, p16)) createRests(symbols, settings.restDurations, bar, stave, part, beat, data.beat - bar.beat);
             // Close beam TODO dont close beam
             if (beam) {
                 closeBeam(symbols, stave, part, beam);
@@ -624,7 +735,7 @@ export function createPart(symbols, bar, stave, key = 0, accidentals = {}, part,
 
         // Fill notes with events playing during beat, and leave event as the
         // next event after beat
-        while ((event = events[++n]) && lte(event[0] - bar.beat, beat, p24)) {
+        while ((event = events[++n]) && lte(event[0] - bar.beat, beat, p16)) {
             notes.push(event);
         }
         --n;
@@ -640,12 +751,12 @@ export function createPart(symbols, bar, stave, key = 0, accidentals = {}, part,
                 }
 
                 // Fill rest of bar with rests
-                createRests(symbols, restDurations, bar, stave, part, beat, bar.duration);
+                createRests(symbols, settings.restDurations, bar, stave, part, beat, bar.duration);
                 break;
             }
 
             // Create rests up to next event
-            const stopBeat = round(0.125, event[0] - bar.beat);
+            const stopBeat = roundTo(0.125, event[0] - bar.beat);
 
 if (stopBeat <= beat) {
     console.log(`Problem at bar ${ bar.count }, moving to next bar ${ beat } ${ stopBeat }`);
@@ -680,84 +791,14 @@ if (stopBeat <= beat) {
         createLedges(symbols, stave, part, beat, pitches);
         createAccidentals(symbols, bar, stave, part, accidentals, beat, notes, pitches);
 
-
-// Note duration heuristics ------------------ what a polava -------------------
-
+        // Original start beat of notes, may be well before beat
+        const startBeat = notes[0][0] - bar.beat;
         // Max stop beat of notes
-        let stopBeat = notes.reduce(toMaxStopBeat, 0) - bar.beat;
-
-        // Some analysis of beats...
-        const minGrain = 0.125;
-        const maxGrain = floorPow2(bar.divisor);
-        // Last division
-        const div1     = floor(beat / bar.divisor) * bar.divisor;
-        // Granularity from last division
-        const grain1   = grainPow2(minGrain, maxGrain, beat - div1);
-        // Last division
-        const div2     = floor(stopBeat / bar.divisor) * bar.divisor;
-        // Granularity from last division
-        const grain2   = grainPow2(minGrain, maxGrain, stopBeat - div2);
-
-console.log('Grain beat', div1, beat, grain1, 'stop beat', div2, stopBeat, grain2, 'bar.divisor', bar.divisor);
-
-
+        const stopBeat  = min(bar.duration, notes.reduce(toMaxStopBeat, 0) - bar.beat);
         // Start beat of next event, if it exists
-        let eventBeat = event && round(0.125, event[0]) - bar.beat;
-//console.log(bar.beat, beat, 'NOTES', stopBeat, eventBeat);
-
-        // If notes are truncated by next event
-        if (lte(eventBeat, stopBeat, p24)) {
-            stopBeat = eventBeat;
-        }
-        // If event beat is less then some multiplier of the duration of notes
-        else if (eventBeat - beat < 1.5 * (stopBeat - beat)) {
-            stopBeat = eventBeat;
-        }
-        // If stop beat is near divisor round it up ??????
-        else if (stopBeat % bar.divisor > 0.6) {
-            stopBeat = Math.ceil(stopBeat / bar.divisor) * bar.divisor;
-        }
-        // If duration is less than a beat and near a power of 2 duration
-        else if (stopBeat - beat < 1 && stopBeat - beat > 0.5 * ceilPowerOf2(stopBeat - beat)) {
-            stopBeat = ceilPowerOf2(stopBeat - beat) + beat;
-        }
-        // Round it
-        else {
-            stopBeat = round(0.125, stopBeat);
-        }
-
-        // If stop beat has ended up after bar end truncate it
-        if (stopBeat > bar.duration) stopBeat = bar.duration;
-
-        const division = getDivision(bar.divisions, beat, stopBeat);
-
-            // Truncate stopBeat to divisor or bar end based on permissable durations
-        let duration = division ? durationToDivisor(headDurations, bar, beat, stopBeat - beat) :
-            // Or truncate duration to next lowest duration
-            floorTo(headDurations, stopBeat - beat)
-            // Or set it to the minimum duration
-            || headDurations[0] ;
-
-        // Update stopBeat accordingly
-        stopBeat = beat + duration;
-
-if (!duration || !stopBeat) {
-    console.log('We have a problem. Stopping bar render.');
-    console.log('DURATION ', duration, stopBeat);
-    bar.error = 'Bad duration';
-    break;
-}
-
-        // Limit duration by division
-        if (division
-            && (!(beat === 0 || eq(0, beat % bar.divisor, p24))
-            || !(stopBeat === bar.duration || eq(0, stopBeat % bar.divisor, p24))
-        )) {
-            duration = floorTo(headDurations, division - beat);
-        }
-
-// -----------------------------------------------------------------------------
-
+        const eventBeat = event && roundTo(0.125, event[0]) - bar.beat;
+        // Duration of next head
+        const duration  = fitDuration(headDurations, bar, startBeat, stopBeat, beat, eventBeat);
 
         // If duration is a quarter note or longer close beam
         if (duration >= 1) {
@@ -766,6 +807,7 @@ if (!duration || !stopBeat) {
                 beam = undefined;
             }
         }
+        // Otherwise if there is no beam open one
         else if (!beam) beam = {
             type: 'beam',
             beat,
@@ -794,9 +836,12 @@ if (!duration || !stopBeat) {
         while (p--) {
             let stopBeat = getStopBeat(notes[p]) - bar.beat;
             // Remove notes that end before or near next beat
-            // TODO! This has to match the rounding heuristic in the duration
-            // shortening thing somehow
-            if (lte(stopBeat, beat + duration, p24)) notes.splice(p, 1);
+            if (// Note stops before next beat
+                lte(stopBeat, beat + duration, p16)
+                // Note stops within 0.125 + 1/16 of its own true duration of next beat
+                || stopBeat - (beat + duration) < 0.125 + (1/16) * (getStopBeat(notes[p]) - notes[p][0])) {
+                notes.splice(p, 1);
+            }
             // Add tie to remaining notes
             else symbols.push({
                 type:   'tie',

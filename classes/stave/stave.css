@@ -5,9 +5,16 @@
     /*--stem-height: 0.875em;*/
 
     display: grid;
-    row-gap: 0;
+
+    /* Allow staves that are not bars to hold content horizontally */
+    grid-auto-columns: auto;
+    column-gap: 0;
+    justify-content: start;
+    padding-left: 0.125em;
+
     /* Prevent stray content from breaking layout */
     grid-auto-rows: 0;
+    row-gap: 0;
 
     /* By default, render staves at 32px high */
     font-size: 2em;

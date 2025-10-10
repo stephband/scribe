@@ -190,32 +190,6 @@
     margin-right: 0.1em;
 }
 
-.bar > .acci:not([data-beat]) {
-    /* Accidental with no beat belongs to key signature in the first column */
-    grid-column-start: 1;
-    justify-self: start;
-
-    --acci-acci-gap: 0.3em;
-}
-
-.bar > .acci:not([data-beat])                                                  { margin-left: var(--clef-acci-gap); }
-.bar > .acci:not([data-beat]) + .acci:not([data-beat])                         { margin-left: calc(var(--clef-acci-gap) + 1 * var(--acci-acci-gap)); }
-.bar > .acci:not([data-beat]) + * + .acci:not([data-beat])                     { margin-left: calc(var(--clef-acci-gap) + 2 * var(--acci-acci-gap)); }
-.bar > .acci:not([data-beat]) + * + * + .acci:not([data-beat])                 { margin-left: calc(var(--clef-acci-gap) + 3 * var(--acci-acci-gap)); }
-.bar > .acci:not([data-beat]) + * + * + * + .acci:not([data-beat])             { margin-left: calc(var(--clef-acci-gap) + 4 * var(--acci-acci-gap)); }
-.bar > .acci:not([data-beat]) + * + * + * + * + .acci:not([data-beat])         { margin-left: calc(var(--clef-acci-gap) + 5 * var(--acci-acci-gap)); }
-.bar > .acci:not([data-beat]) + * + * + * + * + * + .acci:not([data-beat])     { margin-left: calc(var(--clef-acci-gap) + 6 * var(--acci-acci-gap)); }
-.bar > .acci:not([data-beat]) + * + * + * + * + * + * + .acci:not([data-beat]) { margin-left: calc(var(--clef-acci-gap) + 7 * var(--acci-acci-gap)); }
-
-.bar > .acci:not([data-beat]) + .timesig                                                  { margin-left: calc(var(--clef-acci-gap) + 1 * var(--acci-acci-gap) + var(--timesig-gap)); }
-.bar > .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                         { margin-left: calc(var(--clef-acci-gap) + 2 * var(--acci-acci-gap) + var(--timesig-gap)); }
-.bar > .acci:not([data-beat]) + * + .acci:not([data-beat]) + .timesig                     { margin-left: calc(var(--clef-acci-gap) + 3 * var(--acci-acci-gap) + var(--timesig-gap)); }
-.bar > .acci:not([data-beat]) + * + * + .acci:not([data-beat]) + .timesig                 { margin-left: calc(var(--clef-acci-gap) + 4 * var(--acci-acci-gap) + var(--timesig-gap)); }
-.bar > .acci:not([data-beat]) + * + * + * + .acci:not([data-beat]) + .timesig             { margin-left: calc(var(--clef-acci-gap) + 5 * var(--acci-acci-gap) + var(--timesig-gap)); }
-.bar > .acci:not([data-beat]) + * + * + * + * + .acci:not([data-beat]) + .timesig         { margin-left: calc(var(--clef-acci-gap) + 6 * var(--acci-acci-gap) + var(--timesig-gap)); }
-.bar > .acci:not([data-beat]) + * + * + * + * + * + .acci:not([data-beat]) + .timesig     { margin-left: calc(var(--clef-acci-gap) + 7 * var(--acci-acci-gap) + var(--timesig-gap)); }
-.bar > .acci:not([data-beat]) + * + * + * + * + * + * + .acci:not([data-beat]) + .timesig { margin-left: calc(var(--clef-acci-gap) + 8 * var(--acci-acci-gap) + var(--timesig-gap)); }
-
 
 /* Notes and ledges */
 

@@ -82,3 +82,44 @@
     grid-row: bottom;
     align-self: center;
 }
+
+.bar > .acci:not([data-beat]) {
+    /* Accidental with no beat belongs to key signature in the first column */
+    grid-column-start: 1;
+    justify-self: start;
+
+    --acci-acci-gap: 0.3em;
+}
+
+.stave > .clef + .acci:not([data-beat]) {
+    margin-left: 0.25em;
+}
+
+.stave > .acci:not([data-beat]) + .acci:not([data-beat]) {
+    margin-left: 0.0625em;
+}
+
+.signature-stave > .acci:not([data-beat])                                                  { grid-column: 2; }
+.signature-stave > .acci:not([data-beat]) + .acci:not([data-beat])                         { grid-column: 3; }
+.signature-stave > .acci:not([data-beat]) + * + .acci:not([data-beat])                     { grid-column: 4; }
+.signature-stave > .acci:not([data-beat]) + * + * + .acci:not([data-beat])                 { grid-column: 5; }
+.signature-stave > .acci:not([data-beat]) + * + * + * + .acci:not([data-beat])             { grid-column: 6; }
+.signature-stave > .acci:not([data-beat]) + * + * + * + * + .acci:not([data-beat])         { grid-column: 7; }
+.signature-stave > .acci:not([data-beat]) + * + * + * + * + * + .acci:not([data-beat])     { grid-column: 8; }
+.signature-stave > .acci:not([data-beat]) + * + * + * + * + * + * + .acci:not([data-beat]) { grid-column: 9; }
+
+.signature-stave[data-key="C♯"] { width: 3.45em; }
+.signature-stave[data-key="F♯"] { width: 3.15em; }
+.signature-stave[data-key="B"]  { width: 2.85em; }
+.signature-stave[data-key="E"]  { width: 2.55em; }
+.signature-stave[data-key="A"]  { width: 2.25em; }
+.signature-stave[data-key="D"]  { width: 1.95em; }
+.signature-stave[data-key="G"]  { width: 1.65em; }
+.signature-stave                { width: 1.35em; }
+.signature-stave[data-key="F"]  { width: 1.65em; }
+.signature-stave[data-key="B♭"] { width: 1.95em; }
+.signature-stave[data-key="E♭"] { width: 2.25em; }
+.signature-stave[data-key="A♭"] { width: 2.55em; }
+.signature-stave[data-key="D♭"] { width: 2.85em; }
+.signature-stave[data-key="G♭"] { width: 3.15em; }
+.signature-stave[data-key="C♭"] { width: 3.45em; }
