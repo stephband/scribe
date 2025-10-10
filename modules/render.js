@@ -85,7 +85,6 @@ export default function render(data, clef, keyname, meter, duration = Infinity, 
     });
     let n = 24;
     while (n--) column.appendChild(sidebar.cloneNode(true));
-console.log('BBBB', bars);
     // Return array of elements
     bars.unshift(column);
     return bars;

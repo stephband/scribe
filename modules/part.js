@@ -586,13 +586,12 @@ function fitDuration(durations, bar, startBeat, stopBeat, beat, eventBeat) {
         if (durations.indexOf(div2 - beat) !== -1) return div2 - beat;
         // Beat to divisor
         if (division) return division - beat;
-console.log(beat, 'huh', stopBeat - beat, eventBeat - beat);
         //
         return fitRoundedUpDuration(0.125, stopBeat - beat, eventBeat - beat);
     }
     // Stop beat is on a divisor
     else if (eq(stopBeat, div2, p16)) {
-        // If beat to stop beat is a valid head duration
+        // If beat to stop beat is a valid duration use it
         if (durations.indexOf(stopBeat - beat) !== -1) return stopBeat - beat;
         // Otherwise up to the nearest division
         if (division && durations.indexOf(division - beat) !== -1) return division - beat;
