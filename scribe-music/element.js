@@ -107,7 +107,7 @@ export default define(element('scribe-music', {
             );
 
             // Clear the shadow DOM of bars and put new elements in it
-            shadow.querySelectorAll('.side, .bar').forEach((element) => element.remove());
+            shadow.querySelectorAll('.side, .bar, style').forEach((element) => element.remove());
             shadow.append.apply(shadow, elements);
             if (!elements) return;
 

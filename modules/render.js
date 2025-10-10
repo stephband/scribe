@@ -1,12 +1,12 @@
 
-import create         from 'dom/create.js';
-import { toRootName } from 'midi/note.js';
-import { SequenceIterator } from 'sequence/sequence.js';
-import Stave       from '../modules/stave.js';
-import createBars  from './create-bars.js';
+import create           from 'dom/create.js';
+import { toRootName }   from 'midi/note.js';
+import SequenceIterator from 'sequence/sequence-iterator.js';
+import Stave            from '../modules/stave.js';
+import createBars       from './create-bars.js';
 import createSymbolElement from './create-symbol-element.js';
-import * as glyphs from './glyphs.js';
-import config      from './config.js';
+import * as glyphs      from './glyphs.js';
+import config           from './config.js';
 
 function isInitialMeterEvent(event) {
     return event[0] <= 0 && event[1] === 'meter';
@@ -64,7 +64,7 @@ export default function render(data, clef, keyname, meter, duration = Infinity, 
     if (displace)  transforms.push("displace", displace);
 
     // Create sequence object
-    const sequence = new SequenceIterator(events, data.sequences, 0, duration, transforms);
+    const sequence = new SequenceIterator(events, data.sequences, transforms);
 
     // Create bar elements
     const bars = createBars(sequence, stave, settings).reduce(toBarElements, []);
