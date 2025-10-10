@@ -112,10 +112,14 @@ export default define(element('scribe-music', {
             if (!elements) return;
 
             // Apply padding and clef/signature column size
+            // TODO: sort out a better system of getting the key signature metrics in here.
+            // One that isn't going to rely on the font so much?
+            // Wrap bars again, in bars element? Does it actually help, don't we need
+            // position absolute in order for the overflow hiding to work?
             const side  = shadow.getElementById('side');
             const key   = side.children[0].querySelectorAll('.acci');
             const fontSize = parseFloat(getComputedStyle(this).fontSize);
-            const style = create('style', ':host { --signature-width: ' + (3.5 + key.length * 0.3).toFixed(4) + 'em; }');
+            const style = create('style', ':host { --signature-width: ' + (2.25 + key.length * 0.8125).toFixed(4) + 'em; }');
             shadow.appendChild(style);
 
             // Render beams

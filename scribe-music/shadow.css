@@ -59,7 +59,7 @@
     height: auto;
     padding-top: 1em;
     padding-bottom: 1em;
-    padding-left: var(--signature-width);
+    padding-left: calc(var(--signature-width) - 1px);
 }
 
 :host([clef="drum"]) {
@@ -104,8 +104,9 @@
     overflow: hidden;
 }
 
-.side > .bar {
-    width: var(--signature-width);
+.side > .signature-stave {
+    width: auto;
+    min-width: 100%;
 }
 
 .side > .bar + .bar > .clef {
