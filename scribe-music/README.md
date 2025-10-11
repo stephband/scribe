@@ -31,7 +31,7 @@ JSON data imported via its `src` attribute:
 |             | `.data`      | `object`  | Gets and sets sequence data |
 | `clef`      | `.clef`      | `string`  | One of `"treble"`, `"bass"`, `"piano"`, `"drum"` or `"percussion"` |
 | `key`       | `.key`       | `string`  | The name of a major key, eg. `"Ab"` |
-| `meter`     | `.meter`     | `string`  | Set the meter |
+| `meter`     | `.meter`     | `string`  | The time signature, eg. `"4/4"` |
 | `transpose` | `.transpose` | `number`  | Transposes notation by a given number of semitones |
 | `layout`    |              | `string`  | Either `"compact"` or `"regular"` |
 | `shuffle`   |              | `boolean` | Boolean attribute, sets display of swung 16ths as straight 16ths |
@@ -121,14 +121,6 @@ console.log(scribe.clef) // "bass";
 ```
 
 
-### `layout="compact"`
-
-The layout attribute can have one of the values `"compact"` (the default),
-`"regular"` or `"spaced"`. Layout does nothing JavaScript-y, it simply sets the
-`flex-basis` and the `min-width` of the bars for more regular spacing inside
-the `<scribe-music>`container.
-
-
 ### `key="C"`
 
 Both an attribute and a property.
@@ -137,7 +129,7 @@ spelled with unicode sharps `♯` and flats `♭` or with hash `#` and small cas
 This is the name of the tonic of a major scale. Defaults to `"C"`.
 
 ```html
-<scribe-music key="F#">...</scribe-music>
+<scribe-music key="F#" src="..."></scribe-music>
 ```
 
 ```js
@@ -145,10 +137,13 @@ let scribe = document.body.querySelector('scribe-music');
 scribe.key = "B♭";
 ```
 
-There is no provision for choosing a 'minor' key. Declare its relative major.
+There is no provision for choosing a minor key. Declare its relative major.
 
 The key is the key signature pre-transposition. If `transpose` is set to
 something other than `0`, the key signature is also transposed.
+
+The key attribute/property is superceded by a `"key"` event found in the data
+at beat `0`.
 
 
 ### `meter="4/4"`
@@ -157,7 +152,7 @@ Both an attribute and a property.
 The meter, expressed as a standard time signature.
 
 ```html
-<scribe-music meter="3/4">...</scribe-music>
+<scribe-music meter="3/4" src="..."></scribe-music>
 ```
 
 ```js
@@ -165,27 +160,9 @@ let scribe = document.body.querySelector('scribe-music');
 scribe.meter = "3/4";
 ```
 
-This setting is overridden by any meter event found in the data at beat `0`.
+This setting is superceded by a `"meter"` event found in the data at beat `0`.
 If this attribute is omitted (or the property not set in JS), no time signature is displayed (unless the data contains a `"meter"` event at beat `0`).
 Defaults to `"4/4"`.
-
-
-### `shuffle`
-
-A boolean attribute. Displays swung 16ths as straight 16ths.
-
-```html
-<scribe-music shuffle>...</scribe-music>
-```
-
-
-### `swing`
-
-A boolean attribute. Displays swung 8ths as straight 8ths.
-
-```html
-<scribe-music swing>...</scribe-music>
-```
 
 
 ### `transpose="0"`
@@ -195,10 +172,43 @@ Sets scribe to render notation transposed by `transpose` semitones. Transpositio
 is applied to key signature, notes and chords before render, and not to the underlying data.
 
 ```html
-<scribe-music transpose="2">...</scribe-music>
+<scribe-music transpose="2" src="..."></scribe-music>
 ```
 
 ```js
 let scribe = document.body.querySelector('scribe-music');
 scribe.transpose = 2;
+```
+
+### `layout="compact"`
+
+Both an attribute and a property.
+Sets scribe to render notation transposed by `transpose` semitones. Transposition
+is applied to key signature, notes and chords before render, and not to the underlying data.
+
+```html
+<scribe-music layout="regular"></scribe-music>
+```
+
+```js
+let scribe = document.body.querySelector('scribe-music');
+scribe.transpose = 2;
+```
+
+
+### `shuffle`
+
+A boolean attribute. Displays swung 16ths as straight 16ths.
+
+```html
+<scribe-music shuffle src="..."></scribe-music>
+```
+
+
+### `swing`
+
+A boolean attribute. Displays swung 8ths as straight 8ths.
+
+```html
+<scribe-music swing src="..."></scribe-music>
 ```
