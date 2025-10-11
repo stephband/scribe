@@ -22,6 +22,8 @@ JSON data imported via its `src` attribute:
 <scribe-music src="./data/blue-in-green.json"></scribe-music>
 ```
 
+<img src="https://stephen.band/scribe/assets/images/blue-in-green.png" />
+
 
 ## Attributes and properties
 
