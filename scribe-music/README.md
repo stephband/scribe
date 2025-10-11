@@ -22,10 +22,6 @@ JSON data imported via its `src` attribute:
 <scribe-music src="./data/blue-in-green.json"></scribe-music>
 ```
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/stephband/scribe@latest/build/scribe-music/element.css" />
-<script type="module" src="https://cdn.jsdelivr.net/gh/stephband/scribe@latest/build/scribe-music/element.js"></script>
-<scribe-music src="./data/blue-in-green.json"></scribe-music>
-
 
 ## Attributes and properties
 
@@ -83,31 +79,6 @@ tag already in the document:
 <!-- Body -->
 <scribe-music src="#so-what" swing></scribe-music>
 ```
-
-<script type="application/json" id="so-what">{
-    "events": [
-        [0,  "key", "C"],
-        [0,  "meter", 4, 1],
-        [0,  "sequence", 1, 0, 4]
-    ],
-
-    "sequences": [{
-        "id": 1,
-        "name": "Horns",
-        "events": [
-            [0, "chord", 2, "-7", 32],
-            [2,    "note", "B4", 0.1, 1.5],
-            [2,    "note", "G4", 0.1, 1.5],
-            [2,    "note", "D4", 0.1, 1.5],
-            [2,    "note", "A3", 0.1, 1.5],
-            [3.5,  "note", "A4", 0.1, 0.5],
-            [3.5,  "note", "F4", 0.1, 0.5],
-            [3.5,  "note", "C4", 0.1, 0.5],
-            [3.5,  "note", "G3", 0.1, 0.5]
-        ]
-    }]
-}</script>
-<scribe-music src="#so-what" swing></scribe-music>
 
 
 ### `.data`
