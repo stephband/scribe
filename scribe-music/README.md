@@ -19,7 +19,36 @@ The `<scribe-music>` element is now registered. It renders music notation from
 JSON data imported via its `src` attribute:
 
 ```html
-<scribe-music src="/path/to/song.json"></scribe-music>
+<scribe-music src="./data/blue-in-green.json"></scribe-music>
+```
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/stephband/scribe@latest/build/scribe-music/element.css" />
+<script type="module" src="https://cdn.jsdelivr.net/gh/stephband/scribe@latest/build/scribe-music/element.js"></script>
+<scribe-music src="./data/blue-in-green.json"></scribe-music>
+
+
+## Attributes and properties
+
+| Attribute   | Property     | Type      | Description |
+| :---------- | :----------- | :-------- | :---------- |
+| `src`       | `.src`       | `URL`     | A URL of a JSON file or hashref of a script in the document |
+|             | `.data`      | `object`  | Gets and sets sequence data |
+| `clef`      | `.clef`      | `string`  | One of `"treble"`, `"bass"`, `"piano"`, `"drum"` or `"percussion"` |
+| `key`       | `.key`       | `string`  | The name of a major key, eg. `"Ab"` |
+| `meter`     | `.meter`     | `string`  | Set the meter |
+| `transpose` | `.transpose` | `number`  | Transposes notation by a given number of semitones |
+| `layout`    |              | `string`  | Either `"compact"` or `"regular"` |
+| `shuffle`   |              | `boolean` | Boolean attribute, sets display of swung 16ths as straight 16ths |
+| `swing`     |              | `boolean` | Boolean attribute, sets display of swung 8ths as straight 8ths |
+
+
+### `src="url"`
+
+Both an attribute and a property. The URL of a JSON file containing
+<a href="https://github.com/soundio/music-json/#sequence">sequence</a> data.
+
+```html
+<scribe-music src="path/to/song.json"></scribe-music>
 ```
 
 The `src` attribute may alternatively reference a `<script type="application/json">`
@@ -55,31 +84,31 @@ tag already in the document:
 <scribe-music src="#so-what" swing></scribe-music>
 ```
 
+<script type="application/json" id="so-what">{
+    "events": [
+        [0,  "key", "C"],
+        [0,  "meter", 4, 1],
+        [0,  "sequence", 1, 0, 4]
+    ],
 
-## Attributes and properties
+    "sequences": [{
+        "id": 1,
+        "name": "Horns",
+        "events": [
+            [0, "chord", 2, "-7", 32],
+            [2,    "note", "B4", 0.1, 1.5],
+            [2,    "note", "G4", 0.1, 1.5],
+            [2,    "note", "D4", 0.1, 1.5],
+            [2,    "note", "A3", 0.1, 1.5],
+            [3.5,  "note", "A4", 0.1, 0.5],
+            [3.5,  "note", "F4", 0.1, 0.5],
+            [3.5,  "note", "C4", 0.1, 0.5],
+            [3.5,  "note", "G3", 0.1, 0.5]
+        ]
+    }]
+}</script>
+<scribe-music src="#so-what" swing></scribe-music>
 
-| Attribute   | Property     | Type      | Description |
-| :---------- | :----------- | :-------- | :---------- |
-| `src`       | `.src`       | `URL`     | A URL of a JSON file or hashref of a script in the document |
-|             | `.data`      | `object`  | Gets and sets sequence data |
-| `clef`      | `.clef`      | `string`  | One of `"treble"`, `"bass"`, `"piano"`, `"drum"` or `"percussion"` |
-| `key`       | `.key`       | `string`  | The name of a major key, eg. `"Ab"` |
-| `meter`     | `.meter`     | `string`  | Set the meter |
-| `transpose` | `.transpose` | `number`  | Transposes notation by a given number of semitones |
-| `layout`    |              | `string`  | Either `"compact"` or `"regular"` |
-| `shuffle`   |              | `boolean` | Boolean attribute, sets display of swung 16ths as straight 16ths |
-| `swing`     |              | `boolean` | Boolean attribute, sets display of swung 8ths as straight 8ths |
-
-
-### `src="url"`
-
-Both an attribute and a property.
-The URL of a JSON file, or a hash reference to a `<script type="application/json">`
-element in the document.
-
-```html
-<scribe-music src="path/to/song.json"></scribe-music>
-```
 
 ### `.data`
 
