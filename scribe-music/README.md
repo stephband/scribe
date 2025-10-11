@@ -80,6 +80,9 @@ tag already in the document:
 <scribe-music src="#so-what" swing></scribe-music>
 ```
 
+A few examples of sequence data can be found in the <a href="../data">data/</a>
+directory.
+
 
 ### `.data`
 
