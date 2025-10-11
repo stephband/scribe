@@ -1,7 +1,12 @@
 
-<img src="https://stephen.band/scribe/logo.png" style="float: right;" />
+<img src="https://stephen.band/scribe/logo.png" style=" width: 25%; float: right;" />
 
 # `<scribe-music>`
+
+A custom element that imports, interprets and renders music notation from JSON
+data.
+
+## Get started
 
 To use the `<scribe-music>` custom element, import the CSS and JS from the CDN:
 
@@ -53,19 +58,17 @@ tag already in the document:
 
 ## Attributes and properties
 
-An overview of `<scribe-music>` attributes and properties:
-
 | Attribute   | Property     | Type      | Description |
 | :---------- | :----------- | :-------- | :---------- |
 | `src`       | `.src`       | `URL`     | A URL of a JSON file or hashref of a script in the document |
 |             | `.data`      | `object`  | Gets and sets sequence data |
 | `clef`      | `.clef`      | `string`  | One of `"treble"`, `"bass"`, `"piano"`, `"drum"` or `"percussion"` |
-| `key`       | `.key`       | `string`  | The name of a major key |
+| `key`       | `.key`       | `string`  | The name of a major key, eg. `"Ab"` |
+| `meter`     | `.meter`     | `string`  | Set the meter |
+| `transpose` | `.transpose` | `number`  | Transposes notation by a given number of semitones |
 | `layout`    |              | `string`  | Either `"compact"` or `"regular"` |
-| `meter`     | `.meter`     | `string`  | Sets the meter |
 | `shuffle`   |              | `boolean` | Boolean attribute, sets display of swung 16ths as straight 16ths |
 | `swing`     |              | `boolean` | Boolean attribute, sets display of swung 8ths as straight 8ths |
-| `transpose` | `.transpose` | `number`  | Transposes displayed notation by `n` semitones |
 
 
 ### `src="url"`
