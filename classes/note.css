@@ -61,6 +61,8 @@
 }
 
 
+
+
 /*
 Stems
 */
@@ -95,6 +97,15 @@ Stems
 .note[data-duration^="1"] > .head::before,
 .note[data-duration^="0"] > .head::before {
     content: '\E210';
+}
+
+.down-note > .head[data-glyph="headX"] {
+    margin-left: 0.02em;
+}
+
+.down-note > .head[data-glyph="headX"]::before {
+    /* Stem down */
+    left: -0.02em;
 }
 
 

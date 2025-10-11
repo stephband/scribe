@@ -7,7 +7,7 @@ https://web.mit.edu/merolish/Public/drums.pdf
 
 .drum-stave {
     grid-template-rows:
-        [max] 0.0625em
+        [max up-beam] 0.0625em
         0.125em
         [chords]      0.125em
         0.125em
@@ -25,13 +25,13 @@ https://web.mit.edu/merolish/Public/drums.pdf
         [kick]        0.125em
         [kick2 stave-lower drums] 0.125em
         [hihatpedal stave-bottom] 0.125em
-        [foot barcount]        0.125em
+        [foot barcount] 0.125em
         0.125em
         0.125em
         0.125em
         0.125em
-        0.125em
-        [max lyrics] 0.0625em;
+        [down-beam]   0.125em
+        [min lyrics]  0.0625em;
 }
 
 
@@ -113,3 +113,12 @@ https://web.mit.edu/merolish/Public/drums.pdf
 .drum-stave > [data-pitch][data-pitch="A♭5"] { grid-row: crash;  }   /* Mute Triangle */
 .drum-stave > [data-pitch][data-pitch="A5"]  { grid-row: crash;  }   /* Open Triangle */
 .drum-stave > [data-pitch][data-pitch="B♭5"] { grid-row: hihat;  }   /* Shaker */
+
+.drum-stave > .up-beam.beam   { grid-row: up-beam; position: static; }
+.drum-stave > .down-beam.beam { grid-row: down-beam; position: static; }
+
+.drum-stave > .beam-note[data-pitch="F3"]  { --stem-height: 0.85; }
+
+.drum-stave > .beam-note[data-pitch="D2"]  { --stem-height: 1.5; }
+.drum-stave > .beam-note[data-pitch="G♯2"],
+.drum-stave > .beam-note[data-pitch="A♭2"] { --stem-height: 0.7; }

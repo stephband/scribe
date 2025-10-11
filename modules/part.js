@@ -136,79 +136,101 @@ function closeBeam(symbols, stave, part, beam) {
         // Get stem direction from part
         part.stemup ;
 
-    // Get max and min pitches at each beat of beam
-    const pitches = [];
 
-    let note;
-    n = -1;
-    while (note = beam[++n]) {
-        let pitch = note.pitch;
+    if (part.beam) {
+        // TEMP: DO it better
+        let note;
 
-        // Find highest or lowest pitch at beat of note
-        while (beam[++n] && eq(beam[n].beat, note.beat, p16)) {
-            if (stemup) {
-                if (toNoteNumber(beam[n].pitch) > toNoteNumber(pitch)) {
-                    pitch = beam[n].pitch;
+        // Apply beamed properties to note symbols
+        n = -1;
+        while (note = beam[++n]) {
+            note.stemup = stemup;
+            note.beam   = beam;
+        }
+
+        //console.log('TODO: Beam has fixed position according to part', part.beam);
+        // Push the beam into symbols
+        symbols.push(assign(beam, {
+            duration,
+            stemup,
+            range: 0
+        }));
+    }
+    else {
+        // Get max and min pitches at each beat of beam
+        const pitches = [];
+
+        let note;
+        n = -1;
+        while (note = beam[++n]) {
+            let pitch = note.pitch;
+
+            // Find highest or lowest pitch at beat of note
+            while (beam[++n] && eq(beam[n].beat, note.beat, p16)) {
+                if (stemup) {
+                    if (toNoteNumber(beam[n].pitch) > toNoteNumber(pitch)) {
+                        pitch = beam[n].pitch;
+                    }
+                }
+                else {
+                    if (toNoteNumber(beam[n].pitch) < toNoteNumber(pitch)) {
+                        pitch = beam[n].pitch;
+                    }
                 }
             }
-            else {
-                if (toNoteNumber(beam[n].pitch) < toNoteNumber(pitch)) {
-                    pitch = beam[n].pitch;
-                }
+            --n;
+
+            // Push it into pitches
+            pitches.push(pitch);
+        }
+
+        const beamLength = lengthOf(beam);
+        let avgBeginLine = 0;
+        let avgEndLine   = 0;
+        let line;
+
+        n = -1;
+        while (pitches[++n]) {
+            line = stave.getRowDiff(stave.centerPitch, pitches[n]);
+
+            if (n < (pitches.length - 1) / 2) {
+                avgBeginLine += line / Math.floor(pitches.length / 2);
+            }
+
+            else if (n > (pitches.length - 1) / 2) {
+                avgEndLine += line / Math.floor(pitches.length / 2);
             }
         }
-        --n;
 
-        // Push it into pitches
-        pitches.push(pitch);
-    }
+        // Calculate where to put beam exactly
+        let begin    = beam[0];
+        let end      = last(beam);
+        let endRange = stave.getRowDiff(begin.pitch, end.pitch);
+        let avgRange = avgEndLine - avgBeginLine;
+        let range = abs(avgRange) > abs(0.75 * endRange) ?
+            0.5 * endRange :
+            0.5 * avgRange;
 
-    const beamLength = lengthOf(beam);
-    let avgBeginLine = 0;
-    let avgEndLine   = 0;
-    let line;
-
-    n = -1;
-    while (pitches[++n]) {
-        line = stave.getRowDiff(stave.centerPitch, pitches[n]);
-
-        if (n < (pitches.length - 1) / 2) {
-            avgBeginLine += line / Math.floor(pitches.length / 2);
+        // Apply beamed properties to note symbols
+        n = -1;
+        while (note = beam[++n]) {
+            note.stemup = stemup;
+            note.beam   = beam;
+            note.stemHeight = stemup ?
+                1 + 0.125 * (range * n  / (pitches.length - 1) - stave.getRowDiff(begin.pitch, note.pitch)) :
+                1 + 0.125 * (-range * n / (pitches.length - 1) + stave.getRowDiff(begin.pitch, note.pitch)) ;
         }
 
-        else if (n > (pitches.length - 1) / 2) {
-            avgEndLine += line / Math.floor(pitches.length / 2);
-        }
+        // Push the beam into symbols
+        symbols.push(assign(beam, {
+            pitch: begin.pitch,
+            // Duration of beam is the difference between the first note start and
+            // the last note start, not the full duration
+            duration,
+            stemup,
+            range
+        }));
     }
-
-    // Calculate where to put beam exactly
-    let begin    = beam[0];
-    let end      = last(beam);
-    let endRange = stave.getRowDiff(begin.pitch, end.pitch);
-    let avgRange = avgEndLine - avgBeginLine;
-    let range = abs(avgRange) > abs(0.75 * endRange) ?
-        0.5 * endRange :
-        0.5 * avgRange;
-
-    // Apply beamed properties to note symbols
-    n = -1;
-    while (note = beam[++n]) {
-        note.stemup = stemup;
-        note.beam   = beam;
-        note.stemHeight = stemup ?
-            1 + 0.125 * (range * n  / (pitches.length - 1) - stave.getRowDiff(begin.pitch, note.pitch)) :
-            1 + 0.125 * (-range * n / (pitches.length - 1) + stave.getRowDiff(begin.pitch, note.pitch)) ;
-    }
-
-    // Push the beam into symbols
-    symbols.push(assign(beam, {
-        pitch: begin.pitch,
-        // Duration of beam is the difference between the first note start and
-        // the last note start, not the full duration
-        duration,
-        stemup,
-        range
-    }));
 
     return symbols;
 }

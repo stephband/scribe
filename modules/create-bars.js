@@ -135,7 +135,7 @@ function pushEventToPart(stave, parts, event) {
     parts[part.name].push(event);
 }
 
-export default function createBars(sequence, stave, settings = config) {
+export default function createBars(sequence, excludes, stave, settings = config) {
     const scribeEvents = [];
     const bars  = [];
     const ties  = [];
@@ -156,6 +156,8 @@ export default function createBars(sequence, stave, settings = config) {
         event.scribeIndex  = scribeEvents.length;
         event.scribeEvents = scribeEvents;
         scribeEvents.push(event);
+
+        if (excludes.includes(event[1])) continue;
 
         // If event is beyond current duration create bars
         while (event[0] >= beat + duration) {

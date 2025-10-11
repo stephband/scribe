@@ -8,6 +8,16 @@
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width" />
 
+    <script type="importmap">{
+        "imports": {
+            "bolt/":     "/bolt/",
+            "dom/":      "/dom/modules/",
+            "fn/":       "/fn/modules/",
+            "midi/":     "/midi/modules/",
+            "sequence/": "/sequence/modules/"
+        }
+    }</script>
+
     <script title="load">
         document.documentElement.className += ' js loading';
         // window.addEventListener('DOMContentLoaded', () => document.documentElement.classList.remove('content-loading'));
@@ -19,12 +29,13 @@
     </script>
 
     <!-- Import <scribe-music> -->
-    <link rel="stylesheet" href="./build/scribe-music/element.css" />
-    <script type="module" src="./build/scribe-music/element.js"></script>
+    <link rel="stylesheet" href="./scribe-music/element.css" />
+    <script type="module" src="./scribe-music/element.js"></script>
 
     <style>
     @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/elements/html.css';
     @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/atoms.css';
+    @import './assets/font.css';
 
     @import './build/scribe-music/element.css';
     @import './fonts/ash.css';
@@ -78,6 +89,14 @@
     h4.broadway-font,
     h4.jazz-font,
     h4.petaluma-font { height: 1.5em; line-height: 2em; }
+
+    .header-section,
+    .style-section,
+    .font-section,
+    .stave-section {
+        padding-top: 3em;
+        padding-bottom: 3em;
+    }
 
     .header-section > pre {
         margin-top: 3em;
@@ -325,32 +344,46 @@
     }</script>
 </head>
 <body>
-    <header class="header-section 9x-grid grid" style="padding: 3em; --y-gap: 0em;">
-        <h1 class="x2 6x">Scribe <span class="font-08">0.4</span></h1>
+    <header class="header-section 9x-grid grid" style="--y-gap: 0em;">
+        <h1 class="x2 6x">Scribe<span class="font-08"> 0.4</span></h1>
         <p class="x2 6x">
-        Scribe is a new, CSS-powered technique for displaying music notation on the web, packaged in a custom element you can drop into a document.
-        It is perfect for embedding examples into tutorials, for publishing music to be read on a phone at a gig, or for live feedback of, say, MIDI input in a web app.
+        <strong>Scribe</strong> is a new, CSS-powered technique for displaying <strong>music notation on the web</strong>, packaged in a custom element.
+        Scribe is laid out using <strong>flex</strong> and <strong>grid</strong>, sized in <strong>relative font sizes</strong>, and <strong>responds</strong> to the <strong>flow of the web</strong>, making it very readable.
+        <!--And because it's largely CSS it's highly&nbsp;customisable.-->
+        It is perfect for embedding musical examples in tutorials, for publishing a lead sheet to be read on a phone at a gig, or for live feedback of, say, MIDI input in a web app.
         </p>
-        <pre class="x2"><span class="orange-fg">&lt;scribe-music</span> <span class="yellow-fg">src="</span><span class="lime-fg">./blue-in-green.json</span><span class="orange-fg">"&gt;&lt;/scribe-music&gt;</span></pre>
-        <scribe-music class="x1 9x" clef="treble" src="./data/blue-in-green.json"></scribe-music>
     </header>
 
-    <section class="9x-grid grid" style="padding: 3em; --y-gap: 0em;">
-        <h2 class="x2 6x">Fluid and responsive</h2>
-        <p class="x2 6x">
-        Scribe is laid out using flex and grid, sized in relative font sizes, and generally embraces the flow of the web, making it readable.
-        And because it's all CSS it's highly&nbsp;customisable.
-        </p>
+    <section class="example-section 9x-grid grid y-start-grid">
+        <pre class="x2"><span class="orange-fg">&lt;scribe-music</span> <span class="yellow-fg">src="</span><span class="lime-fg">./blue-in-green.json</span><span class="orange-fg">"&gt;&lt;/scribe-music&gt;</span></pre>
+        <scribe-music class="x2 7x" clef="treble" src="./data/blue-in-green.json"></scribe-music>
+
+        <pre class="x2"><span class="orange-fg">&lt;scribe-music</span> <span class="yellow-fg">clef="</span><span class="lime-fg">drum</span><span class="yellow-fg">"</span> <span class="yellow-fg">src="</span><span class="lime-fg">./caravan-drums.json</span><span class="orange-fg">"&gt;&lt;/scribe-music&gt;</span></pre>
+        <scribe-music class="x2 7x" clef="drum" src="./data/caravan-drums.json"></scribe-music>
+
+        <pre class="x2"><span class="orange-fg">&lt;scribe-music</span> <span class="yellow-fg">clef="</span><span class="lime-fg">piano</span><span class="yellow-fg">"</span> <span class="yellow-fg">src="</span><span class="lime-fg">./a-fond-kiss.json</span><span class="orange-fg">"&gt;&lt;/scribe-music&gt;</span></pre>
+        <scribe-music class="x2 7x" clef="piano" src="./data/a-fond-kiss.json" excludes="chord"></scribe-music>
+
+        <h2 class="x2 6x">Get started</h2>
+        <p class="x2 6x">To use the <code>&lt;scribe-music&gt;</code> custom element, import the CSS and JS from the CDN:</p>
+        <pre class="x2 6x">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/stephband/scribe@latest/build/scribe-music/element.css" />
+            <script type="module" src="https://cdn.jsdelivr.net/gh/stephband/scribe@latest/build/scribe-music/element.js"></script>
+        </pre>
+        <p class="x2 6x">The <code>&lt;scribe-music&gt;</code> element is now registered.</p>
     </section>
 
-    <section class="style-section 9x-grid grid y-start-grid" style="padding: 3em; --y-gap: 0em;">
-        <h2 class="x2 6x">Highly styleable</h2>
-        <p class="x2 6x">Scribe is laid out using flex and grid, and sized in relative font sizes, and because it's all CSS it's highly&nbsp;customisable, in ways that image-based notation renderers can't match.</p>
-        <scribe-music class="x2 no-wrap" clef="drum" src="./data/drum-pattern.json"></scribe-music>
+    <section class="style-section 9x-grid grid y-start-grid" style="--y-gap: 0em;">
+        <h2 class="x2 6x">Fluid and responsive and highly styleable</h2>
+        <p class="x2 6x">
+        Scribe is laid out using flex and grid, sized in relative font sizes, and generally embraces the flow of the web, making it very readable.
+        And because it's all CSS it's highly&nbsp;customisable.
+        </p>
+        <scribe-music class="x2 no-wrap" clef="treble" src="./data/blue-in-green.json"></scribe-music>
         <pre class="x2">mix-blend-mode: color-dodge;</pre>
     </section>
 
-    <section class="font-section 9x-grid grid" style="padding: 3em;">
+    <section class="font-section 9x-grid grid">
         <h2 class="x2 6x">SMuFL fonts</h2>
         <p class="x2 6x">
             Scribe supports <a href="https://w3c.github.io/smufl/latest/">SMuFL fonts</a>, W3C-standardised fonts for rendering musical symbols.
@@ -380,13 +413,13 @@
         <scribe-music class="x6 4x y7 2y ash-font no-wrap" clef="piano" src="#where-in"></scribe-music>
     </section>
 
-    <section class="stave-section 9x-grid grid" style="padding: 3em; --y-gap: 0em;">
+    <section class="stave-section 9x-grid grid" style="--y-gap: 0em;">
         <h2 class="x2 6x">6 Staves</h2>
         <p class="x2 6x">Comes with 6 stave types – treble, bass, piano, violin, drum and percussion staves. Plus, the set of staves is extensible – it is possible to define your own.</p>
-        <scribe-music class="x3 2x y3 jazz-font no-wrap" clef="drum" src="./data/drum-pattern.json"></scribe-music>
+        <scribe-music class="x3 2x y3 jazz-font no-wrap" clef="drum" src="./data/caravan-drums.json"></scribe-music>
     </section>
 
-    <section class="stave-section 9x-grid grid" style="padding: 3em; --y-gap: 0em;">
+    <section class="stave-section 9x-grid grid" style="--y-gap: 0em;">
         <h2 class="x2 6x">Current status</h2>
         <p class="x2 6x">
             Scribe is a new way of rendering music on the web, and as a new project it has some rough edges.
@@ -406,11 +439,11 @@
         <p class="x2 6x">If you are good at JS and CSS and want to help out, please do get in touch.</p>
     </section>
 
-    <section class="stave-section 9x-grid grid" style="padding: 3em; --y-gap: 0em;">
+    <section class="stave-section 9x-grid grid" style="--y-gap: 0em;">
         <h2 class="x2 6x">Try it out in a web page</h2>
     </section>
 
-    <section class="stave-section 9x-grid grid" style="padding: 3em; --y-gap: 0em;">
+    <section class="stave-section 9x-grid grid" style="--y-gap: 0em;">
         <h2 class="x2 6x">Writing a Scribe document</h2>
     </section>
 

@@ -56,6 +56,7 @@ export default define(element('scribe-music', {
         internals.beat      = Signal.of(0);
         internals.duration  = Signal.of(Infinity);
         internals.transpose = Signal.of(0);
+        internals.excludes  = Signal.of([]);
         internals.swingAsStraight8ths  = Signal.of(false);
         internals.swingAsStraight16ths = Signal.of(false);
         internals.debug     = Signal.of(false);
@@ -87,6 +88,8 @@ export default define(element('scribe-music', {
             const elements = internals.data.value && render(
                 // Events from data
                 internals.data.value,
+                // Excludes is an array
+                internals.excludes.value,
                 // Clef is a string
                 internals.clef.value,
                 // Key name
@@ -358,6 +361,10 @@ export default define(element('scribe-music', {
         attribute: function(value) { this.debug = value !== null; },
         get: function() { return getInternals(this).debug.value; },
         set: function(value) { getInternals(this).debug.value = !!value; }
+    },
+
+    excludes: {
+        attribute: function(string) { return getInternals(this).excludes.value = string.split(/\s+/); },
     }
 }, null, 'github.com/stephband/scribe/'), {
     // Define ScribeMusic.styleheet as the stylesheet signal

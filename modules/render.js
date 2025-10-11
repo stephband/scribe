@@ -43,8 +43,7 @@ text = glyphs.textNoteShort
     + glyphs.note05Up
 */
 
-export default function render(data, clef, keyname, meter, duration = Infinity, transpose = 0, displace = 0, settings = config) {
-    // TODO, WARNING! This mutates events! We probably oughta clone events first.
+export default function render(data, excludes, clef, keyname, meter, duration = Infinity, transpose = 0, displace = 0, settings = config) {
     const events = data.events;
 
     // If events contains no initial meter and meter is set, insert a meter event
@@ -67,7 +66,7 @@ export default function render(data, clef, keyname, meter, duration = Infinity, 
     const sequence = new SequenceIterator(events, data.sequences, transforms);
 
     // Create bar elements
-    const bars = createBars(sequence, stave, settings).reduce(toBarElements, []);
+    const bars = createBars(sequence, excludes, stave, settings).reduce(toBarElements, []);
 
     // TEMP get keysig and stick it in side bar and do some style stuff
     const bar0   = bars[0];

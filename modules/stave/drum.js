@@ -143,11 +143,13 @@ export default class DrumStave extends Stave {
     parts = {
         drums: {
             name:   'drums',
+            beam:   'drums-beam',
             stemup: false
         },
 
         cymbals: {
             name:   'cymbals',
+            beam:   'cymbals-beam',
             stemup: true
         }
     };

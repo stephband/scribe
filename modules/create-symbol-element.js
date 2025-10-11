@@ -158,10 +158,10 @@ export default overload(get('type'), {
     }),
 
     note: (symbol) => create('data', {
-        class: `${ symbol.stemup ? 'up-note' : 'down-note' } ${ symbol.top ? 'top-note' : '' } ${ symbol.bottom ? 'bottom-note' : '' } note`,
+        class: `${ symbol.stemup ? 'up-note' : 'down-note' } ${ symbol.top ? 'top-note' : '' } ${ symbol.bottom ? 'bottom-note' : '' } ${ symbol.beam ? 'beam-note ' : '' }note`,
         style: symbol.stemHeight ? `--stem-height: ${ symbol.stemHeight };` : undefined,
         html:  symbol.stave.getNoteHTML(symbol.pitch, symbol.dynamic, symbol.duration),
-        title: `${ symbol.pitch } (${ toNoteNumber(symbol.pitch) }) ${ symbol.part.name }`,
+        title: `${ symbol.pitch } (${ toNoteNumber(symbol.pitch) })`,
         data: {
             beat:     truncate(symbol.beat),
             pitch:    symbol.pitch,
