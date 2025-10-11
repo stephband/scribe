@@ -19,7 +19,7 @@ The `<scribe-music>` element is now registered. It renders music notation from
 JSON data imported via its `src` attribute:
 
 ```html
-<scribe-music src="./data/blue-in-green.json"></scribe-music>
+<scribe-music src="../data/blue-in-green.json"></scribe-music>
 ```
 
 <img src="https://stephen.band/scribe/assets/images/blue-in-green.png" />
