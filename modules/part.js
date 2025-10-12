@@ -31,6 +31,11 @@ const p16 = 1/16;
 const p24 = 1/24;
 
 
+function average(a, n, i, array) {
+    return a + n / array.length;
+}
+
+
 /* Events */
 
 function getStopBeat(event) {
@@ -151,81 +156,78 @@ function closeBeam(symbols, stave, part, beam) {
             stemup,
             range: 0
         }));
+
+        return symbols;
     }
-    else {
-        // Get max or min pitches at each beat of beam
-        const pitches = [];
 
-        let note;
-        n = -1;
-        while (note = beam[++n]) {
-            let pitch = note.pitch;
+    // Calculate beam positions
+    const rows = [];
 
-            // Find highest or lowest pitch at beat of note
-            while (beam[++n] && eq(beam[n].beat, note.beat, p16)) {
-                if (stemup) {
-                    if (toNoteNumber(beam[n].pitch) > toNoteNumber(pitch)) {
-                        pitch = beam[n].pitch;
-                    }
-                }
-                else {
-                    if (toNoteNumber(beam[n].pitch) < toNoteNumber(pitch)) {
-                        pitch = beam[n].pitch;
-                    }
-                }
-            }
-            --n;
+    let note;
+    n = -1;
+    while (note = beam[++n]) {
+        let row = stave.getRow(note.pitch);
+        let r;
 
-            // Push it into pitches
-            pitches.push(pitch);
+        // Find highest or lowest pitch at beat of note
+        while (beam[++n] && eq(beam[n].beat, note.beat, p24)) {
+            r = stave.getRow(beam[n].pitch);
+            if (stemup) { if (r < row) row = r; }
+            else { if (r > row) row = r; }
         }
+        --n;
 
-        let avgBeginLine = 0;
-        let avgEndLine   = 0;
-        let line;
-
-        n = -1;
-        while (pitches[++n]) {
-            line = stave.getRowDiff(stave.centerPitch, pitches[n]);
-
-            if (n < (pitches.length - 1) / 2) {
-                avgBeginLine += line / Math.floor(pitches.length / 2);
-            }
-
-            else if (n > (pitches.length - 1) / 2) {
-                avgEndLine += line / Math.floor(pitches.length / 2);
-            }
-        }
-
-        // Calculate where to put beam exactly
-        let begin    = beam[0];
-        let end      = last(beam);
-        let endRange = stave.getRowDiff(begin.pitch, end.pitch);
-        let avgRange = avgEndLine - avgBeginLine;
-        let range = abs(avgRange) > abs(0.75 * endRange) ?
-            -0.5 * endRange :
-            -0.5 * avgRange;
-
-        // Apply beamed properties to note symbols
-        n = -1;
-        while (note = beam[++n]) {
-            note.stemup = stemup;
-            note.beam   = beam;
-            note.stemHeight = stemup ?
-                1 + 0.125 * (range * n  / (pitches.length - 1) - stave.getRowDiff(note.pitch, begin.pitch)) :
-                1 + 0.125 * (-range * n / (pitches.length - 1) + stave.getRowDiff(note.pitch, begin.pitch)) ;
-        }
-
-        // Push the beam into symbols
-        symbols.push(assign(beam, {
-            pitch: begin.pitch,
-            // Duration of beam is the difference between the first note start and
-            // the last note start, not the full duration
-            duration,
-            stemup,
-            range
-        }));
+        // Push it into pitches
+        rows.push(row);
     }
+
+    const beamLength = rows.length - 1;
+    const beginRow   = rows.slice(0, floor(0.5 * rows.length)).reduce(average, 0);
+    const endRow     = rows.slice(ceil(0.5 * rows.length)).reduce(average, 0);
+    // This (0.2 + 0.1 * beamLength) determines the angle of the beam
+    const positions  = Array.from(rows, (r, i) => (0.2 + 0.1 * beamLength) * i * (endRow - beginRow) / beamLength);
+    const range      = positions[positions.length - 1] - positions[0];
+
+    let diff = stemup ? -50 : 50, d;
+    n = rows.length;
+    while (n--) {
+        d = positions[n] - rows[n];
+        diff = stemup ?
+            d > diff ? d : diff :
+            d < diff ? d : diff ;
+    }
+
+    n = rows.length;
+    while (n--) positions[n] -= diff + rows[0];
+
+    // Apply beamed properties to note symbols and stem heights
+    let r = -1;
+    n = -1;
+    while (note = beam[++n]) {
+        ++r;
+        note.stemup = stemup;
+        note.beam   = beam;
+        note.stemHeight = stemup ?
+            1 - 0.125 * (positions[n] - rows[n] + rows[0]) :
+            1 + 0.125 * (positions[n] - rows[n] + rows[0]) ;
+
+        // Find highest or lowest pitch at beat of note
+        while (beam[++n] && eq(beam[n].beat, note.beat, p16)) {
+            beam[n].stemup     = stemup;
+            beam[n].beam       = beam;
+            beam[n].stemHeight = note.stemHeight;
+        }
+        --n;
+    }
+
+    // Push the beam into symbols
+    symbols.push(assign(beam, {
+        pitch: beam[0].pitch,
+        y:     positions[0],
+        duration,
+        stemup,
+        range
+    }));
 
     return symbols;
 }
@@ -444,10 +446,10 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
     if (!isPowerOf2(divisor)) symbols.push(tuplet);
 
     // While beat is before end of tuplet
-    while (lt(beat, stopBeat, p16)) {
+    while (lt(beat, stopBeat, p24)) {
         // Fill notes with events playing during beat, and leave event as the
         // next event after beat
-        while ((event = events[++n]) && lte(event[0] - bar.beat, beat + 0.5 * division, p16)) {
+        while ((event = events[++n]) && lte(event[0] - bar.beat, beat + 0.5 * division, p24)) {
             notes.push(event);
         }
         --n;
@@ -486,7 +488,7 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
         );
 
         // Manage beam
-        if (gt(duration, 0.5, p16)) {
+        if (gt(duration, 0.5, p24)) {
             // If there is a beam, close it
             if (beam) {
                 closeBeam(symbols, stave, part, beam);
@@ -527,7 +529,7 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
         while (p--) {
             let stopBeat = getStopBeat(notes[p]) - bar.beat;
             // Remove notes that end before or near next division, we're done with them
-            if (lte(stopBeat, beat + duration + 0.5 * division, p16)) notes.splice(p, 1);
+            if (lte(stopBeat, beat + duration + 0.5 * division, p24)) notes.splice(p, 1);
             // Add tie to remaining notes
             else symbols.push({
                 type:   'tie',
@@ -550,24 +552,7 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
 
     return n;
 }
-/*
-function durationToDivisor(durations, bar, beat, duration) {
-    // Truncate event until it does end on a bar division or bar end
-    let h = durations.length;
-    let d;
 
-    // Scan backwards and find next shortest duration
-    while ((d = durations[--h]) && d > duration);
-    ++h;
-
-    // Scan backwards and return when a duration takes us to bar divisor or stop
-    while (d = durations[--h]) {
-        if (eq(beat + d, bar.duration, p16) || eq(0, (beat + d) % bar.divisor, p16)) {
-            return d;
-        }
-    }
-}
-*/
 function fitDottedDuration(min, duration) {
     let grain = 2 * ceilPow2(duration);
     while ((grain /= 2) > min / 2) {
