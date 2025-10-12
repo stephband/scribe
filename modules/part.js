@@ -1,25 +1,19 @@
 
 import get      from 'fn/get.js';
-import nothing  from 'fn/nothing.js';
-import overload from 'fn/overload.js';
 import { toNoteName, toNoteNumber, toRootName, toRootNumber } from 'midi/note.js';
 import { keyWeightsForEvent, chooseKeyFromWeights } from './keys.js';
 import { rflat, rsharp, rdoubleflat, rdoublesharp } from './pitch.js';
 import { getDivision } from './bar.js';
 import detectTuplets from './tuplet.js';
 import { round as roundTo, eq, gte, lte, lt, gt } from './number/float.js';
-import { averagePowerOf2, roundPowerOf2, floorPow2, ceilPow2, isPowerOf2 } from './number/power-of-2.js';
-import floorTo     from './number/floor-to.js';
-import ceilTo      from './number/ceil-to.js';
+import { floorPow2, ceilPow2, isPowerOf2 } from './number/power-of-2.js';
 import grainPow2   from './number/grain-pow-2.js';
 import push        from './object/push.js';
-import every       from './object/every.js';
 import last        from './object/last.js';
 import lengthOf    from './object/length-of.js';
 import map         from './object/map.js';
 import getDuration from './event/to-duration.js';
 import getStopBeat from './event/to-stop-beat.js';
-import { rpitch }  from './pitch.js';
 import config      from './config.js';
 
 const assign = Object.assign;
@@ -66,6 +60,8 @@ function getMinPitchRow(stave, pitches) {
     let pitch, r;
     while (pitches[++n]) {
         r = stave.getRow(pitches[n]);
+        // r may be out of range oof this stave
+        if (r === undefined) continue;
         // The bigger r, the lower the pitch
         if (r > row) {
             row   = r;
@@ -80,6 +76,8 @@ function getMaxPitchRow(stave, pitches) {
     let pitch, r;
     while (pitches[++n]) {
         r = stave.getRow(pitches[n]);
+        // r may be out of range oof this stave
+        if (r === undefined) continue;
         // The smaller r, the higher the pitch
         if (r < row) {
             row   = r;
@@ -164,11 +162,16 @@ function closeBeam(symbols, stave, part, beam) {
     n = -1;
     while (note = beam[++n]) {
         let row = stave.getRow(note.pitch);
+        // row may be out of range oof this stave
+        if (row === undefined) continue;
+
         let r;
 
         // Find highest or lowest pitch at beat of note
         while (beam[++n] && eq(beam[n].beat, note.beat, p24)) {
             r = stave.getRow(beam[n].pitch);
+            // row may be out of range oof this stave
+            if (r === undefined) continue;
             if (stemup) { if (r < row) row = r; }
             else { if (r > row) row = r; }
         }

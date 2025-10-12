@@ -5,6 +5,10 @@ import { spellRoot, spellPitch }    from '../spelling.js';
 import * as glyphs from "../glyphs.js";
 import Stave       from './stave.js';
 
+
+const global = globalThis || window;
+
+
 function toDrumPitch(number) {
     return toDrumName(number)
         .toLowerCase()
@@ -112,8 +116,9 @@ export default class DrumStave extends Stave {
         const pitch = typeof n === 'string' ? n : toDrumPitch(n) ;
         if (!pitch) throw new Error('Drum name not found for pitch ' + n);
         const i = this.rows.findIndex((row) => row.includes(pitch));
-        if (i === -1) { throw new Error('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name); }
-        return i;
+        if (global.DEBUG && i === -1) throw new Error('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name);
+        if (i === -1) console.warn('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name);
+        return i > -1 ? i : undefined ;
     }
 
     getSpelling(key, event) {

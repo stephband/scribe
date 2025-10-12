@@ -5,6 +5,8 @@ import { spellRoot, spellPitch } from '../spelling.js';
 import { rflatsharp } from '../pitch.js';
 import * as glyphs    from "../glyphs.js";
 
+
+const global = globalThis || window;
 const assign = Object.assign;
 const { floor, round } = Math;
 
@@ -122,8 +124,9 @@ export default class Stave {
         const name = typeof pitch === 'string' ? pitch : toNoteName(pitch) ;
         const row  = name.replace(rflatsharp, '');
         const i    = this.rows.indexOf(row);
-        if (i === -1) { throw new Error('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name); }
-        return i;
+        if (global.DEBUG && i === -1) throw new Error('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name);
+        if (i === -1) console.warn('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name);
+        return i > -1 ? i : undefined ;
     }
 
     /**
