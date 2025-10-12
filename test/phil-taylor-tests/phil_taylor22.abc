@@ -1,0 +1,15 @@
+X:22
+T:Horizontal beams
+N:From abc2ps sample file.  Multiple slashes edited out.
+N:I'm not sure that  the first beam in bar 3 should be
+N:horizontal.  BarFly slopes it upwards.
+N:Bars don't add up correctly.
+M:C
+K:C
+L: 1/8
+ CDC DED EFE BcB   | C/D/C/ D/E/D/ E/F/E/  |\
+   C/2D/2D/2 D/2E/2D/2 E/2F/2E/2  |
+ cdc ded efe b,a,b,| c/d/c/ d/e/d/ e/f/e/ | c/2d/2c/2 d/2e/2d/2 e/2f/2e/2 |
+ c'd'c' d'e'd' e'f'e' f'g'f' | c'/d'/c'/ d'/e'/d'/ e'/f'/e'/ |\ 
+   c'/2d'/2c'/2 d'/2e'/2d'/2 e'/2f'/2e'/2 |
+

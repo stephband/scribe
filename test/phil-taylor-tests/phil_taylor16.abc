@@ -1,0 +1,12 @@
+X:16
+T:Bars and Rests, Short Lines
+N:From abc2ps sample file.  Multiple slashes for timings
+N:have been edited out.  Change of L: field in tune.
+E: lw 300
+M:6/8
+L: 1/4
+K:D
+[| z4  |] z2 |: z z/z/4z/8 z/16 :| z2> :: z2 z>z z/>z/ |  f>z g>z  ||
+L: 1/8
+cde fga | CDE FGA |]
+

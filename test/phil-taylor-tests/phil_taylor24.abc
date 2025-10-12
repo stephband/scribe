@@ -1,0 +1,19 @@
+X:24
+T:Old Sir Simon the King
+N:From abc2mtex demo files.  Metre change.
+N:C3=120 format for tempo (Q) field.
+C:Trad.
+S:Offord MSS          % from Offord manuscript
+N:see also Playford   % notes
+M:9/8
+R:SJ                  % slip jig
+Q:C3=120              % tempo. (24s playing time).
+Z:originally in C     % transcription notes
+K:G
+D|GFG GAG G2D|GFG GAG F2D|EFE EFE EFG|A2G F2E D2:|
+D|GAG GAB d2D|GAG GAB c2D|1 EFE EFE EFG|A2G F2E D2:|2\
+M:12/8                % change meter for a bar
+E2E EFE E2E EFG|\
+M:9/8                 % change back again
+A2G F2E D2||
+

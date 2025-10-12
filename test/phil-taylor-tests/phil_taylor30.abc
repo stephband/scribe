@@ -1,0 +1,15 @@
+X:30
+T:An tAth. Pat Aherne
+N:12/8 time. Chords in LTH order.  Chords use +.  Tied chords
+N:with the ties outside the chord symbols.  (This is dubious
+N:syntax, since the standard says that ties should follow
+N:directly after the tied note, with no intervening symbols.)
+S:from "Plancstai/ Bhaile na Buc" by Ma/ire & Se/amus O/Beaglaoich
+M:12/8
+K:D
+AFA .d2B AFA d2f|efe B2c ~B2A F2G|
+AFA .d2B AFA d2f|1 efe B2c +D3d3+-+D2d2+B:|2 efe B2c +D3d3+-+D2d2+f|]
++A3a3+ afa +B3b3+ +A2a2+f|efe B2c ~B2A F2f|\
+[1 +A3a3+ afa +B3b3+ +A2a2+f|efe B2c +d3D3+-+d2D2+f:|
+[2 AFA .d2B AFA d2f|efe B2c +D3d3+-+D2d2+G|]
+

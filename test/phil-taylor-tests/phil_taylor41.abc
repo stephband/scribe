@@ -1,0 +1,33 @@
+X:41
+T:Prelude from first Cello Suite 
+N:From abc2ps demo files.
+N:Largish piece.  I edited the final chord from [D16Afd']
+N:Chords in LTH order.  Slurs in and between beams.
+N:Slur across line-break (lines 15 & 16). Unisons in beams.
+C:J.S. Bach, here transposed for mandolin
+M:4/4
+L:1/16
+K:D
+(DAf)e fAfA (DAf)e fAfA | (DBg)f gBgB (DBg)f gBgB | 
+(Dcg)f gcgc (Dcg)f gcgc | (Ddf)d fdfd (Ddf)d fdfd |
+(DBf)e fdcd Bdcd FA^GF  | (^Gde)d eded (^Gde)d eded |
+(cea)^g aede cede AcBA  | (B,Fd)c dFdF (B,Fd)c dFdF |
+(B,^GA)B AGFE (dcB)a ^gfed | (cBA)a eace (ABc)e dcBA |
+^d(A=cB) cAdA f(AcB) cAdA  | (GBe)f geBA (GBe)f ge^cB |
+^A(cAc) ecec A(cAc) ecec   | (dcB)d cdec dcBA GFED |
+CGAG AGAG CGAG AGAG | (DF=c)B cFcF (DFc)B cFcF |
+(DGB)A BGBG (DGB)A BGBG | (D^cg)f gcgc (Dcg)f gcgc |
+(DAf)e fdcB AGFE DCB,A, | ^G,(EBc) dBcd G,(EBc) dBcd |
+=G,(EAB) cABc =G,(EAB) cABc | G,(EAc) (e^g(a2) a)EF=G ABcd |
+%second part
+(ecA)B cdef (gec)d efga | _ba^ga a=gfg gec=B AEFG |
+A,(EAc) efge (fdA)G FDEF | A,DFA defe ^g=fef fe^de |
+e=dcd dB^GF EGBd e^gag | aecB ceAc EA^GF EDCB, |
+A,2 (=gf edcB A)(gfe dcBA | G)(fed cBAG F)(edc BAGF |
+F)(dcB) [cc]e[AA]e [BB]e[cc]e [dd]e[BB]e | [cc]e[AA]e [dd]e[BB]e [cc]e[AA]e [dd]e[BB]e |
+[cc]e[AA]e [BB]e[cc]e [dd]e[ee]e [ff]e[AA]e | [ee]e[ff]e [gg]e[AA]e [ff]e[gg]e [aa]e[ff]e |
+[gg]e[ff]e [gg]e[ee]e [ff]e[ee]e [ff]e[dd]e | [ee]e[dd]e [ee]e[cc]e [dd]e[cc]e [dd]e[BB]e |
+ceAB =cA^cA dA^dA eA=fA | ^fAgA ^gAaA ^bA=bA=c'A^c'A |
+d'(fAf) d'fd'f d'(fAf) d'fd'f | d'(eAe) d'ed'e d'(eAe) d'ed'e |
+c'(gAg) c'gc'g c'(gAg) c'gc'g | [D16A16f16d'16] |]
+

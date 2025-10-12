@@ -1,0 +1,29 @@
+X:19
+T:Changing Time or Key Signatures, Guitar Chords
+N:From abc2ps sample file.  Guitar chords can be placed
+N:over or under the staff, and should align with the note
+N:symbol which follows them.  Originally written using
+N:inline fields, but here edited to the abc1.6 standard.
+N:I'm entirely unsure whether the bars add up here, as
+N:it's not clear where the first repeat is to be repeated
+N:from.  BarFly wants to repeat it from the double bar,
+N:which is in a section in a different time signature
+N:and generates a bar check error.
+N:If the double bar is replaced with a single one the
+N:repeat is back to the beginning, and all is well.  
+M: 6/8
+K: G
+ "Em"ABc def |\
+M: 9/8
+"Am7"A,CC DFF GBB |\
+M:4/4
+"G"a,2b,2"D"c2d2 ||\
+L:1/4
+K:Bb
+"Eb"e4|
+K: Gb
+M: 6/8
+L:1/8
+ "Gb"ede edc | def fed |1 "A"efg "D"gfe | e6 \
+:|2 "G"gag "F"f"Em"e"D7"d | "C"c6 |]
+

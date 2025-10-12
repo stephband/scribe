@@ -1,0 +1,15 @@
+X:15
+T:Key signature, Accidentals and Decorations
+N:From abc2ps sample file
+N:The symbols H..Z are not defined.  Programs can support or
+N:ignore them, but they should not generate an error.  The
+N:symbols u, v and ~ are part of the standard and should be
+N:supported.
+M:C
+K:A
+L: 1/4
+ ^C=C_C ^G=G_G | .F/.G/.A/ Ma/Mg/Mf/ Jc J^c  J[c^f] J[c^g]  |\
+ {f}e {C}D {cd}c {E^c}a2 {dedc}d|    
+ uc vc'-c'/Mb/Mc'/Ma/ | b4- | b/.a/.b/.c'/ | ~A ~g \
+ RA Rg MA Mg | .A .g (vf/g/) (u.a/.b/)  | uR~M.c2  Hg4 ||
+

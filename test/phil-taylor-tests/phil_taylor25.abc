@@ -1,0 +1,21 @@
+X:25
+T:Tullochgorum
+N:Beams/slurs/broken rhythm marks in various
+N:combinations.  H is used to signify the fermata
+N:(Not strictly part of abc 1.6, but widely recognised)
+S Cameron's Flute Music (Glasgow) NLS Mus.D.s.116 p26
+N:original printed in 2 sharps with accidentals on all c's
+N:original uses an initial segno rather than a double bar
+M:C|
+L:1/8
+K:DMix
+Hg||\
+f>(da>)(d           g>)(c e2)|   f>(da>)(d    f>)g(a<d')    |\
+f>(da>)(d           g>)(c e2)|[1 f>(d a>)(d   e/f/)g e>g   :|\
+                              [2 f>da>d      (e/f/)g e>f   ||
+d>d'a>b             c'>(c e2)|   d>d'a>(d'    d>)(d'a>)(d'  |\
+d>)d'a>d'           c'>(c e2)|   d>d'a>d'  (3(efg)   f>e    |
+d>d'a>b             c'>(c e2)|   d>d'a>b      c'>d'e'>d'    |\
+e'/.d'/.c'/b/ c'>a (g<c)e>e' |   d'>a(d'<f') (b<d')(a<d') H|]
+
+

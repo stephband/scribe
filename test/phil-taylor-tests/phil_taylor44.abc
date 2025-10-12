@@ -1,0 +1,48 @@
+X:44
+T:Coventry Carol
+N:From BarFly sample file.
+N:Chords in HTL order.  Tied notes between chords.
+N:Multiple metre changes.  Was originally in GDor;
+N:BarFly displays it on a tenor clef, but this is an
+N:extension to abc, so I transposed it to D.
+N:The hair-raising discord in bar 24 (in the middle 
+N:of the last line) is in the original manuscript.
+C:Pageant of the Shearmen and Tailors 1591
+M:4/4
+Q:1/8=175 %52s playing time
+K:DDorian
+P:Chorus
+[d4A4D4][d2A2D2][^c2A2A,2] |\
+M:3/4
+[d4^F4D,4][f2A2D2] | [e3c3C3] [ecC] [d-G E-][dAE]|\
+[^c6A6A,6] | [d2A2D2] [e2c2C2] [f2A2D2] |\
+M:2/4
+L:1/8
+ [g2^A2G,2] [e-=AA,-][eGA,] |
+M:3/4
+[d4^F4D,4] [a2c2F,2] | [g3c3C3] [gcC] [f2A2D2] | [e6A6A,6] |\
+[d2A2D2] [^c2A2A,2] [d2F2D2] |\
+M:2/4
+L:1/8
+ [g2^A2G,2] [e2=A2A,2] |\
+M:3/4
+[^f6A6D6] |
+P:Verse
+M:4/4
+[d4A4D4][d2A2D2][^c2A2A,2] |\
+M:3/4
+ [d4A4D,4][f2A2D2] | [e4c4C4] [d-F^A,-][dGA,]|\
+[^c6A6A,6] | [d2A2D2] [e2c2C2] [f2A2D2] |\
+M:2/4
+L:1/8
+ [g2^A2G,2] [e-=AA,-] [eGA,] |\
+M:3/4
+[d4^F4D,4] [a2c2F,2] |
+[g4c4C4][f2A2D2] | [e4A4A,4][f2A2D2] | [e4c4C4][d-F^A,-][dGA,] | [c6d6A,6]|\
+[d2F2D2] [^c2A2A,2] [d2F2D2] |\
+M:2/4
+L:1/8
+ [g2^A2G,2] [e2=A2A,2] |\
+M:3/4
+ [^f6A6D,6] |
+

@@ -1,0 +1,19 @@
+X:36
+T:Polska
+C:efter Adolf Lindman
+N:Full extended tuplet notation.  Chords in beams.
+N:Chords in LTH order.  Broken rhythms between chords.
+N:Staccato chords.
+R:polska J
+Z:Transcribed by henrik.norbeck@mailbox.swipnet.se
+M:3/4
+L:1/16
+K:D
+[DA-]>[FA][FA].[FA] [DA-]>[FA].[FA].[FA] [DA-]>[FA].[FA].[FA]|
+[D3A3-][FA] .A3.d f4|(5:4:5fgfef .g2.f2 .e2.d2|.c2.B2 (AB).A.G (FG)FE|
+[DA-]>[FA].[FA].[FA] [DA-]>[FA].[FA].[FA] [DA-]>[FA].[FA].[FA]|
+[D3A3-][FA] .A3.d f4|(5:4:5fgfef .g2.f2 .e2.d2|(cd).e.c d4 z4:|
+|:(Ad).f.d (Ad).f.d (Ad).f.d|(Ac).e.c (Ac).e.c (Ac).e.c|
+(DG).B.G (DG).B.G (DG).B.G|(DF).A.F (DF).A.F (DF).A.F|
+(D3F) (A2d2) (f2a2)|(5:4:5aba^ga (b2a2) (g2e2)|[e3c3]d [d4D4] z4:|
+

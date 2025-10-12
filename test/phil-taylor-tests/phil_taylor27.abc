@@ -1,0 +1,19 @@
+X:27
+T:Cameron's got his wife again
+R:Strathspey
+C:MacNeil MS
+B:Cape Breton Collection of Bagpipe Music,1995,compiled Barry Shears
+B:<caper@ns.sympatico.ca>
+N:Pipe music, Hp keysig = 2 sharps + G natural
+N:Gracenotes and beams of gracenotes in beams of timed notes.
+N:In pipe music, all timed notes are drawn stems down, all gracenotes
+N:with stems up.  Gracenotes should NOT be automatically slurred to
+N:the following note.  To be really traditional, the beams should
+N:all be drawn horizontally.
+M:C
+K:Hp
+{Gdc}d>B{e}G>B{g} A2 {GdGe}A>B | {Gdc}d>B{e}A>G   {g}A>B{gef}e2  |
+{Gdc}d>B{e}G>B{g} A2 {GdGe}A>B |      e<A{gef}e>d {g}B<d{gef}e2 :|
+{Gdc}d>e{g}f<g    a>e{gfg}f2   | {Gdc}d>e{g}f<g      f>e{g}f<g   |
+{Gdc}d>e{g}f<g    a>e{gfg}f2   |      e>d{e}B<d   {g}e>f{g}f<g  :|
+
