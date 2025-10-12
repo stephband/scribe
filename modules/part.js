@@ -18,6 +18,7 @@ import last        from './object/last.js';
 import lengthOf    from './object/length-of.js';
 import map         from './object/map.js';
 import getDuration from './event/to-duration.js';
+import getStopBeat from './event/to-stop-beat.js';
 import { rpitch }  from './pitch.js';
 import config      from './config.js';
 
@@ -37,10 +38,6 @@ function average(a, n, i, array) {
 
 
 /* Events */
-
-function getStopBeat(event) {
-    return event[0] + getDuration(event);
-}
 
 function toMaxStopBeat(n, event) {
     return max(n, getStopBeat(event));
@@ -236,33 +233,6 @@ function closeBeam(symbols, stave, part, beam) {
 /* Rests */
 
 function createRest(durations, bar, stave, part, stopBeat, beat) {
-/*    // [beat, 'rest', pitch (currently unused), duration]
-    let duration = tobeat - beat;
-
-    // If the beat and tobeat don't both fall on start, end or a division...
-    if (!(beat === 0 || divisions.includes(beat)) || !(tobeat === endbeat || divisions.includes(tobeat))) {
-        // Find bar division that rest crosses
-        let division = getDivision(divisions, beat, beat + duration);
-        // Truncate rest up to division
-        if (division) duration = division - beat;
-    }
-
-    // Clamp rest duration to permissable rest symbol durations
-    let r = durations.length;
-    // Employ p16 to work around rounding errors
-    while (durations[--r] + p16 > duration);
-    duration = durations[r + 1] || durations[durations.length - 1];
-
-    // Where beat does not fall on a 2^n division clamp it to next
-    // smallest. This is what stops [0, note, 0.5], [1.5, note, 0.5]
-    // from rendering with a single quarter rest between them, but
-    // rather two eighth rests.
-    let p = 8;
-    while ((p *= 0.5) && beat % p);
-    // TODO: Something not quite right about this logic
-    if (p < duration) duration = p;
-*/
-
     // Create rest symbol
     return {
         type: 'rest',
@@ -641,55 +611,6 @@ function fitDuration(durations, bar, startBeat, stopBeat, beat, eventBeat) {
             // Stop beat is shorter than grain
             fitDottedDuration(0.125, stopBeat - beat) ;
     }
-/*
-    //console.log(bar.beat, beat, 'NOTES', stopBeat, eventBeat);
-
-    // If notes are truncated by next event
-    if (lte(eventBeat, stopBeat, p16)) {
-        stopBeat = eventBeat;
-    }
-    // If event beat is less then some multiplier of the duration of notes
-    else if (eventBeat - beat < 1.5 * (stopBeat - beat)) {
-        stopBeat = eventBeat;
-    }
-    // If stop beat is near divisor round it up ??????
-    else if (stopBeat % bar.divisor > 0.6) {
-        stopBeat = Math.ceil(stopBeat / bar.divisor) * bar.divisor;
-    }
-    // If duration is less than a beat and near a power of 2 duration
-    else if (stopBeat - beat < 1 && stopBeat - beat > 0.5 * ceilPow2(stopBeat - beat)) {
-        stopBeat = ceilPow2(stopBeat - beat) + beat;
-    }
-    // Round it
-    else {
-        stopBeat = roundTo(0.125, stopBeat);
-    }
-
-    // If stop beat has ended up after bar end truncate it
-    if (stopBeat > bar.duration) stopBeat = bar.duration;
-
-    const division = getDivision(bar.divisions, beat, stopBeat);
-
-        // Truncate stopBeat to divisor or bar end based on permissable durations
-    let duration = division ? durationToDivisor(headDurations, bar, beat, stopBeat - beat) :
-        // Or truncate duration to next lowest duration
-        floorTo(headDurations, stopBeat - beat)
-        // Or set it to the minimum duration
-        || headDurations[0] ;
-
-    // Update stopBeat accordingly
-    stopBeat = beat + duration;
-
-    // Limit duration by division
-    if (division
-        && (!(beat === 0 || eq(0, beat % bar.divisor, p16))
-        || !(stopBeat === bar.duration || eq(0, stopBeat % bar.divisor, p16))
-    )) {
-        duration = floorTo(headDurations, division - beat);
-    }
-
-    return duration;
-*/
 }
 
 export function createPart(symbols, bar, stave, key = 0, accidentals = {}, part, events, settings = config) {

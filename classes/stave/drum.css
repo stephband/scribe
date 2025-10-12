@@ -9,7 +9,7 @@ https://web.mit.edu/merolish/Public/drums.pdf
     padding-top: 0.0625em;
     padding-bottom: 0.0625em;
     grid-template-rows:
-        [max up-beam] 0.125em
+        [max up-beam]      0.125em
         [chords]           0.125em
         0.125em
         [splash chinese]   0.125em
@@ -145,6 +145,7 @@ https://web.mit.edu/merolish/Public/drums.pdf
 /*.drum-stave > [data-pitch="B♭5"] { grid-row: hihat;  }   /* Shaker */
 
 .drum-stave > .up-beam.beam   {
+    --translate-y: -0.0625;
     grid-row: up-beam;
     position: static;
 }
