@@ -1,7 +1,7 @@
 
 .chord-stave {
     grid-template-rows:
-        0.125em
+        [max] 0.125em
         0.125em
         0.125em
         [stave-top] 0.125em
@@ -16,14 +16,15 @@
         0.125em
         [stave-bottom] 0.125em
         0.125em
-        [lyrics] 0.125em;
+        [lyrics] 0.125em
+        [min];
 
     background-image: none;
 }
 
 /* TEMP */
-.chord-stave > .ledge,
 /* Just a precaution. */
+.chord-stave > .ledge,
 .chord-stave > .acci {
     display: none !important;
 }

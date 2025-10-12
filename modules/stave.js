@@ -16,7 +16,35 @@ class TrebleUpStave extends Stave {
 class TrebleStave extends Stave {
     type = 'treble';
     clef = glyphs.clefTreble;
-    rows = ['C3','D3','E3','F3','G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5','E5','F5','G5','A5','B5','C6','D6','E6','F6','G6','A6'];
+    rows = [
+        "A6",
+        "G6",
+        "F6",
+        "E6",
+        "D6",
+        "C6",
+        "B5",
+        "A5",
+        "G5",
+        "F5",
+        "E5",
+        "D5",
+        "C5",
+        "B4",
+        "A4",
+        "G4",
+        "F4",
+        "E4",
+        "D4",
+        "C4",
+        "B3",
+        "A3",
+        "G3",
+        "F3",
+        "E3",
+        "D3",
+        "C3"
+    ];
 }
 
 class TrebleDownStave extends Stave {
@@ -28,13 +56,69 @@ class TrebleDownStave extends Stave {
 class AltoStave extends Stave {
     type = 'alto';
     clef = glyphs.clefAlto;
-    rows = ['D2','E2','F2','G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5','E5','F5','G5','A5','B5'];
+    rows = [
+        "B5",
+        "A5",
+        "G5",
+        "F5",
+        "E5",
+        "D5",
+        "C5",
+        "B4",
+        "A4",
+        "G4",
+        "F4",
+        "E4",
+        "D4",
+        "C4",
+        "B3",
+        "A3",
+        "G3",
+        "F3",
+        "E3",
+        "D3",
+        "C3",
+        "B2",
+        "A2",
+        "G2",
+        "F2",
+        "E2",
+        "D2"
+    ];
 }
 
 class BassStave extends Stave {
     type = 'bass';
     clef = glyphs.clefBass;
-    rows = ['E1','F1','G1','A1','B1','C2','D2','E2','F2','G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5'];
+    rows = [
+        "C5",
+        "B4",
+        "A4",
+        "G4",
+        "F4",
+        "E4",
+        "D4",
+        "C4",
+        "B3",
+        "A3",
+        "G3",
+        "F3",
+        "E3",
+        "D3",
+        "C3",
+        "B2",
+        "A2",
+        "G2",
+        "F2",
+        "E2",
+        "D2",
+        "C2",
+        "B1",
+        "A1",
+        "G1",
+        "F1",
+        "E1"
+    ];
 }
 
 

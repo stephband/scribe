@@ -6,7 +6,7 @@ import { rflatsharp } from '../pitch.js';
 import * as glyphs    from "../glyphs.js";
 
 const assign = Object.assign;
-const { round } = Math;
+const { floor, round } = Math;
 
 
 /* Stave */
@@ -57,31 +57,29 @@ export default class Stave {
     }
 
     /**
+    .minRow, .bottomRow, .centerRow, .topRow, .maxRow
+    Minimum and maximum row numbers supported by the stave. Note that `.minRow`
+    is greater than `.maxRow`. We are counting rows in pitch order.
+    **/
+
+    get maxRow()    { return 0; }
+    get topRow()    { return this.centerRow - 4; }
+    get centerRow() { return floor(0.5 * (this.rows.length - 1)); }
+    get bottomRow() { return this.centerRow + 5; }
+    get minRow()    { return this.rows.length - 1; }
+
+    /**
     .minPitch, .bottomPitch, .centerPitch, .topPitch, .maxPitch
     Minimum and maximum pitch names supported by the stave corresponding to the
     first and last row names in `.rows`, and lower, middle and upper stave pitches
     corresponding to the lower, middle and upper lines of the stave.
     **/
 
-    get minPitch() {
-        return this.rows[0];
-    }
-
-    get bottomPitch() {
-        return this.rows[round(0.5 * this.rows.length) - 4];
-    }
-
-    get centerPitch() {
-        return this.rows[round(0.5 * this.rows.length)];
-    }
-
-    get topPitch() {
-        return this.rows[round(0.5 * this.rows.length) + 4];
-    }
-
-    get maxPitch() {
-        return this.rows[this.rows.length - 1];
-    }
+    get maxPitch()    { return this.rows[this.maxRow]; }
+    get topPitch()    { return this.rows[this.topRow]; }
+    get centerPitch() { return this.rows[this.centerRow]; }
+    get bottomPitch() { return this.rows[this.bottomRow]; }
+    get minPitch()    { return this.rows[this.minRow]; }
 
     /**
     .movePitch(pitch, n)
@@ -117,19 +115,25 @@ export default class Stave {
     }
 
     /**
+    .getRow(pitch)
+    Returns the row index of a given pitch name or number.
+    **/
+    getRow(pitch) {
+        const name = typeof pitch === 'string' ? pitch : toNoteName(pitch) ;
+        const row  = name.replace(rflatsharp, '');
+        const i    = this.rows.indexOf(row);
+        if (i === -1) { throw new Error('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name); }
+        return i;
+    }
+
+    /**
     .getRowDiff(pitch1, pitch2)
     Given two pitches `pitch1` and `pitch2`, returns the difference in rows
     between their rendered positions.
     **/
     getRowDiff(pitch1, pitch2) {
-        const row1 = pitch1.replace(rflatsharp, '');
-        const row2 = pitch2.replace(rflatsharp, '');
-        const i1 = this.rows.indexOf(row1);
-        const i2 = this.rows.indexOf(row2);
-
-        if (i1 === -1) { throw new Error('Pitch "' + pitch1 + '" is not supported by stave ' + this.constructor.name); }
-        if (i2 === -1) { throw new Error('Pitch "' + pitch2 + '" is not supported by stave ' + this.constructor.name); }
-
+        const i1 = this.getRow(pitch1);
+        const i2 = this.getRow(pitch2);
         return i2 - i1;
     }
 

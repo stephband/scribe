@@ -1,9 +1,10 @@
 
 .piano-stave {
+    padding-top: 0.0625em;
+    padding-bottom: 0.0625em;
     /* Total 6em height */
     grid-template-rows:
-        [max] 0.0625em
-        [A6] 0.125em
+        [A6 max] 0.125em
         [G6] 0.125em
         [F6 chords] 0.125em
         [E6] 0.125em
@@ -12,16 +13,16 @@
         [B5] 0.125em
         [A5] 0.125em
         [G5] 0.125em
-        [F5 stave-top] 0.125em
+        [F5 rh-top stave-top] 0.125em
         [E5] 0.125em
         [D5] 0.125em
         [C5] 0.125em
-        [B4 stave-upper] 0.125em
+        [B4 rh-center] 0.125em
         [A4] 0.125em
         [G4] 0.125em
         [F4] 0.125em
         [E4] 0.125em
-        [D4] 0.125em
+        [D4 rh-bottom] 0.125em
         [C4] 0.125em
         [rh-B3] 0.125em
         [rh-A3] 0.125em
@@ -32,16 +33,16 @@
         [lh-D4] 0.125em
         [lh-C4] 0.125em
         [B3] 0.125em
-        [A3] 0.125em
+        [A3 lh-top] 0.125em
         [G3] 0.125em
         [F3] 0.125em
         [E3] 0.125em
-        [D3 stave-lower] 0.125em
+        [D3 lh-center] 0.125em
         [C3] 0.125em
         [B2] 0.125em
         [A2] 0.125em
         [G2] 0.125em
-        [F2 stave-bottom] 0.125em
+        [F2 lh-bottom stave-bottom] 0.125em
         [E2] 0.125em
         [D2] 0.125em
         [C2] 0.125em
@@ -50,7 +51,7 @@
         [F1] 0.125em
         [E1] 0.125em
         [D1] 0.125em
-        [min] 0.0625em;
+        [min];
 
     /*background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -14.5 1 29" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
         <style>line{vector-effect:non-scaling-stroke;stroke:currentcolor;stroke-width:0.04em;stroke-linejoin:round;stroke-linecap:round;fill:none;}</style>\
@@ -122,3 +123,8 @@
 .piano-stave > [data-pitch="A♯"] { grid-row-start: A4; }
 .piano-stave > [data-pitch="E♯"] { grid-row-start: E5; }
 .piano-stave > [data-pitch="B♯"] { grid-row-start: B4; }
+
+.piano-stave > .up-ledge[data-part="rh"]   { grid-row-end:   rh-top; }
+.piano-stave > .down-ledge[data-part="rh"] { grid-row-start: rh-bottom; }
+.piano-stave > .up-ledge[data-part="lh"]   { grid-row-end:   lh-top; }
+.piano-stave > .down-ledge[data-part="lh"] { grid-row-start: lh-bottom; }

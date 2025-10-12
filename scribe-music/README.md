@@ -31,7 +31,7 @@ JSON data imported via its `src` attribute:
 | :---------- | :----------- | :-------- | :---------- |
 | `src`       | `.src`       | `URL`     | A URL of a JSON file or hashref of a script in the document |
 |             | `.data`      | `object`  | Gets and sets sequence data |
-| `clef`      | `.clef`      | `string`  | One of `"treble"`, `"bass"`, `"piano"`, `"drum"` or `"percussion"` |
+| `clef`      | `.clef`      | `string`  | One of `"treble"`, `"bass"`, `"piano"`, `"alto"`, `"drum"` or `"percussion"` |
 | `key`       | `.key`       | `string`  | The name of a major key, eg. `"Ab"` |
 | `meter`     | `.meter`     | `string`  | The time signature, eg. `"4/4"` |
 | `transpose` | `.transpose` | `number`  | Transposes notation by a given number of semitones |

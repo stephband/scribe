@@ -1,7 +1,8 @@
 .treble-stave {
+    padding-top: 0.0625em;
+    padding-bottom: 0.0625em;
     grid-template-rows:
-        [max] 0.0625em
-        [A6] 0.125em
+        [A6 max] 0.125em
         [G6 chords] 0.125em
         [F6] 0.125em
         [E6] 0.125em
@@ -27,8 +28,8 @@
         [F3] 0.125em
         [E3] 0.125em
         [D3] 0.125em
-        [C3] 0.125em
-        [min lyrics] 0.0625em;
+        [C3 lyrics] 0.125em
+        [min];
 }
 
 /*
@@ -37,10 +38,6 @@
     grid-row: G4;
 }
 */
-
-.treble-stave > .lyric {
-    align-self: end;
-}
 
 /* Key signature */
 

@@ -54,9 +54,9 @@
         font-family: MartianMono, monospace;
     }
 
-    .orange-fg { font-weight: 600; color: oklch(0.54 0.19 41.4); }
-    .yellow-fg { font-weight: 600; color: oklch(0.62 0.15 95.97); }
-    .lime-fg   { color: oklch(0.2 0.11 297.09); }
+    .nt, .orange-fg { font-weight: 600; color: oklch(0.54 0.19 41.4); }
+    .na, .yellow-fg { font-weight: 600; color: oklch(0.62 0.15 95.97); }
+    .s,  .lime-fg   { color: oklch(0.2 0.11 297.09); }
 
 
     .ash-font      { font-family: Ash, AshText; }
@@ -361,16 +361,14 @@
         <pre class="x2"><span class="orange-fg">&lt;scribe-music</span> <span class="yellow-fg">clef="</span><span class="lime-fg">drum</span><span class="yellow-fg">"</span> <span class="yellow-fg">src="</span><span class="lime-fg">./caravan-drums.json</span><span class="orange-fg">"&gt;&lt;/scribe-music&gt;</span></pre>
         <scribe-music class="x2 7x" clef="drum" src="./data/caravan-drums.json"></scribe-music>
 
-        <pre class="x2"><span class="orange-fg">&lt;scribe-music</span> <span class="yellow-fg">clef="</span><span class="lime-fg">piano</span><span class="yellow-fg">"</span> <span class="yellow-fg">src="</span><span class="lime-fg">./a-fond-kiss.json</span><span class="orange-fg">"&gt;&lt;/scribe-music&gt;</span></pre>
-        <scribe-music class="x2 7x" clef="piano" src="./data/a-fond-kiss.json" excludes="chord"></scribe-music>
+        <pre class="x2"><span class="orange-fg">&lt;scribe-music</span> <span class="yellow-fg">clef="</span><span class="lime-fg">piano</span><span class="yellow-fg">"</span> <span class="yellow-fg">src="</span><span class="lime-fg">./ae-fond-kiss.json</span><span class="orange-fg">"&gt;&lt;/scribe-music&gt;</span></pre>
+        <scribe-music class="x2 7x" clef="piano" src="./data/ae-fond-kiss.json" excludes="chord"></scribe-music>
 
-        <h2 class="x2 6x">Get started</h2>
-        <p class="x2 6x">To use the <code>&lt;scribe-music&gt;</code> custom element, import the CSS and JS from the CDN:</p>
-        <pre class="x2 6x">
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/stephband/scribe@latest/build/scribe-music/element.css" />
-            <script type="module" src="https://cdn.jsdelivr.net/gh/stephband/scribe@latest/build/scribe-music/element.js"></script>
-        </pre>
-        <p class="x2 6x">The <code>&lt;scribe-music&gt;</code> element is now registered.</p>
+        <h2 class="x2 6x">Import <code>&lt;scribe-music&gt;</code></h2>
+        <p class="x2 6x">To use the <code>&lt;scribe-music&gt;</code> custom element, include the CSS and JS from the CDN:</p>
+        <pre class="x2 6x highlight"><code><span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">"stylesheet"</span> <span class="na">href=</span><span class="s">"https://cdn.jsdelivr.net/gh/stephband/scribe@0.4/build/scribe-music/element.css"</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"module"</span> <span class="na">src=</span><span class="s">"https://cdn.jsdelivr.net/gh/stephband/scribe@0.4/build/scribe-music/element.js"</span><span class="nt">&gt;&lt;/script&gt;</span></code></pre>
+        <p class="x2 6x">The <code>&lt;scribe-music&gt;</code> element is now registered. For more details about its attributes </p>
     </section>
 
     <section class="style-section 9x-grid grid y-start-grid" style="--y-gap: 0em;">
@@ -437,10 +435,6 @@
             <li>Scores – aligned display of multiple parts</li>
         </ul>
         <p class="x2 6x">If you are good at JS and CSS and want to help out, please do get in touch.</p>
-    </section>
-
-    <section class="stave-section 9x-grid grid" style="--y-gap: 0em;">
-        <h2 class="x2 6x">Try it out in a web page</h2>
     </section>
 
     <section class="stave-section 9x-grid grid" style="--y-gap: 0em;">

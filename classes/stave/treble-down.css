@@ -1,7 +1,8 @@
 .treble-down-stave {
+    padding-top: 0.0625em;
+    padding-bottom: 0.0625em;
     grid-template-rows:
-        [max] 0.0625em
-        [A5] 0.125em
+        [A5 max] 0.125em
         [G5] 0.125em
         [F5 chords] 0.125em
         [E5] 0.125em
@@ -27,8 +28,8 @@
         [F2] 0.125em
         [E2] 0.125em
         [D2] 0.125em
-        [C2] 0.125em
-        [min lyrics] 0.0625em;
+        [C2 lyrics] 0.125em
+        [min];
 }
 
 /* Map unoctaved pitches to stave lines for key signatures. */

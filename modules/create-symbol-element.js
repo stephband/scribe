@@ -138,12 +138,11 @@ export default overload(get('type'), {
     ledge: (symbol) => create('svg', {
         class:   `${ symbol.rows < 0 ? 'up' : 'down' }-ledge ledge`,
         viewBox: symbol.rows < 0 ?
-            // Up ledge
+            // Up ledge start from 1 row above stave.topRow
             `0 ${ 9 + symbol.rows - 0.5 } 4.8 ${ abs(symbol.rows) }` :
-            // Down ledge
+            // Down ledge starts from 1 row below stave.bottomRow
             `0 -0.5 4.8 ${ abs(symbol.rows) }` ,
         preserveAspectRatio: "xMidYMin",
-        //style: `height: ${ abs(symbol.rows) * 0.125 }em;`,
         html: `
             <line x1="0" x2="4.8" y1="0" y2="0"></line>
             <line x1="0" x2="4.8" y1="2" y2="2"></line>
@@ -153,7 +152,8 @@ export default overload(get('type'), {
         `,
         data: {
             beat:  truncate(symbol.beat),
-            pitch: symbol.pitch
+            pitch: symbol.pitch,
+            part:  symbol.part.name
         }
     }),
 
