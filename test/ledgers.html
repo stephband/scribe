@@ -54,9 +54,40 @@
 
 <body>
     <section class="grid dense-grid" style="row-gap: 0;">
-        <h3 class="x1 no-wrap">32nds</h3>
+        <h3 class="x1 no-wrap">Ledger lines</h3>
 
-        <scribe-music class="x2 8x no-wrap" clef="treble" src="#ledge-1" debug>
+
+        <scribe-music class="x1 6x no-wrap" clef="treble" src="#note-1" debug>
+            <script type="application/json" id="note-1">{
+                "events": [
+                    [0, "meter", 1, 1],
+                    [0, "note", "C4", 0.1, 0.25]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1 6x no-wrap" clef="treble" src="#note-2" debug>
+            <script type="application/json" id="note-2">{
+                "events": [
+                    [0, "meter", 1, 1],
+                    [0, "note", "C4", 0.1, 0.25],
+                    [0, "note", "D4", 0.1, 0.25]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1 6x no-wrap" clef="treble" src="#note-3" debug>
+            <script type="application/json" id="note-3">{
+                "events": [
+                    [0, "meter", 1, 1],
+                    [0, "note", "E6", 0.1, 0.25],
+                    [0, "note", "D6", 0.1, 0.25]
+                ]
+            }</script>
+        </scribe-music>
+
+
+        <scribe-music class="x1 6x no-wrap" clef="treble" src="#ledge-1" debug>
             <script type="application/json" id="ledge-1">{
                 "events": [
                     [0, "meter", 6, 1],
@@ -72,7 +103,7 @@
             }</script>
         </scribe-music>
 
-        <scribe-music class="x2 8x no-wrap" clef="treble" src="#ledge-2" debug>
+        <scribe-music class="x1 6x no-wrap" clef="treble" src="#ledge-2" debug>
             <script type="application/json" id="ledge-2">{
                 "events": [
                     [0, "meter", 6, 1],
@@ -88,7 +119,7 @@
             }</script>
         </scribe-music>
 
-        <scribe-music class="x2 8x no-wrap" clef="bass" src="#ledge-3" debug>
+        <scribe-music class="x1 6x no-wrap" clef="bass" src="#ledge-3" debug>
             <script type="application/json" id="ledge-3">{
                 "events": [
                     [0, "meter", 6, 1],
@@ -104,7 +135,7 @@
             }</script>
         </scribe-music>
 
-        <scribe-music class="x2 8x no-wrap" clef="bass" src="#ledge-4" debug>
+        <scribe-music class="x1 6x no-wrap" clef="bass" src="#ledge-4" debug>
             <script type="application/json" id="ledge-4">{
                 "events": [
                     [0, "meter", 6, 1],
@@ -120,7 +151,7 @@
             }</script>
         </scribe-music>
 
-        <scribe-music class="x2 8x no-wrap" clef="piano" src="#ledge-5" debug>
+        <scribe-music class="x1 6x no-wrap" clef="piano" src="#ledge-5" meter="4/4" debug>
             <script type="application/json" id="ledge-5">{
                 "events": [
                     [0, "sequence", 1, 1, 8]
@@ -142,7 +173,30 @@
             }</script>
         </scribe-music>
 
-        <scribe-music class="x2 8x no-wrap" clef="piano" src="#ledge-6" debug>
+        <scribe-music class="x1 6x no-wrap" clef="piano" src="#ledge-6" meter="4/4" debug>
+            <script type="application/json" id="ledge-6">{
+                "events": [
+                    [0, "sequence", 1, 2, 8]
+                ],
+
+                "sequences": [{
+                    "id": 1,
+                    "events": [
+                        [0, "note", "C4", 0.1, 1],
+                        [1, "note", "B3", 0.1, 1],
+                        [2, "note", "A3", 0.1, 1],
+                        [3, "note", "G3", 0.1, 1],
+                        [4, "note", "F3", 0.1, 1],
+                        [5, "note", "E3", 0.1, 1],
+                        [6, "note", "D3", 0.1, 1]
+                    ]
+                }]
+            }</script>
+        </scribe-music>
+
+        <h3 class="x1 no-wrap">No meter</h3>
+
+        <scribe-music class="x1 6x no-wrap" clef="piano" src="#ledge-6" debug>
             <script type="application/json" id="ledge-6">{
                 "events": [
                     [0, "sequence", 1, 2, 8]

@@ -199,6 +199,31 @@
 	justify-self: start;
 }
 
+.bar > .cluster-note.up-note {
+    margin-left: calc(1em * var(--head-width));
+}
+
+.bar > .cluster-note.up-note > .head {
+    grid-column: 2;
+    margin-left: calc(-0.6em * var(--stem-width));
+}
+
+/* ------------------------------------------------ Too hacky --------------- */
+.bar > .cluster-note.down-note {
+    justify-self: end;
+    /* Push cluster notes on down stems into preceding column */
+    /* TODO: This is going to cause a problem with accidentals!! It doesnt really
+       work anyway, its all a bit of a hacky clusterfuck */
+    grid-column-start: calc(var(--column-beat-0) + round(var(--beat) * var(--columns-per-beat)) - 1);
+    margin-right: calc(-1em * var(--stem-width) + -1 * var(--bar-column-gap) - 0.003em);
+}
+
+.bar > .cluster-note.down-note::before {
+    /* Move flag back into position */
+    transform: translate(calc(1em * var(--head-width)), calc(var(--stem-height) * 1em));
+}
+/* -------------------------------------------------------------------------- */
+
 .bar > .ledge {
     width: 0.625em;
 	/* Make ledger take up same space as head */

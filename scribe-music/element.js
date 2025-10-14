@@ -52,7 +52,7 @@ export default define(element('scribe-music', {
         internals.data      = Signal.of();
         internals.clef      = Signal.of('treble');
         internals.key       = Signal.of('C');
-        internals.meter     = Signal.of([-4, "meter", 4, 1]);
+        internals.meter     = Signal.of(/*[-4, "meter", 4, 1]*/);
         internals.beat      = Signal.of(0);
         internals.duration  = Signal.of(Infinity);
         internals.transpose = Signal.of(0);

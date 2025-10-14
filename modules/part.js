@@ -37,6 +37,10 @@ function toMaxStopBeat(n, event) {
     return max(n, getStopBeat(event));
 }
 
+function byPitch(a, b) {
+    return toNoteNumber(a[2]) < toNoteNumber(b[2]);
+}
+
 function getPitches(stave, key, notes) {
     const pitches = {};
     let n = -1;
@@ -676,6 +680,9 @@ export function createPart(symbols, bar, stave, key = 0, accidentals = {}, part,
         }
         --n;
 
+        // Sort notes by pitch order, descending (ascending row order)
+        if (stave.pitched) notes.sort(byPitch);
+
         // Insert rests
         if (!notes.length) {
             if (!event) {
@@ -750,7 +757,7 @@ if (stopBeat <= beat) {
             beat,
             part
         };
-
+console.log(notes);
         let p = -1;
         while (notes[++p]) symbols.push({
             type:    'note',
@@ -761,7 +768,9 @@ if (stopBeat <= beat) {
             stemup,
             top:     pitches[p] === maxPitch,
             bottom:  pitches[p] === minPitch,
-            cluster: rows[p + 1] - rows[p] === 1,
+            cluster: stemup ?
+                (console.log(p, rows), rows[p + 1] - rows[p] === 1) :
+                rows[p] - rows[p - 1] === 1 ,
             stave,
             event:   notes[p]
         });
