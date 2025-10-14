@@ -200,10 +200,10 @@
 }
 
 .bar > .ledge {
-	width: auto;
+    width: 0.625em;
 	/* Make ledger take up same space as head */
-	margin-left:  -0.125em;
-	margin-right: -0.125em;
+	margin-left:  calc(-0.5 * (0.625em - 1em * var(--head-width)));
+	margin-right: calc(-0.5 * (0.625em - 1em * var(--head-width)));
 }
 
 
