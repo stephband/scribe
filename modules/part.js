@@ -235,6 +235,96 @@ function closeBeam(symbols, stave, part, beam) {
 
 /* Rests */
 
+function fitDottedDuration(min, duration) {
+    let grain = 2 * ceilPow2(duration);
+    while ((grain /= 2) > min / 2) {
+        if (1.75 * grain === duration) return 1.75 * grain;
+        if (1.5  * grain === duration) return 1.5  * grain;
+        if (grain <= duration) return grain;
+    }
+    return min;
+}
+
+function fitRoundedUpDuration(min, duration, maxDuration) {
+    maxDuration = maxDuration || Infinity;
+    let grain = 4 * ceilPow2(duration);
+    while ((grain /= 2) > min / 2) {
+        if (grain <= duration * 2 && grain <= maxDuration) return grain;
+    }
+    return min;
+}
+
+function fitDuration(durations, bar, startBeat, stopBeat, beat, eventBeat) {
+    // Some analysis of beats...
+    const minGrain = 0.125;
+    const maxGrain = floorPow2(bar.divisor);
+    const div1     = floor(beat / bar.divisor) * bar.divisor;
+    const grain    = grainPow2(minGrain, maxGrain, beat - div1);
+    const div2     = floor(stopBeat / bar.divisor) * bar.divisor;
+    const division = div1 + bar.divisor < stopBeat && div1 + bar.divisor;
+
+    // Decision tree
+    // Beat is on a divisor
+    if (beat === div1) {
+        // TODO: Something
+        if (eventBeat) {}
+        // Beat to stop beat is a valid head duration
+        if (durations.indexOf(stopBeat - beat) !== -1) return stopBeat - beat;
+        // If beat to last division is a valid duration
+        if (durations.indexOf(div2 - beat) !== -1) return div2 - beat;
+        // Beat to divisor
+        if (division) return division - beat;
+        //
+        return fitRoundedUpDuration(0.125, stopBeat - beat, eventBeat - beat);
+    }
+    // Stop beat is on a divisor
+    else if (eq(stopBeat, div2, p16)) {
+        // If beat to stop beat is a valid duration use it
+        if (durations.indexOf(stopBeat - beat) !== -1) return stopBeat - beat;
+        // Otherwise up to the nearest division
+        if (division && durations.indexOf(division - beat) !== -1) return division - beat;
+        // Otherwise fill the grain
+        return grain;
+    }
+    else {
+        const quadDuration = 4 * grain;
+        const quadIndex    = ((beat - div1) % quadDuration) / grain;
+
+        if (quadIndex === 1) {
+            // If this note takes us up to note at 0001 render the duration 0--0
+            if (beat + 2 * grain === eventBeat) return 2 * grain;
+
+            // Is event inside the quadruplet?
+            if (beat + 3 * grain >= eventBeat) {
+                console.log('Next event beat is inside quaduplet');
+            }
+
+            // Grain is less than 1
+            return grain < 1 ?
+                // If stop beat is greater than half of three grains render duration 0---
+                stopBeat >= beat + grain * 3/2 ? 3 * grain :
+                // Otherwise render duration 0-00
+                stopBeat >= beat + grain ? grain :
+                // Stop beat is smaller than grain, fit an appropriate duration
+                fitDottedDuration(0.125, stopBeat - beat) :
+            // Grain is 1 or greater and
+                // stop beat is after 3 grains render 0---
+                stopBeat >=  beat + grain * 3 ? grain * 3 :
+                // Stop beat is after 2 grains render 0--0
+                stopBeat >=  beat + grain * 2 ? grain * 2 :
+                // Stop beat is after 1 grain render  0-00
+                stopBeat > beat + grain ? grain :
+                // Stop beat is shorter than a grain
+                fitDottedDuration(0.125, stopBeat - beat) ;
+        }
+
+            // stop beat is after 4th grain render 000-
+        return stopBeat > beat + grain ? grain :
+            // Stop beat is shorter than grain
+            fitDottedDuration(0.125, stopBeat - beat) ;
+    }
+}
+
 function createRest(durations, bar, stave, part, stopBeat, beat) {
     // Create rest symbol
     return {
@@ -524,96 +614,6 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
     closeTuplet(stave, part, tuplet);
 
     return n;
-}
-
-function fitDottedDuration(min, duration) {
-    let grain = 2 * ceilPow2(duration);
-    while ((grain /= 2) > min / 2) {
-        if (1.75 * grain === duration) return 1.75 * grain;
-        if (1.5  * grain === duration) return 1.5  * grain;
-        if (grain <= duration) return grain;
-    }
-    return min;
-}
-
-function fitRoundedUpDuration(min, duration, maxDuration) {
-    maxDuration = maxDuration || Infinity;
-    let grain = 4 * ceilPow2(duration);
-    while ((grain /= 2) > min / 2) {
-        if (grain <= duration * 2 && grain <= maxDuration) return grain;
-    }
-    return min;
-}
-
-function fitDuration(durations, bar, startBeat, stopBeat, beat, eventBeat) {
-    // Some analysis of beats...
-    const minGrain = 0.125;
-    const maxGrain = floorPow2(bar.divisor);
-    const div1     = floor(beat / bar.divisor) * bar.divisor;
-    const grain    = grainPow2(minGrain, maxGrain, beat - div1);
-    const div2     = floor(stopBeat / bar.divisor) * bar.divisor;
-    const division = div1 + bar.divisor < stopBeat && div1 + bar.divisor;
-
-    // Decision tree
-    // Beat is on a divisor
-    if (beat === div1) {
-        // TODO: Something
-        if (eventBeat) {}
-        // Beat to stop beat is a valid head duration
-        if (durations.indexOf(stopBeat - beat) !== -1) return stopBeat - beat;
-        // If beat to last division is a valid duration
-        if (durations.indexOf(div2 - beat) !== -1) return div2 - beat;
-        // Beat to divisor
-        if (division) return division - beat;
-        //
-        return fitRoundedUpDuration(0.125, stopBeat - beat, eventBeat - beat);
-    }
-    // Stop beat is on a divisor
-    else if (eq(stopBeat, div2, p16)) {
-        // If beat to stop beat is a valid duration use it
-        if (durations.indexOf(stopBeat - beat) !== -1) return stopBeat - beat;
-        // Otherwise up to the nearest division
-        if (division && durations.indexOf(division - beat) !== -1) return division - beat;
-        // Otherwise fill the grain
-        return grain;
-    }
-    else {
-        const quadDuration = 4 * grain;
-        const quadIndex    = ((beat - div1) % quadDuration) / grain;
-
-        if (quadIndex === 1) {
-            // If this note takes us up to note at 0001 render the duration 0--0
-            if (beat + 2 * grain === eventBeat) return 2 * grain;
-
-            // Is event inside the quadruplet?
-            if (beat + 3 * grain >= eventBeat) {
-                console.log('Next event beat is inside quaduplet');
-            }
-
-            // Grain is less than 1
-            return grain < 1 ?
-                // If stop beat is greater than half of three grains render duration 0---
-                stopBeat >= beat + grain * 3/2 ? 3 * grain :
-                // Otherwise render duration 0-00
-                stopBeat >= beat + grain ? grain :
-                // Stop beat is smaller than grain, fit an appropriate duration
-                fitDottedDuration(0.125, stopBeat - beat) :
-            // Grain is 1 or greater and
-                // stop beat is after 3 grains render 0---
-                stopBeat >=  beat + grain * 3 ? grain * 3 :
-                // Stop beat is after 2 grains render 0--0
-                stopBeat >=  beat + grain * 2 ? grain * 2 :
-                // Stop beat is after 1 grain render  0-00
-                stopBeat > beat + grain ? grain :
-                // Stop beat is shorter than a grain
-                fitDottedDuration(0.125, stopBeat - beat) ;
-        }
-
-            // stop beat is after 4th grain render 000-
-        return stopBeat > beat + grain ? grain :
-            // Stop beat is shorter than grain
-            fitDottedDuration(0.125, stopBeat - beat) ;
-    }
 }
 
 export function createPart(symbols, bar, stave, key = 0, accidentals = {}, part, events, settings = config) {
