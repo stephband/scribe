@@ -52,6 +52,13 @@ function getPitches(stave, key, notes) {
     return pitches;
 }
 
+function getRows(stave, part, pitches) {
+    const rows = {};
+    let n = -1;
+    while (pitches[++n]) rows[n] = stave.getRow(part, pitches[n]);
+    return rows;
+}
+
 
 /* Pitches */
 
@@ -709,10 +716,11 @@ if (stopBeat <= beat) {
             continue;
         }
 
-        const pitches  = getPitches(stave, key, notes);
+        const pitches = getPitches(stave, key, notes);
+        const rows    = getRows(stave, part, pitches);
         const { row: minRow, pitch: minPitch } = getMinPitchRow(stave, part, pitches);
         const { row: maxRow, pitch: maxPitch } = getMaxPitchRow(stave, part, pitches);
-        const stemup   = part.stemup === undefined ?
+        const stemup  = part.stemup === undefined ?
             stemupFromRows(stave, part, minRow, maxRow) :
             part.stemup ;
 
@@ -745,16 +753,17 @@ if (stopBeat <= beat) {
 
         let p = -1;
         while (notes[++p]) symbols.push({
-            type: 'note',
+            type:    'note',
             beat,
-            pitch: pitches[p],
+            pitch:   pitches[p],
             duration,
             part,
             stemup,
-            top:    pitches[p] === maxPitch,
-            bottom: pitches[p] === minPitch,
+            top:     pitches[p] === maxPitch,
+            bottom:  pitches[p] === minPitch,
+            cluster: rows[p + 1] - rows[p] === 1,
             stave,
-            event:  notes[p]
+            event:   notes[p]
         });
 
         // Push note symbols on to beam

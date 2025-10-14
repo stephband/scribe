@@ -60,6 +60,18 @@
     text-align: center;
 }
 
+.cluster-note > .head {
+    /*grid-column: 3;*/
+    /*margin-left: calc(1em * var(--head-width));*/
+    transform: translateX(calc(1em * var(--head-width)));
+}
+
+.cluster-note > .head::before {
+    /* TEMP */
+    display: none;
+    content: none !important;
+    transform: translateX(calc(-1em * var(--head-width)));
+}
 
 
 
