@@ -4,6 +4,7 @@ import toStopBeat from './event/to-stop-beat.js';
 import { toKeyScale, keyWeightsForEvent, chooseKeyFromWeights } from './keys.js';
 import { major } from './scale.js';
 import { createPart } from './part.js';
+import getStopBeat from './event/to-stop-beat.js';
 import config     from './config.js';
 
 const barDivisions = {
@@ -251,19 +252,12 @@ export function createBar(count, beat, duration, divisor, stave, key, events, pa
         beat,
         duration,
         key,
-        divisor,
+        divisor: divisor || 4,
         divisions: getDivisions(duration, divisor),
         stave,
         count,
         symbols
     };
-
-    // Add clef in front of keysig
-    /*bar.symbols.push({
-        type: 'clef',
-        beat: 0,
-        stave
-    });*/
 
     // Populate symbols with events
     createBarSymbols(symbols, bar, stave, key, accidentals, events, config);
@@ -273,6 +267,7 @@ export function createBar(count, beat, duration, divisor, stave, key, events, pa
     for (index in stave.parts) {
         const part   = stave.parts[index];
         const events = parts[part.name] || [];
+
         // Dont render anything if this is not a default part and there are no events
         if (!part.DEFAULT && !events.length) continue;
         createPart(symbols, bar, stave, key, accidentals, part, events, settings);
