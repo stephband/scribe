@@ -112,7 +112,7 @@ export default class DrumStave extends Stave {
     .getRow(pitch)
     Returns the row index of a given pitch name or number.
     **/
-    getRow(n) {
+    getRow(part, n) {
         const pitch = typeof n === 'string' ? n : toDrumPitch(n) ;
         if (!pitch) throw new Error('Drum name not found for pitch ' + n);
         const i = this.rows.findIndex((row) => row.includes(pitch));

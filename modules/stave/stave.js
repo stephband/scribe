@@ -117,10 +117,11 @@ export default class Stave {
     }
 
     /**
-    .getRow(pitch)
-    Returns the row index of a given pitch name or number.
+    .getRow(part, pitch)
+    Returns the row index of a given pitch name or number. Multi-staff staves
+    require part to know which staff they are positioned upon.
     **/
-    getRow(pitch) {
+    getRow(part, pitch) {
         const name = typeof pitch === 'string' ? pitch : toNoteName(pitch) ;
         const row  = name.replace(rflatsharp, '');
         const i    = this.rows.indexOf(row);

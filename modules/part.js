@@ -55,11 +55,11 @@ function getPitches(stave, key, notes) {
 
 /* Pitches */
 
-function getMinPitchRow(stave, pitches) {
+function getMinPitchRow(stave, part, pitches) {
     let n = -1, row = 0;
     let pitch, r;
     while (pitches[++n]) {
-        r = stave.getRow(pitches[n]);
+        r = stave.getRow(part, pitches[n]);
         // r may be out of range oof this stave
         if (r === undefined) continue;
         // The bigger r, the lower the pitch
@@ -71,11 +71,11 @@ function getMinPitchRow(stave, pitches) {
     return { row, pitch };
 }
 
-function getMaxPitchRow(stave, pitches) {
+function getMaxPitchRow(stave, part, pitches) {
     let n = -1, row = 128;
     let pitch, r;
     while (pitches[++n]) {
-        r = stave.getRow(pitches[n]);
+        r = stave.getRow(part, pitches[n]);
         // r may be out of range oof this stave
         if (r === undefined) continue;
         // The smaller r, the higher the pitch
@@ -98,8 +98,8 @@ function stemupFromRows(stave, part, minRow, maxRow) {
 }
 
 function stemupFromPitches(stave, part, pitches) {
-    const { row: minRow } = getMinPitchRow(stave, pitches);
-    const { row: maxRow } = getMaxPitchRow(stave, pitches);
+    const { row: minRow } = getMinPitchRow(stave, part, pitches);
+    const { row: maxRow } = getMaxPitchRow(stave, part, pitches);
     return stemupFromRows(stave, part, minRow, maxRow);
 }
 
@@ -161,7 +161,7 @@ function closeBeam(symbols, stave, part, beam) {
     let note;
     n = -1;
     while (note = beam[++n]) {
-        let row = stave.getRow(note.pitch);
+        let row = stave.getRow(part, note.pitch);
         // row may be out of range oof this stave
         if (row === undefined) continue;
 
@@ -169,7 +169,7 @@ function closeBeam(symbols, stave, part, beam) {
 
         // Find highest or lowest pitch at beat of note
         while (beam[++n] && eq(beam[n].beat, note.beat, p24)) {
-            r = stave.getRow(beam[n].pitch);
+            r = stave.getRow(part, beam[n].pitch);
             // row may be out of range oof this stave
             if (r === undefined) continue;
             if (stemup) { if (r < row) row = r; }
@@ -390,7 +390,7 @@ function createAccidentals(symbols, bar, stave, part, accidentals, beat, notes, 
 
 function createLedges(symbols, stave, part, beat, pitches) {
     // Up ledger lines
-    const { row: maxRow, pitch: maxPitch } = getMaxPitchRow(stave, pitches);
+    const { row: maxRow, pitch: maxPitch } = getMaxPitchRow(stave, part, pitches);
     // Ledges begin two rows away from topPitch, which is the top line
     let rows = maxRow - (part.topRow || stave.topRow) + 1;
     if (rows < 0) symbols.push({
@@ -402,7 +402,7 @@ function createLedges(symbols, stave, part, beat, pitches) {
     });
 
     // Down ledger lines
-    const { row: minRow, pitch: minPitch } = getMinPitchRow(stave, pitches);
+    const { row: minRow, pitch: minPitch } = getMinPitchRow(stave, part, pitches);
     // Ledges begin two rows away from bottomPitch, which is the bottom line
     rows = minRow - (part.bottomRow || stave.bottomRow);
     if (rows > 0)  symbols.push({
@@ -528,8 +528,8 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
         const pitches  = getPitches(stave, key, notes);
         //const minPitch = getMinPitch(pitches);
         //const maxPitch = getMaxPitch(pitches);
-        const { row: minRow, pitch: minPitch } = getMinPitchRow(stave, pitches);
-        const { row: maxRow, pitch: maxPitch } = getMaxPitchRow(stave, pitches);
+        const { row: minRow, pitch: minPitch } = getMinPitchRow(stave, part, pitches);
+        const { row: maxRow, pitch: maxPitch } = getMaxPitchRow(stave, part, pitches);
         const stemup = part.stemup === undefined ?
             stemupFromRows(stave, part, minRow, maxRow) :
             part.stemup ;
@@ -710,8 +710,8 @@ if (stopBeat <= beat) {
         }
 
         const pitches  = getPitches(stave, key, notes);
-        const { row: minRow, pitch: minPitch } = getMinPitchRow(stave, pitches);
-        const { row: maxRow, pitch: maxPitch } = getMaxPitchRow(stave, pitches);
+        const { row: minRow, pitch: minPitch } = getMinPitchRow(stave, part, pitches);
+        const { row: maxRow, pitch: maxPitch } = getMaxPitchRow(stave, part, pitches);
         const stemup   = part.stemup === undefined ?
             stemupFromRows(stave, part, minRow, maxRow) :
             part.stemup ;

@@ -18,9 +18,20 @@
         window.DEBUG = true;
     </script>
 
+
+    <script type="importmap">{
+        "imports": {
+            "bolt/":     "/bolt/",
+            "dom/":      "/dom/modules/",
+            "fn/":       "/fn/modules/",
+            "midi/":     "/midi/modules/",
+            "sequence/": "/sequence/modules/"
+        }
+    }</script>
+
     <!-- Import <scribe-music> -->
-    <link rel="stylesheet" href="./build/scribe-music/element.css" />
-    <script type="module" src="./build/scribe-music/element.js"></script>
+    <link rel="stylesheet" href="./scribe-music/element.css" />
+    <script type="module" src="./scribe-music/element.js"></script>
 
     <style>
     @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/elements/html.css';
@@ -357,7 +368,7 @@
         <scribe-music class="x2 7x" clef="drum" src="./data/caravan-drums.json"></scribe-music>
 
         <pre class="x2"><span class="orange-fg">&lt;scribe-music</span> <span class="yellow-fg">clef="</span><span class="lime-fg">piano</span><span class="yellow-fg">"</span> <span class="yellow-fg">src="</span><span class="lime-fg">./ae-fond-kiss.json</span><span class="orange-fg">"&gt;&lt;/scribe-music&gt;</span></pre>
-        <scribe-music class="x2 7x" clef="piano" src="./data/ae-fond-kiss.json"></scribe-music>
+        <scribe-music class="x2 7x" clef="piano" src="./data/ae-fond-kiss.json" transpose="2"></scribe-music>
 
         <h2 class="x2 6x">Import <code>&lt;scribe-music&gt;</code></h2>
         <p class="x2 6x">To use the <code>&lt;scribe-music&gt;</code> custom element, include the CSS and JS from the CDN:</p>

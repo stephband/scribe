@@ -25,11 +25,11 @@
         [D4 rh-bottom] 0.125em
         [C4] 0.125em
         [rh-B3] 0.125em
-        [rh-A3] 0.125em
-        [rh-G3] 0.125em
-        [stave-center lyrics] 0.125em
-        [lh-F4] 0.125em
-        [lh-E4] 0.125em
+        [lh-B4 rh-A3] 0.125em
+        [lh-A4 rh-G3] 0.125em
+        [stave-center lyrics lh-G4 rh-F3] 0.125em
+        [lh-F4 rh-E3] 0.125em
+        [lh-E4 rh-D3] 0.125em
         [lh-D4] 0.125em
         [lh-C4] 0.125em
         [B3] 0.125em
@@ -107,6 +107,22 @@
 .bar.piano-stave::before {
     grid-row: D2;
 }
+
+/* Map left and right hand specific pitches to rows between treble and bass staves */
+[data-part^="rh"][data-pitch^="B"][data-pitch$="3"]  { grid-row: rh-B3; }
+[data-part^="rh"][data-pitch^="A"][data-pitch$="3"]  { grid-row: rh-A3; }
+[data-part^="rh"][data-pitch^="G"][data-pitch$="3"]  { grid-row: rh-G3; }
+[data-part^="rh"][data-pitch^="F"][data-pitch$="3"]  { grid-row: rh-F3; }
+[data-part^="rh"][data-pitch^="E"][data-pitch$="3"]  { grid-row: rh-E3; }
+[data-part^="rh"][data-pitch^="D"][data-pitch$="3"]  { grid-row: rh-D3; }
+
+[data-part^="lh"][data-pitch^="B"][data-pitch$="4"]  { grid-row: lh-B4; }
+[data-part^="lh"][data-pitch^="A"][data-pitch$="4"]  { grid-row: lh-A4; }
+[data-part^="lh"][data-pitch^="G"][data-pitch$="4"]  { grid-row: lh-G4; }
+[data-part^="lh"][data-pitch^="F"][data-pitch$="4"]  { grid-row: lh-F4; }
+[data-part^="lh"][data-pitch^="E"][data-pitch$="4"]  { grid-row: lh-E4; }
+[data-part^="lh"][data-pitch^="D"][data-pitch$="4"]  { grid-row: lh-D4; }
+[data-part^="lh"][data-pitch^="C"][data-pitch$="4"]  { grid-row: lh-C4; }
 
 /* Map unoctaved pitches to stave lines for key signatures. */
 .piano-stave > [data-pitch="F♭"] { grid-row-start: F4; }

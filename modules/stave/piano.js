@@ -1,6 +1,11 @@
 
 import * as glyphs from "../glyphs.js";
 import Stave       from './stave.js';
+import { rflatsharp } from '../pitch.js';
+
+
+const global = globalThis || window;
+
 
 /**
 A simple piano grand stave which brute splits treble from bass at Bb3.
@@ -9,53 +14,53 @@ A simple piano grand stave which brute splits treble from bass at Bb3.
 export default class PianoStave extends Stave {
     type = 'piano';
     rows = [
-        "A6",
-        "G6",
-        "F6",
-        "E6",
-        "D6",
-        "C6",
-        "B5",
-        "A5",
-        "G5",
-        "F5",
-        "E5",
-        "D5",
-        "C5",
-        "B4",
-        "A4",
-        "G4",
-        "F4",
-        "E4",
-        "D4",
-        "C4",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "B3",
-        "A3",
-        "G3",
-        "F3",
-        "E3",
-        "D3",
-        "C3",
-        "B2",
-        "A2",
-        "G2",
-        "F2",
-        "E2",
-        "D2",
-        "C2",
-        "B1",
-        "A1",
-        "G1",
-        "F1",
-        "E1"
+        "rh-A6",
+        "rh-G6",
+        "rh-F6",
+        "rh-E6",
+        "rh-D6",
+        "rh-C6",
+        "rh-B5",
+        "rh-A5",
+        "rh-G5",
+        "rh-F5",
+        "rh-E5",
+        "rh-D5",
+        "rh-C5",
+        "rh-B4",
+        "rh-A4",
+        "rh-G4",
+        "rh-F4",
+        "rh-E4",
+        "rh-D4",
+        "rh-C4",
+        "rh-B3",
+        "lh-B4 rh-A3",
+        "lh-A4 rh-G3",
+        "lh-G4 rh-F3",
+        "lh-F4 rh-E3",
+        "lh-E4 rh-D3",
+        "lh-D4",
+        "lh-C4",
+        "lh-B3",
+        "lh-A3",
+        "lh-G3",
+        "lh-F3",
+        "lh-E3",
+        "lh-D3",
+        "lh-C3",
+        "lh-B2",
+        "lh-A2",
+        "lh-G2",
+        "lh-F2",
+        "lh-E2",
+        "lh-D2",
+        "lh-C2",
+        "lh-B1",
+        "lh-A1",
+        "lh-G1",
+        "lh-F1",
+        "lh-E1"
     ];
 
     getClefHTML() {
@@ -77,7 +82,7 @@ export default class PianoStave extends Stave {
         </span>`;
     }
 
-    parts = [{
+    parts = [{}, {
         name:        'lh',
         topRow:      29,
         centerRow:   33,
@@ -85,6 +90,7 @@ export default class PianoStave extends Stave {
         topPitch:    'A3',
         centerPitch: 'D3',
         bottomPitch: 'G2',
+        stemup: false,
         DEFAULT: true
     }, {
         name:        'rh',
@@ -133,9 +139,22 @@ export default class PianoStave extends Stave {
         stemup: false
     }];
 
+    /**
+    .getRow(part, pitch)
+    Returns the row index of a given pitch name or number.
+    **/
+    getRow(part, pitch) {
+        pitch = typeof pitch === 'string' ? pitch : toNoteName(pitch) ;
+        const name = part.name + '-' + pitch.replace(rflatsharp, '');
+        const i = this.rows.findIndex((row) => row.includes(name));
+        if (global.DEBUG && i === -1) throw new Error('Pitch "' + name + '" is not supported by ' + this.constructor.name);
+        if (i === -1) console.warn('Pitch "' + name + '" is not supported by ' + this.constructor.name);
+        return i > -1 ? i : undefined ;
+    }
+
     getPart(pitch) {
         return /[012]$|[AC-G][b#♭♯𝄫𝄪]*3$/.test(pitch) ?
-            this.parts[0] :
-            this.parts[1] ;
+            this.parts[1] :
+            this.parts[2] ;
     }
 }
