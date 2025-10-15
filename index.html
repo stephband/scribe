@@ -154,6 +154,11 @@
 
     .attributes-table th:nth-child(3),
     .attributes-table td:nth-child(3) { display: none; }
+
+    .striped-table > tbody > tr:nth-child(2n) > th,
+    .striped-table > tbody > tr:nth-child(2n) > td {
+        background-color: hsl(0deg 0% 100% / 10%);
+    }
     </style>
 
     <script type="application/json" id="a-fond">{
@@ -387,7 +392,7 @@
         <p class="x2 6x">To use the <code>&lt;scribe-music&gt;</code> custom element, include the CSS and JS from the CDN:</p>
         <pre class="x2 6x highlight"><code><span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">"stylesheet"</span> <span class="na">href=</span><span class="s">"https://cdn.jsdelivr.net/gh/stephband/scribe@0.4/build/scribe-music/element.css"</span> <span class="nt">/&gt;</span>
 <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"module"</span> <span class="na">src=</span><span class="s">"https://cdn.jsdelivr.net/gh/stephband/scribe@0.4/build/scribe-music/element.js"</span><span class="nt">&gt;&lt;/script&gt;</span></code></pre>
-        <p class="x2 6x">The <code>&lt;scribe-music&gt;</code> element is now registered. For more details about its attributes </p>
+        <p class="x2 6x">The <code>&lt;scribe-music&gt;</code> element is now registered.</p>
     </section>
 
     <section class="attributes-section 6x-grid @1-9x-grid grid">
