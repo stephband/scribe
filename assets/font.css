@@ -1,7 +1,16 @@
 
-h1, .font-01 { font-size: 7rem;   font-weight: 600; }
-h8, .font-08 { font-size: 2.5rem; font-weight: 200; }
+h1, .font-01   { font-size: calc(4.75rem + 2.5vw); font-weight: 600; line-height: 1.1em; }
+h2, .font-02   { font-size: calc(1.66176471rem + 0.44117647vw); font-weight: 600; line-height: 1.1em; }
+h3, .font-03   { font-size: calc(1.27573529rem + 0.18382353vw); font-weight: 300; line-height: 1.1em; }
+h4, .font-04   { font-size: calc(1.1171875rem + 0.078125vw); font-weight: 300; line-height: 1.4em; }
+body, .font-08 { font-size: 1rem; font-weight: 400; line-height: 1.4em; }
+
 
 .darkpink-fg { color: oklch(0.28 0.09 357.98); }
 
 .sea-fg { color: oklch(0.5 0.12 213.52); }
+
+a {
+    white-space: nowrap;
+    color: oklch(0.58 0.26 8.33);
+}
