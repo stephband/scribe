@@ -420,7 +420,7 @@ function createRests(symbols, durations, bar, stave, part, beat, tobeat) {
 
 /* Accidentals */
 
-function createAccidental(symbols, bar, stave, part, accidentals, beat, event, pitch) {
+function createAccidental(symbols, bar, stave, part, accidentals, beat, event, pitch, distance) {
     const acci =
         rsharp.test(pitch) ? 1 :
         rflat.test(pitch) ? -1 :
@@ -442,6 +442,7 @@ function createAccidental(symbols, bar, stave, part, accidentals, beat, event, p
             beat,
             pitch,
             part,
+            distance,
             stave,
             event,
             value: acci || 0
@@ -449,9 +450,9 @@ function createAccidental(symbols, bar, stave, part, accidentals, beat, event, p
     }
 }
 
-function createAccidentals(symbols, bar, stave, part, accidentals, beat, notes, pitches) {
+function createAccidentals(symbols, bar, stave, part, accidentals, beat, notes, pitches, rows) {
     let n = -1;
-    while (pitches[++n]) createAccidental(symbols, bar, stave, part, accidentals, beat, notes[n], pitches[n]);
+    while (pitches[++n]) createAccidental(symbols, bar, stave, part, accidentals, beat, notes[n], pitches[n], rows[n] - rows[n - 1]);
     return beat;
 }
 
@@ -636,7 +637,7 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
 
         // Create ledgers and accidentals
         createLedges(symbols, stave, part, beat, pitches);
-        createAccidentals(symbols, bar, stave, part, accidentals, beat, notes, pitches);
+        createAccidentals(symbols, bar, stave, part, accidentals, beat, notes, pitches, rows);
 
         let p = -1;
         while (notes[++p]) symbols.push({
@@ -794,7 +795,7 @@ if (stopBeat <= beat) {
 
         // Create ledgers and accidentals
         createLedges(symbols, stave, part, beat, pitches);
-        createAccidentals(symbols, bar, stave, part, accidentals, beat, notes, pitches);
+        createAccidentals(symbols, bar, stave, part, accidentals, beat, notes, pitches, rows);
 
         // Original start beat of notes, may be well before beat
         const startBeat = notes[0][0] - bar.beat;

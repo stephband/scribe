@@ -125,7 +125,7 @@ export default overload(get('type'), {
     }),
 
     acci: (symbol) => create('span', {
-        class: acciClasses[symbol.value] || 'acci',
+        class: (acciClasses[symbol.value] || 'acci') + (symbol.distance < 6 ? ' cluster-acci' : '' ) ,
         html: acciGlyphs[symbol.value] || glyphs.acciNatural,
         data: symbol.beat === undefined ? { pitch: symbol.pitch } : {
             beat:  truncate(symbol.beat),

@@ -185,10 +185,11 @@
     grid-column-start: calc(var(--column-beat-0) + round(var(--beat) * var(--columns-per-beat)) - 1);
 }
 
-.bar > .acci + .acci {
-    /* Attempt to space adjacent accidentals. */
-    margin-right: 0.1em;
-}
+.bar > .acci + .cluster-acci                                 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.27em) }
+.bar > .acci + .cluster-acci + .cluster-acci                         { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.54em) }
+.bar > .acci + .cluster-acci + .cluster-acci + .cluster-acci                 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.09em) }
+.bar > .acci + .cluster-acci + .cluster-acci + .cluster-acci + .cluster-acci         { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.36em) }
+.bar > .acci + .cluster-acci + .cluster-acci + .cluster-acci + .cluster-acci + .cluster-acci { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.63em) }
 
 
 /* Notes and ledges */
