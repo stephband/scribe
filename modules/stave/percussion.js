@@ -39,9 +39,4 @@ export default class PercussionStave extends DrumStave {
             stemup: true
         }
     };
-
-    getRowDiff(pitch1, pitch2) {
-        // All notes display on one line
-        return 0;
-    }
 }

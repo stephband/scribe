@@ -629,9 +629,9 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
         }));
 
         // Push note symbols on to tuplet
-        push(tuplet, ...symbols.slice(-1 * notes.length));
+        push(tuplet, ...noteSymbols);
         // Push note symbols on to beam
-        if (beam) push(beam, ...symbols.slice(-1 * notes.length));
+        if (beam) push(beam, ...noteSymbols);
 
         // Remove notes or insert ties
         p = notes.length;
@@ -773,6 +773,13 @@ if (stopBeat <= beat) {
         // Duration of next head
         const duration  = fitDuration(headDurations, bar, startBeat, stopBeat, beat, eventBeat);
 
+        // Assign beat, duration to note symbols and push into symbols
+        let p = -1;
+        while (noteSymbols[++p]) symbols.push(assign(noteSymbols[p], {
+            beat,
+            duration
+        }));
+
         // If duration is a quarter note or longer close beam
         if (duration >= 1) {
             if (beam) {
@@ -787,15 +794,8 @@ if (stopBeat <= beat) {
             part
         };
 
-        // Assign beat, duration to note symbols and push into symbols
-        let p = -1;
-        while (noteSymbols[++p]) symbols.push(assign(noteSymbols[p], {
-            beat,
-            duration
-        }));
-
         // Push note symbols on to beam
-        if (beam) push(beam, ...symbols.slice(-1 * notes.length));
+        if (beam) push(beam, ...noteSymbols);
 
         // Remove notes or insert ties
         p = notes.length;

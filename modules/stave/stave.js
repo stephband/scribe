@@ -131,17 +131,6 @@ export default class Stave {
     }
 
     /**
-    .getRowDiff(pitch1, pitch2)
-    Given two pitches `pitch1` and `pitch2`, returns the difference in rows
-    between their rendered positions.
-    **/
-    getRowDiff(pitch1, pitch2) {
-        const i1 = this.getRow(pitch1);
-        const i2 = this.getRow(pitch2);
-        return i2 - i1;
-    }
-
-    /**
     .getSpelling()
     Gets spelling of a given pitch. Returns a pitch name string.
     **/
@@ -149,6 +138,10 @@ export default class Stave {
         return event[1] === 'chord' ?
             spellRoot(key, event[2]) :
             spellPitch(key, event[2]) ;
+    }
+
+    createKeySigSymbols(key) {
+
     }
 
     /**
