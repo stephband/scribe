@@ -106,6 +106,12 @@ const factors = {
 
 function toChordNotes(root, ext) {
     const r = toRootNumber(root);
+    const e = ext.replaceAll(rflatsharp, ($0) =>
+        $0 === 'b' ? '♭' :
+        $0 === '#' ? '♯' :
+        $0
+    );
+
     return extensions[ext].map((n) => toRootNumber(r + n)).sort();
 }
 
