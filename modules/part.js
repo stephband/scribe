@@ -34,7 +34,7 @@ function average(a, n, i, array) {
 }
 
 
-/* Events */
+/* Notes */
 
 function toMaxStopBeat(n, event) {
     return max(n, getStopBeat(event));
@@ -44,83 +44,67 @@ function byPitch(a, b) {
     return toNoteNumber(a[2]) < toNoteNumber(b[2]) ? 1 : -1;
 }
 
-function getPitches(stave, key, notes) {
-    const pitches = {};
-    let n = -1;
-    let note;
-    while (note = notes[++n]) {
-        const events     = note.scribeEvents;
-        const index      = note.scribeIndex;
-        const keyWeights = keyWeightsForEvent(events, index, key);
-        const keyNumber  = chooseKeyFromWeights(keyWeights);
-        pitches[n] = stave.getSpelling(keyNumber, note);
-    }
-
-    return pitches;
-}
-
-function getRows(stave, part, pitches) {
-    const rows = {};
-    let n = -1;
-    while (pitches[++n]) rows[n] = stave.getRow(part, pitches[n]);
-    return rows;
-}
-
-function getClusters(rows) {
-    const clusters = {};
-    let n = -1, c = 0;
-    while (rows[++n] !== undefined) {
-        clusters[n] = {};
-        if (rows[n] - rows[n - 1] === 1) clusters[n].clusterdown = ++c;
-        else c = 0;
-    }
-    c = 0;
-    while (rows[--n] !== undefined) {
-        if (rows[n + 1] - rows[n] === 1) clusters[n].clusterup = ++c;
-        else c = 0;
-    }
-    return clusters;
-}
-
-
-
-/*
-This is an attempt to merge the note creation functions...
-
 function createNoteSymbols(stave, key, part, notes) {
+    if (!notes.length) return [];
+
     const symbols = [];
-    let n = -1;
-    while (notes[++n] !== undefined) {
-        const events     = note.scribeEvents;
-        const index      = note.scribeIndex;
+    let n = -1, event;
+    while (event = notes[++n]) {
+        const events     = event.scribeEvents;
+        const index      = event.scribeIndex;
         const keyWeights = keyWeightsForEvent(events, index, key);
         const keyNumber  = chooseKeyFromWeights(keyWeights);
-        const pitch      = stave.getSpelling(keyNumber, note);
+        const pitch      = stave.getSpelling(keyNumber, event);
         const row        = stave.getRow(part, pitch);
 
-        symbols.push({ pitch, row });
+        // Create symbols with pitch, row
+        symbols.push({
+            type: 'note',
+            pitch,
+            part,
+            row,
+            stave,
+            event
+        });
     }
 
+    // Sort by row order
     symbols.sort(byRow);
 
-    // Loop forward through rows, detect clusters
+    // Assign top and bottom to highest and lowest note symbols
+    symbols[0].top = true;
+    symbols[symbols.length - 1].bottom = true;
+
+    // Figure out stemup, note that this may be overidden by beam
+    const minRow = symbols[0].row;
+    const maxRow = symbols[symbols.length - 1].row;
+    const stemup = part.stemup === undefined ?
+        stemupFromRows(stave, part, minRow, maxRow) :
+        part.stemup ;
+
+    // Loop forward through rows
     let c = 0;
     n = -1;
-    while (notes[++n] !== undefined) {
-        if (rows[n] - rows[n - 1] === 1) symbols[n].clusterdown = ++c;
+    while (symbols[++n]) {
+        // Assign stemup to all symbols
+        symbols[n].stemup = stemup;
+
+        // Detect cluster in downward order
+        if (n > 0 && symbols[n].row - symbols[n - 1].row === 1) symbols[n].clusterdown = ++c;
         else c = 0;
     }
 
-    // Loop backward through rows, detect clusters
+    // Loop backward through rows
     c = 0;
-    while (notes[--n] !== undefined) {
-        if (rows[n + 1] - rows[n] === 1) symbols[n].clusterup = ++c;
+    n = symbols.length - 1;
+    while (n--) {
+        // Detect cluster in upward order
+        if (symbols[n + 1].row - symbols[n].row === 1) symbols[n].clusterup = ++c;
         else c = 0;
     }
 
     return symbols;
 }
-*/
 
 
 /* Pitches */
@@ -420,7 +404,8 @@ function createRests(symbols, durations, bar, stave, part, beat, tobeat) {
 
 /* Accidentals */
 
-function createAccidental(symbols, bar, stave, part, accidentals, beat, event, pitch, distance) {
+function createAccidental(symbols, bar, stave, part, accidentals, beat, note, distance) {
+    const { pitch, event } = note;
     const acci =
         rsharp.test(pitch) ? 1 :
         rflat.test(pitch) ? -1 :
@@ -450,18 +435,20 @@ function createAccidental(symbols, bar, stave, part, accidentals, beat, event, p
     }
 }
 
-function createAccidentals(symbols, bar, stave, part, accidentals, beat, notes, pitches, rows) {
+function createAccidentals(symbols, bar, stave, part, accidentals, beat, notes) {
     let n = -1;
-    while (pitches[++n]) createAccidental(symbols, bar, stave, part, accidentals, beat, notes[n], pitches[n], rows[n] - rows[n - 1]);
+    while (notes[++n]) createAccidental(symbols, bar, stave, part, accidentals, beat, notes[n], notes[n - 1] ? notes[n].row - notes[n - 1].row : undefined);
     return beat;
 }
 
 
 /* Ledger lines */
 
-function createLedges(symbols, stave, part, beat, pitches) {
+function createLedges(symbols, stave, part, beat, notes) {
     // Up ledger lines
-    const { row: maxRow, pitch: maxPitch } = getMaxPitchRow(stave, part, pitches);
+    //const { row: maxRow, pitch: maxPitch } = getMaxPitchRow(stave, part, pitches);
+    const maxRow   = notes[0].row;
+    const maxPitch = notes[0].pitch;
     // Ledges begin two rows away from topPitch, which is the top line
     let rows = maxRow - (part.topRow || stave.topRow) + 1;
     if (rows < 0) symbols.push({
@@ -473,7 +460,9 @@ function createLedges(symbols, stave, part, beat, pitches) {
     });
 
     // Down ledger lines
-    const { row: minRow, pitch: minPitch } = getMinPitchRow(stave, part, pitches);
+    //const { row: minRow, pitch: minPitch } = getMinPitchRow(stave, part, pitches);
+    const minRow   = notes[notes.length - 1].row;
+    const minPitch = notes[notes.length - 1].pitch;
     // Ledges begin two rows away from bottomPitch, which is the bottom line
     rows = minRow - (part.bottomRow || stave.bottomRow);
     if (rows > 0)  symbols.push({
@@ -596,14 +585,11 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
         }
 
         // Insert heads
-        const pitches  = getPitches(stave, key, notes);
-        //const minPitch = getMinPitch(pitches);
-        //const maxPitch = getMaxPitch(pitches);
-        const { row: minRow, pitch: minPitch } = getMinPitchRow(stave, part, pitches);
-        const { row: maxRow, pitch: maxPitch } = getMaxPitchRow(stave, part, pitches);
-        const stemup = part.stemup === undefined ?
-            stemupFromRows(stave, part, minRow, maxRow) :
-            part.stemup ;
+        const noteSymbols = createNoteSymbols(stave, key, part, notes);
+
+        // Create ledgers and accidentals
+        createLedges(symbols, stave, part, beat, noteSymbols);
+        createAccidentals(symbols, bar, stave, part, accidentals, beat, noteSymbols);
 
         const stopBeat = min(
             // Max stop beat of notes
@@ -635,23 +621,12 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
             part
         };
 
-        // Create ledgers and accidentals
-        createLedges(symbols, stave, part, beat, pitches);
-        createAccidentals(symbols, bar, stave, part, accidentals, beat, notes, pitches, rows);
-
+        // Assign beat, duration to note symbols and push into symbols
         let p = -1;
-        while (notes[++p]) symbols.push({
-            type: 'note',
+        while (noteSymbols[++p]) symbols.push(assign(noteSymbols[p], {
             beat,
-            pitch: pitches[p],
-            duration,
-            part,
-            stemup,
-            top:    pitches[p] === maxPitch,
-            bottom: pitches[p] === minPitch,
-            stave,
-            event: notes[p]
-        });
+            duration
+        }));
 
         // Push note symbols on to tuplet
         push(tuplet, ...symbols.slice(-1 * notes.length));
@@ -668,9 +643,9 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
             else symbols.push({
                 type:   'tie',
                 beat,
-                pitch: pitches[p],
+                pitch: noteSymbols[p].pitch,
                 duration,
-                stemup,
+                stemup: noteSymbols[p].stemup,
                 part,
                 event: notes[p]
             });
@@ -783,19 +758,11 @@ if (stopBeat <= beat) {
             continue;
         }
 
-        //const noteSymbols = createNoteSymbols(stave, key, part, notes);
-        const pitches  = getPitches(stave, key, notes);
-        const rows     = getRows(stave, part, pitches);
-        const clusters = getClusters(rows);
-        const { row: minRow } = getMinPitchRow(stave, part, pitches);
-        const { row: maxRow } = getMaxPitchRow(stave, part, pitches);
-        const stemup  = part.stemup === undefined ?
-            stemupFromRows(stave, part, minRow, maxRow) :
-            part.stemup ;
+        const noteSymbols = createNoteSymbols(stave, key, part, notes);
 
         // Create ledgers and accidentals
-        createLedges(symbols, stave, part, beat, pitches);
-        createAccidentals(symbols, bar, stave, part, accidentals, beat, notes, pitches, rows);
+        createLedges(symbols, stave, part, beat, noteSymbols);
+        createAccidentals(symbols, bar, stave, part, accidentals, beat, noteSymbols);
 
         // Original start beat of notes, may be well before beat
         const startBeat = notes[0][0] - bar.beat;
@@ -820,21 +787,12 @@ if (stopBeat <= beat) {
             part
         };
 
+        // Assign beat, duration to note symbols and push into symbols
         let p = -1;
-        while (notes[++p]) symbols.push({
-            type:    'note',
+        while (noteSymbols[++p]) symbols.push(assign(noteSymbols[p], {
             beat,
-            pitch:   pitches[p],
-            duration,
-            part,
-            stemup,
-            top:     p === 0,
-            bottom:  p === notes.length - 1,
-            clusterup:   (console.log(p, clusters[p]), clusters[p].clusterup),
-            clusterdown: clusters[p].clusterdown,
-            stave,
-            event:   notes[p]
-        });
+            duration
+        }));
 
         // Push note symbols on to beam
         if (beam) push(beam, ...symbols.slice(-1 * notes.length));
@@ -854,9 +812,9 @@ if (stopBeat <= beat) {
             else symbols.push({
                 type:   'tie',
                 beat,
-                pitch: pitches[p],
+                pitch: noteSymbols[p].pitch,
                 duration,
-                stemup,
+                stemup: noteSymbols[p].stemup,
                 part,
                 event: notes[p]
             });
