@@ -35,6 +35,7 @@
     <style>
     @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/elements/html.css';
     @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/atoms.css';
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/striped-table.css';
     @import './assets/font.css';
 
     @import './build/scribe-music/element.css';
@@ -58,6 +59,10 @@
     .na, .yellow-fg { font-weight: 600; color: oklch(0.62 0.15 95.97); }
     .s,  .lime-fg   { color: oklch(0.2 0.11 297.09); }
 
+    body > .grid {
+        padding-left:  calc(0.5 * var(--x-gap));
+        padding-right: calc(0.5 * var(--x-gap));
+    }
 
     .ash-font      { font-family: Ash, AshText; }
     .bravura-font  { font-family: Bravura, BravuraText; }
@@ -91,6 +96,7 @@
     h4.petaluma-font { height: 1.5em; line-height: 2em; }
 
     .header-section,
+    .attributes-section,
     .example-section,
     .style-section,
     .font-section,
@@ -105,6 +111,11 @@
 
     .header-section > scribe-music {
         margin-top: 3em;
+    }
+
+    .attributes-section {
+        color: oklch(0.31 0.06 279.08);
+        background-color: oklch(0.8 0.19 95.26);
     }
 
     .example-section {
@@ -140,6 +151,9 @@
     .stave-section > scribe-music {
         font-size: calc(1.125vw + 0.75rem);
     }
+
+    .attributes-table th:nth-child(3),
+    .attributes-table td:nth-child(3) { display: none; }
     </style>
 
     <script type="application/json" id="a-fond">{
@@ -376,6 +390,76 @@
         <p class="x2 6x">The <code>&lt;scribe-music&gt;</code> element is now registered. For more details about its attributes </p>
     </section>
 
+    <section class="attributes-section 6x-grid @1-9x-grid grid">
+        <h2 class="x1 6x @1-x2 @3-4x">Attributes and properties</h2>
+        <table class="attributes-table striped-table x1 7x @1-x2 @3-6x">
+          <thead>
+            <tr>
+              <th style="text-align: left">Attribute</th>
+              <th style="text-align: left">Property</th>
+              <th style="text-align: left">Type</th>
+              <th style="text-align: left">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">src</code></td>
+              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">.src</code></td>
+              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">URL</code></td>
+              <td style="text-align: left">A URL of a JSON file or hashref of a script containing sequence data</td>
+            </tr>
+            <tr>
+              <td style="text-align: left">&nbsp;</td>
+              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">.data</code></td>
+              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">object</code></td>
+              <td style="text-align: left">Sequence data</td>
+            </tr>
+            <tr>
+              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">clef</code></td>
+              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">.clef</code></td>
+              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">string</code></td>
+              <td style="text-align: left">Either <code class="language-plaintext highlighter-rouge">"treble"</code> (the default), <code class="language-plaintext highlighter-rouge">"bass"</code>, <code class="language-plaintext highlighter-rouge">"piano"</code>, <code class="language-plaintext highlighter-rouge">"alto"</code>, <code class="language-plaintext highlighter-rouge">"drum"</code> or <code class="language-plaintext highlighter-rouge">"percussion"</code></td>
+            </tr>
+            <tr>
+              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">key</code></td>
+              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">.key</code></td>
+              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">string</code></td>
+              <td style="text-align: left">The name of a major key, accepts <code class="language-plaintext highlighter-rouge">"Ab"</code> or <code class="language-plaintext highlighter-rouge">"A♭"</code></td>
+            </tr>
+            <tr>
+              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">meter</code></td>
+              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">.meter</code></td>
+              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">string</code></td>
+              <td style="text-align: left">A time signature, eg. <code class="language-plaintext highlighter-rouge">"4/4"</code></td>
+            </tr>
+            <tr>
+              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">transpose</code></td>
+              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">.transpose</code></td>
+              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">number</code></td>
+              <td style="text-align: left">Transposes notation by a given number of semitones</td>
+            </tr>
+            <tr>
+              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">layout</code></td>
+              <td style="text-align: left">&nbsp;</td>
+              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">string</code></td>
+              <td style="text-align: left">Either <code class="language-plaintext highlighter-rouge">"compact"</code> or <code class="language-plaintext highlighter-rouge">"regular"</code></td>
+            </tr>
+            <tr>
+              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">shuffle</code></td>
+              <td style="text-align: left">&nbsp;</td>
+              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">boolean</code></td>
+              <td style="text-align: left">Boolean attribute, displays swung 16ths as straight 16ths</td>
+            </tr>
+            <tr>
+              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">swing</code></td>
+              <td style="text-align: left">&nbsp;</td>
+              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">boolean</code></td>
+              <td style="text-align: left">Boolean attribute, displays swung 8ths as straight 8ths</td>
+            </tr>
+          </tbody>
+        </table>
+    </section>
+
     <!--section class="style-section 9x-grid grid y-start-grid" style="--y-gap: 0em;">
         <h2 class="x2 6x">Fluid and responsive and highly styleable</h2>
         <p class="x2 6x">
@@ -440,10 +524,6 @@
             <li>Scores – aligned display of multiple parts</li>
         </ul>
         <p class="x2 6x">If you are good at JS and CSS and want to help out, please do get in touch.</p>
-    </section>
-
-    <section class="stave-section 9x-grid grid" style="--y-gap: 0em;">
-        <h2 class="x2 6x">Writing a Scribe document</h2>
     </section>
 
     <footer>
