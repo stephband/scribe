@@ -150,7 +150,7 @@
         .footer-section {
             padding-top: 0;
             padding-bottom: 0;
-            grid-template-rows: 42% 58%;
+            grid-template-rows: calc(44% - 0.5 * var(--y-gap)) calc(56% - 0.5 * var(--y-gap));
         }
     }
 
@@ -555,8 +555,8 @@
     <footer class="footer-section ratio-16:9 6x-grid @1-9x-grid grid" style="background-image: url('https://stephen.band/images/stephen-chair-2.avif');">
         <h2 class="font-02 darkpink-fg x1 6x @2-x6 @2-3x y1 y-end">About me</h2>
 
-        <p class="font-03 x1 6x @2-x6 @2-3x y2 y-start" style="color: white;">
-            I am a musician and design engineer exploring web technologies in music creation.
+        <p class="font-03 x1 6x @2-x6 @2-3x y2 y-start" style="color: white; text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);">
+            I'm a musician and design engineer exploring web technologies in music creation.
             Bleat me on <a href="https://bsky.app/profile/stephen.band">BlueSky</a>.
         </p>
     </footer>
