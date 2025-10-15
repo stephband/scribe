@@ -4,7 +4,7 @@ import { toRootName }   from 'midi/note.js';
 import SequenceIterator from 'sequence/sequence-iterator.js';
 import Stave            from '../modules/stave.js';
 import createBars       from './create-bars.js';
-import createSymbolElement from './create-symbol-element.js';
+import createElement    from './create-element.js';
 import * as glyphs      from './glyphs.js';
 import config           from './config.js';
 
@@ -17,7 +17,7 @@ function isInitialKeyEvent(event) {
 }
 
 function toElements(nodes, symbol) {
-    const element = createSymbolElement(symbol);
+    const element = createElement(symbol);
     if (element) { nodes.push(element); }
     return nodes;
 }
@@ -66,25 +66,33 @@ export default function render(data, excludes, clef, keyname, meter, duration = 
     const sequence = new SequenceIterator(events, data.sequences, transforms);
 
     // Create bar elements
-    const bars = createBars(sequence, excludes, stave, settings).reduce(toBarElements, []);
+    const bars = createBars(sequence, excludes, stave, settings);
+    const elements = bars.reduce(toBarElements, []);
 
-    // TEMP get keysig and stick it in side bar and do some style stuff
-    const bar0   = bars[0];
-    const keysig = bar0.querySelectorAll('.acci:not([data-beat])');
+//const keysig = elements[0].querySelectorAll('.acci:not([data-beat])');
+
+    // Creates stave with clef and key signature
+    const bar0      = bars[0];
+    const key       = bar0.key;
+    const signature = stave.createSignatureSymbols(key);
+
     // Quick and dirty way of rendering clefs into left hand side bar
     const sidebar = create('div', {
         class: `${ stave.type }-stave signature-stave stave`,
-        children: [createSymbolElement({ type: 'clef', stave }), ...keysig],
-        data: { key: bar0.dataset.key }
+        children: signature.map(createElement),
+        data: { key: toRootName(key) }
     });
+
     const column = create('div', {
         id: 'side',
         class: 'side',
-        data: { key: bar0.dataset.key }
+        data: { key: toRootName(key) }
     });
+
     let n = 24;
     while (n--) column.appendChild(sidebar.cloneNode(true));
+
     // Return array of elements
-    bars.unshift(column);
-    return bars;
+    elements.unshift(column);
+    return elements;
 }

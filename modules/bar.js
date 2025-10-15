@@ -2,6 +2,7 @@ import nothing from 'fn/nothing.js';
 import { toRootName, toRootNumber } from 'midi/note.js';
 import toStopBeat from './event/to-stop-beat.js';
 import { toKeyScale, keyWeightsForEvent, chooseKeyFromWeights } from './keys.js';
+import { byFatherCharlesPitch, accidentalChars } from './pitch.js';
 import { major } from './scale.js';
 import { createPart } from './part.js';
 import getStopBeat from './event/to-stop-beat.js';
@@ -68,30 +69,7 @@ export function getLastDivision(divisions, b1, b2) {
 
 
 
-
-
 const ignoreTypes = [];
-
-const accidentalChars = {
-    '-2': '𝄫',
-    '-1': '♭',
-    '0': '',
-    '1': '♯',
-    '2': '𝄪'
-};
-
-const fathercharles = [
-    // Father Charles Goes Down And Ends Battle,
-    'F♯', 'C♯', 'G♯', 'D♯', 'A♯', 'E♯', 'B♯',
-    // Battle Ends And Down Goes Charles Father
-    'B♭', 'E♭', 'A♭', 'D♭', 'G♭', 'C♭', 'F♭'
-];
-
-function byFatherCharlesPitch(a, b) {
-    const ai = fathercharles.indexOf(a.pitch);
-    const bi = fathercharles.indexOf(b.pitch);
-    return ai > bi ? 1 : ai < bi ? -1 : 0;
-}
 
 function updateAccidentals(accidentals, key) {
     const scale = toKeyScale(key);
@@ -121,22 +99,11 @@ function createBarSymbols(symbols, bar, stave, key, accidentals, events, setting
             // keynumber is on a continuous scale of fourths, so multiply by 7 semitones
             // to get chromatic number relative to C.
             const key      = toRootNumber(event[2]);
-            const keyscale = toKeyScale(key);
-
             updateAccidentals(accidentals, key);
 
-            // Add key signature
-            symbols.push.apply(symbols, keyscale
-                .map((n, i) => (n - major[i] && {
-                    // No beat for key signature accidentals
-                    type: 'acci',
-                    pitch: toRootName(major[i]) + accidentalChars[n - major[i]],
-                    value: n - major[i],
-                    stave
-                }))
-                .filter((o) => !!o)
-                .sort(byFatherCharlesPitch)
-            );
+            // TODO: Key is global and added to the side bar, we need to think about
+            // how to make key signature changes
+            // symbols.push.apply(symbols, stave.createKeySymbols(key));
 
             bar.key = key;
             break;

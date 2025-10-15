@@ -428,7 +428,6 @@ function createAccidental(symbols, bar, stave, part, accidentals, beat, note, di
             pitch,
             part,
             distance,
-            stave,
             event,
             value: acci || 0
         }));

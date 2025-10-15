@@ -137,7 +137,7 @@ export default define(element('scribe-music', {
                     let total = 0;
                     let b, d;
 
-                    if (bar.querySelector('.BARREPEAT')) {
+                    if (bar.querySelector('.barrepeat')) {
                         return;
                     }
 

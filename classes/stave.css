@@ -92,22 +92,28 @@
     --acci-acci-gap: 0.3em;
 }
 
-.stave > .clef + .acci:not([data-beat]) {
-    margin-left: 0.25em;
+.stave > .clef {
+    margin-right: 0.25em;
 }
 
 .stave > .acci:not([data-beat]) + .acci:not([data-beat]) {
-    margin-left: 0.0625em;
+    margin-left: 0.03125em;
 }
 
-.signature-stave > .acci:not([data-beat])                                                  { grid-column: 2; }
-.signature-stave > .acci:not([data-beat]) + .acci:not([data-beat])                         { grid-column: 3; }
-.signature-stave > .acci:not([data-beat]) + * + .acci:not([data-beat])                     { grid-column: 4; }
-.signature-stave > .acci:not([data-beat]) + * + * + .acci:not([data-beat])                 { grid-column: 5; }
-.signature-stave > .acci:not([data-beat]) + * + * + * + .acci:not([data-beat])             { grid-column: 6; }
-.signature-stave > .acci:not([data-beat]) + * + * + * + * + .acci:not([data-beat])         { grid-column: 7; }
-.signature-stave > .acci:not([data-beat]) + * + * + * + * + * + .acci:not([data-beat])     { grid-column: 8; }
-.signature-stave > .acci:not([data-beat]) + * + * + * + * + * + * + .acci:not([data-beat]) { grid-column: 9; }
+.signature-stave > [data-pitch="F♭"] { grid-column: 8; }
+.signature-stave > [data-pitch="C♭"] { grid-column: 7; }
+.signature-stave > [data-pitch="G♭"] { grid-column: 6; }
+.signature-stave > [data-pitch="D♭"] { grid-column: 5; }
+.signature-stave > [data-pitch="A♭"] { grid-column: 4; }
+.signature-stave > [data-pitch="E♭"] { grid-column: 3; }
+.signature-stave > [data-pitch="B♭"] { grid-column: 2; }
+.signature-stave > [data-pitch="F♯"] { grid-column: 2; }
+.signature-stave > [data-pitch="C♯"] { grid-column: 3; }
+.signature-stave > [data-pitch="G♯"] { grid-column: 4; }
+.signature-stave > [data-pitch="D♯"] { grid-column: 5; }
+.signature-stave > [data-pitch="A♯"] { grid-column: 6; }
+.signature-stave > [data-pitch="E♯"] { grid-column: 7; }
+.signature-stave > [data-pitch="B♯"] { grid-column: 8; }
 
 .signature-stave[data-key="C♯"] { width: 3.45em; }
 .signature-stave[data-key="F♯"] { width: 3.15em; }

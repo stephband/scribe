@@ -18,7 +18,6 @@ function toDrumPitch(number) {
 
 export default class DrumStave extends Stave {
     type = 'drum';
-    clef = glyphs.clefDrum;
 
     pitched = false;
 
@@ -129,6 +128,13 @@ export default class DrumStave extends Stave {
         }
 
         return super.getSpelliing(key, event[2]);
+    }
+
+    createSignatureSymbols(key) {
+        return [{
+            type: 'clef',
+            clef: this.type
+        }];
     }
 
     yRatioToPitch(y) {

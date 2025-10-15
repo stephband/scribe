@@ -1,10 +1,14 @@
 
 import * as glyphs from "../glyphs.js";
+import { toNoteName, toRootNumber, toRootName } from 'midi/note.js';
+import { toKeyScale } from '../keys.js';
+import { rflatsharp, byFatherCharlesPitch, accidentalChars } from '../pitch.js';
+import { major } from '../scale.js';
 import Stave       from './stave.js';
-import { rflatsharp } from '../pitch.js';
 
 
 const global = globalThis || window;
+const assign = Object.assign;
 
 
 /**
@@ -62,14 +66,6 @@ export default class PianoStave extends Stave {
         "lh-F1",
         "lh-E1"
     ];
-
-    getClefHTML() {
-        return `<span class="treble-clef clef">${
-            glyphs.clefTreble
-        }</span><span class="bass-clef clef">${
-            glyphs.clefBass
-        }</span>`;
-    }
 
     getTimeSigHTML(numerator, denominator, eventId) {
         return `<span class="timesig" data-event="${ eventId }" data-part="rh">
@@ -156,5 +152,41 @@ export default class PianoStave extends Stave {
         return /[012]$|[AC-G][b#♭♯𝄫𝄪]*3$/.test(pitch) ?
             this.parts[1] :
             this.parts[2] ;
+    }
+
+    createKeySymbols(key) {
+        const symbols   = [];
+        const keynumber = toRootNumber(key);
+        const keyscale  = toKeyScale(keynumber);
+        const keysig    = keyscale
+            .map((n, i) => (n - major[i] && {
+                type: 'acci',
+                pitch: toRootName(major[i]) + accidentalChars[n - major[i]],
+                value: n - major[i]
+            }))
+            .filter((o) => !!o)
+            .sort(byFatherCharlesPitch);
+
+        // Add key signature to both staffs
+        symbols.push.apply(symbols, keysig.map((symbol) => assign({ part: this.parts[1] }, symbol)));
+        symbols.push.apply(symbols, keysig.map((symbol) => assign({ part: this.parts[2] }, symbol)));
+
+        return symbols;
+    }
+
+    createSignatureSymbols(key) {
+        const symbols = [{
+            type: 'clef',
+            clef: 'treble',
+            part: this.parts[1],
+            stave: this
+        }, {
+            type: 'clef',
+            clef: 'bass',
+            part: this.parts[2],
+            stave: this
+        }];
+
+        return symbols.concat(this.createKeySymbols(key));
     }
 }

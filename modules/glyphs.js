@@ -5,7 +5,6 @@ export const clefTrebleUp    = '&#xE053;';
 export const clefAlto        = '&#xE05C;';
 export const clefBass        = '&#xE062;';
 export const clefDrum        = '&#xE069;';
-export const clefPercussion  = '&#xE069;';
 
 export const timeSig0         = '&#xE080;';
 export const timeSig1         = '&#xE081;';

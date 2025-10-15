@@ -473,7 +473,7 @@ in their duration span. */
     white-space: nowrap;
 }
 
-.bar > .BARREPEAT {
+.bar > .barrepeat {
     justify-self: center;
     margin-left: 0.5em;
     margin-right: 0.5em;

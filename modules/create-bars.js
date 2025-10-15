@@ -25,7 +25,7 @@ function replaceWithRepeat(bar, count) {
     bar.symbols = bar.symbols
         .filter((symbol) => symbol.type === 'doublebarline' || symbol.type === 'clef')
         .concat([{
-            type: 'BARREPEAT',
+            type: 'barrepeat',
             count,
             duration: bar.duration
         }]);

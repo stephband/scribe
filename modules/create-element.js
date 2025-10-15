@@ -32,6 +32,16 @@ const acciGlyphs = {
     '-2': glyphs.acciDoubleFlat
 };
 
+const clefGlyphs = {
+    'treble':      glyphs.clefTreble,
+    'treble-down': glyphs.clefTrebleDown,
+    'treble-up':   glyphs.clefTrebleUp,
+    'alto':        glyphs.clefAlto,
+    'bass':        glyphs.clefBass,
+    'drum':        glyphs.clefDrum,
+    'percussion':  glyphs.clefDrum
+}
+
 const restGlyphs = {
     // Triplet rests
     '1.33': glyphs.rest2,
@@ -48,21 +58,16 @@ function truncate(number) {
 }
 
 export default overload(get('type'), {
-    BARREPEAT: (symbol) => create('span', {
-        class: 'BARREPEAT',
+    barrepeat: (symbol) => create('span', {
+        class: 'barrepeat',
         html: glyphs['barRepeat' + symbol.count],
         data: { duration: symbol.duration }
     }),
 
-    clef: (symbol) => symbol.stave.getClefHTML ?
-        // For support for piano stave treble and bass clef
-        create('fragment', symbol.stave.getClefHTML()) :
-        create('span', {
-            class: `${ symbol.stave.type }-clef clef`,
-            //data: { eventId: identify(symbol.event) },
-            html: symbol.stave.clef
-            //data: { symbol.event }
-        }),
+    clef: (symbol) => create('span', {
+        class: `${ symbol.clef }-clef clef`,
+        html: clefGlyphs[symbol.clef]
+    }),
 
     chord: (symbol) => {
         const parts = rextensionparts.exec(symbol.extension);
@@ -127,11 +132,11 @@ export default overload(get('type'), {
     acci: (symbol) => create('span', {
         class: (acciClasses[symbol.value] || 'acci') + (symbol.distance < 6 ? ' cluster-acci' : '' ) ,
         html: acciGlyphs[symbol.value] || glyphs.acciNatural,
-        data: symbol.beat === undefined ? { pitch: symbol.pitch } : {
-            beat:  truncate(symbol.beat),
+        data: {
+            beat:  symbol.beat && truncate(symbol.beat),
             pitch: symbol.pitch,
             part:  symbol.part.name,
-            event: identify(symbol.event)
+            event: symbol.event && identify(symbol.event)
         }
     }),
 

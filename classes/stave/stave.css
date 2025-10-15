@@ -281,7 +281,7 @@
     align-self: end;
 }
 
-.stave > .BARREPEAT {
+.stave > .barrepeat {
     align-self: center;
     grid-row: stave-center;
 }

@@ -1,8 +1,10 @@
 
 import nothing        from 'fn/nothing.js';
-import { toNoteName, toNoteNumber, toNoteOctave } from 'midi/note.js';
+import { toNoteName, toNoteNumber, toRootName, toRootNumber } from 'midi/note.js';
+import { toKeyScale } from '../keys.js';
 import { spellRoot, spellPitch } from '../spelling.js';
-import { rflatsharp } from '../pitch.js';
+import { rflatsharp, byFatherCharlesPitch, accidentalChars } from '../pitch.js';
+import { major } from '../scale.js';
 import * as glyphs    from "../glyphs.js";
 
 
@@ -140,8 +142,34 @@ export default class Stave {
             spellPitch(key, event[2]) ;
     }
 
-    createKeySigSymbols(key) {
+    createKeySymbols(key) {
+        const symbols   = [];
+        const keynumber = toRootNumber(key);
+        const keyscale  = toKeyScale(keynumber);
 
+        // Add key signature
+        symbols.push.apply(symbols, keyscale
+            .map((n, i) => (n - major[i] && {
+                type:  'acci',
+                pitch: toRootName(major[i]) + accidentalChars[n - major[i]],
+                value: n - major[i],
+                part:  this.parts[0]
+            }))
+            .filter((o) => !!o)
+            .sort(byFatherCharlesPitch)
+        );
+
+        return symbols;
+    }
+
+    createSignatureSymbols(key) {
+        const symbols   = [{
+            type: 'clef',
+            clef: this.type,
+            part: this.parts[0]
+        }];
+
+        return symbols.concat(this.createKeySymbols(key));
     }
 
     /**
