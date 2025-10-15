@@ -158,7 +158,18 @@ export default overload(get('type'), {
     }),
 
     note: (symbol) => create('data', {
-        class: `${ symbol.stemup ? 'up-note ' : 'down-note ' }${ symbol.top ? 'top-note ' : '' }${ symbol.bottom ? 'bottom-note ' : '' }${ symbol.cluster ? 'cluster-note ' : '' }${ symbol.beam ? 'beam-note ' : '' }note`,
+        class: `${ symbol.stemup ? 'up-note ' : 'down-note ' }${ symbol.top ? 'top-note ' : '' }${ symbol.bottom ? 'bottom-note ' : '' }${
+            // Stem up
+            symbol.stemup ?
+                // Stem up, bottom not should not be clustered
+                symbol.clusterup % 2 === 1 ? 'cluster-note ' : '' :
+                // Stem down, top note cannot be clustered
+                symbol.clusterdown % 2 === 1 ? 'cluster-note ' : ''
+        }${
+            symbol.beam ?
+                'beam-note ' :
+                ''
+        }note`,
         style: symbol.stemHeight ? `--stem-height: ${ symbol.stemHeight };` : undefined,
         html:  symbol.stave.getNoteHTML(symbol.pitch, symbol.dynamic, symbol.duration),
         title: `${ symbol.pitch } (${ toNoteNumber(symbol.pitch) })`,

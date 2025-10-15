@@ -1,4 +1,5 @@
 
+import by       from 'fn/by.js';
 import get      from 'fn/get.js';
 import { toNoteName, toNoteNumber, toRootName, toRootNumber } from 'midi/note.js';
 import { keyWeightsForEvent, chooseKeyFromWeights } from './keys.js';
@@ -24,6 +25,8 @@ const { abs, ceil, floor, min, max, sqrt, round } = Math;
    smallest possible note values, 32nd notes, or ±1/16 precision */
 const p16 = 1/16;
 const p24 = 1/24;
+
+const byRow = by(get('row'));
 
 
 function average(a, n, i, array) {
@@ -62,6 +65,62 @@ function getRows(stave, part, pitches) {
     while (pitches[++n]) rows[n] = stave.getRow(part, pitches[n]);
     return rows;
 }
+
+function getClusters(rows) {
+    const clusters = {};
+    let n = -1, c = 0;
+    while (rows[++n] !== undefined) {
+        clusters[n] = {};
+        if (rows[n] - rows[n - 1] === 1) clusters[n].clusterdown = ++c;
+        else c = 0;
+    }
+    c = 0;
+    while (rows[--n] !== undefined) {
+        if (rows[n + 1] - rows[n] === 1) clusters[n].clusterup = ++c;
+        else c = 0;
+    }
+    return clusters;
+}
+
+
+
+/*
+This is an attempt to merge the note creation functions...
+
+function createNoteSymbols(stave, key, part, notes) {
+    const symbols = [];
+    let n = -1;
+    while (notes[++n] !== undefined) {
+        const events     = note.scribeEvents;
+        const index      = note.scribeIndex;
+        const keyWeights = keyWeightsForEvent(events, index, key);
+        const keyNumber  = chooseKeyFromWeights(keyWeights);
+        const pitch      = stave.getSpelling(keyNumber, note);
+        const row        = stave.getRow(part, pitch);
+
+        symbols.push({ pitch, row });
+    }
+
+    symbols.sort(byRow);
+
+    // Loop forward through rows, detect clusters
+    let c = 0;
+    n = -1;
+    while (notes[++n] !== undefined) {
+        if (rows[n] - rows[n - 1] === 1) symbols[n].clusterdown = ++c;
+        else c = 0;
+    }
+
+    // Loop backward through rows, detect clusters
+    c = 0;
+    while (notes[--n] !== undefined) {
+        if (rows[n + 1] - rows[n] === 1) symbols[n].clusterup = ++c;
+        else c = 0;
+    }
+
+    return symbols;
+}
+*/
 
 
 /* Pitches */
@@ -723,10 +782,12 @@ if (stopBeat <= beat) {
             continue;
         }
 
-        const pitches = getPitches(stave, key, notes);
-        const rows    = getRows(stave, part, pitches);
-        const { row: minRow, pitch: minPitch } = getMinPitchRow(stave, part, pitches);
-        const { row: maxRow, pitch: maxPitch } = getMaxPitchRow(stave, part, pitches);
+        //const noteSymbols = createNoteSymbols(stave, key, part, notes);
+        const pitches  = getPitches(stave, key, notes);
+        const rows     = getRows(stave, part, pitches);
+        const clusters = getClusters(rows);
+        const { row: minRow } = getMinPitchRow(stave, part, pitches);
+        const { row: maxRow } = getMaxPitchRow(stave, part, pitches);
         const stemup  = part.stemup === undefined ?
             stemupFromRows(stave, part, minRow, maxRow) :
             part.stemup ;
@@ -766,11 +827,10 @@ if (stopBeat <= beat) {
             duration,
             part,
             stemup,
-            top:     pitches[p] === maxPitch,
-            bottom:  pitches[p] === minPitch,
-            cluster: stemup ?
-                rows[p + 1] - rows[p] === 1 :
-                rows[p] - rows[p - 1] === 1 ,
+            top:     p === 0,
+            bottom:  p === notes.length - 1,
+            clusterup:   (console.log(p, clusters[p]), clusters[p].clusterup),
+            clusterdown: clusters[p].clusterdown,
             stave,
             event:   notes[p]
         });
