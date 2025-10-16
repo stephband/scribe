@@ -6,11 +6,11 @@ h4, .font-04   { font-size: calc(1.1171875rem + 0.078125vw); font-weight: 300; l
 body, .font-08 { font-size: 1rem; font-weight: 400; line-height: 1.4em; }
 
 
-.darkpink-fg { color: oklch(0.28 0.09 357.98); }
+.darkpink-fg { color: oklch(0.36 0.05 0); }
 
 .sea-fg { color: oklch(0.5 0.12 213.52); }
 
 a {
     white-space: nowrap;
-    color: oklch(0.58 0.26 8.33);
+    color: oklch(0.58 0.26 354);
 }

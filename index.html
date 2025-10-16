@@ -29,8 +29,8 @@
     }</script>
 
     <!-- Import <scribe-music> -->
-    <link rel="stylesheet" href="./build/scribe-music/element.css" />
-    <script type="module" src="./build/scribe-music/element.js"></script>
+    <link rel="stylesheet" href="./scribe-music/element.css" />
+    <script type="module" src="./scribe-music/element.js"></script>
 
     <style>
     @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/elements/html.css';
@@ -56,9 +56,9 @@
         font-family: MartianMono, monospace;
     }
 
-    .nt, .orange-fg { font-weight: 600; color: oklch(0.54 0.19 41.4); }
-    .na, .yellow-fg { font-weight: 600; color: oklch(0.62 0.15 95.97); }
-    .s,  .lime-fg   { color: oklch(0.2 0.11 297.09); }
+    .nt, .orange-fg { font-weight: 400; color: oklch(0.51 0.23 0); }
+    .na, .yellow-fg { font-weight: 400; color: oklch(0.51 0.23 180); }
+    .s,  .lime-fg   { font-weight: 400; color: oklch(0.51 0.23 90); }
 
     body > .grid {
         padding-left:  calc(0.5 * var(--x-gap));
@@ -437,7 +437,7 @@
         <pre class="9x @1-x2 @1-7x"><span class="orange-fg">&lt;scribe-music</span> <span class="yellow-fg">clef="</span><span class="lime-fg">piano</span><span class="yellow-fg">"</span> <span class="yellow-fg">src="</span><span class="lime-fg">./ae-fond-kiss.json</span><span class="orange-fg">"&gt;&lt;/scribe-music&gt;</span></pre>
         <scribe-music class="9x @1-x2 @1-7x @3-6x" clef="piano" src="./data/ae-fond-kiss.json" transpose="2"></scribe-music>
 
-        <p class="9x @1-x2 @1-6x @2-5x @3-4x">There are some examples of full lead sheets on <a href="https://the-dots.app">the-dots.app</a>.</p>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">There's some more examples on <a href="https://the-dots.app">the-dots.app</a>.</p>
 
         <h2 class="font-02 darkpink-fg 6x @1-x2 @3-4x">Import the custom element</h2>
         <p class="x1 6x @1-x2 @3-4x">To use the <code>&lt;scribe-music&gt;</code> custom element, include the CSS and JS from the CDN:</p>
@@ -606,7 +606,6 @@
     <section class="status-section 9x-grid grid">
         <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Status</h2>
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-            Scribe is a neat new way of rendering music on the web.
             The current version, Scribe 0.4, is an <strong>evaluation release</strong>.
             It is capable of rendering <strong>a decent lead sheet</strong>, and there are some example lead sheets at <a href="https://the-dots.app">the-dots.app</a>.
             It does have some rough edges, and I am looking for feedback.
