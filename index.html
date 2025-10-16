@@ -97,10 +97,10 @@
     h4.petaluma-font { height: 1.5em; line-height: 2em; }
 
     .header-section,
-    .attributes-section,
     .example-section,
-    .style-section,
+    .attributes-section,
     .font-section,
+    .data-section,
     .status-section {
         padding-top: 3em;
         padding-bottom: 3em;
@@ -140,16 +140,30 @@
     }
 
     .footer-section {
-        padding-bottom: 56.25vw;
         background-color: #fffbf5;
         background-size: contain;
         background-position: 50% 100%;
+        background-color: rgba(0, 0, 0, 0.3);
+
+        padding-bottom: var(--x-gap);
+        grid-template-rows: 1fr min-content;
+        row-gap: 0.25em;
+        color: white;
     }
 
     @media (min-width: 50em) {
         .footer-section {
             padding-top: 0;
             padding-bottom: 0;
+            row-gap: 0.25em;
+            grid-template-rows: 60fr 40fr;
+        }
+    }
+
+    @media (min-width: 70em) {
+        .footer-section {
+            text-shadow: 0px 0px 0.625rem rgba(0, 0, 0, 0.3);
+            row-gap: var(--y-gap);
             grid-template-rows: calc(43.75% - 0.5 * var(--y-gap)) calc(56.25% - 0.5 * var(--y-gap));
         }
     }
@@ -396,7 +410,7 @@
         <h1 class="font-01 darkpink-fg no-wrap x1 6x @1-x2 @3-4x">Scribe<span class="font-03"> 0.4</span></h1>
         <p class="font-04 x1 6x @1-x2 @3-4x">
         <strong>Scribe</strong> is a new, CSS-powered technique for displaying <strong>music notation on the web</strong>, packaged in a custom element.
-        Scribe is laid out using <strong>flex</strong> and <strong>grid</strong>, sized in <strong>relative font sizes</strong>, and <strong>responds</strong> to the <strong>flow of the web</strong>, making it very readable.
+        Scribe is laid out using <strong>flex</strong> and <strong>grid</strong>, sized in <strong>relative font sizes</strong>, and <strong>responds</strong> to the <strong>flow of the web</strong>, making it very readable at any screen size.
         <!--And because it's largely CSS it's highly&nbsp;customisable.-->
         It is perfect for embedding musical examples in tutorials, for publishing a lead sheet to be read on a phone at a gig, or for live feedback of, say, MIDI input in a web app.
         </p>
@@ -419,9 +433,9 @@
         <p class="x1 6x @1-x2 @3-4x">The <code>&lt;scribe-music&gt;</code> element is now registered.</p>
     </section>
 
-    <section class="attributes-section 6x-grid @1-9x-grid grid">
-        <h2 class="font-02 x1 6x @1-x2 @3-4x">Attributes and properties</h2>
-        <table class="attributes-table striped-table x1 6x @1-x2 @1-8x @3-6x">
+    <section class="attributes-section 9x-grid grid">
+        <h2 class="font-02 x1 9x @1-x2 @1-7x @2-6x @3-4x">Attributes and properties</h2>
+        <table class="attributes-table striped-table x1 9x @2-x2 @2-7x @3-6x">
           <thead>
             <tr>
               <th style="text-align: left">Attribute</th>
@@ -529,17 +543,59 @@
         <scribe-music class="x6 4x y7 2y ash-font no-wrap" clef="piano" src="#where-in"></scribe-music>
     </section>
 
+    <section class="data-section 6x-grid 9x-grid grid">
+        <h2 class="font-02 darkpink-fg x1 6x @1-x2 @3-4x">Sequence data</h2>
+
+        <pre class="9x @1-8x @1-x2" style="font-size: 0.8em;">{
+  <span class="pl-ent">"name"</span>: <span class="pl-s"><span class="pl-pds">"</span>So What<span class="pl-pds">"</span></span>,
+  <span class="pl-ent">"author"</span>: { <span class="pl-ent">"name"</span>: <span class="pl-s"><span class="pl-pds">"</span>Miles Davis<span class="pl-pds">"</span></span> },
+  <span class="pl-ent">"events"</span>: [
+    [<span class="pl-c1">0</span>,  <span class="pl-s"><span class="pl-pds">"</span>key<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>C<span class="pl-pds">"</span></span>],
+    [<span class="pl-c1">0</span>,  <span class="pl-s"><span class="pl-pds">"</span>meter<span class="pl-pds">"</span></span>, <span class="pl-c1">4</span>, <span class="pl-c1">1</span>],
+    [<span class="pl-c1">0</span>,  <span class="pl-s"><span class="pl-pds">"</span>sequence<span class="pl-pds">"</span></span>, <span class="pl-c1">1</span>, <span class="pl-c1">0</span>, <span class="pl-c1">32</span>],
+    [<span class="pl-c1">32</span>, <span class="pl-s"><span class="pl-pds">"</span>sequence<span class="pl-pds">"</span></span>, <span class="pl-c1">1</span>, <span class="pl-c1">0</span>, <span class="pl-c1">32</span>],
+    [<span class="pl-c1">64</span>, <span class="pl-s"><span class="pl-pds">"</span>sequence<span class="pl-pds">"</span></span>, <span class="pl-c1">1</span>, <span class="pl-c1">0</span>, <span class="pl-c1">32</span>, <span class="pl-s"><span class="pl-pds">"</span>transpose<span class="pl-pds">"</span></span>, <span class="pl-c1">1</span>],
+    [<span class="pl-c1">96</span>, <span class="pl-s"><span class="pl-pds">"</span>sequence<span class="pl-pds">"</span></span>, <span class="pl-c1">1</span>, <span class="pl-c1">0</span>, <span class="pl-c1">32</span>]
+  ],
+
+  <span class="pl-ent">"sequences"</span>: [{
+    <span class="pl-ent">"id"</span>: <span class="pl-c1">1</span>,
+    <span class="pl-ent">"name"</span>: <span class="pl-s"><span class="pl-pds">"</span>Section<span class="pl-pds">"</span></span>,
+    <span class="pl-ent">"events"</span>: [
+      [<span class="pl-c1">0</span>,  <span class="pl-s"><span class="pl-pds">"</span>sequence<span class="pl-pds">"</span></span>, <span class="pl-c1">2</span>, <span class="pl-c1">0</span>, <span class="pl-c1">8</span>],
+      [<span class="pl-c1">8</span>,  <span class="pl-s"><span class="pl-pds">"</span>sequence<span class="pl-pds">"</span></span>, <span class="pl-c1">2</span>, <span class="pl-c1">0</span>, <span class="pl-c1">8</span>],
+      [<span class="pl-c1">16</span>, <span class="pl-s"><span class="pl-pds">"</span>sequence<span class="pl-pds">"</span></span>, <span class="pl-c1">2</span>, <span class="pl-c1">0</span>, <span class="pl-c1">8</span>],
+      [<span class="pl-c1">24</span>, <span class="pl-s"><span class="pl-pds">"</span>sequence<span class="pl-pds">"</span></span>, <span class="pl-c1">2</span>, <span class="pl-c1">0</span>, <span class="pl-c1">8</span>]
+    ]
+  }, {
+    <span class="pl-ent">"id"</span>: <span class="pl-c1">2</span>,
+    <span class="pl-ent">"name"</span>: <span class="pl-s"><span class="pl-pds">"</span>Horns<span class="pl-pds">"</span></span>,
+    <span class="pl-ent">"events"</span>: [
+      [<span class="pl-c1">0</span>,    <span class="pl-s"><span class="pl-pds">"</span>chord<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>D<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>-7<span class="pl-pds">"</span></span>, <span class="pl-c1">32</span>],
+      [<span class="pl-c1">2</span>,    <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>B4<span class="pl-pds">"</span></span>, <span class="pl-c1">0.1</span>, <span class="pl-c1">1.6</span>],
+      [<span class="pl-c1">2</span>,    <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>G4<span class="pl-pds">"</span></span>, <span class="pl-c1">0.1</span>, <span class="pl-c1">1.6</span>],
+      [<span class="pl-c1">2</span>,    <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>D4<span class="pl-pds">"</span></span>, <span class="pl-c1">0.1</span>, <span class="pl-c1">1.6</span>],
+      [<span class="pl-c1">2</span>,    <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>A3<span class="pl-pds">"</span></span>, <span class="pl-c1">0.1</span>, <span class="pl-c1">1.6</span>],
+      [<span class="pl-c1">3.6</span>,  <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>A4<span class="pl-pds">"</span></span>, <span class="pl-c1">0.1</span>, <span class="pl-c1">0.4</span>],
+      [<span class="pl-c1">3.6</span>,  <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>F4<span class="pl-pds">"</span></span>, <span class="pl-c1">0.1</span>, <span class="pl-c1">0.4</span>],
+      [<span class="pl-c1">3.6</span>,  <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>C4<span class="pl-pds">"</span></span>, <span class="pl-c1">0.1</span>, <span class="pl-c1">0.4</span>],
+      [<span class="pl-c1">3.6</span>,  <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>G3<span class="pl-pds">"</span></span>, <span class="pl-c1">0.1</span>, <span class="pl-c1">0.4</span>]
+      ]
+  }]
+}</pre>
+    </section>
+
     <section class="status-section 6x-grid @1-9x-grid grid">
         <h2 class="font-02 darkpink-fg x1 6x @1-x2 @3-4x">Status</h2>
         <p class="x1 6x @1-x2 @3-4x">
             Scribe is a neat new way of rendering music on the web.
-            The current version, Scribe 0.4, is an <strong>evaluation release</strong>, and is capable of rendering <strong>a decent lead sheet</strong>.
-            There are some example lead sheets at <a href="https://the-dots.app">the-dots.app</a>.
+            The current version, Scribe 0.4, is an <strong>evaluation release</strong>.
+            It is capable of rendering <strong>a decent lead sheet</strong>, and there are some example lead sheets at <a href="https://the-dots.app">the-dots.app</a>.
             It does have some rough edges, and I am looking for feedback.
             Leave an issue on <strong>GitHub</strong> <a href="https://github.com/stephband/scribe/">github.com/stephband/scribe/</a> or bleat me on <strong>BlueSky</strong> <a href="https://bsky.app/profile/stephen.band">bsky.app/profile/stephen.band</a>.
         </p>
         <p class="x1 6x @1-x2 @3-4x">
-            For a description of how the CSS works, there's a blog post outlining the approach at <a class="no-wrap" href="https://cruncher.ch/blog/printing-music-with-css-grid/">cruncher.ch/blog/printing-music-with-css-grid/</a>.
+            If you're curious about how the CSS works, there's a blog post outlining the approach at <a class="no-wrap" href="https://cruncher.ch/blog/printing-music-with-css-grid/">cruncher.ch/blog/printing-music-with-css-grid/</a>.
         </p>
         <!--p class="x2 6x">
             Here are some features that yet to be worked out in a future version:
@@ -552,13 +608,12 @@
         <p class="x2 6x">If you are good at JS and CSS and want to help out, please do get in touch.</p-->
     </section>
 
-    <footer class="footer-section ratio-16:9 6x-grid @1-9x-grid grid" style="background-image: url('https://stephen.band/images/stephen-chair-2.avif');">
-        <h2 class="font-02 darkpink-fg x1 6x @2-x6 @2-3x y1 y-end">About me</h2>
-
-        <p class="font-03 x1 6x @2-x6 @2-3x y2 y-start" style="color: white; text-shadow: 0px 0px 0.625rem rgba(0, 0, 0, 0.3);">
-            I'm a musician and design engineer exploring web technologies for music creation.
-            Bleat me on <a href="https://bsky.app/profile/stephen.band" style="color: white;">BlueSky</a>.
-            Or hire me!
+    <footer class="footer-section ratio-16:9 9x-grid grid" style="background-image: url('/stephenband/images/stephen-chair-2.avif');">
+        <h2 class="font-02 x1 9x @1-x4 @1-5x @2-x6 @2-3x y1 y-end">About me</h2>
+        <p class="font-04 x1 9x @1-x4 @1-5x @2-x6 @2-3x y2 y-start">
+            I'm a sound and design engineer exploring web technologies for music creation.
+            Bleat me on <a href="https://bsky.app/profile/stephen.band" style="color: white;">BlueSky</a>,
+            <a href="mailto:stephband@cruncher.ch" style="color: white;">hire me</a>, or <a href="TODO" style="color: white;">fund me</a> to work on Scribe.
         </p>
     </footer>
 </body>
