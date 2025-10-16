@@ -18,7 +18,7 @@ import getStopBeat from './event/to-stop-beat.js';
 import config      from './config.js';
 
 const assign = Object.assign;
-const { abs, ceil, floor, min, max, sqrt, round } = Math;
+const { abs, ceil, floor, min, max, pow, sqrt, round } = Math;
 
 /* When dealing with rounding errors we only really need beat grid-level
    precision, our display grid has 24 slots but we only need to compare the
@@ -732,11 +732,12 @@ export function createPart(symbols, bar, stave, key = 0, accidentals = {}, part,
         if (data && data.divisor !== 2 && data.divisor !== 4) {
             // Create rests up to tuplet
             if (gt(data.beat - bar.beat, beat, p16)) createRests(symbols, settings.restDurations, bar, stave, part, beat, data.beat - bar.beat);
-            // Close beam TODO dont close beam
-            if (beam) {
+            // Close beam if there any holes in rhythm
+            if (beam && data.rhythm < pow(2, data.divisor) - 1) {
                 closeBeam(symbols, stave, part, beam);
                 beam = undefined;
             }
+
             // Render tuplet
             n = createTuplet(symbols, bar, stave, key, accidentals, part, settings, data.beat - bar.beat, data.duration, data.divisor, data.rhythm, notes, events, n);
             // Update beat
@@ -862,10 +863,7 @@ if (stopBeat <= beat) {
     }
 
     // If there's still a beam close it
-    if (beam) {
-        closeBeam(symbols, stave, part, beam);
-        beam = undefined;
-    }
+    if (beam) closeBeam(symbols, stave, part, beam);
 
     return symbols;
 }

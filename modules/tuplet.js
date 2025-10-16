@@ -1,8 +1,12 @@
 
 import getStopBeat from './event/to-stop-beat.js';
+import { gt, lte } from './number/float.js';
 
 
 const assign = Object.assign;
+
+// Rounding precision
+const p24 = 1/24;
 
 // Tuplet divisors detected by the algorithm.
 const tupletDivisors = [2, 3, 4, 5, 6, 7, 9];
@@ -40,8 +44,9 @@ function scoreTupletAtBeat(duration, divisor, beat, events, n) {
     let s, r;
 
     // Did previous event cross into - tie into - tuplet? Mark rhythm as
-    // occupying division 0
-    if (events[n - 1] && getStopBeat(events[n - 1]) > beat + 0.125) {
+    // occupying division 0. This check MUST match the stop beat test in part.js
+    // that rejects notes from being rendered on the following render iteration
+    if (events[n - 1] && gt(getStopBeat(events[n - 1]), beat + 0.5 * tupletDuration, p24)) {
         rhythm = 1;
     }
 
