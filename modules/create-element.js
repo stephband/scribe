@@ -183,7 +183,7 @@ export default overload(get('type'), {
             pitch:    symbol.pitch,
             duration: truncate(symbol.duration),
             part:     symbol.part.name,
-            beam:     symbol.beam && identify(symbol.beam),
+            beam:     symbol.beam && symbol.beam.id,
             event:    identify(symbol.event)
         }
     }),
@@ -202,7 +202,7 @@ export default overload(get('type'), {
             pitch:    symbol.pitch,
             duration: truncate(symbol.duration),
             part:     symbol.part.name,
-            events:   map((symbol) => identify(symbol.event), symbol).join(' ')
+            beam:     symbol.id
         }
     }),
 

@@ -65,9 +65,10 @@ function createBeamPaths(svg, durations, xs, i, range, duration) {
 }
 
 export function renderBeam(svg) {
-    const ids       = svg.dataset.events.split(/\s+/);
+    const id        = svg.dataset.beam;
     const parent    = svg.parentElement;
-    const notes     = ids.map((id) => parent.querySelector('.note[data-event="' + id + '"]'));
+    /* There is only one .top-note (or .bottom-note) per beam division, select that */
+    const notes     = Array.from(parent.querySelectorAll('.top-note[data-beam="' + id + '"]'));
     const durations = notes.map(getDataDuration);
     const box       = svg.viewBox.baseVal;
     const range =

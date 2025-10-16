@@ -20,7 +20,7 @@
     font-size: 2em;
 
     /* Render the stave as a background image */
-    --line-thickness: 0.015625em;
+    --line-thickness: 0.025em;
     /*background-image:
     url('data:image/svg+xml;utf8,<svg viewBox="0 -5 1 10" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
         <style>line{vector-effect:non-scaling-stroke;stroke:currentcolor;stroke-width:0.04em;stroke-linejoin:round;stroke-linecap:butt;fill:none;}</style>\

@@ -171,6 +171,13 @@
     .attributes-table th:nth-child(3),
     .attributes-table td:nth-child(3) { display: none; }
 
+    .striped-table {
+        text-align: left;
+        width: calc(100% + 1.5em);
+        margin-left: -0.75em;
+        margin-right: -0.75em;
+    }
+
     .striped-table > tbody > tr:nth-child(2n) > th,
     .striped-table > tbody > tr:nth-child(2n) > td {
         background-color: hsl(0deg 0% 100% / 10%);
@@ -196,6 +203,10 @@
     .striped-table > tbody > tr > td {
         padding-top:    0.75em;
         padding-bottom: 0.75em;
+    }
+
+    pre {
+        overflow: auto;
     }
     </style>
 
@@ -406,9 +417,9 @@
     }</script>
 </head>
 <body>
-    <header class="header-section 6x-grid @1-9x-grid grid" style="--y-gap: 0em;">
-        <h1 class="font-01 darkpink-fg no-wrap x1 6x @1-x2 @3-4x">Scribe<span class="font-03"> 0.4</span></h1>
-        <p class="font-04 x1 6x @1-x2 @3-4x">
+    <header class="header-section 9x-grid grid" style="--y-gap: 0em;">
+        <h1 class="font-01 darkpink-fg no-wrap 9x @1-x2 @1-6x @3-4x">Scribe<span class="font-03"> 0.4</span></h1>
+        <p class="font-04 9x @1-x2 @1-6x @2-5x @3-4x">
         <strong>Scribe</strong> is a new, CSS-powered technique for displaying <strong>music notation on the web</strong>, packaged in a custom element.
         Scribe is laid out using <strong>flex</strong> and <strong>grid</strong>, sized in <strong>relative font sizes</strong>, and <strong>responds</strong> to the <strong>flow of the web</strong>, making it very readable at any screen size.
         <!--And because it's largely CSS it's highly&nbsp;customisable.-->
@@ -416,21 +427,23 @@
         </p>
     </header>
 
-    <section class="example-section 6x-grid @1-9x-grid grid">
-        <pre class="x1 6x @1-x2 @1-7x"><span class="orange-fg">&lt;scribe-music</span> <span class="yellow-fg">src="</span><span class="lime-fg">./blue-in-green.json</span><span class="orange-fg">"&gt;&lt;/scribe-music&gt;</span></pre>
-        <scribe-music class="x1 6x @1-x2 @1-7x @3-6x" clef="treble" src="./data/blue-in-green.json"></scribe-music>
+    <section class="example-section 9x-grid grid">
+        <pre class="9x @1-x2 @1-8x"><span class="orange-fg">&lt;scribe-music</span> <span class="yellow-fg">src="</span><span class="lime-fg">./blue-in-green.json</span><span class="orange-fg">"&gt;&lt;/scribe-music&gt;</span></pre>
+        <scribe-music class="9x @1-x2 @1-7x @3-6x" clef="treble" src="./data/blue-in-green.json"></scribe-music>
 
-        <pre class="x1 6x @1-x2 @1-7x"><span class="orange-fg">&lt;scribe-music</span> <span class="yellow-fg">clef="</span><span class="lime-fg">drum</span><span class="yellow-fg">"</span> <span class="yellow-fg">src="</span><span class="lime-fg">./caravan-drums.json</span><span class="orange-fg">"&gt;&lt;/scribe-music&gt;</span></pre>
-        <scribe-music class="x1 6x @1-x2 @1-7x @3-6x" clef="drum" src="./data/caravan-drums.json"></scribe-music>
+        <pre class="9x @1-x2 @1-7x"><span class="orange-fg">&lt;scribe-music</span> <span class="yellow-fg">clef="</span><span class="lime-fg">drum</span><span class="yellow-fg">"</span> <span class="yellow-fg">src="</span><span class="lime-fg">./caravan-drums.json</span><span class="orange-fg">"&gt;&lt;/scribe-music&gt;</span></pre>
+        <scribe-music class="9x @1-x2 @1-7x @3-6x" clef="drum" src="./data/caravan-drums.json"></scribe-music>
 
-        <pre class="x1 6x @1-x2 @1-7x"><span class="orange-fg">&lt;scribe-music</span> <span class="yellow-fg">clef="</span><span class="lime-fg">piano</span><span class="yellow-fg">"</span> <span class="yellow-fg">src="</span><span class="lime-fg">./ae-fond-kiss.json</span><span class="orange-fg">"&gt;&lt;/scribe-music&gt;</span></pre>
-        <scribe-music class="x1 6x @1-x2 @1-7x @3-6x" clef="piano" src="./data/ae-fond-kiss.json" transpose="2"></scribe-music>
+        <pre class="9x @1-x2 @1-7x"><span class="orange-fg">&lt;scribe-music</span> <span class="yellow-fg">clef="</span><span class="lime-fg">piano</span><span class="yellow-fg">"</span> <span class="yellow-fg">src="</span><span class="lime-fg">./ae-fond-kiss.json</span><span class="orange-fg">"&gt;&lt;/scribe-music&gt;</span></pre>
+        <scribe-music class="9x @1-x2 @1-7x @3-6x" clef="piano" src="./data/ae-fond-kiss.json" transpose="2"></scribe-music>
 
-        <h2 class="font-02 darkpink-fg x1 6x @1-x2 @3-4x">Import <code>&lt;scribe-music&gt;</code></h2>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">There are some examples of full lead sheets on <a href="https://the-dots.app">the-dots.app</a>.</p>
+
+        <h2 class="font-02 darkpink-fg 6x @1-x2 @3-4x">Import the custom element</h2>
         <p class="x1 6x @1-x2 @3-4x">To use the <code>&lt;scribe-music&gt;</code> custom element, include the CSS and JS from the CDN:</p>
-        <pre class="x1 6x @1-x2 @3-4x highlight"><code><span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">"stylesheet"</span> <span class="na">href=</span><span class="s">"https://cdn.jsdelivr.net/gh/stephband/scribe@0.4/build/scribe-music/element.css"</span> <span class="nt">/&gt;</span>
+        <pre class="9x @1-x2 @1-8x"><code><span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">"stylesheet"</span> <span class="na">href=</span><span class="s">"https://cdn.jsdelivr.net/gh/stephband/scribe@0.4/build/scribe-music/element.css"</span> <span class="nt">/&gt;</span>
 <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"module"</span> <span class="na">src=</span><span class="s">"https://cdn.jsdelivr.net/gh/stephband/scribe@0.4/build/scribe-music/element.js"</span><span class="nt">&gt;&lt;/script&gt;</span></code></pre>
-        <p class="x1 6x @1-x2 @3-4x">The <code>&lt;scribe-music&gt;</code> element is now registered.</p>
+        <p class="x1 6x @1-x2 @3-4x">The <code>&lt;scribe-music&gt;</code> element is now registered and ready to author into your document.</p>
     </section>
 
     <section class="attributes-section 9x-grid grid">
@@ -438,66 +451,66 @@
         <table class="attributes-table striped-table x1 9x @2-x2 @2-7x @3-6x">
           <thead>
             <tr>
-              <th style="text-align: left">Attribute</th>
-              <th style="text-align: left">Property</th>
-              <th style="text-align: left">Type</th>
-              <th style="text-align: left">Description</th>
+              <th>Attribute</th>
+              <th>Property</th>
+              <th>Type</th>
+              <th>Description</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">src</code></td>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">.src</code></td>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">URL</code></td>
-              <td style="text-align: left">A URL of a JSON file or hashref of a script containing sequence data</td>
+              <td><code>src</code></td>
+              <td><code>.src</code></td>
+              <td><code>URL</code></td>
+              <td>URL of a JSON file or hashref of a script containing sequence data</td>
             </tr>
             <tr>
-              <td style="text-align: left">&nbsp;</td>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">.data</code></td>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">object</code></td>
-              <td style="text-align: left">Sequence data object</td>
+              <td>&nbsp;</td>
+              <td><code>.data</code></td>
+              <td><code>object</code></td>
+              <td>The sequence data object</td>
             </tr>
             <tr>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">clef</code></td>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">.clef</code></td>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">string</code></td>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">"treble"</code>, <code class="language-plaintext highlighter-rouge">"bass"</code>, <code class="language-plaintext highlighter-rouge">"piano"</code>, <code class="language-plaintext highlighter-rouge">"alto"</code>, <code class="language-plaintext highlighter-rouge">"drum"</code> or <code class="language-plaintext highlighter-rouge">"percussion"</code></td>
+              <td><code>clef</code></td>
+              <td><code>.clef</code></td>
+              <td><code>string</code></td>
+              <td><code>"treble"</code>, <code>"bass"</code>, <code>"piano"</code>, <code>"alto"</code>, <code>"drum"</code> or <code>"percussion"</code></td>
             </tr>
             <tr>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">key</code></td>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">.key</code></td>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">string</code></td>
-              <td style="text-align: left">The name of a major key, accepts <code class="language-plaintext highlighter-rouge">"Ab"</code> or <code class="language-plaintext highlighter-rouge">"A♭"</code></td>
+              <td><code>key</code></td>
+              <td><code>.key</code></td>
+              <td><code>string</code></td>
+              <td>The name of a major key, accepts <code>"Ab"</code> or <code>"A♭"</code> and <code>"F#"</code> or <code>"F♯"</code></td>
             </tr>
             <tr>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">meter</code></td>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">.meter</code></td>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">string</code></td>
-              <td style="text-align: left">A meter expressed as a standard time signature, such as <code class="language-plaintext highlighter-rouge">"4/4"</code> or <code class="language-plaintext highlighter-rouge">"6/8"</code></td>
+              <td><code>meter</code></td>
+              <td><code>.meter</code></td>
+              <td><code>string</code></td>
+              <td>A meter expressed as a standard time signature, such as <code>"4/4"</code> or <code>"6/8"</code></td>
             </tr>
             <tr>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">transpose</code></td>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">.transpose</code></td>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">number</code></td>
-              <td style="text-align: left">Transpose notation, but not the underlying data, by a given number of semitones</td>
+              <td><code>transpose</code></td>
+              <td><code>.transpose</code></td>
+              <td><code>number</code></td>
+              <td>Transpose notation, but not the underlying data, by a given number of semitones</td>
             </tr>
             <tr>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">layout</code></td>
-              <td style="text-align: left">&nbsp;</td>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">string</code></td>
-              <td style="text-align: left">Either <code class="language-plaintext highlighter-rouge">"compact"</code> or <code class="language-plaintext highlighter-rouge">"regular"</code></td>
+              <td><code>layout</code></td>
+              <td>&nbsp;</td>
+              <td><code>string</code></td>
+              <td>Either <code>"compact"</code> or <code>"regular"</code></td>
             </tr>
             <tr>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">shuffle</code></td>
-              <td style="text-align: left">&nbsp;</td>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">boolean</code></td>
-              <td style="text-align: left">Boolean attribute, displays swung 16ths as straight 16ths</td>
+              <td><code>shuffle</code></td>
+              <td>&nbsp;</td>
+              <td><code>boolean</code></td>
+              <td>Boolean attribute, displays swung 16ths as straight 16ths</td>
             </tr>
             <tr>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">swing</code></td>
-              <td style="text-align: left">&nbsp;</td>
-              <td style="text-align: left"><code class="language-plaintext highlighter-rouge">boolean</code></td>
-              <td style="text-align: left">Boolean attribute, displays swung 8ths as straight 8ths</td>
+              <td><code>swing</code></td>
+              <td>&nbsp;</td>
+              <td><code>boolean</code></td>
+              <td>Boolean attribute, displays swung 8ths as straight 8ths</td>
             </tr>
           </tbody>
         </table>
@@ -513,9 +526,9 @@
         <pre class="x2">mix-blend-mode: color-dodge;</pre>
     </section-->
 
-    <section class="font-section 6x-grid @1-9x-grid grid">
-        <h2 class="x2 6x">SMuFL fonts</h2>
-        <p class="x2 6x">
+    <section class="font-section 9x-grid grid">
+        <h2 class="9x @1-x2 @1-6x @2-5x @3-4x">SMuFL fonts</h2>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
             Scribe supports <a href="https://w3c.github.io/smufl/latest/">SMuFL fonts</a>, W3C-standardised fonts for rendering musical symbols.
             It comes tested with 5 openly licensed SMuFL fonts out of the box.
             Changing the look of your music can be as simple as importing and setting a new font family.
@@ -544,13 +557,13 @@
     </section>
 
     <section class="data-section 9x-grid grid">
-        <h2 class="font-02 darkpink-fg x1 9x @1-x2 @1-7x @2-6x @3-4x">Sequence data</h2>
-        <p class="x1 9x @1-x2 @1-7x @2-6x @3-4x">
+        <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Sequence data</h2>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
         Scribe consumes sequence data.
         A sequence is an object with an <code>events</code> property, an array of events.
-        Events have the form <code>[beat, type, ...data]</code>.
+        An event has the form <code>[beat, type, ...data]</code>.
         A sequence may also have child sequences.
-        As an example, here are the first few bars of Herbie Hancock's "Dolphin Dance":
+        As an example, here are the first few bars of Herbie Hancock's <a href="https://www.youtube.com/watch?v=RaHCnfI7y74&list=RDRaHCnfI7y74">Dolphin Dance</a> as sequence data:
         </p>
 
         <pre class="9x @1-8x @1-x2" style="font-size: 0.8em;" id="dolphin-dance-intro">{
@@ -581,42 +594,33 @@
     }]
 }</pre>
 
-        <p class="x1 9x @1-x2 @1-7x @2-6x @3-4x">
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
         What's going on here? The main events array declares the key and the meter at beat <code>0</code>, then cues the "Intro" sequence to play for <code>16</code> beats.
         The "Intro" sequence contains the melody and chords.
         The result renders as:
         </p>
 
-        <scribe-music class="x1 9x @2-x2 @2-7x @3-6x" clef="treble" src="#dolphin-dance-intro"></scribe-music>
+        <scribe-music class="9x @1-x2 @1-7x @3-6x" clef="treble" src="#dolphin-dance-intro"></scribe-music>
     </section>
 
-    <section class="status-section 6x-grid @1-9x-grid grid">
-        <h2 class="font-02 darkpink-fg x1 6x @1-x2 @3-4x">Status</h2>
-        <p class="x1 6x @1-x2 @3-4x">
+    <section class="status-section 9x-grid grid">
+        <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Status</h2>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
             Scribe is a neat new way of rendering music on the web.
             The current version, Scribe 0.4, is an <strong>evaluation release</strong>.
             It is capable of rendering <strong>a decent lead sheet</strong>, and there are some example lead sheets at <a href="https://the-dots.app">the-dots.app</a>.
             It does have some rough edges, and I am looking for feedback.
             Leave an issue on <strong>GitHub</strong> <a href="https://github.com/stephband/scribe/">github.com/stephband/scribe/</a> or bleat me on <strong>BlueSky</strong> <a href="https://bsky.app/profile/stephen.band">bsky.app/profile/stephen.band</a>.
         </p>
-        <p class="x1 6x @1-x2 @3-4x">
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
             If you're curious about how the CSS works, there's a blog post outlining the approach at <a class="no-wrap" href="https://cruncher.ch/blog/printing-music-with-css-grid/">cruncher.ch/blog/printing-music-with-css-grid/</a>.
         </p>
-        <!--p class="x2 6x">
-            Here are some features that yet to be worked out in a future version:
-        </p>
-        <ul class="x2 6x">
-            <li>Dynamics – accent and dynamic markings</li>
-            <li>Staccato and Long note detection</li>
-            <li>Scores – aligned display of multiple parts</li>
-        </ul>
-        <p class="x2 6x">If you are good at JS and CSS and want to help out, please do get in touch.</p-->
     </section>
 
     <footer class="footer-section ratio-16:9 9x-grid grid" style="background-image: url('/stephenband/images/stephen-chair-2.avif');">
         <h2 class="font-02 x1 9x @1-x4 @1-5x @2-x6 @2-3x y1 y-end">About me</h2>
         <p class="font-04 x1 9x @1-x4 @1-5x @2-x6 @2-3x y2 y-start">
-            I'm a sound and design engineer exploring web technologies for music creation.
+            I'm a sound and design engineer exploring web technologies for music production.
             Bleat me on <a href="https://bsky.app/profile/stephen.band" style="color: white;">BlueSky</a>,
             <a href="mailto:stephband@cruncher.ch" style="color: white;">hire me</a>, or <a href="TODO" style="color: white;">fund me</a> to work on Scribe.
         </p>

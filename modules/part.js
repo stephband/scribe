@@ -26,8 +26,10 @@ const { abs, ceil, floor, min, max, sqrt, round } = Math;
 const p16 = 1/16;
 const p24 = 1/24;
 
-const byRow = by(get('row'));
 
+/* Fns */
+
+const byRow = by(get('row'));
 
 function average(a, n, i, array) {
     return a + n / array.length;
@@ -169,6 +171,8 @@ function stemupFromSymbols(stave, part, symbols) {
 
 /* Beams */
 
+let beamId = 0;
+
 function closeBeam(symbols, stave, part, beam) {
     // Scan through beam symbols to find note not on beat of beam
     let n = -1;
@@ -203,7 +207,8 @@ function closeBeam(symbols, stave, part, beam) {
         symbols.push(assign(beam, {
             duration,
             stemup,
-            range: 0
+            range: 0,
+            id: ++beamId
         }));
 
         return symbols;
@@ -280,7 +285,8 @@ function closeBeam(symbols, stave, part, beam) {
         y:     positions[0],
         duration,
         stemup,
-        range
+        range,
+        id: ++beamId
     }));
 
     return symbols;
@@ -314,21 +320,52 @@ function fitDuration(durations, bar, startBeat, stopBeat, beat, eventBeat) {
     const maxGrain = floorPow2(bar.divisor);
     const div1     = floor(beat / bar.divisor) * bar.divisor;
     const grain    = grainPow2(minGrain, maxGrain, beat - div1);
-    const div2     = floor(stopBeat / bar.divisor) * bar.divisor;
-    const division = div1 + bar.divisor < stopBeat && div1 + bar.divisor;
 
-    // Decision tree
+    // Duration decision tree
+
+    // If note is truncated by next event render up to next event
+    if (eventBeat < stopBeat) {
+        // Beat to event beat is a valid head duration
+        if (durations.indexOf(eventBeat - beat) !== -1) return eventBeat - beat;
+
+        // Last divisor crossed
+        const div2 = floor(eventBeat / bar.divisor) * bar.divisor;
+
+        // Beat is on a divisor
+        if (beat === div1) {
+            // If beat to last division is a valid duration
+            if (durations.indexOf(div2 - beat) !== -1) return div2 - beat;
+            // Beat to next divisor
+            const division = div1 + bar.divisor < eventBeat && div1 + bar.divisor;
+            if (division) return division - beat;
+            // Get the power of 2 duration before eventBeat
+            return fitDottedDuration(0.125, eventBeat - beat);
+        }
+
+        // Event beat is on a divisor
+        if (eq(eventBeat, div2, p16)) {
+            // Otherwise up to the nearest division
+            const division = div1 + bar.divisor < eventBeat && div1 + bar.divisor;
+            if (division && durations.indexOf(division - beat) !== -1) return division - beat;
+            // Otherwise fill the grain
+            // Is this good ??????
+            return grain;
+        }
+    }
+
+    // If beat to last division is a valid duration
+    const div2 = floor(stopBeat / bar.divisor) * bar.divisor;
+
     // Beat is on a divisor
     if (beat === div1) {
-        // TODO: Something
-        if (eventBeat) {}
         // Beat to stop beat is a valid head duration
         if (durations.indexOf(stopBeat - beat) !== -1) return stopBeat - beat;
         // If beat to last division is a valid duration
         if (durations.indexOf(div2 - beat) !== -1) return div2 - beat;
         // Beat to divisor
+        const division = div1 + bar.divisor < stopBeat && div1 + bar.divisor;
         if (division) return division - beat;
-        //
+        // Get the next power of 2 duration after stopBeat but before eventBeat
         return fitRoundedUpDuration(0.125, stopBeat - beat, eventBeat - beat);
     }
     // Stop beat is on a divisor
@@ -336,6 +373,7 @@ function fitDuration(durations, bar, startBeat, stopBeat, beat, eventBeat) {
         // If beat to stop beat is a valid duration use it
         if (durations.indexOf(stopBeat - beat) !== -1) return stopBeat - beat;
         // Otherwise up to the nearest division
+        const division = div1 + bar.divisor < stopBeat && div1 + bar.divisor;
         if (division && durations.indexOf(division - beat) !== -1) return division - beat;
         // Otherwise fill the grain
         return grain;

@@ -10,9 +10,6 @@
 [submodule "lib/bolt"]
 	path = lib/bolt
 	url = git@github.com:stephband/bolt-2
-[submodule "lib/abcjs"]
-	path = lib/abcjs
-	url = git@github.com:stephband/abcjs
 [submodule "fonts/Leland"]
 	path = fonts/Leland
 	url = https://github.com/MuseScoreFonts/Leland.git
