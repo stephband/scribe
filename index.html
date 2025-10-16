@@ -543,46 +543,51 @@
         <scribe-music class="x6 4x y7 2y ash-font no-wrap" clef="piano" src="#where-in"></scribe-music>
     </section>
 
-    <section class="data-section 6x-grid 9x-grid grid">
-        <h2 class="font-02 darkpink-fg x1 6x @1-x2 @3-4x">Sequence data</h2>
+    <section class="data-section 9x-grid grid">
+        <h2 class="font-02 darkpink-fg x1 9x @1-x2 @1-7x @2-6x @3-4x">Sequence data</h2>
+        <p class="x1 9x @1-x2 @1-7x @2-6x @3-4x">
+        Scribe consumes sequence data.
+        A sequence is an object with an <code>events</code> property, an array of events.
+        Events have the form <code>[beat, type, ...data]</code>.
+        A sequence may also have child sequences.
+        As an example, here are the first few bars of Herbie Hancock's "Dolphin Dance":
+        </p>
 
-        <pre class="9x @1-8x @1-x2" style="font-size: 0.8em;">{
-  <span class="pl-ent">"name"</span>: <span class="pl-s"><span class="pl-pds">"</span>So What<span class="pl-pds">"</span></span>,
-  <span class="pl-ent">"author"</span>: { <span class="pl-ent">"name"</span>: <span class="pl-s"><span class="pl-pds">"</span>Miles Davis<span class="pl-pds">"</span></span> },
-  <span class="pl-ent">"events"</span>: [
-    [<span class="pl-c1">0</span>,  <span class="pl-s"><span class="pl-pds">"</span>key<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>C<span class="pl-pds">"</span></span>],
-    [<span class="pl-c1">0</span>,  <span class="pl-s"><span class="pl-pds">"</span>meter<span class="pl-pds">"</span></span>, <span class="pl-c1">4</span>, <span class="pl-c1">1</span>],
-    [<span class="pl-c1">0</span>,  <span class="pl-s"><span class="pl-pds">"</span>sequence<span class="pl-pds">"</span></span>, <span class="pl-c1">1</span>, <span class="pl-c1">0</span>, <span class="pl-c1">32</span>],
-    [<span class="pl-c1">32</span>, <span class="pl-s"><span class="pl-pds">"</span>sequence<span class="pl-pds">"</span></span>, <span class="pl-c1">1</span>, <span class="pl-c1">0</span>, <span class="pl-c1">32</span>],
-    [<span class="pl-c1">64</span>, <span class="pl-s"><span class="pl-pds">"</span>sequence<span class="pl-pds">"</span></span>, <span class="pl-c1">1</span>, <span class="pl-c1">0</span>, <span class="pl-c1">32</span>, <span class="pl-s"><span class="pl-pds">"</span>transpose<span class="pl-pds">"</span></span>, <span class="pl-c1">1</span>],
-    [<span class="pl-c1">96</span>, <span class="pl-s"><span class="pl-pds">"</span>sequence<span class="pl-pds">"</span></span>, <span class="pl-c1">1</span>, <span class="pl-c1">0</span>, <span class="pl-c1">32</span>]
-  ],
-
-  <span class="pl-ent">"sequences"</span>: [{
-    <span class="pl-ent">"id"</span>: <span class="pl-c1">1</span>,
-    <span class="pl-ent">"name"</span>: <span class="pl-s"><span class="pl-pds">"</span>Section<span class="pl-pds">"</span></span>,
-    <span class="pl-ent">"events"</span>: [
-      [<span class="pl-c1">0</span>,  <span class="pl-s"><span class="pl-pds">"</span>sequence<span class="pl-pds">"</span></span>, <span class="pl-c1">2</span>, <span class="pl-c1">0</span>, <span class="pl-c1">8</span>],
-      [<span class="pl-c1">8</span>,  <span class="pl-s"><span class="pl-pds">"</span>sequence<span class="pl-pds">"</span></span>, <span class="pl-c1">2</span>, <span class="pl-c1">0</span>, <span class="pl-c1">8</span>],
-      [<span class="pl-c1">16</span>, <span class="pl-s"><span class="pl-pds">"</span>sequence<span class="pl-pds">"</span></span>, <span class="pl-c1">2</span>, <span class="pl-c1">0</span>, <span class="pl-c1">8</span>],
-      [<span class="pl-c1">24</span>, <span class="pl-s"><span class="pl-pds">"</span>sequence<span class="pl-pds">"</span></span>, <span class="pl-c1">2</span>, <span class="pl-c1">0</span>, <span class="pl-c1">8</span>]
-    ]
-  }, {
-    <span class="pl-ent">"id"</span>: <span class="pl-c1">2</span>,
-    <span class="pl-ent">"name"</span>: <span class="pl-s"><span class="pl-pds">"</span>Horns<span class="pl-pds">"</span></span>,
-    <span class="pl-ent">"events"</span>: [
-      [<span class="pl-c1">0</span>,    <span class="pl-s"><span class="pl-pds">"</span>chord<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>D<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>-7<span class="pl-pds">"</span></span>, <span class="pl-c1">32</span>],
-      [<span class="pl-c1">2</span>,    <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>B4<span class="pl-pds">"</span></span>, <span class="pl-c1">0.1</span>, <span class="pl-c1">1.6</span>],
-      [<span class="pl-c1">2</span>,    <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>G4<span class="pl-pds">"</span></span>, <span class="pl-c1">0.1</span>, <span class="pl-c1">1.6</span>],
-      [<span class="pl-c1">2</span>,    <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>D4<span class="pl-pds">"</span></span>, <span class="pl-c1">0.1</span>, <span class="pl-c1">1.6</span>],
-      [<span class="pl-c1">2</span>,    <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>A3<span class="pl-pds">"</span></span>, <span class="pl-c1">0.1</span>, <span class="pl-c1">1.6</span>],
-      [<span class="pl-c1">3.6</span>,  <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>A4<span class="pl-pds">"</span></span>, <span class="pl-c1">0.1</span>, <span class="pl-c1">0.4</span>],
-      [<span class="pl-c1">3.6</span>,  <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>F4<span class="pl-pds">"</span></span>, <span class="pl-c1">0.1</span>, <span class="pl-c1">0.4</span>],
-      [<span class="pl-c1">3.6</span>,  <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>C4<span class="pl-pds">"</span></span>, <span class="pl-c1">0.1</span>, <span class="pl-c1">0.4</span>],
-      [<span class="pl-c1">3.6</span>,  <span class="pl-s"><span class="pl-pds">"</span>note<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>G3<span class="pl-pds">"</span></span>, <span class="pl-c1">0.1</span>, <span class="pl-c1">0.4</span>]
-      ]
-  }]
+        <pre class="9x @1-8x @1-x2" style="font-size: 0.8em;" id="dolphin-dance-intro">{
+    "name": "Dolphin Dance",
+    "events": [
+        [0, "key", "Eb"],
+        [0, "meter", 4, 1],
+        [0, "sequence", 1, 0,  16]
+    ],
+    "sequences": [{
+        "id": 1,
+        "name": "Intro",
+        "events": [
+            [0,    "chord", 3, "∆", 4],
+            [2,    "note",  67, 0.1, 0.5],
+            [2.5,  "note",  68, 0.1, 0.5],
+            [3,    "note",  70, 0.1, 0.5],
+            [3.5,  "note",  65, 0.1, 3.5],
+            [4,    "chord", 10, "-", 4],
+            [8,    "chord", 3, "∆", 4],
+            [10,   "note",  67, 0.1, 0.5],
+            [10.5, "note",  68, 0.1, 0.5],
+            [11,   "note",  70, 0.1, 0.5],
+            [11.5, "note",  65, 0.1, 3.5],
+            [12,   "chord", 2, "ø", 2],
+            [14,   "chord", 7, "7alt", 2]
+        ]
+    }]
 }</pre>
+
+        <p class="x1 9x @1-x2 @1-7x @2-6x @3-4x">
+        What's going on here? The main events array declares the key and the meter at beat <code>0</code>, then cues the "Intro" sequence to play for <code>16</code> beats.
+        The "Intro" sequence contains the melody and chords.
+        The result renders as:
+        </p>
+
+        <scribe-music class="x1 9x @2-x2 @2-7x @3-6x" clef="treble" src="#dolphin-dance-intro"></scribe-music>
     </section>
 
     <section class="status-section 6x-grid @1-9x-grid grid">

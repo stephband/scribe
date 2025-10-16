@@ -4,9 +4,9 @@
 "events": [
     [0, "key", "Eb"],
     [0, "meter", 4, 1],
-    [0,   "sequence", 1, 0,  16, "displace", 0],
+    [0,   "sequence", 1, 0,  16],
     [16,  "sequence", 2, 0, 136, "displace", 16],
-    [152, "sequence", 4, 0,  16, "displace", 0]
+    [152, "sequence", 4, 0,  16]
 ],
 
 "sequences": [{
