@@ -4,6 +4,7 @@ import { gt, lte } from './number/float.js';
 
 
 const assign = Object.assign;
+const { pow } = Math;
 
 // Rounding precision
 const p24 = 1/24;
@@ -159,7 +160,7 @@ Detects tuplet and duplet rhythms. Returns a data object with the properties:
 ```
 **/
 
-export default function detectTuplet(events, beat, duration) {
+export function detectTuplet(events, beat, duration) {
     let n = -1;
 
     // Ignore events up to start `beat`. Beat must be a power of 2 or multiple
@@ -182,4 +183,8 @@ export default function detectTuplet(events, beat, duration) {
     }
 
     return score > tolerance && tuplet;
+}
+
+export function rhythmHasHoles(divisor, rhythm) {
+    return rhythm < pow(2, divisor) - 1;
 }

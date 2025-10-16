@@ -5,7 +5,7 @@ import { toNoteName, toNoteNumber, toRootName, toRootNumber } from 'midi/note.js
 import { keyWeightsForEvent, chooseKeyFromWeights } from './keys.js';
 import { rflat, rsharp, rdoubleflat, rdoublesharp } from './pitch.js';
 import { getDivision } from './bar.js';
-import detectTuplets from './tuplet.js';
+import { detectTuplet, rhythmHasHoles } from './tuplet.js';
 import { round as roundTo, eq, gte, lte, lt, gt } from './number/float.js';
 import { floorPow2, ceilPow2, isPowerOf2 } from './number/power-of-2.js';
 import grainPow2   from './number/grain-pow-2.js';
@@ -442,7 +442,7 @@ function createRests(symbols, durations, bar, stave, part, beat, tobeat) {
 
 /* Accidentals */
 
-function createAccidental(symbols, bar, stave, part, accidentals, beat, note, distance) {
+function createAccidental(part, accidentals, beat, note, distance) {
     const { pitch, event } = note;
     const acci =
         rsharp.test(pitch) ? 1 :
@@ -452,30 +452,36 @@ function createAccidental(symbols, bar, stave, part, accidentals, beat, note, di
     // Line name is note name + octave (no # or b)
     const line = pitch[0] + pitch.slice(-1);
 
-    if (
-        // If event started before this bar we don't require an accidental
-        gte(event[0], bar.beat, p16)
-        // and if it has changed from the bars current accidentals
-        && acci !== accidentals[line]
-    ) {
-        // Alter current state of bar accidentals
-        accidentals[line] = acci;
-        symbols.push(assign({}/*, head*/, {
-            type: 'acci',
-            beat,
-            pitch,
-            part,
-            distance,
-            event,
-            value: acci || 0
-        }));
-    }
+    // If accidental is already in bar's current accidentals do nothing
+    if (acci === accidentals[line]) return;
+
+    // Alter current state of bar accidentals
+    accidentals[line] = acci;
+
+    // Return accidental symbol
+    return {
+        type: 'acci',
+        beat,
+        pitch,
+        part,
+        distance,
+        value: acci || 0
+    };
 }
 
-function createAccidentals(symbols, bar, stave, part, accidentals, beat, notes) {
-    let n = -1;
-    while (notes[++n]) createAccidental(symbols, bar, stave, part, accidentals, beat, notes[n], notes[n - 1] ? notes[n].row - notes[n - 1].row : undefined);
-    return beat;
+function createAccidentals(symbols, bar, part, accidentals, beat, notes) {
+    let n = -1, note, accidental, row;
+    while (note = notes[++n]) {
+        // If event started before this bar we don't require an accidental
+        if (lt(note.event[0], bar.beat, p16)) continue;
+        // Create accidental symbol
+        accidental = createAccidental(part, accidentals, beat, note, row !== undefined ? note.row - row : undefined);
+        // Track row of last accidental so that symbols know row distance between accidentals
+        if (accidental) {
+            row = note.row;
+            symbols.push(accidental);
+        }
+    }
 }
 
 
@@ -576,7 +582,7 @@ function closeTuplet(stave, part, tuplet) {
         -4 * sqrt(diff) ;
 }
 
-function createTuplet(symbols, bar, stave, key, accidentals, part, settings, beat, duration, divisor, rhythm, notes, events, n) {
+function createTuplet(symbols, bar, stave, key, accidentals, part, beam, settings, beat, duration, divisor, rhythm, notes, events, n) {
     // Check if we are to interpret swung 8ths or 16ths as straight 8ths or 16ths.
     // Rhythm is a binary representation of filled divisions where 1 (1) means
     // an event in the first division, 10 (2) an event in the second division,
@@ -600,7 +606,7 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
         stave
     };
 
-    let event, beam;
+    let event;
 
     // If divisor is not power of two push tuplet symbol
     if (!isPowerOf2(divisor)) symbols.push(tuplet);
@@ -626,7 +632,7 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
 
         // Create ledgers and accidentals
         createLedges(symbols, stave, part, beat, noteSymbols);
-        createAccidentals(symbols, bar, stave, part, accidentals, beat, noteSymbols);
+        createAccidentals(symbols, bar, part, accidentals, beat, noteSymbols);
 
         const stopBeat = min(
             // Max stop beat of notes
@@ -644,6 +650,16 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
             roundTo(division, stopBeat - beat)
         );
 
+        // Assign beat, duration to note symbols and push into symbols
+        let p = -1;
+        while (noteSymbols[++p]) symbols.push(assign(noteSymbols[p], {
+            beat,
+            duration
+        }));
+
+        // Push note symbols on to tuplet
+        push(tuplet, ...noteSymbols);
+
         // Manage beam
         if (gt(duration, 0.5, p24)) {
             // If there is a beam, close it
@@ -658,15 +674,6 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, settings, bea
             part
         };
 
-        // Assign beat, duration to note symbols and push into symbols
-        let p = -1;
-        while (noteSymbols[++p]) symbols.push(assign(noteSymbols[p], {
-            beat,
-            duration
-        }));
-
-        // Push note symbols on to tuplet
-        push(tuplet, ...noteSymbols);
         // Push note symbols on to beam
         if (beam) push(beam, ...noteSymbols);
 
@@ -723,23 +730,22 @@ export function createPart(symbols, bar, stave, key = 0, accidentals = {}, part,
         }
 
         // If we are not currently in tuplet mode detect the next tuplet
-        const data = detectTuplets(events, bar.beat + beat, bar.duration - beat);
+        const data = detectTuplet(events, bar.beat + beat, bar.duration - beat);
 
 //if (data) console.log(bar.beat, beat, n, event, 'TUPLETS', data.beat, data.duration, 'divisor', data.divisor, data.rhythm, n, events);
 //else console.log(bar.beat, beat, 'DUPLETS', n, events);
 //if (data) console.log(bar.count, beat, 'Rhythm', data.duration, data.divisor, data.rhythm.toString(2).split('').reverse().join(''));
 
-        if (data && data.divisor !== 2 && data.divisor !== 4) {
+        if (data && !isPowerOf2(data.divisor)) {
             // Create rests up to tuplet
             if (gt(data.beat - bar.beat, beat, p16)) createRests(symbols, settings.restDurations, bar, stave, part, beat, data.beat - bar.beat);
             // Close beam if there any holes in rhythm
-            if (beam && data.rhythm < pow(2, data.divisor) - 1) {
+            if (beam && rhythmHasHoles(data.divisor, data.rhythm)) {
                 closeBeam(symbols, stave, part, beam);
                 beam = undefined;
             }
-
             // Render tuplet
-            n = createTuplet(symbols, bar, stave, key, accidentals, part, settings, data.beat - bar.beat, data.duration, data.divisor, data.rhythm, notes, events, n);
+            n = createTuplet(symbols, bar, stave, key, accidentals, part, beam, settings, data.beat - bar.beat, data.duration, data.divisor, data.rhythm, notes, events, n);
             // Update beat
             beat = data.beat - bar.beat + data.duration;
             //
@@ -800,7 +806,7 @@ if (stopBeat <= beat) {
 
         // Create ledgers and accidentals
         createLedges(symbols, stave, part, beat, noteSymbols);
-        createAccidentals(symbols, bar, stave, part, accidentals, beat, noteSymbols);
+        createAccidentals(symbols, bar, part, accidentals, beat, noteSymbols);
 
         // Original start beat of notes, may be well before beat
         const startBeat = notes[0][0] - bar.beat;
