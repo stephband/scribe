@@ -1,12 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>&lt;scribe-music&gt;</title>
+    <title>Scribe</title>
 
     <meta charset="utf-8" />
     <meta name="author" content="@stephband" />
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width" />
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="stephband">
+    <meta property="og:title" content="Scribe" />
+    <meta property="og:description" content="Scribe, a CSS library and custom element for responsive music notation on the web" />
+    <meta property="og:image" content="https://stephen.band/scribe/card/card.png" />
+    <meta property="og:url" content="https://stephen.band/scribe/" />
 
     <script title="load">
         document.documentElement.className += ' js loading';
@@ -177,6 +183,9 @@
 
     .attributes-table th:nth-child(3),
     .attributes-table td:nth-child(3) { display: none; }
+
+    .events-table th:nth-child(6),
+    .events-table td:nth-child(6) { display: none; }
 
     .striped-table {
         text-align: left;
@@ -444,7 +453,7 @@
         <pre class="9x @1-x2 @1-8x"><code class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">clef=<span class="attribute-value">"piano"</span></span> <span class="attribute">src=<span class="attribute-value">"./ae-fond-kiss.json"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</code></pre>
         <scribe-music class="9x @1-x2 @1-7x @3-6x" clef="piano" src="./data/ae-fond-kiss.json" transpose="2"></scribe-music>
 
-        <p class="9x @1-x2 @1-6x @2-5x @3-4x">There's some more examples on <a href="https://the-dots.app">the-dots.app</a>.</p>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">There are more examples on <a href="https://the-dots.app">the-dots.app</a>.</p>
 
         <h2 class="font-02 darkpink-fg 6x @1-x2 @3-4x">Import the custom element</h2>
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">To use the <code class="orange-fg">&lt;scribe-music&gt;</code> custom element, include the CSS and JS from the CDN:</p>
@@ -523,7 +532,7 @@
         </table>
     </section>
 
-    <section class="data-section 9x-grid grid">
+    <section class="data-section 9x-grid grid dense-grid">
         <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Sequences</h2>
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
         Scribe consumes sequence data.
@@ -570,137 +579,145 @@
 
         <scribe-music class="9x @1-x2 @1-7x @3-6x" clef="treble" src="#dolphin-dance-intro"></scribe-music>
 
-        <h3 class="font-03 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Events</h3>
+        <div class="x-sub-grid y-start-grid grid 9x @1-x2 @1-8x @3-x2 @3-3x">
+            <h3 class="font-03 darkpink-fg 9x @1-6x @2-5x @3-3x">Events</h3>
+
+            <p class="9x @1-6x @2-5x @3-3x">
+            Scribe understands the following event types:
+            </p>
+
+            <table class="striped-table events-table 9x @1-7x @3-3x">
+                <thead>
+                    <tr>
+                        <th>beat</th>
+                        <th>type</th>
+                        <th>data</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!--tr>
+                        <td><code>beat</code></td>
+                        <td><code>"param"</code></td>
+                        <td><code>name</code></td>
+                        <td><code>value</code></td>
+                        <td><code>curve</code></td>
+                        <td><code>duration</code></td>
+                    </tr-->
+                    <!--tr>
+                        <td><code>beat</code></td>
+                        <td><code>"rate"</code></td>
+                        <td><code>number</code></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr-->
+                    <tr>
+                        <td><code>beat</code></td>
+                        <td><code class="string">"chord"</code></td>
+                        <td><code>root</code> | <code>number</code></td>
+                        <td><code>extension</code></td>
+                        <td><code>duration</code></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><code>beat</code></td>
+                        <td><code class="string">"key"</code></td>
+                        <td><code>name</code> | <code>number</code></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><code>beat</code></td>
+                        <td><code class="string">"meter"</code></td>
+                        <td><code>beats</code></td>
+                        <td><code>divisor</code></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><code>beat</code></td>
+                        <td><code class="string">"note"</code></td>
+                        <td><code>name</code> | <code>number</code></td>
+                        <td><code>dynamic</code></td>
+                        <td><code>duration</code></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><code>beat</code></td>
+                        <td><code class="string">"sequence"</code></td>
+                        <td><code>id</code></td>
+                        <td><code>target</code></td>
+                        <td><code>duration</code></td>
+                        <td><code>transforms</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>beat</code></td>
+                        <td><code class="string">"text"</code></td>
+                        <td><code>string</code></td>
+                        <td><code>duration</code></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p class="9x @1-6x @2-5x @3-3x">
+            Unrecognised types are ignored.
+            </p>
+        </div>
+
+        <div class="x-sub-grid y-start-grid grid 9x @1-x2 @1-8x @3-x5 @3-5x">
+            <h3 class="font-03 darkpink-fg 9x @1-6x @2-5x @3-3x">Transforms</h3>
+
+            <p class="9x @1-6x @2-5x @3-3x">
+            Sequence events may carry transforms for the sequences they cue:
+            </p>
+
+            <pre class="9x @1-8x @3-5x"><code class="json" id="dolphin-dance-intro">[<span class="number">0</span>, <span class="string">"sequence"</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">16</span>, <span class="string">"transpose"</span>, <span class="number">-3</span>, <span class="string">"rate"</span>, <span class="number">2</span>]</code></pre>
+
+            <p class="9x @1-6x @2-5x @3-3x">
+            This renders as:
+            </p>
+
+            <scribe-music class="9x @1-7x @3-4x" clef="treble" src="#dolphin-dance-intro-transformed">
+                <script type="application/json" id="dolphin-dance-intro-transformed">{"name":"Dolphin Dance","events":[[0,"key","Eb"],[0,"meter",4,1],[0,"sequence",1,0,16,"transpose",-3,"rate",2]],"sequences":[{"id":1,"name":"Intro","events":[[0,"chord",3,"∆",4],[2,"note",67,0.1,0.5],[2.5,"note",68,0.1,0.5],[3,"note",70,0.1,0.5],[3.5,"note",65,0.1,3.5],[4,"chord",10,"-",4],[8,"chord",3,"∆",4],[10,"note",67,0.1,0.5],[10.5,"note",68,0.1,0.5],[11,"note",70,0.1,0.5],[11.5,"note",65,0.1,3.5],[12,"chord",2,"ø",2],[14,"chord",7,"7alt",2]]}]}</script>
+            </scribe-music>
+
+            <p class="9x @1-6x @2-5x @3-3x">
+            Notice that all 16 beats are still rendered – the event itself is not transformed – but the rate of the melody is doubled and it is transposed down a minor third.
+            Transforms are applied to content in the order they are declared. Scribe supports the transforms:
+            </p>
+
+            <table class="striped-table 9x @1-6x @2-5x @3-3x">
+                <thead>
+                    <tr>
+                        <th>transform</th>
+                        <th>data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code class="string">"displace"</code></td>
+                        <td><code>float</code> (beats)</td>
+                    </tr>
+                    <tr>
+                        <td><code class="string">"rate"</code></td>
+                        <td><code>float</code> (playback rate)</td>
+                    </tr>
+                    <tr>
+                        <td><code class="string">"transpose"</code></td>
+                        <td><code>integer</code> (semitones)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-        Scribe understands the following event types. Unrecognised types are ignored.
-        </p>
-
-        <table class="striped-table 9x @1-x2 @1-7x @3-6x">
-            <thead>
-                <tr>
-                    <th>beat</th>
-                    <th>type</th>
-                    <th>data</th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <!--tr>
-                    <td><code>beat</code></td>
-                    <td><code>"param"</code></td>
-                    <td><code>name</code></td>
-                    <td><code>value</code></td>
-                    <td><code>curve</code></td>
-                    <td><code>duration</code></td>
-                </tr-->
-                <!--tr>
-                    <td><code>beat</code></td>
-                    <td><code>"rate"</code></td>
-                    <td><code>number</code></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr-->
-                <tr>
-                    <td><code>beat</code></td>
-                    <td><code class="string">"chord"</code></td>
-                    <td><code>root</code> | <code>number</code></td>
-                    <td><code>extension</code></td>
-                    <td><code>duration</code></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td><code>beat</code></td>
-                    <td><code class="string">"key"</code></td>
-                    <td><code>name</code> | <code>number</code></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td><code>beat</code></td>
-                    <td><code class="string">"meter"</code></td>
-                    <td><code>beats</code></td>
-                    <td><code>divisor</code></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td><code>beat</code></td>
-                    <td><code class="string">"note"</code></td>
-                    <td><code>name</code> | <code>number</code></td>
-                    <td><code>dynamic</code></td>
-                    <td><code>duration</code></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td><code>beat</code></td>
-                    <td><code class="string">"sequence"</code></td>
-                    <td><code>id</code></td>
-                    <td><code>target</code></td>
-                    <td><code>duration</code></td>
-                    <td><code>transforms</code></td>
-                </tr>
-                <tr>
-                    <td><code>beat</code></td>
-                    <td><code class="string">"text"</code></td>
-                    <td><code>string</code></td>
-                    <td><code>duration</code></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
-
-        <h3 class="font-03 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Transforms</h3>
-
-        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-        Sequence events may carry transforms for the sequences they cue:
-        </p>
-
-        <pre class="9x @1-8x @1-x2"><code class="json" id="dolphin-dance-intro">[<span class="number">0</span>, <span class="string">"sequence"</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">16</span>, <span class="string">"transpose"</span>, <span class="number">-3</span>, <span class="string">"rate"</span>, <span class="number">2</span>]</code></pre>
-
-        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-        This renders as:
-        </p>
-
-        <scribe-music class="9x @1-x2 @1-7x @3-6x" clef="treble" src="#dolphin-dance-intro-transformed">
-            <script type="application/json" id="dolphin-dance-intro-transformed">{"name":"Dolphin Dance","events":[[0,"key","Eb"],[0,"meter",4,1],[0,"sequence",1,0,16,"transpose",-3,"rate",2]],"sequences":[{"id":1,"name":"Intro","events":[[0,"chord",3,"∆",4],[2,"note",67,0.1,0.5],[2.5,"note",68,0.1,0.5],[3,"note",70,0.1,0.5],[3.5,"note",65,0.1,3.5],[4,"chord",10,"-",4],[8,"chord",3,"∆",4],[10,"note",67,0.1,0.5],[10.5,"note",68,0.1,0.5],[11,"note",70,0.1,0.5],[11.5,"note",65,0.1,3.5],[12,"chord",2,"ø",2],[14,"chord",7,"7alt",2]]}]}</script>
-        </scribe-music>
-
-        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-        Notice that 16 beats are still rendered – the event itself is not transformed – but the rate of the content is doubled and is transposed down a minor third.
-        Transforms are applied to content in the order they are declared. Scribe supports the transforms:
-        </p>
-
-        <table class="striped-table 9x @1-x2 @1-7x @3-6x">
-            <thead>
-                <tr>
-                    <th>transform</th>
-                    <th>data</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><code class="string">"displace"</code></td>
-                    <td><code>float</code> (beats)</td>
-                </tr>
-                <tr>
-                    <td><code class="string">"rate"</code></td>
-                    <td><code>float</code> (playback rate)</td>
-                </tr>
-                <tr>
-                    <td><code class="string">"transpose"</code></td>
-                    <td><code>integer</code> (semitones)</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-        For more examples of sequence JSON have a look in the repository's <a href="https://github.com/stephband/scribe/tree/main/data">data</a> folder.
+        Some examples of sequence JSON can be found in the repository's <a href="https://github.com/stephband/scribe/tree/main/data">data</a> folder.
         </p>
     </section>
 
@@ -727,16 +744,19 @@
             <pre>font-family: Petaluma, PetalumaText;</pre>
         </div>
         <scribe-music class="x1 4x y3 2y petaluma-font no-wrap" clef="piano" src="#a-fond"></scribe-music>
+
         <div class="x5 4x y3">
             <h3 class="bravura-font">Bravura</h3>
             <pre>font-family: Bravura, BravuraText;</pre>
         </div>
         <scribe-music class="x5 4x y4 2y bravura-font no-wrap" clef="piano" src="#fare-thee"></scribe-music>
+
         <div class="x2 4x y8">
             <h3 class="broadway-font">Broadway</h3>
             <pre>font-family: Broadway, BroadwayText;</pre>
         </div>
         <scribe-music class="x2 4x y6 2y broadway-font no-wrap" clef="piano" src="#thine-be"></scribe-music>
+
         <div class="x6 4x y6">
             <h3 class="ash-font">Ash</h3>
             <pre>font-family: Ash, AshText;</pre>
