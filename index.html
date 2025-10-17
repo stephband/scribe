@@ -147,8 +147,6 @@
         background-color: #fffbf5;
         background-size: contain;
         background-position: 50% 100%;
-        background-color: rgba(0, 0, 0, 0.3);
-
         padding-bottom: var(--x-gap);
         grid-template-rows: 1fr min-content;
         row-gap: 0.25em;
@@ -169,6 +167,11 @@
             text-shadow: 0px 0px 0.625rem rgba(0, 0, 0, 0.3);
             row-gap: var(--y-gap);
             grid-template-rows: calc(43.75% - 0.5 * var(--y-gap)) calc(56.25% - 0.5 * var(--y-gap));
+        }
+
+        .footer-section > .font-02 {
+            color: oklch(0.36 0.05 0);
+            text-shadow: none;
         }
     }
 
