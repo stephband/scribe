@@ -52,6 +52,10 @@
     column-gap: 0;
     align-content: start;
 
+    /* Encourage scribe not to stretch vertically when in a grid context – it
+       exposes signature staves */
+    align-self: start;
+
     /* Make sure bars do not stretch vertically */
     align-items: start;
     z-index: 1;
