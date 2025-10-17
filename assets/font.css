@@ -16,6 +16,8 @@ a {
 }
 
 code { font-size: 0.9375em; }
+strong { font-weight: 600; }
+
 
 .x-sub-grid {
     grid-template-columns: subgrid;
