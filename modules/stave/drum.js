@@ -100,9 +100,9 @@ export default class DrumStave extends Stave {
         }
     };
 
-    getPart(pitch) {
+    getPart(number) {
         // Split drums stave into drums and cymbals parts
-        return [35, 36, 37, 38, 40, 41, 43, 44, 45, 47, 50].includes(toNoteNumber(pitch)) ?
+        return [35, 36, 37, 38, 40, 41, 43, 44, 45, 47, 50].includes(toNoteNumber(number)) ?
             this.parts.drums :
             this.parts.cymbals ;
     }

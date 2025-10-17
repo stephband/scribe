@@ -148,10 +148,14 @@ export default class PianoStave extends Stave {
         return i > -1 ? i : undefined ;
     }
 
-    getPart(pitch) {
-        return /[012]$|[AC-G][b#♭♯𝄫𝄪]*3$/.test(pitch) ?
-            this.parts[1] :
-            this.parts[2] ;
+    getPart(number) {
+        return typeof number === 'number' ?
+            number < 60 ?
+                this.parts[1] :
+                this.parts[2] :
+            /[012]$|[AC-G][b#♭♯𝄫𝄪]*3$/.test(number) ?
+                this.parts[1] :
+                this.parts[2] ;
     }
 
     createKeySymbols(key) {

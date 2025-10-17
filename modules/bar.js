@@ -159,10 +159,10 @@ function createBarSymbols(symbols, bar, stave, key, accidentals, events, setting
             break;
         }
 
-        case "lyric": {
+        case "text": {
             const beat = event[0] - bar.beat;
             symbols.push({
-                type: 'lyric',
+                type: 'text',
                 beat,
                 // Does chord cross into next bar? The symbol should not
                 duration: event[0] + event[3] > bar.beat + bar.duration ?

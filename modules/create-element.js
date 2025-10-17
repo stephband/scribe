@@ -118,7 +118,7 @@ export default overload(get('type'), {
         class: "barline"
     }),
 */
-    lyric: (symbol) => create('span', {
+    text: (symbol) => create('span', {
         class: "lyric",
         part:  "lyric",
         html: symbol.value,

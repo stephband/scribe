@@ -119,10 +119,11 @@ export default define(element('scribe-music', {
             // One that isn't going to rely on the font so much?
             // Wrap bars again, in bars element? Does it actually help, don't we need
             // position absolute in order for the overflow hiding to work?
-            const side  = shadow.getElementById('side');
-            const key   = side.children[0].querySelectorAll('.acci');
-            const fontSize = parseFloat(getComputedStyle(this).fontSize);
-            const style = create('style', ':host { --signature-width: ' + (2.25 + key.length * 0.8125).toFixed(4) + 'em; }');
+            const side   = shadow.getElementById('side');
+            const key    = side.dataset.key;
+            const counts = {'G♭': 6, 'D♭': 5, 'A♭': 4, 'E♭': 3, 'B♭': 2, 'F':  1, 'C':  0, 'G':  1, 'D':  2, 'A':  3, 'E':  4, 'B':  5, 'F♯': 6};
+            const count  = counts[key];
+            const style  = create('style', ':host { --signature-width: ' + (2.25 + count * 0.625 + 0.625).toFixed(4) + 'em; }');
             shadow.appendChild(style);
 
             // Render beams

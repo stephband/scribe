@@ -114,7 +114,7 @@ export default class Stave {
         DEFAULT: true
     }];
 
-    getPart(pitch) {
+    getPart(number) {
         return this.parts[0];
     }
 
