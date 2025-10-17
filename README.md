@@ -118,6 +118,46 @@ as a sequence document:
 }
 ```
 
+```html
+<script type="application/json">{
+    "name": "So What",
+    "author": { "name": "Miles Davis" },
+    "events": [
+        [0,  "key", "C"],
+        [0,  "meter", 4, 1],
+        [0,  "sequence", 1, 0, 32],
+        [32, "sequence", 1, 0, 32],
+        [64, "sequence", 1, 0, 32, "transpose", 1],
+        [96, "sequence", 1, 0, 32]
+    ],
+
+    "sequences": [{
+        "id": 1,
+        "name": "Section",
+        "events": [
+            [0,  "sequence", 2, 0, 8],
+            [8,  "sequence", 2, 0, 8],
+            [16, "sequence", 2, 0, 8],
+            [24, "sequence", 2, 0, 8]
+        ]
+    }, {
+        "id": 2,
+        "name": "Horns",
+        "events": [
+            [0, "chord", "D", "-7", 32],
+            [2,    "note", "B4", 0.1, 1.6],
+            [2,    "note", "G4", 0.1, 1.6],
+            [2,    "note", "D4", 0.1, 1.6],
+            [2,    "note", "A3", 0.1, 1.6],
+            [3.6,  "note", "A4", 0.1, 0.4],
+            [3.6,  "note", "F4", 0.1, 0.4],
+            [3.6,  "note", "C4", 0.1, 0.4],
+            [3.6,  "note", "G3", 0.1, 0.4]
+        ]
+    }]
+}</script>
+```
+
 The main sequence plays the "Section" sequence four times, 32 beats (or 8 bars) per
 section, with the third section transposed up 1 semitone. The "Section" sequence
 plays the "Horns" phrase four times, 8 beats (or 2 bars) per phrase. That renders as:
