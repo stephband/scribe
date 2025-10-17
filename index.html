@@ -56,9 +56,13 @@
         font-family: MartianMono, monospace;
     }
 
-    .nt, .orange-fg { font-weight: 400; color: oklch(0.51 0.23 0); }
-    .na, .yellow-fg { font-weight: 400; color: oklch(0.51 0.23 180); }
-    .s,  .lime-fg   { font-weight: 400; color: oklch(0.51 0.23 90); }
+    .nt, .orange-fg, .tag { font-weight: 400; color: oklch(0.51 0.23 0); }
+    .na, .yellow-fg, .attribute, .property { font-weight: 400; color: oklch(0.51 0.23 180); }
+    .s,  .lime-fg, .attribute-value   { font-weight: 400; color: oklch(0.51 0.23 90); }
+    .number { color: oklch(0.51 0.23 30); }
+    .string { color: oklch(0.51 0.23 120); }
+    .json   { color: oklch(0.2 0.2 210); }
+
 
     body > .grid {
         padding-left:  calc(0.5 * var(--x-gap));
@@ -428,13 +432,13 @@
     </header>
 
     <section class="example-section 9x-grid grid">
-        <pre class="9x @1-x2 @1-8x"><span class="orange-fg">&lt;scribe-music</span> <span class="yellow-fg">src="</span><span class="lime-fg">./blue-in-green.json</span><span class="orange-fg">"&gt;&lt;/scribe-music&gt;</span></pre>
+        <pre class="9x @1-x2 @1-8x"><code class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">src=<span class="attribute-value">"./blue-in-green.json"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</code></pre>
         <scribe-music class="9x @1-x2 @1-7x @3-6x" clef="treble" src="./data/blue-in-green.json"></scribe-music>
 
-        <pre class="9x @1-x2 @1-7x"><span class="orange-fg">&lt;scribe-music</span> <span class="yellow-fg">clef="</span><span class="lime-fg">drum</span><span class="yellow-fg">"</span> <span class="yellow-fg">src="</span><span class="lime-fg">./caravan-drums.json</span><span class="orange-fg">"&gt;&lt;/scribe-music&gt;</span></pre>
+        <pre class="9x @1-x2 @1-8x"><code class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">clef=<span class="attribute-value">"drum"</span></span> <span class="attribute">src=<span class="attribute-value">"./caravan-drums.json"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</code></pre>
         <scribe-music class="9x @1-x2 @1-7x @3-6x" clef="drum" src="./data/caravan-drums.json"></scribe-music>
 
-        <pre class="9x @1-x2 @1-7x"><span class="orange-fg">&lt;scribe-music</span> <span class="yellow-fg">clef="</span><span class="lime-fg">piano</span><span class="yellow-fg">"</span> <span class="yellow-fg">src="</span><span class="lime-fg">./ae-fond-kiss.json</span><span class="orange-fg">"&gt;&lt;/scribe-music&gt;</span></pre>
+        <pre class="9x @1-x2 @1-8x"><code class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">clef=<span class="attribute-value">"piano"</span></span> <span class="attribute">src=<span class="attribute-value">"./ae-fond-kiss.json"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</code></pre>
         <scribe-music class="9x @1-x2 @1-7x @3-6x" clef="piano" src="./data/ae-fond-kiss.json" transpose="2"></scribe-music>
 
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">There's some more examples on <a href="https://the-dots.app">the-dots.app</a>.</p>
@@ -526,33 +530,33 @@
         As an example, here are the first few bars of Herbie Hancock's <a href="https://www.youtube.com/watch?v=RaHCnfI7y74&list=RDRaHCnfI7y74">Dolphin Dance</a> as sequence data:
         </p>
 
-        <pre class="9x @1-8x @1-x2" style="font-size: 0.8em;" id="dolphin-dance-intro">{
-    "name": "Dolphin Dance",
-    "events": [
-        [0, "key", "Eb"],
-        [0, "meter", 4, 1],
-        [0, "sequence", 1, 0,  16]
+        <pre class="9x @1-8x @1-x2"><code class="json" id="dolphin-dance-intro">{
+    <span class="property">"name"</span>: <span class="string">"Dolphin Dance"</span>,
+    <span class="property">"events"</span>: [
+        [<span class="number">0</span>, <span class="string">"key"</span>, <span class="string">"Eb"</span>],
+        [<span class="number">0</span>, <span class="string">"meter"</span>, <span class="number">4</span>, <span class="number">1</span>],
+        [<span class="number">0</span>, <span class="string">"sequence"</span>, <span class="number">1</span>, <span class="number">0</span>,  <span class="number">16</span>]
     ],
-    "sequences": [{
-        "id": 1,
-        "name": "Intro",
-        "events": [
-            [0,    "chord", 3, "∆", 4],
-            [2,    "note",  67, 0.1, 0.5],
-            [2.5,  "note",  68, 0.1, 0.5],
-            [3,    "note",  70, 0.1, 0.5],
-            [3.5,  "note",  65, 0.1, 3.5],
-            [4,    "chord", 10, "-", 4],
-            [8,    "chord", 3, "∆", 4],
-            [10,   "note",  67, 0.1, 0.5],
-            [10.5, "note",  68, 0.1, 0.5],
-            [11,   "note",  70, 0.1, 0.5],
-            [11.5, "note",  65, 0.1, 3.5],
-            [12,   "chord", 2, "ø", 2],
-            [14,   "chord", 7, "7alt", 2]
+    <span class="property">"sequences"</span>: [{
+        <span class="property">"id"</span>: <span class="number">1</span>,
+        <span class="property">"name"</span>: <span class="string">"Intro"</span>,
+        <span class="property">"events"</span>: [
+            [<span class="number">0</span>,    <span class="string">"chord"</span>, <span class="number">3</span>, <span class="string">"∆"</span>, <span class="number">4</span>],
+            [<span class="number">2</span>,    <span class="string">"note"</span>,  <span class="number">67</span>, <span class="number">0.1</span>, <span class="number">0.5</span>],
+            [<span class="number">2.5</span>,  <span class="string">"note"</span>,  <span class="number">68</span>, <span class="number">0.1</span>, <span class="number">0.5</span>],
+            [<span class="number">3</span>,    <span class="string">"note"</span>,  <span class="number">70</span>, <span class="number">0.1</span>, <span class="number">0.5</span>],
+            [<span class="number">3.5</span>,  <span class="string">"note"</span>,  <span class="number">65</span>, <span class="number">0.1</span>, <span class="number">3.5</span>],
+            [<span class="number">4</span>,    <span class="string">"chord"</span>, <span class="number">10</span>, <span class="string">"-"</span>, <span class="number">4</span>],
+            [<span class="number">8</span>,    <span class="string">"chord"</span>, <span class="number">3</span>, <span class="string">"∆"</span>, <span class="number">4</span>],
+            [<span class="number">10</span>,   <span class="string">"note"</span>,  <span class="number">67</span>, <span class="number">0.1</span>, <span class="number">0.5</span>],
+            [<span class="number">10.5</span>, <span class="string">"note"</span>,  <span class="number">68</span>, <span class="number">0.1</span>, <span class="number">0.5</span>],
+            [<span class="number">11</span>,   <span class="string">"note"</span>,  <span class="number">70</span>, <span class="number">0.1</span>, <span class="number">0.5</span>],
+            [<span class="number">11.5</span>, <span class="string">"note"</span>,  <span class="number">65</span>, <span class="number">0.1</span>, <span class="number">3.5</span>],
+            [<span class="number">12</span>,   <span class="string">"chord"</span>, <span class="number">2</span>, <span class="string">"ø"</span>, <span class="number">2</span>],
+            [<span class="number">14</span>,   <span class="string">"chord"</span>, <span class="number">7</span>, <span class="string">"7alt"</span>, <span class="number">2</span>]
         ]
     }]
-}</pre>
+}</code></pre>
 
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
         What's going on here? The main <code>events</code> array declares the key and the meter at beat <code>0</code>, then cues the "Intro" sequence to play for <code>16</code> beats.
@@ -639,7 +643,7 @@
         </table>
 
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-        Any unrecognised types found in sequences are ignored.
+        Unrecognised types are ignored.
         </p>
     </section>
 

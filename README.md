@@ -1,45 +1,14 @@
 
 <img src="https://stephen.band/scribe/logo.png" style="float: right;" />
 
-
-```json
-{
-    "name": "Dolphin Dance",
-    "events": [
-        [0, "key", "Eb"],
-        [0, "meter", 4, 1],
-        [0, "sequence", 1, 0,  16]
-    ],
-    "sequences": [{
-        "id": 1,
-        "name": "Intro",
-        "events": [
-            [0,    "chord", 3, "∆", 4],
-            [2,    "note",  67, 0.1, 0.5],
-            [2.5,  "note",  68, 0.1, 0.5],
-            [3,    "note",  70, 0.1, 0.5],
-            [3.5,  "note",  65, 0.1, 3.5],
-            [4,    "chord", 10, "-", 4],
-            [8,    "chord", 3, "∆", 4],
-            [10,   "note",  67, 0.1, 0.5],
-            [10.5, "note",  68, 0.1, 0.5],
-            [11,   "note",  70, 0.1, 0.5],
-            [11.5, "note",  65, 0.1, 3.5],
-            [12,   "chord", 2, "ø", 2],
-            [14,   "chord", 7, "7alt", 2]
-        ]
-    }]
-}
-```
-
-
-
 # Scribe
 
 Responsive music notation for the web.
 
 Scribe takes a sequence of events – notes, chords, meter changes and so on – and
 interprets and renders notation in HTML and CSS.
+
+Documentation and examples at [https://stephen.band/scribe](stephen.band/scribe).
 
 
 ## `<scribe-music>`
@@ -117,48 +86,6 @@ as a sequence document:
     }]
 }
 ```
-
-```html
-<script type="application/json">{
-    "name": "So What",
-    "author": { "name": "Miles Davis" },
-    "events": [
-        [0,  "key", "C"],
-        [0,  "meter", 4, 1],
-        [0,  "sequence", 1, 0, 32],
-        [32, "sequence", 1, 0, 32],
-        [64, "sequence", 1, 0, 32, "transpose", 1],
-        [96, "sequence", 1, 0, 32]
-    ],
-
-    "sequences": [{
-        "id": 1,
-        "name": "Section",
-        "events": [
-            [0,  "sequence", 2, 0, 8],
-            [8,  "sequence", 2, 0, 8],
-            [16, "sequence", 2, 0, 8],
-            [24, "sequence", 2, 0, 8]
-        ]
-    }, {
-        "id": 2,
-        "name": "Horns",
-        "events": [
-            [0, "chord", "D", "-7", 32],
-            [2,    "note", "B4", 0.1, 1.6],
-            [2,    "note", "G4", 0.1, 1.6],
-            [2,    "note", "D4", 0.1, 1.6],
-            [2,    "note", "A3", 0.1, 1.6],
-            [3.6,  "note", "A4", 0.1, 0.4],
-            [3.6,  "note", "F4", 0.1, 0.4],
-            [3.6,  "note", "C4", 0.1, 0.4],
-            [3.6,  "note", "G3", 0.1, 0.4]
-        ]
-    }]
-}</script>
-```
-
-DUH
 
 The main sequence plays the "Section" sequence four times, 32 beats (or 8 bars) per
 section, with the third section transposed up 1 semitone. The "Section" sequence
