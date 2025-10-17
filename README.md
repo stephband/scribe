@@ -158,6 +158,8 @@ as a sequence document:
 }</script>
 ```
 
+DUH
+
 The main sequence plays the "Section" sequence four times, 32 beats (or 8 bars) per
 section, with the third section transposed up 1 semitone. The "Section" sequence
 plays the "Horns" phrase four times, 8 beats (or 2 bars) per phrase. That renders as:
