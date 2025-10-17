@@ -1,6 +1,39 @@
 
 <img src="https://stephen.band/scribe/logo.png" style="float: right;" />
 
+
+```json
+{
+    "name": "Dolphin Dance",
+    "events": [
+        [0, "key", "Eb"],
+        [0, "meter", 4, 1],
+        [0, "sequence", 1, 0,  16]
+    ],
+    "sequences": [{
+        "id": 1,
+        "name": "Intro",
+        "events": [
+            [0,    "chord", 3, "∆", 4],
+            [2,    "note",  67, 0.1, 0.5],
+            [2.5,  "note",  68, 0.1, 0.5],
+            [3,    "note",  70, 0.1, 0.5],
+            [3.5,  "note",  65, 0.1, 3.5],
+            [4,    "chord", 10, "-", 4],
+            [8,    "chord", 3, "∆", 4],
+            [10,   "note",  67, 0.1, 0.5],
+            [10.5, "note",  68, 0.1, 0.5],
+            [11,   "note",  70, 0.1, 0.5],
+            [11.5, "note",  65, 0.1, 3.5],
+            [12,   "chord", 2, "ø", 2],
+            [14,   "chord", 7, "7alt", 2]
+        ]
+    }]
+}
+```
+
+
+
 # Scribe
 
 Responsive music notation for the web.
@@ -105,7 +138,7 @@ these event types:
 | beat   | type         | 2 | 3 | 4 | 5 |
 | :----- | :----------- | :--- | :--- | :--- |
 | `beat` | `"chord"`    | `root` | `mode` | `duration` | `bass` |
-| `beat` | `"lyric"`    | `text` | `duration` |  |  |
+| `beat` | `"text"`     | `text` | `duration` |  |  |
 | `beat` | `"note"`     | `pitch` | `dynamic` | `duration` |  |
 | `beat` | `"meter"`    | `duration` | `divisor` |  |  |
 | `beat` | `"rate"`     | `number` |  |  |  |

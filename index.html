@@ -29,8 +29,8 @@
     }</script>
 
     <!-- Import <scribe-music> -->
-    <link rel="stylesheet" href="./build/scribe-music/element.css" />
-    <script type="module" src="./build/scribe-music/element.js"></script>
+    <link rel="stylesheet" href="./scribe-music/element.css" />
+    <script type="module" src="./scribe-music/element.js"></script>
 
     <style>
     @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/elements/html.css';
@@ -451,10 +451,10 @@
         <table class="attributes-table striped-table x1 9x @2-x2 @2-7x @3-6x">
           <thead>
             <tr>
-              <th>Attribute</th>
-              <th>Property</th>
-              <th>Type</th>
-              <th>Description</th>
+              <th>attribute</th>
+              <th>property</th>
+              <th>type</th>
+              <th>description</th>
             </tr>
           </thead>
           <tbody>
@@ -516,6 +516,133 @@
         </table>
     </section>
 
+    <section class="data-section 9x-grid grid">
+        <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Sequence data</h2>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+        Scribe consumes sequence data.
+        A sequence is an object with an <code>events</code> property, an array of events.
+        An event has the form <code>[beat, type, ...data]</code>.
+        A sequence may also have a <code>sequences</code> property, an array of 'child' sequences.
+        As an example, here are the first few bars of Herbie Hancock's <a href="https://www.youtube.com/watch?v=RaHCnfI7y74&list=RDRaHCnfI7y74">Dolphin Dance</a> as sequence data:
+        </p>
+
+        <pre class="9x @1-8x @1-x2" style="font-size: 0.8em;" id="dolphin-dance-intro">{
+    "name": "Dolphin Dance",
+    "events": [
+        [0, "key", "Eb"],
+        [0, "meter", 4, 1],
+        [0, "sequence", 1, 0,  16]
+    ],
+    "sequences": [{
+        "id": 1,
+        "name": "Intro",
+        "events": [
+            [0,    "chord", 3, "∆", 4],
+            [2,    "note",  67, 0.1, 0.5],
+            [2.5,  "note",  68, 0.1, 0.5],
+            [3,    "note",  70, 0.1, 0.5],
+            [3.5,  "note",  65, 0.1, 3.5],
+            [4,    "chord", 10, "-", 4],
+            [8,    "chord", 3, "∆", 4],
+            [10,   "note",  67, 0.1, 0.5],
+            [10.5, "note",  68, 0.1, 0.5],
+            [11,   "note",  70, 0.1, 0.5],
+            [11.5, "note",  65, 0.1, 3.5],
+            [12,   "chord", 2, "ø", 2],
+            [14,   "chord", 7, "7alt", 2]
+        ]
+    }]
+}</pre>
+
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+        What's going on here? The main <code>events</code> array declares the key and the meter at beat <code>0</code>, then cues the "Intro" sequence to play for <code>16</code> beats.
+        The "Intro" sequence contains the melody and chords.
+        The result renders as:
+        </p>
+
+        <scribe-music class="9x @1-x2 @1-7x @3-6x" clef="treble" src="#dolphin-dance-intro"></scribe-music>
+
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+        Scribe understands the following event types:
+        </p>
+
+        <table class="striped-table 9x @1-x2 @1-6x @2-5x @3-4x">
+            <thead>
+                <tr>
+                    <th>beat</th>
+                    <th>type</th>
+                    <th>data</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!--tr>
+                    <td><code>beat</code></td>
+                    <td><code>"param"</code></td>
+                    <td><code>name</code></td>
+                    <td><code>value</code></td>
+                    <td><code>curve</code></td>
+                    <td><code>duration</code></td>
+                </tr-->
+                <!--tr>
+                    <td><code>beat</code></td>
+                    <td><code>"rate"</code></td>
+                    <td><code>number</code></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr-->
+                <tr>
+                    <td><code>beat</code></td>
+                    <td><code>"chord"</code></td>
+                    <td><code>root</code> | <code>number</code></td>
+                    <td><code>extension</code></td>
+                    <td><code>duration</code></td>
+                </tr>
+                <tr>
+                    <td><code>beat</code></td>
+                    <td><code>"key"</code></td>
+                    <td><code>name</code> | <code>number</code></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><code>beat</code></td>
+                    <td><code>"meter"</code></td>
+                    <td><code>duration</code></td>
+                    <td><code>divisor</code></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><code>beat</code></td>
+                    <td><code>"note"</code></td>
+                    <td><code>name</code> | <code>number</code></td>
+                    <td><code>dynamic</code></td>
+                    <td><code>duration</code></td>
+                </tr>
+                <tr>
+                    <td><code>beat</code></td>
+                    <td><code>"sequence"</code></td>
+                    <td><code>id</code></td>
+                    <td><code>target</code></td>
+                    <td><code>duration</code></td>
+                </tr>
+                <tr>
+                    <td><code>beat</code></td>
+                    <td><code>"text"</code></td>
+                    <td><code>string</code></td>
+                    <td><code>duration</code></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+        Any unrecognised types found in sequences are ignored.
+        </p>
+    </section>
+
     <!--section class="style-section 9x-grid grid y-start-grid" style="--y-gap: 0em;">
         <h2 class="x2 6x">Fluid and responsive and highly styleable</h2>
         <p class="x2 6x">
@@ -556,57 +683,10 @@
         <scribe-music class="x6 4x y7 2y ash-font no-wrap" clef="piano" src="#where-in"></scribe-music>
     </section>
 
-    <section class="data-section 9x-grid grid">
-        <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Sequence data</h2>
-        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-        Scribe consumes sequence data.
-        A sequence is an object with an <code>events</code> property, an array of events.
-        An event has the form <code>[beat, type, ...data]</code>.
-        A sequence may also have child sequences.
-        As an example, here are the first few bars of Herbie Hancock's <a href="https://www.youtube.com/watch?v=RaHCnfI7y74&list=RDRaHCnfI7y74">Dolphin Dance</a> as sequence data:
-        </p>
-
-        <pre class="9x @1-8x @1-x2" style="font-size: 0.8em;" id="dolphin-dance-intro">{
-    "name": "Dolphin Dance",
-    "events": [
-        [0, "key", "Eb"],
-        [0, "meter", 4, 1],
-        [0, "sequence", 1, 0,  16]
-    ],
-    "sequences": [{
-        "id": 1,
-        "name": "Intro",
-        "events": [
-            [0,    "chord", 3, "∆", 4],
-            [2,    "note",  67, 0.1, 0.5],
-            [2.5,  "note",  68, 0.1, 0.5],
-            [3,    "note",  70, 0.1, 0.5],
-            [3.5,  "note",  65, 0.1, 3.5],
-            [4,    "chord", 10, "-", 4],
-            [8,    "chord", 3, "∆", 4],
-            [10,   "note",  67, 0.1, 0.5],
-            [10.5, "note",  68, 0.1, 0.5],
-            [11,   "note",  70, 0.1, 0.5],
-            [11.5, "note",  65, 0.1, 3.5],
-            [12,   "chord", 2, "ø", 2],
-            [14,   "chord", 7, "7alt", 2]
-        ]
-    }]
-}</pre>
-
-        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-        What's going on here? The main events array declares the key and the meter at beat <code>0</code>, then cues the "Intro" sequence to play for <code>16</code> beats.
-        The "Intro" sequence contains the melody and chords.
-        The result renders as:
-        </p>
-
-        <scribe-music class="9x @1-x2 @1-7x @3-6x" clef="treble" src="#dolphin-dance-intro"></scribe-music>
-    </section>
-
     <section class="status-section 9x-grid grid">
         <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Status</h2>
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-            The current version, Scribe 0.4, is an <strong>evaluation release</strong>.
+            Scribe 0.4 is an <strong>evaluation release</strong>.
             It is capable of rendering <strong>a decent lead sheet</strong>, and there are some example lead sheets at <a href="https://the-dots.app">the-dots.app</a>.
             It does have some rough edges, and I am looking for feedback.
             Leave an issue on <strong>GitHub</strong> <a href="https://github.com/stephband/scribe/">github.com/stephband/scribe/</a> or bleat me on <strong>BlueSky</strong> <a href="https://bsky.app/profile/stephen.band">bsky.app/profile/stephen.band</a>.
