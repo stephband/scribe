@@ -174,7 +174,18 @@
         padding-bottom: var(--x-gap);
         grid-template-rows: 1fr min-content;
         row-gap: 0.25em;
+        height: 154vw;
         color: white;
+        background-image: url('http://localhost/stephenband/images/stephen-chair-4.avif');
+        background-size: cover;
+        background-position: 50% 100%;
+    }
+
+    @media (min-width: 35em) {
+        .footer-section {
+            height: 56.25vw;
+            background-image: url('http://localhost/stephenband/images/stephen-chair-2.avif');
+        }
     }
 
     @media (min-width: 50em) {
@@ -817,7 +828,7 @@
         </p>
     </section>
 
-    <footer class="footer-section ratio-16:9 9x-grid grid" style="background-image: url('https://stephen.band/images/stephen-chair-2.avif');">
+    <footer class="footer-section 9x-grid grid">
         <h2 class="font-02 x1 9x @1-x4 @1-5x @2-x6 @2-3x y1 y-end">About me</h2>
         <p class="font-04 x1 9x @1-x4 @1-5x @2-x6 @2-3x y2 y-start">
             I'm a sound and design engineer exploring web technologies for music production.
