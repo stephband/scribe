@@ -205,6 +205,12 @@
     .events-table th:nth-child(6),
     .events-table td:nth-child(6) { display: none; }
 
+    @media (max-width: 28em) {
+        /* Because this table braks layout on small screens */
+        .events-table th:nth-child(1),
+        .events-table td:nth-child(1) { display: none; }
+    }
+
     .striped-table {
         text-align: left;
         width: calc(100% + 1.5em);
