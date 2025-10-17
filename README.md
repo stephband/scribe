@@ -8,7 +8,7 @@ Responsive music notation for the web.
 Scribe takes a sequence of events – notes, chords, meter changes and so on – and
 interprets and renders notation in HTML and CSS.
 
-Documentation and examples at [https://stephen.band/scribe](stephen.band/scribe).
+Documentation and examples at [stephen.band/scribe](https://stephen.band/scribe).
 
 
 ## `<scribe-music>`
