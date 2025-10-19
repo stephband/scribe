@@ -40,11 +40,6 @@
     --signature-width: 2em;
 
     position: relative;
-    /*display: grid;
-    grid-template-columns: var(--signature-width) 1fr;
-    grid-template-rows: min-content;
-    align-content: start;
-    justify-content: stretch;*/
 
     display: flex;
     flex-wrap: wrap;
@@ -53,8 +48,9 @@
     align-content: start;
 
     /* Encourage scribe not to stretch vertically when in a grid context – it
-       exposes signature staves */
-    align-self: start;
+       exposes signature staves. Hmm, no don't do this, it causes problems when
+       in flex with flex direction row. */
+    /* align-self: start; */
 
     /* Make sure bars do not stretch vertically */
     align-items: start;
