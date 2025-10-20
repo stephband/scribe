@@ -2,5 +2,5 @@
    0.4.5
    By Stephen */
 
-import"./modules/chunk-VSRHKSOQ.js";var r=class t{constructor(o){}static from(o){return new t(o)}};export{r as default};
+import"./modules/chunk-HVPY6A6A.js";var r=class t{constructor(o){}static from(o){return new t(o)}};export{r as default};
 //# sourceMappingURL=module.js.map
