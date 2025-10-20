@@ -38,7 +38,7 @@ function renderPathData(range, xs, beam, beat, duration) {
         // If beat is divisible by 2 x duration the sub beam projects forward
         beat % (duration * 2) === 0 ?
             // Forward tail beam stops after i0
-            xs[i0] + 0.4 * (xs[i0 + 1] - xs[i0]) :
+            xs[i0] + 0.5 * (xs[i0 + 1] - xs[i0]) :
             // Backward tail beam stops at i0
             xs[i0] :
         // Beam spans whole duration
