@@ -505,7 +505,7 @@
 
         <h3 class="font-03 darkpink-fg 6x @1-x2 @3-4x">Write a tune</h3>
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">Write some sequence data and use <code class="tag">&lt;scribe-music&gt;</code> to render it:</p>
-        <pre class="9x @1-x2 @1-8x"><code><span class="tag">&lt;script <span class="attribute">type=</span><span class="attribute-value">"application/json"</span> <span class="attribute">id=</span><span class="attribute-value">"a-tune"</span>&gt;</span><span class="json" id="a-tune">{
+        <pre class="9x @1-x2 @1-8x"><code><span class="tag">&lt;script <span class="attribute">type=</span><span class="attribute-value">"application/json"</span> <span class="attribute">id=</span><span class="attribute-value">"tune"</span>&gt;</span><span class="json" id="tune">{
     <span class="property">"events"</span>: [
         [<span class="number">0</span>, <span class="string">"key"</span>, <span class="string">"D"</span>],
         [<span class="number">0</span>, <span class="string">"meter"</span>, <span class="number">4</span>, <span class="number">1</span>],
@@ -514,8 +514,8 @@
         [<span class="number">2</span>, <span class="string">"note"</span>, <span class="string">"A4"</span>, <span class="number">0.1</span>, <span class="number">1</span>]
     ]
 }</span><span class="tag">&lt;/script&gt;</span>
-<span class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">src=<span class="attribute-value">"#a-tune"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</span></code></pre>
-        <scribe-music class="9x @1-x2 @1-6x @2-5x @3-4x" src="#a-tune"></scribe-music>
+<span class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">src=<span class="attribute-value">"#tune"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</span></code></pre>
+        <scribe-music class="9x @1-x2 @1-6x @2-5x @3-4x" src="#tune"></scribe-music>
     </section>
 
     <section class="attributes-section 9x-grid grid">
@@ -628,7 +628,7 @@
 }</code></pre>
 
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-        What's going on here? The main <code class="property">events</code> array declares the key and the meter at beat <code class="number">0</code>, then cues the <code class="string">"Intro"</code> sequence to play for <code class="number">16</code> beats.
+        What's going on here? The main <code class="property">events</code> array declares the key and the meter at beat <code class="number">0</code>, then cues the <code class="string">"Intro"</code> sequence to 'play' for <code class="number">16</code> beats.
         The intro sequence contains the melody and chords.
         The result renders as:
         </p>
