@@ -1,0 +1,17 @@
+{
+    "name": "In The Bleak Midwinter",
+    "arranger": { "name": "Stephen Band" },
+    "events": [
+        [0,  "key", "Ab"],
+        [0,  "meter", 4, 1],
+        [0, "sequence", 1, 0, 40]
+    ],
+
+    "sequences": [{
+        "id": 1,
+        "name": "Head",
+        "events": [
+
+        ]
+    }]
+}

@@ -45,6 +45,14 @@
     background-position: 0 50%;
 }
 
+@media screen and (max-resolution: 1x) {
+    .stave {
+        /* Make stave lines appear on standard density screens, particular
+           problem in FF */
+        --line-thickness: 1px;
+    }
+}
+
 .open-stave {
     /* Render the stave as a background image */
     /*background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -5 1 10" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\

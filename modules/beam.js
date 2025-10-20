@@ -18,11 +18,29 @@ function removeBeamPaths(svg) {
 }
 
 function renderPathData(range, xs, beam) {
-    return `M${xs[beam[0]]}, ${ -range * xs[beam[0]] - 0.5 * beamThickness }
-        L${xs[beam[beam.length - 1]]},${ -range * xs[beam[beam.length - 1]] - 0.5 * beamThickness }
-        L${xs[beam[beam.length - 1]]},${ -range * xs[beam[beam.length - 1]] + 0.5 * beamThickness }
-        L${xs[beam[0]]}, ${ -range * xs[beam[0]] + 0.5 * beamThickness }
-        Z`;
+    const i0 = beam[0];
+
+    const x0 = beam.length === 1 ?
+        i0 === 0 ?
+            // Forward tail beam starts at i0
+            xs[i0] :
+            // Backward tail beam starts before i0
+            xs[i0] - 0.4 * (xs[i0] - xs[i0 - 1]) :
+        xs[i0] ;
+
+    const x1 = beam.length === 1 ?
+        i0 === 0 ?
+            // Forward tail beam stops after i0
+            xs[i0] + 0.4 * (xs[i0 + 1] - xs[i0]) :
+            // Backward tail beam stops at i0
+            xs[i0] :
+        xs[beam[beam.length - 1]] ;
+
+    return `M${ x0 }, ${ -range * x0 - 0.5 * beamThickness }
+        L${ x1 },${ -range * x1 - 0.5 * beamThickness }
+        L${ x1 },${ -range * x1 + 0.5 * beamThickness }
+        L${ x0 }, ${ -range * x0 + 0.5 * beamThickness }
+        Z` ;
 }
 
 function createBeamPaths(svg, durations, xs, i, range, duration) {

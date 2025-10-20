@@ -56,7 +56,7 @@
 </head>
 <body>
     <section class="grid dense-grid" style="row-gap: 0;">
-        <h3 class="x1 2x">Problematic rhythms</h3>
+        <!--h3 class="x1 2x">Problematic rhythms</h3>
 
         <scribe-music class="x1" clef="treble" src="#rhythm-1" debug>
             <script type="application/json" id="rhythm-1">{
@@ -166,9 +166,83 @@
                     [5.6667,"note",68,0.25,0.3333]
                 ]
             }</script>
+        </scribe-music-->
+
+        <scribe-music src="#rhythm-11">
+            <script type="application/json" id="rhythm-11">{
+              "name": "Scotland The Brave",
+              "events": [
+                [0, "meter", 4, 1],
+                [0,    "note", "C4", 0.1, 1],
+                [1,    "note", "C4", 0.1, 0.75],
+                [1.75, "note", "D4", 0.1, 0.25]
+              ]
+            }</script>
         </scribe-music>
 
-        <h3 class="x1 2x">Overlapping notes</h3>
+        <scribe-music src="#rhythm-12">
+            <script type="application/json" id="rhythm-12">{
+              "name": "Scotland The Brave",
+              "events": [
+                [0, "meter", 4, 1],
+                [0,    "note", "C4", 0.1, 1],
+                [1,    "note", "C4", 0.1, 0.25],
+                [1.25, "note", "D4", 0.1, 0.75]
+              ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music src="#rhythm-13">
+            <script type="application/json" id="rhythm-13">{
+              "name": "Scotland The Brave",
+              "events": [
+                [0, "meter", 4, 1],
+                [0,    "note", "C4", 0.1, 0.75],
+                [0.75, "note", "C4", 0.1, 0.25],
+                [1,    "note", "C4", 0.1, 0.75],
+                [1.75, "note", "D4", 0.1, 0.25]
+              ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music src="#rhythm-14">
+            <script type="application/json" id="rhythm-14">{
+              "name": "Scotland The Brave",
+              "events": [
+                [0, "meter", 4, 1],
+                [0,    "note", "C4", 0.1, 0.25],
+                [0.25, "note", "C4", 0.1, 0.75],
+                [1,    "note", "C4", 0.1, 0.25],
+                [1.25, "note", "D4", 0.1, 0.75]
+              ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music src="#rhythm-15">
+            <script type="application/json" id="rhythm-15">{
+              "name": "Scotland The Brave",
+              "events": [
+                [0, "meter", 4, 1],
+                [0,    "note", "C4", 0.1, 1],
+                [1,    "note", "C4", 0.1, 0.875],
+                [1.875,"note", "D4", 0.1, 0.125]
+              ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music src="#rhythm-16">
+            <script type="application/json" id="rhythm-16">{
+              "name": "Scotland The Brave",
+              "events": [
+                [0, "meter", 4, 1],
+                [0,    "note", "C4", 0.1, 1],
+                [1,    "note", "C4", 0.1, 0.125],
+                [1.125,"note", "D4", 0.1, 0.875]
+              ]
+            }</script>
+        </scribe-music>
+
+        <!--h3 class="x1 2x">Overlapping notes</h3>
 
         <scribe-music class="x1" clef="piano" src="#overlap-1" swing>
             <script type="application/json" id="overlap-1">{
