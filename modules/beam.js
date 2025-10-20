@@ -6,6 +6,10 @@ import rect   from 'dom/rect.js';
 
 export const beamThickness = 1.1;
 
+function getDataBeat(note) {
+    return parseFloat(note.dataset.beat);
+}
+
 function getDataDuration(note) {
     return parseFloat(note.dataset.duration);
 }
@@ -17,23 +21,27 @@ function removeBeamPaths(svg) {
     }
 }
 
-function renderPathData(range, xs, beam) {
+function renderPathData(range, xs, beam, beat, duration) {
     const i0 = beam[0];
 
     const x0 = beam.length === 1 ?
-        i0 === 0 ?
+        // If beat is divisible by 2 x duration the sub beam projects forward
+        beat % (duration * 2) === 0 ?
             // Forward tail beam starts at i0
             xs[i0] :
             // Backward tail beam starts before i0
             xs[i0] - 0.4 * (xs[i0] - xs[i0 - 1]) :
+        // Beam spans whole duration
         xs[i0] ;
 
     const x1 = beam.length === 1 ?
-        i0 === 0 ?
+        // If beat is divisible by 2 x duration the sub beam projects forward
+        beat % (duration * 2) === 0 ?
             // Forward tail beam stops after i0
             xs[i0] + 0.4 * (xs[i0 + 1] - xs[i0]) :
             // Backward tail beam stops at i0
             xs[i0] :
+        // Beam spans whole duration
         xs[beam[beam.length - 1]] ;
 
     return `M${ x0 }, ${ -range * x0 - 0.5 * beamThickness }
@@ -43,9 +51,9 @@ function renderPathData(range, xs, beam) {
         Z` ;
 }
 
-function createBeamPaths(svg, durations, xs, i, range, duration) {
-    // Don't render anything shorter than 32nd note beams
-    if (duration < 0.125) return;
+function createBeamPaths(svg, beats, durations, xs, i, range, duration) {
+    // Don't render anything shorter than triplet 32nd note beams
+    if (duration < 0.0833) return;
 
     let n = i - 1;
     let beam;
@@ -62,10 +70,10 @@ function createBeamPaths(svg, durations, xs, i, range, duration) {
             svg.appendChild(create('path', {
                 // Remember duration is the duration of the beam above this one
                 class: `beam-path-${ 4 / duration } beam-path`,
-                d: renderPathData(range, xs, beam)
+                d: renderPathData(range, xs, beam, beats[n - 1], duration)
             }));
 
-            createBeamPaths(svg, durations, xs, beam[0], range, duration / 2);
+            createBeamPaths(svg, beats, durations, xs, beam[0], range, duration / 2);
             beam = undefined;
         }
     }
@@ -74,10 +82,10 @@ function createBeamPaths(svg, durations, xs, i, range, duration) {
     if (beam) {
         svg.appendChild(create('path', {
             class: `beam-path-${ 4 / duration } beam-path`,
-            d: renderPathData(range, xs, beam)
+            d: renderPathData(range, xs, beam, beats[n - 1], duration)
         }));
 
-        createBeamPaths(svg, durations, xs, beam[0], range, duration / 2);
+        createBeamPaths(svg, beats, durations, xs, beam[0], range, duration / 2);
         beam = undefined;
     }
 }
@@ -87,6 +95,7 @@ export function renderBeam(svg) {
     const parent    = svg.parentElement;
     /* There is only one .top-note (or .bottom-note) per beam division, select that */
     const notes     = Array.from(parent.querySelectorAll('.top-note[data-beam="' + id + '"]'));
+    const beats     = notes.map(getDataBeat);
     const durations = notes.map(getDataDuration);
     const box       = svg.viewBox.baseVal;
     const range =
@@ -99,5 +108,5 @@ export function renderBeam(svg) {
     const xs     = boxes.map((box) => (box.x - firstX) / (lastX - firstX));
 
     removeBeamPaths(svg);
-    createBeamPaths(svg, durations, xs, 0, -range, 0.25);
+    createBeamPaths(svg, beats, durations, xs, 0, -range, 0.25);
 }

@@ -174,6 +174,10 @@ function stemupFromSymbols(stave, part, symbols) {
 let beamId = 0;
 
 function closeBeam(symbols, stave, part, beam) {
+
+
+console.log('BEAM', beam);
+
     // Scan through beam symbols to find note not on beat of beam
     let n = -1;
     while (beam[++n] && beam[n].beat === beam.beat);
