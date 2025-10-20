@@ -1,8 +1,0 @@
-X:4
-T:Short Note lengths
-N:Default note length is a quaver = an eighth note.
-N:Shortest timed note here is hemidemisemiquaver (=1/64 :-)
-M:C
-K:C
-{c}c/8 c/8 c/4 c/2 c1/8c1/4c1/2c {c}c/8 c/4 c/ c c/8c/4c/c |
-c3/8 c3/4 c3/ c3/2 c2 c3 | c7/8 c7/4 c7/2 c7/ c7|

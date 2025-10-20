@@ -1,32 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>&lt;scribe-music&gt;</title>
+    <title>Scribe</title>
 
     <meta charset="utf-8" />
     <meta name="author" content="@stephband" />
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width" />
-
-    <!--script type="importmap">{
-        "imports": {
-            "bolt/":     "https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/",
-            "dom/":      "https://cdn.jsdelivr.net/gh/stephband/dom@1.4.1/modules/",
-            "fn/":       "https://cdn.jsdelivr.net/gh/stephband/fn@1.5.1/modules/",
-            "midi/":     "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.1/modules/",
-            "sequence/": "https://cdn.jsdelivr.net/gh/soundio/sequence@0.1.4/modules/"
-        }
-    }</script-->
-
-    <script type="importmap">{
-        "imports": {
-            "bolt/":     "/bolt/",
-            "dom/":      "/dom/modules/",
-            "fn/":       "/fn/modules/",
-            "midi/":     "/midi/modules/",
-            "sequence/": "/sequence/modules/"
-        }
-    }</script>
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="stephband">
+    <meta property="og:title" content="Scribe" />
+    <meta property="og:description" content="Scribe is a CSS library and custom element for embedding responsive music notation on the web" />
+    <meta property="og:image" content="https://stephen.band/scribe/card/card-1200x630.jpg" />
+    <meta property="og:image:width" content="1200"/>
+    <meta property="og:image:height" content="630"/>
+    <meta property="og:url" content="https://stephen.band/scribe/" />
 
     <script title="load">
         document.documentElement.className += ' js loading';
@@ -38,20 +26,109 @@
         window.DEBUG = true;
     </script>
 
-    <!-- Import <scribe-music> -->
-    <link rel="stylesheet" href="/bolt/classes/atoms.css" />
-    <link rel="stylesheet" href="../scribe-music/element.css" />
-    <script type="module" src="../scribe-music/element.js"></script>
-    <link rel="stylesheet" href="../elements/lead-sheet-document.css" />
+    <script type="importmap">{
+        "imports": {
+            "bolt/":     "/bolt/",
+            "dom/":      "/dom/modules/",
+            "fn/":       "/fn/modules/",
+            "midi/":     "/midi/modules/",
+            "sequence/": "/sequence/modules/"
+        }
+    }</script>
+
     <style>
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/elements/html.css';
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/ratio.css';
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/list.css';
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/atoms.css';
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/striped-table.css';
+    @import '../assets/font.css';
+
     body {
-        font-family: Jazz, JazzText;
-        letter-spacing: 0.004em;
-        word-spacing: 0.125em;
+        font-family: system-ui, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    body > .grid {
+        padding-left:  calc(0.5 * var(--x-gap));
+        padding-right: calc(0.5 * var(--x-gap));
+    }
+
+    .header-section {
+        padding-top: 3em;
+        padding-bottom: 3em;
+    }
+
+    .footer-section {
+        background-color: #fffbf5;
+        background-size: contain;
+        background-position: 50% 100%;
+        padding-bottom: var(--x-gap);
+        grid-template-rows: 1fr min-content;
+        row-gap: 0.25em;
+        margin-top: 5em;
+        height: 154vw;
+        color: white;
+        background-image: url('https://stephen.band/images/stephen-chair-4.avif');
+        background-size: cover;
+        background-position: 50% 100%;
+    }
+
+    @media (min-width: 35em) {
+        .footer-section {
+            height: 56.25vw;
+            background-image: url('https://stephen.band/images/stephen-chair-2.avif');
+        }
+    }
+
+    @media (min-width: 50em) {
+        .footer-section {
+            padding-top: 0;
+            padding-bottom: 0;
+            row-gap: 0.25em;
+            grid-template-rows: 60fr 40fr;
+        }
+    }
+
+    @media (min-width: 70em) {
+        .footer-section {
+            text-shadow: 0px 0px 0.625rem rgba(0, 0, 0, 0.3);
+            row-gap: var(--y-gap);
+            grid-template-rows: calc(43.75% - 0.5 * var(--y-gap)) calc(56.25% - 0.5 * var(--y-gap));
+        }
+
+        .footer-section > .font-02 {
+            color: oklch(0.36 0.05 0);
+            text-shadow: none;
+        }
     }
     </style>
 </head>
 <body>
+    <header class="header-section 9x-grid grid" style="--y-gap: 0em;">
+        <h1 class="font-01 darkpink-fg no-wrap 9x @1-x2 @1-6x @3-4x">Scribe<span class="font-03" style="font-weight: 300;"> 0.4</span></h1>
+        <p class="font-04 9x @1-x2 @1-6x @2-5x @3-4x">Test pages.</p>
+    </header>
 
+    <section class="9x-grid grid">
+        <ul class="list 9x @1-x2 @1-6x @2-5x @3-4x">
+            <li><a href="./glyphs.html">Glyphs</a></li>
+            <li><a href="./ledgers.html">Ledgers</a></li>
+            <li><a href="./rhythms.html">Rhythms</a></li>
+            <li><a href="./repeats.html">Repeats</a></li>
+            <li><a href="./ties.html">Ties</a></li>
+            <li><a href="./tuplets.html">Tuplets</a></li>
+        </ul>
+    </section>
+
+    <footer class="footer-section 9x-grid grid">
+        <h2 class="font-02 x1 9x @1-x4 @1-5x @2-x6 @2-3x y1 y-end">About me</h2>
+        <p class="font-04 x1 9x @1-x4 @1-5x @2-x6 @2-3x y2 y-start">
+            I'm a sound and design engineer exploring web technologies for music production.
+            Bleat me on <a href="https://bsky.app/profile/stephen.band" style="color: white;">BlueSky</a>,
+            <a href="https://cruncher.ch" style="color: white;">hire me</a>, or please fund me on <a href="https://github.com/sponsors/stephband" style="color: white;">Github Sponsors</a> or <a href="https://buymeacoffee.com/stephband" style="color: white;">Buy Me a Coffee</a> to continue work on Scribe.
+        </p>
+    </footer>
 </body>
 </html>

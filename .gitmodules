@@ -7,9 +7,6 @@
 [submodule "fonts/MartianMono"]
 	path = fonts/MartianMono
 	url = https://github.com/evilmartians/mono.git
-[submodule "lib/bolt"]
-	path = lib/bolt
-	url = git@github.com:stephband/bolt-2
 [submodule "fonts/Leland"]
 	path = fonts/Leland
 	url = https://github.com/MuseScoreFonts/Leland.git
