@@ -130,7 +130,7 @@ export default overload(get('type'), {
     }),
 
     acci: (symbol) => create('span', {
-        class: (acciClasses[symbol.value] || 'acci') + (symbol.distance < 6 ? ' cluster-acci' : '' ) ,
+        class: (acciClasses[symbol.value] || 'acci') + (symbol.cluster ? ' acci-' + symbol.cluster : '' ) ,
         html: acciGlyphs[symbol.value] || glyphs.acciNatural,
         data: {
             beat:  symbol.beat && truncate(symbol.beat),

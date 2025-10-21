@@ -94,6 +94,8 @@ export default class PianoStave extends Stave {
         bottomRow: 18
     }, {
         // Voice range C4-C6
+        // Soprano sax Ab3-Eb6
+        // Trumpet F#3-C6
         name:      'soprano',
         staff:     'treble',
         topRow:    9,
@@ -102,6 +104,8 @@ export default class PianoStave extends Stave {
         stemup:    true
     }, {
         // Voice range G3-G5
+        // Flugel horn E3-Bb5
+        // Alto sax rannge Db3-Ab5
         name:      'alto',
         staff:     'treble',
         topRow:    9,
@@ -120,6 +124,7 @@ export default class PianoStave extends Stave {
     }, {
         // Voice range E2-C4
         // Trombone range E2-Bb4
+        // Sousaphone Eb1-Bb4
         name:      'bass',
         staff:     'bass',
         topRow:    29,

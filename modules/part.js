@@ -442,8 +442,8 @@ function createRests(symbols, durations, bar, stave, part, beat, tobeat) {
 
 /* Accidentals */
 
-function createAccidental(part, accidentals, beat, note, distance) {
-    const { pitch, event } = note;
+function createAccidental(part, accidentals, beat, note, /*distance,*/ cluster) {
+    const { pitch, event, row } = note;
     const acci =
         rsharp.test(pitch) ? 1 :
         rflat.test(pitch) ? -1 :
@@ -463,26 +463,44 @@ function createAccidental(part, accidentals, beat, note, distance) {
         type: 'acci',
         beat,
         pitch,
+        row,
+        cluster,
         part,
-        distance,
+        //distance,
         value: acci || 0
     };
 }
 
+function getAccidentalAboveRowAtBeat(symbols, beat, maxRow) {
+    let n = -1, symbol, row = 0, o;
+    while (symbol = symbols[++n]) if (
+        symbol.type === 'acci'
+        && symbol.beat === beat
+        && symbol.row < maxRow
+        && symbol.row > row
+    ) {
+        row = symbol.row;
+        o = n;
+    }
+
+    return symbols[o];
+}
+
 function createAccidentals(symbols, bar, part, accidentals, beat, notes) {
-    let n = -1, note, accidental, row;
+    let n = -1, note, accidental, above;
+
     while (note = notes[++n]) {
         // If event started before this bar we don't require an accidental
         if (lt(note.event[0], bar.beat, p16)) continue;
 
+        // Find existing accidental above this one
+        above = getAccidentalAboveRowAtBeat(symbols, beat, note.row);
+
         // Create accidental symbol
-        accidental = createAccidental(part, accidentals, beat, note, row !== undefined ? note.row - row : undefined);
-        // Track row of last accidental so that symbols know row distance between accidentals
-        if (accidental) {
-console.log(bar.beat + beat, 'ACCI', note.pitch, note.row, row !== undefined ? note.row - row : undefined);
-            row = note.row;
-            symbols.push(accidental);
-        }
+        accidental = createAccidental(part, accidentals, beat, note, above && above.row - note.row < 6 ? above.cluster + 1 : 0);
+
+        // Push it into symbols
+        if (accidental) symbols.push(accidental);
     }
 }
 

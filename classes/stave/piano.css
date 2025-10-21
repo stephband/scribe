@@ -139,6 +139,10 @@
 [data-part^="tenor"][data-pitch^="D"][data-pitch$="4"]  { grid-row: lh-D4; }
 [data-part^="tenor"][data-pitch^="C"][data-pitch$="4"]  { grid-row: lh-C4; }
 
+[data-part^="bass"][data-pitch^="B"][data-pitch$="4"]  { grid-row: lh-B4; }
+[data-part^="bass"][data-pitch^="A"][data-pitch$="4"]  { grid-row: lh-A4; }
+[data-part^="bass"][data-pitch^="G"][data-pitch$="4"]  { grid-row: lh-G4; }
+[data-part^="bass"][data-pitch^="F"][data-pitch$="4"]  { grid-row: lh-F4; }
 [data-part^="bass"][data-pitch^="E"][data-pitch$="4"]  { grid-row: lh-E4; }
 [data-part^="bass"][data-pitch^="D"][data-pitch$="4"]  { grid-row: lh-D4; }
 [data-part^="bass"][data-pitch^="C"][data-pitch$="4"]  { grid-row: lh-C4; }

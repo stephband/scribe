@@ -3,4 +3,9 @@
     /* Make it's box two stave spaces high */
     line-height: 0.5em;
     height: auto;
+
+    /* Naturals can be very narrow and bunch up against other accidentals,
+       give them a little minimum space */
+    min-width: 0.25em;
+    text-align: center;
 }
