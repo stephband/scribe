@@ -231,20 +231,23 @@ export function createBar(count, beat, duration, divisor, stave, key, events, pa
 
     // Populate symbols with parts
     let index, p = 0;
+    const staffs = stave.staffs ? stave.staffs.slice() : [];
     for (index in stave.parts) {
         const part   = stave.parts[index];
         const events = parts[part.name] || [];
 
         // Dont render anything if this is not a default part and there are no events
-        if (!part.DEFAULT && !events.length) continue;
+        if (!events.length) continue;
+        const s = staffs.indexOf(part.staff);
+        if (s) staffs.splice(s, 1);
         createPart(symbols, bar, stave, key, accidentals, part, events, settings);
         ++p;
     }
 
-    // But if no part was rendered at least render rests
-    if (!p) {
-        console.log('Stave has no parts defined SHOULD NOT BE');
-        createPart(symbols, bar, stave, key, accidentals, stave.parts[0], [], settings);
+    let n = staffs.length;
+    while (n--) {
+        console.log('Stave has not rendered onto staff, render rests');
+        createPart(symbols, bar, stave, key, accidentals, stave.parts[n + 1], [], settings);
     }
 
     return bar;

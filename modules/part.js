@@ -474,10 +474,12 @@ function createAccidentals(symbols, bar, part, accidentals, beat, notes) {
     while (note = notes[++n]) {
         // If event started before this bar we don't require an accidental
         if (lt(note.event[0], bar.beat, p16)) continue;
+
         // Create accidental symbol
         accidental = createAccidental(part, accidentals, beat, note, row !== undefined ? note.row - row : undefined);
         // Track row of last accidental so that symbols know row distance between accidentals
         if (accidental) {
+console.log(bar.beat + beat, 'ACCI', note.pitch, note.row, row !== undefined ? note.row - row : undefined);
             row = note.row;
             symbols.push(accidental);
         }

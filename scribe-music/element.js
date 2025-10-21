@@ -121,8 +121,9 @@ export default define(element('scribe-music', {
             // position absolute in order for the overflow hiding to work?
             const side   = shadow.getElementById('side');
             const key    = side.dataset.key;
-            const counts = {'G♭': 6, 'D♭': 5, 'A♭': 4, 'E♭': 3, 'B♭': 2, 'F':  1, 'C':  0, 'G':  1, 'D':  2, 'A':  3, 'E':  4, 'B':  5, 'F♯': 6};
+            const counts = {'G♭': 6, 'C♯': 5, 'D♭': 5, 'G♯': 4, 'A♭': 4, 'D♯': 3, 'E♭': 3, 'B♭': 2, 'F':  1, 'C':  0, 'G':  1, 'D':  2, 'A':  3, 'E':  4, 'B':  5, 'F♯': 6};
             const count  = counts[key];
+//console.log('COUn', key, count);
             const style  = create('style', ':host { --signature-width: ' + (2.25 + count * 0.625 + 0.625).toFixed(4) + 'em; }');
             shadow.appendChild(style);
 

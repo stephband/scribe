@@ -43,14 +43,14 @@
         [A2] 0.125em
         [G2] 0.125em
         [F2 lh-bottom stave-bottom] 0.125em
-        [E2] 0.125em
+        [E2 barcount] 0.125em
         [D2] 0.125em
         [C2] 0.125em
+        [B1] 0.125em
         [A1] 0.125em
         [G1] 0.125em
         [F1] 0.125em
         [E1] 0.125em
-        [D1] 0.125em
         [min];
 
     /*background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -14.5 1 29" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
@@ -115,6 +115,13 @@
 [data-part^="rh"][data-pitch^="F"][data-pitch$="3"]  { grid-row: rh-F3; }
 [data-part^="rh"][data-pitch^="E"][data-pitch$="3"]  { grid-row: rh-E3; }
 [data-part^="rh"][data-pitch^="D"][data-pitch$="3"]  { grid-row: rh-D3; }
+/* Fudge */
+[data-part^="alto"][data-pitch^="B"][data-pitch$="3"]  { grid-row: rh-B3; }
+[data-part^="alto"][data-pitch^="A"][data-pitch$="3"]  { grid-row: rh-A3; }
+[data-part^="alto"][data-pitch^="G"][data-pitch$="3"]  { grid-row: rh-G3; }
+[data-part^="alto"][data-pitch^="F"][data-pitch$="3"]  { grid-row: rh-F3; }
+[data-part^="alto"][data-pitch^="E"][data-pitch$="3"]  { grid-row: rh-E3; }
+[data-part^="alto"][data-pitch^="D"][data-pitch$="3"]  { grid-row: rh-D3; }
 
 [data-part^="lh"][data-pitch^="B"][data-pitch$="4"]  { grid-row: lh-B4; }
 [data-part^="lh"][data-pitch^="A"][data-pitch$="4"]  { grid-row: lh-A4; }
@@ -123,6 +130,18 @@
 [data-part^="lh"][data-pitch^="E"][data-pitch$="4"]  { grid-row: lh-E4; }
 [data-part^="lh"][data-pitch^="D"][data-pitch$="4"]  { grid-row: lh-D4; }
 [data-part^="lh"][data-pitch^="C"][data-pitch$="4"]  { grid-row: lh-C4; }
+/* Fudge */
+[data-part^="tenor"][data-pitch^="B"][data-pitch$="4"]  { grid-row: lh-B4; }
+[data-part^="tenor"][data-pitch^="A"][data-pitch$="4"]  { grid-row: lh-A4; }
+[data-part^="tenor"][data-pitch^="G"][data-pitch$="4"]  { grid-row: lh-G4; }
+[data-part^="tenor"][data-pitch^="F"][data-pitch$="4"]  { grid-row: lh-F4; }
+[data-part^="tenor"][data-pitch^="E"][data-pitch$="4"]  { grid-row: lh-E4; }
+[data-part^="tenor"][data-pitch^="D"][data-pitch$="4"]  { grid-row: lh-D4; }
+[data-part^="tenor"][data-pitch^="C"][data-pitch$="4"]  { grid-row: lh-C4; }
+
+[data-part^="bass"][data-pitch^="E"][data-pitch$="4"]  { grid-row: lh-E4; }
+[data-part^="bass"][data-pitch^="D"][data-pitch$="4"]  { grid-row: lh-D4; }
+[data-part^="bass"][data-pitch^="C"][data-pitch$="4"]  { grid-row: lh-C4; }
 
 /* Map unoctaved pitches to stave lines for key signatures. */
 .piano-stave > [data-pitch="F♭"] { grid-row-start: F4; }
@@ -155,7 +174,16 @@
 .piano-stave > [data-pitch="E♯"][data-part="lh"] { grid-row-start: E3; }
 .piano-stave > [data-pitch="B♯"][data-part="lh"] { grid-row-start: B2; }
 
+/* TODO: The distinction between part and staff and vertical range really needs sorting out */
+.piano-stave > .up-ledge[data-part="soprano"],
+.piano-stave > .up-ledge[data-part="alto"],
 .piano-stave > .up-ledge[data-part="rh"]   { grid-row-end:   rh-top; }
+.piano-stave > .down-ledge[data-part="soprano"],
+.piano-stave > .down-ledge[data-part="alto"],
 .piano-stave > .down-ledge[data-part="rh"] { grid-row-start: rh-bottom; }
+.piano-stave > .up-ledge[data-part="tenor"],
+.piano-stave > .up-ledge[data-part="bass"],
 .piano-stave > .up-ledge[data-part="lh"]   { grid-row-end:   lh-top; }
+.piano-stave > .down-ledge[data-part="tenor"],
+.piano-stave > .down-ledge[data-part="bass"],
 .piano-stave > .down-ledge[data-part="lh"] { grid-row-start: lh-bottom; }

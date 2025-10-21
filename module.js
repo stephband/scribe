@@ -1,5 +1,5 @@
 
-import render from './modules/render.js';
+/*import render from './modules/render.js';
 import config from './modules/config.js';
 
 export default class Scribe {
@@ -10,4 +10,4 @@ export default class Scribe {
     static from(sequence) {
         return new Scribe(sequence);
     }
-}
+}*/

@@ -18,53 +18,53 @@ A simple piano grand stave which brute splits treble from bass at Bb3.
 export default class PianoStave extends Stave {
     type = 'piano';
     rows = [
-        "rh-A6",
-        "rh-G6",
-        "rh-F6",
-        "rh-E6",
-        "rh-D6",
-        "rh-C6",
-        "rh-B5",
-        "rh-A5",
-        "rh-G5",
-        "rh-F5",
-        "rh-E5",
-        "rh-D5",
-        "rh-C5",
-        "rh-B4",
-        "rh-A4",
-        "rh-G4",
-        "rh-F4",
-        "rh-E4",
-        "rh-D4",
-        "rh-C4",
-        "rh-B3",
-        "lh-B4 rh-A3",
-        "lh-A4 rh-G3",
-        "lh-G4 rh-F3",
-        "lh-F4 rh-E3",
-        "lh-E4 rh-D3",
-        "lh-D4",
-        "lh-C4",
-        "lh-B3",
-        "lh-A3",
-        "lh-G3",
-        "lh-F3",
-        "lh-E3",
-        "lh-D3",
-        "lh-C3",
-        "lh-B2",
-        "lh-A2",
-        "lh-G2",
-        "lh-F2",
-        "lh-E2",
-        "lh-D2",
-        "lh-C2",
-        "lh-B1",
-        "lh-A1",
-        "lh-G1",
-        "lh-F1",
-        "lh-E1"
+        "rh-A6 soprano-A6 alto-A6",
+        "rh-G6 soprano-G6 alto-G6",
+        "rh-F6 soprano-F6 alto-F6",
+        "rh-E6 soprano-E6 alto-E6",
+        "rh-D6 soprano-D6 alto-D6",
+        "rh-C6 soprano-C6 alto-C6",
+        "rh-B5 soprano-B5 alto-B5",
+        "rh-A5 soprano-A5 alto-A5",
+        "rh-G5 soprano-G5 alto-G5",
+        "rh-F5 soprano-F5 alto-F5",
+        "rh-E5 soprano-E5 alto-E5",
+        "rh-D5 soprano-D5 alto-D5",
+        "rh-C5 soprano-C5 alto-C5",
+        "rh-B4 soprano-B4 alto-B4",
+        "rh-A4 soprano-A4 alto-A4",
+        "rh-G4 soprano-G4 alto-G4",
+        "rh-F4 soprano-F4 alto-F4",
+        "rh-E4 soprano-E4 alto-E4",
+        "rh-D4 soprano-D4 alto-D4",
+        "rh-C4 soprano-C4 alto-C4",
+        "rh-B3 soprano-B3 alto-B3",
+        "lh-B4 rh-A3 soprano-A3 alto-A3 tenor-B4 bass-B4",
+        "lh-A4 rh-G3 soprano-G3 alto-G3 tenor-A4 bass-A4",
+        "lh-G4 rh-F3 soprano-F3 alto-F3 tenor-G4 bass-G4",
+        "lh-F4 rh-E3 soprano-E3 alto-E3 tenor-F4 bass-F4",
+        "lh-E4 rh-D3 soprano-D3 alto-D3 tenor-E4 bass-E4",
+        "lh-D4 tenor-D4 bass-D4",
+        "lh-C4 tenor-C4 bass-C4",
+        "lh-B3 tenor-B3 bass-B3",
+        "lh-A3 tenor-A3 bass-A3",
+        "lh-G3 tenor-G3 bass-G3",
+        "lh-F3 tenor-F3 bass-F3",
+        "lh-E3 tenor-E3 bass-E3",
+        "lh-D3 tenor-D3 bass-D3",
+        "lh-C3 tenor-C3 bass-C3",
+        "lh-B2 tenor-B2 bass-B2",
+        "lh-A2 tenor-A2 bass-A2",
+        "lh-G2 tenor-G2 bass-G2",
+        "lh-F2 tenor-F2 bass-F2",
+        "lh-E2 tenor-E2 bass-E2",
+        "lh-D2 tenor-D2 bass-D2",
+        "lh-C2 tenor-C2 bass-C2",
+        "lh-B1 tenor-B1 bass-B1",
+        "lh-A1 tenor-A1 bass-A1",
+        "lh-G1 tenor-G1 bass-G1",
+        "lh-F1 tenor-F1 bass-F1",
+        "lh-E1 tenor-E1 bass-E1"
     ];
 
     getTimeSigHTML(numerator, denominator, eventId) {
@@ -78,61 +78,54 @@ export default class PianoStave extends Stave {
         </span>`;
     }
 
+    staffs = ['bass', 'treble'];
+
     parts = [{}, {
-        name:        'lh',
-        topRow:      29,
-        centerRow:   33,
-        bottomRow:   38,
-        topPitch:    'A3',
-        centerPitch: 'D3',
-        bottomPitch: 'G2',
-        stemup: false,
-        DEFAULT: true
+        name:      'lh',
+        staff:     'bass',
+        topRow:    29,
+        centerRow: 33,
+        bottomRow: 38
     }, {
-        name:        'rh',
-        topRow:      9,
-        centerRow:   13,
-        bottomRow:   18,
-        topPitch:    'F5',
-        centerPitch: 'B4',
-        bottomPitch: 'E4',
-        DEFAULT: true
+        name:      'rh',
+        staff:     'treble',
+        topRow:    9,
+        centerRow: 13,
+        bottomRow: 18
     }, {
-        name:        'soprano',
-        topRow:      9,
-        centerRow:   13,
-        bottomRow:   18,
-        topPitch:    'F5',
-        centerPitch: 'B4',
-        bottomPitch: 'E4',
-        stemup: true
+        // Voice range C4-C6
+        name:      'soprano',
+        staff:     'treble',
+        topRow:    9,
+        centerRow: 13,
+        bottomRow: 18,
+        stemup:    true
     }, {
-        name:        'alto',
-        topRow:      9,
-        centerRow:   13,
-        bottomRow:   18,
-        topPitch:    'F5',
-        centerPitch: 'B4',
-        bottomPitch: 'E4',
-        stemup: false
+        // Voice range G3-G5
+        name:      'alto',
+        staff:     'treble',
+        topRow:    9,
+        centerRow: 13,
+        bottomRow: 18,
+        stemup:    false
     }, {
-        name:        'tenor',
-        topRow:      29,
-        centerRow:   33,
-        bottomRow:   38,
-        topPitch:    'A3',
-        centerPitch: 'D3',
-        bottomPitch: 'G2',
-        stemup: true
+        // Voice range C3-C5
+        // Tenor Sax range Ab2-Eb5
+        name:      'tenor',
+        staff:     'bass',
+        topRow:    29,
+        centerRow: 33,
+        bottomRow: 38,
+        stemup:    true
     }, {
-        name:        'bass',
-        topRow:      29,
-        centerRow:   33,
-        bottomRow:   38,
-        topPitch:    'A3',
-        centerPitch: 'D3',
-        bottomPitch: 'G2',
-        stemup: false
+        // Voice range E2-C4
+        // Trombone range E2-Bb4
+        name:      'bass',
+        staff:     'bass',
+        topRow:    29,
+        centerRow: 33,
+        bottomRow: 38,
+        stemup:    false
     }];
 
     /**
@@ -180,14 +173,14 @@ export default class PianoStave extends Stave {
 
     createSignatureSymbols(key) {
         const symbols = [{
-            type: 'clef',
-            clef: 'treble',
-            part: this.parts[1],
+            type:  'clef',
+            clef:  'treble',
+            part:  this.parts[1],
             stave: this
         }, {
-            type: 'clef',
-            clef: 'bass',
-            part: this.parts[2],
+            type:  'clef',
+            clef:  'bass',
+            part:  this.parts[2],
             stave: this
         }];
 
