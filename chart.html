@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- This document is a basic web page set up as a music chart -->
+    <title>My Tune</title>
+
+    <meta charset="utf-8" />
+    <meta name="author" content="" />
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width" />
+
+    <!-- Import <scribe-music> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/stephband/scribe@0.4/build/scribe-music/element.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/stephband/scribe@0.4/fonts/bravura.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/gh/stephband/scribe@0.4/build/scribe-music/element.js"></script>
+
+    <!-- CSS Style rules -->
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        body {
+            font-family: system-ui, sans-serif;
+            margin: 0;
+            padding: 1em 1.5em;
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            font-family: JazzText, cursive;
+            display: grid;
+            grid-template-columns: [part] auto [title] 1fr [credits] auto;
+            align-items: last baseline;
+        }
+
+        header > * {
+            margin: 0;
+            grid-row: 1;
+        }
+
+        header > .title {
+            font-size: 3em;
+            grid-column: title;
+            justify-self: center;
+            text-align: center;
+        }
+
+        header > .part {
+            grid-column: part;
+            justify-self: start;
+            text-align: left;
+        }
+
+        header > .credit {
+            grid-column: credit;
+            justify-self: end;
+            text-align: right;
+        }
+
+        footer {
+            font-size: 0.625em;
+            margin-top: auto;
+        }
+
+        a {
+            color: oklch(0.6 0.27 1.54);
+            text-decoration: none;
+        }
+
+        scribe-music {
+            font-family: Bravura, BravuraText;
+        }
+    </style>
+
+    <!-- Sequence JSON for render by scribe-music -->
+    <script type="application/json" id="my-tune">{
+        "events": [
+            [0, "key", "D"],
+            [0, "meter", 4, 1],
+            [0, "note", "D4",  0.1, 1],
+            [1, "note", "F#4", 0.1, 1],
+            [2, "note", "A4",  0.1, 1],
+            [3, "note", "C#5", 0.1, 1],
+            [4, "note", "B4",  0.1, 1],
+            [5, "note", "A4",  0.1, 1],
+            [6, "note", "F#4", 0.1, 1],
+            [7, "note", "D4",  0.1, 1],
+            [8, "note", "E4",  0.1, 1],
+            [9, "note", "G4",  0.1, 1],
+            [10,"note", "B4",  0.1, 1],
+            [11,"note", "D5",  0.1, 1],
+            [12,"note", "C#5", 0.1, 1]
+        ]
+    }</script>
+</head>
+<body>
+    <header>
+        <h1 class="title">My Tune</h1>
+        <p class="part">Piano</p>
+        <p class="credit">Composed by My Name</p>
+    </header>
+
+    <scribe-music clef="piano" src="#my-tune"></scribe-music>
+
+    <footer>
+        <p>&copy;2025 My Name. <a href="https://stephen.band/scribe/">Scribe</a> by Stephen Band.</p>
+    </footer>
+</body>
+</html>

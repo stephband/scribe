@@ -1,9 +1,6 @@
 [submodule "fonts/Petaluma"]
 	path = fonts/Petaluma
 	url = https://github.com/steinbergmedia/petaluma.git
-[submodule "fonts/Bravura"]
-	path = fonts/Bravura
-	url = https://github.com/steinbergmedia/bravura.git
 [submodule "fonts/MartianMono"]
 	path = fonts/MartianMono
 	url = https://github.com/evilmartians/mono.git
