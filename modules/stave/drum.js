@@ -84,27 +84,21 @@ export default class DrumStave extends Stave {
             html ;
     }
 
-    parts = {
-        drums: {
-            name:   'drums',
-            // Does not need name, existence is enough actually
-            beam:   'drums-beam',
-            stemup: false
-        },
-
-        cymbals: {
-            name:   'cymbals',
-            // Does not need name, existence is enough actually
-            beam:   'cymbals-beam',
-            stemup: true
-        }
-    };
+    parts = [{
+        name:   'drums',
+        beam:   'drums-beam',
+        stemup: false
+    }, {
+        name:   'cymbals',
+        beam:   'cymbals-beam',
+        stemup: true
+    }];
 
     getPart(number) {
         // Split drums stave into drums and cymbals parts
         return [35, 36, 37, 38, 40, 41, 43, 44, 45, 47, 50].includes(toNoteNumber(number)) ?
-            this.parts.drums :
-            this.parts.cymbals ;
+            this.parts[0] :
+            this.parts[1] ;
     }
 
     /**

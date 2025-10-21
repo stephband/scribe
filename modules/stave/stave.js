@@ -107,11 +107,7 @@ export default class Stave {
     **/
 
     parts = [{
-        name:   'main',
-        top:    'stave-top',
-        center: 'stave-center',
-        bottom: 'stave-bottom',
-        DEFAULT: true
+        name: 'main'
     }];
 
     getPart(number) {

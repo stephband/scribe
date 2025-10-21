@@ -25,18 +25,4 @@ export default class PercussionStave extends DrumStave {
     get topPitch() {
         return this.rows[8];
     }
-
-    parts = {
-        drums: {
-            name: 'drums',
-            beam: 'drums-beam',
-            stemup: false
-        },
-
-        cymbals: {
-            name: 'cymbals',
-            beam: 'cymbals-beam',
-            stemup: true
-        }
-    };
 }

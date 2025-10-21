@@ -442,7 +442,7 @@ function createRests(symbols, durations, bar, stave, part, beat, tobeat) {
 
 /* Accidentals */
 
-function createAccidental(part, accidentals, beat, note, /*distance,*/ cluster) {
+function createAccidental(part, accidentals, beat, note, clump, cluster) {
     const { pitch, event, row } = note;
     const acci =
         rsharp.test(pitch) ? 1 :
@@ -464,9 +464,11 @@ function createAccidental(part, accidentals, beat, note, /*distance,*/ cluster) 
         beat,
         pitch,
         row,
+        // An index of overlapping accidentals
+        clump,
+        // Whether the corresponding note head is on the wrong side of its stem
         cluster,
         part,
-        //distance,
         value: acci || 0
     };
 }
@@ -487,7 +489,15 @@ function getAccidentalAboveRowAtBeat(symbols, beat, maxRow) {
 }
 
 function createAccidentals(symbols, bar, part, accidentals, beat, notes) {
-    let n = -1, note, accidental, above;
+    let n = -1, clump = 0, note, accidental, above;
+
+    // This only looks for clusters within the current part – but its a start
+    const cluster = !!notes.find((note) => note.stemup ?
+        // Stem up, bottom not should not be clustered
+        note.clusterup % 2 === 1 :
+        // Stem down, top note cannot be clustered
+        note.clusterdown % 2 === 1
+    );
 
     while (note = notes[++n]) {
         // If event started before this bar we don't require an accidental
@@ -496,8 +506,15 @@ function createAccidentals(symbols, bar, part, accidentals, beat, notes) {
         // Find existing accidental above this one
         above = getAccidentalAboveRowAtBeat(symbols, beat, note.row);
 
+        // Is any new accidental part of a clump
+        clump = above && above.row - note.row < 6 ?
+            above.cluster === cluster ?
+                above.clump + 1 :
+                0 :
+            0 ;
+
         // Create accidental symbol
-        accidental = createAccidental(part, accidentals, beat, note, above && above.row - note.row < 6 ? above.cluster + 1 : 0);
+        accidental = createAccidental(part, accidentals, beat, note, clump, cluster);
 
         // Push it into symbols
         if (accidental) symbols.push(accidental);

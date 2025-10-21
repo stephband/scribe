@@ -1,3 +1,4 @@
+import matches from 'fn/matches.js';
 import nothing from 'fn/nothing.js';
 import { toRootName, toRootNumber } from 'midi/note.js';
 import toStopBeat from './event/to-stop-beat.js';
@@ -203,14 +204,6 @@ export function createBar(count, beat, duration, divisor, stave, key, events, pa
         }
     }
 
-    // Get the key scale from keyname. This scale is not a true
-    // 'scale' in an internal-data sense as it may not begin with a 0, but it
-    // maps naturals to accidentals when compared against the C scale. Remember
-    // keynumber is on a continuous scale of fourths, so multiply by 7 semitones
-    // to get chromatic number relative to C.
-    //const scale = toKeyScale(key * 7);
-//console.log('KEY', toRootName(key), 'scale', scale);
-
     // Populate accidentals with key signature sharps and flats
     const accidentals = updateAccidentals({}, key);
 
@@ -230,24 +223,24 @@ export function createBar(count, beat, duration, divisor, stave, key, events, pa
     createBarSymbols(symbols, bar, stave, key, accidentals, events, config);
 
     // Populate symbols with parts
-    let index, p = 0;
-    const staffs = stave.staffs ? stave.staffs.slice() : [];
-    for (index in stave.parts) {
-        const part   = stave.parts[index];
-        const events = parts[part.name] || [];
+    const centers = stave.parts.reduce((centers, part) => part.centerRow ?
+        centers.add(part.centerRow) :
+        centers,
+        new Set()
+    );
+    if (!centers.size) centers.add(stave.centerRow);
 
-        // Dont render anything if this is not a default part and there are no events
-        if (!events.length) continue;
-        const s = staffs.indexOf(part.staff);
-        if (s) staffs.splice(s, 1);
+    let part;
+    for (part of stave.parts) {
+        const events = parts[part.name];
+        if (!events || !events.length) continue;
+        centers.delete(part.centerRow || stave.centerRow);
         createPart(symbols, bar, stave, key, accidentals, part, events, settings);
-        ++p;
     }
 
-    let n = staffs.length;
-    while (n--) {
-        console.log('Stave has not rendered onto staff, render rests');
-        createPart(symbols, bar, stave, key, accidentals, stave.parts[n + 1], [], settings);
+    let center;
+    for (center of centers) {
+        createPart(symbols, bar, stave, key, accidentals, { centerRow: center }, [], settings);
     }
 
     return bar;
