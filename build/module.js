@@ -1,5 +1,5 @@
 /* Scribe 
    0.4.18
-   By Stephen */
+   By stephband */
 
 //# sourceMappingURL=module.js.map
