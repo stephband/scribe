@@ -346,8 +346,9 @@ in their duration span. */
 
 .bar > .lyric {
 	justify-self: start;
-	margin-left:  0;
-	margin-right: 0.25em;
+    /* Move words away from descending stalks just a fraction */
+	margin-left:  0.125em;
+	margin-right: 0.125em;
     grid-column-end: span calc(round(nearest, var(--duration) * var(--columns-per-beat)));
 }
 
