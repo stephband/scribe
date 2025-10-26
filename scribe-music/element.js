@@ -10,8 +10,7 @@ import requestData       from '../modules/request-data.js';
 import parseSource       from '../modules/parse.js';
 import { timesigToMeter, meterToTimesig } from '../modules/timesig.js';
 import Stave             from '../modules/stave.js';
-import { renderBeam }    from '../modules/beam.js';
-import render            from '../modules/render.js';
+import { renderElements, renderStyle, renderDOM } from '../modules/render.js';
 import config            from '../modules/config.js';
 
 const assign = Object.assign;
@@ -26,11 +25,7 @@ const stylefns   = [];
 /* Element resizing */
 const resizes = new ResizeObserver((entries) => {
     for (const entry of entries) {
-        // Render beams
-        getInternals(entry.target)
-        .shadowRoot
-        .querySelectorAll('.beam')
-        .forEach(renderBeam);
+        renderDOM(getInternals(entry.target).shadowRoot);
     }
 });
 
@@ -85,7 +80,9 @@ export default define(element('scribe-music', {
 
         // Listens to changes
         return Signal.frame(() => {
-            const elements = internals.data.value && render(
+            if (!internals.data.value) return;
+
+            const elements = internals.data.value && renderElements(
                 // Events from data
                 internals.data.value,
                 // Excludes is an array
@@ -114,24 +111,14 @@ export default define(element('scribe-music', {
             shadow.append.apply(shadow, elements);
             if (!elements) return;
 
-            // Apply padding and clef/signature column size
-            // TODO: sort out a better system of getting the key signature metrics in here.
-            // One that isn't going to rely on the font so much?
-            // Wrap bars again, in bars element? Does it actually help, don't we need
-            // position absolute in order for the overflow hiding to work?
-            const side   = shadow.getElementById('side');
-            const key    = side.dataset.key;
-            const counts = {'G♭': 6, 'C♯': 5, 'D♭': 5, 'G♯': 4, 'A♭': 4, 'D♯': 3, 'E♭': 3, 'B♭': 2, 'F':  1, 'C':  0, 'G':  1, 'D':  2, 'A':  3, 'E':  4, 'B':  5, 'F♯': 6};
-            const count  = counts[key];
-//console.log('COUn', key, count);
-            const style  = create('style', ':host { --signature-width: ' + (2.25 + count * 0.625 + 0.625).toFixed(4) + 'em; }');
+            const style = create('style', `:host { ${ renderStyle(shadow) } }`);
             shadow.appendChild(style);
 
             // Render beams
-            shadow.querySelectorAll('.beam').forEach(renderBeam);
+            renderDOM(shadow);
 
             // DEBUG
-
+/*
             // Does bar contain symbols that add up to longer than bar?
             if (internals.debug.value) {
                 shadow.querySelectorAll('.bar').forEach((bar) => {
@@ -156,6 +143,7 @@ export default define(element('scribe-music', {
                     }
                 });
             }
+*/
         });
     },
 

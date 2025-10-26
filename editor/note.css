@@ -1,0 +1,29 @@
+.scribe {
+    cursor: crosshair;
+}
+
+[data-event],
+[data-events] {
+    cursor: pointer;
+}
+
+.bar *,
+.stave * {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.chord {
+    /* Allow the chord, but not its huge content, to be selected */
+    pointer-events: none;
+    position: relative;
+}
+
+.chord::before {
+    /* Hit zone for chord */
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 1em;
+    pointer-events: auto;
+}

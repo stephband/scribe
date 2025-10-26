@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- This document is a basic web page set up as a music chart -->
+    <title>My Tune</title>
+
+    <meta charset="utf-8" />
+    <meta name="author" content="" />
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width" />
+
+    <!--script type="importmap">{
+        "imports": {
+            "dom/":      "https://cdn.jsdelivr.net/gh/stephband/dom@1.4.1/modules/",
+            "fn/":       "https://cdn.jsdelivr.net/gh/stephband/fn@1.5.x/modules/",
+            "bolt/":     "https://cdn.jsdelivr.net/gh/stephband/bolt-2@1.0.1/",
+            "midi/":     "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.1/modules/",
+            "sequence/": "https://cdn.jsdelivr.net/gh/soundio/sequence@0.1.5/modules/"
+        },
+
+        "lock": false
+    }</script-->
+
+    <script type="importmap">{
+        "imports": {
+            "dom/":      "/dom/modules/",
+            "fn/":       "/fn/modules/",
+            "bolt/":     "/bolt/",
+            "midi/":     "/midi/modules/",
+            "sequence/": "/sequence/modules/"
+        }
+    }</script>
+
+    <!-- Import <scribe-music> -->
+    <script type="module" src="https://cdn.jsdelivr.net/gh/stephband/scribe@0.4.x/build/scribe-music/element.js"></script>
+
+    <!-- CSS Style rules -->
+    <style>
+        @import './module.css';
+
+        @import './editor/note.css';
+        @import './editor/head.css';
+        @import './editor/selected.css';
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        body {
+            font-family: system-ui, sans-serif;
+            margin: 0;
+            padding: 1em 1.5em;
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            font-family: JazzText, cursive;
+            display: grid;
+            grid-template-columns: [part] auto [title] 1fr [credits] auto;
+            align-items: last baseline;
+        }
+
+        header > * {
+            margin: 0;
+            grid-row: 1;
+        }
+
+        header > .title {
+            font-size: 3em;
+            grid-column: title;
+            justify-self: center;
+            text-align: center;
+        }
+
+        header > .part {
+            grid-column: part;
+            justify-self: start;
+            text-align: left;
+        }
+
+        header > .credit {
+            grid-column: credit;
+            justify-self: end;
+            text-align: right;
+        }
+
+        footer {
+            font-size: 0.625em;
+            margin-top: auto;
+        }
+
+        a {
+            color: oklch(0.6 0.27 1.54);
+            text-decoration: none;
+        }
+
+        /* For a more classic look... */
+        /*@import 'https://cdn.jsdelivr.net/gh/stephband/scribe@0.4.x/build/fonts/bravura.css';
+
+        header {
+          font-family: BravuraText, serif;
+        }
+
+        scribe-music {
+          font-family: Bravura, BravuraText;
+        }*/
+    </style>
+
+    <script type="module">
+        import Sequence from 'sequence/sequence.js';
+        import pointer from './editor/pointer.js';
+        import { renderElements, renderStyle, renderDOM } from './modules/render.js';
+        import data from './data/blue-in-green.json' with { type: 'json' };
+
+        const sequence = Sequence.from(data);
+        const elements = renderElements(
+            // Events from data
+            sequence,
+            // Excludes is an array
+            [],
+            // Clef is a string
+            'treble',
+            // Key name
+            '',
+            // Create an initial [0, "meter", ...] event
+            ''
+        );
+
+        const root = document.querySelector('.scribe');
+
+        root.append.apply(root, elements);
+        root.setAttribute('style', renderStyle(root));
+        renderDOM(root);
+
+        const state = { sequence };
+        pointer(root, state);
+    </script>
+</head>
+<body>
+    <header>
+        <h1 class="title">My Tune</h1>
+        <p class="part">Piano</p>
+        <p class="credit">Composed by My Name</p>
+    </header>
+
+    <main class="scribe"></main>
+
+    <footer>
+        <p>&copy;2025 My Name. <a href="https://stephen.band/scribe/">Scribe</a> by Stephen Band.</p>
+    </footer>
+</body>
+</html>

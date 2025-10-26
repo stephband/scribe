@@ -1,13 +1,4 @@
 
-/*import render from './modules/render.js';
-import config from './modules/config.js';
+import render from './modules/render.js';
 
-export default class Scribe {
-    constructor(sequence) {
-
-    }
-
-    static from(sequence) {
-        return new Scribe(sequence);
-    }
-}*/
+export { render };

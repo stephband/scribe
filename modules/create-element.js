@@ -1,13 +1,15 @@
-import get from 'fn/get.js';
-import overload from 'fn/overload.js';
-import create from 'dom/create.js';
-import { toNoteNumber } from 'midi/note.js';
-import * as glyphs from "./glyphs.js";
-import { chordGlyphs } from "./glyphs.js";
+import get               from 'fn/get.js';
+import overload          from 'fn/overload.js';
+import create            from 'dom/create.js';
+import { toNoteNumber }  from 'midi/note.js';
+import * as glyphs       from "./glyphs.js";
+import { chordGlyphs }   from "./glyphs.js";
 import { rflat, rsharp } from './pitch.js';
-import { identify } from './event.js';
+import { identify }      from './event.js';
 import { beamThickness } from './beam.js';
-import map from './object/map.js';
+import map               from './object/map.js';
+import truncate          from './number/truncate.js';
+
 
 const abs = Math.abs;
 
@@ -53,8 +55,11 @@ const restGlyphs = {
 
 const rextensionparts = /^(∆|-|ø|7|\+)?(alt|sus|maj|min|dim|aug)?(.*)$/;
 
-function truncate(number) {
-    return number.toFixed(4).replace(/\.?0+$/, '');
+
+function toEventIds(symbol) {
+    let n = -1, string = '';
+    while (symbol[++n]) string += (string ? ' ' : '') + identify(symbol[n].event);
+    return string;
 }
 
 export default overload(get('type'), {
@@ -85,8 +90,8 @@ export default overload(get('type'), {
                 + '</span>'
                 + (symbol.bass ? glyphs.chordBassSlash + '<span class="chord-bass">' + symbol.bass + '</span>' : ''),
             data: {
-                beat:     truncate(symbol.beat),
-                duration: truncate(symbol.duration),
+                beat:     truncate(4, symbol.beat),
+                duration: truncate(4, symbol.duration),
                 event:    identify(symbol.event)
             }
         });
@@ -112,19 +117,14 @@ export default overload(get('type'), {
         html: symbol.text,
         class: "barcount"
     }),
-/*
-    doublebarline: (symbol) => create('span', {
-        html: glyphs.barLine + '&#x200A;' + glyphs.barLine,
-        class: "barline"
-    }),
-*/
+
     text: (symbol) => create('span', {
         class: "lyric",
         part:  "lyric",
         html: symbol.value,
         data: {
-            beat:     truncate(symbol.beat),
-            duration: truncate(symbol.duration),
+            beat:     truncate(4, symbol.beat),
+            duration: truncate(4, symbol.duration),
             event:  identify(symbol.event)
         }
     }),
@@ -133,7 +133,7 @@ export default overload(get('type'), {
         class: (acciClasses[symbol.value] || 'acci') + (symbol.clump ? ' acci-' + symbol.clump : '' ) + (symbol.cluster ? ' acci-cluster' : ''),
         html: acciGlyphs[symbol.value] || glyphs.acciNatural,
         data: {
-            beat:  symbol.beat && truncate(symbol.beat),
+            beat:  symbol.beat && truncate(4, symbol.beat),
             pitch: symbol.pitch,
             part:  symbol.part.name,
             event: symbol.event && identify(symbol.event)
@@ -156,7 +156,7 @@ export default overload(get('type'), {
             <line x1="0" x2="5" y1="8" y2="8"></line>
         `,
         data: {
-            beat:  truncate(symbol.beat),
+            beat:  truncate(4, symbol.beat),
             pitch: symbol.pitch,
             part:  symbol.part.name
         }
@@ -179,9 +179,9 @@ export default overload(get('type'), {
         html:  symbol.stave.getNoteHTML(symbol.pitch, symbol.dynamic, symbol.duration),
         title: `${ symbol.pitch } (${ toNoteNumber(symbol.pitch) })`,
         data: {
-            beat:     truncate(symbol.beat),
+            beat:     truncate(4, symbol.beat),
             pitch:    symbol.pitch,
-            duration: truncate(symbol.duration),
+            duration: truncate(4, symbol.duration),
             part:     symbol.part.name,
             beam:     symbol.beam && symbol.beam.id,
             event:    identify(symbol.event)
@@ -195,13 +195,14 @@ export default overload(get('type'), {
         class: `${ symbol.stemup ? 'up' : 'down' }-beam beam`,
         viewBox: `0 ${ (symbol.range < 0 ? symbol.range : 0) - 0.5 } 1 ${ abs(symbol.range) + 1 }`,
         preserveAspectRatio: "none",
-        style: `--duration: ${ truncate(symbol.duration) }; ${ symbol.y ? '--translate-y:' + (symbol.y * 0.125) + ';' : '' } height: ${ (abs(symbol.range) + beamThickness) * 0.125 }em; align-self: ${ symbol.range < 0 ? 'end' : 'start' };`,
+        style: `--duration: ${ truncate(4, symbol.duration) }; ${ symbol.y ? '--translate-y:' + (symbol.y * 0.125) + ';' : '' } height: ${ (abs(symbol.range) + beamThickness) * 0.125 }em; align-self: ${ symbol.range < 0 ? 'end' : 'start' };`,
         html: `<path class="beam-path" d="M0,${ -0.5 * beamThickness } L1,${ symbol.range - 0.5 * beamThickness } L1,${ symbol.range + 0.5 * beamThickness } L0,${ 0.5 * beamThickness } Z"></path>`,
         data: {
-            beat:     truncate(symbol.beat),
+            beat:     truncate(4, symbol.beat),
             pitch:    symbol.pitch,
             part:     symbol.part.name,
-            beam:     symbol.id
+            beam:     symbol.id,
+            events:   toEventIds(symbol)
         }
     }),
 
@@ -211,9 +212,9 @@ export default overload(get('type'), {
         preserveAspectRatio: "none",
         html: `<path class="tie-path" transform="translate(0, 0.14) scale(1 0.6)" d="M0.979174733,0.0124875307 C0.650597814,1.1195554 0.135029714,1.00095361 0.0165376402,0.026468657 C0.0113570514,0.0135475362 0.00253387291,0.00218807553 0,0 C0.0977526897,1.29523004 0.656681642,1.37089992 1,2.43111793e-08 C0.991901367,2.43111797e-08 0.987703936,0.01248753 0.979174733,0.0124875307 Z M0.979174733,0.0124875307"></path>`,
         data: {
-            beat:     truncate(symbol.beat),
+            beat:     truncate(4, symbol.beat),
             pitch:    symbol.pitch,
-            duration: truncate(symbol.duration),
+            duration: truncate(4, symbol.duration),
             part:     symbol.part.name
         }
     }),
@@ -222,9 +223,9 @@ export default overload(get('type'), {
         class: `${ symbol.stemup ? 'up' : 'down' }-tuplet tuplet`,
         html: glyphs['tuplet' + symbol.divisor],
         data: {
-            beat:     truncate(symbol.beat),
+            beat:     truncate(4, symbol.beat),
             pitch:    symbol.pitch,
-            duration: truncate(symbol.duration),
+            duration: truncate(4, symbol.duration),
             divisor:  symbol.divisor,
             // Rhythm is a binary number
             rhythm:   symbol.rhythm.toString(2).split('').reverse().join(''),
@@ -239,9 +240,9 @@ export default overload(get('type'), {
             || glyphs['rest' + (symbol.duration + '').replace('.', '')]
             || '',
         data: {
-            beat:     truncate(symbol.beat),
+            beat:     truncate(4, symbol.beat),
             pitch:    symbol.pitch,
-            duration: truncate(symbol.duration),
+            duration: truncate(4, symbol.duration),
             part:     symbol.part.name
         },
         'aria-hidden': 'true'

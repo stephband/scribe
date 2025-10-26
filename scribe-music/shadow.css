@@ -1,6 +1,4 @@
 
-@import './elements/host.css';
-
 @import '../attributes/data-beat.css';
 @import '../attributes/data-divisor.css';
 @import '../attributes/data-duration.css';
@@ -22,9 +20,30 @@
 @import '../classes/lyric.css';
 @import '../classes/svg.css';
 
-:host {
+:host *,
+:host ::before,
+:host ::after,
+.scribe *,
+.scribe ::before,
+.scribe ::after {
+    box-sizing: border-box;
+    background-repeat: no-repeat;
+}
+
+:host,
+.scribe {
+    container-type: inline-size;
+    container-name: host;
+
     font-family: Jazz, JazzText, sans-serif;
 
+    /* Metrics */
+    --bar-line-size:     0.05rem;
+    /* Compress column-gap below 800px viewport to fit more information
+       on mobile (0.08vw becomes 0.04em at 800px viewport). */
+    --bar-column-gap:    min(0.08vw, 0.02em);
+    --bar-padding-left:  0.3em;
+    --bar-padding-right: 0.15em;
     /* Width of standard black note head */
     --head-width:        0.3375;
     /* Space around accidentals */
@@ -36,11 +55,17 @@
     /* Space around rests */
     --rest-margin-left:  0;
     --rest-margin-right: 0;
-
+    /* Default height of stem */
+    --stem-height:     1;
+    /* Thickness of stem */
+    --stem-width:      0.033;
+    /* Alignment of root of stem relative to baseline */
+    --stem-align-up:   0.03;
+    --stem-align-down: -0.04;
+    /* Width of signature column */
     --signature-width: 2em;
 
     position: relative;
-
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
@@ -62,26 +87,19 @@
     padding-left: calc(var(--signature-width) - 1px);
 }
 
+:host::after,
+.scribe::after {
+    /* Control spread of last line */
+    content: '';
+    flex: 6 1;
+}
+
 :host([clef="drum"]) {
     --signature-width: 1em;
 }
 
-:host .note {
-    /* Default height of stem */
-    --stem-height:     1;
-    /* Thickness of stem */
-    --stem-width:      0.033;
-    /* Alignment of root of stem relative to baseline */
-    --stem-align-up:   0.03;
-    --stem-align-down: -0.04;
-}
-
-:host .head[data-glyph="headX"] {
-    --stem-align-up:   0.18;
-    --stem-align-down: -0.14;
-}
-
-:host > .side {
+:host > .side,
+.scribe > .side {
     position: absolute;
     top: 0;
     bottm: 0;
@@ -113,7 +131,8 @@
     display: block;
 }
 
-:host > .bar {
+:host > .bar,
+.scribe > .bar {
     flex: 1 0 min-content;
     /* Make bar lines overlap */
     margin-left: calc(-1 * var(--bar-line-size, 1px));
@@ -127,11 +146,6 @@ svg {
 
 svg > path {
     fill: inherit;
-}
-
-.side-bar {
-    max-height: cqh;
-    width: 2.125em;
 }
 
 

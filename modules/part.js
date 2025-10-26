@@ -180,9 +180,9 @@ function closeBeam(symbols, stave, part, beam) {
     // If there is only notes on start beat of beam, no beam needed
     if (!beam[n]) return symbols;
 
-    const startBeat  = beam[0].beat;
-    const stopBeat   = last(beam).beat;
-    const duration   = stopBeat - startBeat;
+    const startBeat = beam[0].beat;
+    const stopBeat  = last(beam).beat;
+    const duration  = stopBeat - startBeat;
     const stemup = part.stemup === undefined ?
         // Calculate stem up or down
         stemupFromPitches(stave, part, map(get('pitch'), beam)) :
@@ -469,6 +469,7 @@ function createAccidental(part, accidentals, beat, note, clump, cluster) {
         // Whether the corresponding note head is on the wrong side of its stem
         cluster,
         part,
+        event,
         value: acci || 0
     };
 }

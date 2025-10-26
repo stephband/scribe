@@ -1,5 +1,5 @@
 
-/* Font must be imported outside the shadow DOM */
+/* Font must be imported outside the shadow DOM for Safari's sake */
 @import '../fonts/jazz.css';
 
 scribe-music {

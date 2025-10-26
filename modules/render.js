@@ -1,12 +1,17 @@
 
 import create           from 'dom/create.js';
+import px               from 'dom/parse-length.js';
+import rect             from 'dom/rect.js';
 import { toRootName }   from 'midi/note.js';
 import SequenceIterator from 'sequence/sequence-iterator.js';
-import Stave            from '../modules/stave.js';
+import Stave            from './stave.js';
 import createBars       from './create-bars.js';
 import createElement    from './create-element.js';
+import { renderBeam }   from './beam.js';
 import * as glyphs      from './glyphs.js';
+import truncate         from './number/truncate.js';
 import config           from './config.js';
+
 
 function isInitialMeterEvent(event) {
     return event[0] <= 0 && event[1] === 'meter';
@@ -43,7 +48,7 @@ text = glyphs.textNoteShort
     + glyphs.note05Up
 */
 
-export default function render(data, excludes, clef, keyname, meter, duration = Infinity, transpose = 0, displace = 0, settings = config) {
+export function renderElements(data, excludes, clef, keyname, meter, duration = Infinity, transpose = 0, displace = 0, settings = config) {
     const events = data.events;
 
     // If events contains no initial meter and meter is set, insert a meter event
@@ -95,4 +100,51 @@ export default function render(data, excludes, clef, keyname, meter, duration = 
     // Return array of elements
     elements.unshift(column);
     return elements;
+}
+
+
+const heads = [
+    create('span', glyphs.head1),
+    create('span', glyphs.head2),
+    create('span', glyphs.head4)
+];
+
+function remove(element) {
+    element.remove();
+}
+
+export function renderStyle(root) {
+    // Measure head widths
+
+    root.append.apply(root, heads);
+
+    const computed   = window.getComputedStyle(root);
+    const fontSize   = px(computed.fontSize);
+    const head1Width = rect(heads[0]).width;
+    const head2Width = rect(heads[1]).width;
+    const head3Width = rect(heads[2]).width;
+
+    heads.forEach(remove);
+
+    // Calculate clef and key signature width
+
+    // TODO: sort out a better system of getting the key signature metrics in here.
+    // One that isn't going to rely on the font so much? Or maybe include the
+    // metrics in the font stylesheet?
+    const side   = root.querySelector('.side');
+    const key    = side.dataset.key;
+    const counts = {'G♭': 6, 'C♯': 5, 'D♭': 5, 'G♯': 4, 'A♭': 4, 'D♯': 3, 'E♭': 3, 'B♭': 2, 'F':  1, 'C':  0, 'G':  1, 'D':  2, 'A':  3, 'E':  4, 'B':  5, 'F♯': 6};
+    const count  = counts[key];
+
+    return `
+        --head-1-size: ${ truncate(6, head1Width / fontSize) };
+        --head-2-size: ${ truncate(6, head2Width / fontSize) };
+        --head-4-size: ${ truncate(6, head3Width / fontSize) };
+        --signature-width: ${ (2.25 + count * 0.625 + 0.625).toFixed(4) }em;
+    `;
+}
+
+export function renderDOM(element) {
+    // Render beams
+    element.querySelectorAll('.beam').forEach(renderBeam);
 }

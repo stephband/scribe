@@ -1,0 +1,16 @@
+
+.selected {
+    color: limegreen;
+}
+
+.select-rectangle {
+    position: fixed;
+    pointer-events: none;
+    z-index: 100;
+    border: 1px dotted color(display-p3 0 0.725 0.672);
+}
+
+.no-select {
+    -webkit-user-select: none;
+    user-select: none;
+}
