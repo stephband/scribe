@@ -56,6 +56,8 @@
             min-height: 100%;
             display: flex;
             flex-direction: column;
+
+            --zone-duration: 0.5;
         }
 
         header {
@@ -148,14 +150,35 @@
 
             root.querySelectorAll('.bar').forEach((bar) => {
                 bar.append(
-                    create('div', { class: 'zone', data: { beat: 0,   duration: 0.5 } }),
-                    create('div', { class: 'zone', data: { beat: 0.5, duration: 0.5 } }),
-                    create('div', { class: 'zone', data: { beat: 1,   duration: 0.5 } }),
-                    create('div', { class: 'zone', data: { beat: 1.5, duration: 0.5 } }),
-                    create('div', { class: 'zone', data: { beat: 2,   duration: 0.5 } }),
-                    create('div', { class: 'zone', data: { beat: 2.5, duration: 0.5 } }),
-                    create('div', { class: 'zone', data: { beat: 3,   duration: 0.5 } }),
-                    create('div', { class: 'zone', data: { beat: 3.5, duration: 0.5 } })
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' }),
+                    create('div', { class: 'zone' })
                 );
             });
         });
@@ -164,7 +187,7 @@
         pointer(root, state);
     </script>
 </head>
-<body>
+<body data-zone="0.5">
     <header>
         <h1 class="title">My Tune</h1>
         <p class="part">Piano</p>
@@ -174,6 +197,15 @@
     <main class="scribe scribe-regular"></main>
 
     <footer>
+        <kbd title="1">1</kbd>
+        <kbd title="2">2</kbd>
+        <kbd title="3">3</kbd>
+        <kbd title="4">4</kbd>
+        <kbd title="5">5</kbd>
+        <kbd title="6">6</kbd>
+        <kbd title="7">7</kbd>
+        <kbd title="8">8</kbd>
+        <kbd title="9">9</kbd>
         <p>&copy;2025 My Name. <a href="https://stephen.band/scribe/">Scribe</a> by Stephen Band.</p>
     </footer>
 </body>

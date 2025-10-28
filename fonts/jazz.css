@@ -17,7 +17,7 @@
     font-family: Jazz, JazzText;
 
     /* Width of standard black note head */
-    --head-width: 0.3375;
+    --head-1-size: 0.3375;
 }
 
 .scribe-jazz .note {
