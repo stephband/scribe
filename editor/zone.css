@@ -33,35 +33,22 @@
 [data-zone^="0.5"]   { --zone-duration: 0.5; }
 [data-zone^="1"]     { --zone-duration: 1; }
 
-[data-zone^="0.11"]  .bar[data-duration="4"] > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { display: none !important; }
-[data-zone^="0.125"] .bar[data-duration="4"] > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { display: none !important; }
-[data-zone^="0.14"]  .bar[data-duration="4"] > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { display: none !important; }
-[data-zone^="0.16"]  .bar[data-duration="4"] > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { display: none !important; }
-[data-zone^="0.2"]   .bar[data-duration="4"] > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { display: none !important; }
-[data-zone^="0.25"]  .bar[data-duration="4"] > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { display: none !important; }
-[data-zone^="0.33"]  .bar[data-duration="4"] > .zone + * + * + * + * + * + * + * + * + * + * + * + .zone { display: none !important; }
-[data-zone^="0.5"]   .bar[data-duration="4"] > .zone + * + * + * + * + * + * + * + .zone { display: none !important; }
-[data-zone^="1"]     .bar[data-duration="4"] > .zone + * + * + * + .zone { display: none !important; }
-
-[data-zone^="0.11"]  kbd[title="9"],
-[data-zone^="0.125"] kbd[title="8"],
-[data-zone^="0.14"]  kbd[title="7"],
-[data-zone^="0.16"]  kbd[title="6"],
-[data-zone^="0.2"]   kbd[title="5"],
-[data-zone^="0.25"]  kbd[title="4"],
-[data-zone^="0.33"]  kbd[title="3"],
-[data-zone^="0.5"]   kbd[title="2"],
-[data-zone^="1"]     kbd[title="1"] {
-    color: white;
-    background: color(display-p3 0 0.651 1);
-}
+[data-zone^="0.11"] .bar[data-duration="4"] > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { display: none !important; }
+[data-zone="0.125"] .bar[data-duration="4"] > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { display: none !important; }
+[data-zone^="0.14"] .bar[data-duration="4"] > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { display: none !important; }
+[data-zone^="0.16"] .bar[data-duration="4"] > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { display: none !important; }
+[data-zone="0.2"]   .bar[data-duration="4"] > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { display: none !important; }
+[data-zone="0.25"]  .bar[data-duration="4"] > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { display: none !important; }
+[data-zone^="0.33"] .bar[data-duration="4"] > .zone + * + * + * + * + * + * + * + * + * + * + * + .zone { display: none !important; }
+[data-zone="0.5"]   .bar[data-duration="4"] > .zone + * + * + * + * + * + * + * + .zone { display: none !important; }
+[data-zone="1"]     .bar[data-duration="4"] > .zone + * + * + * + .zone { display: none !important; }
 
 .bar > .zone {
     justify-self: stretch;
     grid-column-start: calc(var(--column-beat-0) + round(var(--beat) * var(--columns-per-beat)));
     grid-column-end: span calc(round(var(--columns-per-beat) * var(--zone-duration)));
-    margin-left: 0;
-    margin-right: 0;
+    margin-left: -0.125em;
+    margin-right: 0.1875em;
     /*min-width: calc(1em * var(--head-1-size));*/
 }
 
@@ -89,13 +76,103 @@
 .bar > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { --beat: calc(21 * var(--zone-duration)); }
 .bar > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { --beat: calc(22 * var(--zone-duration)); }
 .bar > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { --beat: calc(23 * var(--zone-duration)); }
-.bar > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { --beat: calc(24 * var(--zone-duration)); }/*
-.bar > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { --beat: calc(9 * var(--zone-duration)); }
-.bar > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { --beat: calc(10 * var(--zone-duration)); }
-.bar > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { --beat: calc(11 * var(--zone-duration)); }
-.bar > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { --beat: calc(12 * var(--zone-duration)); }
-.bar > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { --beat: calc(13 * var(--zone-duration)); }
-.bar > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { --beat: calc(14 * var(--zone-duration)); }
-.bar > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { --beat: calc(15 * var(--zone-duration)); }
-.bar > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { --beat: calc(16 * var(--zone-duration)); }
-.bar > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { --beat: calc(17 * var(--zone-duration)); }*/
+.bar > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { --beat: calc(24 * var(--zone-duration)); }
+.bar > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { --beat: calc(25 * var(--zone-duration)); }
+.bar > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { --beat: calc(26 * var(--zone-duration)); }
+.bar > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { --beat: calc(27 * var(--zone-duration)); }
+.bar > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { --beat: calc(28 * var(--zone-duration)); }
+.bar > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { --beat: calc(29 * var(--zone-duration)); }
+.bar > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { --beat: calc(30 * var(--zone-duration)); }
+.bar > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { --beat: calc(31 * var(--zone-duration)); }
+.bar > .zone + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + * + .zone { --beat: calc(32 * var(--zone-duration)); }
+
+
+/* Keyboard */
+
+[data-zone^="0.11"] kbd[title="9"],
+[data-zone="0.125"] kbd[title="8"],
+[data-zone^="0.14"] kbd[title="7"],
+[data-zone^="0.16"] kbd[title="6"],
+[data-zone="0.2"]   kbd[title="5"],
+[data-zone="0.25"]  kbd[title="4"],
+[data-zone^="0.33"] kbd[title="3"],
+[data-zone="0.5"]   kbd[title="2"],
+[data-zone="1"]     kbd[title="1"],
+.shift-key .shift-kbd,
+.ctrl-key .ctrl-kbd,
+.alt-key .alt-kbd,
+.meta-key .meta-kbd {
+    color: white;
+    background: color(display-p3 0 0.651 1);
+}
+
+* > .keyboard {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.keyboard {
+    font-size: 1rem;
+    display: grid;
+    column-gap: 0.125em;
+    row-gap: 0.125em;
+    grid-template-columns: repeat(44, 0.85416em);
+    grid-template-rows: repeat(10, 1.3125em);
+    justify-content: center;
+    justify-items: stretch;
+    align-items: stretch;
+}
+
+.keyboard > kbd {
+    grid-column-end: span 3;
+    grid-row-end: span 2;
+}
+
+.keyboard > .backspace-kbd { grid-column-end: span 5; }
+.keyboard > .tab-kbd       { grid-column-end: span 4; }
+.keyboard > .enter-kbd     { grid-column-end: span 4; }
+.keyboard > .lock-kbd      { grid-column-end: span 5; }
+.keyboard > .l-shift-kbd   { grid-column-end: span 4; }
+.keyboard > .r-shift-kbd   { grid-column-end: span 7; }
+.keyboard > .meta-kbd      { grid-column-end: span 4; }
+.keyboard > .space-kbd     { grid-column-end: span 15; }
+.keyboard > .up-kbd        { grid-column-start: 39; grid-row-end: span 1; line-height: 1.3125em; }
+.keyboard > .down-kbd      { grid-column-start: 39; grid-row-end: span 1; line-height: 1.3125em; }
+.keyboard > .right-kbd     { grid-column-start: 42; grid-row-start: 9; }
+
+kbd {
+    width: 100%;
+    height: 100%;
+    line-height: 2.8125rem;
+    text-align: center;
+    background-color: rgba(0,0,0,0.08);
+    border-radius: 0.25em;
+    overflow: hidden;
+}
+
+kbd[title] {
+    background-color: rgba(0,0,0,0.2);
+}
+
+.light-kbd,
+.dark-kbd {
+    font-family: JazzText, Jazz;
+    font-size: 1.3333em;
+    font-weight: 300;
+}
+
+.light-kbd[title] {
+    color: white;
+}
+
+.dark-kbd[title] {
+    color: black;
+}
+
+kbd > .glyph {
+    font-size: 1.5em;
+    line-height: 1em;
+    vertical-align: 0.4em;
+}
+
+

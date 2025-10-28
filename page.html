@@ -119,17 +119,17 @@
         import Sequence from 'sequence/sequence.js';
         import create   from 'dom/create.js';
         import pointer  from './editor/pointer.js';
-        import keys     from './editor/keys.js';
+        import keyboard from './editor/keys.js';
         import { renderElements, renderStyle, renderDOM } from './modules/render.js';
         import data from './data/so-what.json' with { type: 'json' };
 
         const root     = document.querySelector('.scribe');
-        const sequence = Sequence.from(data);
+        const sequence = Data.of(Sequence.from(data));
 
         Signal.frame(() => {
             const elements = renderElements(
                 // Events from data
-                Data.of(sequence),
+                sequence,
                 // Excludes is an array
                 [],
                 // Clef is a string
@@ -140,7 +140,7 @@
                 ''
             );
 
-            const y = Data.of(sequence.events).length;
+            const y = sequence.events.length;
 
             root.innerHTML = '';
             root.append.apply(root, elements);
@@ -150,40 +150,49 @@
 
             root.querySelectorAll('.bar').forEach((bar) => {
                 bar.append(
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' }),
-                    create('div', { class: 'zone' })
+                    create('div', { class: 'zone', data: { index: 0 } }),
+                    create('div', { class: 'zone', data: { index: 1 } }),
+                    create('div', { class: 'zone', data: { index: 2 } }),
+                    create('div', { class: 'zone', data: { index: 3 } }),
+                    create('div', { class: 'zone', data: { index: 4 } }),
+                    create('div', { class: 'zone', data: { index: 5 } }),
+                    create('div', { class: 'zone', data: { index: 6 } }),
+                    create('div', { class: 'zone', data: { index: 7 } }),
+                    create('div', { class: 'zone', data: { index: 8 } }),
+                    create('div', { class: 'zone', data: { index: 9 } }),
+                    create('div', { class: 'zone', data: { index: 10 } }),
+                    create('div', { class: 'zone', data: { index: 11 } }),
+                    create('div', { class: 'zone', data: { index: 12 } }),
+                    create('div', { class: 'zone', data: { index: 13 } }),
+                    create('div', { class: 'zone', data: { index: 14 } }),
+                    create('div', { class: 'zone', data: { index: 15 } }),
+                    create('div', { class: 'zone', data: { index: 16 } }),
+                    create('div', { class: 'zone', data: { index: 17 } }),
+                    create('div', { class: 'zone', data: { index: 18 } }),
+                    create('div', { class: 'zone', data: { index: 19 } }),
+                    create('div', { class: 'zone', data: { index: 20 } }),
+                    create('div', { class: 'zone', data: { index: 21 } }),
+                    create('div', { class: 'zone', data: { index: 22 } }),
+                    create('div', { class: 'zone', data: { index: 23 } }),
+                    create('div', { class: 'zone', data: { index: 24 } }),
+                    create('div', { class: 'zone', data: { index: 25 } }),
+                    create('div', { class: 'zone', data: { index: 26 } }),
+                    create('div', { class: 'zone', data: { index: 27 } }),
+                    create('div', { class: 'zone', data: { index: 28 } }),
+                    create('div', { class: 'zone', data: { index: 29 } }),
+                    create('div', { class: 'zone', data: { index: 30 } }),
+                    create('div', { class: 'zone', data: { index: 31 } })
                 );
             });
         });
 
-        const state = { sequence: Data.of(sequence) };
+        const state = {
+            sequence: sequence,
+            // Zone and cursos duration
+            duration: 0.5
+        };
+
+        keyboard(root, state);
         pointer(root, state);
     </script>
 </head>
@@ -197,16 +206,78 @@
     <main class="scribe scribe-regular"></main>
 
     <footer>
-        <kbd title="1">1</kbd>
-        <kbd title="2">2</kbd>
-        <kbd title="3">3</kbd>
-        <kbd title="4">4</kbd>
-        <kbd title="5">5</kbd>
-        <kbd title="6">6</kbd>
-        <kbd title="7">7</kbd>
-        <kbd title="8">8</kbd>
-        <kbd title="9">9</kbd>
-        <p>&copy;2025 My Name. <a href="https://stephen.band/scribe/">Scribe</a> by Stephen Band.</p>
+        <div class="keyboard">
+            <kbd></kbd>
+            <kbd title="1"><span class="glyph" style="font-family: Jazz, JazzText;">&#xE1D6;</span></kbd>
+            <kbd title="2"><span class="glyph" style="font-family: Jazz, JazzText;">&#xE1D8;</span></kbd>
+            <kbd title="3"><span class="glyph" style="font-family: Jazz, JazzText;">&#xE883;</span><span class="glyph" style="font-family: Jazz, JazzText;">&#xE1D8;</span></kbd>
+            <kbd title="4"><span class="glyph" style="font-family: Jazz, JazzText;">&#xE1DA;</span></kbd>
+            <kbd title="5"><span class="glyph" style="font-family: Jazz, JazzText;">&#xE885;</span><span class="glyph" style="font-family: Jazz, JazzText;">&#xE1DA;</span></kbd>
+            <kbd title="6"><span class="glyph" style="font-family: Jazz, JazzText;">&#xE883;</span><span class="glyph" style="font-family: Jazz, JazzText;">&#xE1DA;</span></kbd>
+            <kbd title="7"><span class="glyph" style="font-family: Jazz, JazzText;">&#xE887;</span><span class="glyph" style="font-family: Jazz, JazzText;">&#xE1DA;</span></kbd>
+            <kbd title="8"><span class="glyph" style="font-family: Jazz, JazzText;">&#xE1DC;</span></kbd>
+            <kbd title="9"><span class="glyph" style="font-family: Jazz, JazzText;">&#xE889;</span><span class="glyph" style="font-family: Jazz, JazzText;">&#xE1DC;</span></kbd>
+            <kbd></kbd>
+            <kbd></kbd>
+            <kbd></kbd>
+            <kbd class="backspace-kbd"></kbd>
+
+            <kbd class="tab-kbd"></kbd>
+            <kbd></kbd>
+            <kbd></kbd>
+            <kbd></kbd>
+            <kbd></kbd>
+            <kbd></kbd>
+            <kbd></kbd>
+            <kbd></kbd>
+            <kbd></kbd>
+            <kbd></kbd>
+            <kbd></kbd>
+            <kbd></kbd>
+            <kbd></kbd>
+            <kbd class="enter-kbd"></kbd>
+
+            <kbd class="lock-kbd"></kbd>
+            <kbd title="" class="dark-kbd">A&#xED60;</kbd>
+            <kbd title="" class="dark-kbd">B&#xED60;</kbd>
+            <kbd></kbd>
+            <kbd title="" class="dark-kbd">C&#xED62;</kbd>
+            <kbd title="" class="dark-kbd">E&#xED60;</kbd>
+            <kbd></kbd>
+            <kbd title="" class="dark-kbd">F&#xED62;</kbd>
+            <kbd title="" class="dark-kbd">A&#xED60;</kbd>
+            <kbd title="" class="dark-kbd">B&#xED60;</kbd>
+            <kbd></kbd>
+            <kbd title="" class="dark-kbd">C&#xED62;</kbd>
+            <kbd></kbd>
+
+            <kbd class="l-shift-kbd shift-kbd"></kbd>
+            <kbd title="`" class="light-kbd">G</kbd>
+            <kbd title="z" class="light-kbd">A</kbd>
+            <kbd title="x" class="light-kbd">B</kbd>
+            <kbd title="c" class="light-kbd">C<small>4</small></kbd>
+            <kbd title="v" class="light-kbd">D</kbd>
+            <kbd title="b" class="light-kbd">E</kbd>
+            <kbd title="n" class="light-kbd">F</kbd>
+            <kbd title="m" class="light-kbd">G</kbd>
+            <kbd title="," class="light-kbd">A</kbd>
+            <kbd title="." class="light-kbd">B</kbd>
+            <kbd title="/" class="light-kbd">C<small>5</small></kbd>
+            <kbd class="r-shift-kbd shift-kbd"></kbd>
+
+            <kbd></kbd>
+            <kbd class="ctrl-kbd"></kbd>
+            <kbd class="alt-kbd"></kbd>
+            <kbd class="meta-kbd" title="+">+</kbd>
+            <kbd class="space-kbd"></kbd>
+            <kbd class="meta-kbd" title="+">+</kbd>
+            <kbd class="alt-kbd"></kbd>
+            <kbd class="left-kbd">◂</kbd>
+            <kbd class="up-kbd">▴</kbd>
+            <kbd class="down-kbd">▾</kbd>
+            <kbd class="right-kbd">▸</kbd>
+        </div>
+        <!--p>&copy;2025 My Name. <a href="https://stephen.band/scribe/">Scribe</a> by Stephen Band.</p-->
     </footer>
 </body>
 </html>

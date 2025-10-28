@@ -62,8 +62,8 @@ export default function pointer(root, state) {
             const row      = round((e.clientY - box.top) / rowSize);
             //const pitch    = stave.pitchAtRow(row);
             const barbeat  = Number(zone.closest('.bar').dataset.beat)
-            const beat     = Number(zone.dataset.beat);
-            const duration = Number(zone.dataset.duration);
+            const beat     = Number(zone.dataset.index) * state.duration;
+            const duration = state.duration;
             const event    = sequence.create(barbeat + beat, 'note', 'G4', 0.1, duration);
 
             // Clear selection
@@ -77,7 +77,8 @@ export default function pointer(root, state) {
                 type: 'add',
                 pageX: e.pageX,
                 pageY: e.pageY,
-                duration
+                duration,
+                transpose: 0
             };
 
             /*
@@ -281,14 +282,28 @@ events({ type: 'pointermove', device: 'mouse pen touch' }, document)
 .each(overload(() => action && action.type, {
     add: (e) => {
         const x = e.pageX - action.pageX;
-        //const y = e.pageY - action.pageY;
+        const y = e.pageY - action.pageY;
+
+console.log(x, y);
+
         // Move x
         const b = round((x / beatSize) / grain) * grain;
 
         // Beat has changed
         if (b !== action.duration) {
-            durateEvents(b - action.beats, Data.of(selection));
+//            durateEvents(b - action.beats, Data.of(selection));
             action.duration = b;
+        }
+
+        // Move y
+        const rows = -1 * y / rowSize;
+        const t    = round(rows * 12 / 7);
+console.log(t, selection[0]);
+        // Transpose has changed
+        if (t !== action.transpose) {
+            let i = -1, event;
+            while (event = selection[++i]) transpose(t - action.transpose, Data.of(event));
+            action.transpose = t;
         }
     },
 
