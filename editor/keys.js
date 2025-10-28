@@ -2,7 +2,8 @@
 import delegate from 'dom/delegate.js';
 import events   from 'dom/events.js';
 import keyboard from 'dom/keyboard.js';
-import { select, deselect, clear } from './selection.js';
+import { moveEvents, transposeEvents, durateEvents } from './actions.js';
+import { selection, select, deselect, clear } from './selection.js';
 
 
 let timer;
@@ -25,10 +26,18 @@ function updateNoteEvent(event) {
 
 
 
-keyboard({
+export default keyboard({
+    'shift:down': (e) => document.body.classList.add('shift-key'),
+    'shift:up':   (e) => document.body.classList.remove('shift-key'),
+    'alt:down':   (e) => document.body.classList.add('alt-key'),
+    'alt:up':     (e) => document.body.classList.remove('alt-key'),
+    'ctrl:down':  (e) => document.body.classList.add('ctrl-key'),
+    'ctrl:up':    (e) => document.body.classList.remove('ctrl-key'),
+    'meta:down':  (e) => document.body.classList.add('meta-key'),
+    'meta:up':    (e) => document.body.classList.remove('meta-key'),
     // TODO: I'm doing this wrong. We want to map by key position,
     // not character name
-    'backquote:down':   (e) => addNoteEvent('G3',  1),
+/*    'backquote:down':   (e) => addNoteEvent('G3',  1),
     'backquote:up':     (e) => stopTimer(),
     'A:down':           (e) => addNoteEvent('Ab3', 1),
     'A:up':             (e) => stopTimer(),
@@ -66,12 +75,13 @@ keyboard({
     'slash:up':         (e) => stopTimer(),
     'quote:down':       (e) => addNoteEvent('C#5', 1),
     'quote:up':         (e) => stopTimer(),
-    'up:down':          (e) => moveSelectionPitch(stave, 1),
-    'down:down':        (e) => moveSelectionPitch(stave, -1),
-    'left:down':        (e) => moveSelectionBeat(-editDuration),
-    'right:down':       (e) => moveSelectionBeat(editDuration),
-    'shift-left:down':  (e) => moveSelectionDuration(-editDuration),
-    'shift-right:down': (e) => moveSelectionDuration(editDuration),
-    'backspace:down':   (e) => deleteSelection()
-}, body);
+*/
+    'down:down':        (e) => transposeEvents(-1, selection),
+    'up:down':          (e) => transposeEvents(1, selection),
+    'left:down':        (e) => moveEvents(-0.5, selection),
+    'right:down':       (e) => moveEvents(0.5, selection),
+    'shift-left:down':  (e) => durateEvents(-0.5, selection),
+    'shift-right:down': (e) => durateEvents(0.5, selection),
+/*    'backspace:down':   (e) => deleteSelection()*/
+}, document.body);
 

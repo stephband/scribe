@@ -1,8 +1,4 @@
 
-.selected {
-    color: limegreen;
-}
-
 .select-rectangle {
     position: fixed;
     pointer-events: none;

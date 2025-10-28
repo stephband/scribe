@@ -1,0 +1,32 @@
+.zone {
+    display: none;
+    cursor: crosshair;
+    position: relative;
+    /*background-color: rgba(80,80,80,0.06);*/
+    border-radius: 0.25em;
+}
+
+.shift-key .zone,
+.meta-key .zone {
+    display: block;
+}
+
+.meta-key .zone {
+    cursor: copy;
+}
+
+.meta-key .zone:hover {
+    background-color: rgba(60,160,60,0.12);
+}
+
+.stave > .zone {
+    grid-row: min / max;
+}
+
+.bar > .zone {
+    justify-self: stretch;
+    grid-column-end: span calc(round(var(--columns-per-beat) * var(--duration)));
+    margin-left: 0;
+    margin-right: 0;
+    /*min-width: calc(1em * var(--head-width));*/
+}

@@ -151,56 +151,57 @@ svg > path {
 
 /* Regular layout */
 
-:host([layout="regular"]) > .bar { min-width: 34cqw; } /* 2 bars */
+:host([layout="regular"]) > .bar,
+.scribe-regular > .bar { min-width: 34cqw; } /* 2 bars */
 
-@container host (width > 10em)   { :host([layout="regular"]) > .bar[data-duration^="1"] { min-width: 21cqw; } } /* 4 bars */
-@container host (width > 15em)   { :host([layout="regular"]) > .bar[data-duration^="1"] { min-width: 15cqw; } } /* 6 bars */
-@container host (width > 20em)   { :host([layout="regular"]) > .bar[data-duration^="1"] { min-width: 12cqw; } } /* 8 bars */
-@container host (width > 25em)   { :host([layout="regular"]) > .bar[data-duration^="1"] { min-width: 10cqw; } } /* 10 bars */
-@container host (width > 30em)   { :host([layout="regular"]) > .bar[data-duration^="1"] { min-width: 8cqw;  } } /* 12 bars */
-@container host (width > 45em)   { :host([layout="regular"]) > .bar[data-duration^="1"] { min-width: 7cqw;  } } /* 14 bars */
-@container host (width > 60em)   { :host([layout="regular"]) > .bar[data-duration^="1"] { min-width: 6cqw;  } } /* 16 bars */
+@container host (width > 10em)   { :host([layout="regular"]) > .bar[data-duration^="1"], .scribe-regular > .bar[data-duration^="1"] { min-width: 21cqw; } } /* 4 bars */
+@container host (width > 15em)   { :host([layout="regular"]) > .bar[data-duration^="1"], .scribe-regular > .bar[data-duration^="1"] { min-width: 15cqw; } } /* 6 bars */
+@container host (width > 20em)   { :host([layout="regular"]) > .bar[data-duration^="1"], .scribe-regular > .bar[data-duration^="1"] { min-width: 12cqw; } } /* 8 bars */
+@container host (width > 25em)   { :host([layout="regular"]) > .bar[data-duration^="1"], .scribe-regular > .bar[data-duration^="1"] { min-width: 10cqw; } } /* 10 bars */
+@container host (width > 30em)   { :host([layout="regular"]) > .bar[data-duration^="1"], .scribe-regular > .bar[data-duration^="1"] { min-width: 8cqw;  } } /* 12 bars */
+@container host (width > 45em)   { :host([layout="regular"]) > .bar[data-duration^="1"], .scribe-regular > .bar[data-duration^="1"] { min-width: 7cqw;  } } /* 14 bars */
+@container host (width > 60em)   { :host([layout="regular"]) > .bar[data-duration^="1"], .scribe-regular > .bar[data-duration^="1"] { min-width: 6cqw;  } } /* 16 bars */
 
-@container host (width > 15em)   { :host([layout="regular"]) > .bar[data-duration^="2"] { min-width: 26cqw; } } /* 3 bars */
-@container host (width > 20em)   { :host([layout="regular"]) > .bar[data-duration^="2"] { min-width: 21cqw; } } /* 4 bars */
-@container host (width > 30em)   { :host([layout="regular"]) > .bar[data-duration^="2"] { min-width: 15cqw; } } /* 6 bars */
-@container host (width > 40em)   { :host([layout="regular"]) > .bar[data-duration^="2"] { min-width: 12cqw; } } /* 8 bars */
-@container host (width > 50em)   { :host([layout="regular"]) > .bar[data-duration^="2"] { min-width: 10cqw; } } /* 10 bars */
-@container host (width > 60em)   { :host([layout="regular"]) > .bar[data-duration^="2"] { min-width: 8cqw;  } } /* 12 bars */
-@container host (width > 70em)   { :host([layout="regular"]) > .bar[data-duration^="2"] { min-width: 7cqw;  } } /* 14 bars */
-@container host (width > 80em)   { :host([layout="regular"]) > .bar[data-duration^="2"] { min-width: 6cqw;  } } /* 16 bars */
+@container host (width > 15em)   { :host([layout="regular"]) > .bar[data-duration^="2"], .scribe-regular > .bar[data-duration^="2"] { min-width: 26cqw; } } /* 3 bars */
+@container host (width > 20em)   { :host([layout="regular"]) > .bar[data-duration^="2"], .scribe-regular > .bar[data-duration^="2"] { min-width: 21cqw; } } /* 4 bars */
+@container host (width > 30em)   { :host([layout="regular"]) > .bar[data-duration^="2"], .scribe-regular > .bar[data-duration^="2"] { min-width: 15cqw; } } /* 6 bars */
+@container host (width > 40em)   { :host([layout="regular"]) > .bar[data-duration^="2"], .scribe-regular > .bar[data-duration^="2"] { min-width: 12cqw; } } /* 8 bars */
+@container host (width > 50em)   { :host([layout="regular"]) > .bar[data-duration^="2"], .scribe-regular > .bar[data-duration^="2"] { min-width: 10cqw; } } /* 10 bars */
+@container host (width > 60em)   { :host([layout="regular"]) > .bar[data-duration^="2"], .scribe-regular > .bar[data-duration^="2"] { min-width: 8cqw;  } } /* 12 bars */
+@container host (width > 70em)   { :host([layout="regular"]) > .bar[data-duration^="2"], .scribe-regular > .bar[data-duration^="2"] { min-width: 7cqw;  } } /* 14 bars */
+@container host (width > 80em)   { :host([layout="regular"]) > .bar[data-duration^="2"], .scribe-regular > .bar[data-duration^="2"] { min-width: 6cqw;  } } /* 16 bars */
 
-@container host (width > 22.5em) { :host([layout="regular"]) > .bar[data-duration^="3"] { min-width: 26cqw; } } /* 3 bars */
-@container host (width > 30em)   { :host([layout="regular"]) > .bar[data-duration^="3"] { min-width: 21cqw; } } /* 4 bars */
-@container host (width > 45em)   { :host([layout="regular"]) > .bar[data-duration^="3"] { min-width: 15cqw; } } /* 6 bars */
-@container host (width > 60em)   { :host([layout="regular"]) > .bar[data-duration^="3"] { min-width: 12cqw; } } /* 8 bars */
-@container host (width > 75em)   { :host([layout="regular"]) > .bar[data-duration^="3"] { min-width: 10cqw; } } /* 10 bars */
-@container host (width > 90em)   { :host([layout="regular"]) > .bar[data-duration^="3"] { min-width: 8cqw;  } } /* 12 bars */
-@container host (width > 105em)  { :host([layout="regular"]) > .bar[data-duration^="3"] { min-width: 7cqw;  } } /* 14 bars */
-@container host (width > 120em)  { :host([layout="regular"]) > .bar[data-duration^="3"] { min-width: 6cqw;  } } /* 16 bars */
+@container host (width > 22.5em) { :host([layout="regular"]) > .bar[data-duration^="3"], .scribe-regular > .bar[data-duration^="3"] { min-width: 26cqw; } } /* 3 bars */
+@container host (width > 30em)   { :host([layout="regular"]) > .bar[data-duration^="3"], .scribe-regular > .bar[data-duration^="3"] { min-width: 21cqw; } } /* 4 bars */
+@container host (width > 45em)   { :host([layout="regular"]) > .bar[data-duration^="3"], .scribe-regular > .bar[data-duration^="3"] { min-width: 15cqw; } } /* 6 bars */
+@container host (width > 60em)   { :host([layout="regular"]) > .bar[data-duration^="3"], .scribe-regular > .bar[data-duration^="3"] { min-width: 12cqw; } } /* 8 bars */
+@container host (width > 75em)   { :host([layout="regular"]) > .bar[data-duration^="3"], .scribe-regular > .bar[data-duration^="3"] { min-width: 10cqw; } } /* 10 bars */
+@container host (width > 90em)   { :host([layout="regular"]) > .bar[data-duration^="3"], .scribe-regular > .bar[data-duration^="3"] { min-width: 8cqw;  } } /* 12 bars */
+@container host (width > 105em)  { :host([layout="regular"]) > .bar[data-duration^="3"], .scribe-regular > .bar[data-duration^="3"] { min-width: 7cqw;  } } /* 14 bars */
+@container host (width > 120em)  { :host([layout="regular"]) > .bar[data-duration^="3"], .scribe-regular > .bar[data-duration^="3"] { min-width: 6cqw;  } } /* 16 bars */
 
-@container host (width > 30em)   { :host([layout="regular"]) > .bar[data-duration^="4"] { min-width: 26cqw; } } /* 3 bars */
-@container host (width > 40em)   { :host([layout="regular"]) > .bar[data-duration^="4"] { min-width: 21cqw; } } /* 4 bars */
-@container host (width > 60em)   { :host([layout="regular"]) > .bar[data-duration^="4"] { min-width: 15cqw; } } /* 6 bars */
-@container host (width > 80em)   { :host([layout="regular"]) > .bar[data-duration^="4"] { min-width: 12cqw; } } /* 8 bars */
-@container host (width > 100em)  { :host([layout="regular"]) > .bar[data-duration^="4"] { min-width: 10cqw; } } /* 10 bars */
-@container host (width > 120em)  { :host([layout="regular"]) > .bar[data-duration^="4"] { min-width: 8cqw;  } } /* 12 bars */
-@container host (width > 140em)  { :host([layout="regular"]) > .bar[data-duration^="1"] { min-width: 7cqw;  } } /* 14 bars */
-@container host (width > 160em)  { :host([layout="regular"]) > .bar[data-duration^="1"] { min-width: 6cqw;  } } /* 16 bars */
+@container host (width > 30em)   { :host([layout="regular"]) > .bar[data-duration^="4"], .scribe-regular > .bar[data-duration^="4"] { min-width: 26cqw; } } /* 3 bars */
+@container host (width > 40em)   { :host([layout="regular"]) > .bar[data-duration^="4"], .scribe-regular > .bar[data-duration^="4"] { min-width: 21cqw; } } /* 4 bars */
+@container host (width > 60em)   { :host([layout="regular"]) > .bar[data-duration^="4"], .scribe-regular > .bar[data-duration^="4"] { min-width: 15cqw; } } /* 6 bars */
+@container host (width > 80em)   { :host([layout="regular"]) > .bar[data-duration^="4"], .scribe-regular > .bar[data-duration^="4"] { min-width: 12cqw; } } /* 8 bars */
+@container host (width > 100em)  { :host([layout="regular"]) > .bar[data-duration^="4"], .scribe-regular > .bar[data-duration^="4"] { min-width: 10cqw; } } /* 10 bars */
+@container host (width > 120em)  { :host([layout="regular"]) > .bar[data-duration^="4"], .scribe-regular > .bar[data-duration^="4"] { min-width: 8cqw;  } } /* 12 bars */
+@container host (width > 140em)  { :host([layout="regular"]) > .bar[data-duration^="1"], .scribe-regular > .bar[data-duration^="1"] { min-width: 7cqw;  } } /* 14 bars */
+@container host (width > 160em)  { :host([layout="regular"]) > .bar[data-duration^="1"], .scribe-regular > .bar[data-duration^="1"] { min-width: 6cqw;  } } /* 16 bars */
 
-@container host (width > 50em)   { :host([layout="regular"]) > .bar[data-duration^="5"] { min-width: 21cqw; } } /* 4 bars */
-@container host (width > 75em)   { :host([layout="regular"]) > .bar[data-duration^="5"] { min-width: 15cqw; } } /* 6 bars */
-@container host (width > 100em)  { :host([layout="regular"]) > .bar[data-duration^="5"] { min-width: 12cqw; } } /* 8 bars */
-@container host (width > 125em)  { :host([layout="regular"]) > .bar[data-duration^="5"] { min-width: 10cqw; } } /* 10 bars */
-@container host (width > 150em)  { :host([layout="regular"]) > .bar[data-duration^="5"] { min-width: 8cqw;  } } /* 12 bars */
+@container host (width > 50em)   { :host([layout="regular"]) > .bar[data-duration^="5"], .scribe-regular > .bar[data-duration^="5"] { min-width: 21cqw; } } /* 4 bars */
+@container host (width > 75em)   { :host([layout="regular"]) > .bar[data-duration^="5"], .scribe-regular > .bar[data-duration^="5"] { min-width: 15cqw; } } /* 6 bars */
+@container host (width > 100em)  { :host([layout="regular"]) > .bar[data-duration^="5"], .scribe-regular > .bar[data-duration^="5"] { min-width: 12cqw; } } /* 8 bars */
+@container host (width > 125em)  { :host([layout="regular"]) > .bar[data-duration^="5"], .scribe-regular > .bar[data-duration^="5"] { min-width: 10cqw; } } /* 10 bars */
+@container host (width > 150em)  { :host([layout="regular"]) > .bar[data-duration^="5"], .scribe-regular > .bar[data-duration^="5"] { min-width: 8cqw;  } } /* 12 bars */
 
-@container host (width > 60em)   { :host([layout="regular"]) > .bar[data-duration^="6"] { min-width: 21cqw; } } /* 4 bars */
-@container host (width > 90em)   { :host([layout="regular"]) > .bar[data-duration^="6"] { min-width: 15cqw; } } /* 6 bars */
-@container host (width > 120em)  { :host([layout="regular"]) > .bar[data-duration^="6"] { min-width: 12cqw; } } /* 8 bars */
-@container host (width > 150em)  { :host([layout="regular"]) > .bar[data-duration^="6"] { min-width: 10cqw; } } /* 10 bars */
-@container host (width > 180em)  { :host([layout="regular"]) > .bar[data-duration^="6"] { min-width: 8cqw;  } } /* 12 bars */
+@container host (width > 60em)   { :host([layout="regular"]) > .bar[data-duration^="6"], .scribe-regular > .bar[data-duration^="6"] { min-width: 21cqw; } } /* 4 bars */
+@container host (width > 90em)   { :host([layout="regular"]) > .bar[data-duration^="6"], .scribe-regular > .bar[data-duration^="6"] { min-width: 15cqw; } } /* 6 bars */
+@container host (width > 120em)  { :host([layout="regular"]) > .bar[data-duration^="6"], .scribe-regular > .bar[data-duration^="6"] { min-width: 12cqw; } } /* 8 bars */
+@container host (width > 150em)  { :host([layout="regular"]) > .bar[data-duration^="6"], .scribe-regular > .bar[data-duration^="6"] { min-width: 10cqw; } } /* 10 bars */
+@container host (width > 180em)  { :host([layout="regular"]) > .bar[data-duration^="6"], .scribe-regular > .bar[data-duration^="6"] { min-width: 8cqw;  } } /* 12 bars */
 
-@container host (width > 70em)   { :host([layout="regular"]) > .bar[data-duration^="7"] { min-width: 21cqw; } } /* 4 bars */
-@container host (width > 105em)  { :host([layout="regular"]) > .bar[data-duration^="7"] { min-width: 15cqw; } } /* 6 bars */
-@container host (width > 140em)  { :host([layout="regular"]) > .bar[data-duration^="7"] { min-width: 12cqw; } } /* 8 bars */
-@container host (width > 175em)  { :host([layout="regular"]) > .bar[data-duration^="7"] { min-width: 10cqw; } } /* 10 bars */
+@container host (width > 70em)   { :host([layout="regular"]) > .bar[data-duration^="7"], .scribe-regular > .bar[data-duration^="7"] { min-width: 21cqw; } } /* 4 bars */
+@container host (width > 105em)  { :host([layout="regular"]) > .bar[data-duration^="7"], .scribe-regular > .bar[data-duration^="7"] { min-width: 15cqw; } } /* 6 bars */
+@container host (width > 140em)  { :host([layout="regular"]) > .bar[data-duration^="7"], .scribe-regular > .bar[data-duration^="7"] { min-width: 12cqw; } } /* 8 bars */
+@container host (width > 175em)  { :host([layout="regular"]) > .bar[data-duration^="7"], .scribe-regular > .bar[data-duration^="7"] { min-width: 10cqw; } } /* 10 bars */

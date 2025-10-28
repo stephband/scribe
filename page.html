@@ -31,15 +31,14 @@
         }
     }</script>
 
-    <!-- Import <scribe-music> -->
-    <script type="module" src="https://cdn.jsdelivr.net/gh/stephband/scribe@0.4.x/build/scribe-music/element.js"></script>
-
     <!-- CSS Style rules -->
     <style>
+        @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@1.x/classes/atoms.css';
         @import './module.css';
 
         @import './editor/note.css';
         @import './editor/head.css';
+        @import './editor/zone.css';
         @import './editor/selected.css';
 
         * {
@@ -113,32 +112,55 @@
     </style>
 
     <script type="module">
+        import Data     from 'fn/data.js';
+        import Signal   from 'fn/signal.js';
         import Sequence from 'sequence/sequence.js';
-        import pointer from './editor/pointer.js';
+        import create   from 'dom/create.js';
+        import pointer  from './editor/pointer.js';
+        import keys     from './editor/keys.js';
         import { renderElements, renderStyle, renderDOM } from './modules/render.js';
-        import data from './data/blue-in-green.json' with { type: 'json' };
+        import data from './data/so-what.json' with { type: 'json' };
 
+        const root     = document.querySelector('.scribe');
         const sequence = Sequence.from(data);
-        const elements = renderElements(
-            // Events from data
-            sequence,
-            // Excludes is an array
-            [],
-            // Clef is a string
-            'treble',
-            // Key name
-            '',
-            // Create an initial [0, "meter", ...] event
-            ''
-        );
 
-        const root = document.querySelector('.scribe');
+        Signal.frame(() => {
+            const elements = renderElements(
+                // Events from data
+                Data.of(sequence),
+                // Excludes is an array
+                [],
+                // Clef is a string
+                'treble',
+                // Key name
+                '',
+                // Create an initial [0, "meter", ...] event
+                ''
+            );
 
-        root.append.apply(root, elements);
-        root.setAttribute('style', renderStyle(root));
-        renderDOM(root);
+            const y = Data.of(sequence.events).length;
 
-        const state = { sequence };
+            root.innerHTML = '';
+            root.append.apply(root, elements);
+            root.setAttribute('style', renderStyle(root));
+            renderDOM(root);
+
+
+            root.querySelectorAll('.bar').forEach((bar) => {
+                bar.append(
+                    create('div', { class: 'zone', data: { beat: 0,   duration: 0.5 } }),
+                    create('div', { class: 'zone', data: { beat: 0.5, duration: 0.5 } }),
+                    create('div', { class: 'zone', data: { beat: 1,   duration: 0.5 } }),
+                    create('div', { class: 'zone', data: { beat: 1.5, duration: 0.5 } }),
+                    create('div', { class: 'zone', data: { beat: 2,   duration: 0.5 } }),
+                    create('div', { class: 'zone', data: { beat: 2.5, duration: 0.5 } }),
+                    create('div', { class: 'zone', data: { beat: 3,   duration: 0.5 } }),
+                    create('div', { class: 'zone', data: { beat: 3.5, duration: 0.5 } })
+                );
+            });
+        });
+
+        const state = { sequence: Data.of(sequence) };
         pointer(root, state);
     </script>
 </head>
@@ -146,10 +168,10 @@
     <header>
         <h1 class="title">My Tune</h1>
         <p class="part">Piano</p>
-        <p class="credit">Composed by My Name</p>
+        <p class="credit"><span class="@1-shown">Composed by </span>My Name</p>
     </header>
 
-    <main class="scribe"></main>
+    <main class="scribe scribe-regular"></main>
 
     <footer>
         <p>&copy;2025 My Name. <a href="https://stephen.band/scribe/">Scribe</a> by Stephen Band.</p>

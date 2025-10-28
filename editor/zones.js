@@ -1,4 +1,5 @@
 
+import create       from 'dom/create.js';
 import { identify } from '../modules/event.js';
 
 function trunc2(n) {
@@ -15,14 +16,25 @@ export function unhighlightZones(element) {
 
 export function unhighlightSymbols(element) {
     // Unhighlight zones
-    element
+    /*element
     .querySelectorAll('.selected')
-    .forEach((element) => element.classList.remove('selected'));
+    .forEach((element) => element.classList.remove('selected'));*/
+
+    style.textContent = '';
 }
+
+const style = create('style', { title: 'selection' });
+document.head.append(style);
 
 export function highlightZones(element, events) {
     unhighlightZones(element);
     unhighlightSymbols(element);
+
+    const selector = '[data-event="' + events.map(identify).join('"],[data-event="') + '"]';
+    const rule     = '{ cursor: move; color: limegreen; }';
+
+    style.textContent = selector + rule;
+/*
 
     events.forEach((event) => {
         // Select all zones up to end of event duration
@@ -34,11 +46,12 @@ export function highlightZones(element, events) {
             absbeat += editDuration;
         }
         */
-
+/*
         // Select elements identified by event
 
         element
         .querySelectorAll('[data-event="' + identify(event) + '"]')
         .forEach((element) => element.classList.add('selected'));
     });
+*/
 }

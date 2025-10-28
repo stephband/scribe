@@ -1,4 +1,27 @@
 
+import { retrieve, move, durate, transpose } from '../modules/event.js';
+
+export function moveEvents(beats, events) {
+    let i = -1, event;
+    while (event = events[++i]) move(beats, event);
+    return events;
+}
+
+export function durateEvents(beats, events) {
+    let i = -1, event;
+    while (event = events[++i]) durate(beats, event);
+    return events;
+}
+
+export function transposeEvents(semitones, events) {
+    let i = -1, event;
+    while (event = events[++i]) transpose(semitones, event);
+    return events;
+}
+
+
+
+
 import { selection, select, deselect, clear } from './selection.js';
 
 

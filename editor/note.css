@@ -2,9 +2,17 @@
     cursor: crosshair;
 }
 
+.meta-key .scribe {
+    cursor: copy;
+}
+
 [data-event],
 [data-events] {
     cursor: pointer;
+}
+
+.alt-key [data-event] {
+    cursor: grab;
 }
 
 .bar *,

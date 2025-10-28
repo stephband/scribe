@@ -215,7 +215,8 @@ export default overload(get('type'), {
             beat:     truncate(4, symbol.beat),
             pitch:    symbol.pitch,
             duration: truncate(4, symbol.duration),
-            part:     symbol.part.name
+            part:     symbol.part.name,
+            event:    identify(symbol.event)
         }
     }),
 

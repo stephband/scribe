@@ -6,7 +6,7 @@ import create   from 'dom/create.js';
 import delegate from 'dom/delegate.js';
 import events   from 'dom/events.js';
 import rect     from 'dom/rect.js';
-import { retrieve } from '../modules/event.js';
+import { retrieve, move, transpose } from '../modules/event.js';
 import { selection, select, deselect, clear } from './selection.js';
 import { highlightZones, unhighlightZones, unhighlightSymbols } from './zones.js';
 
@@ -51,19 +51,33 @@ document.body.append(rectangle);
 
 export default function pointer(root, state) {
     events({ type: 'pointerdown', device: 'mouse pen touch' }, root)
-    .filter((e) => e.isPrimary)
+    .filter((e) => e.isPrimary && e.which === 1)
     .each(delegate({
         '.zone': (zone, e) => {
-            const zoneRect = rect(zone);
-            const ratio    = (e.clientY - zoneRect.top) / zoneRect.height;
-            const beat     = Number(zone.dataset.absbeat);
-            const pitch    = stave.yRatioToPitch(ratio);
+            const { sequence } = state;
+
+            const box      = rect(zone);
+            const row      = round((e.clientY - box.top) / rowSize);
+            //const pitch    = stave.pitchAtRow(row);
+            const barbeat  = Number(zone.closest('.bar').dataset.beat)
+            const beat     = Number(zone.dataset.beat);
             const duration = Number(zone.dataset.duration);
-            const event    = addNoteEventByTouch(beat, pitch, 0.2, duration);
-            const zones    = Array.from(body.querySelectorAll('.zone'));
+
+            sequence.add(barbeat + beat, 'note', 'G4', 0.1, duration);
+
+            //const event    = addNoteEventByTouch(beat, pitch, 0.2, duration);
+            //const zones    = Array.from(body.querySelectorAll('.zone'));
+
+            action = {
+                type: 'add',
+                pageX: e.pageX,
+                pageY: e.pageY
+            };
 
             // Clear selection
             clear();
+
+            /*
             activateZonesFromEvent(zones, event);
 
             const pointermoves = events('pointermove', body)
@@ -117,6 +131,7 @@ export default function pointer(root, state) {
                 select(event);
                 highlightZones();
             });
+            */
         },
 
         '[data-event]': (element, e) => {
@@ -266,33 +281,27 @@ events({ type: 'pointermove', device: 'mouse pen touch' }, document)
         const y = e.pageY - action.pageY;
 
         // Move x
-        const beats = round((x / beatSize) / grain) * grain;
+        const b = round((x / beatSize) / grain) * grain;
 
         // Beat has changed
-        if (beats !== action.beats) {
+        if (b !== action.beats) {
             let i = -1, event;
-            while (event = selection[++i]) {
-                event.move(beats - action.beats);
-            }
-
-            action.beats = beats;
+            while (event = selection[++i]) move(b - action.beats, event);
+            action.beats = b;
         }
 
         // Move y
-        const rows      = -1 * y / rowSize;
-        const transpose = round(rows * 12 / 7);
+        const rows = -1 * y / rowSize;
+        const t    = round(rows * 12 / 7);
 
         // Transpose has changed
-        if (transpose !== action.transpose) {
+        if (t !== action.transpose) {
             let i = -1, event;
-            while (event = selection[++i]) {
-                event.transpose(transpose - action.transpose);
-            }
-
-            action.transpose = transpose;
+            while (event = selection[++i]) transpose(t - action.transpose, event);
+            action.transpose = t;
         }
 
-        console.log(JSON.stringify(selection));
+        //console.log(JSON.stringify(selection));
     },
 
     select: (e) => {
