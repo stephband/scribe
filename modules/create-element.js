@@ -66,7 +66,10 @@ export default overload(get('type'), {
     barrepeat: (symbol) => create('span', {
         class: 'barrepeat',
         html: glyphs['barRepeat' + symbol.count],
-        data: { duration: symbol.duration }
+        data: {
+            beat: 0,
+            duration: symbol.duration
+        }
     }),
 
     clef: (symbol) => create('span', {

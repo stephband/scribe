@@ -1,7 +1,7 @@
 :root,
 :host {
     /* Width of head of duration 1 */
-    --head-width: 0.3375;
+    --head-1-size: 0.3375;
 }
 
 .head {

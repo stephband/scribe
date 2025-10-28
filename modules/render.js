@@ -136,12 +136,10 @@ export function renderStyle(root) {
     const counts = {'G♭': 6, 'C♯': 5, 'D♭': 5, 'G♯': 4, 'A♭': 4, 'D♯': 3, 'E♭': 3, 'B♭': 2, 'F':  1, 'C':  0, 'G':  1, 'D':  2, 'A':  3, 'E':  4, 'B':  5, 'F♯': 6};
     const count  = counts[key];
 
-    return `
-        --head-1-size: ${ truncate(6, head1Width / fontSize) };
-        --head-2-size: ${ truncate(6, head2Width / fontSize) };
-        --head-4-size: ${ truncate(6, head3Width / fontSize) };
-        --signature-width: ${ (2.25 + count * 0.625 + 0.625).toFixed(4) }em;
-    `;
+    return `--head-1-size: ${ truncate(6, head1Width / fontSize) }; `
+        + `--head-2-size: ${ truncate(6, head2Width / fontSize) }; `
+        + `--head-4-size: ${ truncate(6, head3Width / fontSize) }; `
+        + `--signature-width: ${ (2.25 + count * 0.625 + 0.625).toFixed(4) }em;`;
 }
 
 export function renderDOM(element) {

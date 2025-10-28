@@ -17,7 +17,7 @@
 
 .up-tuplet[data-rhythm^="1"] {
     /* Move the left position by one head width to center number on beam */
-    margin-left: calc(1em * var(--head-width) - 3em * var(--stem-width));
+    margin-left: calc(1em * var(--head-1-size) - 3em * var(--stem-width));
 }
 
 .tuplet::before,

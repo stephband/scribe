@@ -44,8 +44,10 @@
     --bar-column-gap:    min(0.08vw, 0.02em);
     --bar-padding-left:  0.3em;
     --bar-padding-right: 0.15em;
-    /* Width of standard black note head */
-    --head-width:        0.3375;
+    /* Widths of note heads in em (measured and overridden on render) */
+    --head-1-size:       0.337402;
+    --head-1-size:       0.390137;
+    --head-1-size:       0.455078;
     /* Space around accidentals */
     --acci-margin-left:  0.0875;
     --acci-margin-right: 0.0833;

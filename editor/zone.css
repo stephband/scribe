@@ -28,5 +28,5 @@
     grid-column-end: span calc(round(var(--columns-per-beat) * var(--duration)));
     margin-left: 0;
     margin-right: 0;
-    /*min-width: calc(1em * var(--head-width));*/
+    /*min-width: calc(1em * var(--head-1-size));*/
 }

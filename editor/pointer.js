@@ -1,4 +1,5 @@
 
+import Data     from 'fn/data.js';
 import get      from 'fn/get.js';
 import noop     from 'fn/noop.js';
 import overload from 'fn/overload.js';
@@ -6,6 +7,7 @@ import create   from 'dom/create.js';
 import delegate from 'dom/delegate.js';
 import events   from 'dom/events.js';
 import rect     from 'dom/rect.js';
+import { moveEvents, transposeEvents, durateEvents } from './actions.js';
 import { retrieve, move, transpose } from '../modules/event.js';
 import { selection, select, deselect, clear } from './selection.js';
 import { highlightZones, unhighlightZones, unhighlightSymbols } from './zones.js';
@@ -62,8 +64,11 @@ export default function pointer(root, state) {
             const barbeat  = Number(zone.closest('.bar').dataset.beat)
             const beat     = Number(zone.dataset.beat);
             const duration = Number(zone.dataset.duration);
+            const event    = sequence.create(barbeat + beat, 'note', 'G4', 0.1, duration);
 
-            sequence.add(barbeat + beat, 'note', 'G4', 0.1, duration);
+            // Clear selection
+            clear();
+            select(event);
 
             //const event    = addNoteEventByTouch(beat, pitch, 0.2, duration);
             //const zones    = Array.from(body.querySelectorAll('.zone'));
@@ -71,11 +76,9 @@ export default function pointer(root, state) {
             action = {
                 type: 'add',
                 pageX: e.pageX,
-                pageY: e.pageY
+                pageY: e.pageY,
+                duration
             };
-
-            // Clear selection
-            clear();
 
             /*
             activateZonesFromEvent(zones, event);
@@ -276,6 +279,19 @@ const grain    = 0.5;
 
 events({ type: 'pointermove', device: 'mouse pen touch' }, document)
 .each(overload(() => action && action.type, {
+    add: (e) => {
+        const x = e.pageX - action.pageX;
+        //const y = e.pageY - action.pageY;
+        // Move x
+        const b = round((x / beatSize) / grain) * grain;
+
+        // Beat has changed
+        if (b !== action.duration) {
+            durateEvents(b - action.beats, Data.of(selection));
+            action.duration = b;
+        }
+    },
+
     move: (e) => {
         const x = e.pageX - action.pageX;
         const y = e.pageY - action.pageY;

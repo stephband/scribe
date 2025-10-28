@@ -23,7 +23,7 @@
     line-height: 0.25em;
     white-space: nowrap;
     grid-auto-columns: min-content;
-/*    grid-auto-columns: calc(1em * var(--head-width)) min-content; */
+/*    grid-auto-columns: calc(1em * var(--head-1-size)) min-content; */
     grid-auto-rows: 0.25em;
     grid-auto-flow: column;
     height: 0.25em;
@@ -64,7 +64,7 @@
     /* TEMP */
     display: none;
     content: none !important;
-    transform: translateX(calc(-1em * var(--head-width)));
+    transform: translateX(calc(-1em * var(--head-1-size)));
 }
 
 

@@ -191,12 +191,12 @@
 .bar > .acci-4 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.36em) }
 .bar > .acci-5 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.63em) }
 
-.bar > .acci-cluster        { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 1em * var(--head-width)) }
-.bar > .acci-cluster.acci-1 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.27em + 1em * var(--head-width)) }
-.bar > .acci-cluster.acci-2 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.54em + 1em * var(--head-width)) }
-.bar > .acci-cluster.acci-3 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.09em + 1em * var(--head-width)) }
-.bar > .acci-cluster.acci-4 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.36em + 1em * var(--head-width)) }
-.bar > .acci-cluster.acci-5 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.63em + 1em * var(--head-width)) }
+.bar > .acci-cluster        { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 1em * var(--head-1-size)) }
+.bar > .acci-cluster.acci-1 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.27em + 1em * var(--head-1-size)) }
+.bar > .acci-cluster.acci-2 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.54em + 1em * var(--head-1-size)) }
+.bar > .acci-cluster.acci-3 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.09em + 1em * var(--head-1-size)) }
+.bar > .acci-cluster.acci-4 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.36em + 1em * var(--head-1-size)) }
+.bar > .acci-cluster.acci-5 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.63em + 1em * var(--head-1-size)) }
 
 
 /* Notes and ledges */
@@ -208,7 +208,7 @@
 }
 
 .bar > .cluster-note.up-note {
-    margin-left: calc(1em * var(--head-width));
+    margin-left: calc(1em * var(--head-1-size));
 }
 
 .bar > .cluster-note.up-note > .head {
@@ -228,15 +228,15 @@
 
 .bar > .cluster-note.down-note::before {
     /* Move flag back into position */
-    transform: translate(calc(1em * var(--head-width)), calc(var(--stem-height) * 1em));
+    transform: translate(calc(1em * var(--head-1-size)), calc(var(--stem-height) * 1em));
 }
 /* -------------------------------------------------------------------------- */
 
 .bar > .ledge {
     width: 0.625em;
 	/* Make ledger take up same space as head */
-	margin-left:  calc(-0.5 * (0.625em - 1em * var(--head-width)));
-	margin-right: calc(-0.5 * (0.625em - 1em * var(--head-width)));
+	margin-left:  calc(-0.5 * (0.625em - 1em * var(--head-1-size)));
+	margin-right: calc(-0.5 * (0.625em - 1em * var(--head-1-size)));
 }
 
 
@@ -325,7 +325,7 @@ in their duration span. */
 .bar > .up-beam {
 	margin-left: calc(-1em * var(--stem-width));
 	margin-right: calc(-1 * var(--bar-column-gap));
-	transform: translate(calc(1em * var(--head-width)), calc(1em * var(--translate-y, 0)));
+	transform: translate(calc(1em * var(--head-1-size)), calc(1em * var(--translate-y, 0)));
 }
 
 .bar > .down-beam {
@@ -355,7 +355,7 @@ in their duration span. */
 .bar > .tie {
 	justify-self: stretch;
 	/* Make tie span from end of one head to start of next. */
-	margin-left: calc(1.125em * var(--head-width));
+	margin-left: calc(1.125em * var(--head-1-size));
 	min-width: 0.5em;
     /* Ties span from one head to another minus the accidentals column */
     grid-column-end: span calc(round(var(--duration) * var(--columns-per-beat)) - 1);
