@@ -1,11 +1,11 @@
 .scribe {
     cursor: crosshair;
 }
-
+/*
 .meta-key .scribe {
     cursor: copy;
 }
-
+*/
 [data-event],
 [data-events] {
     cursor: pointer;

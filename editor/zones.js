@@ -30,10 +30,12 @@ export function highlightZones(element, events) {
     unhighlightZones(element);
     unhighlightSymbols(element);
 
-    const selector = '[data-event="' + events.map(identify).join('"],[data-event="') + '"]';
-    const rule     = '{ cursor: move; color: limegreen; }';
+    const selector1 = '[data-event="' + events.map(identify).join('"], [data-event="') + '"]';
+    const rule1     = '{ cursor: move; color: var(--selection-fg, limegreen); }';
+    const selector2 = '.bar:has([data-event="' + events.map(identify).join('"]) .zone, .bar:has([data-event="') + '"]) .zone';
+    const rule2     = '{ opacity: 1; pointer-events: all; }';
 
-    style.textContent = selector + rule;
+    style.textContent = selector1 + rule1;// + selector2 + rule2;
 /*
 
     events.forEach((event) => {

@@ -3,7 +3,8 @@
     position: fixed;
     pointer-events: none;
     z-index: 100;
-    border: 1px dotted color(display-p3 0 0.725 0.672);
+    border: 1px dotted var(--selection-fg);
+    background-color: oklch(from var(--selection-fg) l c h / 0.05);
 }
 
 .no-select {

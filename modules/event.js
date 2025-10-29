@@ -39,7 +39,7 @@ export function transpose(n, event) {
     switch (event[1]) {
         case "chord":
         case "key":
-            event[2] = mod12(toRootNnumber(event[2]) + n);
+            event[2] = mod12(toRootNumber(event[2]) + n);
             break;
         case "note":
         case "start":
@@ -59,8 +59,8 @@ export function durate(n, event) {
         case "chord":
         case "note":
         case "sequence":
-            event[4] = event[4] + n < 0 ?
-                0 :
+            event[4] = event[4] + n <= 0 ?
+                event[4] :
                 event[4] + n ;
             break;
     }

@@ -52,12 +52,21 @@
         body {
             font-family: system-ui, sans-serif;
             margin: 0;
-            padding: 1em 1.5em;
+            padding: 1em 1.5em 0.5em;
             min-height: 100%;
             display: flex;
             flex-direction: column;
 
+            --selection-fg: oklch(0.64 0.15 203.61);
             --zone-duration: 0.5;
+        }
+
+        body > footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 2;
         }
 
         header {
@@ -94,6 +103,8 @@
         footer {
             font-size: 0.625em;
             margin-top: auto;
+            padding-bottom: 0.5em;
+            background-color: white;
         }
 
         a {
@@ -147,41 +158,40 @@
             root.setAttribute('style', renderStyle(root));
             renderDOM(root);
 
-
             root.querySelectorAll('.bar').forEach((bar) => {
                 bar.append(
-                    create('div', { class: 'zone', data: { index: 0 } }),
-                    create('div', { class: 'zone', data: { index: 1 } }),
-                    create('div', { class: 'zone', data: { index: 2 } }),
-                    create('div', { class: 'zone', data: { index: 3 } }),
-                    create('div', { class: 'zone', data: { index: 4 } }),
-                    create('div', { class: 'zone', data: { index: 5 } }),
-                    create('div', { class: 'zone', data: { index: 6 } }),
-                    create('div', { class: 'zone', data: { index: 7 } }),
-                    create('div', { class: 'zone', data: { index: 8 } }),
-                    create('div', { class: 'zone', data: { index: 9 } }),
-                    create('div', { class: 'zone', data: { index: 10 } }),
-                    create('div', { class: 'zone', data: { index: 11 } }),
-                    create('div', { class: 'zone', data: { index: 12 } }),
-                    create('div', { class: 'zone', data: { index: 13 } }),
-                    create('div', { class: 'zone', data: { index: 14 } }),
-                    create('div', { class: 'zone', data: { index: 15 } }),
-                    create('div', { class: 'zone', data: { index: 16 } }),
-                    create('div', { class: 'zone', data: { index: 17 } }),
-                    create('div', { class: 'zone', data: { index: 18 } }),
-                    create('div', { class: 'zone', data: { index: 19 } }),
-                    create('div', { class: 'zone', data: { index: 20 } }),
-                    create('div', { class: 'zone', data: { index: 21 } }),
-                    create('div', { class: 'zone', data: { index: 22 } }),
-                    create('div', { class: 'zone', data: { index: 23 } }),
-                    create('div', { class: 'zone', data: { index: 24 } }),
-                    create('div', { class: 'zone', data: { index: 25 } }),
-                    create('div', { class: 'zone', data: { index: 26 } }),
-                    create('div', { class: 'zone', data: { index: 27 } }),
-                    create('div', { class: 'zone', data: { index: 28 } }),
-                    create('div', { class: 'zone', data: { index: 29 } }),
-                    create('div', { class: 'zone', data: { index: 30 } }),
-                    create('div', { class: 'zone', data: { index: 31 } })
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 0 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 1 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 2 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 3 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 4 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 5 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 6 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 7 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 8 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 9 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 10 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 11 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 12 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 13 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 14 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 15 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 16 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 17 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 18 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 19 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 20 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 21 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 22 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 23 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 24 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 25 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 26 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 27 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 28 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 29 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 30 } }),
+                    create('div', { class: 'zone', tabindex: 0, data: { index: 31 } })
                 );
             });
         });
@@ -207,22 +217,25 @@
 
     <footer>
         <div class="keyboard">
-            <kbd></kbd>
+            <h4 class="font-08 grid-label">Grid</h4>
+            <h4 class="font-08 octave-label">Octave</h4>
+
+            <kbd class="kbd-1"></kbd>
             <kbd title="1"><span class="glyph" style="font-family: Jazz, JazzText;">&#xE1D6;</span></kbd>
             <kbd title="2"><span class="glyph" style="font-family: Jazz, JazzText;">&#xE1D8;</span></kbd>
-            <kbd title="3"><span class="glyph" style="font-family: Jazz, JazzText;">&#xE883;</span><span class="glyph" style="font-family: Jazz, JazzText;">&#xE1D8;</span></kbd>
+            <kbd title="3"><span class="glyph" style="font-family: Jazz, JazzText; font-size: 1.6667em;">&#xE883;</span><span class="glyph" style="font-family: Jazz, JazzText;">&#xE1D8;</span></kbd>
             <kbd title="4"><span class="glyph" style="font-family: Jazz, JazzText;">&#xE1DA;</span></kbd>
-            <kbd title="5"><span class="glyph" style="font-family: Jazz, JazzText;">&#xE885;</span><span class="glyph" style="font-family: Jazz, JazzText;">&#xE1DA;</span></kbd>
-            <kbd title="6"><span class="glyph" style="font-family: Jazz, JazzText;">&#xE883;</span><span class="glyph" style="font-family: Jazz, JazzText;">&#xE1DA;</span></kbd>
-            <kbd title="7"><span class="glyph" style="font-family: Jazz, JazzText;">&#xE887;</span><span class="glyph" style="font-family: Jazz, JazzText;">&#xE1DA;</span></kbd>
+            <kbd title="5"><span class="glyph" style="font-family: Jazz, JazzText; font-size: 1.6667em;">&#xE885;</span><span class="glyph" style="font-family: Jazz, JazzText;">&#xE1DA;</span></kbd>
+            <kbd title="6"><span class="glyph" style="font-family: Jazz, JazzText; font-size: 1.6667em;">&#xE883;</span><span class="glyph" style="font-family: Jazz, JazzText;">&#xE1DA;</span></kbd>
+            <kbd title="7"><span class="glyph" style="font-family: Jazz, JazzText; font-size: 1.6667em;">&#xE887;</span><span class="glyph" style="font-family: Jazz, JazzText;">&#xE1DA;</span></kbd>
             <kbd title="8"><span class="glyph" style="font-family: Jazz, JazzText;">&#xE1DC;</span></kbd>
-            <kbd title="9"><span class="glyph" style="font-family: Jazz, JazzText;">&#xE889;</span><span class="glyph" style="font-family: Jazz, JazzText;">&#xE1DC;</span></kbd>
+            <kbd title="9"><span class="glyph" style="font-family: Jazz, JazzText; font-size: 1.6667em;">&#xE889;</span><span class="glyph" style="font-family: Jazz, JazzText;">&#xE1DC;</span></kbd>
             <kbd></kbd>
             <kbd></kbd>
             <kbd></kbd>
-            <kbd class="backspace-kbd"></kbd>
+            <kbd class="backspace-kbd">⌫</kbd>
 
-            <kbd class="tab-kbd"></kbd>
+            <kbd class="tab-kbd">⇥</kbd>
             <kbd></kbd>
             <kbd></kbd>
             <kbd></kbd>
@@ -235,9 +248,9 @@
             <kbd></kbd>
             <kbd></kbd>
             <kbd></kbd>
-            <kbd class="enter-kbd"></kbd>
+            <kbd class="enter-kbd" style="border-bottom-right-radius: 0;"></kbd>
 
-            <kbd class="lock-kbd"></kbd>
+            <kbd class="lock-kbd">⇪</kbd>
             <kbd title="" class="dark-kbd">A&#xED60;</kbd>
             <kbd title="" class="dark-kbd">B&#xED60;</kbd>
             <kbd></kbd>
@@ -250,8 +263,9 @@
             <kbd></kbd>
             <kbd title="" class="dark-kbd">C&#xED62;</kbd>
             <kbd></kbd>
+            <kbd style="margin-top: -2px; height: calc(100% + 2px); border-top-left-radius: 0; border-top-right-radius: 0;">↵</kbd>
 
-            <kbd class="l-shift-kbd shift-kbd"></kbd>
+            <kbd class="l-shift-kbd shift-kbd">⇧</kbd>
             <kbd title="`" class="light-kbd">G</kbd>
             <kbd title="z" class="light-kbd">A</kbd>
             <kbd title="x" class="light-kbd">B</kbd>
@@ -263,15 +277,15 @@
             <kbd title="," class="light-kbd">A</kbd>
             <kbd title="." class="light-kbd">B</kbd>
             <kbd title="/" class="light-kbd">C<small>5</small></kbd>
-            <kbd class="r-shift-kbd shift-kbd"></kbd>
+            <kbd class="r-shift-kbd shift-kbd">⇧</kbd>
 
             <kbd></kbd>
-            <kbd class="ctrl-kbd"></kbd>
-            <kbd class="alt-kbd"></kbd>
-            <kbd class="meta-kbd" title="+">+</kbd>
+            <kbd class="ctrl-kbd">^</kbd>
+            <kbd class="alt-kbd">⌥</kbd>
+            <kbd class="meta-kbd">⌘</kbd>
             <kbd class="space-kbd"></kbd>
-            <kbd class="meta-kbd" title="+">+</kbd>
-            <kbd class="alt-kbd"></kbd>
+            <kbd class="meta-kbd">⌘</kbd>
+            <kbd class="alt-kbd">⌥</kbd>
             <kbd class="left-kbd">◂</kbd>
             <kbd class="up-kbd">▴</kbd>
             <kbd class="down-kbd">▾</kbd>

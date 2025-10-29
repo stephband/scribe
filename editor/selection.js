@@ -7,6 +7,7 @@ function is(a) {
 
 export function clear(object, point) {
     selection.length = 0;
+    document.body.classList.remove('selection');
 }
 
 export function select(object) {
@@ -14,6 +15,8 @@ export function select(object) {
 
     // Check if selected
     if (selection.includes(object)) { return; }
+
+    if (selection.length === 0) document.body.classList.add('selection');
 
     // Push new selection object
     selection.push(object);
@@ -28,4 +31,6 @@ export function deselect(object) {
 
     // Remove it
     selection.splice(i, 1);
+
+    if (selection.length === 0) document.body.classList.remove('selection');
 }

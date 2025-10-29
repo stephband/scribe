@@ -205,6 +205,13 @@ export default function pointer(root, state) {
                 }))
             };
 
+            assign(rectangle.style, {
+                left:   e.pageX + 'px',
+                top:    e.pageY + 'px',
+                width:  '0px',
+                height: '0px'
+            });
+
             rectangle.hidden = false;
             document.body.classList.add('no-select');
         }

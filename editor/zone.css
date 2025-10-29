@@ -1,22 +1,45 @@
 .zone {
     /*display: none;*/
+    opacity: 0;
+    pointer-events: none;
     cursor: crosshair;
     position: relative;
-    background-color: rgba(80,80,80,0.06);
-    border-radius: 0.25em;
+    background-color: rgba(80,80,80,0.05);
+    border-radius: 0.125em;
 }
 
-.shift-key .zone,
-.meta-key .zone {
-    display: block;
+.bar:focus-within .zone {
+    opacity: 1;
+    pointer-events: all;
+    cursor: copy;
+}
+
+.meta-key .bar:hover .zone {
+    pointer-events: all;
+    cursor: copy;
+}
+
+.meta-key .bar:hover .zone:hover {
+    opacity: 1;
 }
 
 .meta-key .zone {
     cursor: copy;
 }
 
+.zone:focus,
 .meta-key .zone:hover {
     background-color: rgba(60,160,60,0.12);
+}
+
+.zone:focus {
+    outline-offset: 0;
+    outline-width: 1px;
+    outline-style: solid;
+    outline-color: color(display-p3 0.588 0.848 0);
+    background-color: color(display-p3 0.541 0.779 0 / 0.12);
+    border-width: 0;
+    box-shadow: none;
 }
 
 .stave > .zone {
@@ -45,11 +68,12 @@
 
 .bar > .zone {
     justify-self: stretch;
-    grid-column-start: calc(var(--column-beat-0) + round(var(--beat) * var(--columns-per-beat)));
+    grid-column-start: calc(var(--column-beat-0) + round(var(--beat) * var(--columns-per-beat)) - 1);
     grid-column-end: span calc(round(var(--columns-per-beat) * var(--zone-duration)));
-    margin-left: -0.125em;
-    margin-right: 0.1875em;
+    margin-left: -1px;
+    margin-right: 2px;
     /*min-width: calc(1em * var(--head-1-size));*/
+    z-index: 1;
 }
 
 .bar > .zone { --beat: 0; }
@@ -97,13 +121,17 @@
 [data-zone="0.25"]  kbd[title="4"],
 [data-zone^="0.33"] kbd[title="3"],
 [data-zone="0.5"]   kbd[title="2"],
-[data-zone="1"]     kbd[title="1"],
+[data-zone="1"]     kbd[title="1"] {
+    color: white;
+    background: color(display-p3 0 0.651 1);
+}
+
 .shift-key .shift-kbd,
 .ctrl-key .ctrl-kbd,
 .alt-key .alt-kbd,
 .meta-key .meta-kbd {
-    color: white;
-    background: color(display-p3 0 0.651 1);
+    color: black;
+    background: rgba(0,0,0,0.2);
 }
 
 * > .keyboard {
@@ -117,10 +145,27 @@
     column-gap: 0.125em;
     row-gap: 0.125em;
     grid-template-columns: repeat(44, 0.85416em);
-    grid-template-rows: repeat(10, 1.3125em);
+    grid-template-rows: min-content repeat(10, 1.3125em);
     justify-content: center;
     justify-items: stretch;
     align-items: stretch;
+    grid-auto-flow: row;
+}
+
+.keyboard > * {
+    margin: 0;
+}
+
+.keyboard > .grid-label {
+    grid-column-start: 4;
+    grid-column-end: span 30;
+    grid-row: 1;
+}
+
+.keyboard > .octave-label {
+    grid-column-start: 34;
+    grid-column-end: span 10;
+    grid-row: 1;
 }
 
 .keyboard > kbd {
@@ -138,29 +183,36 @@
 .keyboard > .space-kbd     { grid-column-end: span 15; }
 .keyboard > .up-kbd        { grid-column-start: 39; grid-row-end: span 1; line-height: 1.3125em; }
 .keyboard > .down-kbd      { grid-column-start: 39; grid-row-end: span 1; line-height: 1.3125em; }
-.keyboard > .right-kbd     { grid-column-start: 42; grid-row-start: 9; }
+.keyboard > .right-kbd     { grid-column-start: 42; grid-row-start: 10; }
+
+
+.keyboard > .kbd-1 { grid-row-start: 2; }
 
 kbd {
     width: 100%;
     height: 100%;
     line-height: 2.8125rem;
     text-align: center;
+    color: white;
     background-color: rgba(0,0,0,0.08);
     border-radius: 0.25em;
     overflow: hidden;
 }
 
 kbd[title] {
+    color: black;
     background-color: rgba(0,0,0,0.2);
 }
 
-.light-kbd,
-.dark-kbd {
+.light-kbd[title],
+.dark-kbd[title] {
     font-family: JazzText, Jazz;
     font-size: 1.3333em;
     font-weight: 300;
+    color: transparent;
+    background-color: rgba(0,0,0,0.08);
 }
-
+/*
 .light-kbd[title] {
     color: white;
 }
@@ -168,11 +220,34 @@ kbd[title] {
 .dark-kbd[title] {
     color: black;
 }
-
+*/
 kbd > .glyph {
     font-size: 1.5em;
     line-height: 1em;
     vertical-align: 0.4em;
 }
 
+.up-kbd,
+.down-kbd,
+.left-kbd,
+.right-kbd {
+    color: transparent;
+}
 
+.selection:not(.shift-key) .up-kbd,
+.selection:not(.shift-key) .down-kbd,
+.selection .left-kbd,
+.selection .right-kbd {
+    color: black;
+    background-color: rgba(0,0,0,0.2);
+}
+
+.scribe:focus-within ~ footer .light-kbd {
+    color: white;
+    background-color: rgba(0,0,0,0.2);
+}
+
+.scribe:focus-within ~ footer .dark-kbd {
+    color: black;
+    background-color: rgba(0,0,0,0.2);
+}
