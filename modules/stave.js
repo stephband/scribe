@@ -59,7 +59,7 @@ Stave.create(type)
 Create a stave object by type.
 **/
 Stave.create = (type) => {
-    console.trace('Deprecated: Stave.create()');
+    console.warn('Deprecated: Stave.create(type). Use Stave[type].');
     return Stave[type];
 }
 

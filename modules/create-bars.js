@@ -252,7 +252,11 @@ export default function createBars(sequence, excludes, stave, settings = config)
     // If no meter was declared this is a bar with indeterminate duration,
     // but we do need to know how much duration to render so get it from the
     // last event: TODO: check all events, the last may not be the longest
-    if (!duration) duration = getStopBeat(scribeEvents[scribeEvents.length - 1]);
+    if (!duration) {
+        duration = scribeEvents.length ?
+            getStopBeat(scribeEvents[scribeEvents.length - 1]) :
+            1 ;
+    }
 
     // Close final bar, push to bars
     const bar = createBar(bars.length + 1, beat, duration, divisor, stave, key, events, parts, sequenceEvent, settings);

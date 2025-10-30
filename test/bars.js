@@ -5,7 +5,7 @@ import Stave      from '../modules/stave.js';
 import createBars from '../modules/create-bars.js';
 
 // Get the stave controller
-const stave = Stave.create('treble');
+const stave = Stave['treble'];
 /*
 console.log(createBars(new Sequence([]), stave));
 

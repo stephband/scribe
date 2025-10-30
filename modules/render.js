@@ -66,7 +66,7 @@ export function renderElements(data, excludes, clef, keyname, meter, duration = 
     if (!keyEvent && keyname) events.unshift([0, 'key', keyname]);
 
     // Get the stave controller
-    const stave = Stave.create(clef || 'treble');
+    const stave = Stave[clef || 'treble'];
 
     // Make transforms list
     const transforms = [];
@@ -120,15 +120,15 @@ function remove(element) {
 }
 
 export function renderStyle(root) {
-    // Measure head widths
-
+    // Measure head widths. Be aware that root may be a fragment (a shadow root)
+    // and getComputedStyle() won't work on a fragment
     root.append.apply(root, heads);
 
-    const computed   = window.getComputedStyle(root);
-    const fontSize   = px(computed.fontSize);
     const head1Width = rect(heads[0]).width;
     const head2Width = rect(heads[1]).width;
     const head3Width = rect(heads[2]).width;
+    const computed   = window.getComputedStyle(heads[0]);
+    const fontSize   = px(computed.fontSize);
 
     heads.forEach(remove);
 
