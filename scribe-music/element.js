@@ -111,17 +111,17 @@ export default define(element('scribe-music', {
             shadow.append.apply(shadow, elements);
             if (!elements) return;
 
-            const style = create('style', `:host { ${ renderStyle(shadow) } }`);
+            const style = create('style', `:host { ${ renderStyle(this, shadow) } }`);
             shadow.appendChild(style);
 
             // Render beams
-            renderDOM(shadow);
+            renderDOM(this, shadow);
 
             requestAnimationFrame(() => {
-                style.textContent = `:host { ${ renderStyle(shadow) } }`;
+                style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
 
                 // Render beams
-                renderDOM(shadow);
+                renderDOM(this, shadow);
             });
 
             // DEBUG

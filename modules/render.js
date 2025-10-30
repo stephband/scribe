@@ -110,19 +110,19 @@ export function renderElements(data, excludes, clef, keyname, meter, duration = 
 
 
 const heads = [
-    create('span', glyphs.head1),
-    create('span', glyphs.head2),
-    create('span', glyphs.head4)
+    create('span', { html: glyphs.head1, style: 'width: min-content;' }),
+    create('span', { html: glyphs.head2, style: 'width: min-content;' }),
+    create('span', { html: glyphs.head4, style: 'width: min-content;' })
 ];
 
 function remove(element) {
     element.remove();
 }
 
-export function renderStyle(root) {
+export function renderStyle(element, root = element) {
     // Measure head widths. Be aware that root may be a fragment (a shadow root)
     // and getComputedStyle() won't work on a fragment
-    root.append.apply(root, heads);
+    element.append.apply(element, heads);
 
     const head1Width = rect(heads[0]).width;
     const head2Width = rect(heads[1]).width;
@@ -149,7 +149,7 @@ console.log('FONT SIZE', fontSize);
         + `--signature-width: ${ (2.25 + count * 0.625 + 0.625).toFixed(4) }em;`;
 }
 
-export function renderDOM(element) {
+export function renderDOM(element, root = element) {
     // Render beams
-    element.querySelectorAll('.beam').forEach(renderBeam);
+    root.querySelectorAll('.beam').forEach(renderBeam);
 }
