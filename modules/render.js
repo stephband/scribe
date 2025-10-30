@@ -11,6 +11,7 @@ import { renderBeam }   from './beam.js';
 import * as glyphs      from './glyphs.js';
 import truncate         from './number/truncate.js';
 import config           from './config.js';
+import log              from './log.js';
 
 
 const global = globalThis || window;
@@ -133,7 +134,7 @@ export function renderStyle(element, root = element) {
     const computed   = window.getComputedStyle(heads[0]);
     const fontSize   = px(computed.fontSize);
 
-    if (global.DEBUG) console.log('Scribe head measurements font-size:', fontSize, 'heads:', head1Width, head2Width, head3Width);
+    if (global.DEBUG) log('post render font-size', fontSize, 'heads', head1Width, head2Width, head3Width);
 
     heads.forEach(remove);
 
