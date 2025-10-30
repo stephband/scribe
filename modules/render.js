@@ -13,6 +13,9 @@ import truncate         from './number/truncate.js';
 import config           from './config.js';
 
 
+const global = globalThis || window;
+
+
 function isInitialMeterEvent(event) {
     return event[0] <= 0 && event[1] === 'meter';
 }
@@ -130,7 +133,7 @@ export function renderStyle(element, root = element) {
     const computed   = window.getComputedStyle(heads[0]);
     const fontSize   = px(computed.fontSize);
 
-console.log('FONT SIZE', head1Width, head2Width, head3Width, fontSize);
+    if (global.DEBUG) console.log('Scribe head measurements font-size:', fontSize, 'heads:', head1Width, head2Width, head3Width);
 
     heads.forEach(remove);
 

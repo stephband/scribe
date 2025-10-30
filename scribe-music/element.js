@@ -117,18 +117,14 @@ export default define(element('scribe-music', {
             // Render beams
             renderDOM(this, shadow);
 
-            // Render again on next frame
-            requestAnimationFrame(() => {
-                console.log('FRAME');
+            // Annoyingly we must wait for fonts to load – this is a safety
+            // render as we cannot gaurantee fonts have loaded on load()
+            // callback as the font stylesheet must be imported outside the
+            // shadow DOM so we cannot track it
+            setTimeout(() => {
                 style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
                 renderDOM(this, shadow);
-            });
-
-            // Annoyingly we must wait for fonts to load
-            /*setTimeout(() => {
-                style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
-                renderDOM(this, shadow);
-            }, 3000);*/
+            }, 2000);
 
             // DEBUG
 /*
@@ -161,7 +157,7 @@ export default define(element('scribe-music', {
     },
 
     load: function(shadow, { style }) {
-        console.log('LOAD');
+        // Recalculate when style loads
         style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
         renderDOM(this, shadow);
     },
