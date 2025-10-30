@@ -122,7 +122,7 @@ function remove(element) {
 export function renderStyle(element, root = element) {
     // Measure head widths. Be aware that root may be a fragment (a shadow root)
     // and getComputedStyle() won't work on a fragment
-    element.append.apply(element, heads);
+    root.append.apply(root, heads);
 
     const head1Width = rect(heads[0]).width;
     const head2Width = rect(heads[1]).width;
