@@ -119,15 +119,16 @@ export default define(element('scribe-music', {
 
             // Render again on next frame
             requestAnimationFrame(() => {
+                console.log('FRAME');
                 style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
                 renderDOM(this, shadow);
             });
 
             // Annoyingly we must wait for fonts to load
-            setTimeout(() => {
+            /*setTimeout(() => {
                 style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
                 renderDOM(this, shadow);
-            }, 3000);
+            }, 3000);*/
 
             // DEBUG
 /*
@@ -157,6 +158,15 @@ export default define(element('scribe-music', {
             }
 */
         });
+    },
+
+    load: function() {
+        console.log('LOAD');
+        const style = create('style', `:host { ${ renderStyle(this, shadow) } }`);
+        shadow.appendChild(style);
+
+        // Render beams
+        renderDOM(this, shadow);
     },
 
     disconnect: function() {
