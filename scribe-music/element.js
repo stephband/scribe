@@ -106,7 +106,7 @@ export default define(element('scribe-music', {
                 })
             );
 
-            // Clear the shadow DOM of bars and put new elements in it
+            // Clear the shadow DOM of bars and style and put new elements in it
             shadow.querySelectorAll('.side, .bar, style').forEach((element) => element.remove());
             shadow.append.apply(shadow, elements);
             if (!elements) return;
@@ -116,6 +116,13 @@ export default define(element('scribe-music', {
 
             // Render beams
             renderDOM(shadow);
+
+            requestAnimationFrame(() => {
+                style.textContent = `:host { ${ renderStyle(shadow) } }`;
+
+                // Render beams
+                renderDOM(shadow);
+            });
 
             // DEBUG
 /*
