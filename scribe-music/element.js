@@ -111,7 +111,7 @@ export default define(element('scribe-music', {
             shadow.append.apply(shadow, elements);
             if (!elements) return;
 
-            const style = create('style', `:host { ${ renderStyle(this, shadow) } }`);
+            const style = internals.style = create('style', `:host { ${ renderStyle(this, shadow) } }`);
             shadow.appendChild(style);
 
             // Render beams
@@ -160,12 +160,9 @@ export default define(element('scribe-music', {
         });
     },
 
-    load: function() {
+    load: function(shadow, { style }) {
         console.log('LOAD');
-        const style = create('style', `:host { ${ renderStyle(this, shadow) } }`);
-        shadow.appendChild(style);
-
-        // Render beams
+        style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
         renderDOM(this, shadow);
     },
 
