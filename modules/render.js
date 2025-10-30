@@ -134,7 +134,7 @@ export function renderStyle(element, root = element) {
     const computed   = window.getComputedStyle(heads[0]);
     const fontSize   = px(computed.fontSize);
 
-    if (global.DEBUG) log('post render font-size', fontSize, 'heads', head1Width, head2Width, head3Width);
+    if (global.DEBUG) log('post render font-size', fontSize, 'heads', `${ head1Width }, ${ head2Width }, ${ head3Width }`);
 
     heads.forEach(remove);
 
