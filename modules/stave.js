@@ -44,20 +44,23 @@ class BassStave extends Stave {
 // as in <scribe-music clef="treble">. Create a stave by type with:
 // Stave.create(type);
 
-Stave['treble']      = TrebleStave;
-Stave['treble-up']   = TrebleUpStave;
-Stave['treble-down'] = TrebleDownStave;
-Stave['alto']        = AltoStave;
-Stave['bass']        = BassStave;
-Stave['piano']       = PianoStave;
-Stave['drum']        = DrumStave;
-Stave['percussion']  = PercussionStave;
+Stave['treble']      = new TrebleStave();
+Stave['treble-up']   = new TrebleUpStave();
+Stave['treble-down'] = new TrebleDownStave();
+Stave['alto']        = new AltoStave();
+Stave['bass']        = new BassStave();
+Stave['piano']       = new PianoStave();
+Stave['drum']        = new DrumStave();
+Stave['percussion']  = new PercussionStave();
 
 
 /**
 Stave.create(type)
 Create a stave object by type.
 **/
-Stave.create = (type) => new Stave[type]();
+Stave.create = (type) => {
+    console.trace('Deprecated: Stave.create()');
+    return Stave[type];
+}
 
 export default Stave;

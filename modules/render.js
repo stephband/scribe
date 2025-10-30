@@ -30,7 +30,13 @@ function toElements(nodes, symbol) {
 export function toBarElements(elements, bar) {
     elements.push(create('div', {
         class: `${ bar.stave.type }-stave stave ${ bar.doubleBarLine ? 'end-bar ' : '' }bar${ bar.error ? ' error ': '' }`,
-        data: { beat: bar.beat, duration: bar.duration, count: bar.count, key: toRootName(bar.key) },
+        data: {
+            beat: bar.beat,
+            duration: bar.duration,
+            count: bar.count,
+            key: toRootName(bar.key),
+            stave: bar.stave.type
+        },
         children: bar.symbols.reduce(toElements, [])
     }));
 

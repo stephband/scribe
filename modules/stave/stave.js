@@ -19,12 +19,6 @@ export default class Stave {
     constructor() {}
 
     /**
-    .clef
-    String containing single clef glyph.
-    **/
-    clef = '';
-
-    /**
     .pitched
     A boolean indicating whether this stave supports keys and transposition.
     **/
@@ -126,6 +120,15 @@ export default class Stave {
         if (global.DEBUG && i === -1) throw new Error('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name);
         if (i === -1) console.warn('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name);
         return i > -1 ? i : undefined ;
+    }
+
+    /**
+    .getPitch(row)
+    Returns the pitch of a given row number.
+    **/
+    getPitch(row) {
+        const names = this.rows[row];
+        return names.split(/\s+/)[0];
     }
 
     /**
