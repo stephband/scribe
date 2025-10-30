@@ -117,12 +117,17 @@ export default define(element('scribe-music', {
             // Render beams
             renderDOM(this, shadow);
 
+            // Render again on next frame
             requestAnimationFrame(() => {
                 style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
-
-                // Render beams
                 renderDOM(this, shadow);
             });
+
+            // Annoyingly we must wait for fonts to load
+            setTimeout(() => {
+                style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
+                renderDOM(this, shadow);
+            }, 3000);
 
             // DEBUG
 /*
