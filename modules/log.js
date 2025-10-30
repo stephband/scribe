@@ -7,7 +7,7 @@ const colors = {
     'grey':   '#81868f'
 };
 
-const log = (global.DEBUG && glabel.DEBUG.scribe !== false) ?
+const log = (global.DEBUG && global.DEBUG.scribe !== false) ?
     function log($1, $2, $3 = '', $4 = '') {
         console.log('%cScribe %c' + $1 + ' %c' + $2 + ' %c' + $3 + ' %c' + $4,
             'color: ' + (colors.pink) + '; font-weight: 300;',
