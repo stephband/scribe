@@ -59,9 +59,9 @@ export function durate(n, event) {
         case "chord":
         case "note":
         case "sequence":
-            event[4] = event[4] + n <= 0 ?
+            event[4] = n <= 0 ?
                 event[4] :
-                event[4] + n ;
+                n ;
             break;
     }
 
