@@ -22,7 +22,6 @@ export default class DrumStave extends Stave {
         "",
         "",
         "",
-        "",
         /* Splash, Chinese */
         toDrumSlug(55) + ' ' + toDrumSlug(52),
         /* Crash 2 */
@@ -51,7 +50,6 @@ export default class DrumStave extends Stave {
         "",
         /* Pedal Hi-hat */
         toDrumSlug(44),
-        "",
         "",
         "",
         "",
@@ -125,12 +123,12 @@ export default class DrumStave extends Stave {
 
     getSpelling(key, event) {
         if (event[1] === 'note') {
-            // Use note number as row identifier. We don't want any spelling
+            // Use pitch slug as row identifier. We don't want any spelling
             // happening on drum parts.
             return toDrumSlug(event[2]);
         }
 
-        return super.getSpelliing(key, event[2]);
+        return super.getSpelling(key, event[2]);
     }
 
     createSignatureSymbols(key) {
