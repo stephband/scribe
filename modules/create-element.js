@@ -7,16 +7,12 @@ import { chordGlyphs }   from "./glyphs.js";
 import { rflat, rsharp } from './pitch.js';
 import { identify }      from './event.js';
 import { beamThickness } from './beam.js';
+import { toHTML }        from './html.js';
 import map               from './object/map.js';
 import truncate          from './number/truncate.js';
 
 
 const abs = Math.abs;
-
-const chordParts = {
-    'flat':  `<span class="chord-flat">${ glyphs.acciFlat }</span>`,
-    'sharp': `<span class="chord-sharp">${ glyphs.acciSharp }</span>`
-};
 
 const acciClasses = {
     '2':  'acci acci-doublesharp',
@@ -85,11 +81,11 @@ export default overload(get('type'), {
             title: "",
             // Note that we must detect sharps before flats because HTML entities
             // contain hash symbols that can be interpreted as sharps
-            html: '<span class="chord-root">' + symbol.root.replace(rsharp, chordParts.sharp).replace(rflat, chordParts.flat) + '</span>'
+            html: '<span class="chord-root">' + toHTML(symbol.root) + '</span>'
                 + '<span class="chord-ext">'
                 + (parts[1] ? '<span class="chord-ext-' + parts[1] + '">' + parts[1] + '</span>' : '')
                 + (parts[2] ? '<sub>' + parts[2] + '</sub>' : '')
-                + (parts[3] ? '<sup>' + parts[3].replace(rsharp, chordParts.sharp).replace(rflat, chordParts.flat) + '</sup>' : '')
+                + (parts[3] ? '<sup>' + toHTML(parts[3]) + '</sup>' : '')
                 + '</span>'
                 + (symbol.bass ? glyphs.chordBassSlash + '<span class="chord-bass">' + symbol.bass + '</span>' : ''),
             data: {

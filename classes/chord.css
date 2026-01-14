@@ -44,12 +44,12 @@
     vertical-align: -0.25em;
 }
 
-.chord-abbr .chord-flat {
+.chord-abbr .glyph-flat {
     vertical-align: 0.3em;
     margin-left: 0.05em;
 }
 
-.chord-abbr .chord-sharp {
+.chord-abbr .glyph-sharp {
     vertical-align: 0.333333333em;
 }
 

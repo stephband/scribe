@@ -7,6 +7,7 @@ export const rsharp       = /#|♯/;
 export const rdoubleflat  = /bb|𝄫/;
 export const rdoublesharp = /##|𝄪/;
 export const rflatsharp   = /b|♭|#|♯/g;
+export const raccidental  = /(♮)|(bb|𝄫)|(##|𝄪)|(b|♭)|(#|♯)/g;
 
 export const accidentalChars = {
     '-2': '𝄫',

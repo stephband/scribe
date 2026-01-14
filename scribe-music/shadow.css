@@ -9,6 +9,7 @@
 @import '../classes/bar.css';
 @import '../classes/clef.css';
 @import '../classes/timesig.css';
+@import '../classes/glyph.css';
 @import '../classes/chord.css';
 @import '../classes/note.css';
 @import '../classes/head.css';

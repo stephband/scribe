@@ -1,7 +1,7 @@
 
 import get        from 'fn/get.js';
 import overload   from 'fn/overload.js';
-import { toNoteName, toNoteNumber, toRootName, toRootNumber } from 'midi/note.js';
+import { toNoteNumber, toRootName, toRootNumber } from 'midi/note.js';
 import join       from './object/join.js';
 import toStopBeat from './event/to-stop-beat.js';
 import { createBar }  from './bar.js';

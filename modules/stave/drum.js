@@ -1,6 +1,6 @@
 
 import slugify from 'fn/slugify.js';
-import { toNoteName, toDrumName, toNoteNumber } from 'midi/note.js';
+import { toDrumName, toNoteNumber } from 'midi/note.js';
 import { spellRoot, spellPitch }    from '../spelling.js';
 import * as glyphs from "../glyphs.js";
 import Stave       from './stave.js';
@@ -9,11 +9,8 @@ import Stave       from './stave.js';
 const global = globalThis || window;
 
 
-function toDrumPitch(number) {
-    return toDrumName(number)
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/-drum|-cymbal/, '');
+function toDrumSlug(number) {
+    return slugify(toDrumName(number));
 }
 
 export default class DrumStave extends Stave {
@@ -26,20 +23,34 @@ export default class DrumStave extends Stave {
         "",
         "",
         "",
-        "splash chinese",
-        "crash-2",
-        "crash-1",
-        "ride-1 ride-2 ride-bell",
-        "closed-hi-hat open-hi-hat",
-        "high-tom cowbell",
-        "low-mid-tom high-mid-tom",
-        "snare-1 snare2 side-stick",
-        "low-tom sticks hand-clap tambourine",
-        "high-floor-tom",
-        "low-floor-tom",
-        "low-bass high-bass",
+        /* Splash, Chinese */
+        toDrumSlug(55) + ' ' + toDrumSlug(52),
+        /* Crash 2 */
+        toDrumSlug(57),
+        /* Crash 1 */
+        toDrumSlug(49),
+        /* Ride Cymbal, Ride Bell, Ride Cymbal 2 */
+        toDrumSlug(51) + ' ' + toDrumSlug(53) + ' ' + toDrumSlug(59),
+        /* Closed Hi-hat, Open Hi-hat - Top line */
+        toDrumSlug(42) + ' ' + toDrumSlug(46),
+        /* High tom, Cowbell */
+        toDrumSlug(50) + ' ' + toDrumSlug(56),
+        /* Low mid tom, High mid tom */
+        toDrumSlug(48) + ' ' + toDrumSlug(47),
+        /* Snare drum 1, Snare drum 2 */
+        toDrumSlug(38) + ' ' + toDrumSlug(40),
+        /* Low tom, Sticks, Hand clap, Tambourine */
+        toDrumSlug(45) + ' ' + toDrumSlug(31) + ' ' + toDrumSlug(39) + ' ' + toDrumSlug(54),
+        /* High floor tom */
+        toDrumSlug(43),
+        /* Low floor tom */
+        toDrumSlug(41),
+        /* Low bass drum, High bass drum */
+        toDrumSlug(35) + ' ' + toDrumSlug(36),
+        /* Bottom line */
         "",
-        "pedal-hi-hat",
+        /* Pedal Hi-hat */
+        toDrumSlug(44),
         "",
         "",
         "",
@@ -67,8 +78,6 @@ export default class DrumStave extends Stave {
         58: 'headTriangleUp', // Vibraslap
         59: 'headX'           // Ride Cymbal 2
     };
-
-
 
     getNoteHTML(pitch, dynamic, duration) {
         const number = toNoteNumber(pitch);
@@ -106,8 +115,8 @@ export default class DrumStave extends Stave {
     Returns the row index of a given pitch name or number.
     **/
     getRow(part, n) {
-        const pitch = typeof n === 'string' ? n : toDrumPitch(n) ;
-        if (!pitch) throw new Error('Drum name not found for pitch ' + n);
+        const pitch = typeof n === 'string' ? n : toDrumSlug(n) ;
+        if (!pitch) throw new Error('Number not found for pitch ' + n);
         const i = this.rows.findIndex((row) => row.includes(pitch));
         if (global.DEBUG && i === -1) throw new Error('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name);
         if (i === -1) console.warn('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name);
@@ -116,9 +125,9 @@ export default class DrumStave extends Stave {
 
     getSpelling(key, event) {
         if (event[1] === 'note') {
-            // Use standard MIDI note names. We don't want any spelling happening
-            // on drum parts.
-            return toDrumPitch(toNoteNumber(event[2]));
+            // Use note number as row identifier. We don't want any spelling
+            // happening on drum parts.
+            return toDrumSlug(event[2]);
         }
 
         return super.getSpelliing(key, event[2]);
