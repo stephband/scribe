@@ -128,7 +128,9 @@ export default class Stave {
     **/
     getPitch(row) {
         const names = this.rows[row];
-        return names.split(/\s+/)[0];
+        return names ?
+            names.split(/\s+/)[0] :
+            undefined ;
     }
 
     /**

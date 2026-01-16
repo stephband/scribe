@@ -47,7 +47,7 @@ function scoreTupletAtBeat(duration, divisor, beat, events, n) {
     // Did previous event cross into - tie into - tuplet? Mark rhythm as
     // occupying division 0. This check MUST match the stop beat test in part.js
     // that rejects notes from being rendered on the following render iteration
-    if (events[n - 1] && gt(getStopBeat(events[n - 1]), beat + 0.5 * tupletDuration, p24)) {
+    if (events[n - 1] && gt(beat + 0.5 * tupletDuration, getStopBeat(events[n - 1]), p24)) {
         rhythm = 1;
     }
 

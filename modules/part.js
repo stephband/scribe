@@ -430,7 +430,7 @@ function createRest(durations, bar, stave, part, stopBeat, beat) {
 
 function createRests(symbols, durations, bar, stave, part, beat, tobeat) {
     // Insert rests frombeat - tobeat
-    while (gt(tobeat, beat, p16)) {
+    while (gt(beat, tobeat, p16)) {
         const rest = createRest(durations, bar, stave, part, tobeat, beat);
         symbols.push(rest);
         beat += rest.duration;
@@ -502,7 +502,7 @@ function createAccidentals(symbols, bar, part, accidentals, beat, notes) {
 
     while (note = notes[++n]) {
         // If event started before this bar we don't require an accidental
-        if (lt(note.event[0], bar.beat, p16)) continue;
+        if (lt(bar.beat, note.event[0], p16)) continue;
 
         // Find existing accidental above this one
         above = getAccidentalAboveRowAtBeat(symbols, beat, note.row);
@@ -650,10 +650,10 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, beam, setting
     if (!isPowerOf2(divisor)) symbols.push(tuplet);
 
     // While beat is before end of tuplet
-    while (lt(beat, stopBeat, p24)) {
+    while (lt(stopBeat, beat, p24)) {
         // Fill notes with events playing during beat, and leave event as the
         // next event after beat
-        while ((event = events[++n]) && lte(event[0] - bar.beat, beat + 0.5 * division, p24)) {
+        while ((event = events[++n]) && lte(beat + 0.5 * division, event[0] - bar.beat, p24)) {
             notes.push(event);
         }
         --n;
@@ -699,7 +699,7 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, beam, setting
         push(tuplet, ...noteSymbols);
 
         // Manage beam
-        if (gt(duration, 0.5, p24)) {
+        if (gt(0.5, duration, p24)) {
             // If there is a beam, close it
             if (beam) {
                 closeBeam(symbols, stave, part, beam);
@@ -720,7 +720,7 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, beam, setting
         while (p--) {
             let stopBeat = getStopBeat(notes[p]) - bar.beat;
             // Remove notes that end before or near next division, we're done with them
-            if (lte(stopBeat, beat + duration + 0.5 * division, p24)) notes.splice(p, 1);
+            if (lte(beat + duration + 0.5 * division, stopBeat, p24)) notes.splice(p, 1);
             // Add tie to remaining notes
             else symbols.push({
                 type:   'tie',
@@ -754,10 +754,10 @@ export function createPart(symbols, bar, stave, key = 0, accidentals = {}, part,
 
     // Ignore events that stop before beat 0. An extra cautious measure because
     // events array should already start with events at beat 0
-    while ((event = events[++n]) && lte(event[0] + event[4] - bar.beat, beat, p16));
+    while ((event = events[++n]) && lte(beat, event[0] + event[4] - bar.beat, p16));
     --n;
 
-    while (lt(beat, bar.duration, p16)) {
+    while (lt(bar.duration, beat, p16)) {
         // If there's a beam and beat is on a division close it
         if (beam && bar.divisions.find((division) => eq(beat, division, p16))
             // or head started after a new division
@@ -776,7 +776,7 @@ export function createPart(symbols, bar, stave, key = 0, accidentals = {}, part,
 
         if (data && !isPowerOf2(data.divisor)) {
             // Create rests up to tuplet
-            if (gt(data.beat - bar.beat, beat, p16)) createRests(symbols, settings.restDurations, bar, stave, part, beat, data.beat - bar.beat);
+            if (gt(beat, data.beat - bar.beat, p16)) createRests(symbols, settings.restDurations, bar, stave, part, beat, data.beat - bar.beat);
             // Close beam if there any holes in rhythm
             if (beam && rhythmHasHoles(data.divisor, data.rhythm)) {
                 closeBeam(symbols, stave, part, beam);
@@ -792,7 +792,7 @@ export function createPart(symbols, bar, stave, key = 0, accidentals = {}, part,
 
         // Fill notes with events playing during beat, and leave event as the
         // next event after beat
-        while ((event = events[++n]) && lte(event[0] - bar.beat, beat, p16)) {
+        while ((event = events[++n]) && lte(beat, event[0] - bar.beat, p16)) {
             notes.push(event);
         }
         --n;
@@ -885,7 +885,7 @@ if (stopBeat <= beat) {
             let stopBeat = getStopBeat(notes[p]) - bar.beat;
             // Remove notes that end before or near next beat
             if (// Note stops before next beat
-                lte(stopBeat, beat + duration, p16)
+                lte(beat + duration, stopBeat, p16)
                 // Note stops within 0.125 + 1/16 of its own true duration of next beat
                 || stopBeat - (beat + duration) < 0.125 + (1/16) * (getStopBeat(notes[p]) - notes[p][0])) {
                 notes.splice(p, 1);
