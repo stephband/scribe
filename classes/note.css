@@ -23,6 +23,7 @@
     line-height: 0.25em;
     white-space: nowrap;
     grid-auto-columns: min-content;
+    column-gap: 0;
 /*    grid-auto-columns: calc(1em * var(--head-1-size)) min-content; */
     grid-auto-rows: 0.25em;
     grid-auto-flow: column;

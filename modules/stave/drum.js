@@ -102,11 +102,14 @@ export default class DrumStave extends Stave {
         const ghostable = this.#ghostables[number];
         const html      = name ?
             `<span class="head" data-glyph="${ name }">${ glyphs[name] }</span>` :
-             super.getNoteHTML(pitch, dynamic, duration) ;
+            super.getNoteHTML(pitch, dynamic, duration) ;
 
         // Ghost note gets brackets
-        return ghostable && dynamic < ghostGain ?
-            glyphs.headBracketLeft + html + glyphs.headBracketRight :
+        return ghostable && dynamic < ghostGain ? `
+            <span class="pre" data-glyph="headBracketLeft">${ glyphs.headBracketLeft }</span>
+            ${ html }
+            <span class="post" data-glyph="headBracketRight">${ glyphs.headBracketRight }</span>
+            ` :
             html ;
     }
 
@@ -122,7 +125,7 @@ export default class DrumStave extends Stave {
 
     getPart(number) {
         // Split drums stave into drums and cymbals parts
-        return [35, 36, 37, 38, 40, 41, 43, 44, 45, 47, 50].includes(toNoteNumber(number)) ?
+        return [35, 36, 37, 38, 40, 41, 43, 44, 45, 47, 48, 50].includes(toNoteNumber(number)) ?
             this.parts[0] :
             this.parts[1] ;
     }
