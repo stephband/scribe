@@ -1,14 +1,15 @@
 
-import slugify from 'fn/slugify.js';
+import slugify     from 'fn/slugify.js';
 import { toDrumName, toNoteNumber } from 'midi/note.js';
-import { spellRoot, spellPitch }    from '../spelling.js';
+import parseGain   from 'sequence/parse/parse-gain.js';
+import { spellRoot, spellPitch } from '../spelling.js';
 import * as glyphs from "../glyphs.js";
 import Stave       from './stave.js';
 
 
 const global = globalThis || window;
 
-const ghostGain = 0.026607250794768333;
+const ghostGain = parseGain('-24dB');
 
 
 function toDrumSlug(number) {
