@@ -63,6 +63,7 @@ function createNoteSymbols(stave, key, part, notes) {
         symbols.push({
             type: 'note',
             pitch,
+            dynamic: event[3],
             part,
             row,
             stave,
