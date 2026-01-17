@@ -44,6 +44,7 @@
 }
 
 .note > .pre {
+    justify-self: start;
     margin-left: -0.1em;
 }
 
