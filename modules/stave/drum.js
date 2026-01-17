@@ -103,7 +103,8 @@ export default class DrumStave extends Stave {
         const html      = name ?
             `<span class="head" data-glyph="${ glyphs[name] }">${ head }</span>` :
              super.getNoteHTML(pitch, dynamic, duration) ;
-console.log(number, ghostable, name, dynamic);
+console.trace(number, ghostable, name, dynamic);
+debugger
         // Ghost note gets brackets
         return ghostable && dynamic < ghostGain ?
             glyphs.headBracketLeft + html + glyphs.headBracketRight :
