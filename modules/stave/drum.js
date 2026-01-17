@@ -8,6 +8,8 @@ import Stave       from './stave.js';
 
 const global = globalThis || window;
 
+const ghostGain = 0.026607250794768333;
+
 
 function toDrumSlug(number) {
     return slugify(toDrumName(number));
@@ -77,16 +79,33 @@ export default class DrumStave extends Stave {
         59: 'headX'           // Ride Cymbal 2
     };
 
+    #ghostables = {
+        31: true, // Sticks
+        35: true, // Low bass drum
+        36: true, // High bass drum
+        37: true, // Side Stick
+        38: true, // Snare drum 1
+        40: true, // Snare drum 2
+        41: true, // Low floor tom
+        42: true, // Closed Hi-Hat
+        43: true, // High floot tom
+        45: true, // Low tom
+        47: true, // Low mid tim
+        48: true, // High mid tom
+        50: true, // High tom
+        56: true  // Cowbell
+    };
+
     getNoteHTML(pitch, dynamic, duration) {
-        const number = toNoteNumber(pitch);
-        const name   = this.#headnames[number];
-        const head   = glyphs[name];
-        const html   = name ?
-            `<span class="head" data-glyph="${ name }">${ head }</span>` :
+        const number    = toNoteNumber(pitch);
+        const name      = this.#headnames[number];
+        const ghostable = this.#ghostables[number];
+        const html      = name ?
+            `<span class="head" data-glyph="${ glyphs[name] }">${ head }</span>` :
              super.getNoteHTML(pitch, dynamic, duration) ;
 
         // Ghost note gets brackets
-        return dynamic < 0.02 ?
+        return ghostable && dynamic < ghostGain ?
             glyphs.headBracketLeft + html + glyphs.headBracketRight :
             html ;
     }
