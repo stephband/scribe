@@ -19,8 +19,6 @@ const define = Object.defineProperties;
 /* ScribeMusic.stylesheet */
 const shadowCSSUrl = new URL('shadow.css', import.meta.url);
 const stylesheet = Signal.of();
-const stylefns   = [];
-//stylesheet.each((url) => stylefns.forEach((fn) => fn(url)));
 
 /* Element resizing */
 const resizes = new ResizeObserver((entries) => {
@@ -39,9 +37,8 @@ export default define(element('scribe-music', {
 
     construct: function(shadow, internals) {
         // Listen to updates to ScribeMusic.stylesheet and update the link
-        const stylelink = shadow.querySelector('link');
-        stylefns.push((url) => stylelink.href = url);
-        if (stylesheet.value) stylelink.href = stylesheet.value;
+        const link = shadow.querySelector('link');
+        if (stylesheet.value) link.href = stylesheet.value;
 
         // Set up listeners for attribute/property changes
         internals.data      = Signal.of();
@@ -371,7 +368,7 @@ export default define(element('scribe-music', {
     excludes: {
         attribute: function(string) { return getInternals(this).excludes.value = string.split(/\s+/); },
     }
-}, null, 'github.com/stephband/scribe/'), {
+}, 'stephband.band/scribe/'), {
     // Define ScribeMusic.styleheet as the stylesheet signal
     stylesheet: {
         set: (url) => stylesheet.value = url,
