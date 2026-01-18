@@ -57,6 +57,15 @@ export const note025Down  = '&#xE1DA;';
 export const note0125Down = '&#xE1DC;';
 export const augmentationDot = '&#xE1E7;';
 
+export const accentUp     = '&#xE4A0;';
+export const accentDown   = '&#xE4A1;';
+export const staccatoUp   = '&#xE4A2;';
+export const staccatoDown = '&#xE4A3;';
+export const tenutoUp     = '&#xE4A4;';
+export const tenutoDown   = '&#xE4A5;';
+export const marcatoUp    = '&#xE4AC;';
+export const marcatoDown  = '&#xE4AD;';
+
 // https://w3c.github.io/smufl/latest/tables/metronome-marks.html
 export const metNote2Up    = '&#xECA3;';
 export const metNote1Up    = '&#xECA5;';
