@@ -141,7 +141,7 @@ export default overload(get('type'), {
     }),
 
     accent: (symbol) => {
-        const isMarcato   = symbol.dynamic > config.marcatoThreshold;
+        const isMarcato   = symbol.dynamic >= config.marcatoThreshold;
         const isDrumStave = symbol.stave.type === 'drum' || symbol.stave.type === 'percussion';
 
         return create('span', {

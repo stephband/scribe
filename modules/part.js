@@ -536,7 +536,7 @@ function createAccents(symbols, stave, part, beat, notes, settings) {
     }
 
     // If max dynamic exceeds accent threshold, create an accent
-    if (notes.length && maxDynamic > settings.accentThreshold) {
+    if (notes.length && maxDynamic >= settings.accentThreshold) {
         const minMaxNote = notes[0].stemup ? notes[notes.length - 1] : notes[0];
         symbols.push({
             type:    'accent',
