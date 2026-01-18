@@ -529,25 +529,23 @@ function createAccidentals(symbols, bar, part, accidentals, beat, notes) {
 function createAccents(symbols, stave, part, beat, notes, settings) {
     // Find max dynamic among all notes
     let maxDynamic = -Infinity;
-    let n = -1, note;
-    while (note = notes[++n]) {
-        if (note.dynamic !== undefined && note.dynamic > maxDynamic) {
-            maxDynamic = note.dynamic;
-        }
+    let n = -1, note, event;
+    while (note = notes[++n]) if (note.dynamic > maxDynamic) {
+        maxDynamic = note.dynamic;
+        event      = note.event;
     }
 
     // If max dynamic exceeds accent threshold, create an accent
-    if (maxDynamic > settings.accentThreshold && notes.length) {
-        const targetNote = notes[0].stemup ? notes[notes.length - 1] : notes[0];
-
+    if (notes.length && maxDynamic > settings.accentThreshold) {
+        const minMaxNote = notes[0].stemup ? notes[notes.length - 1] : notes[0];
         symbols.push({
             type:    'accent',
             beat,
-            pitch:   targetNote.pitch,
+            pitch:   minMaxNote.pitch,
             dynamic: maxDynamic,
-            stemup:  targetNote.stemup,
+            stemup:  minMaxNote.stemup,
             part,
-            event:   targetNote.event
+            event
         });
     }
 }

@@ -125,7 +125,7 @@ export default overload(get('type'), {
         data: {
             beat:     truncate(4, symbol.beat),
             duration: truncate(4, symbol.duration),
-            event:  identify(symbol.event)
+            event:    identify(symbol.event)
         }
     }),
 
