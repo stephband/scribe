@@ -1,0 +1,15 @@
+
+.accent {
+    line-height: 0.25em;
+    height: 0.25em;
+}
+
+/* Stem-down notes get accents above */
+.down-accent {
+    transform: translateY(-0.25em);
+}
+
+/* Stem-up notes get accents below */
+.up-accent {
+    transform: translateY(0.25em);
+}
