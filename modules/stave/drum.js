@@ -101,7 +101,7 @@ export default class DrumStave extends Stave {
         const ghostable = this.#ghostables[number];
         const html      = name ?
             `<span class="head" data-glyph="${ name }">${ glyphs[name] }</span>` :
-            super.getNoteHTML(pitch, dynamic, duration) ;
+            this.getHeadHTML(pitch, dynamic, duration) ;
 
         // Ghost note gets brackets
         return ghostable && dynamic < config.ghostThreshold ? `

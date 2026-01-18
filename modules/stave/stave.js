@@ -4,8 +4,9 @@ import { toNoteName, toNoteNumber, toRootName, toRootNumber } from 'midi/note.js
 import { toKeyScale } from '../keys.js';
 import { spellRoot, spellPitch } from '../spelling.js';
 import { rflatsharp, byFatherCharlesPitch, accidentalChars } from '../pitch.js';
-import { major } from '../scale.js';
-import * as glyphs    from "../glyphs.js";
+import config      from '../config.js';
+import { major }   from '../scale.js';
+import * as glyphs from "../glyphs.js";
 
 
 const global = globalThis || window;
@@ -38,7 +39,7 @@ export default class Stave {
     percussion staves may replace heads based on pitch and dynamics.
     **/
 
-    getNoteHTML(pitch, dynamic, duration) {
+    getHeadHTML(pitch, dynamic, duration) {
         const name =
             // Semibreve
             duration >= 4 ? 'head4' :
@@ -52,6 +53,14 @@ export default class Stave {
             'head1' ;
 
         return `<span class="head" data-glyph="${ name }">${ glyphs[name] }</span>`;
+    }
+
+    getNoteHTML(pitch, dynamic, duration) {
+        return dynamic < config.ghostThreshold ? `
+            <span class="pre" data-glyph="headBracketLeft">${ glyphs.headBracketLeft }</span>
+            ${ this.getHeadHTML(pitch, dynamic, duration) }
+            <span class="post" data-glyph="headBracketRight">${ glyphs.headBracketRight }</span>` :
+            this.getHeadHTML(pitch, dynamic, duration) ;
     }
 
     /**

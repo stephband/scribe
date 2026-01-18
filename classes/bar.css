@@ -244,7 +244,9 @@
 
 .bar > .accent {
     grid-column-end: span 1;
-    justify-self: center;
+    justify-self: start;
+    width: calc(1em * var(--head-1-size));
+    text-align: center;
 }
 
 
