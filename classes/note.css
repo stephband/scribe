@@ -45,12 +45,16 @@
 
 .note > .pre {
     justify-self: start;
-    margin-left: -0.1em;
+    /* Moves bracket away from head in x direction. For Jazz font y position and
+       rotation helps keep bracket away from stem */
+    transform: translate(-0.1em, -0.02em) rotate(6deg);
 }
 
 .note > .post {
     justify-self: end;
-    margin-right: -0.1em;
+    /* Moves bracket away from head in x direction. For Jazz font y position and
+       rotation helps keep bracket away from stem */
+    transform: translate(0.1em, 0.02em) rotate(6deg);
 }
 
 .note > .head {
