@@ -14,7 +14,7 @@ export default {
     // Accent thresholds
     marcatoThreshold: parseGain('-6dB'),
     accentThreshold:  parseGain('-12dB'),
-    ghostThreshold:   parseGain('-24dB'),
+    ghostThreshold:   parseGain('-30dB'),
 
     // Allowed head durations
     headDurations: [
