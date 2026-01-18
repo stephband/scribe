@@ -1,15 +1,13 @@
 
 import slugify     from 'fn/slugify.js';
 import { toDrumName, toNoteNumber } from 'midi/note.js';
-import parseGain   from 'sequence/parse/parse-gain.js';
 import { spellRoot, spellPitch } from '../spelling.js';
 import * as glyphs from "../glyphs.js";
+import config      from '../config.js';
 import Stave       from './stave.js';
 
 
 const global = globalThis || window;
-
-const ghostGain = parseGain('-24dB');
 
 
 function toDrumSlug(number) {
@@ -106,7 +104,7 @@ export default class DrumStave extends Stave {
             super.getNoteHTML(pitch, dynamic, duration) ;
 
         // Ghost note gets brackets
-        return ghostable && dynamic < ghostGain ? `
+        return ghostable && dynamic < config.ghostThreshold ? `
             <span class="pre" data-glyph="headBracketLeft">${ glyphs.headBracketLeft }</span>
             ${ html }
             <span class="post" data-glyph="headBracketRight">${ glyphs.headBracketRight }</span>

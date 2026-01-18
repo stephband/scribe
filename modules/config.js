@@ -12,8 +12,9 @@ export default {
     swingAsStraight16ths: true,
 
     // Accent thresholds
-    accentThreshold:  parseGain('-12dB'),
     marcatoThreshold: parseGain('-6dB'),
+    accentThreshold:  parseGain('-12dB'),
+    ghostThreshold:   parseGain('-24dB'),
 
     // Allowed head durations
     headDurations: [

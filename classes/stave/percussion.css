@@ -59,3 +59,14 @@ https://web.mit.edu/merolish/Public/drums.pdf
 .percussion-stave > .rest[data-duration="6"] {
     grid-row: stave-center;
 }
+
+/* Accents for cymbal parts (stem-up) go above the stave */
+.percussion-stave > .up-accent {
+    grid-row: cymbals-beam;
+    transform: translateY(-0.25em);
+}
+
+/* Accents for drum parts (stem-down) use default positioning */
+.percussion-stave > .down-accent {
+    /* Uses default positioning */
+}

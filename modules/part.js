@@ -544,6 +544,7 @@ function createAccents(symbols, stave, part, beat, notes, settings) {
             pitch:   minMaxNote.pitch,
             dynamic: maxDynamic,
             stemup:  minMaxNote.stemup,
+            stave,
             part,
             event
         });

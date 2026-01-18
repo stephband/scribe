@@ -106,6 +106,12 @@ https://web.mit.edu/merolish/Public/drums.pdf
     position: static;
 }
 
+/* Accents for cymbal parts (stem-up) go above the stave */
+.drum-stave > .up-accent {
+    grid-row: up-beam;
+    transform: translateY(-0.1875em);
+}
+
 .drum-stave > .beam-note[data-pitch^="ride"]        { --stem-height: 0.85; }
 .drum-stave > .beam-note[data-pitch^="snare"]       { --stem-height: 1.5; }
 .drum-stave > .beam-note[data-pitch="pedal-hi-hat"] { --stem-height: 0.7; }

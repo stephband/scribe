@@ -141,14 +141,16 @@ export default overload(get('type'), {
     }),
 
     accent: (symbol) => {
-        const isMarcato = symbol.dynamic > config.marcatoThreshold;
-        const glyph = isMarcato ?
-            (symbol.stemup ? glyphs.marcatoDown : glyphs.marcatoUp) :
-            (symbol.stemup ? glyphs.accentDown : glyphs.accentUp) ;
+        const isMarcato   = symbol.dynamic > config.marcatoThreshold;
+        const isDrumStave = symbol.stave.type === 'drum' || symbol.stave.type === 'percussion';
 
         return create('span', {
             class: `${ symbol.stemup ? 'up' : 'down' }-accent accent${ isMarcato ? ' marcato-accent' : '' }`,
-            html: glyph,
+            html: isDrumStave ?
+                isMarcato ? glyphs.marcatoUp : glyphs.accentUp :
+            isMarcato ? symbol.stemup ? glyphs.marcatoDown : glyphs.marcatoUp :
+            symbol.stemup ? glyphs.accentDown : glyphs.accentUp,
+
             data: {
                 beat:  truncate(4, symbol.beat),
                 pitch: symbol.pitch,
