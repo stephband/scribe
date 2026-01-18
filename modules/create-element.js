@@ -147,9 +147,10 @@ export default overload(get('type'), {
         return create('span', {
             class: `${ symbol.stemup ? 'up' : 'down' }-accent accent${ isMarcato ? ' marcato-accent' : '' }`,
             html: isDrumStave ?
-                isMarcato ? glyphs.marcatoUp : glyphs.accentUp :
-            isMarcato ? symbol.stemup ? glyphs.marcatoDown : glyphs.marcatoUp :
-            symbol.stemup ? glyphs.accentDown : glyphs.accentUp,
+                    isMarcato ? symbol.stemup ? glyphs.marcatoUp : glyphs.marcatoDown :
+                symbol.stemup ? glyphs.accentUp : glyphs.accentDown :
+                    isMarcato ? symbol.stemup ? glyphs.marcatoDown : glyphs.marcatoUp :
+                symbol.stemup ? glyphs.accentDown : glyphs.accentUp,
 
             data: {
                 beat:  truncate(4, symbol.beat),
