@@ -240,6 +240,14 @@
 }
 
 
+/* Accents */
+
+.bar > .accent {
+    grid-column-end: span 1;
+    justify-self: center;
+}
+
+
 /* Rests
 Short rests inhabit one column, longer rests are centered
 in their duration span. */

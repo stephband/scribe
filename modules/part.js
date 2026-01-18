@@ -524,6 +524,35 @@ function createAccidentals(symbols, bar, part, accidentals, beat, notes) {
 }
 
 
+/* Accents */
+
+function createAccents(symbols, stave, part, beat, notes, settings) {
+    // Find max dynamic among all notes
+    let maxDynamic = -Infinity;
+    let n = -1, note;
+    while (note = notes[++n]) {
+        if (note.dynamic !== undefined && note.dynamic > maxDynamic) {
+            maxDynamic = note.dynamic;
+        }
+    }
+
+    // If max dynamic exceeds accent threshold, create an accent
+    if (maxDynamic > settings.accentThreshold && notes.length) {
+        const targetNote = notes[0].stemup ? notes[notes.length - 1] : notes[0];
+
+        symbols.push({
+            type:    'accent',
+            beat,
+            pitch:   targetNote.pitch,
+            dynamic: maxDynamic,
+            stemup:  targetNote.stemup,
+            part,
+            event:   targetNote.event
+        });
+    }
+}
+
+
 /* Ledger lines */
 
 function createLedges(symbols, stave, part, beat, notes) {
@@ -672,6 +701,7 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, beam, setting
         // Create ledgers and accidentals
         createLedges(symbols, stave, part, beat, noteSymbols);
         createAccidentals(symbols, bar, part, accidentals, beat, noteSymbols);
+        createAccents(symbols, stave, part, beat, noteSymbols, settings);
 
         const stopBeat = min(
             // Max stop beat of notes
@@ -846,6 +876,7 @@ if (stopBeat <= beat) {
         // Create ledgers and accidentals
         createLedges(symbols, stave, part, beat, noteSymbols);
         createAccidentals(symbols, bar, part, accidentals, beat, noteSymbols);
+        createAccents(symbols, stave, part, beat, noteSymbols, settings);
 
         // Original start beat of notes, may be well before beat
         const startBeat = notes[0][0] - bar.beat;

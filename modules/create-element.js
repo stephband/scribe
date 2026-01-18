@@ -10,6 +10,7 @@ import { beamThickness } from './beam.js';
 import { toHTML }        from './html.js';
 import map               from './object/map.js';
 import truncate          from './number/truncate.js';
+import config            from './config.js';
 
 
 const abs = Math.abs;
@@ -138,6 +139,24 @@ export default overload(get('type'), {
             event: symbol.event && identify(symbol.event)
         }
     }),
+
+    accent: (symbol) => {
+        const isMarcato = symbol.dynamic > config.marcatoThreshold;
+        const glyph = isMarcato ?
+            (symbol.stemup ? glyphs.marcatoDown : glyphs.marcatoUp) :
+            (symbol.stemup ? glyphs.accentDown : glyphs.accentUp) ;
+
+        return create('span', {
+            class: `${ symbol.stemup ? 'up' : 'down' }-accent accent${ isMarcato ? ' marcato-accent' : '' }`,
+            html: glyph,
+            data: {
+                beat:  truncate(4, symbol.beat),
+                pitch: symbol.pitch,
+                part:  symbol.part.name,
+                event: identify(symbol.event)
+            }
+        });
+    },
 
     ledge: (symbol) => create('svg', {
         class:   `${ symbol.rows < 0 ? 'up' : 'down' }-ledge ledge`,

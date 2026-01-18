@@ -1,3 +1,5 @@
+import parseGain from 'sequence/parse/parse-gain.js';
+
 export default {
     // Spelling
     spellChordRootCFlatAsB:  true,
@@ -8,6 +10,10 @@ export default {
     // Swing and shuffle interpretation
     swingAsStraight8ths:  true,
     swingAsStraight16ths: true,
+
+    // Accent thresholds
+    accentThreshold:  parseGain('-12dB'),
+    marcatoThreshold: parseGain('-6dB'),
 
     // Allowed head durations
     headDurations: [

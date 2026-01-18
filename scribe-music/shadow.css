@@ -5,6 +5,7 @@
 
 @import '../classes/instruction.css';
 @import '../classes/accidental.css';
+@import '../classes/accent.css';
 @import '../classes/stave.css';
 @import '../classes/bar.css';
 @import '../classes/clef.css';

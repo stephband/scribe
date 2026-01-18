@@ -328,6 +328,10 @@
     align-self: center;
 }
 
+.stave > .accent {
+    align-self: center;
+}
+
 .stave > .chord {
     grid-row: chords;
     align-self: center;
