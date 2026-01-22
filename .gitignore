@@ -1,6 +1,9 @@
+.claude/
 .venv/
-archive/*
-phil-taylor-tests/*
+archive/
+screenshots/
+phil-taylor-tests/
 *.m4a
 *.wav
 *.mp3
+CLAUDE.md
