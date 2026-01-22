@@ -47,6 +47,10 @@
         ]
     }],
 
+    "display": {
+        "clef": "drum"
+    },
+
     "notes": {
         "links": [{
             "url": "https://www.youtube.com/watch?v=JsVMXCirqto&list=RDJsVMXCirqto",
