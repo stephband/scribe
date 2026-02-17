@@ -1,6 +1,7 @@
 import matches from 'fn/matches.js';
 import nothing from 'fn/nothing.js';
 import { toRootName, toRootNumber } from 'midi/note.js';
+import { toChordName } from 'sequence/modules/event/chords.js';
 import toStopBeat from './event/to-stop-beat.js';
 import { toKeyScale, keyWeightsForEvent, chooseKeyFromWeights } from './keys.js';
 import { byFatherCharlesPitch, accidentalChars } from './pitch.js';
@@ -152,7 +153,7 @@ function createBarSymbols(symbols, bar, stave, key, accidentals, events, setting
                     bar.duration - beat :
                     event[4],
                 root,
-                extension: event[3],
+                extension: toChordName(event[3]),
                 event,
                 stave
             });

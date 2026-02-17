@@ -144,6 +144,8 @@ export function renderStyle(element, root = element) {
     // One that isn't going to rely on the font so much? Or maybe include the
     // metrics in the font stylesheet?
     const side   = root.querySelector('.side');
+    if (!side) return;
+
     const key    = side.dataset.key;
     const counts = {'G♭': 6, 'C♯': 5, 'D♭': 5, 'G♯': 4, 'A♭': 4, 'D♯': 3, 'E♭': 3, 'B♭': 2, 'F':  1, 'C':  0, 'G':  1, 'D':  2, 'A':  3, 'E':  4, 'B':  5, 'F♯': 6};
     const count  = counts[key];

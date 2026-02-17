@@ -4,7 +4,7 @@
         "fn/":       "https://cdn.jsdelivr.net/gh/stephband/fn@1.5.x/modules/",
         "bolt/":     "https://cdn.jsdelivr.net/gh/stephband/bolt-2@1.0.1/",
         "midi/":     "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.1/modules/",
-        "sequence/": "https://cdn.jsdelivr.net/gh/soundio/sequence@0.2.11/"
+        "sequence/": "https://cdn.jsdelivr.net/gh/soundio/sequence@0.2.13/"
     },
 
     "lock": false

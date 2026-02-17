@@ -2,6 +2,8 @@
 import overload           from 'fn/overload.js';
 import { toNoteNumber, toRootNumber, toRootName } from 'midi/note.js';
 import { isChordEvent, isNoteEvent } from 'sequence/modules/event.js';
+import { hsidToNumbers }  from 'sequence/modules/event/hsid.js';
+import { toHSID }         from 'sequence/modules/event/chords.js';
 import toStopBeat         from './event/to-stop-beat.js';
 import { transposeScale } from './scale.js';
 import { major }          from './scale.js';
@@ -31,39 +33,6 @@ export function toKeyScale(key) {
 
 const { abs } = Math;
 
-const extensions = {
-    "":       [0,4,7],
-    "∆":      [0,4,7,11],
-    "∆7":     [0,4,7,11],
-    "∆♯11":   [0,4,6,7,11],
-    "7":      [0,4,7,10],
-    "13":     [0,4,7,9,10],
-    "7sus":   [0,5,7,10],
-    "-":      [0,3,7],
-    "-7":     [0,3,7,10],
-    "-11":    [0,3,5,7],
-    "-6":     [0,3,7,9],
-    "-13":    [0,3,7,9],
-    "-♭6":    [0,3,7,8],
-    "7sus♭9": [0,1,5,7,10],
-    "ø":      [0,3,6,10],
-    "-∆":     [0,3,7,11],
-    "7♯11":   [0,4,6,7,10],
-    "∆♭6":    [0,4,7,8],
-    "-♭9":    [0,1,3,7],
-    "ø7":     [0,2,3,6,10],
-    "∆♯5":    [0,2,4,6,8,9,11],
-    "7alt":   [0,1,3,4,6,8,10],
-    "°":      [0,3,6,9],
-    "7♭9":    [0,1,4,7,10],
-    "7♯9":    [0,3,4,7,10],
-    "7♭13":   [0,4,7,8,10],
-    "13♭9":   [0,1,4,7,9],
-    "+":      [0,2,4,6,8,10],
-    "+7":     [0,2,4,6,8,10],
-    "dim":    [0,3,6,9],
-};
-
 const degreeWeights = Float32Array.of(
 //  Root b9   9    min3 maj3 11   #11  5    b6   13   7    maj7
     1,   0.9, 0.8, 1,   1,   0.8, 0.8, 1,   0.9, 1,   1,   1
@@ -91,31 +60,6 @@ const factors = {
     3: [10/16, 13/16, 10/16],
     4: [10/16, 13/16, 10/16, 12/16]
 };
-
-/*function toChordKeys(root, ext) {
-    const r       = toRootNumber(root);
-    const notes   = extensions[ext];
-    const weights = Float32Array.of(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-    const facts   = factors[notes.length];
-    let n = notes.length, number, keys;
-    while (n--) {
-        number = r + notes[n];
-        keys   = keysContainingNote(number);
-        multiplyWeights(weights, keys, facts[n]);
-    }
-    return weights;
-}*/
-
-function toChordNotes(root, ext) {
-    const r = toRootNumber(root);
-    const e = ext.replaceAll(rflatsharp, ($0) =>
-        $0 === 'b' ? '♭' :
-        $0 === '#' ? '♯' :
-        $0
-    );
-
-    return extensions[ext].map((n) => toRootNumber(r + n)).sort();
-}
 
 function keysContainingNote(number) {
     const keys = new Float32Array(12);
@@ -156,24 +100,18 @@ const types = {
     },
 
     chord: (weights, event, influence = 1) => {
-        const r = toRootNumber(event[2]);
-        const degrees = extensions[event[3].replace(/\(|\)/g, '')];
+        const r       = toRootNumber(event[2]);
+        const numbers = hsidToNumbers(event[3]);
 
-        if (!degrees) {
-            console.warn('No scale for chord extension "' + event[3] + '"');
-            return weights;
-        }
-
-        const notes = degrees.map((n) => toRootNumber(r + n));
-
-        let n = notes.length, probs;
+        let n = numbers.length, probs;
         while (n--) {
-            probs = keysContainingNote(notes[n]);
-            multiplyWeights(weights, probs, (influence / notes.length)
+            probs = keysContainingNote(r + numbers[n]);
+            multiplyWeights(weights, probs, (influence / numbers.length)
                 // Weight notes based on chord degree
-                * degreeWeights[degrees[n]]
+                * degreeWeights[numbers[n]]
             );
         }
+
         return weights;
     }
 }
