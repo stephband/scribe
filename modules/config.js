@@ -1,4 +1,4 @@
-import parseGain from 'sequence/parse/parse-gain.js';
+import parseGain from 'sequence/modules/parse/parse-gain.js';
 
 export default {
     // Spelling

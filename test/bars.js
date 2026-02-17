@@ -1,6 +1,6 @@
 import 'https://cdn.jsdelivr.net/gh/stephband/fn@1.5.x/deno/deno-2-support.js';
 
-import Sequence   from 'sequence/sequence.js';
+import Sequence   from 'sequence/module.js';
 import Stave      from '../modules/stave.js';
 import createBars from '../modules/create-bars.js';
 

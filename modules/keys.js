@@ -1,7 +1,7 @@
 
 import overload           from 'fn/overload.js';
 import { toNoteNumber, toRootNumber, toRootName } from 'midi/note.js';
-import { isChordEvent, isNoteEvent } from 'sequence/event.js';
+import { isChordEvent, isNoteEvent } from 'sequence/modules/event.js';
 import toStopBeat         from './event/to-stop-beat.js';
 import { transposeScale } from './scale.js';
 import { major }          from './scale.js';

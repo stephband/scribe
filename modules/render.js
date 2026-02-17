@@ -3,7 +3,7 @@ import create           from 'dom/create.js';
 import px               from 'dom/parse-length.js';
 import rect             from 'dom/rect.js';
 import { toRootName }   from 'midi/note.js';
-import SequenceIterator from 'sequence/sequence-iterator.js';
+import SequenceIterator from 'sequence/modules/sequence-iterator.js';
 import Stave            from './stave.js';
 import createBars       from './create-bars.js';
 import createElement    from './create-element.js';
@@ -58,8 +58,8 @@ text = glyphs.textNoteShort
     + glyphs.note05Up
 */
 
-export function renderElements(data, excludes, clef, keyname, meter, duration = Infinity, transpose = 0, displace = 0, settings = config) {
-    const events = data.events;
+export function renderElements(sequence, excludes, clef, keyname, meter, duration = Infinity, transpose = 0, displace = 0, settings = config) {
+    const events = sequence.events;
 
     // If events contains no initial meter and meter is set, insert a meter event
     const meterEvent = events.find(isInitialMeterEvent);
@@ -78,10 +78,10 @@ export function renderElements(data, excludes, clef, keyname, meter, duration = 
     if (displace)  transforms.push("displace", displace);
 
     // Create sequence object
-    const sequence = new SequenceIterator(events, data.sequences, transforms);
+    const iterator = new SequenceIterator(events, sequence.sequences, transforms);
 
     // Create bar elements
-    const bars = createBars(sequence, excludes, stave, settings);
+    const bars = createBars(iterator, excludes, stave, settings);
     const elements = bars.reduce(toBarElements, []);
 
 //const keysig = elements[0].querySelectorAll('.acci:not([data-beat])');

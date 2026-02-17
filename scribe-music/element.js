@@ -5,6 +5,7 @@ import create                    from 'dom/create.js';
 import element, { getInternals } from 'dom/element.js';
 import events                    from 'dom/events.js';
 import { toRootName, toRootNumber } from 'midi/note.js';
+import Sequence                  from 'sequence/module.js';
 
 import requestData       from '../modules/request-data.js';
 import parseSource       from '../modules/parse.js';
@@ -81,7 +82,7 @@ export default define(element('scribe-music', {
 
             const elements = internals.data.value && renderElements(
                 // Events from data
-                internals.data.value,
+                Sequence.from(internals.data.value),
                 // Excludes is an array
                 internals.excludes.value,
                 // Clef is a string
