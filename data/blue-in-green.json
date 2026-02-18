@@ -1,9 +1,9 @@
 {
     "name": "Blue in Green",
-    "author": { "name": "Miles Davis / Bill Evans" },
+
     "events": [
-        [0,  "key", "F"],
-        [0,  "meter", 4, 1],
+        [0, "key", "F"],
+        [0, "meter", 4, 1],
         [0, "sequence", 1, 0, 40]
     ],
 
@@ -49,6 +49,11 @@
             [36,   "note",  "F5",  0.1, 3],
             [39,   "note",  "C#5", 0.1, 1]
         ]
+    }],
+
+    "credits": [{
+        "name": "Miles Davis / Bill Evans",
+        "role": "composer"
     }],
 
     "notes": {
