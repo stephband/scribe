@@ -1,12 +1,21 @@
 
 import nothing        from 'fn/nothing.js';
-import { toNoteName, toNoteNumber, toRootName, toRootNumber } from 'midi/note.js';
-import { toKeyScale } from '../keys.js';
-import { spellRoot, spellPitch } from '../spelling.js';
-import { rflatsharp, byFatherCharlesPitch, accidentalChars } from '../pitch.js';
+import { noteNames, toNoteName, toNoteNumber, toNoteOctave, toRootName, toRootNumber } from 'midi/note.js';
+import mod12       from '../number/mod-12.js';
+import keys, { toKeyScale } from '../keys.js';
+import { rpitch, rflatsharp, byFatherCharlesPitch, accidentalChars } from '../pitch.js';
 import config      from '../config.js';
 import { major }   from '../scale.js';
 import * as glyphs from "../glyphs.js";
+
+
+const accidentals = {
+    '-2': '𝄫',
+    '-1': '♭',
+    '0':  '',
+    '1':  '♯',
+    '2':  '𝄪'
+};
 
 
 const global = globalThis || window;
@@ -143,13 +152,45 @@ export default class Stave {
     }
 
     /**
-    .getSpelling()
+    .getSpelling(key, pitch, withOctave)
     Gets spelling of a given pitch. Returns a pitch name string.
     **/
-    getSpelling(key, event) {
-        return event[1] === 'chord' ?
-            spellRoot(key, event[2]) :
-            spellPitch(key, event[2]) ;
+    getSpelling(key, pitch, withOctave = false) {
+        if (!withOctave) {
+            const keyData = keys[key];
+            const n = toRootNumber(pitch);
+            const a = keyData.spellings[n];
+            return noteNames[mod12(n - a)] + accidentals[a];
+        }
+
+        const keyData = keys[key];
+        let n, a, o;
+
+        if (typeof pitch === 'string') {
+            let [notename, letter, accidental, octave] = rpitch.exec(pitch) || [pitch];
+            if (octave) {
+                // pitch is note name like "C4", deconstruct it and put it back together
+                n = toNoteNumber(pitch);
+                a = keyData.spellings[mod12(n)];
+                o = toNoteOctave(n - a);
+            }
+        }
+        else {
+            // pitch is a number
+            n = pitch;
+            a = keyData.spellings[mod12(n)];
+            o = toNoteOctave(n - a);
+        }
+
+        // key.spellings makes sure name is a natural note name
+        const name = noteNames[mod12(n - a)];
+        const accidental = accidentals[a];
+
+        if (window.DEBUG && name === undefined) {
+            throw new Error('Incorrect spelling for pitch number ' + n + ': "' + name + '"');
+        }
+
+        return name + accidental + o;
     }
 
     createKeySymbols(key) {

@@ -50,13 +50,24 @@ const restGlyphs = {
     '0.08': glyphs.rest0125
 };
 
-const rextensionparts = /^(∆|-|ø|7|\+)?(alt|sus|maj|min|dim|aug)?(.*)$/;
+//                        (C         )(7            )(sus      )(♭9      )(/G              )
+const rchordparts     = /^([A-G][♭♯]?)([∆\-ø+°♭♯\d]*)([a-zA-Z]*)([♭♯]?\d+)?(?:\/([A-G][♭♯]?))?$/;
 
 
 function toEventIds(symbol) {
     let n = -1, string = '';
     while (symbol[++n]) string += (string ? ' ' : '') + identify(symbol[n].event);
     return string;
+}
+
+function toChordHTML($0, $root, $ext, $sub, $sup, $bass) {
+    return '<span class="chord-root">' + toHTML($root) + '</span>'
+        + (($ext || $sub || $sup) ? '<span class="chord-ext">'
+            + ($ext ? toHTML($ext) : '')
+            + ($sub ? '<sub>' + $sub + '</sub>' : '')
+            + ($sup ? toHTML($sup) : '')
+        + '</span>' : '')
+        + ($bass ? glyphs.chordBassSlash + '<span class="chord-bass">' + toHTML($bass) + '</span>' : '');
 }
 
 export default overload(get('type'), {
@@ -75,20 +86,10 @@ export default overload(get('type'), {
     }),
 
     chord: (symbol) => {
-        const parts = rextensionparts.exec(symbol.extension);
-
         return create('abbr', {
             class: "chord chord-abbr",
             title: "",
-            // Note that we must detect sharps before flats because HTML entities
-            // contain hash symbols that can be interpreted as sharps
-            html: '<span class="chord-root">' + toHTML(symbol.root) + '</span>'
-                + '<span class="chord-ext">'
-                + (parts[1] ? '<span class="chord-ext-' + parts[1] + '">' + parts[1] + '</span>' : '')
-                + (parts[2] ? '<sub>' + parts[2] + '</sub>' : '')
-                + (parts[3] ? '<sup>' + toHTML(parts[3]) + '</sup>' : '')
-                + '</span>'
-                + (symbol.bass ? glyphs.chordBassSlash + '<span class="chord-bass">' + symbol.bass + '</span>' : ''),
+            html: symbol.name.replace(rchordparts, toChordHTML),
             data: {
                 beat:     truncate(4, symbol.beat),
                 duration: truncate(4, symbol.duration),

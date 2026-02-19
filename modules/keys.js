@@ -1,12 +1,11 @@
 
-import overload           from 'fn/overload.js';
+import overload                  from 'fn/overload.js';
 import { toNoteNumber, toRootNumber, toRootName } from 'midi/note.js';
 import { isChordEvent, isNoteEvent } from 'sequence/modules/event.js';
-import { hsidToNumbers }  from 'sequence/modules/event/hsid.js';
-import { toHSID }         from 'sequence/modules/event/chords.js';
-import toStopBeat         from './event/to-stop-beat.js';
-import { transposeScale } from './scale.js';
-import { major }          from './scale.js';
+import { hsidToNumbers }         from 'sequence/modules/event/hsid.js';
+import { toHSID }                from 'sequence/modules/event/chords.js';
+import toStopBeat                from './event/to-stop-beat.js';
+import { transposeScale, major } from './scale.js';
 
 export default [
     //                                       C      D       E  F      G      A       B

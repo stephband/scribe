@@ -2,6 +2,7 @@ import matches from 'fn/matches.js';
 import nothing from 'fn/nothing.js';
 import { toRootName, toRootNumber } from 'midi/note.js';
 import { toChordName } from 'sequence/modules/event/chords.js';
+import mod12       from './number/mod-12.js';
 import toStopBeat from './event/to-stop-beat.js';
 import { toKeyScale, keyWeightsForEvent, chooseKeyFromWeights } from './keys.js';
 import { byFatherCharlesPitch, accidentalChars } from './pitch.js';
@@ -28,6 +29,8 @@ const barDivisions = {
     // 12/8
     '12,0.5': [1.5,3,4.5]
 };
+
+const rslashbass = /\/\{(\d{1,2})\}$/;
 
 /**
 getBarDivisions(meter)
@@ -89,6 +92,14 @@ function updateAccidentals(accidentals, key) {
     return accidentals;
 }
 
+function substituteSpelling(settings, name) {
+    if (name === 'C♭' && settings.spellChordRootCFlatAsB)  return 'B';
+    if (name === 'E♯' && settings.spellChordRootESharpAsF) return 'F';
+    if (name === 'B♯' && settings.spellChordRootBSharpAsC) return 'C';
+    if (name === 'F♭' && settings.spellChordRootFFlatAsE)  return 'E';
+    return name;
+}
+
 function createBarSymbols(symbols, bar, stave, key, accidentals, events, settings) {
     let n = -1;
     let event;
@@ -137,23 +148,30 @@ function createBarSymbols(symbols, bar, stave, key, accidentals, events, setting
             const beat       = event[0] - bar.beat;
             const keyWeights = keyWeightsForEvent(events, n, key);
             const keyNumber  = chooseKeyFromWeights(keyWeights);
+            const extension  = toChordName(event[3]);
+            const slashbass  = rslashbass.exec(extension);
 
-            let root = stave.getSpelling(keyNumber, event);
+            let root, bass, name;
 
-            if (root === 'C♭' && settings.spellChordRootCFlatAsB)  root = 'B';
-            if (root === 'E♯' && settings.spellChordRootESharpAsF) root = 'F';
-            if (root === 'B♯' && settings.spellChordRootBSharpAsC) root = 'C';
-            if (root === 'F♭' && settings.spellChordRootFFlatAsE)  root = 'E';
+            if (slashbass) {
+                const n    = parseInt(slashbass[1], 10);
+                root = stave.getSpelling(keyNumber, mod12(event[2] - n));
+                bass = stave.getSpelling(keyNumber, event[2]);
+                name = substituteSpelling(settings, root) + '/' + extension.replace(rslashbass, substituteSpelling(settings, bass));
+            }
+            else {
+                root = stave.getSpelling(keyNumber, event[2]);
+                name = substituteSpelling(settings, root) + extension;
+            }
 
             symbols.push({
                 type: 'chord',
                 beat,
+                name,
                 // Does chord cross into next bar? The symbol should not
                 duration: event[0] + event[4] > bar.beat + bar.duration ?
                     bar.duration - beat :
                     event[4],
-                root,
-                extension: toChordName(event[3]),
                 event,
                 stave
             });

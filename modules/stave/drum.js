@@ -1,7 +1,6 @@
 
 import slugify     from 'fn/slugify.js';
 import { toDrumName, toNoteNumber } from 'midi/note.js';
-import { spellRoot, spellPitch } from '../spelling.js';
 import * as glyphs from "../glyphs.js";
 import config      from '../config.js';
 import Stave       from './stave.js';
@@ -142,14 +141,14 @@ export default class DrumStave extends Stave {
         return i > -1 ? i : undefined ;
     }
 
-    getSpelling(key, event) {
-        if (event[1] === 'note') {
+    getSpelling(key, number) {
+        //if (event[1] === 'note') {
             // Use pitch slug as row identifier. We don't want any spelling
             // happening on drum parts.
-            return toDrumSlug(event[2]);
-        }
+            return toDrumSlug(number);
+        //}
 
-        return super.getSpelling(key, event[2]);
+        //return super.getSpelling(key, event[2]);
     }
 
     createSignatureSymbols(key) {

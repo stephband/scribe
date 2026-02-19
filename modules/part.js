@@ -56,7 +56,7 @@ function createNoteSymbols(stave, key, part, notes) {
         const index      = event.scribeIndex;
         const keyWeights = keyWeightsForEvent(events, index, key);
         const keyNumber  = chooseKeyFromWeights(keyWeights);
-        const pitch      = stave.getSpelling(keyNumber, event);
+        const pitch      = stave.getSpelling(keyNumber, event[2], true);
         const row        = stave.getRow(part, pitch);
 
         // Create symbols with pitch, row
