@@ -1,6 +1,6 @@
 
-import by       from 'fn/by.js';
-import get      from 'fn/get.js';
+import by          from 'fn/by.js';
+import get         from 'fn/get.js';
 import { toNoteName, toNoteNumber, toRootName, toRootNumber } from 'midi/note.js';
 import { keyToRootNumber } from 'sequence/modules/event/keys.js';
 import { keyWeightsForEvent, chooseKeyFromWeights } from './keys.js';
@@ -17,6 +17,7 @@ import map         from './object/map.js';
 import getDuration from './event/to-duration.js';
 import getStopBeat from './event/to-stop-beat.js';
 import config      from './config.js';
+
 
 const assign = Object.assign;
 const { abs, ceil, floor, min, max, pow, sqrt, round } = Math;
@@ -81,15 +82,22 @@ function createNoteSymbols(stave, key, part, notes) {
     symbols.sort(byRow);
 
     // Assign top and bottom to highest and lowest note symbols
-    symbols[0].top = true;
-    symbols[symbols.length - 1].bottom = true;
+    const top    = symbols[0];
+    const bottom = symbols[symbols.length - 1];
+    top.top       = true;
+    bottom.bottom = true;
 
     // Figure out stemup, note that this may be overidden by beam
-    const minRow = symbols[0].row;
-    const maxRow = symbols[symbols.length - 1].row;
+    const minRow = top.row;
+    const maxRow = bottom.row;
     const stemup = part.stemup === undefined ?
         stemupFromRows(stave, part, minRow, maxRow) :
         part.stemup ;
+
+    // Assign stemHeight to top and bottom symbols
+    const stemHeight = 1 + (maxRow - minRow) / 8;
+    top.stemHeight    = stemHeight;
+    bottom.stemHeight = stemHeight;
 
     // Loop forward through rows
     let c = 0;
@@ -196,8 +204,7 @@ function closeBeam(symbols, stave, part, beam) {
         // Get stem direction from part
         part.stemup ;
 
-
-    // If part has beam beams are in a fixed position
+    // If part has beam (drum stave) beams are in a fixed position
     if (part.beam) {
         // TEMP: DO it better
         let note;
@@ -228,7 +235,7 @@ function closeBeam(symbols, stave, part, beam) {
     n = -1;
     while (note = beam[++n]) {
         let row = stave.getRow(part, note.pitch);
-        // row may be out of range oof this stave
+        // row may be out of range of this stave
         if (row === undefined) continue;
 
         let r;
@@ -236,10 +243,17 @@ function closeBeam(symbols, stave, part, beam) {
         // Find highest or lowest pitch at beat of note
         while (beam[++n] && eq(beam[n].beat, note.beat, p24)) {
             r = stave.getRow(part, beam[n].pitch);
-            // row may be out of range oof this stave
+            // row may be out of range of this stave
             if (r === undefined) continue;
             if (stemup) { if (r < row) row = r; }
-            else { if (r > row) row = r; }
+            else {
+
+                if (r > row) {
+                    row = r;
+                console.log('YEAH');
+                }
+
+            }
         }
         --n;
 
@@ -262,7 +276,7 @@ function closeBeam(symbols, stave, part, beam) {
             d > diff ? d : diff :
             d < diff ? d : diff ;
     }
-
+console.log(positions, rows, diff);
     n = rows.length;
     while (n--) positions[n] -= diff + rows[0];
 
@@ -271,18 +285,22 @@ function closeBeam(symbols, stave, part, beam) {
     n = -1;
     while (note = beam[++n]) {
         ++r;
-        note.stemup = stemup;
-        note.beam   = beam;
+        const beamHeight = (positions[r] - rows[r] + rows[0]) / 8;
+        note.stemup     = stemup;
+        note.beam       = beam;
         note.stemHeight = stemup ?
-            1 - 0.125 * (positions[n] - rows[n] + rows[0]) :
-            1 + 0.125 * (positions[n] - rows[n] + rows[0]) ;
+            1 - beamHeight :
+            1 + beamHeight ;
 
-        // Find highest or lowest pitch at beat of note
+        // Find all other notes at beat
         while (beam[++n] && eq(beam[n].beat, note.beat, p16)) {
             beam[n].stemup     = stemup;
             beam[n].beam       = beam;
-            beam[n].stemHeight = note.stemHeight;
+            beam[n].stemHeight = stemup ?
+                1 + (beam[n].row - note.row) / 8 - beamHeight :
+                1 + (beam[n].row - note.row) / 8 + beamHeight ;
         }
+
         --n;
     }
 

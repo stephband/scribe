@@ -3,7 +3,7 @@ import cache                     from 'fn/cache.js';
 import overload                  from 'fn/overload.js';
 import { toNoteNumber, toRootNumber, toRootName } from 'midi/note.js';
 import { isChordEvent, isNoteEvent } from 'sequence/modules/event.js';
-import { keyToRootNumber }       from 'sequence/modules/event/keys.js';
+import { keyToRootNumber, rootToKeyNumber } from 'sequence/modules/event/keys.js';
 import { hsidToNumbers }         from 'sequence/modules/event/hsid.js';
 import { toHSID }                from 'sequence/modules/event/chords.js';
 import toStopBeat                from './event/to-stop-beat.js';
@@ -166,10 +166,10 @@ const order = [0,7,5,2,10,9,3,4,8,11,1,6];
 
 export function chooseKeyFromWeights(weights) {
     let n = order.length;
-    let value = 0, key;
+    let value = 0, root;
     while(n--) if (weights[order[n]] > value) {
         value = weights[order[n]];
-        key   = order[n];
+        root  = order[n];
     }
-    return key;
+    return rootToKeyNumber(root);
 }

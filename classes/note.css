@@ -2,7 +2,7 @@
 :root,
 :host {
     /* Default height of stem. Overridden note-by-note where notes are beamed */
-    --stem-height:     1;
+    --stem-height: 1;
     /* According to spec, a stems registration x=0 should be the centre of
        the stem. And its advance width may not correspond to its thickness
        at all, so we cannot use it's right-hand edge as any kind of
@@ -10,10 +10,10 @@
        frustratingly, guess at) its thickness to draw it in the correct
        position... and this changes from font to font. This is the thickness
        for Jazz font (by eye). */
-    --stem-width:      0.033;
+    --stem-width: 0.033;
     /* Alignment of root of stem relative to baseline - y position of point
        where stem joins note head */
-    --stem-align-up:   0.03;
+    --stem-align-up: 0.03;
     --stem-align-down: -0.04;
 }
 
@@ -104,10 +104,14 @@ Stems
         scale(1, calc(var(--stem-height) + var(--stem-align-down)));
 }
 
-.note[data-duration^="3"] > .head::before,
-.note[data-duration^="2"] > .head::before,
-.note[data-duration^="1"] > .head::before,
-.note[data-duration^="0"] > .head::before {
+.up-note.bottom-note[data-duration^="3"] > .head::before,
+.up-note.bottom-note[data-duration^="2"] > .head::before,
+.up-note.bottom-note[data-duration^="1"] > .head::before,
+.up-note.bottom-note[data-duration^="0"] > .head::before,
+.down-note.top-note[data-duration^="3"] > .head::before,
+.down-note.top-note[data-duration^="2"] > .head::before,
+.down-note.top-note[data-duration^="1"] > .head::before,
+.down-note.top-note[data-duration^="0"] > .head::before {
     content: '\E210';
 }
 

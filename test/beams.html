@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>&lt;scribe-music&gt;</title>
+
+    <meta charset="utf-8" />
+    <meta name="author" content="@stephband" />
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width" />
+
+    <!--script type="importmap">{
+        "imports": {
+            "bolt/":     "https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/",
+            "dom/":      "https://cdn.jsdelivr.net/gh/stephband/dom@1.4.1/modules/",
+            "fn/":       "https://cdn.jsdelivr.net/gh/stephband/fn@1.5.x/modules/",
+            "midi/":     "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.2/modules/",
+            "sequence/": "https://cdn.jsdelivr.net/gh/soundio/sequence@0.2.27/"
+        }
+    }</script-->
+
+    <script type="importmap">{
+        "imports": {
+            "bolt/":     "/bolt/",
+            "dom/":      "/dom/modules/",
+            "fn/":       "/fn/modules/",
+            "midi/":     "/midi/modules/",
+            "sequence/": "/sequence/"
+        }
+    }</script>
+
+    <script title="load">
+        document.documentElement.className += ' js loading';
+        // window.addEventListener('DOMContentLoaded', () => document.documentElement.classList.remove('content-loading'));
+        // Wait for other load handlers to run first - Bolt does a few things on
+        // load (eg. targetable scrolls) and we want them to run before the loading
+        // class is removed
+        window.addEventListener('load', () => window.requestAnimationFrame(() => document.documentElement.classList.remove('loading')));
+        window.DEBUG = true;
+    </script>
+
+    <!-- Import <scribe-music> -->
+    <link rel="stylesheet" href="/bolt/classes/atoms.css" />
+    <link rel="stylesheet" href="../scribe-music/element.css" />
+    <script type="module" src="../scribe-music/element.js"></script>
+    <link rel="stylesheet" href="../assets/lead-sheet-document.css" />
+    <style>
+    body {
+        font-family: Jazz, JazzText;
+        letter-spacing: 0.004em;
+        word-spacing: 0.125em;
+    }
+    </style>
+</head>
+
+<body>
+    <section class="grid dense-grid" style="row-gap: 0;">
+        <h3 class="x1 6x no-wrap">Beams</h3>
+
+        <scribe-music class="x1 no-wrap" clef="treble" src="#beams-1" debug>
+            <script type="application/json" id="beams-1">{
+                "events": [
+                    [0, "key", "F"],
+                    [0, "meter", 4, 1],
+                    [0, "sequence", 1, 0, 16]
+                ],
+
+                "sequences": [{
+                    "id": 1,
+                    "name": "Head",
+                    "events": [
+                        [0,    "note",  "E5",  0.1, 0.5],
+                        [0,    "note",  "C3",  0.1, 0.5],
+                        [0.5,  "note",  "E5",  0.1, 0.5],
+                        [0.5,  "note",  "C3",  0.1, 0.5],
+                        [2,    "note",  "E5",  0.1, 0.25],
+                        [2,    "note",  "C3",  0.1, 0.25],
+                        [2.25, "note",  "E5",  0.1, 0.25],
+                        [2.25, "note",  "C3",  0.1, 0.25],
+                        [4,    "note",  "E6",  0.1, 0.25],
+                        [4,    "note",  "C4",  0.1, 0.25],
+                        [4.25, "note",  "E6",  0.1, 0.25],
+                        [4.25, "note",  "C4",  0.1, 0.25],
+                        [6,    "note",  "E6",  0.1, 0.5],
+                        [6,    "note",  "C4",  0.1, 0.5],
+                        [6.5,  "note",  "E6",  0.1, 0.5],
+                        [6.5,  "note",  "C4",  0.1, 0.5]
+                    ]
+                }]
+            }</script>
+        </scribe-music>
+
+        <!-- -->
+    </section>
+</body>
+</html>

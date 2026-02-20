@@ -192,18 +192,14 @@ export default overload(get('type'), {
                 symbol.clusterup % 2 === 1 ? 'cluster-note ' : '' :
                 // Stem down, top note cannot be clustered
                 symbol.clusterdown % 2 === 1 ? 'cluster-note ' : ''
-        }${
-            symbol.beam ?
-                'beam-note ' :
-                ''
-        }note`,
+        }${ symbol.beam ? 'beam-note ' : '' }note`,
         style: symbol.stemHeight ? `--stem-height: ${ symbol.stemHeight };` : undefined,
         html:  symbol.stave.getNoteHTML(symbol.pitch, symbol.dynamic, symbol.duration),
         title: `${ symbol.pitch } (${ toNoteNumber(symbol.pitch) })`,
         data: {
             beat:     truncate(4, symbol.beat),
-            pitch:    symbol.pitch,
             duration: truncate(4, symbol.duration),
+            pitch:    symbol.pitch,
             part:     symbol.part.name,
             beam:     symbol.beam && symbol.beam.id,
             event:    identify(symbol.event)
