@@ -61,13 +61,13 @@ function toEventIds(symbol) {
 }
 
 function toChordHTML($0, $root, $ext, $sub, $sup, $bass) {
-    return '<span class="chord-root">' + toHTML($root) + '</span>'
+    return toHTML($root)
         + (($ext || $sub || $sup) ? '<span class="chord-ext">'
             + ($ext ? toHTML($ext) : '')
             + ($sub ? '<sub>' + $sub + '</sub>' : '')
             + ($sup ? toHTML($sup) : '')
         + '</span>' : '')
-        + ($bass ? glyphs.chordBassSlash + '<span class="chord-bass">' + toHTML($bass) + '</span>' : '');
+        + ($bass ? '<span class="glyph glyph-slash">' + glyphs.chordBassSlash + '</span><span class="chord-bass">' + toHTML($bass) + '</span>' : '');
 }
 
 export default overload(get('type'), {

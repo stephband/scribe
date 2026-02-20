@@ -6,6 +6,7 @@
     vertical-align: baseline;
     text-decoration: none;
     line-height: 1em;
+    font-size: 0.75em;
     /*letter-spacing: 0.002em;*/
 }
 
@@ -33,13 +34,13 @@
     font-size: inherit;
     vertical-align: 0.1875em;
 }
-
+/*
 .chord-abbr .chord-root,
 .chord-abbr .chord-ext,
 .chord-abbr .chord-bass {
     font-size: 0.75em;
 }
-
+*/
 .chord-abbr .chord-bass {
     vertical-align: -0.25em;
 }
