@@ -1,33 +1,14 @@
 
+import cache                     from 'fn/cache.js';
 import overload                  from 'fn/overload.js';
 import { toNoteNumber, toRootNumber, toRootName } from 'midi/note.js';
 import { isChordEvent, isNoteEvent } from 'sequence/modules/event.js';
+import { keyToRootNumber }       from 'sequence/modules/event/keys.js';
 import { hsidToNumbers }         from 'sequence/modules/event/hsid.js';
 import { toHSID }                from 'sequence/modules/event/chords.js';
 import toStopBeat                from './event/to-stop-beat.js';
-import { transposeScale, major } from './scale.js';
-
-export default [
-    //                                       C      D       E  F      G      A       B
-    { name: 'C',  symbol: 'C∆',  spellings: [0,  1, 0, -1,  0, 0,  1, 0, -1, 0, -1,  0] },
-    { name: 'D♭', symbol: 'D♭∆', spellings: [0, -1, 0, -1, -1, 0, -1, 0, -1, 0, -1, -1] },
-    { name: 'D',  symbol: 'D∆',  spellings: [0,  1, 0,  1,  0, 0,  1, 0,  1, 0, -1,  0] },
-    { name: 'E♭', symbol: 'E♭∆', spellings: [0, -1, 0, -1,  0, 0, -1, 0, -1, 0, -1, -1] },
-    { name: 'E',  symbol: 'E∆',  spellings: [0,  1, 0,  1,  0, 1,  1, 0,  1, 0,  1,  0] },
-    { name: 'F',  symbol: 'F∆',  spellings: [0, -1, 0, -1,  0, 0,  1, 0, -1, 0, -1,  0] },
-    { name: 'F♯', symbol: 'F♯∆', spellings: [1,  1, 0,  1,  0, 1,  1, 0,  1, 0,  1,  0] },  // (Should have G##?)
-  //{ name: 'G♭', symbol: 'G♭∆', spellings: [0, -1, 0, -1, -1, 0, -1, 0, -1, 0, -1, -1] },  // (Should have Ebb?)
-    { name: 'G',  symbol: 'G∆',  spellings: [0,  1, 0, -1,  0, 0,  1, 0,  1, 0, -1,  0] },
-    { name: 'A♭', symbol: 'A♭∆', spellings: [0, -1, 0, -1, -1, 0, -1, 0, -1, 0, -1, -1] },
-    { name: 'A',  symbol: 'A∆',  spellings: [0,  1, 0,  1,  0, 0,  1, 0,  1, 0,  1,  0] },
-    { name: 'B♭', symbol: 'B♭∆', spellings: [0, -1, 0, -1,  0, 0, -1, 0, -1, 0, -1,  0] },
-    { name: 'B',  symbol: 'B∆',  spellings: [1,  1, 0,  1,  0, 1,  1, 0,  1, 0,  1,  0] }
-];
-
-export function toKeyScale(key) {
-    return transposeScale(major, key);
-}
-
+import mod12                     from './number/mod-12.js';
+import { major }                 from './scale.js';
 
 
 const { abs } = Math;
@@ -59,6 +40,14 @@ const factors = {
     3: [10/16, 13/16, 10/16],
     4: [10/16, 13/16, 10/16, 12/16]
 };
+
+
+export const keyToNumbers = cache((key) => {
+    const root = keyToRootNumber(key);
+    return major
+    .map((n) => mod12(n + root))
+    .sort();
+});
 
 function keysContainingNote(number) {
     const keys = new Float32Array(12);

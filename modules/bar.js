@@ -1,11 +1,11 @@
 import matches from 'fn/matches.js';
 import nothing from 'fn/nothing.js';
 import { toRootName, toRootNumber } from 'midi/note.js';
-import { keyToRootNumber } from 'sequence/modules/event/keys.js';
+import { toKeyNumber, keyToRootNumber, rootToKeyNumber } from 'sequence/modules/event/keys.js';
 import { toChordName } from 'sequence/modules/event/chords.js';
 import mod12       from './number/mod-12.js';
 import toStopBeat from './event/to-stop-beat.js';
-import { toKeyScale, keyWeightsForEvent, chooseKeyFromWeights } from './keys.js';
+import { keyToNumbers, keyWeightsForEvent, chooseKeyFromWeights } from './keys.js';
 import { byFatherCharlesPitch, accidentalChars } from './pitch.js';
 import { major } from './scale.js';
 import { createPart } from './part.js';
@@ -78,9 +78,9 @@ export function getLastDivision(divisions, b1, b2) {
 const ignoreTypes = [];
 
 function updateAccidentals(accidentals, key) {
-    const scale = toKeyScale(key);
+    const numbers = keyToNumbers(key);
 
-    scale.reduce((accidentals, n, i) => {
+    numbers.reduce((accidentals, n, i) => {
         const acci = n - major[i];
         if (acci !== 0) {
             const name = toRootName(major[i]);
@@ -107,21 +107,16 @@ function createBarSymbols(symbols, bar, stave, key, accidentals, events, setting
 
     while (event = events[++n]) switch (event[1]) {
         case "key": {
-            // Get the key scale from keyname. This scale is not a true
-            // 'scale' in an internal-data sense as it may not begin with a 0, but it
-            // maps naturals to accidentals when compared against the C scale. Remember
-            // keynumber is on a continuous scale of fourths, so multiply by 7 semitones
-            // to get chromatic number relative to C.
-            //const key = toRootNumber(event[2]);
-            const key = keyToRootNumber(event[2]);
-console.log('KEY', key);
+            const key  = toKeyNumber(event[2]);
+            const root = keyToRootNumber(event[2]);
+
             updateAccidentals(accidentals, key);
 
             // TODO: Key is global and added to the side bar, we need to think about
             // how to make key signature changes
             // symbols.push.apply(symbols, stave.createKeySymbols(key));
 
-            bar.key = key;
+            bar.key = root;
             break;
         }
 
@@ -215,7 +210,7 @@ console.log('KEY', key);
     return symbols;
 }
 
-export function createBar(count, beat, duration, divisor, stave, key, events, parts, sequence, settings = config) {
+export function createBar(count, beat, duration, divisor, stave, root, events, parts, sequence, settings = config) {
     const symbols = [];
 
     // Track end of sequence and shove in a double bar line
@@ -227,13 +222,14 @@ export function createBar(count, beat, duration, divisor, stave, key, events, pa
     }
 
     // Populate accidentals with key signature sharps and flats
+    const key = rootToKeyNumber(root);
     const accidentals = updateAccidentals({}, key);
 
     const bar = {
         type: 'bar',
         beat,
         duration,
-        key,
+        key: root,
         divisor: divisor || 4,
         divisions: getDivisions(duration, divisor),
         stave,
@@ -242,7 +238,7 @@ export function createBar(count, beat, duration, divisor, stave, key, events, pa
     };
 
     // Populate symbols with events
-    createBarSymbols(symbols, bar, stave, key, accidentals, events, config);
+    createBarSymbols(symbols, bar, stave, root, accidentals, events, config);
 
     // Populate symbols with parts
     const centers = stave.parts.reduce((centers, part) => part.centerRow ?
@@ -257,12 +253,12 @@ export function createBar(count, beat, duration, divisor, stave, key, events, pa
         const events = parts[part.name];
         if (!events || !events.length) continue;
         centers.delete(part.centerRow || stave.centerRow);
-        createPart(symbols, bar, stave, key, accidentals, part, events, settings);
+        createPart(symbols, bar, stave, root, accidentals, part, events, settings);
     }
 
     let center;
     for (center of centers) {
-        createPart(symbols, bar, stave, key, accidentals, { centerRow: center }, [], settings);
+        createPart(symbols, bar, stave, root, accidentals, { centerRow: center }, [], settings);
     }
 
     return bar;

@@ -1,7 +1,7 @@
 
 import * as glyphs from "../glyphs.js";
 import { toNoteName, toRootNumber, toRootName } from 'midi/note.js';
-import { toKeyScale } from '../keys.js';
+import { keyToNumbers } from '../keys.js';
 import { rflatsharp, byFatherCharlesPitch, accidentalChars } from '../pitch.js';
 import { major } from '../scale.js';
 import Stave       from './stave.js';
@@ -157,10 +157,10 @@ export default class PianoStave extends Stave {
     }
 
     createKeySymbols(key) {
-        const symbols   = [];
-        const keynumber = toRootNumber(key);
-        const keyscale  = toKeyScale(keynumber);
-        const keysig    = keyscale
+        const symbols = [];
+console.trace('IS NUMBER? MAKE SURE ITS A KEY NUMBER, NOT ROOT', key);
+        const numbers = keyToNumbers(key);
+        const keysig  = numbers
             .map((n, i) => (n - major[i] && {
                 type: 'acci',
                 pitch: toRootName(major[i]) + accidentalChars[n - major[i]],

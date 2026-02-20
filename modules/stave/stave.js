@@ -1,8 +1,9 @@
 
 import nothing        from 'fn/nothing.js';
 import { noteNames, toNoteName, toNoteNumber, toNoteOctave, toRootName, toRootNumber } from 'midi/note.js';
+import { rootToKeyNumber } from 'sequence/modules/event/keys.js';
 import mod12       from '../number/mod-12.js';
-import keys, { toKeyScale } from '../keys.js';
+import { keyToNumbers } from '../keys.js';
 import { rpitch, rflatsharp, byFatherCharlesPitch, accidentalChars } from '../pitch.js';
 import config      from '../config.js';
 import { major }   from '../scale.js';
@@ -17,10 +18,26 @@ const accidentals = {
     '2':  '𝄪'
 };
 
-
 const global = globalThis || window;
 const assign = Object.assign;
 const { floor, round } = Math;
+
+const keys = [
+    //                                       C      D       E  F      G      A       B
+    { name: 'C',  symbol: 'C∆',  spellings: [0,  1, 0, -1,  0, 0,  1, 0, -1, 0, -1,  0] },
+    { name: 'D♭', symbol: 'D♭∆', spellings: [0, -1, 0, -1, -1, 0, -1, 0, -1, 0, -1, -1] },
+    { name: 'D',  symbol: 'D∆',  spellings: [0,  1, 0,  1,  0, 0,  1, 0,  1, 0, -1,  0] },
+    { name: 'E♭', symbol: 'E♭∆', spellings: [0, -1, 0, -1,  0, 0, -1, 0, -1, 0, -1, -1] },
+    { name: 'E',  symbol: 'E∆',  spellings: [0,  1, 0,  1,  0, 1,  1, 0,  1, 0,  1,  0] },
+    { name: 'F',  symbol: 'F∆',  spellings: [0, -1, 0, -1,  0, 0,  1, 0, -1, 0, -1,  0] },
+    { name: 'F♯', symbol: 'F♯∆', spellings: [1,  1, 0,  1,  0, 1,  1, 0,  1, 0,  1,  0] },  // (Should have G##?)
+  //{ name: 'G♭', symbol: 'G♭∆', spellings: [0, -1, 0, -1, -1, 0, -1, 0, -1, 0, -1, -1] },  // (Should have Ebb?)
+    { name: 'G',  symbol: 'G∆',  spellings: [0,  1, 0, -1,  0, 0,  1, 0,  1, 0, -1,  0] },
+    { name: 'A♭', symbol: 'A♭∆', spellings: [0, -1, 0, -1, -1, 0, -1, 0, -1, 0, -1, -1] },
+    { name: 'A',  symbol: 'A∆',  spellings: [0,  1, 0,  1,  0, 0,  1, 0,  1, 0,  1,  0] },
+    { name: 'B♭', symbol: 'B♭∆', spellings: [0, -1, 0, -1,  0, 0, -1, 0, -1, 0, -1,  0] },
+    { name: 'B',  symbol: 'B∆',  spellings: [1,  1, 0,  1,  0, 1,  1, 0,  1, 0,  1,  0] }
+];
 
 
 /* Stave */
@@ -156,6 +173,7 @@ export default class Stave {
     Gets spelling of a given pitch. Returns a pitch name string.
     **/
     getSpelling(key, pitch, withOctave = false) {
+console.log('KEY IS A ROOT NUMBER, MAKE IT A KEY', key);
         if (!withOctave) {
             const keyData = keys[key];
             const n = toRootNumber(pitch);
@@ -193,13 +211,13 @@ export default class Stave {
         return name + accidental + o;
     }
 
-    createKeySymbols(key) {
-        const symbols   = [];
-        const keynumber = toRootNumber(key);
-        const keyscale  = toKeyScale(keynumber);
-
+    createKeySymbols(root) {
+        const symbols = [];
+        const key     = rootToKeyNumber(root);
+        const numbers = keyToNumbers(key);
+console.trace('IS NUMBER? MAKE SURE ITS A KEY NUMBER, NOT ROOT', key, numbers);
         // Add key signature
-        symbols.push.apply(symbols, keyscale
+        symbols.push.apply(symbols, numbers
             .map((n, i) => (n - major[i] && {
                 type:  'acci',
                 pitch: toRootName(major[i]) + accidentalChars[n - major[i]],

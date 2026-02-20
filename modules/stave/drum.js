@@ -142,13 +142,7 @@ export default class DrumStave extends Stave {
     }
 
     getSpelling(key, number) {
-        //if (event[1] === 'note') {
-            // Use pitch slug as row identifier. We don't want any spelling
-            // happening on drum parts.
-            return toDrumSlug(number);
-        //}
-
-        //return super.getSpelling(key, event[2]);
+        return toDrumSlug(number);
     }
 
     createSignatureSymbols(key) {
