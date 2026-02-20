@@ -246,14 +246,7 @@ function closeBeam(symbols, stave, part, beam) {
             // row may be out of range of this stave
             if (r === undefined) continue;
             if (stemup) { if (r < row) row = r; }
-            else {
-
-                if (r > row) {
-                    row = r;
-                console.log('YEAH');
-                }
-
-            }
+            else        { if (r > row) row = r; }
         }
         --n;
 
@@ -276,39 +269,50 @@ function closeBeam(symbols, stave, part, beam) {
             d > diff ? d : diff :
             d < diff ? d : diff ;
     }
-console.log(positions, rows, diff);
+
     n = rows.length;
     while (n--) positions[n] -= diff + rows[0];
 
     // Apply beamed properties to note symbols and stem heights
-    let r = -1;
+    let r = -1, top, bottom;
     n = -1;
     while (note = beam[++n]) {
         ++r;
         const beamHeight = (positions[r] - rows[r] + rows[0]) / 8;
-        note.stemup     = stemup;
-        note.beam       = beam;
-        note.stemHeight = stemup ?
-            1 - beamHeight :
-            1 + beamHeight ;
+        note.stemup = stemup;
+        note.beam   = beam;
+
+        // Keep top start note
+        if (r === 0) top = note;
 
         // Find all other notes at beat
         while (beam[++n] && eq(beam[n].beat, note.beat, p16)) {
-            beam[n].stemup     = stemup;
-            beam[n].beam       = beam;
-            beam[n].stemHeight = stemup ?
-                1 + (beam[n].row - note.row) / 8 - beamHeight :
-                1 + (beam[n].row - note.row) / 8 + beamHeight ;
+            beam[n].stemup = stemup;
+            beam[n].beam   = beam;
         }
 
         --n;
+
+        // Keep bottom start note
+        if (r === 0) bottom = beam[n];
+
+        // if stemup set stemHeight on lowest note...
+        if (stemup) {
+            beam[n].stemHeight = 1 + (beam[n].row - note.row) / 8 - beamHeight ;
+        }
+        // ...otherwise set stemHeight on highest note
+        else {
+            note.stemHeight = 1 + (beam[n].row - note.row) / 8 + beamHeight ;
+        }
     }
 
     // Push the beam into symbols
     symbols.push(assign(beam, {
-        pitch: beam[0].pitch,
-        y:     positions[0],
         duration,
+        y: positions[0],
+        pitch: stemup ?
+            top.pitch :
+            bottom.pitch ,
         stemup,
         range,
         id: ++beamId
