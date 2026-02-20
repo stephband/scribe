@@ -22,7 +22,8 @@ const global = globalThis || window;
 const assign = Object.assign;
 const { floor, round } = Math;
 
-const keys = {                                    C      D       E  F      G      A       B
+const keys = {
+    //                                             C      D       E  F      G      A       B
     '-7': { name: 'C♭', symbol: 'C♭∆', spellings: [0, -1, 0, -1, -1, 0, -1, 0, -1, 0, -1, -1] },  // (Should have Ebb?)
     '-6': { name: 'G♭', symbol: 'G♭∆', spellings: [0, -1, 0, -1, -1, 0, -1, 0, -1, 0, -1, -1] },  // (Should have Ebb?)
     '-5': { name: 'D♭', symbol: 'D♭∆', spellings: [0, -1, 0, -1, -1, 0, -1, 0, -1, 0, -1, -1] },

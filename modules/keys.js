@@ -164,6 +164,8 @@ export function keyWeightsForEvent(events, n, key = 0) {
 // we see two keys weighted the same we end up with the one with fewer accidentals
 const order = [0,7,5,2,10,9,3,4,8,11,1,6];
 
+const keys  = [0,-5,2,-3,4,-1,6,1,-4,3,-2,5];
+
 export function chooseKeyFromWeights(weights) {
     let n = order.length;
     let value = 0, root;
@@ -171,5 +173,5 @@ export function chooseKeyFromWeights(weights) {
         value = weights[order[n]];
         root  = order[n];
     }
-    return rootToKeyNumber(root);
+    return keys[root];
 }
