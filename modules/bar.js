@@ -1,6 +1,7 @@
 import matches from 'fn/matches.js';
 import nothing from 'fn/nothing.js';
 import { toRootName, toRootNumber } from 'midi/note.js';
+import { keyToRootNumber } from 'sequence/modules/event/keys.js';
 import { toChordName } from 'sequence/modules/event/chords.js';
 import mod12       from './number/mod-12.js';
 import toStopBeat from './event/to-stop-beat.js';
@@ -111,7 +112,9 @@ function createBarSymbols(symbols, bar, stave, key, accidentals, events, setting
             // maps naturals to accidentals when compared against the C scale. Remember
             // keynumber is on a continuous scale of fourths, so multiply by 7 semitones
             // to get chromatic number relative to C.
-            const key      = toRootNumber(event[2]);
+            //const key = toRootNumber(event[2]);
+            const key = keyToRootNumber(event[2]);
+console.log('KEY', key);
             updateAccidentals(accidentals, key);
 
             // TODO: Key is global and added to the side bar, we need to think about
@@ -154,10 +157,10 @@ function createBarSymbols(symbols, bar, stave, key, accidentals, events, setting
             let root, bass, name;
 
             if (slashbass) {
-                const n    = parseInt(slashbass[1], 10);
+                const n = parseInt(slashbass[1], 10);
                 root = stave.getSpelling(keyNumber, mod12(event[2] - n));
                 bass = stave.getSpelling(keyNumber, event[2]);
-                name = substituteSpelling(settings, root) + '/' + extension.replace(rslashbass, substituteSpelling(settings, bass));
+                name = substituteSpelling(settings, root) + extension.replace(rslashbass, '/' + substituteSpelling(settings, bass));
             }
             else {
                 root = stave.getSpelling(keyNumber, event[2]);

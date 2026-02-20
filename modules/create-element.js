@@ -50,8 +50,8 @@ const restGlyphs = {
     '0.08': glyphs.rest0125
 };
 
-//                        (C         )(7            )(sus      )(♭9      )(/G              )
-const rchordparts     = /^([A-G][♭♯]?)([∆\-ø+°♭♯\d]*)([a-zA-Z]*)([♭♯]?\d+)?(?:\/([A-G][♭♯]?))?$/;
+//                    (C         )(7            )(sus      )(♭9      )(/G              )
+const rchordparts = /^([A-G][♭♯]?)([∆\-ø+°♭♯\d]*)([a-zA-Z]*)([♭♯]?\d+)?(?:\/([A-G][♭♯]?))?$/;
 
 
 function toEventIds(symbol) {
