@@ -157,22 +157,11 @@ export default class PianoStave extends Stave {
     }
 
     createKeySymbols(key) {
+        const keysig  = super.createKeySymbols(key);
         const symbols = [];
-console.trace('IS NUMBER? MAKE SURE ITS A KEY NUMBER, NOT ROOT', key);
-        const numbers = keyToNumbers(key);
-        const keysig  = numbers
-            .map((n, i) => (n - major[i] && {
-                type: 'acci',
-                pitch: toRootName(major[i]) + accidentalChars[n - major[i]],
-                value: n - major[i]
-            }))
-            .filter((o) => !!o)
-            .sort(byFatherCharlesPitch);
-
         // Add key signature to both staffs
-        symbols.push.apply(symbols, keysig.map((symbol) => assign({ part: this.parts[1] }, symbol)));
-        symbols.push.apply(symbols, keysig.map((symbol) => assign({ part: this.parts[2] }, symbol)));
-
+        symbols.push.apply(symbols, keysig.map((symbol) => assign({}, symbol, { part: this.parts[1] })));
+        symbols.push.apply(symbols, keysig.map((symbol) => assign({}, symbol, { part: this.parts[2] })));
         return symbols;
     }
 

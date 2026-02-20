@@ -104,9 +104,10 @@ const types = {
     }
 }
 
-export function keyWeightsForEvent(events, n, currentKey) {
+export function keyWeightsForEvent(events, n, key = 0) {
     let event = events[n];
 
+    const KEYROOT = keyToRootNumber(key);
     const beat    = event[0];
     const weights =
         isNoteEvent(event)  ? keysContainingNote(toNoteNumber(event[2])) :
@@ -114,8 +115,8 @@ export function keyWeightsForEvent(events, n, currentKey) {
         0 ;
 
     // Weight by influence of current key
-    if (currentKey !== undefined) {
-        const probs = Float32Array.from({ length: 12 }, (n, i) => modulationWeights[(i + 12 - currentKey) % 12]);
+    if (KEYROOT !== undefined) {
+        const probs = Float32Array.from({ length: 12 }, (n, i) => modulationWeights[(i + 12 - KEYROOT) % 12]);
         multiplyWeights(weights, probs, 0.3);
     }
 

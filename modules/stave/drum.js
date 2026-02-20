@@ -136,7 +136,7 @@ export default class DrumStave extends Stave {
         const pitch = typeof n === 'string' ? n : toDrumSlug(n) ;
         if (!pitch) throw new Error('Number not found for pitch ' + n);
         const i = this.rows.findIndex((row) => row.includes(pitch));
-        if (global.DEBUG && i === -1) throw new Error('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name);
+        //if (global.DEBUG && i === -1) throw new Error('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name);
         if (i === -1) console.warn('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name);
         return i > -1 ? i : undefined ;
     }

@@ -2,6 +2,7 @@
 import by       from 'fn/by.js';
 import get      from 'fn/get.js';
 import { toNoteName, toNoteNumber, toRootName, toRootNumber } from 'midi/note.js';
+import { keyToRootNumber } from 'sequence/modules/event/keys.js';
 import { keyWeightsForEvent, chooseKeyFromWeights } from './keys.js';
 import { rflat, rsharp, rdoubleflat, rdoublesharp } from './pitch.js';
 import { getDivision } from './bar.js';
@@ -59,6 +60,9 @@ function createNoteSymbols(stave, key, part, notes) {
         const pitch      = stave.getSpelling(keyNumber, event[2], true);
         const row        = stave.getRow(part, pitch);
 
+        // Is note not on the stave?
+        if (!row) continue;
+
         // Create symbols with pitch, row
         symbols.push({
             type: 'note',
@@ -70,6 +74,8 @@ function createNoteSymbols(stave, key, part, notes) {
             event
         });
     }
+
+    if (symbols.length === 0) return symbols;
 
     // Sort by row order
     symbols.sort(byRow);
@@ -698,9 +704,11 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, beam, setting
         const noteSymbols = createNoteSymbols(stave, key, part, notes);
 
         // Create ledgers and accidentals
-        createLedges(symbols, stave, part, beat, noteSymbols);
-        createAccidentals(symbols, bar, part, accidentals, beat, noteSymbols);
-        createAccents(symbols, stave, part, beat, noteSymbols, settings);
+        if (noteSymbols.length) {
+            createLedges(symbols, stave, part, beat, noteSymbols);
+            createAccidentals(symbols, bar, part, accidentals, beat, noteSymbols);
+            createAccents(symbols, stave, part, beat, noteSymbols, settings);
+        }
 
         const stopBeat = min(
             // Max stop beat of notes
@@ -873,9 +881,11 @@ if (stopBeat <= beat) {
         const noteSymbols = createNoteSymbols(stave, key, part, notes);
 
         // Create ledgers and accidentals
-        createLedges(symbols, stave, part, beat, noteSymbols);
-        createAccidentals(symbols, bar, part, accidentals, beat, noteSymbols);
-        createAccents(symbols, stave, part, beat, noteSymbols, settings);
+        if (noteSymbols.length) {
+            createLedges(symbols, stave, part, beat, noteSymbols);
+            createAccidentals(symbols, bar, part, accidentals, beat, noteSymbols);
+            createAccents(symbols, stave, part, beat, noteSymbols, settings);
+        }
 
         // Original start beat of notes, may be well before beat
         const startBeat = notes[0][0] - bar.beat;

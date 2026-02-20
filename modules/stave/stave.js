@@ -152,7 +152,7 @@ export default class Stave {
         const name = typeof pitch === 'string' ? pitch : toNoteName(pitch) ;
         const row  = name.replace(rflatsharp, '');
         const i    = this.rows.indexOf(row);
-        if (global.DEBUG && i === -1) throw new Error('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name);
+        //if (global.DEBUG && i === -1) throw new Error('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name);
         if (i === -1) console.warn('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name);
         return i > -1 ? i : undefined ;
     }
@@ -211,24 +211,16 @@ console.log('KEY IS A ROOT NUMBER, MAKE IT A KEY', key);
         return name + accidental + o;
     }
 
-    createKeySymbols(root) {
-        const symbols = [];
-        const key     = rootToKeyNumber(root);
+    createKeySymbols(key) {
         const numbers = keyToNumbers(key);
-console.trace('IS NUMBER? MAKE SURE ITS A KEY NUMBER, NOT ROOT', key, numbers);
-        // Add key signature
-        symbols.push.apply(symbols, numbers
-            .map((n, i) => (n - major[i] && {
-                type:  'acci',
-                pitch: toRootName(major[i]) + accidentalChars[n - major[i]],
-                value: n - major[i],
-                part:  this.parts[0]
-            }))
-            .filter((o) => !!o)
-            .sort(byFatherCharlesPitch)
-        );
-
-        return symbols;
+        return Array.from(numbers, (n, i) => (n - major[i] && {
+            type:  'acci',
+            pitch: toRootName(major[i]) + accidentalChars[n - major[i]],
+            value: n - major[i],
+            part:  this.parts[0]
+        }))
+        .filter((o) => !!o)
+        .sort(byFatherCharlesPitch);
     }
 
     createSignatureSymbols(key) {

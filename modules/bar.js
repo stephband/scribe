@@ -107,16 +107,12 @@ function createBarSymbols(symbols, bar, stave, key, accidentals, events, setting
 
     while (event = events[++n]) switch (event[1]) {
         case "key": {
-            const key  = toKeyNumber(event[2]);
-            const root = keyToRootNumber(event[2]);
-
+            const key = toKeyNumber(event[2]);
             updateAccidentals(accidentals, key);
-
             // TODO: Key is global and added to the side bar, we need to think about
             // how to make key signature changes
             // symbols.push.apply(symbols, stave.createKeySymbols(key));
-
-            bar.key = root;
+            bar.key = key;
             break;
         }
 
@@ -210,7 +206,7 @@ function createBarSymbols(symbols, bar, stave, key, accidentals, events, setting
     return symbols;
 }
 
-export function createBar(count, beat, duration, divisor, stave, root, events, parts, sequence, settings = config) {
+export function createBar(count, beat, duration, divisor, stave, key, events, parts, sequence, settings = config) {
     const symbols = [];
 
     // Track end of sequence and shove in a double bar line
@@ -222,14 +218,13 @@ export function createBar(count, beat, duration, divisor, stave, root, events, p
     }
 
     // Populate accidentals with key signature sharps and flats
-    const key = rootToKeyNumber(root);
     const accidentals = updateAccidentals({}, key);
 
     const bar = {
         type: 'bar',
         beat,
         duration,
-        key: root,
+        key,
         divisor: divisor || 4,
         divisions: getDivisions(duration, divisor),
         stave,
@@ -238,7 +233,7 @@ export function createBar(count, beat, duration, divisor, stave, root, events, p
     };
 
     // Populate symbols with events
-    createBarSymbols(symbols, bar, stave, root, accidentals, events, config);
+    createBarSymbols(symbols, bar, stave, key, accidentals, events, config);
 
     // Populate symbols with parts
     const centers = stave.parts.reduce((centers, part) => part.centerRow ?
@@ -253,12 +248,12 @@ export function createBar(count, beat, duration, divisor, stave, root, events, p
         const events = parts[part.name];
         if (!events || !events.length) continue;
         centers.delete(part.centerRow || stave.centerRow);
-        createPart(symbols, bar, stave, root, accidentals, part, events, settings);
+        createPart(symbols, bar, stave, key, accidentals, part, events, settings);
     }
 
     let center;
     for (center of centers) {
-        createPart(symbols, bar, stave, root, accidentals, { centerRow: center }, [], settings);
+        createPart(symbols, bar, stave, key, accidentals, { centerRow: center }, [], settings);
     }
 
     return bar;
