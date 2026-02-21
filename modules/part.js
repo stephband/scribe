@@ -206,14 +206,20 @@ function closeBeam(symbols, stave, part, beam) {
 
     // If part has beam (drum stave) beams are in a fixed position
     if (part.beam) {
-        // TEMP: DO it better
-        let note;
+        let note, row;
 
         // Apply beamed properties to note symbols
         n = -1;
         while (note = beam[++n]) {
             note.stemup = stemup;
             note.beam   = beam;
+            // Set stem height on all notes. TODO: This is hard-coded to drum
+            // stave, we need to get row of part.beam, which is a named row at
+            // the moment
+            row = stave.getRow(part, note.pitch);
+            note.stemHeight = stemup ?
+                0.125 + row / 8 :
+                2.8125 - row / 8 ;
         }
 
         //console.log('TODO: Beam has fixed position according to part', part.beam);
