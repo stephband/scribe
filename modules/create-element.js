@@ -53,7 +53,6 @@ const restGlyphs = {
 //                    (C         )(7            )(sus      )(♭9      )(/G              )
 const rchordparts = /^([A-G][♭♯]?)([∆\-ø+°♭♯\d]*)([a-zA-Z]*)([♭♯]?\d+)?(?:\/([A-G][♭♯]?))?$/;
 
-
 function toEventIds(symbol) {
     let n = -1, string = '';
     while (symbol[++n]) string += (string ? ' ' : '') + identify(symbol[n].event);

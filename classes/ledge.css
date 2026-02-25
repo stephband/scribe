@@ -2,6 +2,9 @@
 .ledge {
     overflow: hidden;
     width: 0.55em;
+    /* Make sure svgs are unconstrained by other styles */
+    min-width: 0;
+    max-width: none;
     vector-effect: non-scaling-stroke;
     stroke: currentcolor;
     stroke-width: 0.05em;

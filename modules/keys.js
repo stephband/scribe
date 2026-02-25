@@ -5,7 +5,6 @@ import { toNoteNumber, toRootNumber, toRootName } from 'midi/note.js';
 import { isChordEvent, isNoteEvent } from 'sequence/modules/event.js';
 import { keyToRootNumber, rootToKeyNumber } from 'sequence/modules/event/keys.js';
 import { hsidToNumbers }         from 'sequence/modules/event/hsid.js';
-import { toHSID }                from 'sequence/modules/event/chords.js';
 import toStopBeat                from './event/to-stop-beat.js';
 import mod12                     from './number/mod-12.js';
 import { major }                 from './scale.js';
