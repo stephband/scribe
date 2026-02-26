@@ -334,7 +334,7 @@
 
 .stave > .chord {
     grid-row: chords;
-    align-self: center;
+    align-self: end;
     margin-top: 0;
     margin-bottom: 0;
     font-size: 0.75em;

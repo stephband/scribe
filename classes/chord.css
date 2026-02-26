@@ -5,7 +5,8 @@
 .chord-abbr {
     vertical-align: baseline;
     text-decoration: none;
-    line-height: 1em;
+    height: 1.1em;
+    line-height: 1.875em;
     /*font-size: 0.75em;*/
     /*letter-spacing: 0.002em;*/
 }
