@@ -60,10 +60,10 @@ function toEventIds(symbol) {
 }
 
 function toChordHTML($0, $root, $ext, $sub, $sup, $bass) {
-    return toHTML($root)
+    return '<span class="chord-root">' + toHTML($root) + '</span>'
         + (($ext || $sub || $sup) ? '<span class="chord-ext">'
             + ($ext ? toHTML($ext) : '')
-            + ($sub ? '<sub>' + $sub + '</sub>' : '')
+            + ($sub ? '<span class="glyph glyph-sub">' + $sub + '</span>' : '')
             + ($sup ? toHTML($sup) : '')
         + '</span>' : '')
         + ($bass ? '<span class="glyph glyph-slash">' + glyphs.chordBassSlash + '</span><span class="chord-bass">' + toHTML($bass) + '</span>' : '');

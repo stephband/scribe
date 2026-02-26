@@ -6,34 +6,10 @@
     vertical-align: baseline;
     text-decoration: none;
     line-height: 1em;
-    font-size: 0.75em;
+    /*font-size: 0.75em;*/
     /*letter-spacing: 0.002em;*/
 }
 
-.chord-abbr .chord-maj {
-    font-size: inherit;
-    vertical-align: 0em;
-}
-
-.chord-abbr .chord-min {
-    font-size: inherit;
-    vertical-align: 0.1875em;
-}
-
-.chord-abbr .chord-halfdim {
-    font-size: inherit;
-    vertical-align: 0.3125em;
-}
-
-.chord-abbr .chord-dim {
-    font-size: inherit;
-    vertical-align: 0.3125em;
-}
-
-.chord-abbr .chord-aug {
-    font-size: inherit;
-    vertical-align: 0.1875em;
-}
 /*
 .chord-abbr .chord-root,
 .chord-abbr .chord-ext,
@@ -51,30 +27,37 @@
     margin-left: 0.1em;
 }
 
-.chord-ext sup {
-    font-size: 0.75em;
-    font-weight: 700;
-    vertical-align: 0.333333333em;
-    margin-left: 0.04em;
+
+
+
+.glyph {
+    /* Give glyphs their own line box */
+    display: inline-block;
+    /* It's not clear why, but any number over 1.999em will start adding height
+       to a .glyph's parent's line box when the glyph is vertical-align baseline */
+    line-height: 1.875em;
 }
 
-.chord-ext sub {
-    font-size: 0.75em;
-    vertical-align: 0;
-}
-
-.glyph-flat {
-    vertical-align: 0.3em;
-    margin-left: 0.05em;
+.glyph-flat,
+.glyph-sharp,
+.glyph-doubleflat,
+.glyph-doublesharp,
+.glyph-natural {
+    vertical-align: 0.29em;
+    line-height: 1.3em;
+    margin-left: 0.025em;
 }
 
 .glyph-sharp {
-    vertical-align: 0.333333333em;
+    line-height: 1em;
+    vertical-align: 0.44em;
 }
 
 .glyph-number {
     font-size: 0.833333333em;
     vertical-align: 0.166666667em;
+    /* No, I don't understand why this is necessary, any value under 2em appears to work. */
+    line-height: 2em;
 }
 
 .glyph-major {
@@ -83,21 +66,43 @@
 }
 
 .glyph-minor {
-    font-size: 1.125em;
-    vertical-align: 0;
+    line-height: 1.875em;
+    font-size: 1.0625em;
 }
 
+.glyph-aug,
+.glyph-dim,
 .glyph-halfdim {
-    font-size: 1em;
     vertical-align: 0.15em;
+    line-height: 1.6em;
 }
 
-.glyph-dim {
-    font-size: 1em;
-    vertical-align: 0.15em;
+.glyph-sub {
+    font-size: 0.75em;
+    vertical-align: 0em;
 }
 
-.glyph-aug {
-    font-size: 1em;
-    vertical-align: 0.15em;
+.chord-ext > .glyph-flat,
+.chord-ext > .glyph-sharp,
+.chord-ext > .glyph-doubleflat,
+.chord-ext > .glyph-doublesharp,
+.chord-ext > .glyph-natural {
+    line-height: 1.2em;
+    vertical-align: 0.44em;
+    font-size: 0.86em;
+}
+
+.chord-ext > .glyph-sharp {
+    line-height: 0.9em;
+    vertical-align: 0.54em;
+}
+
+.chord-ext > .glyph-major {
+    font-size:   0.8125em;
+    height:      0.5625lh;
+    line-height: 1.875em;
+}
+
+.chord-ext > .glyph-major + .glyph-number {
+    margin-left: -0.025em;
 }
