@@ -107,3 +107,11 @@
 .chord-ext > .glyph-major + .glyph-number {
     margin-left: -0.025em;
 }
+
+.chord-ext > .glyph-dim {
+    margin-left: -0.075em;
+}
+
+.chord-ext > .glyph-dim + .glyph-number {
+    margin-left: 0.1em;
+}
