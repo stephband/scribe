@@ -3,8 +3,8 @@
     padding-bottom: 0.0625em;
     grid-template-rows:
         [B5 max] 0.125em
-        [A5 chords] 0.125em
-        [G5] 0.125em
+        [A5] 0.125em
+        [G5 chords] 0.125em
         [F5] 0.125em
         [E5] 0.125em
         [D5] 0.125em
