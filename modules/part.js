@@ -683,38 +683,18 @@ function closeTuplet(stave, part, tuplet) {
         -4 * sqrt(diff) ;
 }
 
-function isAtNextBeatDivisionDuplet(division, beat, stopBeat, duration, notes) {
+function isAtNextBeatDivisionDuplet(division, beat, stopBeat, duration, notes, n) {
         // Note stops before next beat
     return lte(beat + duration, stopBeat, p16)
         // Note stops within 0.125 + 1/16 of its own true duration of next beat
-        || stopBeat - (beat + duration) < 0.125 + (1/16) * (getStopBeat(notes[p]) - notes[p][0]);
+        || stopBeat - (beat + duration) < 0.125 + (1/16) * (getStopBeat(notes[n]) - notes[n][0]);
 }
 
-function isAtNextBeatDivisionTuplet(division, beat, stopBeat, duration, notes) {
+function isAtNextBeatDivisionTuplet(division, beat, stopBeat, duration, notes, n) {
     return lte(beat + duration + 0.5 * division, stopBeat, p24)
 }
 
-function createSymbols(stave, key, part, notes, tuplet, beat, stopBeat, duration, fn) {
-    // Insert heads
-    const noteSymbols = createNoteSymbols(stave, key, part, notes);
-
-    // Create ledgers and accidentals
-    if (noteSymbols.length) {
-        createLedges(symbols, stave, part, beat, noteSymbols);
-        createAccidentals(symbols, bar, part, accidentals, beat, noteSymbols);
-        createAccents(symbols, stave, part, beat, noteSymbols, settings);
-    }
-
-    // Push note symbols on to tuplet
-    push(tuplet, ...noteSymbols);
-
-    // Assign beat, duration to note symbols and push into symbols
-    let p = -1;
-    while (noteSymbols[++p]) symbols.push(assign(noteSymbols[p], {
-        beat,
-        duration
-    }));
-
+function createSymbols(symbols, bar, stave, key, accidentals, part, notes, beam, tuplet, beat, stopBeat, duration, division, settings, fn) {
     // Manage beam
     if (gt(0.5, duration, p24)) {
         // If there is a beam, close it
@@ -729,32 +709,60 @@ function createSymbols(stave, key, part, notes, tuplet, beat, stopBeat, duration
         part
     };
 
-    // Push note symbols on to beam
-    if (beam) push(beam, ...noteSymbols);
+    // Insert heads
+    const noteSymbols = createNoteSymbols(stave, key, part, notes);
+
+    if (noteSymbols.length) {
+        // Create ledgers, accidentals and accents
+        createLedges(symbols, stave, part, beat, noteSymbols);
+        createAccidentals(symbols, bar, part, accidentals, beat, noteSymbols);
+        createAccents(symbols, stave, part, beat, noteSymbols, settings);
+
+        // Push note symbols on to tuplet
+        if (tuplet) push(tuplet, ...noteSymbols);
+
+        // Assign beat, duration to note symbols and push into symbols
+        let n = -1;
+        while (noteSymbols[++n]) symbols.push(assign(noteSymbols[n], {
+            beat,
+            duration
+        }));
+
+        // Push note symbols on to beam
+        if (beam) push(beam, ...noteSymbols);
+    }
 
     // Remove notes or insert ties
-    p = notes.length;
-    while (p--) {
-        let stopBeat = getStopBeat(notes[p]) - bar.beat;
+    let n = notes.length;
+    while (n--) {
+        let stopBeat = getStopBeat(notes[n]) - bar.beat;
         // Remove notes that end before or near next division, we're done with them
-        if (fn(division, beat, stopBeat, duration, notes)) notes.splice(p, 1);
+        if (fn(division, beat, stopBeat, duration, notes, n)) notes.splice(n, 1);
         // Add tie to remaining notes
         else symbols.push({
             type:   'tie',
             beat,
-            pitch: noteSymbols[p].pitch,
+            pitch: noteSymbols[n].pitch,
             duration,
-            stemup: noteSymbols[p].stemup,
+            stemup: noteSymbols[n].stemup,
             part,
-            event: notes[p]
+            event: notes[n]
         });
     }
 
     // Update beat
-    return beat + duration;
+    return { beat: beat + duration, beam };
 }
 
 function createTuplet(symbols, bar, stave, key, accidentals, part, beam, settings, beat, duration, divisor, rhythm, notes, events, n) {
+    const BEAT = beat;
+
+    // Close beam if there any holes in rhythm
+    if (beam && rhythmHasHoles(divisor, rhythm)) {
+        closeBeam(symbols, stave, part, beam);
+        beam = undefined;
+    }
+
     // Check if we are to interpret swung 8ths or 16ths as straight 8ths or 16ths.
     // Rhythm is a binary representation of filled divisions where 1 (1) means
     // an event in the first division, 10 (2) an event in the second division,
@@ -781,7 +789,7 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, beam, setting
     let event;
 
     // If divisor is not power of two push tuplet symbol
-    if (!isPowerOf2(divisor)) symbols.push(tuplet);
+    /*if (!isPowerOf2(divisor))*/ symbols.push(tuplet);
 
     // While beat is before end of tuplet
     while (lt(stopBeat, beat, p24)) {
@@ -818,19 +826,92 @@ function createTuplet(symbols, bar, stave, key, accidentals, part, beam, setting
             roundTo(division, stopBeat - beat)
         );
 
-        beat = createSymbols(stave, key, part, notes, tuplet, beat, stopBeat, duration, isAtNextBeatDivisionTuplet);
+        const beatbeam = createSymbols(symbols, bar, stave, key, accidentals, part, notes, beam, tuplet, beat, stopBeat, duration, division, settings, isAtNextBeatDivisionTuplet);
+        beat = beatbeam.beat;
+        beam = beatbeam.beam;
     }
 
     if (beam) closeBeam(symbols, stave, part, beam);
 
     closeTuplet(stave, part, tuplet);
 
-    return n;
+    return {
+        beat: BEAT + duration,
+        n
+    };
+}
+
+function createDuplet(symbols, bar, stave, key, accidentals, part, beam, settings, beat, notes, events, n) {
+    const { headDurations, restDurations } = settings;
+
+    let event;
+
+    // Fill notes with events playing during beat, and leave event as the
+    // next event after beat
+    while ((event = events[++n]) && lte(beat, event[0] - bar.beat, p16)) notes.push(event);
+    --n;
+
+    // Sort notes by pitch order, descending (ascending row order)
+    if (stave.pitched) notes.sort(byPitch);
+
+    // Insert rests
+    if (!notes.length) {
+        if (!event) {
+            // If beam close it
+            if (beam) {
+                // Close the current beam
+                closeBeam(symbols, stave, part, beam);
+                beam = undefined;
+            }
+
+            // Fill rest of bar with rests
+            createRests(symbols, restDurations, bar, stave, part, beat, bar.duration);
+            return { beat: bar.duration, n };
+        }
+
+        // Create rests up to next event
+        const stopBeat = roundTo(0.125, event[0] - bar.beat);
+
+if (stopBeat <= beat) {
+    console.log(`Problem at bar ${ bar.count }, moving to next bar ${ beat } ${ stopBeat }`);
+    bar.error = 'Stop beat has ended up less than beat';
+    return { beat: bar.duration, n };
+}
+
+        if (beam && (
+            // If beam would cross a division
+            getDivision(bar.divisions, beat, stopBeat)
+            // If beam would have a rest longer than an eighth note
+            || stopBeat - beat >= 0.5
+        )) {
+            // Close the current beam
+            closeBeam(symbols, stave, part, beam);
+            beam = undefined;
+        }
+
+        createRests(symbols, restDurations, bar, stave, part, beat, stopBeat);
+        return { beat: stopBeat, beam, n }
+    }
+
+    // Original start beat of notes, may be well before beat
+    const startBeat = notes[0][0] - bar.beat;
+    // Max stop beat of notes
+    const stopBeat  = min(bar.duration, notes.reduce(toMaxStopBeat, 0) - bar.beat);
+    // Start beat of next event, if it exists
+    const eventBeat = event && roundTo(0.125, event[0]) - bar.beat;
+    // Duration of next head
+    const duration  = fitDuration(headDurations, bar, startBeat, stopBeat, beat, eventBeat);
+
+    const beatbeam = createSymbols(symbols, bar, stave, key, accidentals, part, notes, beam, undefined, beat, stopBeat, duration, undefined, settings, isAtNextBeatDivisionDuplet);
+    beat = beatbeam.beat;
+    beam = beatbeam.beam;
+    beatbeam.n = n;
+    return beatbeam;
 }
 
 export function createPart(symbols, bar, stave, key = 0, accidentals = {}, part, events, settings = config) {
+    const { restDurations } = settings;
     const notes = [];
-    const { headDurations, restDurations } = settings;
 
     let beat = 0;
     let n = -1;
@@ -854,86 +935,28 @@ export function createPart(symbols, bar, stave, key = 0, accidentals = {}, part,
         // If we are not currently in tuplet mode detect the next tuplet
         const data = detectTuplet(events, bar.beat + beat, bar.duration - beat);
 
-//if (data) console.log(bar.beat, beat, n, event, 'TUPLETS', data.beat, data.duration, 'divisor', data.divisor, data.rhythm, n, events);
-//else console.log(bar.beat, beat, 'DUPLETS', n, events);
-//if (data) console.log(bar.count, beat, 'Rhythm', data.duration, data.divisor, data.rhythm.toString(2).split('').reverse().join(''));
+        //if (data) console.log(bar.beat, beat, n, event, 'TUPLETS', data.beat, data.duration, 'divisor', data.divisor, data.rhythm, n, events);
+        //else console.log(bar.beat, beat, 'DUPLETS', n, events);
+        //if (data) console.log(bar.count, beat, 'Rhythm', data.duration, data.divisor, data.rhythm.toString(2).split('').reverse().join(''));
 
         if (data && !isPowerOf2(data.divisor)) {
             // Create rests up to tuplet
-            if (gt(beat, data.beat - bar.beat, p16)) createRests(symbols, settings.restDurations, bar, stave, part, beat, data.beat - bar.beat);
-            // Close beam if there any holes in rhythm
-            if (beam && rhythmHasHoles(data.divisor, data.rhythm)) {
-                closeBeam(symbols, stave, part, beam);
-                beam = undefined;
-            }
+            if (gt(beat, data.beat - bar.beat, p16)) createRests(symbols, restDurations, bar, stave, part, beat, data.beat - bar.beat);
             // Render tuplet
-            n = createTuplet(symbols, bar, stave, key, accidentals, part, beam, settings, data.beat - bar.beat, data.duration, data.divisor, data.rhythm, notes, events, n);
+            const beatbeam = createTuplet(symbols, bar, stave, key, accidentals, part, beam, settings, data.beat - bar.beat, data.duration, data.divisor, data.rhythm, notes, events, n);
             // Update beat
-            beat = data.beat - bar.beat + data.duration;
-            //
-            continue;
+            beat = beatbeam.beat;
+            beam = beatbeam.beam;
+            n    = beatbeam.n;
         }
-
-        // Fill notes with events playing during beat, and leave event as the
-        // next event after beat
-        while ((event = events[++n]) && lte(beat, event[0] - bar.beat, p16)) {
-            notes.push(event);
+        else {
+            // Render duplets
+            const beatbeam = createDuplet(symbols, bar, stave, key, accidentals, part, beam, settings, beat, notes, events, n);
+            // Update beat
+            beat = beatbeam.beat;
+            beam = beatbeam.beam;
+            n    = beatbeam.n;
         }
-        --n;
-
-        // Sort notes by pitch order, descending (ascending row order)
-        if (stave.pitched) notes.sort(byPitch);
-
-        // Insert rests
-        if (!notes.length) {
-            if (!event) {
-                // If beam close it
-                if (beam) {
-                    // Close the current beam
-                    closeBeam(symbols, stave, part, beam);
-                    beam = undefined;
-                }
-
-                // Fill rest of bar with rests
-                createRests(symbols, settings.restDurations, bar, stave, part, beat, bar.duration);
-                break;
-            }
-
-            // Create rests up to next event
-            const stopBeat = roundTo(0.125, event[0] - bar.beat);
-
-if (stopBeat <= beat) {
-    console.log(`Problem at bar ${ bar.count }, moving to next bar ${ beat } ${ stopBeat }`);
-    bar.error = 'Stop beat has ended up less than beat';
-    break;
-}
-
-            if (beam && (
-                // If beam would cross a division
-                getDivision(bar.divisions, beat, stopBeat)
-                // If beam would have a rest longer than an eighth note
-                || stopBeat - beat >= 0.5
-            )) {
-                // Close the current beam
-                closeBeam(symbols, stave, part, beam);
-                beam = undefined;
-            }
-
-            createRests(symbols, restDurations, bar, stave, part, beat, stopBeat);
-            beat = stopBeat;
-            continue;
-        }
-
-        // Original start beat of notes, may be well before beat
-        const startBeat = notes[0][0] - bar.beat;
-        // Max stop beat of notes
-        const stopBeat  = min(bar.duration, notes.reduce(toMaxStopBeat, 0) - bar.beat);
-        // Start beat of next event, if it exists
-        const eventBeat = event && roundTo(0.125, event[0]) - bar.beat;
-        // Duration of next head
-        const duration  = fitDuration(headDurations, bar, startBeat, stopBeat, beat, eventBeat);
-
-        beat = createSymbols(stave, key, part, notes, {}, beat, stopBeat, duration, isAtNextBeatDivisionDuplet);
     }
 
     // If there's still a beam close it
