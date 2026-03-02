@@ -7,5 +7,9 @@
         "sequence/": "https://cdn.jsdelivr.net/gh/soundio/sequence@0.2.27/"
     },
 
+    "tasks": {
+        "test": "deno run --allow-read test/tuplets.js"
+    },
+
     "lock": false
 }
