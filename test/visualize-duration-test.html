@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Duration Testing Visualization</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 4px;
+        }
+        .controls input { margin: 0 10px; }
+        .controls button { margin: 0 5px; padding: 5px 15px; }
+        .columns {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding: 20px 0;
+        }
+        .duration-column {
+            min-width: 300px;
+            background: white;
+            border-radius: 4px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .duration-column.winner {
+            background: #fff8f0;
+            border: 2px solid #e41a1c;
+        }
+        .duration-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ddd;
+        }
+        .duration-column.winner .duration-header {
+            color: #e41a1c;
+        }
+        canvas {
+            display: block;
+            margin: 10px 0;
+        }
+        .divisor-scores {
+            font-size: 11px;
+            margin-top: 10px;
+        }
+        .divisor-scores div {
+            padding: 3px;
+            border-bottom: 1px solid #eee;
+        }
+        .divisor-scores .best {
+            background: #ffffcc;
+            font-weight: bold;
+        }
+        .info {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Duration Testing Progression</h2>
+
+    <div class="controls">
+        <label>Events (beats, comma-separated):
+            <input type="text" id="eventsInput" value="0, 0.5, 1, 1.333, 1.667" size="50">
+        </label>
+        <label>Start: <input type="number" id="startInput" value="0" step="0.1"></label>
+        <label>Max Duration: <input type="number" id="durationInput" value="4" step="0.5"></label>
+        <button onclick="update()">Update</button>
+        <button onclick="loadPreset('duplet-triplet')">Duplet+Triplet</button>
+        <button onclick="loadPreset('eighth')">Two Eighths</button>
+    </div>
+
+    <div class="columns" id="columnsContainer"></div>
+    <div id="results" class="info"></div>
+
+    <script type="module">
+        const { cos, sin, PI, sqrt, atan2, pow, floor, log2 } = Math;
+
+        const MIN_DURATION = 0.25;
+        const MIN_PERIOD = 0.25 / 3;
+
+        let events = [0, 0.5, 1, 1.333, 1.667];
+        let startBeat = 0;
+        let maxDuration = 4;
+
+        function floorPowerOf2(n) {
+            if (n <= 0) return MIN_DURATION;
+            return pow(2, floor(log2(n)));
+        }
+
+        window.loadPreset = function(name) {
+            if (name === 'duplet-triplet') {
+                events = [0, 0.5, 1, 1.333, 1.667];
+                document.getElementById('eventsInput').value = '0, 0.5, 1, 1.333, 1.667';
+            } else if (name === 'eighth') {
+                events = [0, 0.5];
+                document.getElementById('eventsInput').value = '0, 0.5';
+            }
+            update();
+        };
+
+        window.update = function() {
+            const input = document.getElementById('eventsInput').value;
+            events = input.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+            startBeat = parseFloat(document.getElementById('startInput').value);
+            maxDuration = parseFloat(document.getElementById('durationInput').value);
+            draw();
+        };
+
+        function analyzeDuration(eventBeats, start, dur) {
+            const relevantEvents = eventBeats.filter(b => b >= start && b < start + dur);
+            if (relevantEvents.length === 0) return null;
+
+            const eventCount = relevantEvents.length;
+            let bestScore = 0;
+            let bestDivisor = 1;
+            let allResults = [];
+
+            for (let divisor = 1; divisor <= 9; divisor++) {
+                const period = dur / divisor;
+                if (period < MIN_PERIOD) continue;
+
+                let real = 0;
+                let imag = 0;
+
+                for (const eventBeat of relevantEvents) {
+                    const beat = eventBeat - start;
+                    const phi = 2 * PI * divisor * beat / dur;
+                    real += cos(phi);
+                    imag += sin(phi);
+                }
+
+                const amplitude = sqrt(real * real + imag * imag);
+                const phase = atan2(imag, real);
+                const phaseWeight = (cos(phase) + 1) / 2;
+                const weightedAmplitude = amplitude * phaseWeight;
+                const normalizedScore = weightedAmplitude / eventCount;
+
+                allResults.push({
+                    divisor,
+                    amplitude,
+                    phase,
+                    weightedAmplitude,
+                    normalizedScore
+                });
+
+                if (normalizedScore > bestScore) {
+                    bestScore = normalizedScore;
+                    bestDivisor = divisor;
+                }
+            }
+
+            return {
+                duration: dur,
+                eventCount,
+                bestScore,
+                bestDivisor,
+                allResults
+            };
+        }
+
+        function draw() {
+            const container = document.getElementById('columnsContainer');
+            container.innerHTML = '';
+
+            const dur = floorPowerOf2(maxDuration);
+            const allDurations = [];
+            let testDuration = dur;
+            while (testDuration >= MIN_DURATION) {
+                allDurations.push(testDuration);
+                testDuration /= 2;
+            }
+
+            let overallBestScore = 0;
+            let overallBestDuration = null;
+
+            // Test all durations
+            const durationResults = allDurations.map(d => {
+                const result = analyzeDuration(events, startBeat, d);
+                if (result && result.bestScore > overallBestScore) {
+                    overallBestScore = result.bestScore;
+                    overallBestDuration = d;
+                }
+                return result;
+            }).filter(r => r !== null);
+
+            // Draw columns
+            for (const result of durationResults) {
+                const isWinner = result.duration === overallBestDuration;
+                const column = document.createElement('div');
+                column.className = 'duration-column' + (isWinner ? ' winner' : '');
+
+                const header = document.createElement('div');
+                header.className = 'duration-header';
+                header.innerHTML = `
+                    Duration: ${result.duration}<br>
+                    Events: ${result.eventCount}<br>
+                    Best: div ${result.bestDivisor}, score ${result.bestScore.toFixed(3)}
+                    ${isWinner ? '<br>★ WINNER' : ''}
+                `;
+                column.appendChild(header);
+
+                // Draw cosine wave for winning divisor
+                const waveCanvas = document.createElement('canvas');
+                waveCanvas.width = 280;
+                waveCanvas.height = 80;
+                column.appendChild(waveCanvas);
+
+                const waveCtx = waveCanvas.getContext('2d');
+                waveCtx.fillStyle = '#fafafa';
+                waveCtx.fillRect(0, 0, 280, 80);
+
+                // Draw cosine wave
+                const margin = 10;
+                const waveWidth = 260;
+                waveCtx.strokeStyle = isWinner ? '#e41a1c' : '#999';
+                waveCtx.lineWidth = 1.5;
+                waveCtx.beginPath();
+
+                for (let x = 0; x <= waveWidth; x++) {
+                    const beat = (x / waveWidth) * result.duration;
+                    const phi = 2 * PI * result.bestDivisor * beat / result.duration;
+                    const y = 40 - cos(phi) * 25;
+                    if (x === 0) waveCtx.moveTo(x + margin, y);
+                    else waveCtx.lineTo(x + margin, y);
+                }
+                waveCtx.stroke();
+
+                // Draw zero line
+                waveCtx.strokeStyle = '#ddd';
+                waveCtx.lineWidth = 1;
+                waveCtx.beginPath();
+                waveCtx.moveTo(margin, 40);
+                waveCtx.lineTo(margin + waveWidth, 40);
+                waveCtx.stroke();
+
+                // Draw event markers
+                const relevantEvents = events.filter(e => e >= startBeat && e < startBeat + result.duration);
+                for (const eventBeat of relevantEvents) {
+                    const beat = eventBeat - startBeat;
+                    const x = margin + (beat / result.duration) * waveWidth;
+                    const phi = 2 * PI * result.bestDivisor * beat / result.duration;
+                    const cosVal = cos(phi);
+                    const y = 40 - cosVal * 25;
+
+                    // Event line
+                    waveCtx.strokeStyle = isWinner ? '#e41a1c' : '#666';
+                    waveCtx.lineWidth = 1;
+                    waveCtx.setLineDash([3, 3]);
+                    waveCtx.beginPath();
+                    waveCtx.moveTo(x, 75);
+                    waveCtx.lineTo(x, y);
+                    waveCtx.stroke();
+                    waveCtx.setLineDash([]);
+
+                    // Event dot
+                    waveCtx.fillStyle = isWinner ? '#e41a1c' : '#666';
+                    waveCtx.beginPath();
+                    waveCtx.arc(x, y, 3, 0, 2 * PI);
+                    waveCtx.fill();
+                }
+
+                // Label
+                waveCtx.fillStyle = '#666';
+                waveCtx.font = '9px monospace';
+                waveCtx.fillText(`Divisor ${result.bestDivisor}`, margin, 12);
+
+                // Draw bar chart of scores
+                const canvas = document.createElement('canvas');
+                canvas.width = 280;
+                canvas.height = 250;
+                column.appendChild(canvas);
+
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#fafafa';
+                ctx.fillRect(0, 0, 280, 250);
+
+                const barWidth = 25;
+                const maxBarHeight = 200;
+
+                result.allResults.forEach((r, i) => {
+                    const x = 10 + i * 30;
+                    const h = r.normalizedScore * maxBarHeight;
+
+                    ctx.fillStyle = r.divisor === result.bestDivisor ? '#e41a1c' : '#999';
+                    ctx.fillRect(x, 250 - h - 30, barWidth, h);
+
+                    ctx.fillStyle = '#000';
+                    ctx.font = '10px monospace';
+                    ctx.fillText(r.divisor, x + 8, 240);
+                });
+
+                // Y-axis labels
+                ctx.fillStyle = '#666';
+                ctx.font = '9px monospace';
+                ctx.fillText('1.0', 5, 25);
+                ctx.fillText('0.5', 5, 125);
+                ctx.fillText('0', 5, 225);
+
+                // Scores table
+                const scores = document.createElement('div');
+                scores.className = 'divisor-scores';
+                result.allResults.forEach(r => {
+                    const div = document.createElement('div');
+                    div.className = r.divisor === result.bestDivisor ? 'best' : '';
+                    div.textContent = `${r.divisor}: ${r.normalizedScore.toFixed(3)} (φ=${r.phase.toFixed(2)})`;
+                    scores.appendChild(div);
+                });
+                column.appendChild(scores);
+
+                container.appendChild(column);
+            }
+
+            // Results summary
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <strong>Winner: Duration ${overallBestDuration}, Divisor ${durationResults.find(r => r.duration === overallBestDuration).bestDivisor}</strong><br>
+                Score: ${overallBestScore.toFixed(3)}<br><br>
+                Early exit logic: ${checkEarlyExit(durationResults)}
+            `;
+        }
+
+        function checkEarlyExit(results) {
+            for (let i = 1; i < results.length; i++) {
+                const prev = results[i - 1];
+                const curr = results[i];
+
+                if (curr.eventCount > prev.eventCount && curr.bestScore < prev.bestScore) {
+                    return `Would exit at duration ${curr.duration} (score dropped from ${prev.bestScore.toFixed(3)} to ${curr.bestScore.toFixed(3)})`;
+                }
+            }
+            return 'Would test all durations (no score drop with new events)';
+        }
+
+        draw();
+    </script>
+</body>
+</html>
