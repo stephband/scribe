@@ -27,6 +27,8 @@ export function detectOsc(beat, duration, events, index = 0) {
     // Duration must be at least MIN_DURATION
     if (duration < MIN_DURATION) return undefined;
 
+    const maxBeat = beat + duration;
+
     // Ensure duration is power-of-2
     duration = floorPow2(duration);
 
@@ -99,8 +101,8 @@ export function detectOsc(beat, duration, events, index = 0) {
                 }
             }
 
-            // If there were no events to process we can exit
-            if (n === startIndex) return result;
+            // If there were no events to process, skip this divisor
+            if (n === startIndex) continue;
 
             const amplitude = sqrt(r * r + i * i);
             const phase     = atan2(i, r);
@@ -122,6 +124,7 @@ export function detectOsc(beat, duration, events, index = 0) {
                 result.rhythm   = rhythm;
                 result.drift    = phase * duration / (2 * PI * divisor);
                 result.count    = count;
+                result.score    = score;
             }
         }
 
@@ -129,5 +132,52 @@ export function detectOsc(beat, duration, events, index = 0) {
         duration /= 2;
     }
 
+    // Check if first half of rhythm is empty - if so, slide window forward
+    const firstHalfMask = (1 << (result.divisor >> 1)) - 1;
+    if ((result.rhythm & firstHalfMask) === 0 && beat + 1.5 * result.duration <= maxBeat) {
+        // Find first event at or after new beat
+        n = startIndex - 1;
+        const nextBeat = beat + 0.5 * result.duration;
+        while (events[++n] !== undefined && events[n][0] < nextBeat);
+
+        // Recursively analyze from new beat with remaining duration
+        const nextResult = detectOsc(nextBeat, maxBeat - nextBeat, events, n);
+
+        // Return better of the two results
+        if (nextResult) {
+            const nextScore = calculateScore(nextResult, events);
+            if (nextScore > bestScore) {
+                return nextResult;
+            }
+        }
+    }
+
     return result;
+}
+
+function calculateScore(result, events) {
+    // Recalculate score from result - need to find events and compute
+    // This is a bit ugly but avoids storing score in result object
+    let n = result.index - 1;
+    const beat = result.beat;
+    const duration = result.duration;
+    const divisor = result.divisor;
+    const stopBeat = beat + duration;
+
+    let r = 0;
+    let i = 0;
+    let count = 0;
+
+    while (events[++n] !== undefined && events[n][0] < stopBeat) {
+        const b = events[n][0] - beat;
+        const p = 2 * PI * divisor * b / duration;
+        r += cos(p);
+        i += sin(p);
+        count++;
+    }
+
+    const amplitude = sqrt(r * r + i * i);
+    const phase = atan2(i, r);
+    const weight = 0.5 * (cos(phase) + 1) / count;
+    return amplitude * weight;
 }

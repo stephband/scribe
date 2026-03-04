@@ -13,22 +13,115 @@ Returns: `{ divisor, amplitude, phase, beat, duration }` where:
 - `duration`: Duration of analysis window
 **/
 
-import { floorPow2 } from './number/power-of-2.js';
+import { floorPow2, ceilPow2 } from './number/power-of-2.js';
+
+const DEBUG = globalThis.DEBUG;
+
+const { atan2, ceil, cos, floor, max, min, pow, sin, sqrt, PI } = Math;
+
+const defaults = {
+    minNoteDuration:   1 / 12,
+    maxNoteDuration:   4,
+    stopBeatInfluence: 0.01
+};
+
+const divisors = [1, 2, 3, 5, 7, 9];
+
+// Favour slightly inexact triplets over exact duplets by an arbitrary factor
+const TOLERANCE = 0.07;
 
 
-// Minimum duration to test
-const MIN_DURATION = 0.25;
-// Minimum period for any oscillator (prevents testing absurdly fast divisions)
-const MIN_PERIOD = MIN_DURATION / 3;
+function hasConsecutiveHoles(divisor, rhythm) {
+    const fullRhythm = (1 << divisor) - 1;
+    const holes = fullRhythm ^ rhythm;
+    return holes & (holes << 1);
+}
 
-const { sqrt, atan2, cos, sin, PI } = Math;
+function compare(beat, duration, divisor, rhythm, length, count, r, i, score, result) {
+    // Reject higher order rhythms with consecutive holes
+    if (divisor > 3 && hasConsecutiveHoles(divisor, rhythm)) return score;
 
-export function detectOsc(beat, duration, events, index = 0) {
-    // Duration must be at least MIN_DURATION
-    if (duration < MIN_DURATION) return undefined;
+    const amplitude = sqrt(r * r + i * i);
+    const phase     = atan2(i, r);
 
-    // Ensure duration is power-of-2
-    duration = floorPow2(duration);
+    // Weight amplitude by phase alignment to prefer nearer-zero
+    // phases and reject out-of-phase rhythms.
+    // Phase 0   → weight 1.0 (events perfectly aligned with grid)
+    // Phase π/2 → weight 0.5 (events quarter-cycle off)
+    // Phase ±π  → weight 0   (events half-cycle out, completely reject)
+    const weightPhase =  0.5 * (cos(phase) + 1);
+
+    // Weight amplitude by events analysed to make various durations
+    // comparable, weight by an arbitrary tolerance
+    const weightCount = TOLERANCE + 1 / length;
+
+    // Score
+    const s = amplitude * weightPhase * weightCount;
+
+    if (DEBUG) console.log('divisor', divisor, 'length', length, 'score', s);
+    if (s <= score) return score;
+
+    result.beat     = beat;
+    result.duration = duration;
+    result.divisor  = divisor;
+    result.rhythm   = rhythm;
+    result.drift    = phase * duration / (2 * PI * divisor);
+    result.count    = count;
+
+    return s;
+}
+
+function test(events, index, beat, duration, divisor, rhythm, count, score, result, stopBeatInfluence) {
+    const d = duration / divisor;
+
+    let r = 0;
+    let i = 0;
+    let n = index - 1;
+    while (events[++n] !== undefined && events[n][0] < beat + duration) {
+        // Each start beat gives this oscillator a kick. Accumulate complex
+        // components, they constructively interfere when events align with
+        // resonant frequency, destructively interfere when events are out of phase.
+        const b1 = events[n][0] - beat;
+        const p1 = 2 * PI * divisor * b1 / duration;
+        r += cos(p1);
+        i += sin(p1);
+
+        // If event durations - stop beats - are to influence the scoring
+        if (stopBeatInfluence) {
+            const b2 = b1 + events[n][4];
+            const p2 = 2 * PI * divisor * b2 / duration;
+            r += stopBeatInfluence * cos(p2);
+            i += stopBeatInfluence * sin(p2);
+        }
+
+        // Build rhythm bitmap, where each bit represents a division
+        // bit 0 = first division
+        // bit 1 = second division
+        // and so on
+        const slot = Math.round(b1 / d);
+        if (slot < divisor) {
+            rhythm |= (1 << slot);
+            ++count;
+        }
+    }
+
+    return compare(beat, duration, divisor, rhythm, n - index, count, r, i, score, result);
+}
+
+export default function detectRhythm(beat, maxDuration, events, index = 0, options) {
+    const minNoteDuration   = options?.minNoteDuration   || defaults.minNoteDuration;
+    const maxNoteDuration   = options?.maxNoteDuration   || defaults.maxNoteDuration;
+    const stopBeatInfluence = options?.stopBeatInfluence || defaults.stopBeatInfluence;
+
+    // Min duration is divided by at least duplets, so must be at least
+    // twice minNoteDuration
+    const minDuration = ceilPow2(minNoteDuration);
+
+    // Duration must be at least minDuration
+    if (maxDuration < minDuration) throw new Error(`detectRhythm() - duration (${ maxDuration }) must be at least ${ minDuration }`);
+
+    // Ensure initial duration is power-of-2
+    let duration = floorPow2(maxDuration);
 
     // Find first event after index in analysis window
     let n = index - 1;
@@ -37,8 +130,10 @@ export function detectOsc(beat, duration, events, index = 0) {
     // If events were found before beat they are assumed to be hangovers from
     // the end of a previous analysis window that were not counted as rhythm,
     // they are now counted as rhythm in slot 0
-    const initialCount  = n - index;
-    const initialRhythm = initialCount ? 1 : 0 ;
+    const count  = n - index;
+    const rhythm = count ? 1 : 0 ;
+
+    // The return object
     const result = {
         // Start beat of rhythmic analysis window
         beat,
@@ -47,85 +142,55 @@ export function detectOsc(beat, duration, events, index = 0) {
         // Number of divisions over duration
         divisor: 1,
         // Rhythm bitmap identifier
-        rhythm: initialRhythm,
+        rhythm,
         // Phase offset in beats, whether the performance is pushing or dragging
         drift: 0,
         // Index of first event in rhythm
         index,
         // Number of events counted in rhythm
-        count: initialCount
+        count
     };
 
     // If no event in window, quick out
     if (!events[n]) return result;
 
+    const startBeat  = beat;
     const startIndex = n;
-    let bestScore  = 0;
+    const startEvent = events[startIndex];
 
-    // Test durations in descending power-of-2 steps
-    while (duration >= MIN_DURATION) {
-        const stopBeat = beat + duration;
+    let score = 0;
+    while (duration >= minDuration) {
+        const maxDivisor = min(9, floor(duration / minNoteDuration));
 
-        // Test oscillators at frequencies 1-9 cycles per duration
-        // Skip oscillators whose period would be too short
-        for (let divisor = 1; divisor <= 9; divisor++) {
-            const d = duration / divisor;
+        // Find minimum divisor
+        let m = -1;
+        while (divisors[++m] < duration / maxNoteDuration);
 
-            // Ignore divisions shorter than a triplet 32nd note
-            if (d < MIN_PERIOD) continue;
-
-            let r = 0;
-            let i = 0;
-            let rhythm = initialRhythm;
-            let count  = initialCount;
-
-            n = startIndex - 1;
-            while (events[++n] !== undefined && events[n][0] < stopBeat) {
-                // Each event gives this oscillator a kick. Accumulate complex
-                // components, they constructively interfere when events align
-                // with resonant frequency, destructively interfere when events
-                // are out of phase.
-                const b = events[n][0] - beat;
-                const p = 2 * PI * divisor * b / duration;
-                r += cos(p);
-                i += sin(p);
-
-                // Build rhythm bitmap, where each bit represents a division
-                // bit 0 = first division, bit 1 = second, and so on
-                const slot = Math.round(b / d);
-                if (slot < divisor) {
-                    rhythm |= (1 << slot);
-                    ++count;
-                }
-            }
-
-            // If there were no events to process we can exit
-            if (n === startIndex) return result;
-
-            const amplitude = sqrt(r * r + i * i);
-            const phase     = atan2(i, r);
-
-            // Weight amplitude by phase alignment to prefer nearer-zero phases
-            // and reject out-of-phase rhythms.
-            // Phase 0   → weight 1.0 (events perfectly aligned with grid)
-            // Phase π/2 → weight 0.5 (events quarter-cycle off)
-            // Phase ±π  → weight 0   (events half-cycle out, completely reject)
-            // Weight amplitude by events analysed to make various durations
-            // comparable.
-            const weight = 0.5 * (cos(phase) + 1) / (n - startIndex);
-            const score  = amplitude * weight;
-
-            if (score > bestScore) {
-                bestScore = score;
-                result.duration = duration;
-                result.divisor  = divisor;
-                result.rhythm   = rhythm;
-                result.drift    = phase * duration / (2 * PI * divisor);
-                result.count    = count;
-            }
+        // Set beat to first half duration after startEvent
+        beat = startBeat;
+        while (!rhythm
+            && beat + 0.5 * duration <= startEvent[0]
+            && beat + 1.5 * duration <= startBeat + maxDuration) {
+            beat += duration / 2;
         }
 
-        // Try next shorter duration
+        // For as long as beat is after startBeat and duration encompasses startEvent
+        while (beat >= startBeat && beat + duration > startEvent[0]) {
+            if (DEBUG) console.group('duration', duration, 'beat', beat);
+
+            // Test oscillators at frequencies  duration
+            --m;
+            while (divisors[++m] <= maxDivisor) {
+                score = test(events, startIndex, beat, duration, divisors[m], rhythm, count, score, result, stopBeatInfluence);
+            }
+
+            if (DEBUG) console.groupEnd();
+
+            // Scan window backward by half durations
+            beat -= duration / 2;
+        }
+
+        // Test durations in descending power-of-2 steps
         duration /= 2;
     }
 
