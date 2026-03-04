@@ -1,0 +1,231 @@
+
+/**
+detectRhythm(beat, duration, events, index = 0, options)
+Rhythm detection via harmonic oscillators. Takes an options object of the form:
+
+```
+{
+    minDivision: 1/12,   // Shortest division duration
+    maxDivision: 4,      // Longest division duration
+    stopBeatInfluence: 0 // Influence of event stop beats on detection algorithm
+}
+```
+
+Returns an object of the form:
+
+```
+{
+    beat       // Start beat of rhythmic analysis window
+    duration   // Duration of rhythmic analysis window
+    divisor    // Number of divisions over duration, one of 1, 2, 3, 5, 6, 7, 9, 11
+    rhythm     // Rhythm bitmap identifier
+    drift      // Phase offset in beats, whether the performance is pushing or dragging
+    index      // Index of first event in rhythm
+    count      // Number of events counted in rhythm
+}
+```
+**/
+
+import { floorPow2, ceilPow2 } from './number/power-of-2.js';
+
+const DEBUG = true;//globalThis.DEBUG;
+
+const { atan2, ceil, cos, floor, max, min, pow, sin, sqrt, PI } = Math;
+
+const defaults = {
+    minDivision: 1 / 12,
+    maxDivision: 4,
+    stopBeatInfluence: 0 //0.01
+};
+
+// Divisors to test
+const divisors = [1, 2, 3, 5, 6, 7, 9, 11];
+
+// Favour slightly inexact triplets over exact duplets by an arbitrary factor
+const TOLERANCE = 0.07;
+
+
+function hasConsecutiveHoles(divisor, rhythm) {
+    const fullRhythm = (1 << divisor) - 1;
+    const holes = fullRhythm ^ rhythm;
+    return holes & (holes << 1);
+}
+
+function compare(beat, duration, divisor, rhythm, length, count, r, i, score, result) {
+    // If no events return score
+    if (!length) return score;
+
+    // Reject higher order rhythms with consecutive holes
+    //switch (divisor) {
+    //    case 5:
+    //    case 6:
+    //    case 7:
+    //    case 9:
+    //    case 11:
+    //        if (hasConsecutiveHoles(divisor, rhythm)) return score;
+    //}
+    if (divisor > 3 && hasConsecutiveHoles(divisor, rhythm)) return score;
+
+    const amplitude = sqrt(r * r + i * i);
+    const phase     = atan2(i, r);
+
+    // Weight amplitude by phase alignment to prefer nearer-zero
+    // phases and reject out-of-phase rhythms.
+    // Phase 0   → weight 1.0 (events perfectly aligned with grid)
+    // Phase π/2 → weight 0.5 (events quarter-cycle off)
+    // Phase ±π  → weight 0   (events half-cycle out, completely reject)
+    //const weightPhase =  0.5 * (cos(phase) + 1);
+    //const phaseWeight  = 0.5 * (r / amplitude + 1);
+
+    // Weight amplitude by events analysed to make various durations
+    // comparable, weight by an arbitrary tolerance
+    const lengthWeight = TOLERANCE + 1 / length;
+
+    // Score
+    //const s = amplitude * pow(phaseWeight, 2) * lengthWeight;
+    // r is ±, amplitude is +ve
+    const s = (0.5 * r + 0.5 * amplitude) * lengthWeight;
+
+    if (s <= score) return score;
+//console.log('duration', duration, 'beat', beat, 'divisor', divisor, 'length', length, 'score', s);
+
+    result.beat     = beat;
+    result.duration = duration;
+    result.divisor  = divisor;
+    result.rhythm   = rhythm;
+    result.drift    = phase * duration / (2 * PI * divisor);
+    result.count    = count;
+
+    return s;
+}
+
+function test(events, index, beat, duration, divisor, rhythm, count, score, result, stopBeatInfluence) {
+    const d = duration / divisor;
+
+    let r = 0;
+    let i = 0;
+    let n = index - 1;
+    while (events[++n] !== undefined && events[n][0] < beat + duration) {
+        // Each start beat gives this oscillator a kick. Accumulate complex
+        // components, they constructively interfere when events align with
+        // resonant frequency, destructively interfere when events are out of phase.
+        const b1 = events[n][0] - beat;
+        const p1 = 2 * PI * divisor * b1 / duration;
+        r += cos(p1);
+        i += sin(p1);
+
+        // If event durations - stop beats - are to influence the scoring
+        if (stopBeatInfluence) {
+            const b2 = b1 + events[n][4];
+            const p2 = 2 * PI * divisor * b2 / duration;
+            r += stopBeatInfluence * cos(p2);
+            i += stopBeatInfluence * sin(p2);
+        }
+
+        // Build rhythm bitmap, where each bit represents a division
+        // bit 0 = first division
+        // bit 1 = second division
+        // and so on
+        const slot = Math.round(b1 / d);
+        if (slot < divisor) {
+            rhythm |= (1 << slot);
+            ++count;
+        }
+    }
+
+    return compare(beat, duration, divisor, rhythm, n - index, count, r, i, score, result);
+}
+
+function run(minDivision, maxDivision, startBeat, maxDuration, rhythm, count, events, index, result, stopBeatInfluence = 0) {
+    const startEvent = events[index];
+
+    // Ensure initial duration is power-of-2
+    let duration = floorPow2(maxDuration);
+    let score = 0;
+    while (duration > minDivision) {
+        // Find minimum divisor
+        let m = -1;
+        while (divisors[++m] < duration / maxDivision);
+        let o = m - 1;
+        while (divisors[++o] < duration / minDivision);
+        const maxDivisor = divisors[o - 1];
+
+        // Set beat to first duration to span startEvent
+        let beat = startBeat;
+        while (!rhythm
+            && beat + duration <= startEvent[0]
+            && beat + duration < startBeat + maxDuration) beat += duration;
+
+        // Test oscillators at frequencies  duration
+        let g = m - 1;
+        let divisor;
+        while ((divisor = divisors[++g]) && divisor <= maxDivisor) {
+            //if (DEBUG) console.group('duration', duration, 'beat', beat, 'divisor', divisors[g]);
+            score = test(events, index, beat, duration, divisor, rhythm, count, score, result, stopBeatInfluence);
+            //if (DEBUG) console.groupEnd();
+        }
+
+        // Advance by half duration
+        beat += duration / 2;
+        if (beat + duration < startBeat + maxDuration) {
+            // Test odd divisors only
+            g = max(2, m - 1);
+            while ((divisor = divisors[++g]) && divisor <= maxDivisor) {
+                //if (DEBUG) console.group('duration', duration, 'beat', beat, 'divisor', divisors[g]);
+                score = test(events, index, beat, duration, divisor, rhythm, count, score, result, stopBeatInfluence);
+                //if (DEBUG) console.groupEnd();
+            }
+        }
+
+        // Test durations in descending power-of-2 steps
+        duration /= 2;
+    }
+
+    return result;
+}
+
+export default function detectRhythm(beat, duration, events, index = 0, options) {
+    const minDivision       = options?.minDivision   || defaults.minDivision;
+    const maxDivision       = options?.maxDivision   || defaults.maxDivision;
+    const stopBeatInfluence = options?.stopBeatInfluence || defaults.stopBeatInfluence;
+
+    // Duration must be at least minDivision
+    if (duration < minDivision) {
+        throw new Error(`detectRhythm() - duration (${ duration }) must be at least ${ minDivision }`);
+    }
+
+    // Find first event after index in analysis window
+    let n = index - 1;
+    while (events[++n] !== undefined && events[n][0] < beat);
+
+    // If events were found before beat they are assumed to be hangovers from
+    // the end of a previous analysis window that were not counted as rhythm,
+    // they are now counted as rhythm in slot 0
+    const count  = n - index;
+    const rhythm = count ? 1 : 0 ;
+
+    // The return object
+    const result = {
+        // Start beat of rhythmic analysis window
+        beat,
+        // Duration of rhythmic analysis window
+        duration,
+        // Number of divisions over duration
+        divisor: 1,
+        // Rhythm bitmap identifier
+        rhythm,
+        // Phase offset in beats, whether the performance is pushing or dragging
+        drift: 0,
+        // Index of first event in rhythm
+        index,
+        // Number of events counted in rhythm
+        count
+    };
+
+    // If no event in window, quick out
+    if (!events[n]) return result;
+    if (events[n][0] >= beat + duration) return result;
+
+    // Run the analysis
+    return run(minDivision, maxDivision, beat, duration, rhythm, count, events, n, result, stopBeatInfluence);
+}
