@@ -30,6 +30,10 @@ import { floorPow2, ceilPow2 } from './number/power-of-2.js';
 
 const DEBUG = true;//globalThis.DEBUG;
 
+// Populated during detectRhythm() when DEBUG is true. Each entry is a
+// snapshot of result at the moment a new best score was found.
+export const analytics = [];
+
 const { atan2, ceil, cos, floor, max, min, pow, sin, sqrt, PI } = Math;
 
 const defaults = {
@@ -55,16 +59,19 @@ function compare(beat, duration, divisor, rhythm, length, count, r, i, score, re
     // If no events return score
     if (!length) return score;
 
-    // Reject higher order rhythms with consecutive holes
-    //switch (divisor) {
-    //    case 5:
-    //    case 6:
-    //    case 7:
-    //    case 9:
-    //    case 11:
-    //        if (hasConsecutiveHoles(divisor, rhythm)) return score;
-    //}
-    if (divisor > 3 && hasConsecutiveHoles(divisor, rhythm)) return score;
+    switch (divisor) {
+        case 1:
+        case 2:
+            break;
+        case 3:
+            // Don't permit the triplet rhythm 010, let it fall through to the
+            // shorter duration 001
+            if (rhythm === 2) return score;
+            break;
+        default:
+            // Reject higher order rhythms with consecutive holes
+            if (hasConsecutiveHoles(divisor, rhythm)) return score;
+    }
 
     const amplitude = sqrt(r * r + i * i);
     const phase     = atan2(i, r);
@@ -81,13 +88,19 @@ function compare(beat, duration, divisor, rhythm, length, count, r, i, score, re
     // comparable, weight by an arbitrary tolerance
     const lengthWeight = TOLERANCE + 1 / length;
 
+    // when duration 4 divisor 2 x is 0.25
+    // when duration 2 divisor 2 x is 0.125
+    // when duration 1 divisor 2 x is 0.0625
+    const warp = 0.25 * duration / divisor;
+
     // Score
     //const s = amplitude * pow(phaseWeight, 2) * lengthWeight;
     // r is ±, amplitude is +ve
-    const s = (0.5 * r + 0.5 * amplitude) * lengthWeight;
+    const s = ((0.5 + warp) * r + (0.5 - warp) * amplitude) * lengthWeight;
+
+    if (DEBUG) analytics.push({ beat, duration, divisor, rhythm, length, count, r, i, amplitude, phase, drift: phase * duration / (2 * PI * divisor), score: s, isNewBest: s > score });
 
     if (s <= score) return score;
-//console.log('duration', duration, 'beat', beat, 'divisor', divisor, 'length', length, 'score', s);
 
     result.beat     = beat;
     result.duration = duration;
@@ -167,9 +180,11 @@ function run(minDivision, maxDivision, startBeat, maxDuration, rhythm, count, ev
 
         // Advance by half duration
         beat += duration / 2;
-        if (beat + duration < startBeat + maxDuration) {
+        if (!rhythm
+            && beat + duration <= startEvent[0]
+            && beat + duration < startBeat + maxDuration) {
             // Test odd divisors only
-            g = max(2, m - 1);
+            g = max(1, m - 1);
             while ((divisor = divisors[++g]) && divisor <= maxDivisor) {
                 //if (DEBUG) console.group('duration', duration, 'beat', beat, 'divisor', divisors[g]);
                 score = test(events, index, beat, duration, divisor, rhythm, count, score, result, stopBeatInfluence);
@@ -227,5 +242,6 @@ export default function detectRhythm(beat, duration, events, index = 0, options)
     if (events[n][0] >= beat + duration) return result;
 
     // Run the analysis
+    if (DEBUG) analytics.length = 0;
     return run(minDivision, maxDivision, beat, duration, rhythm, count, events, n, result, stopBeatInfluence);
 }

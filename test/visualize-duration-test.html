@@ -2,7 +2,15 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Duration Testing Visualization</title>
+    <title>Rhythm Detection — analytics</title>
+    <script type="importmap">{
+        "imports": {
+            "dom/":      "https://cdn.jsdelivr.net/gh/stephband/dom@1.4.1/modules/",
+            "fn/":       "https://cdn.jsdelivr.net/gh/stephband/fn@1.5.10/modules/",
+            "midi/":     "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.2/modules/",
+            "sequence/": "https://cdn.jsdelivr.net/gh/soundio/sequence@0.2.27/"
+        }
+    }</script>
     <style>
         body {
             font-family: monospace;
@@ -15,451 +23,293 @@
             background: white;
             border-radius: 4px;
         }
-        .controls input { margin: 0 10px; }
-        .controls button { margin: 0 5px; padding: 5px 15px; }
-        .columns {
-            display: flex;
-            gap: 20px;
-            overflow-x: auto;
+        .controls label { display: inline-block; margin: 4px 8px; }
+        .controls button { margin: 0 4px; padding: 5px 12px; }
+        .timeline {
+            width: 100%;
             padding: 20px 0;
         }
-        .duration-column {
-            min-width: 300px;
-            max-width: 300px;
-            background: white;
-            border-radius: 4px;
-            padding: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        .graph-wrap {
+            display: grid;
+            margin-bottom: 16px;
         }
-        .duration-column.winner {
-            background: #fff8f0;
-            border: 2px solid #e41a1c;
-        }
-        .duration-header {
-            font-weight: bold;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #ddd;
-        }
-        .duration-column.winner .duration-header {
-            color: #e41a1c;
+        .graph-wrap > * {
+            grid-column: 1;
+            grid-row: 1;
         }
         canvas {
             display: block;
-            margin: 10px 0;
+            width: 100%;
         }
-        .divisor-scores {
-            font-size: 11px;
-            margin-top: 10px;
+        .graph-data {
+            justify-self: end;
+            align-self: start;
+            padding: 12px;
+            text-align: left;
+            min-width: 35rem;
         }
-        .divisor-scores div {
-            padding: 3px;
-            border-bottom: 1px solid #eee;
+        .group {
+            margin-bottom: 4px;
         }
-        .divisor-scores .best {
-            background: #ffffcc;
-            font-weight: bold;
+        .group-label {
+            font-size: 10px;
+            color: #999;
+            margin-bottom: 1px;
         }
+        .entry-line {
+            font-size: 10px;
+            white-space: nowrap;
+            color: #bbb;
+        }
+        .entry-line.new-best     { color: #669944; }
+        .entry-line.final-winner { color: #2d8800; font-weight: bold; }
         .info {
-            background: white;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 4px;
-            font-size: 13px;
+            justify-self: end;
+            align-self: end;
+            padding: 12px;
+            font-size: 11px;
+            min-width: 35rem;
         }
     </style>
 </head>
 <body>
-    <h2>Duration Testing Progression</h2>
+    <h2>Rhythm Detection — analytics</h2>
 
     <div class="controls">
-        <label>Events (beats, comma-separated):
-            <input type="text" id="eventsInput" value="0, 0.667, 1.333" size="50">
+        <label>Events (beats):
+            <input type="text" id="eventsInput" value="0.58" size="40">
         </label>
-        <label>Start: <input type="number" id="startInput" value="0" step="0.1"></label>
-        <label>Max Duration: <input type="number" id="durationInput" value="4" step="0.5"></label>
-        <label>Factor: <input type="number" id="factorInput" value="0.0001" step="0.0001"></label>
+        <label>Start: <input type="number" id="startInput" value="0" step="0.1" style="width:55px"></label>
+        <label>maxDuration: <input type="number" id="durationInput" value="4" step="0.5" style="width:55px"></label>
+        <label>minDivision: <input type="number" id="minDivInput" value="0.0833" step="0.001" style="width:70px"></label>
+        <label>maxDivision: <input type="number" id="maxDivInput" value="4" step="0.5" style="width:55px"></label>
+        <br>
         <button onclick="update()">Update</button>
-        <button onclick="loadPreset('triplet')">Triplets at 0</button>
-        <button onclick="loadPreset('duplet-triplet')">Duplet+Triplet</button>
-        <button onclick="loadPreset('eighth')">Two Eighths</button>
+        <button onclick="preset([0, 0.667, 1.333],       '0, 0.667, 1.333')">Triplets</button>
+        <button onclick="preset([0, 0.5, 1, 1.333, 1.667], '0, 0.5, 1, 1.333, 1.667')">Duplet+Triplet</button>
+        <button onclick="preset([0, 0.5],  '0, 0.5')">Two Eighths</button>
+        <label>Swing: <input type="range" id="swingInput" min="0" max="1" step="any" value="0.58" style="width:512px"></label>
     </div>
 
-    <div class="columns" id="columnsContainer"></div>
-    <div id="results" class="info"></div>
+    <div class="timeline" id="columns"></div>
 
     <script type="module">
-        const { cos, sin, PI, sqrt, atan2, pow, floor, log2 } = Math;
+        import detectRhythm, { analytics } from '../modules/rhythm.js';
 
-        const MIN_DURATION = 0.25;
-        const MIN_PERIOD = 0.25 / 3;
+        const { cos, PI } = Math;
 
-        const minRhythms = {
-            1: 0,
-            2: 0,
-            3: 0,
-            4: 0,
-            5: parseInt('11111', 2),
-            6: parseInt('111111', 2),
-            7: parseInt('1111111', 2),
-            8: 0,
-            9: parseInt('111111111', 2)
-        };
+        // Restore beats from URL on load
+        const urlBeats = new URLSearchParams(location.search).get('beats');
+        const initBeats = urlBeats ?? '0.58';
 
-        let events = [0, 0.667, 1.333];
-        let startBeat = 0;
+        let events      = initBeats.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+        let startBeat   = 0;
         let maxDuration = 4;
-        let factor = 0.0001;
+        let minDivision = 1 / 12;
+        let maxDivision = 4;
 
-        function floorPowerOf2(n) {
-            if (n <= 0) return MIN_DURATION;
-            return pow(2, floor(log2(n)));
+        document.getElementById('eventsInput').value = initBeats;
+        document.getElementById('swingInput').value  = events.length === 1 ? events[0] : 0.58;
+
+        function updateBeatsParam(str) {
+            const url = new URL(location.href);
+            url.searchParams.set('beats', str);
+            history.replaceState(null, '', url);
         }
 
-        window.loadPreset = function(name) {
-            if (name === 'triplet') {
-                events = [0, 0.667, 1.333];
-                document.getElementById('eventsInput').value = '0, 0.667, 1.333';
-            } else if (name === 'duplet-triplet') {
-                events = [0, 0.5, 1, 1.333, 1.667];
-                document.getElementById('eventsInput').value = '0, 0.5, 1, 1.333, 1.667';
-            } else if (name === 'eighth') {
-                events = [0, 0.5];
-                document.getElementById('eventsInput').value = '0, 0.5';
-            }
-            update();
-        };
-
-        window.update = function() {
-            const input = document.getElementById('eventsInput').value;
-            events = input.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
-            startBeat = parseFloat(document.getElementById('startInput').value);
-            maxDuration = parseFloat(document.getElementById('durationInput').value);
-            factor = parseFloat(document.getElementById('factorInput').value);
+        window.preset = function(evts, str) {
+            events = evts;
+            document.getElementById('eventsInput').value = str;
+            updateBeatsParam(str);
             draw();
         };
 
-        function analyzeDuration(eventBeats, startBeat, maxDuration, dur, index = 0) {
-            // Convert to event array format [beat, ...]
-            const eventArray = eventBeats.map(b => [b]);
+        document.getElementById('swingInput').addEventListener('input', function() {
+            const beat = parseFloat(this.value);
+            events = [beat];
+            document.getElementById('eventsInput').value = beat;
+            updateBeatsParam(beat);
+            draw();
+        });
 
-            // Find first event after index in analysis window
-            let n = index - 1;
-            while (eventArray[++n] !== undefined && eventArray[n][0] < startBeat);
+        window.update = function() {
+            const str   = document.getElementById('eventsInput').value;
+            events      = str.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+            startBeat   = parseFloat(document.getElementById('startInput').value);
+            maxDuration = parseFloat(document.getElementById('durationInput').value);
+            minDivision = parseFloat(document.getElementById('minDivInput').value);
+            maxDivision = parseFloat(document.getElementById('maxDivInput').value);
+            updateBeatsParam(str);
+            draw();
+        };
 
-            const initialCount = n - index;
-            const initialRhythm = initialCount ? 1 : 0;
-
-            // If no event in window, return null
-            if (!eventArray[n]) return null;
-
-            const startIndex = n;
-            let bestScore = 0;
-            let bestDivisor = 1;
-            let bestBeat = startBeat;
-            let allResults = [];
-            let maxEventCount = 0;
-
-            // Set beat to ensure window contains at least one event
-            // (matches lines 84-89 in detect-osc.js)
-            let beat = startBeat;
-            if (!initialRhythm) {
-                // Set beat to the nearest half duration before event[startIndex][0]
-                while (beat + dur <= startBeat + maxDuration && beat + dur <= eventArray[startIndex][0]) {
-                    beat += dur / 2;
-                }
-            }
-
-            for (let divisor = 1; divisor <= 9; divisor++) {
-                const d = dur / divisor;
-
-                if (d < MIN_PERIOD) {
-                    // Add placeholder for skipped divisor
-                    allResults.push({
-                        divisor,
-                        skipped: true
-                    });
-                    continue;
-                }
-
-                let r = 0;
-                let i = 0;
-                let rhythm = initialRhythm;
-                let count = initialCount;
-
-                n = startIndex - 1;
-                while (eventArray[++n] !== undefined && eventArray[n][0] < beat + dur) {
-                    const b = eventArray[n][0] - beat;
-                    const p = 2 * PI * divisor * b / dur;
-                    r += cos(p);
-                    i += sin(p);
-
-                    const slot = Math.round(b / d);
-                    if (slot < divisor) {
-                        rhythm |= (1 << slot);
-                        ++count;
-                    }
-                }
-
-                // If no events processed, skip this divisor
-                if (n === startIndex) {
-                    allResults.push({
-                        divisor,
-                        skipped: true
-                    });
-                    continue;
-                }
-
-                const eventCount = n - startIndex;
-                maxEventCount = Math.max(maxEventCount, eventCount);
-
-                // Reject higher order tuplets with holes
-                if (rhythm < minRhythms[divisor]) {
-                    allResults.push({
-                        divisor,
-                        skipped: true,
-                        reason: 'holes'
-                    });
-                    continue;
-                }
-
-                const amplitude = sqrt(r * r + i * i);
-                const phase = atan2(i, r);
-                const weightPhase = 0.5 * (cos(phase) + 1);
-                const weightCount = factor + 1 / eventCount;
-                const score = amplitude * weightPhase * weightCount;
-
-                allResults.push({
-                    divisor,
-                    amplitude,
-                    phase,
-                    weightPhase,
-                    weightCount,
-                    score,
-                    eventCount,
-                    rhythm,
-                    skipped: false
-                });
-
-                if (score > bestScore) {
-                    bestScore = score;
-                    bestDivisor = divisor;
-                    bestBeat = beat;
-                }
-            }
-
-            return {
-                duration: dur,
-                startBeat: bestBeat,
-                eventCount: maxEventCount,
-                bestScore,
-                bestDivisor,
-                allResults
-            };
-        }
+        const BASE_W = 1920;
+        const BASE_H = 640;
 
         function draw() {
-            const container = document.getElementById('columnsContainer');
+            const container = document.getElementById('columns');
             container.innerHTML = '';
 
-            const dur = floorPowerOf2(maxDuration);
-            const allDurations = [];
-            let testDuration = dur;
-            while (testDuration >= MIN_DURATION) {
-                allDurations.push(testDuration);
-                testDuration /= 2;
+            // Build event array in the format detectRhythm expects
+            const eventArray = events.map(b => [b, 'note', 60, 0.1, 0.25]);
+
+            // Run the actual algorithm — populates analytics
+            const result = detectRhythm(startBeat, maxDuration, eventArray, 0, { minDivision, maxDivision });
+
+            if (!analytics.length) {
+                container.innerHTML = '<em>No candidates scored.</em>';
+                return;
             }
 
-            let overallBestScore = 0;
-            let overallBestDuration = null;
+            // Index of the last isNewBest entry = final winner
+            const finalIdx = analytics.reduce((fi, a, i) => a.isNewBest ? i : fi, -1);
 
-            // Test all durations
-            const durationResults = allDurations.map(d => {
-                const result = analyzeDuration(events, startBeat, maxDuration, d);
-                if (result && result.bestScore > overallBestScore) {
-                    overallBestScore = result.bestScore;
-                    overallBestDuration = d;
+            // Wrapper: canvas and data overlay share the same grid cell
+            const wrap = document.createElement('div');
+            wrap.className = 'graph-wrap';
+            container.appendChild(wrap);
+
+            // One canvas for all results
+            const c = document.createElement('canvas');
+            c.width  = BASE_W;
+            c.height = BASE_H;
+            wrap.appendChild(c);
+            const cx = c.getContext('2d');
+
+            cx.fillStyle = '#fafafa';
+            cx.fillRect(0, 0, BASE_W, BASE_H);
+
+            const midY = BASE_H / 2;
+
+            // Amplitude ±1 lines — dotted
+            cx.strokeStyle = '#aaa'; cx.lineWidth = 1;
+            cx.setLineDash([1, 4]);
+            cx.beginPath(); cx.moveTo(0, midY - 240); cx.lineTo(BASE_W, midY - 240); cx.stroke();
+            cx.beginPath(); cx.moveTo(0, midY + 240); cx.lineTo(BASE_W, midY + 240); cx.stroke();
+            cx.setLineDash([]);
+
+            // Zero line — solid
+            cx.strokeStyle = '#ccc'; cx.lineWidth = 1;
+            cx.beginPath(); cx.moveTo(0, midY); cx.lineTo(BASE_W, midY); cx.stroke();
+
+            // Pale blue rectangles, one per (beat, duration) window — stacks to
+            // show analysis density; skip the full-width window (obvious from canvas size)
+            cx.fillStyle = 'rgba(140, 175, 230, 0.06)';
+            const seen = new Set();
+            for (const a of analytics) {
+                const key = `${ a.beat }:${ a.duration }`;
+                if (seen.has(key)) continue;
+                seen.add(key);
+                const x0 = (a.beat - startBeat) / maxDuration * BASE_W;
+                const w  = a.duration / maxDuration * BASE_W;
+                if (Math.round(w) >= BASE_W) continue;
+                cx.fillRect(x0, 0, w, BASE_H);
+            }
+
+            // Draw all waveforms — winner last so it renders on top
+            const sorted = analytics.map((a, idx) => ({ idx, a })).sort((a, b) =>
+                a.idx === finalIdx ? 1 : b.idx === finalIdx ? -1 : 0
+            );
+
+            for (const { idx, a } of sorted) {
+                const isFinal   = idx === finalIdx;
+                const isNewBest = a.isNewBest;
+
+                // x range for this entry's window within the full canvas
+                const x0 = (a.beat - startBeat) / maxDuration * BASE_W;
+                const x1 = (a.beat - startBeat + a.duration) / maxDuration * BASE_W;
+                const w  = x1 - x0;
+
+                const amp = a.score * 240;
+
+                cx.strokeStyle = isFinal ? '#226600' : isNewBest ? '#558833' : '#bbb';
+                cx.lineWidth   = isFinal ? 2.5 : 1;
+                cx.beginPath();
+                for (let x = 0; x <= Math.ceil(w); x++) {
+                    const phi = 2 * PI * a.divisor * x / w - a.phase;
+                    const y   = midY - cos(phi) * amp;
+                    x === 0 ? cx.moveTo(x0 + x, y) : cx.lineTo(x0 + x, y);
                 }
-                return result;
-            }).filter(r => r !== null);
+                cx.stroke();
+            }
 
-            // Draw columns
-            for (const result of durationResults) {
-                const isWinner = result.duration === overallBestDuration;
-                const column = document.createElement('div');
-                column.className = 'duration-column' + (isWinner ? ' winner' : '');
+            // Beat grid — dotted lines every 0.25 beats, darker on integers
+            cx.lineWidth = 1;
+            cx.setLineDash([4, 4]);
+            for (let b = startBeat + 0.25; b < startBeat + maxDuration; b += 0.25) {
+                const isInteger = Math.abs(b - Math.round(b)) < 0.001;
+                cx.strokeStyle  = isInteger ? '#aaa' : '#ddd';
+                const x = (b - startBeat) / maxDuration * BASE_W;
+                cx.beginPath(); cx.moveTo(x, 0); cx.lineTo(x, BASE_H); cx.stroke();
+            }
+            cx.setLineDash([]);
 
-                const header = document.createElement('div');
-                header.className = 'duration-header';
-                header.innerHTML = `
-                    Duration: ${result.duration}<br>
-                    Start: ${result.startBeat}<br>
-                    Events: ${result.eventCount}<br>
-                    Best: div ${result.bestDivisor}, score ${result.bestScore.toFixed(6)}
-                    ${isWinner ? '<br>★ WINNER' : ''}
-                `;
-                column.appendChild(header);
+            // Beat labels at integer positions along the bottom
+            cx.fillStyle    = '#bbb';
+            cx.font         = '14.72px monospace';
+            cx.textAlign    = 'left';
+            cx.textBaseline = 'bottom';
+            for (let b = startBeat; b <= startBeat + maxDuration; b++) {
+                const x = (b - startBeat) / maxDuration * BASE_W;
+                cx.fillText(`${ b }`, x + 4, BASE_H - 4);
+            }
 
-                // Draw cosine wave for ALL divisors tested
-                result.allResults.forEach(r => {
-                    const waveCanvas = document.createElement('canvas');
-                    waveCanvas.width = 300;
-                    waveCanvas.height = 60;
-                    column.appendChild(waveCanvas);
+            // Event markers — solid blue
+            cx.strokeStyle = '#0044cc';
+            cx.lineWidth   = 1.5;
+            for (const eb of events) {
+                const x = (eb - startBeat) / maxDuration * BASE_W;
+                cx.beginPath(); cx.moveTo(x, 0); cx.lineTo(x, BASE_H); cx.stroke();
+            }
 
-                    const waveCtx = waveCanvas.getContext('2d');
+            // Data lines as HTML, grouped by (beat, duration), overlaid right-aligned
+            const groups = [];
+            const groupKey = new Map();
+            for (let idx = 0; idx < analytics.length; idx++) {
+                const a   = analytics[idx];
+                const key = `${ a.beat }:${ a.duration }`;
+                if (!groupKey.has(key)) {
+                    groupKey.set(key, groups.length);
+                    groups.push({ beat: a.beat, duration: a.duration, entries: [] });
+                }
+                groups[groupKey.get(key)].entries.push({ idx, a });
+            }
 
-                    if (r.skipped) {
-                        // Draw blank placeholder for skipped divisor
-                        waveCtx.fillStyle = '#f0f0f0';
-                        waveCtx.fillRect(0, 0, 300, 60);
-                        waveCtx.fillStyle = '#999';
-                        waveCtx.font = '9px monospace';
-                        const reason = r.reason === 'holes' ? 'has holes' : 'period too short';
-                        waveCtx.fillText(`Div ${r.divisor}: ${reason}`, 10, 30);
-                        return;
-                    }
+            const dataEl = document.createElement('div');
+            dataEl.className = 'graph-data';
 
-                    const isWinningDivisor = r.divisor === result.bestDivisor;
-                    waveCtx.fillStyle = isWinningDivisor ? '#fffaf5' : '#fafafa';
-                    waveCtx.fillRect(0, 0, 300, 60);
+            for (const group of groups) {
+                const groupEl = document.createElement('div');
+                groupEl.className = 'group';
 
-                    // Draw cosine wave
-                    const margin = 10;
-                    const waveWidth = 280;
-                    waveCtx.strokeStyle = isWinningDivisor ? '#e41a1c' : '#999';
-                    waveCtx.lineWidth = isWinningDivisor ? 1.5 : 1;
-                    waveCtx.beginPath();
+                const label = document.createElement('div');
+                label.className   = 'group-label';
+                label.textContent = `beat=${ group.beat }  duration=${ group.duration }`;
+                groupEl.appendChild(label);
 
-                    for (let x = 0; x <= waveWidth; x++) {
-                        const beat = (x / waveWidth) * result.duration;
-                        const phi = 2 * PI * r.divisor * beat / result.duration;
-                        const y = 30 - cos(phi) * 18;
-                        if (x === 0) waveCtx.moveTo(x + margin, y);
-                        else waveCtx.lineTo(x + margin, y);
-                    }
-                    waveCtx.stroke();
-
-                    // Draw zero line
-                    waveCtx.strokeStyle = '#ddd';
-                    waveCtx.lineWidth = 1;
-                    waveCtx.beginPath();
-                    waveCtx.moveTo(margin, 30);
-                    waveCtx.lineTo(margin + waveWidth, 30);
-                    waveCtx.stroke();
-
-                    // Draw event markers
-                    const relevantEvents = events.filter(e => e >= result.startBeat && e < result.startBeat + result.duration);
-                    for (const eventBeat of relevantEvents) {
-                        const beat = eventBeat - result.startBeat;
-                        const x = margin + (beat / result.duration) * waveWidth;
-                        const phi = 2 * PI * r.divisor * beat / result.duration;
-                        const cosVal = cos(phi);
-                        const y = 30 - cosVal * 18;
-
-                        // Event line
-                        waveCtx.strokeStyle = isWinningDivisor ? '#e41a1c' : '#666';
-                        waveCtx.lineWidth = 1;
-                        waveCtx.setLineDash([2, 2]);
-                        waveCtx.beginPath();
-                        waveCtx.moveTo(x, 55);
-                        waveCtx.lineTo(x, y);
-                        waveCtx.stroke();
-                        waveCtx.setLineDash([]);
-
-                        // Event dot
-                        waveCtx.fillStyle = isWinningDivisor ? '#e41a1c' : '#666';
-                        waveCtx.beginPath();
-                        waveCtx.arc(x, y, 2, 0, 2 * PI);
-                        waveCtx.fill();
-                    }
-
-                    // Label
-                    waveCtx.fillStyle = isWinningDivisor ? '#000' : '#666';
-                    waveCtx.font = isWinningDivisor ? 'bold 9px monospace' : '9px monospace';
-                    waveCtx.fillText(`Div ${r.divisor}: score=${r.score.toFixed(6)}`, margin, 10);
-                });
-
-                // Draw bar chart of scores
-                const canvas = document.createElement('canvas');
-                canvas.width = 300;
-                canvas.height = 250;
-                column.appendChild(canvas);
-
-                const ctx = canvas.getContext('2d');
-                ctx.fillStyle = '#fafafa';
-                ctx.fillRect(0, 0, 300, 250);
-
-                const barWidth = 28;
-                const barSpacing = 33;
-                const maxBarHeight = 200;
-                const fixedMaxScore = 1.5;
-
-                // Draw tick marks at 0.1 intervals
-                ctx.strokeStyle = '#e0e0e0';
-                ctx.lineWidth = 1;
-                for (let i = 0; i <= 15; i++) {
-                    const scoreValue = i * 0.1;
-                    const y = 250 - 30 - (scoreValue / fixedMaxScore) * maxBarHeight;
-                    ctx.beginPath();
-                    ctx.moveTo(0, y);
-                    ctx.lineTo(300, y);
-                    ctx.stroke();
-
-                    // Label at 0.5, 1.0, 1.5
-                    if (i === 5 || i === 10 || i === 15) {
-                        ctx.fillStyle = '#666';
-                        ctx.font = '9px monospace';
-                        ctx.fillText(scoreValue.toFixed(1), 5, y + 3);
-                    }
+                for (const { idx, a } of group.entries) {
+                    const isFinal   = idx === finalIdx;
+                    const isNewBest = a.isNewBest;
+                    const status    = isFinal ? '★' : isNewBest ? '↑' : '✗';
+                    const rhythm    = a.rhythm.toString(2).padStart(a.divisor, '0');
+                    const line      = document.createElement('div');
+                    line.className  = 'entry-line' + (isFinal ? ' final-winner' : isNewBest ? ' new-best' : '');
+                    line.textContent = `${ status }  div=${ a.divisor }  rhythm=${ rhythm }  r=${ a.r.toFixed(3) }  i=${ a.i.toFixed(3) }  amp=${ a.amplitude.toFixed(3) }  phase=${ a.phase.toFixed(3) }  drift=${ a.drift.toFixed(3) }  score=${ a.score.toFixed(3) }`;
+                    groupEl.appendChild(line);
                 }
 
-                result.allResults.forEach((r, i) => {
-                    const x = 3 + i * barSpacing;
-
-                    if (!r.skipped) {
-                        const h = Math.min((r.score / fixedMaxScore) * maxBarHeight, maxBarHeight);
-                        ctx.fillStyle = r.divisor === result.bestDivisor ? '#e41a1c' : '#999';
-                        ctx.fillRect(x, 250 - h - 30, barWidth, h);
-                    }
-
-                    ctx.fillStyle = '#000';
-                    ctx.font = '10px monospace';
-                    ctx.fillText(r.divisor, x + 10, 240);
-                });
-
-                // Scores table
-                const scores = document.createElement('div');
-                scores.className = 'divisor-scores';
-                result.allResults.forEach(r => {
-                    const div = document.createElement('div');
-                    div.className = r.divisor === result.bestDivisor && !r.skipped ? 'best' : '';
-                    if (r.skipped) {
-                        const reason = r.reason === 'holes' ? 'has holes' : 'period too short';
-                        div.textContent = `${r.divisor}: skipped (${reason})`;
-                        div.style.color = '#999';
-                    } else {
-                        div.textContent = `${r.divisor}: ${r.score.toFixed(6)} (amp=${r.amplitude.toFixed(3)}, φ=${r.phase.toFixed(3)}, n=${r.eventCount})`;
-                    }
-                    scores.appendChild(div);
-                });
-                column.appendChild(scores);
-
-                container.appendChild(column);
+                dataEl.appendChild(groupEl);
             }
 
-            // Results summary
-            const resultsDiv = document.getElementById('results');
-            if (durationResults.length > 0 && overallBestDuration) {
-                const winner = durationResults.find(r => r.duration === overallBestDuration);
-                resultsDiv.innerHTML = `
-                    <strong>Winner: Start ${winner.startBeat}, Duration ${overallBestDuration}, Divisor ${winner.bestDivisor}</strong><br>
-                    Score: ${overallBestScore.toFixed(6)}<br>
-                    Factor: ${factor}
-                `;
-            } else {
-                resultsDiv.innerHTML = '<strong>No results</strong>';
-            }
+            wrap.appendChild(dataEl);
+
+            // Final result — bottom right of canvas
+            const resultEl = document.createElement('div');
+            resultEl.className = 'info';
+            resultEl.innerHTML =
+                `<strong>beat=${ result.beat }  duration=${ result.duration }  divisor=${ result.divisor }</strong><br>` +
+                `rhythm=${ result.rhythm }  drift=${ result.drift?.toFixed(4) }  count=${ result.count }  index=${ result.index }`;
+            wrap.appendChild(resultEl);
         }
 
         draw();

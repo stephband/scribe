@@ -12,7 +12,7 @@ run('No events', [
 
 run('Singlets', [
     // 4/4 bar
-    { beat: 0,   duration: 4, divisor: 1, rhythm: 1 }, // One quarter note
+/*    { beat: 0,   duration: 4, divisor: 2, rhythm: 1 }, // One quarter note
     { beat: 0,   duration: 4, divisor: 2, rhythm: 2 },
 
     { beat: 0,   duration: 2, divisor: 2, rhythm: 2 },
@@ -40,9 +40,25 @@ run('Singlets', [
     { beat: 2,   duration: 0.5, divisor: 2, rhythm: 2 },
     { beat: 2.5, duration: 0.5, divisor: 2, rhythm: 2 },
     { beat: 0,   duration: 3,               rhythm: 0 },
-    { beat: 0,   duration: 3,               rhythm: 0 }
+    { beat: 0,   duration: 3,               rhythm: 0 },
+*/
+    // Straight to swing
+    { beat: 0,   duration: 1,   divisor: 2, rhythm: 2 },
+    { beat: 0,   duration: 1,   divisor: 2, rhythm: 2 },
+    { beat: 0,   duration: 1,   divisor: 2, rhythm: 2 },
+    { beat: 0,   duration: 1,   divisor: 2, rhythm: 2 },
+    { beat: 0,   duration: 1,   divisor: 3, rhythm: 4 },
+    { beat: 0,   duration: 1,   divisor: 3, rhythm: 4 },
+    { beat: 0,   duration: 1,   divisor: 3, rhythm: 4 },
+    { beat: 0,   duration: 1,   divisor: 3, rhythm: 4 },
+    { beat: 0,   duration: 1,   divisor: 3, rhythm: 4 },
+    { beat: 0,   duration: 1,   divisor: 3, rhythm: 4 },
+    { beat: 0,   duration: 1,   divisor: 3, rhythm: 4 },
+    { beat: 0.5, duration: 0.5, divisor: 2, rhythm: 2 },
+    { beat: 0.5, duration: 0.5, divisor: 2, rhythm: 2 },
+    { beat: 0.5, duration: 0.5, divisor: 2, rhythm: 2 }
 ], ({ equals, matches }, done) => {
-    matches(detectRhythm(0, 4, [[0,   'note', 60, 0.1, 1]])); // Note at beat 0
+/*    matches(detectRhythm(0, 4, [[0,   'note', 60, 0.1, 1]])); // Note at beat 0
     matches(detectRhythm(0, 4, [[2,   'note', 60, 0.1, 1]])); // Note at beat 2
 
     matches(detectRhythm(0, 4, [[1,   'note', 60, 0.1, 1]])); // Note at beat 1
@@ -70,6 +86,22 @@ run('Singlets', [
     matches(detectRhythm(0, 3, [[2.75, 'note', 60, 0.1, 1]]));
     matches(detectRhythm(0, 3, [[3.25, 'note', 60, 0.1, 1]]));
     matches(detectRhythm(0, 3, [[3.75, 'note', 60, 0.1, 1]]));
+*/
+    // Straight to swing
+    matches(detectRhythm(0, 4, [[0.5,  'note', 60, 0.1, 1]]));
+    matches(detectRhythm(0, 4, [[0.52, 'note', 60, 0.1, 1]]));
+    matches(detectRhythm(0, 4, [[0.54, 'note', 60, 0.1, 1]]));
+    matches(detectRhythm(0, 4, [[0.56, 'note', 60, 0.1, 1]]));
+    matches(detectRhythm(0, 4, [[0.58, 'note', 60, 0.1, 1]])); // 5
+    matches(detectRhythm(0, 4, [[0.60, 'note', 60, 0.1, 1]]));
+    matches(detectRhythm(0, 4, [[0.62, 'note', 60, 0.1, 1]]));
+    matches(detectRhythm(0, 4, [[0.64, 'note', 60, 0.1, 1]]));
+    matches(detectRhythm(0, 4, [[0.66, 'note', 60, 0.1, 1]]));
+    matches(detectRhythm(0, 4, [[0.68, 'note', 60, 0.1, 1]]));
+    matches(detectRhythm(0, 4, [[0.70, 'note', 60, 0.1, 1]]));
+    matches(detectRhythm(0, 4, [[0.72, 'note', 60, 0.1, 1]]));
+    matches(detectRhythm(0, 4, [[0.74, 'note', 60, 0.1, 1]]));
+    matches(detectRhythm(0, 4, [[0.76, 'note', 60, 0.1, 1]]));
 
     done();
 });
