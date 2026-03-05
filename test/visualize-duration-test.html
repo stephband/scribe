@@ -89,7 +89,7 @@
         <button onclick="preset1([0, 0.667, 1.333],       '0, 0.667, 1.333')">Triplets</button>
         <button onclick="preset1([0, 0.5, 1, 1.333, 1.667], '0, 0.5, 1, 1.333, 1.667')">Duplet+Triplet</button>
         <button onclick="preset1([0, 0.5],  '0, 0.5')">Two Eighths</button>
-        <label>Swing: <input type="range" id="swingInput1" min="0" max="1" step="any" value="0.58" style="width:512px"></label>
+        <label>Swing: <input type="range" id="swingInput1" min="0" max="2" step="any" value="0.58" style="width:512px"></label>
     </div>
 
     <div class="timeline" id="columns1"></div>
@@ -106,7 +106,7 @@
         <button onclick="preset2([0, 0.667, 1.333],       '0, 0.667, 1.333')">Triplets</button>
         <button onclick="preset2([0, 0.5, 1, 1.333, 1.667], '0, 0.5, 1, 1.333, 1.667')">Duplet+Triplet</button>
         <button onclick="preset2([0, 0.5],  '0, 0.5')">Two Eighths</button>
-        <label>Swing: <input type="range" id="swingInput2" min="0" max="1" step="any" value="0.667" style="width:512px"></label>
+        <label>Swing: <input type="range" id="swingInput2" min="0" max="2" step="any" value="0.667" style="width:512px"></label>
     </div>
 
     <div class="timeline" id="columns2"></div>
@@ -261,7 +261,7 @@
                     const rhythm    = a.rhythm.toString(2).padStart(a.divisor, '0');
                     const line      = document.createElement('div');
                     line.className  = 'entry-line' + (isFinal ? ' final-winner' : isNewBest ? ' new-best' : '');
-                    line.textContent = `${ status }  div=${ a.divisor }  rhythm=${ rhythm }  r=${ a.r.toFixed(3) }  i=${ a.i.toFixed(3) }  amp=${ a.amplitude.toFixed(3) }  phase=${ a.phase.toFixed(3) }  drift=${ a.drift.toFixed(3) }  score=${ a.score.toFixed(3) }`;
+                    line.textContent = `${ status }  div=${ a.divisor }  rhythm=${ rhythm }  density=${ a.density.toFixed(3) }  amp=${ a.amplitude.toFixed(3) }  phase=${ a.phase.toFixed(3) }  drift=${ a.drift.toFixed(3) }  score=${ a.score.toFixed(3) }`;
                     groupEl.appendChild(line);
                 }
 

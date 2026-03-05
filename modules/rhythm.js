@@ -34,7 +34,7 @@ const DEBUG = true;//globalThis.DEBUG;
 // snapshot of result at the moment a new best score was found.
 export const analytics = [];
 
-const { atan2, ceil, cos, floor, max, min, pow, sin, sqrt, PI } = Math;
+const { abs, atan2, ceil, cos, exp, floor, max, min, pow, sin, sqrt, PI } = Math;
 
 const defaults = {
     minDivision: 1 / 12,
@@ -43,7 +43,7 @@ const defaults = {
 };
 
 // Divisors to test
-const divisors = [1, 2, 3, 5, 6, 7, 9, 11];
+const divisors = [2, 3/*, 5, 6, 7, 9, 11*/];
 
 // Favour slightly inexact triplets over exact duplets by an arbitrary factor
 const TOLERANCE = 0.07;
@@ -53,6 +53,20 @@ function hasConsecutiveHoles(divisor, rhythm) {
     const fullRhythm = (1 << divisor) - 1;
     const holes = fullRhythm ^ rhythm;
     return holes & (holes << 1);
+}
+
+function count1s(n) {
+    let count = 0;
+    while (n) { n &= n - 1; ++count; }
+    return count;
+}
+
+function rhythmicDensity(slots, rhythm) {
+    return count1s(rhythm) / slots;
+}
+
+function gaussian(sigma, n) {
+    return exp(-(n * n) / (2 * sigma * sigma));
 }
 
 function compare(beat, duration, divisor, rhythm, length, count, r, i, score, result) {
@@ -66,7 +80,7 @@ function compare(beat, duration, divisor, rhythm, length, count, r, i, score, re
         case 3:
             // Don't permit the triplet rhythm 010, let it fall through to the
             // shorter duration 001
-            if (rhythm === 2) return score;
+            //if (rhythm === 2) return score;
             break;
         default:
             // Reject higher order rhythms with consecutive holes
@@ -74,31 +88,37 @@ function compare(beat, duration, divisor, rhythm, length, count, r, i, score, re
     }
 
     const amplitude = sqrt(r * r + i * i);
-    const phase     = atan2(i, r);
 
-    // Weight amplitude by phase alignment to prefer nearer-zero
-    // phases and reject out-of-phase rhythms.
-    // Phase 0   → weight 1.0 (events perfectly aligned with grid)
-    // Phase π/2 → weight 0.5 (events quarter-cycle off)
-    // Phase ±π  → weight 0   (events half-cycle out, completely reject)
-    //const weightPhase =  0.5 * (cos(phase) + 1);
-    //const phaseWeight  = 0.5 * (r / amplitude + 1);
+    // Phase
+    // Weight amplitude by phase alignment to prefer nearer-zero phases and
+    // reject out-of-phase rhythms.
+    const phase = atan2(i, r);
+    const phaseWeight = 1;
 
-    // Weight amplitude by events analysed to make various durations
-    // comparable, weight by an arbitrary tolerance
-    const lengthWeight = TOLERANCE + 1 / length;
+    // Division
+    const division = duration / divisor;
 
-    // when duration 4 divisor 2 x is 0.25
-    // when duration 2 divisor 2 x is 0.125
-    // when duration 1 divisor 2 x is 0.0625
-    const warp = 0.25 * duration / divisor;
+    // Drift
+    // Duration-normalised phase alignment in beats. Weight drift by gaussian
+    // distribution around 0. A sigma of 1 means driftWeight will be ~0.6 when
+    // drift is 1 beat out.
+    const drift = division * phase / (2 * PI);
+    const driftWeight = gaussian(0.125, drift);
+
+    // Density
+    // Problematic. A [0, 0.25] rhythm has a density of 1 while a [0.25, 0.5]
+    // rhythm has a density of 0.5 due to the way the analysis window shifts (it
+    // doesn't include the [0.5]). We're running with it anyway. Weight density
+    // by inverse division power so that smaller divisions require higher
+    // densities while large divisions remain largely unaffected.
+    const density = rhythmicDensity(divisor, rhythm);
+    const densityWeight = pow(density, 0.25 / division);
 
     // Score
-    //const s = amplitude * pow(phaseWeight, 2) * lengthWeight;
     // r is ±, amplitude is +ve
-    const s = ((0.5 + warp) * r + (0.5 - warp) * amplitude) * lengthWeight;
+    const s = driftWeight * densityWeight * (phaseWeight * r + (1 - phaseWeight) * amplitude) / length;
 
-    if (DEBUG) analytics.push({ beat, duration, divisor, rhythm, length, count, r, i, amplitude, phase, drift: phase * duration / (2 * PI * divisor), score: s, isNewBest: s > score });
+    if (DEBUG) analytics.push({ beat, duration, divisor, rhythm, density, densityWeight, length, count, r, i, amplitude, phase, phaseWeight, drift, driftWeight, score: s, isNewBest: s > score });
 
     if (s <= score) return score;
 
@@ -106,14 +126,14 @@ function compare(beat, duration, divisor, rhythm, length, count, r, i, score, re
     result.duration = duration;
     result.divisor  = divisor;
     result.rhythm   = rhythm;
-    result.drift    = phase * duration / (2 * PI * divisor);
+    result.drift    = drift;
     result.count    = count;
 
     return s;
 }
 
 function test(events, index, beat, duration, divisor, rhythm, count, score, result, stopBeatInfluence) {
-    const d = duration / divisor;
+    const division = duration / divisor;
 
     let r = 0;
     let i = 0;
@@ -139,7 +159,7 @@ function test(events, index, beat, duration, divisor, rhythm, count, score, resu
         // bit 0 = first division
         // bit 1 = second division
         // and so on
-        const slot = Math.round(b1 / d);
+        const slot = Math.round(b1 / division);
         if (slot < divisor) {
             rhythm |= (1 << slot);
             ++count;
