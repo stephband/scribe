@@ -261,7 +261,7 @@
                     const rhythm    = a.rhythm.toString(2).padStart(a.divisor, '0');
                     const line      = document.createElement('div');
                     line.className  = 'entry-line' + (isFinal ? ' final-winner' : isNewBest ? ' new-best' : '');
-                    line.textContent = `${ status }  div=${ a.divisor }  rhythm=${ rhythm }  density=${ a.density.toFixed(3) }  amp=${ a.amplitude.toFixed(3) }  phase=${ a.phase.toFixed(3) }  drift=${ a.drift.toFixed(3) }  score=${ a.score.toFixed(3) }`;
+                    line.textContent = `${ status }  div=${ a.divisor }  rhythm=${ rhythm }  density=${ a.density.toFixed(3) } | ${ a.densityWeight.toFixed(3) }  amp=${ a.amp.toFixed(3) }  phase=${ a.phase.toFixed(3) }  drift=${ a.drift.toFixed(3) } | ${ a.driftWeight.toFixed(3) }  score=${ a.score.toFixed(3) }`;
                     groupEl.appendChild(line);
                 }
 

@@ -43,7 +43,7 @@ const defaults = {
 };
 
 // Divisors to test
-const divisors = [2, 3/*, 5, 6, 7, 9, 11*/];
+const divisors = [2, 3, 5, 6, 7, 9, 11];
 
 // Favour slightly inexact triplets over exact duplets by an arbitrary factor
 const TOLERANCE = 0.07;
@@ -111,14 +111,31 @@ function compare(beat, duration, divisor, rhythm, length, count, r, i, score, re
     // doesn't include the [0.5]). We're running with it anyway. Weight density
     // by inverse division power so that smaller divisions require higher
     // densities while large divisions remain largely unaffected.
+    // THE CHOSEN POWER IS A BIT ARBITRARY, NEEDS SOME FURTHER INVESTIGATION
     const density = rhythmicDensity(divisor, rhythm);
-    const densityWeight = pow(density, 0.25 / division);
+    //const densityWeight = pow(density, 0.25 / division);
+    const densityWeight = pow(density, 0.11 / division);
 
     // Score
     // r is ±, amplitude is +ve
     const s = driftWeight * densityWeight * (phaseWeight * r + (1 - phaseWeight) * amplitude) / length;
 
-    if (DEBUG) analytics.push({ beat, duration, divisor, rhythm, density, densityWeight, length, count, r, i, amplitude, phase, phaseWeight, drift, driftWeight, score: s, isNewBest: s > score });
+    if (DEBUG) analytics.push({
+        beat,
+        duration,
+        divisor,
+        rhythm,
+        density,
+        densityWeight,
+        length,
+        count,
+        phase,
+        amp: (phaseWeight * r + (1 - phaseWeight) * amplitude) / length,
+        drift,
+        driftWeight,
+        score: s,
+        isNewBest: s > score
+    });
 
     if (s <= score) return score;
 
