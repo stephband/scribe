@@ -17,8 +17,11 @@
             padding: 20px;
             background: #f5f5f5;
         }
+        h2 {
+            margin-top: 0;
+        }
         .controls {
-            margin: 20px 0;
+            margin: 20px 0 0;
             padding: 15px;
             background: white;
             border-radius: 4px;
@@ -27,7 +30,6 @@
         .controls button { margin: 0 4px; padding: 5px 12px; }
         .timeline {
             width: 100%;
-            padding: 20px 0;
         }
         .graph-wrap {
             display: grid;
@@ -77,83 +79,55 @@
 
     <div class="controls">
         <label>Events (beats):
-            <input type="text" id="eventsInput" value="0.58" size="40">
+            <input type="text" id="eventsInput1" value="0.58" size="40">
         </label>
-        <label>Start: <input type="number" id="startInput" value="0" step="0.1" style="width:55px"></label>
-        <label>maxDuration: <input type="number" id="durationInput" value="4" step="0.5" style="width:55px"></label>
-        <label>minDivision: <input type="number" id="minDivInput" value="0.0833" step="0.001" style="width:70px"></label>
-        <label>maxDivision: <input type="number" id="maxDivInput" value="4" step="0.5" style="width:55px"></label>
+        <label>Start: <input type="number" id="startInput1" value="0" step="0.1" style="width:55px"></label>
+        <label>maxDuration: <input type="number" id="durationInput1" value="4" step="0.5" style="width:55px"></label>
+        <label>minDivision: <input type="number" id="minDivInput1" value="0.0833" step="0.001" style="width:70px"></label>
+        <label>maxDivision: <input type="number" id="maxDivInput1" value="4" step="0.5" style="width:55px"></label>
         <br>
-        <button onclick="update()">Update</button>
-        <button onclick="preset([0, 0.667, 1.333],       '0, 0.667, 1.333')">Triplets</button>
-        <button onclick="preset([0, 0.5, 1, 1.333, 1.667], '0, 0.5, 1, 1.333, 1.667')">Duplet+Triplet</button>
-        <button onclick="preset([0, 0.5],  '0, 0.5')">Two Eighths</button>
-        <label>Swing: <input type="range" id="swingInput" min="0" max="1" step="any" value="0.58" style="width:512px"></label>
+        <button onclick="preset1([0, 0.667, 1.333],       '0, 0.667, 1.333')">Triplets</button>
+        <button onclick="preset1([0, 0.5, 1, 1.333, 1.667], '0, 0.5, 1, 1.333, 1.667')">Duplet+Triplet</button>
+        <button onclick="preset1([0, 0.5],  '0, 0.5')">Two Eighths</button>
+        <label>Swing: <input type="range" id="swingInput1" min="0" max="1" step="any" value="0.58" style="width:512px"></label>
     </div>
 
-    <div class="timeline" id="columns"></div>
+    <div class="timeline" id="columns1"></div>
+
+    <div class="controls">
+        <label>Events (beats):
+            <input type="text" id="eventsInput2" value="0.667" size="40">
+        </label>
+        <label>Start: <input type="number" id="startInput2" value="0" step="0.1" style="width:55px"></label>
+        <label>maxDuration: <input type="number" id="durationInput2" value="4" step="0.5" style="width:55px"></label>
+        <label>minDivision: <input type="number" id="minDivInput2" value="0.0833" step="0.001" style="width:70px"></label>
+        <label>maxDivision: <input type="number" id="maxDivInput2" value="4" step="0.5" style="width:55px"></label>
+        <br>
+        <button onclick="preset2([0, 0.667, 1.333],       '0, 0.667, 1.333')">Triplets</button>
+        <button onclick="preset2([0, 0.5, 1, 1.333, 1.667], '0, 0.5, 1, 1.333, 1.667')">Duplet+Triplet</button>
+        <button onclick="preset2([0, 0.5],  '0, 0.5')">Two Eighths</button>
+        <label>Swing: <input type="range" id="swingInput2" min="0" max="1" step="any" value="0.667" style="width:512px"></label>
+    </div>
+
+    <div class="timeline" id="columns2"></div>
 
     <script type="module">
         import detectRhythm, { analytics } from '../modules/rhythm.js';
 
         const { cos, PI } = Math;
-
-        // Restore beats from URL on load
-        const urlBeats = new URLSearchParams(location.search).get('beats');
-        const initBeats = urlBeats ?? '0.58';
-
-        let events      = initBeats.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
-        let startBeat   = 0;
-        let maxDuration = 4;
-        let minDivision = 1 / 12;
-        let maxDivision = 4;
-
-        document.getElementById('eventsInput').value = initBeats;
-        document.getElementById('swingInput').value  = events.length === 1 ? events[0] : 0.58;
-
-        function updateBeatsParam(str) {
-            const url = new URL(location.href);
-            url.searchParams.set('beats', str);
-            history.replaceState(null, '', url);
-        }
-
-        window.preset = function(evts, str) {
-            events = evts;
-            document.getElementById('eventsInput').value = str;
-            updateBeatsParam(str);
-            draw();
-        };
-
-        document.getElementById('swingInput').addEventListener('input', function() {
-            const beat = parseFloat(this.value);
-            events = [beat];
-            document.getElementById('eventsInput').value = beat;
-            updateBeatsParam(beat);
-            draw();
-        });
-
-        window.update = function() {
-            const str   = document.getElementById('eventsInput').value;
-            events      = str.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
-            startBeat   = parseFloat(document.getElementById('startInput').value);
-            maxDuration = parseFloat(document.getElementById('durationInput').value);
-            minDivision = parseFloat(document.getElementById('minDivInput').value);
-            maxDivision = parseFloat(document.getElementById('maxDivInput').value);
-            updateBeatsParam(str);
-            draw();
-        };
-
         const BASE_W = 1920;
         const BASE_H = 640;
 
-        function draw() {
-            const container = document.getElementById('columns');
+        function updateParam(param, str) {
+            const url = new URL(location.href);
+            url.searchParams.set(param, str);
+            history.replaceState(null, '', url);
+        }
+
+        function draw(container, events, startBeat, maxDuration, minDivision, maxDivision) {
             container.innerHTML = '';
 
-            // Build event array in the format detectRhythm expects
             const eventArray = events.map(b => [b, 'note', 60, 0.1, 0.25]);
-
-            // Run the actual algorithm — populates analytics
             const result = detectRhythm(startBeat, maxDuration, eventArray, 0, { minDivision, maxDivision });
 
             if (!analytics.length) {
@@ -161,15 +135,12 @@
                 return;
             }
 
-            // Index of the last isNewBest entry = final winner
             const finalIdx = analytics.reduce((fi, a, i) => a.isNewBest ? i : fi, -1);
 
-            // Wrapper: canvas and data overlay share the same grid cell
             const wrap = document.createElement('div');
             wrap.className = 'graph-wrap';
             container.appendChild(wrap);
 
-            // One canvas for all results
             const c = document.createElement('canvas');
             c.width  = BASE_W;
             c.height = BASE_H;
@@ -192,8 +163,7 @@
             cx.strokeStyle = '#ccc'; cx.lineWidth = 1;
             cx.beginPath(); cx.moveTo(0, midY); cx.lineTo(BASE_W, midY); cx.stroke();
 
-            // Pale blue rectangles, one per (beat, duration) window — stacks to
-            // show analysis density; skip the full-width window (obvious from canvas size)
+            // Pale blue rectangles per (beat, duration) window
             cx.fillStyle = 'rgba(140, 175, 230, 0.06)';
             const seen = new Set();
             for (const a of analytics) {
@@ -206,7 +176,7 @@
                 cx.fillRect(x0, 0, w, BASE_H);
             }
 
-            // Draw all waveforms — winner last so it renders on top
+            // Draw all waveforms — winner last
             const sorted = analytics.map((a, idx) => ({ idx, a })).sort((a, b) =>
                 a.idx === finalIdx ? 1 : b.idx === finalIdx ? -1 : 0
             );
@@ -214,12 +184,9 @@
             for (const { idx, a } of sorted) {
                 const isFinal   = idx === finalIdx;
                 const isNewBest = a.isNewBest;
-
-                // x range for this entry's window within the full canvas
                 const x0 = (a.beat - startBeat) / maxDuration * BASE_W;
                 const x1 = (a.beat - startBeat + a.duration) / maxDuration * BASE_W;
                 const w  = x1 - x0;
-
                 const amp = a.score * 240;
 
                 cx.strokeStyle = isFinal ? '#226600' : isNewBest ? '#558833' : '#bbb';
@@ -244,7 +211,7 @@
             }
             cx.setLineDash([]);
 
-            // Beat labels at integer positions along the bottom
+            // Beat labels
             cx.fillStyle    = '#bbb';
             cx.font         = '14.72px monospace';
             cx.textAlign    = 'left';
@@ -262,7 +229,7 @@
                 cx.beginPath(); cx.moveTo(x, 0); cx.lineTo(x, BASE_H); cx.stroke();
             }
 
-            // Data lines as HTML, grouped by (beat, duration), overlaid right-aligned
+            // Data overlay — grouped by (beat, duration)
             const groups = [];
             const groupKey = new Map();
             for (let idx = 0; idx < analytics.length; idx++) {
@@ -300,10 +267,9 @@
 
                 dataEl.appendChild(groupEl);
             }
-
             wrap.appendChild(dataEl);
 
-            // Final result — bottom right of canvas
+            // Result — bottom right
             const resultEl = document.createElement('div');
             resultEl.className = 'info';
             resultEl.innerHTML =
@@ -312,7 +278,60 @@
             wrap.appendChild(resultEl);
         }
 
-        draw();
+        function createInstance(n) {
+            const param      = `beats${ n }`;
+            const urlBeats   = new URLSearchParams(location.search).get(param);
+            const initBeats  = urlBeats ?? (n === 1 ? '0.58' : '0.667');
+            const container  = document.getElementById(`columns${ n }`);
+
+            let events      = initBeats.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+            let startBeat   = 0;
+            let maxDuration = 4;
+            let minDivision = 1 / 12;
+            let maxDivision = 4;
+
+            document.getElementById(`eventsInput${ n }`).value = initBeats;
+            document.getElementById(`swingInput${ n }`).value  = events.length === 1 ? events[0] : 0.5;
+
+            function redraw() {
+                draw(container, events, startBeat, maxDuration, minDivision, maxDivision);
+            }
+
+            window[`preset${ n }`] = function(evts, str) {
+                events = evts;
+                document.getElementById(`eventsInput${ n }`).value = str;
+                updateParam(param, str);
+                redraw();
+            };
+
+            window[`update${ n }`] = function() {
+                const str   = document.getElementById(`eventsInput${ n }`).value;
+                events      = str.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+                startBeat   = parseFloat(document.getElementById(`startInput${ n }`).value);
+                maxDuration = parseFloat(document.getElementById(`durationInput${ n }`).value);
+                minDivision = parseFloat(document.getElementById(`minDivInput${ n }`).value);
+                maxDivision = parseFloat(document.getElementById(`maxDivInput${ n }`).value);
+                updateParam(param, str);
+                redraw();
+            };
+
+            document.getElementById(`eventsInput${ n }`).addEventListener('change', function() {
+                window[`update${ n }`]();
+            });
+
+            document.getElementById(`swingInput${ n }`).addEventListener('input', function() {
+                const beat = parseFloat(this.value);
+                events = [beat];
+                document.getElementById(`eventsInput${ n }`).value = beat;
+                updateParam(param, beat);
+                redraw();
+            });
+
+            redraw();
+        }
+
+        createInstance(1);
+        createInstance(2);
     </script>
 </body>
 </html>
