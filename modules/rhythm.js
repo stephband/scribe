@@ -43,7 +43,7 @@ const defaults = {
 };
 
 // Divisors to test
-const divisors = [2, 3, 5, 6, 7, 9, 11];
+const divisors = [2, 3, 5, /*6,*/ 7, 9, 11];
 
 // Favour slightly inexact triplets over exact duplets by an arbitrary factor
 const TOLERANCE = 0.07;
@@ -78,22 +78,22 @@ function compare(beat, duration, divisor, rhythm, length, count, r, i, score, re
         case 2:
             break;
         case 3:
-            // Don't permit the triplet rhythm 010, let it fall through to the
-            // shorter duration 001
-            //if (rhythm === 2) return score;
+            // Don't permit the triplet rhythms 010 or 110, let them fall
+            // through to the shorter duration 001 and 101
+            //if (rhythm === 2 || rhythm === 3) return score;
             break;
         default:
             // Reject higher order rhythms with consecutive holes
             if (hasConsecutiveHoles(divisor, rhythm)) return score;
     }
 
-    const amplitude = sqrt(r * r + i * i);
+    const amplitude = sqrt(r * r + i * i); // Same as length, because we kick amplitude one for every event
 
     // Phase
     // Weight amplitude by phase alignment to prefer nearer-zero phases and
     // reject out-of-phase rhythms.
     const phase = atan2(i, r);
-    const phaseWeight = 1;
+    const phaseWeight = (0.5 * r + 0.5 * amplitude) / length;
 
     // Division
     const division = duration / divisor;
@@ -113,12 +113,13 @@ function compare(beat, duration, divisor, rhythm, length, count, r, i, score, re
     // densities while large divisions remain largely unaffected.
     // THE CHOSEN POWER IS A BIT ARBITRARY, NEEDS SOME FURTHER INVESTIGATION
     const density = rhythmicDensity(divisor, rhythm);
-    //const densityWeight = pow(density, 0.25 / division);
-    const densityWeight = pow(density, 0.11 / division);
+    const densityWeight = pow(density, 0.122  / division); // Can't be higher than 0.125 or [0.375, 0.75] is misidentified as triplets
+    //const densityWeight = pow((count1s(rhythm) + 1) / (divisor + 1), 0.125 / (duration / (divisor + 1)));
+    //const densityWeight = pow(density, 0.24 / duration);    // Can't be higher than 0.24 or [0.375, 0.75] is misidentified as triplets
 
     // Score
     // r is ±, amplitude is +ve
-    const s = driftWeight * densityWeight * (phaseWeight * r + (1 - phaseWeight) * amplitude) / length;
+    const s = driftWeight * densityWeight * phaseWeight;
 
     if (DEBUG) analytics.push({
         beat,
@@ -130,7 +131,8 @@ function compare(beat, duration, divisor, rhythm, length, count, r, i, score, re
         length,
         count,
         phase,
-        amp: (phaseWeight * r + (1 - phaseWeight) * amplitude) / length,
+        phaseWeight,
+        amp: phaseWeight,
         drift,
         driftWeight,
         score: s,
@@ -218,8 +220,8 @@ function run(minDivision, maxDivision, startBeat, maxDuration, rhythm, count, ev
         // Advance by half duration
         beat += duration / 2;
         if (!rhythm
-            && beat + duration <= startEvent[0]
-            && beat + duration < startBeat + maxDuration) {
+            && beat <= startEvent[0]
+            && beat + duration <= startBeat + maxDuration) {
             // Test odd divisors only
             g = max(1, m - 1);
             while ((divisor = divisors[++g]) && divisor <= maxDivisor) {

@@ -291,16 +291,27 @@
             let maxDivision = 4;
 
             document.getElementById(`eventsInput${ n }`).value = initBeats;
-            document.getElementById(`swingInput${ n }`).value  = events.length === 1 ? events[0] : 0.5;
+            document.getElementById(`swingInput${ n }`).value  = events[0] ?? 0.5;
+
+            let urlTimer;
+            function debouncedUpdateParam(str) {
+                clearTimeout(urlTimer);
+                urlTimer = setTimeout(() => updateParam(param, str), 500);
+            }
 
             function redraw() {
                 draw(container, events, startBeat, maxDuration, minDivision, maxDivision);
             }
 
+            function syncSlider() {
+                document.getElementById(`swingInput${ n }`).value = events[0] ?? 0;
+            }
+
             window[`preset${ n }`] = function(evts, str) {
                 events = evts;
                 document.getElementById(`eventsInput${ n }`).value = str;
-                updateParam(param, str);
+                syncSlider();
+                debouncedUpdateParam(str);
                 redraw();
             };
 
@@ -311,7 +322,8 @@
                 maxDuration = parseFloat(document.getElementById(`durationInput${ n }`).value);
                 minDivision = parseFloat(document.getElementById(`minDivInput${ n }`).value);
                 maxDivision = parseFloat(document.getElementById(`maxDivInput${ n }`).value);
-                updateParam(param, str);
+                syncSlider();
+                debouncedUpdateParam(str);
                 redraw();
             };
 
@@ -320,10 +332,12 @@
             });
 
             document.getElementById(`swingInput${ n }`).addEventListener('input', function() {
-                const beat = parseFloat(this.value);
-                events = [beat];
-                document.getElementById(`eventsInput${ n }`).value = beat;
-                updateParam(param, beat);
+                const newFirst = parseFloat(this.value);
+                const delta    = events.length ? newFirst - events[0] : 0;
+                events = events.length ? events.map(e => parseFloat((e + delta).toFixed(6))) : [newFirst];
+                const str = events.join(', ');
+                document.getElementById(`eventsInput${ n }`).value = str;
+                debouncedUpdateParam(str);
                 redraw();
             });
 
