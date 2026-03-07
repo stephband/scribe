@@ -247,8 +247,16 @@ export function createBar(count, beat, duration, divisor, stave, key, events, pa
     for (part of stave.parts) {
         const events = parts[part.name];
         if (!events || !events.length) continue;
+        // Don't process the default center
         centers.delete(part.centerRow || stave.centerRow);
-        createPart(symbols, bar, stave, key, accidentals, part, events, settings);
+
+        if (stave.createPartSymbols) {
+            const partSymbols = stave.createPartSymbols(key, accidentals, part, events, bar.beat, bar.duration, bar.divisions, bar.divisor, settings);
+            symbols.push.apply(symbols, partSymbols);
+        }
+        else {
+            createPart(symbols, bar, stave, key, accidentals, part, events, settings);
+        }
     }
 
     let center;

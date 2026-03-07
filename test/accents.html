@@ -57,7 +57,7 @@
 <body>
     <section class="grid dense-grid" style="row-gap: 0;">
         <h3 class="x1 2x">Accents</h3>
-
+<!--
         <scribe-music class="x1" clef="treble" src="#accent-1" debug>
             <script type="application/json" id="accent-1">{
                 "events": [
@@ -113,7 +113,7 @@
                 "events": [
                     [0, "meter", 4, 1],
                     [0, "note", 38, 0.0625, 1],
-                    [1, "note", 38, 0.25, 1],
+                    [1.5, "note", 38, 0.25, 1],
                     [2, "note", 38, 0.5, 1],
                     [3, "note", 38, 1, 1],
                     [4, "note", 42, 0.0625, 1],
@@ -122,6 +122,54 @@
                     [7, "note", 42, 1, 0.5],
                     [7.5, "note", 42, 1, 0.5]
                 ]
+            }</script>
+        </scribe-music>
+-->
+
+        <scribe-music class="x1" clef="drum" src="#accent-5" swing debug>
+            <script type="application/json" id="accent-5">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [0,  "sequence", 1, 0, 8]
+                ],
+
+                "sequences": [{
+                    "id": 1,
+                    "name": "Intro",
+                    "events": [
+                        [0,  "sequence", 2, 0, 8]
+                    ]
+                }, {
+                    "id": 2,
+                    "events": [
+                        [1,    "note", "A♭2", 0.1, 0.2],
+                        [3,    "note", "A♭2", 0.1, 0.2],
+                        [5,    "note", "A♭2", 0.1, 0.2],
+                        [7,    "note", "A♭2", 0.1, 0.2],
+                        [0,    "note", "B1", 0.1, 0.6],
+                        [1.63, "note", "B1", 0.1, 0.2],
+                        [3,    "note", "B1", 0.1, 0.6],
+                        [4.62, "note", "B1", 0.1, 0.2],
+                        [6,    "note", "B1", 0.1, 0.6],
+                        [1,    "note", "D2", 0.1, 0.2],
+                        [2.64, "note", "D2", 0.1, 0.2],
+                        [4,    "note", "D2", 0.4, 0.2],
+                        [5.63, "note", "D2", 0.1, 0.2],
+                        [7,    "note", "D2", 0.02, 0.2],
+                        [7.62, "note", "D2", 0.02, 0.2],
+                        [0,    "note", "F3", 0.1, 0.6],
+                        [1,    "note", "F3", 0.1, 0.2],
+                        [1.63, "note", "F3", 0.1, 0.2],
+                        [2,    "note", "F3", 0.1, 0.6],
+                        [3,    "note", "F3", 0.1, 0.2],
+                        [3.64, "note", "F3", 0.1, 0.2],
+                        [4,    "note", "F3", 0.1, 0.6],
+                        [5,    "note", "F3", 0.1, 0.2],
+                        [5.65, "note", "F3", 0.1, 0.2],
+                        [6,    "note", "F3", 0.1, 0.6],
+                        [7,    "note", "F3", 0.1, 0.8]
+                    ]
+                }]
             }</script>
         </scribe-music>
 

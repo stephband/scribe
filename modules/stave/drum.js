@@ -1,12 +1,25 @@
 
-import slugify     from 'fn/slugify.js';
+import slugify      from 'fn/slugify.js';
 import { toDrumName, toNoteNumber } from 'midi/note.js';
-import * as glyphs from "../glyphs.js";
-import config      from '../config.js';
-import Stave       from './stave.js';
+import * as glyphs  from "../glyphs.js";
+import config       from '../config.js';
+import Stave        from './stave.js';
+import { eq, gte, lte, lt, gt } from '../number/float.js';
+import detectRhythm, { straighten, hasHoles } from '../rhythm.js';
+import createRests  from '../symbol/create-rests.js';
 
 
-const global = globalThis || window;
+const global  = globalThis || window;
+const symbols = [];
+
+// When dealing with rounding errors we only really need beat grid-level
+// precision, our display grid has 24 slots but we only need to compare the
+// smallest possible note values, 32nd notes, or ±1/16 precision
+const p16     = 1/16;
+const p24     = 1/24;
+
+
+
 
 
 function toDrumSlug(number) {
@@ -156,5 +169,96 @@ export default class DrumStave extends Stave {
         const i = floor(y * this.rows.length);
         const j = i < 4 ? 4 : i > 17 ? 17 : i ;
         return this.pitches[j];
+    }
+
+    createPartSymbols(key, accidentals, part, events, beat, duration, divisions, divisor, settings) {
+        const startBeat = beat;
+        const stopBeat  = beat + duration;
+        const notes     = [];
+
+console.log('PART', part.name);
+
+        let n = -1;
+        let event, beam;
+
+        symbols.length = 0;
+
+        // Ignore events that stop before beat, an extra cautious measure,
+        // events array should already start with events at beat
+        while ((event = events[++n]) && lte(beat, event[0] + event[4], p16));
+        --n;
+
+        while (beat < stopBeat) {
+
+console.log('RTM', 'startBeat', startBeat, 'stopBeat', stopBeat, 'beat', beat, 'n', n + 1, events);
+
+            const data = detectRhythm(beat, stopBeat - beat, events, n + 1);
+
+            // If there's a beam and beat is on a division close it
+            if (beam && bar.divisions.find((division) => eq(beat - startBeat, division, p16))
+                // or head started after a new division
+                // || getDivision(bar.divisions, , beat)
+            ) {
+                closeBeam(symbols, stave, part, beam);
+                beam = undefined;
+            }
+
+            switch (data.divisor) {
+                case 2:
+                    // If we are rendering swing rhythms decide whether a duplet
+                    // should render as a tuplet
+                    if (data.rhythm === 1) {
+                        break;
+                    }
+                    else if (data.duration === 1) {
+                        if (!settings.swingAsStraight8ths) break;
+                    }
+                    else if (data.duration === 0.5) {
+                        if (!settings.swingAsStraight16ths) break;
+                    }
+                    else {
+                        break;
+                    }
+
+                case 3:
+                    // Convert swing rhythms to straight rhythms
+                    if (settings.swingAsStraight8ths  && data.duration === 1) {
+                        straighten(data);
+                        break;
+                    }
+
+                    if (settings.swingAsStraight16ths && data.duration === 0.5) {
+                        straighten(data);
+                        break;
+                    }
+
+                default:
+                    // Turn rhythm data into tuplet symbol
+                    data.type  = 'tuplet';
+                    data.part  = part;
+                    data.stave = this;
+                    symbols.push(data);
+
+                    // Close beam if there any holes in tuplet
+                    if (beam && rhythmHasHoles(divisor, rhythm)) {
+                        closeBeam(symbols, stave, part, beam);
+                        beam = undefined;
+                    }
+            }
+
+            // Create rests up to rhythm
+            const b = data.beat + (data.rhythm === 2 ? data.duration / 2 : 0);
+            if (gt(beat, b, p24)) createRests(symbols, settings.restDurations, divisor, this, part, beat, b);
+
+console.log('RHYTHM!', data.divisor);
+
+            n    = data.index + data.count - 1;
+            beat = data.beat + data.duration;
+        }
+
+        // If there's still a beam close it
+        if (beam) closeBeam(symbols, stave, part, beam);
+
+        return symbols;
     }
 }

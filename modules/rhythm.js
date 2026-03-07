@@ -49,19 +49,23 @@ const divisors = [2, 3, 5, /*6,*/ 7, 9, 11];
 const TOLERANCE = 0.07;
 
 
-function hasConsecutiveHoles(divisor, rhythm) {
-    const fullRhythm = (1 << divisor) - 1;
-    const holes = fullRhythm ^ rhythm;
-    return holes & (holes << 1);
-}
-
 function count1s(n) {
     let count = 0;
     while (n) { n &= n - 1; ++count; }
     return count;
 }
 
-function rhythmicDensity(slots, rhythm) {
+export function hasHoles(divisor, rhythm) {
+    return rhythm < pow(2, divisor) - 1;
+}
+
+export function hasConsecutiveHoles(divisor, rhythm) {
+    const fullRhythm = (1 << divisor) - 1;
+    const holes = fullRhythm ^ rhythm;
+    return holes & (holes << 1);
+}
+
+export function rhythmicDensity(slots, rhythm) {
     return count1s(rhythm) / slots;
 }
 
@@ -283,4 +287,26 @@ export default function detectRhythm(beat, duration, events, index = 0, options)
     // Run the analysis
     if (DEBUG) analytics.length = 0;
     return run(minDivision, maxDivision, beat, duration, rhythm, count, events, n, result, stopBeatInfluence);
+}
+
+
+/**
+straighten(data)
+Straightens out swing rhythms - any `4` or `5` rhythms with divisor `3`.
+**/
+export function straighten(data) {
+    if (data.divisor === 3) {
+        switch (data.rhythm) {
+            case 4:
+                data.divisor = 2;
+                data.rhythm  = 2;
+                break;
+            case 5:
+                data.divisor = 2;
+                data.rhythm  = 3;
+                break;
+        }
+    }
+
+    return data;
 }
