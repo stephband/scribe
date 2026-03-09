@@ -27,7 +27,7 @@ function fitRoundedUpDuration(min, duration, maxDuration) {
     return min;
 }
 
-function fitDuration(durations, divisor, startBeat, stopBeat, beat, eventBeat) {
+function fitDuration(durations, divisor, beat, stopBeat, eventBeat) {
     // Some analysis of beats...
     const minGrain = 0.125;
     const maxGrain = floorPow2(divisor);
@@ -130,13 +130,13 @@ function fitDuration(durations, divisor, startBeat, stopBeat, beat, eventBeat) {
     }
 }
 
-export default function createRests(symbols, durations, divisor, stave, part, beat, stopBeat) {
+export function createRests(symbols, durations, divisor, stave, part, startBeat, stopBeat, beat) {
     // Insert rests beat - stopBeat
-    while (gt(beat, stopBeat, P16)) {
+    while (lt(stopBeat, beat, P16)) {
         const rest = {
             type: 'rest',
-            beat,
-            duration: fitDuration(durations, divisor, beat, stopBeat, beat, stopBeat),
+            beat: beat - startBeat,
+            duration: fitDuration(durations, divisor, beat, stopBeat, stopBeat),
             stave,
             part
         };

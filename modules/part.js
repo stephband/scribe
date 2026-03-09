@@ -1,6 +1,6 @@
 
-import by          from 'fn/by.js';
-import get         from 'fn/get.js';
+import by              from 'fn/by.js';
+import get             from 'fn/get.js';
 import { toNoteName, toNoteNumber, toRootName, toRootNumber } from 'midi/note.js';
 import { keyToRootNumber } from 'sequence/modules/event/keys.js';
 import { keyWeightsForEvent, chooseKeyFromWeights } from './keys.js';
@@ -9,14 +9,14 @@ import { getDivision } from './bar.js';
 import { detectTuplet, rhythmHasHoles } from './tuplet.js';
 import { round as roundTo, eq, gte, lte, lt, gt } from './number/float.js';
 import { floorPow2, ceilPow2, isPowerOf2 } from './number/power-of-2.js';
-import grainPow2   from './number/grain-pow-2.js';
-import push        from './object/push.js';
-import last        from './object/last.js';
-import lengthOf    from './object/length-of.js';
-import map         from './object/map.js';
-import getDuration from './event/to-duration.js';
-import getStopBeat from './event/to-stop-beat.js';
-import config      from './config.js';
+import grainPow2       from './number/grain-pow-2.js';
+import push            from './object/push.js';
+import last            from './object/last.js';
+import lengthOf        from './object/length-of.js';
+import map             from './object/map.js';
+import getDuration     from './event/to-duration.js';
+import getStopBeat     from './event/to-stop-beat.js';
+import config          from './config.js';
 
 
 const assign = Object.assign;
@@ -124,7 +124,7 @@ function createNoteSymbols(stave, key, part, notes) {
 }
 
 
-/* Pitches */
+/* DONE Pitches */
 
 function getMinPitchRow(stave, part, pitches) {
     let n = -1, row = 0;
@@ -159,7 +159,7 @@ function getMaxPitchRow(stave, part, pitches) {
 }
 
 
-/* Stems */
+/* DONE Stems */
 
 function stemupFromRows(stave, part, minRow, maxRow) {
     const centerRow = part.centerRow || stave.centerRow;

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>&lt;scribe-music&gt;</title>
+
+    <meta charset="utf-8" />
+    <meta name="author" content="@stephband" />
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width" />
+
+    <!--script type="importmap">{
+        "imports": {
+            "bolt/":     "https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/",
+            "dom/":      "https://cdn.jsdelivr.net/gh/stephband/dom@1.4.1/modules/",
+            "fn/":       "https://cdn.jsdelivr.net/gh/stephband/fn@1.5.10/modules/",
+            "midi/":     "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.2/modules/",
+            "sequence/": "https://cdn.jsdelivr.net/gh/soundio/sequence@0.2.27/"
+        }
+    }</script-->
+
+    <script type="importmap">{
+        "imports": {
+            "bolt/":     "/bolt/",
+            "dom/":      "/dom/modules/",
+            "fn/":       "/fn/modules/",
+            "midi/":     "/midi/modules/",
+            "sequence/": "/sequence/"
+        }
+    }</script>
+
+    <script title="load">
+        document.documentElement.className += ' js loading';
+        // window.addEventListener('DOMContentLoaded', () => document.documentElement.classList.remove('content-loading'));
+        // Wait for other load handlers to run first - Bolt does a few things on
+        // load (eg. targetable scrolls) and we want them to run before the loading
+        // class is removed
+        window.addEventListener('load', () => window.requestAnimationFrame(() => document.documentElement.classList.remove('loading')));
+        window.DEBUG = true;
+    </script>
+
+    <!-- Import <scribe-music> -->
+    <link rel="stylesheet" href="/bolt/classes/atoms.css" />
+    <link rel="stylesheet" href="../scribe-music/element.css" />
+    <script type="module" src="../scribe-music/element.js"></script>
+    <link rel="stylesheet" href="../assets/lead-sheet-document.css" />
+    <style>
+    body {
+        font-family: Jazz, JazzText;
+        letter-spacing: 0.004em;
+        word-spacing: 0.125em;
+    }
+    </style>
+    <script type="module">
+
+    </script>
+</head>
+<body>
+    <section class="grid dense-grid" style="row-gap: 0;">
+        <h3 class="x1 2x">Drums</h3>
+
+        <h3 class="x1 2x">Dotted</h3>
+
+        <scribe-music class="x1" clef="drum" src="#drum-7" debug>
+            <script type="application/json" id="drum-7">{
+                "events": [
+                    [0, "meter", 5, 1],
+                    [3,   "note", 42, 0.25, 0.25],
+                    [4.5, "note", 42, 0.25, 0.25]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1" clef="drum" src="#drum-8" debug>
+            <script type="application/json" id="drum-8">{
+                "events": [
+                    [0, "meter", 3, 1],
+                    [4,    "note", 42, 0.25, 0.75],
+                    [4.75, "note", 42, 0.25, 0.25]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1" clef="drum" src="#drum-9" debug>
+            <script type="application/json" id="drum-9">{
+                "events": [
+                    [0, "meter", 4, 1],
+
+                    [4,     "note", 42, 0.0625, 1],
+                    [5,     "note", 42, 0.25, 1],
+                    [5.5,   "note", 42, 0.5, 1],
+                    [5.75,  "note", 42, 0.5, 1],
+
+                    [8,     "note", 42, 0.25, 1],
+                    [8.5,   "note", 42, 0.5, 1],
+                    [8.75,  "note", 42, 0.5, 1],
+                    [11,    "note", 42, 0.25, 1]
+                ]
+            }</script>
+        </scribe-music>
+
+        <h3 class="x1 2x">Long durations</h3>
+
+        <scribe-music class="x1" clef="drum" src="#drum-1" debug>
+            <script type="application/json" id="drum-1">{
+                "events": [
+                    [0, "meter", 4, 1],
+
+                    [18,    "note", 42, 0.25, 2],
+                    [20,    "note", 42, 0.25, 2],
+                    [25,    "note", 42, 0.25, 3],
+                    [28,    "note", 42, 0.25, 4],
+                    [32,    "note", 42, 0.25, 2],
+                    [34,    "note", 42, 0.25, 2],
+
+                    [38,    "note", 42, 0.25, 0.25],
+                    [40,    "note", 42, 0.25, 0.25],
+                    [45,    "note", 42, 0.25, 0.25],
+                    [48,    "note", 42, 0.25, 0.25],
+                    [52,    "note", 42, 0.25, 0.25],
+                    [54,    "note", 42, 0.25, 0.25]
+                ]
+            }</script>
+        </scribe-music>
+
+        <h3 class="x1 2x">Tuplets</h3>
+
+        <scribe-music class="x1" clef="drum" src="#drum-2" debug>
+            <script type="application/json" id="drum-2">{
+                "events": [
+                    [0, "meter", 4, 1],
+
+                    [1,    "note", 42, 0.1, 1],
+
+                    [3,    "note", 42, 0.1, 1],
+                    [3.5,  "note", 42, 0.1, 1],
+
+                    [5,    "note", 42, 0.1, 1],
+                    [5.33, "note", 42, 0.1, 1],
+                    [5.67, "note", 42, 0.1, 1],
+
+                    [7,    "note", 42, 0.1, 1],
+                    [7.2,  "note", 42, 0.1, 1],
+                    [7.4,  "note", 42, 0.1, 1],
+                    [7.6,  "note", 42, 0.1, 1],
+                    [7.8,  "note", 42, 0.1, 1],
+
+                    [9,    "note", 42, 0.1, 1],
+                    [9.14, "note", 42, 0.1, 1],
+                    [9.29, "note", 42, 0.1, 1],
+                    [9.43, "note", 42, 0.1, 1],
+                    [9.57, "note", 42, 0.1, 1],
+                    [9.71, "note", 42, 0.1, 1],
+                    [9.86, "note", 42, 0.1, 1],
+
+                    [11,    "note", 42, 0.1, 1],
+                    [11.11, "note", 42, 0.1, 1],
+                    [11.22, "note", 42, 0.1, 1],
+                    [11.33, "note", 42, 0.1, 1],
+                    [11.44, "note", 42, 0.1, 1],
+                    [11.56, "note", 42, 0.1, 1],
+                    [11.67, "note", 42, 0.1, 1],
+                    [11.78, "note", 42, 0.1, 1],
+                    [11.89, "note", 42, 0.1, 1]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1" clef="drum" src="#drum-3" debug>
+            <script type="application/json" id="drum-3">{
+                "events": [
+                    [0, "meter", 4, 1],
+
+                    [1,    "note", 42, 0.1, 1],
+
+                    [3,    "note", 42, 0.1, 1],
+                    [3.5,  "note", 42, 0.1, 1],
+
+                    [4,    "note", 42, 0.1, 1],
+                    [4.67, "note", 42, 0.1, 1],
+                    [5.33, "note", 42, 0.1, 1],
+
+                    [8,    "note", 42, 0.1, 1],
+                    [8.4,  "note", 42, 0.1, 1],
+                    [8.8,  "note", 42, 0.1, 1],
+                    [9.2,  "note", 42, 0.1, 1],
+                    [9.6,  "note", 42, 0.1, 1],
+
+                    [12,    "note", 42, 0.1, 1],
+                    [12.29, "note", 42, 0.1, 1],
+                    [12.57, "note", 42, 0.1, 1],
+                    [12.86, "note", 42, 0.1, 1],
+                    [13.14, "note", 42, 0.1, 1],
+                    [13.43, "note", 42, 0.1, 1],
+                    [13.71, "note", 42, 0.1, 1],
+
+                    [16,    "note", 42, 0.1, 1],
+                    [16.22, "note", 42, 0.1, 1],
+                    [16.44, "note", 42, 0.1, 1],
+                    [16.67, "note", 42, 0.1, 1],
+                    [16.89, "note", 42, 0.1, 1],
+                    [17.11, "note", 42, 0.1, 1],
+                    [17.33, "note", 42, 0.1, 1],
+                    [17.56, "note", 42, 0.1, 1],
+                    [17.78, "note", 42, 0.1, 1]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1" clef="drum" src="#drum-4" debug>
+            <script type="application/json" id="drum-4">{
+                "events": [
+                    [0, "meter", 4, 1],
+
+                    [1,    "note", 42, 0.1, 1],
+
+                    [3,    "note", 42, 0.1, 1],
+                    [3.5,  "note", 42, 0.1, 1],
+
+                    [4,    "note", 42, 0.1, 1],
+                    [5.33, "note", 42, 0.1, 1],
+                    [6.67, "note", 42, 0.1, 1],
+
+                    [8,    "note", 42, 0.1, 1],
+                    [8.8,  "note", 42, 0.1, 1],
+                    [9.6,  "note", 42, 0.1, 1],
+                    [10.4, "note", 42, 0.1, 1],
+                    [11.2, "note", 42, 0.1, 1],
+
+                    [12,    "note", 42, 0.1, 1],
+                    [12.57, "note", 42, 0.1, 1],
+                    [13.14, "note", 42, 0.1, 1],
+                    [13.71, "note", 42, 0.1, 1],
+                    [14.28, "note", 42, 0.1, 1],
+                    [14.86, "note", 42, 0.1, 1],
+                    [15.43, "note", 42, 0.1, 1],
+
+                    [16,    "note", 42, 0.1, 1],
+                    [16.44, "note", 42, 0.1, 1],
+                    [16.89, "note", 42, 0.1, 1],
+                    [17.33, "note", 42, 0.1, 1],
+                    [17.78, "note", 42, 0.1, 1],
+                    [18.22, "note", 42, 0.1, 1],
+                    [18.67, "note", 42, 0.1, 1],
+                    [19.11, "note", 42, 0.1, 1],
+                    [19.56, "note", 42, 0.1, 1]
+                ]
+            }</script>
+        </scribe-music>
+
+        <h3 class="x1 2x">Chart</h3>
+
+        <scribe-music class="x1" clef="drum" src="#drum-12" swing debug>
+            <script type="application/json" id="drum-12">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [0,  "sequence", 1, 0, 8]
+                ],
+
+                "sequences": [{
+                    "id": 1,
+                    "name": "Intro",
+                    "events": [
+                        [0,  "sequence", 2, 0, 8]
+                    ]
+                }, {
+                    "id": 2,
+                    "events": [
+                        [1,    "note", "A♭2", 0.1, 0.2],
+                        [3,    "note", "A♭2", 0.1, 0.2],
+                        [5,    "note", "A♭2", 0.1, 0.2],
+                        [7,    "note", "A♭2", 0.1, 0.2],
+                        [0,    "note", "B1",  0.1, 0.6],
+                        [1.63, "note", "B1",  0.1, 0.2],
+                        [3,    "note", "B1",  0.1, 0.6],
+                        [4.62, "note", "B1",  0.1, 0.2],
+                        [6,    "note", "B1",  0.1, 0.6],
+                        [1,    "note", "D2",  0.1, 0.2],
+                        [2.64, "note", "D2",  0.1, 0.2],
+                        [4,    "note", "D2",  0.4, 0.2],
+                        [5.63, "note", "D2",  0.1, 0.2],
+                        [7,    "note", "D2",  0.02, 0.2],
+                        [7.62, "note", "D2",  0.02, 0.2],
+                        [0,    "note", "F3", 0.1, 0.6],
+                        [1,    "note", "F3", 0.1, 0.2],
+                        [1.63, "note", "F3", 0.1, 0.2],
+                        [2,    "note", "F3", 0.1, 0.6],
+                        [3,    "note", "F3", 0.1, 0.2],
+                        [3.64, "note", "F3", 0.1, 0.2],
+                        [4,    "note", "F3", 0.1, 0.6],
+                        [5,    "note", "F3", 0.1, 0.2],
+                        [5.65, "note", "F3", 0.1, 0.2],
+                        [6,    "note", "F3", 0.1, 0.6],
+                        [7,    "note", "F3", 0.1, 0.8]
+                    ]
+                }]
+            }</script>
+        </scribe-music>
+
+        <!---->
+    </section>
+</body>
+</html>

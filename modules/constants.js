@@ -3,3 +3,6 @@
 // smallest possible note values, 32nd notes, or ±1/16 precision
 export const P16 = 1/16;
 export const P24 = 1/24;
+
+// Golden ratio
+export const GR  = 0.618034;
