@@ -6,6 +6,10 @@ const assign = Object.assign;
 let beamId = 0;
 
 
+function average(a, n, i, array) {
+    return a + n / array.length;
+}
+
 export function createBeam(part, beat) {
     return {
         type: 'beam',

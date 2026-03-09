@@ -56,7 +56,7 @@
 </head>
 <body>
     <section class="grid dense-grid" style="row-gap: 0;">
-        <h3 class="x1 2x">Drums</h3>
+        <h2 class="x1 2x">Drums</h2>
 
         <h3 class="x1 2x">Dotted</h3>
 
@@ -83,12 +83,34 @@
         <scribe-music class="x1" clef="drum" src="#drum-9" debug>
             <script type="application/json" id="drum-9">{
                 "events": [
+                    [0, "meter", 3, 1],
+                    [4,     "note", 42, 0.25, 0.5],
+                    [4.375, "note", 42, 0.25, 0.5],
+                    [4.5,   "note", 42, 0.25, 0.5],
+                    [4.625, "note", 42, 0.25, 0.5],
+                    [4.75,  "note", 42, 0.25, 0.5],
+                    [4.875, "note", 42, 0.25, 0.5]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1" clef="drum" src="#drum-10" debug>
+            <script type="application/json" id="drum-10">{
+                "events": [
                     [0, "meter", 4, 1],
 
                     [4,     "note", 42, 0.0625, 1],
                     [5,     "note", 42, 0.25, 1],
                     [5.5,   "note", 42, 0.5, 1],
-                    [5.75,  "note", 42, 0.5, 1],
+                    [5.75,  "note", 42, 0.5, 1]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1" clef="drum" src="#drum-11" debug>
+            <script type="application/json" id="drum-11">{
+                "events": [
+                    [0, "meter", 4, 1],
 
                     [8,     "note", 42, 0.25, 1],
                     [8.5,   "note", 42, 0.5, 1],

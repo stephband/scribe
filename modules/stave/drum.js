@@ -284,8 +284,6 @@ export default class DrumStave extends Stave {
         while (++d < divisor) {
             beat = data.beat + d * division;
 
-console.log('BEAT', beat, 'tuplet', divisor);
-
             // Fill notes with events playing during division, and leave
             // event as the first event in the next division
             while ((event = events[++n]) && event[0] < beat + 0.5 * division) notes.push(event);
@@ -336,7 +334,7 @@ console.log('BEAT', beat, 'tuplet', divisor);
         const state     = STATE;
         const stave     = this;
 
-console.log('createPart "' + part.name + '"', 'beat', startBeat);
+//console.log('createPart "' + part.name + '"', 'beat', startBeat);
 
         state.notes.length = 0;
         state.beam         = undefined;
@@ -353,10 +351,8 @@ console.log('createPart "' + part.name + '"', 'beat', startBeat);
         --n;
 
         while (beat < stopBeat) {
-
-console.log('RTM', 'startBeat', startBeat, 'stopBeat', stopBeat, 'beat', beat, 'n', n + 1, events);
-
             const data = detectRhythm(beat, stopBeat - beat, events, n + 1);
+//console.log('RTM', 'startBeat', startBeat, 'stopBeat', stopBeat, 'beat', beat, 'data.beat', data.beat, 'data.duration', data.duration, 'data.rhythm', data.rhythm);
 
             // If there's a beam and beat is on a division close it
             if (state.beam && divisions.find((division) => eq(beat - startBeat, division, P16))
@@ -380,6 +376,18 @@ console.log('RTM', 'startBeat', startBeat, 'stopBeat', stopBeat, 'beat', beat, '
 
             switch (data.divisor) {
                 case 2:
+                    // HACK to back up and dit the previous note. There MUST be
+                    // a better way.
+                    if (data.rhythm === 2) {
+                        let u = symbols.length;
+                        while (symbols[--u] && symbols[u].beat === data.beat - data.duration - startBeat) {
+                            if (symbols[u].type === 'note') {
+                                symbols[u].duration = 1.5 * data.duration;
+                                beat = data.beat + 0.5 * data.duration;
+                            }
+                        }
+                    }
+
                     // If we are rendering swing rhythms decide whether a duplet
                     // should render as a tuplet
                     if (data.rhythm === 1) {
