@@ -22,7 +22,7 @@ const assign  = Object.assign;
 const { abs, ceil, floor, min, max, pow, sqrt, round } = Math;
 const symbols = [];
 const notes   = [];
-const STATE   = {};
+const STATE   = { notes: [] };
 
 const rhythms = [];
 
@@ -253,27 +253,26 @@ export default class DrumStave extends Stave {
         let { beat } = data;
         let event;
         notes.length = 0;
-
+console.log('–––––––––––––––', JSON.stringify(data));
         // Get the binary representation of the rhythm
         const rh = data.rhythm.toString(2);
         // Loop through rhythm divisions, count from
         let i = -1;
         while (++i < divisor) {
-            // Query the binary string from its end backwards
+            // Query the binary string from the first slot, its end, backwards
             if (rh[rh.length - 1 - i] === '1') {
                 // Division has notes
-console.log('•', beat, division, divisor, data.rhythm, rh, i, events);
-                // Fill notes with events playing during division, leaving event as
-                // the first event in the next division
+console.log('✓', beat, duration, divisor, rh);
+                // Fill notes with events playing during division, leaving event
+                // as first event in the next division
                 while ((event = events[++n]) && event[0] < beat + 0.5 * division) notes.push(event);
                 --n;
+if (!notes.length) throw new Error('THIS SHOULD NOT BE POSSIBLE');
                 // Sort notes by pitch order, descending (ascending row order)
                 //if (stave.pitched) notes.sort(byRow);
-                // Must have notes, the rhythm detector said so!
-if (!notes.length) throw new Error('THIS SHOULD NOT BE POSSIBLE');
                 // Impose max note duration
                 const d = min(1, division);
-                // Insert second half
+                // Insert note symbols
                 state.notes = this.createSymbols(symbols, part, state, notes, beat - startBeat, d, settings);
                 // Insert rests where max note duration is less than division
                 createRests(symbols, settings.restDurations, divisor, this, part, beat + d - startBeat, beat + division - startBeat);
@@ -281,37 +280,38 @@ if (!notes.length) throw new Error('THIS SHOULD NOT BE POSSIBLE');
             }
             else {
                 // Division has no notes
-console.log('X', beat, division, divisor, data.rhythm, rh, i, events);
-
+console.log('✕', beat, duration, divisor, rh);
                 // If this is the first slot in a duplet shorter than 4 beats...
                 if (duration < 4 && divisor === 2 && i === 0) {
                     // HACK to back up and dot the previous note. There MUST be
                     // a better way.
-                    /*let u = symbols.length;
                     let has;
-                    while (symbols[--u] && symbols[u].beat >= data.beat - data.duration - startBeat) {
-                        if (symbols[u].type === 'note' && symbols[u].beat === data.beat - data.duration - startBeat) {
-                            symbols[u].duration = 1.5 * data.duration;
+                    let n = -1, note;
+                    while (note = state.notes[++n]) {
+                        if (note.beat === beat - duration - startBeat) {
+                            note.duration = 1.5 * duration;
                             has = true;
                         }
                     }
-                    if (has) while (symbols[++u]) {
-                        if (symbols[u].type === 'rest') {
-                            symbols.splice(u, 1);
-                            --u;
-                        }
-                    }*/
-                }
 
+                    let u = symbols.length;
+                    if (has) while (symbols[--u] && symbols[u].beat >= beat - duration - startBeat) {
+                        if (symbols[u].type === 'rest') symbols.splice(u, 1);
+                    }
+                }
                 // If this is the second slot in a duplet shorter than 2 beats...
-                if (duration < 2 && divisor === 2 && i === 1) {
+                else if (duration < 2 && divisor === 2 && i === 1) {
                     // ...give notes in the first slot full duration
                     let n = -1, note;
                     while (note = state.notes[++n]) note.duration = duration;
                     // ...and if duration longer than an eighth cancel any beam
-                    if (duration > 0.5) state.beam = undefined;
+                    if (duration > 0.5) {
+                        closeBeam(symbols, stave, part, state.beam);
+                        state.beam = undefined;
+                    }
                 }
-                // If this is anything other than the first slot in a duplet...
+                // If this is anything other than the first slot in a duplet
+                // (which has already had rests laid up to it)...
                 else if (divisor !== 2 || i !== 0) {
                     //createRests(symbols, settings.restDurations, divisor, this, part, beat - startBeat, beat + division - startBeat);
                     symbols.push({
@@ -351,7 +351,6 @@ console.log('X', beat, division, divisor, data.rhythm, rh, i, events);
         while ((event = events[++n]) && lt(beat, event[0], P16));
         --n;
 
-//        const rhythms = detectRhythms(events, n + 1, beat, duration, divisions);
         let data, previousData;
         while (beat < stopBeat) {
             data = detectRhythm(beat, stopBeat - beat, events, n + 1, { maxDivision: 1 });

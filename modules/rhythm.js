@@ -197,6 +197,7 @@ function run(minDivision, maxDivision, startBeat, maxDuration, rhythm, count, ev
 
     // Ensure initial duration is power-of-2
     let duration = floorPow2(maxDuration);
+//console.trace(duration, maxDuration);
     let score = 0;
     while (duration > minDivision) {
         // Find minimum divisor
@@ -210,7 +211,13 @@ function run(minDivision, maxDivision, startBeat, maxDuration, rhythm, count, ev
         let beat = startBeat;
         while (!rhythm
             && beat + duration <= startEvent[0]
-            && beat + duration < startBeat + maxDuration) beat += duration;
+            /*&& beat + duration < startBeat + maxDuration*/) beat += duration;
+
+        // If window has moved beyond maxDuration drop through to shorter duration
+        if (beat + duration > startBeat + maxDuration) {
+            duration /= 2;
+            continue;
+        }
 
         // Test oscillators at frequencies  duration
         let g = m - 1;
