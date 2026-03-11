@@ -21,9 +21,28 @@ const global  = globalThis || window;
 const assign  = Object.assign;
 const { abs, ceil, floor, min, max, pow, sqrt, round } = Math;
 const symbols = [];
-const STATE   = {
-    notes: []
-};
+const notes   = [];
+const STATE   = {};
+
+const rhythms = [];
+
+function detectRhythms(events, n, beat, duration, divisions) {
+    const startBeat = beat;
+    const stopBeat  = beat + duration;
+
+    rhythms.length = 0;
+    let data;
+    while (lt(stopBeat, beat, P16)) {
+        // Detect next rhythm data
+        data = detectRhythm(beat, stopBeat - beat, events, n + 1);
+        // If there's no data the rest of the bar is empty
+        if (!data) break;
+        // Update beat to end of data
+        beat = data.beat + data.duration;
+    }
+
+    return rhythms;
+}
 
 
 function toDrumSlug(number) {
@@ -179,7 +198,7 @@ export default class DrumStave extends Stave {
         return this.pitches[j];
     }
 
-    createSymbols(symbols, part, state, beat, duration, settings, fn) {
+    createSymbols(symbols, part, state, notes, beat, duration, settings, fn) {
         // Inside this fn beat is relative to bar
         const stave = this;
 
@@ -197,11 +216,11 @@ export default class DrumStave extends Stave {
         }
 
         // Insert heads
-        const { key, beam, notes, tuplet } = state;
+        const { key, beam, tuplet } = state;
         const noteSymbols = createNotes(stave, key, part, notes);
 
         // Empty note events, they have been consumed
-        notes.length = 0;
+        //notes.length = 0;
 
         if (!noteSymbols.length) return;
 
@@ -222,106 +241,91 @@ export default class DrumStave extends Stave {
 
         // Push note symbols on to beam
         if (beam) push(beam, ...noteSymbols);
+        // Return note symbols
+        return noteSymbols;
     }
 
     createRhythmSymbols(symbols, part, state, settings, data, startBeat, events, n) {
-        const { notes } = state;
         const { duration, divisor, rhythm } = data;
         const division  = duration / divisor;
         const stave     = this;
 
         let { beat } = data;
         let event;
+        notes.length = 0;
 
-        if (divisor === 2) {
-            switch (rhythm) {
-                case 1:
-                    // Fill notes with events playing during division, and leave
-                    // event as the first event in the next division
-                    while ((event = events[++n]) && event[0] < beat + 0.5 * division) notes.push(event);
-                    --n;
-                    this.createSymbols(symbols, part, state, beat - startBeat, min(1, duration), settings);
-                    // Return beat
-                    return beat + min(1, duration);
+        // Get the binary representation of the rhythm
+        const rh = data.rhythm.toString(2);
+        // Loop through rhythm divisions, count from
+        let i = -1;
+        while (++i < divisor) {
+            // Query the binary string from its end backwards
+            if (rh[rh.length - 1 - i] === '1') {
+                // Division has notes
+console.log('•', beat, division, divisor, data.rhythm, rh, i, events);
+                // Fill notes with events playing during division, leaving event as
+                // the first event in the next division
+                while ((event = events[++n]) && event[0] < beat + 0.5 * division) notes.push(event);
+                --n;
+                // Sort notes by pitch order, descending (ascending row order)
+                //if (stave.pitched) notes.sort(byRow);
+                // Must have notes, the rhythm detector said so!
+if (!notes.length) throw new Error('THIS SHOULD NOT BE POSSIBLE');
+                // Impose max note duration
+                const d = min(1, division);
+                // Insert second half
+                state.notes = this.createSymbols(symbols, part, state, notes, beat - startBeat, d, settings);
+                // Insert rests where max note duration is less than division
+                createRests(symbols, settings.restDurations, divisor, this, part, beat + d - startBeat, beat + division - startBeat);
+                notes.length = 0;
+            }
+            else {
+                // Division has no notes
+console.log('X', beat, division, divisor, data.rhythm, rh, i, events);
 
-                case 2:
-                    beat += division;
-                    // Fill notes with events playing during division, and leave
-                    // event as the first event in the next division
-                    while ((event = events[++n]) && event[0] < beat + 0.5 * division) notes.push(event);
-                    --n;
-                    // Insert second half
-                    this.createSymbols(symbols, part, state, beat - startBeat, min(1, division), settings);
-                    // Return beat
-                    return beat + min(1, division);
-
-                case 3:
-                    // Fill notes with events playing during division, and leave
-                    // event as the first event in the next division
-                    while ((event = events[++n]) && event[0] < beat + 0.5 * division) notes.push(event);
-                    --n;
-                    // Insert first half
-                    this.createSymbols(symbols, part, state, beat - startBeat, min(1, division), settings);
-
-                    if (min(1, division) < division) {
-                        createRests(symbols, settings.restDurations, divisor, this, part, startBeat, beat + division, beat + min(1, division));
+                // If this is the first slot in a duplet shorter than 4 beats...
+                if (duration < 4 && divisor === 2 && i === 0) {
+                    // HACK to back up and dot the previous note. There MUST be
+                    // a better way.
+                    /*let u = symbols.length;
+                    let has;
+                    while (symbols[--u] && symbols[u].beat >= data.beat - data.duration - startBeat) {
+                        if (symbols[u].type === 'note' && symbols[u].beat === data.beat - data.duration - startBeat) {
+                            symbols[u].duration = 1.5 * data.duration;
+                            has = true;
+                        }
                     }
+                    if (has) while (symbols[++u]) {
+                        if (symbols[u].type === 'rest') {
+                            symbols.splice(u, 1);
+                            --u;
+                        }
+                    }*/
+                }
 
-                    beat += division;
-                    // Fill notes with events playing during division, and leave
-                    // event as the first event in the next division
-                    while ((event = events[++n]) && event[0] < beat + 0.5 * division) notes.push(event);
-                    --n;
-                    // Insert second half
-                    this.createSymbols(symbols, part, state, beat - startBeat, min(1, division), settings);
-                    // Return beat
-                    return beat + min(1, division);
+                // If this is the second slot in a duplet shorter than 2 beats...
+                if (duration < 2 && divisor === 2 && i === 1) {
+                    // ...give notes in the first slot full duration
+                    let n = -1, note;
+                    while (note = state.notes[++n]) note.duration = duration;
+                    // ...and if duration longer than an eighth cancel any beam
+                    if (duration > 0.5) state.beam = undefined;
+                }
+                // If this is anything other than the first slot in a duplet...
+                else if (divisor !== 2 || i !== 0) {
+                    //createRests(symbols, settings.restDurations, divisor, this, part, beat - startBeat, beat + division - startBeat);
+                    symbols.push({
+                        type: 'rest',
+                        beat:     beat - startBeat,
+                        duration: division,
+                        stave,
+                        part
+                    });
+                }
             }
-        }
 
-        let d = -1;
-        // While beat is before end of tuplet
-        while (++d < divisor) {
-            beat = data.beat + d * division;
-
-            // Fill notes with events playing during division, and leave
-            // event as the first event in the next division
-            while ((event = events[++n]) && event[0] < beat + 0.5 * division) notes.push(event);
-            --n;
-
-            // Sort notes by pitch order, descending (ascending row order)
-            //if (stave.pitched) notes.sort(byRow);
-
-            // If notes is empty insert rest
-            if (!notes.length) {
-                symbols.push({
-                    type: 'rest',
-                    beat:     beat - startBeat,
-                    duration: division,
-                    stave,
-                    part
-                });
-
-                continue;
-            }
-/*
-            const stopBeat = min(
-                // Max stop beat of notes
-                notes.reduce(toMaxStopBeat, 0),
-                // Start beat of next event, if it exists, or end of bar
-                event && event[0] : stopBeat,
-                // Beat at end of tuplet
-                tuplet.beat + tuplet.duration
-            );
-
-            const duration = max(
-                // Min duration is 1 tuplet division
-                division,
-                // Distance to stop beat rounded to nearest division
-                roundTo(division, stopBeat - beat)
-            );
-*/
-            this.createSymbols(symbols, part, state, beat - startBeat, division, settings);
+            // Update beat
+            beat += division;
         }
 
         // Return beat
@@ -334,12 +338,9 @@ export default class DrumStave extends Stave {
         const state     = STATE;
         const stave     = this;
 
-//console.log('createPart "' + part.name + '"', 'beat', startBeat);
-
-        state.notes.length = 0;
-        state.beam         = undefined;
-        state.tuplet       = undefined;
-        symbols.length     = 0;
+        state.beam      = undefined;
+        state.tuplet    = undefined;
+        symbols.length  = 0;
 
         let n = -1;
         let event;
@@ -350,10 +351,11 @@ export default class DrumStave extends Stave {
         while ((event = events[++n]) && lt(beat, event[0], P16));
         --n;
 
+//        const rhythms = detectRhythms(events, n + 1, beat, duration, divisions);
+        let data, previousData;
         while (beat < stopBeat) {
-            const data = detectRhythm(beat, stopBeat - beat, events, n + 1);
-//console.log('RTM', 'startBeat', startBeat, 'stopBeat', stopBeat, 'beat', beat, 'data.beat', data.beat, 'data.duration', data.duration, 'data.rhythm', data.rhythm);
-
+            data = detectRhythm(beat, stopBeat - beat, events, n + 1, { maxDivision: 1 });
+//console.log(beat, JSON.stringify(data));
             // If there's a beam and beat is on a division close it
             if (state.beam && divisions.find((division) => eq(beat - startBeat, division, P16))
                 // or head started after a new division
@@ -363,99 +365,85 @@ export default class DrumStave extends Stave {
                 state.beam = undefined;
             }
 
-            if (!data.count) {
-                //beat = data.beat + data.duration;
-                // Create rests up to rhythm
-                const b2 = data.beat + data.duration;
-                if (gt(beat, b2, P16)) createRests(symbols, settings.restDurations, divisor, this, part, startBeat, b2, beat);
-                beat = b2;
-                continue;
-            }
-
             const { beam } = state;
 
-            switch (data.divisor) {
-                case 2:
-                    // HACK to back up and dit the previous note. There MUST be
-                    // a better way.
-                    if (data.rhythm === 2) {
-                        let u = symbols.length;
-                        while (symbols[--u] && symbols[u].beat === data.beat - data.duration - startBeat) {
-                            if (symbols[u].type === 'note') {
-                                symbols[u].duration = 1.5 * data.duration;
-                                beat = data.beat + 0.5 * data.duration;
-                            }
+            if (data) {
+                switch (data.divisor) {
+                    case 2:
+                        // If we are rendering swing rhythms decide whether a duplet
+                        // should render as a tuplet
+                        if (data.rhythm === 1) {
+                            break;
                         }
-                    }
+                        else if (data.duration === 1) {
+                            if (!settings.swingAsStraight8ths) break;
+                        }
+                        else if (data.duration === 0.5) {
+                            if (!settings.swingAsStraight16ths) break;
+                        }
+                        else {
+                            break;
+                        }
 
-                    // If we are rendering swing rhythms decide whether a duplet
-                    // should render as a tuplet
-                    if (data.rhythm === 1) {
-                        break;
-                    }
-                    else if (data.duration === 1) {
-                        if (!settings.swingAsStraight8ths) break;
-                    }
-                    else if (data.duration === 0.5) {
-                        if (!settings.swingAsStraight16ths) break;
-                    }
-                    else {
-                        break;
-                    }
+                    case 3:
+                        // Convert eighth note swing rhythms to duplets
+                        if (settings.swingAsStraight8ths && data.duration === 1) {
+                            straighten(data);
+                            break;
+                        }
 
-                case 3:
-                    // Convert eighth note swing rhythms to duplets
-                    if (settings.swingAsStraight8ths  && data.duration === 1) {
-                        straighten(data);
-                        break;
-                    }
+                        // Convert sixteenth note shuffle rhythms to duplets
+                        if (settings.swingAsStraight16ths && data.duration === 0.5) {
+                            straighten(data);
+                            break;
+                        }
 
-                    // Convert sixteenth note shuffle rhythms to duplets
-                    if (settings.swingAsStraight16ths && data.duration === 0.5) {
-                        straighten(data);
-                        break;
-                    }
+                    default:
+                        // Turn rhythm data into tuplet symbol
+                        const tuplet = {
+                            type: 'tuplet',
+                            part,
+                            beat:     data.beat - startBeat,
+                            duration: data.duration,
+                            divisor:  data.divisor,
+                            rhythm:   data.rhythm,
+                            stave:    this
+                        };
 
-                default:
-                    // Turn rhythm data into tuplet symbol
-                    const tuplet = {
-                        type: 'tuplet',
-                        part,
-                        beat:     data.beat - startBeat,
-                        duration: data.duration,
-                        divisor:  data.divisor,
-                        rhythm:   data.rhythm,
-                        stave:    this
-                    };
+                        symbols.push(tuplet);
+                        state.tuplet = tuplet;
 
-                    symbols.push(tuplet);
-                    state.tuplet = tuplet;
-
-                    // Close beam if there any holes in tuplet
-                    if (beam && hasHoles(data.divisor, data.rhythm)) {
-                        closeBeam(symbols, stave, part, beam);
-                        state.beam = undefined;
-                    }
-            }
-
-            // Create rests up to rhythm
-            const b2 = data.beat + (data.rhythm === 2 ? data.duration / 2 : 0);
-            if (gt(beat, b2, P16)) createRests(symbols, settings.restDurations, divisor, this, part, startBeat, b2, beat);
-
-            beat = this.createRhythmSymbols(symbols, part, state, settings, data, startBeat, events, n);
-
-            if (state.tuplet) {
-                closeTuplet(this, part, state.tuplet);
-                state.tuplet = undefined;
-
-                // If there's still a beam close it
-                if (state.beam) {
-                    closeBeam(symbols, stave, part, state.beam);
-                    state.beam = undefined;
+                        // Close beam if there any holes in tuplet
+                        if (beam && hasHoles(data.divisor, data.rhythm)) {
+                            closeBeam(symbols, stave, part, beam);
+                            state.beam = undefined;
+                        }
                 }
             }
 
-            n = data.index + data.count - 1;
+            // Create rests up to rhythm
+            const b2 = data ?
+                data.beat + (data.rhythm === 2 ? data.duration / 2 : 0) :
+                stopBeat ;
+            if (gt(beat, b2, P16)) createRests(symbols, settings.restDurations, divisor, this, part, beat - startBeat, b2 - startBeat);
+            beat = b2;
+
+            if (data) {
+                beat = this.createRhythmSymbols(symbols, part, state, settings, data, startBeat, events, n);
+
+                if (state.tuplet) {
+                    closeTuplet(this, part, state.tuplet);
+                    state.tuplet = undefined;
+
+                    // If there's still a beam close it
+                    if (state.beam) {
+                        closeBeam(symbols, stave, part, state.beam);
+                        state.beam = undefined;
+                    }
+                }
+
+                n = data.index + data.count - 1;
+            }
         }
 
         // If there's still a beam close it

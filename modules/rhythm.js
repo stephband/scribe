@@ -84,7 +84,7 @@ function compare(beat, duration, divisor, rhythm, length, count, r, i, score, re
         case 3:
             // Don't permit the triplet rhythms 010 or 110, let them fall
             // through to the shorter duration 001 and 101
-            //if (rhythm === 2 || rhythm === 3) return score;
+            if (rhythm === 2 || rhythm === 3) return score;
             break;
         default:
             // Reject higher order rhythms with consecutive holes
@@ -256,6 +256,10 @@ export default function detectRhythm(beat, duration, events, index = 0, options)
     let n = index - 1;
     while (events[++n] !== undefined && events[n][0] < beat);
 
+    // If no event in window, quick out
+    if (!events[n]) return;
+    if (events[n][0] >= beat + duration) return;
+
     // If events were found before beat they are assumed to be hangovers from
     // the end of a previous analysis window that were not counted as rhythm,
     // they are now counted as rhythm in slot 0
@@ -280,12 +284,9 @@ export default function detectRhythm(beat, duration, events, index = 0, options)
         count
     };
 
-    // If no event in window, quick out
-    if (!events[n]) return result;
-    if (events[n][0] >= beat + duration) return result;
-
     // Run the analysis
     if (DEBUG) analytics.length = 0;
+
     return run(minDivision, maxDivision, beat, duration, rhythm, count, events, n, result, stopBeatInfluence);
 }
 

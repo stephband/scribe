@@ -130,12 +130,12 @@ function fitDuration(durations, divisor, beat, stopBeat, eventBeat) {
     }
 }
 
-export function createRests(symbols, durations, divisor, stave, part, startBeat, stopBeat, beat) {
+export function createRests(symbols, durations, divisor, stave, part, beat, stopBeat) {
     // Insert rests beat - stopBeat
     while (lt(stopBeat, beat, P16)) {
         const rest = {
             type: 'rest',
-            beat: beat - startBeat,
+            beat,
             duration: fitDuration(durations, divisor, beat, stopBeat, stopBeat),
             stave,
             part
