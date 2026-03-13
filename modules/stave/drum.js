@@ -259,7 +259,7 @@ console.log('–––––––––––––––', JSON.stringify(data
         // Loop through rhythm divisions, count from
         let i = -1;
         while (++i < divisor) {
-            // Query the binary string from the first slot, its end, backwards
+            // Query the binary string from its end (the first slot) backwards
             if (rh[rh.length - 1 - i] === '1') {
                 // Division has notes
 console.log('✓', beat, duration, divisor, rh);
@@ -270,7 +270,7 @@ console.log('✓', beat, duration, divisor, rh);
 if (!notes.length) throw new Error('THIS SHOULD NOT BE POSSIBLE');
                 // Sort notes by pitch order, descending (ascending row order)
                 //if (stave.pitched) notes.sort(byRow);
-                // Impose max note duration
+                // Impose max note duration, drum notation only has black notes
                 const d = min(1, division);
                 // Insert note symbols
                 state.notes = this.createSymbols(symbols, part, state, notes, beat - startBeat, d, settings);
