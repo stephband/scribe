@@ -255,9 +255,7 @@ export default function detectRhythm(beat, duration, events, index = 0, options)
     const stopBeatInfluence = options?.stopBeatInfluence || defaults.stopBeatInfluence;
 
     // Duration must be at least minDivision
-    if (duration < minDivision) {
-        throw new Error(`detectRhythm() - duration (${ duration }) must be at least ${ minDivision }`);
-    }
+    if (duration < minDivision) return;
 
     // Find first event after index in analysis window
     let n = index - 1;

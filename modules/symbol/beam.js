@@ -23,7 +23,7 @@ export function closeBeam(symbols, stave, part, beam) {
     let n = -1;
     while (beam[++n] && beam[n].beat === beam.beat);
     // If there is only notes on start beat of beam, no beam needed
-    if (!beam[n]) return symbols;
+    if (!beam[n]) return;
 
     const startBeat = beam[0].beat;
     const stopBeat  = last(beam).beat;
@@ -61,7 +61,7 @@ export function closeBeam(symbols, stave, part, beam) {
             id: ++beamId
         }));
 
-        return symbols;
+        return;
     }
 
     // Calculate beam positions
@@ -153,6 +153,4 @@ export function closeBeam(symbols, stave, part, beam) {
         range,
         id: ++beamId
     }));
-
-    return symbols;
 }
