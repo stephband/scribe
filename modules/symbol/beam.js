@@ -19,6 +19,7 @@ export function createBeam(part, beat) {
 }
 
 export function closeBeam(symbols, stave, part, beam) {
+    if (!beam) return;
     // Scan through beam symbols to find note not on beat of beam
     let n = -1;
     while (beam[++n] && beam[n].beat === beam.beat);

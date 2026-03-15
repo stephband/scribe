@@ -312,20 +312,14 @@ export default class DrumStave extends Stave {
         let data, previousData;
         while (data = detectRhythm(beat, stopBeat - beat, events, n + 1, { maxDivision: 1 })) {
             // Tuplet
-            const tuplet = createTuplet(settings, stave, part, startBeat, data);
+            const tuplet   = createTuplet(settings, stave, part, startBeat, data);
             const { rhythm, duration, divisor } = data;
             const division = duration / divisor;
-
-            // If there's a tuplet...
-            if (tuplet) symbols.push(tuplet);
-
-console.log('–––––––––––––––', JSON.stringify(data));
-            // Get the binary representation of the rhythm
-            const r = rhythm.toString(2);
-            // Loop through rhythm divisions
-            let i = -1;
+            const r        = rhythm.toString(2);
 
             if (tuplet) {
+                // Push it in
+                symbols.push(tuplet);
                 // Fill with rests up to start of tuplet
                 createRests(symbols, settings.restDurations, barDivisor, this, part, beat - startBeat, data.beat - startBeat);
                 // Set beat to start of tuplet
@@ -333,6 +327,7 @@ console.log('–––––––––––––––', JSON.stringify(data
                 // if there is a beam, close it
                 if (beam) beam = closeBeam(symbols, stave, part, beam);
                 // Loop through tuplet divisions
+                let i = -1;
                 while (++i < divisor) {
                     // Query the binary from its end (the first division) backwards
                     if (r[r.length - 1 - i] === '1') {
@@ -340,7 +335,6 @@ console.log('–––––––––––––––', JSON.stringify(data
                         notes.length = 0;
                         while ((event = events[++n]) && event[0] < beat + 0.5 * division) notes.push(event);
                         --n;
-if (!notes.length) throw new Error('THIS SHOULD NOT BE POSSIBLE');
                         // Sort notes by pitch order, descending (ascending row order)
                         //if (stave.pitched) notes.sort(byRow);
                         // Impose max note duration, drum notation only has black notes
@@ -375,11 +369,11 @@ if (!notes.length) throw new Error('THIS SHOULD NOT BE POSSIBLE');
                 if (beam) beam = closeBeam(symbols, stave, part, beam);
             }
             else {
+                // Loop through rhythm divisions
+                let i = -1;
                 while (++i < divisor) {
                     // Query the binary string from its end (the first division) backwards
                     if (r[r.length - 1 - i] === '1') {
-                        // Division has notes
-console.log('✓', beat, data.beat + i * division, data.duration, data.divisor, r);
                         // Render up to division
                         if (state.notes.length) {
                             const b1 = state.notes[0].beat;
@@ -392,9 +386,6 @@ console.log('✓', beat, data.beat + i * division, data.duration, data.divisor, 
                                 noteDurations.includes(b2 - b1) ? b2 - b1 : state.notes[0].duration : // floorPow2(min(1, b2 - b1)) :
                                 // Duration up to next bar division
                                 noteDurations.includes(v2 - b1) ? v2 - b1 : state.notes[0].duration ; // floorPow2(min(1, v2 - b1)) ;
-
-console.log('Extend notes from', b1, 'to', b2, duration);
-//if (!duration) throw new Error('SHOULD NEVER HAPPEN');
 
                             // If last notes have a duration too long for a beam
                             if (gte(1, duration, P24)) {
@@ -430,17 +421,12 @@ console.log('Extend notes from', b1, 'to', b2, duration);
                         notes.length = 0;
                         while ((event = events[++n]) && event[0] < beat + 0.5 * division) notes.push(event);
                         --n;
-
-if (!notes.length) throw new Error('THIS SHOULD NOT BE POSSIBLE');
-
                         // Sort notes by pitch order, descending (ascending row order)
                         //if (stave.pitched) notes.sort(byRow);
                         // Impose max note duration, drum notation only has black notes
                         const d = min(1, division);
                         // Insert note symbols
                         state.notes = this.createSymbols(symbols, part, key, tuplet, notes, beat - startBeat, d, settings);
-                        // Note events have been consumed
-                        notes.length = 0;
                         // Update beat to division end
                         beat = data.beat + i * division + division;
                     }
@@ -472,11 +458,10 @@ if (!notes.length) throw new Error('THIS SHOULD NOT BE POSSIBLE');
             beat = b1 + duration + startBeat;
         }
 
-        // Create rests to stopBeat
-        createRests(symbols, settings.restDurations, barDivisor, this, part, beat - startBeat, stopBeat - startBeat);
-
         // If there's still a beam close it
         if (beam) beam = closeBeam(symbols, stave, part, beam);
+        // Create rests to stopBeat
+        createRests(symbols, settings.restDurations, barDivisor, this, part, beat - startBeat, stopBeat - startBeat);
 
         state.notes.length = 0;
         return symbols;
