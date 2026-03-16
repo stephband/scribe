@@ -335,13 +335,13 @@ in their duration span. */
 .bar > .up-beam {
 	margin-left: calc(-1em * var(--stem-width));
 	margin-right: calc(-1 * var(--bar-column-gap));
-	transform: translate(calc(1em * var(--head-1-size)), calc(1em * var(--translate-y, 0)));
+	transform: translate3d(calc(1em * var(--head-1-size)), calc(1em * var(--translate-y, 0)), 0);
 }
 
 .bar > .down-beam {
 	margin-left:  0;
 	margin-right: calc(-1em * var(--stem-width) - var(--bar-column-gap));
-	transform: translate(0, calc(1em * var(--translate-y, 0)));
+	transform: translate3d(0, calc(1em * var(--translate-y, 0)), 0);
 }
 
 /* Words */

@@ -268,7 +268,7 @@ export default class DrumStave extends Stave {
     createSymbols(symbols, part, key, tuplet, notes, beat, duration, settings, fn) {
         // Inside this fn beat is relative to bar
         const stave = this;
-
+console.log('NOTES', notes);
         // Insert heads
         const noteSymbols = createNotes(stave, key, part, notes);
         if (!noteSymbols.length) return noteSymbols;

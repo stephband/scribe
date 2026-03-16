@@ -6,22 +6,24 @@ https://web.mit.edu/merolish/Public/drums.pdf
 */
 
 .percussion-stave {
+    padding-top: 0.0625em;
+    padding-bottom: 0.0625em;
     grid-template-rows:
-        [max cymbals-beam] 0.125em
+        [max] 0.125em
         0.125em
-        [chords] 0.125em
         0.125em
         0.125em
         [stave-top] 0.125em
         0.125em
-        [stave-center stave-top] 0.125em
+        0.125em
+        [stave-center] 0.125em
+        0.125em
         0.125em
         0.125em
         [stave-bottom] 0.125em
         0.125em
         0.125em
-        0.125em
-        [drums-beam lyrics] 0.125em
+        [lyrics] 0.125em
         [min];
 
     /*background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 -2.5 1 5" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">\
@@ -45,6 +47,10 @@ https://web.mit.edu/merolish/Public/drums.pdf
 /* Just a precaution. */
 .percussion-stave > .acci {
     display: none !important;
+}
+
+.percussion-stave > .beam {
+    grid-row-start: stave-center;
 }
 
 

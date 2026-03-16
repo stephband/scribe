@@ -51,8 +51,8 @@
     transform-origin: -0.2333em 50%;
 }
 
-.up-tuplet[data-duration^="0."][data-rhythm^="111"],
-.up-tuplet[data-duration="1"][data-rhythm^="111"],
+.up-tuplet[data-duration^="0."][data-rhythm^="1"][data-rhythm$="1"],
+.up-tuplet[data-duration="1"][data-rhythm^="1"][data-rhythm$="1"],
 .up-tuplet[data-duration="2"]:not([data-divisor="3"]),
 .up-tuplet[data-duration="4"][data-divisor="9"] {
     /* Center tuplet numbers on top of beams. A tuplet is definitely beamed if
@@ -61,10 +61,10 @@
     justify-content: center;
 }
 
-.up-tuplet[data-duration^="0."][data-rhythm^="111"]::before,
-.up-tuplet[data-duration^="0."][data-rhythm^="111"]::after,
-.up-tuplet[data-duration="1"][data-rhythm^="111"]::before,
-.up-tuplet[data-duration="1"][data-rhythm^="111"]::after,
+.up-tuplet[data-duration^="0."][data-rhythm^="1"][data-rhythm$="1"]::before,
+.up-tuplet[data-duration^="0."][data-rhythm^="1"][data-rhythm$="1"]::after,
+.up-tuplet[data-duration="1"][data-rhythm^="1"][data-rhythm$="1"]::before,
+.up-tuplet[data-duration="1"][data-rhythm^="1"][data-rhythm$="1"]::after,
 .up-tuplet[data-duration="2"]:not([data-divisor="3"])::before,
 .up-tuplet[data-duration="2"]:not([data-divisor="3"])::after,
 .up-tuplet[data-duration="4"][data-divisor="9"]::before,

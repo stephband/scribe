@@ -38,8 +38,10 @@ export function toBarElements(elements, bar) {
             beat:     bar.beat,
             duration: bar.duration,
             count:    bar.count,
-            key:      toKeyName(bar.key),
-            stave:    bar.stave.type
+            stave:    bar.stave.type,
+            key:      bar.stave.pitched ?
+                toKeyName(bar.key) :
+                undefined
         },
         children: bar.symbols.reduce(toElements, [])
     }));
@@ -88,7 +90,6 @@ export function renderElements(sequence, excludes, clef, keyname, meter, duratio
 
     // Creates stave with clef and key signature
     const bar0      = bars[0];
-    //const key       = rootToKeyNumber(bar0.key);
     const key       = toKeyNumber(bar0.key);
     const signature = stave.createSignatureSymbols(key);
 
@@ -96,7 +97,11 @@ export function renderElements(sequence, excludes, clef, keyname, meter, duratio
     const sidebar = create('div', {
         class: `${ stave.type }-stave signature-stave stave`,
         children: signature.map(createElement),
-        data: { key: toKeyName(key) }
+        data: {
+            key: stave.pitched ?
+                toKeyName(key) :
+                undefined
+        }
     });
 
     const column = create('div', {

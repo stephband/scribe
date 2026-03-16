@@ -56,9 +56,58 @@
 </head>
 <body>
     <section class="grid dense-grid" style="row-gap: 0;">
+        <h2 class="x1 2x">Percussion</h2>
+
+        <scribe-music class="x1" clef="percussion" src="#percussion-1">
+            <script type="application/json" id="percussion-1">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [2,    "note", "F3", 0.1, 0.6],
+                    [3,    "note", "F3", 0.1, 0.2],
+                    [3.63, "note", "F3", 0.1, 0.2]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1" clef="percussion" src="#percussion-2" debug>
+            <script type="application/json" id="percussion-2">{
+                "events": [
+                    [0, "meter", 3, 1],
+                    [4,     "note", 42, 0.25, 0.5],
+                    [4.375, "note", 42, 0.25, 0.5],
+                    [4.5,   "note", 42, 0.25, 0.5],
+                    [4.625, "note", 42, 0.25, 0.5],
+                    [4.75,  "note", 42, 0.25, 0.5],
+                    [4.875, "note", 42, 0.25, 0.5]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1" clef="percussion" src="#percussion-3" debug>
+            <script type="application/json" id="percussion-3">{
+                "events": [
+                    [0, "meter", 4, 1],
+
+                    [18,    "note", 42, 0.25, 2],
+                    [20,    "note", 42, 0.25, 2],
+                    [25,    "note", 42, 0.25, 3],
+                    [31,    "note", 42, 0.25, 4],
+                    [32,    "note", 42, 0.25, 2],
+                    [34,    "note", 42, 0.25, 2],
+
+                    [38,    "note", 42, 0.25, 0.25],
+                    [40,    "note", 42, 0.25, 0.25],
+                    [45,    "note", 42, 0.25, 0.25],
+                    [48,    "note", 42, 0.25, 0.25],
+                    [52,    "note", 42, 0.25, 0.25],
+                    [54,    "note", 42, 0.25, 0.25]
+                ]
+            }</script>
+        </scribe-music>
+
         <h2 class="x1 2x">Drums</h2>
 
-        <scribe-music class="x1" clef="drum" src="#drum-0" swing debug>
+        <!--scribe-music class="x1" clef="drum" src="#drum-0" swing debug>
             <script type="application/json" id="drum-0">{
                 "events": [
                     [0, "meter", 4, 1],

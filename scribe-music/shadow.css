@@ -98,7 +98,8 @@
     flex: 6 1;
 }
 
-:host([clef="drum"]) {
+:host([clef="drum"]),
+:host([clef="percussion"]) {
     --signature-width: 1em;
 }
 
@@ -133,6 +134,11 @@
 
 .side > .bar + .bar > .clef {
     display: block;
+}
+
+.side + .bar.drum-stave,
+.side + .bar.percussion-stave {
+    --bar-padding-left: 0.125em;
 }
 
 :host > .bar,
