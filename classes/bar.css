@@ -341,7 +341,8 @@ in their duration span. */
 }
 
 .bar > .beam-note:has([data-glyph="headX"]) + .up-beam {
-    /* TODO: This does, but the selector is dodgy, it doesnt target exactly what we need to target */
+    /* TODO: This does, but the selector is dodgy, it doesnt target exactly what
+       we need to target, it gets the last note of a beam rather than the first */
     transform: translate3d(calc(1em * var(--head-x-size) - 0.5px), calc(1em * var(--translate-y, 0) - 0.2px), 0);
 }
 
