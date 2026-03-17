@@ -53,6 +53,11 @@ https://web.mit.edu/merolish/Public/drums.pdf
     grid-row-start: stave-center;
 }
 
+.percussion-stave > .up-beam.beam {
+    /* Related to beamThickness in beam.js - TODO: expose beamThickness as CSS var */
+    --translate-y: 0.00625;
+}
+
 
 /* Moved all pitched symbols to the central stave line. Selectors must match
    the importance of data-pitch selectors found on the base class .stave, hence

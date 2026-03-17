@@ -5,6 +5,7 @@ import * as glyphs       from "../glyphs.js";
 import config            from '../config.js';
 import Stave             from './stave.js';
 import { eq, gte, lte, lt, gt } from '../number/float.js';
+import nearest           from '../number/nearest.js';
 import { floorPow2 }     from '../number/power-of-2.js';
 import push              from '../object/push.js';
 import { createAccents } from '../symbol/accent.js';
@@ -23,7 +24,7 @@ const assign  = Object.assign;
 const { abs, ceil, floor, min, max, pow, sqrt, round } = Math;
 const symbols = [];
 const notes   = [];
-const STATE   = { notes: [] };
+const NOTESYMBOLS = [];
 
 
 function toDrumSlug(number) {
@@ -268,7 +269,7 @@ export default class DrumStave extends Stave {
     createSymbols(symbols, part, key, tuplet, notes, beat, duration, settings, fn) {
         // Inside this fn beat is relative to bar
         const stave = this;
-console.log('NOTES', notes);
+
         // Insert heads
         const noteSymbols = createNotes(stave, key, part, notes);
         if (!noteSymbols.length) return noteSymbols;
@@ -293,13 +294,12 @@ console.log('NOTES', notes);
     }
 
     createPartSymbols(key, accidentals, part, events, beat, duration, barDivisions, barDivisor, settings) {
-        const startBeat = beat;
-        const stopBeat  = beat + duration;
-        const state     = STATE;
-        const stave     = this;
+        const startBeat   = beat;
+        const stopBeat    = beat + duration;
+        const stave       = this;
 
         let n = -1;
-        let beam, event, tuplet;
+        let beam, event, tuplet, noteSymbols;
 
         symbols.length = 0;
 
@@ -340,13 +340,13 @@ console.log('NOTES', notes);
                         // Impose max note duration, drum notation only has black notes
                         const d = min(1, division);
                         // Insert note symbols
-                        state.notes = this.createSymbols(symbols, part, key, tuplet, notes, beat - startBeat, d, settings);
+                        noteSymbols = this.createSymbols(symbols, part, key, tuplet, notes, beat - startBeat, d, settings);
                         // If division is short enough for a beam
                         if (division < 0.5) {
                             // ...make sure there is a beam
                             if (!beam) beam = createBeam(part, beat - startBeat);
                             // ...and push note symbols on to it
-                            push(beam, ...state.notes);
+                            push(beam, ...noteSymbols);
                         }
                     }
                     else {
@@ -375,17 +375,17 @@ console.log('NOTES', notes);
                     // Query the binary string from its end (the first division) backwards
                     if (r[r.length - 1 - i] === '1') {
                         // Render up to division
-                        if (state.notes.length) {
-                            const b1 = state.notes[0].beat;
+                        if (noteSymbols && noteSymbols.length) {
+                            const b1 = noteSymbols[0].beat;
                             const b2 = data.beat + i * division - startBeat;
                             const v1 = getDivisionBefore(barDivisions, b1);
                             const v2 = getDivisionAfter(barDivisions, b1);
                             const v3 = getDivisionBefore(barDivisions, b2);
                             const duration = v1 === v3 ?
                                 // Duration up to rhythm divisor
-                                noteDurations.includes(b2 - b1) ? b2 - b1 : state.notes[0].duration : // floorPow2(min(1, b2 - b1)) :
+                                noteDurations.includes(b2 - b1) ? b2 - b1 : noteSymbols[0].duration : // floorPow2(min(1, b2 - b1)) :
                                 // Duration up to next bar division
-                                noteDurations.includes(v2 - b1) ? v2 - b1 : state.notes[0].duration ; // floorPow2(min(1, v2 - b1)) ;
+                                noteDurations.includes(v2 - b1) ? v2 - b1 : noteSymbols[0].duration ; // floorPow2(min(1, v2 - b1)) ;
 
                             // If last notes have a duration too long for a beam
                             if (gte(1, duration, P24)) {
@@ -397,21 +397,25 @@ console.log('NOTES', notes);
                                 // ...make sure there is a beam
                                 if (!beam) beam = createBeam(part, b1);
                                 // ...and push note symbols on to it
-                                push(beam, ...state.notes);
+                                push(beam, ...noteSymbols);
                             }
                             // If there is a beam
                             else if (beam) {
                                 // ...push last note symbols on to it
-                                push(beam, ...state.notes);
+                                push(beam, ...noteSymbols);
                                 // ...and close it
                                 beam = closeBeam(symbols, stave, part, beam);
                             }
 
                             // Extend duration of notes
-                            setDurations(state.notes, duration);
+                            setDurations(noteSymbols, duration);
                             beat = b1 + duration + startBeat;
                         }
 
+                        // If gap is bigger than division stop the beam
+                        if (beam && gt(division, data.beat + i * division - beat, P24)) {
+                            beam = closeBeam(symbols, stave, part, beam);
+                        }
                         // Fill gap with rests
                         createRests(symbols, settings.restDurations, barDivisor, this, part, beat - startBeat, data.beat + i * division - startBeat);
                         // Update beat to division beginning
@@ -426,7 +430,7 @@ console.log('NOTES', notes);
                         // Impose max note duration, drum notation only has black notes
                         const d = min(1, division);
                         // Insert note symbols
-                        state.notes = this.createSymbols(symbols, part, key, tuplet, notes, beat - startBeat, d, settings);
+                        noteSymbols = this.createSymbols(symbols, part, key, tuplet, notes, beat - startBeat, d, settings);
                         // Update beat to division end
                         beat = data.beat + i * division + division;
                     }
@@ -438,10 +442,10 @@ console.log('NOTES', notes);
             n = data.index + data.count - 1;
         }
 
-        if (state.notes.length) {
-            const b1       = state.notes[0].beat;
+        if (noteSymbols && noteSymbols.length) {
+            const b1       = noteSymbols[0].beat;
             const b2       = stopBeat - startBeat;
-            const duration = getNotesDuration(barDivisions, b1, b2) || state.notes[0].duration;
+            const duration = getNotesDuration(barDivisions, b1, b2) || noteSymbols[0].duration;
 
             // If duration is not beamable, close beam
             if (gte(1, duration, P24)) {
@@ -450,12 +454,12 @@ console.log('NOTES', notes);
             }
             else if (beam) {
                 // Push note symbols on to it
-                push(beam, ...state.notes);
+                push(beam, ...noteSymbols);
             }
 
             // Set duration of notes
-            setDurations(state.notes, duration);
-            beat = b1 + duration + startBeat;
+            setDurations(noteSymbols, duration);
+            beat = nearest(P24, b1 + duration + startBeat);
         }
 
         // If there's still a beam close it
@@ -463,7 +467,6 @@ console.log('NOTES', notes);
         // Create rests to stopBeat
         createRests(symbols, settings.restDurations, barDivisor, this, part, beat - startBeat, stopBeat - startBeat);
 
-        state.notes.length = 0;
         return symbols;
     }
 }

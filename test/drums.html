@@ -55,10 +55,12 @@
     </script>
 </head>
 <body>
-    <section class="grid dense-grid" style="row-gap: 0;">
-        <h2 class="x1 2x">Percussion</h2>
+    <section class="grid" style="row-gap: 0;">
+        <h2 class="x1">Percussion</h2>
 
-        <scribe-music class="x1" clef="percussion" src="#percussion-1">
+        <h3 class="x1">Swing</h3>
+
+        <scribe-music class="x1 y-start" clef="percussion" src="#percussion-1">
             <script type="application/json" id="percussion-1">{
                 "events": [
                     [0, "meter", 4, 1],
@@ -69,8 +71,93 @@
             }</script>
         </scribe-music>
 
-        <scribe-music class="x1" clef="percussion" src="#percussion-2" debug>
+        <scribe-music class="x2 y-start" clef="percussion" src="#percussion-2">
             <script type="application/json" id="percussion-2">{
+                "events": [
+                    [0, "meter", 3, 1],
+                    [2,    "note", "F3", 0.1, 0.6],
+                    [3,    "note", "F3", 0.1, 0.2],
+                    [3.63, "note", "F3", 0.1, 0.2]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1 y-start" clef="percussion" src="#percussion-3" swing>
+            <script type="application/json" id="percussion-3">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [2,    "note", "F3", 0.1, 0.6],
+                    [3,    "note", "F3", 0.1, 0.2],
+                    [3.63, "note", "F3", 0.1, 0.2]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x2 y-start" clef="percussion" src="#percussion-4" swing>
+            <script type="application/json" id="percussion-4">{
+                "events": [
+                    [0, "meter", 3, 1],
+                    [2,    "note", "F3", 0.1, 0.6],
+                    [3,    "note", "F3", 0.1, 0.2],
+                    [3.63, "note", "F3", 0.1, 0.2]
+                ]
+            }</script>
+        </scribe-music>
+
+        <h3 class="x1">Shuffle</h3>
+
+        <scribe-music class="x1 y-start" clef="percussion" src="#percussion-5">
+            <script type="application/json" id="percussion-5">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [2,    "note", "F3", 0.1, 0.2],
+                    [2.33, "note", "F3", 0.1, 0.2],
+                    [2.5,  "note", "F3", 0.1, 0.2],
+                    [2.83, "note", "F3", 0.1, 0.2]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x2 y-start" clef="percussion" src="#percussion-6">
+            <script type="application/json" id="percussion-6">{
+                "events": [
+                    [0, "meter", 3, 1],
+                    [2,    "note", "F3", 0.1, 0.2],
+                    [2.33, "note", "F3", 0.1, 0.2],
+                    [2.5,  "note", "F3", 0.1, 0.2],
+                    [2.83, "note", "F3", 0.1, 0.2]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1 y-start" clef="percussion" src="#percussion-7" shuffle>
+            <script type="application/json" id="percussion-7">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [2,    "note", "F3", 0.1, 0.2],
+                    [2.33, "note", "F3", 0.1, 0.2],
+                    [2.5,  "note", "F3", 0.1, 0.2],
+                    [2.83, "note", "F3", 0.1, 0.2]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x2 y-start" clef="percussion" src="#percussion-8" shuffle>
+            <script type="application/json" id="percussion-8">{
+                "events": [
+                    [0, "meter", 3, 1],
+                    [2,    "note", "F3", 0.1, 0.2],
+                    [2.33, "note", "F3", 0.1, 0.2],
+                    [2.5,  "note", "F3", 0.1, 0.2],
+                    [2.83, "note", "F3", 0.1, 0.2]
+                ]
+            }</script>
+        </scribe-music>
+
+        <h3 class="x1">Dotted</h3>
+
+        <scribe-music class="x1 y-start" clef="percussion" src="#percussion-20" debug>
+            <script type="application/json" id="percussion-20">{
                 "events": [
                     [0, "meter", 3, 1],
                     [4,     "note", 42, 0.25, 0.5],
@@ -83,32 +170,518 @@
             }</script>
         </scribe-music>
 
-        <scribe-music class="x1" clef="percussion" src="#percussion-3" debug>
-            <script type="application/json" id="percussion-3">{
+        <h3 class="x1">Rests</h3>
+
+        <scribe-music class="x1 y-start" clef="percussion" src="#percussion-30" debug>
+            <script type="application/json" id="percussion-30">{
                 "events": [
-                    [0, "meter", 4, 1],
+                    [0, "meter", 3, 1],
 
-                    [18,    "note", 42, 0.25, 2],
-                    [20,    "note", 42, 0.25, 2],
-                    [25,    "note", 42, 0.25, 3],
-                    [31,    "note", 42, 0.25, 4],
-                    [32,    "note", 42, 0.25, 2],
-                    [34,    "note", 42, 0.25, 2],
+                    [6,     "note", 42, 0.25, 1],
+                    [9,     "note", 42, 0.25, 1],
+                    [12,    "note", 42, 0.25, 1],
+                    [15,    "note", 42, 0.25, 1],
 
+                    [18,    "note", 42, 0.25, 1],
+                    [19,    "note", 42, 0.25, 1],
+                    [21,    "note", 42, 0.25, 1],
+                    [22,    "note", 42, 0.25, 1],
+                    [24,    "note", 42, 0.25, 1],
+                    [25,    "note", 42, 0.25, 1],
+
+                    [28,    "note", 42, 0.25, 0.5],
+                    [28.5,  "note", 42, 0.25, 0.5],
+                    [29.5,  "note", 42, 0.25, 0.5],
+                    [30,    "note", 42, 0.25, 0.5],
+                    [31,    "note", 42, 0.25, 0.5],
+                    [31.5,  "note", 42, 0.25, 0.5],
+                    [32.5,  "note", 42, 0.25, 0.5],
+                    [33,    "note", 42, 0.25, 0.5],
+
+                    [36,    "note", 42, 0.25, 0.25],
+                    [36.25, "note", 42, 0.25, 0.25],
+                    [36.5,  "note", 42, 0.25, 0.25],
+                    [37.75, "note", 42, 0.25, 0.25],
                     [38,    "note", 42, 0.25, 0.25],
+                    [38.25, "note", 42, 0.25, 0.25],
+                    [39.5,  "note", 42, 0.25, 0.25],
+                    [39.75, "note", 42, 0.25, 0.25],
                     [40,    "note", 42, 0.25, 0.25],
-                    [45,    "note", 42, 0.25, 0.25],
+                    [41.25, "note", 42, 0.25, 0.25],
+                    [41.5,  "note", 42, 0.25, 0.25],
+                    [41.75, "note", 42, 0.25, 0.25],
+
                     [48,    "note", 42, 0.25, 0.25],
-                    [52,    "note", 42, 0.25, 0.25],
-                    [54,    "note", 42, 0.25, 0.25]
+                    [48.125,"note", 42, 0.25, 0.25],
+                    [48.25, "note", 42, 0.25, 0.25],
+                    [48.375,"note", 42, 0.25, 0.25],
+                    [49.75, "note", 42, 0.25, 0.25],
+                    [49.875,"note", 42, 0.25, 0.25],
+                    [50,    "note", 42, 0.25, 0.25],
+                    [50.125,"note", 42, 0.25, 0.25],
+                    [51.5,  "note", 42, 0.25, 0.25],
+                    [51.625,"note", 42, 0.25, 0.25],
+                    [51.75, "note", 42, 0.25, 0.25],
+                    [51.875,"note", 42, 0.25, 0.25],
+                    [53.25, "note", 42, 0.25, 0.25],
+                    [53.375,"note", 42, 0.25, 0.25],
+                    [53.5,  "note", 42, 0.25, 0.25],
+                    [53.625,"note", 42, 0.25, 0.25],
+
+                    [56,    "note", 42, 0.25, 0.25],
+                    [56.25, "note", 42, 0.25, 0.25],
+                    [56.5,  "note", 42, 0.25, 0.25],
+                    [56.75, "note", 42, 0.25, 0.25],
+                    [57,    "note", 42, 0.25, 0.25],
+                    [57.25, "note", 42, 0.25, 0.25],
+                    [57.5,  "note", 42, 0.25, 0.25],
+                    [57.75, "note", 42, 0.25, 0.25],
+                    [58,    "note", 42, 0.25, 0.25],
+                    [58.25, "note", 42, 0.25, 0.25],
+                    [58.5,  "note", 42, 0.25, 0.25],
+                    [58.75, "note", 42, 0.25, 0.25],
+                    [59,    "note", 42, 0.25, 0.25],
+                    [59.25, "note", 42, 0.25, 0.25],
+                    [59.5,  "note", 42, 0.25, 0.25],
+                    [59.75, "note", 42, 0.25, 0.25],
+                    [60,    "note", 42, 0.25, 0.25],
+                    [60.25, "note", 42, 0.25, 0.25],
+                    [60.5,  "note", 42, 0.25, 0.25],
+                    [60.75, "note", 42, 0.25, 0.25],
+                    [61,    "note", 42, 0.25, 0.25],
+                    [61.25, "note", 42, 0.25, 0.25],
+                    [61.5,  "note", 42, 0.25, 0.25],
+                    [61.75, "note", 42, 0.25, 0.25]
                 ]
             }</script>
         </scribe-music>
 
-        <h2 class="x1 2x">Drums</h2>
+        <scribe-music class="x2 y-start" clef="percussion" src="#percussion-31" debug>
+            <script type="application/json" id="percussion-31">{
+                "events": [
+                    [0, "meter", 3, 0.5],
 
-        <!--scribe-music class="x1" clef="drum" src="#drum-0" swing debug>
-            <script type="application/json" id="drum-0">{
+                    [6,     "note", 42, 0.25, 1],
+                    [9,     "note", 42, 0.25, 1],
+                    [12,    "note", 42, 0.25, 1],
+                    [15,    "note", 42, 0.25, 1],
+
+                    [18,    "note", 42, 0.25, 1],
+                    [19,    "note", 42, 0.25, 1],
+                    [21,    "note", 42, 0.25, 1],
+                    [22,    "note", 42, 0.25, 1],
+                    [24,    "note", 42, 0.25, 1],
+                    [25,    "note", 42, 0.25, 1],
+
+                    [28,    "note", 42, 0.25, 0.5],
+                    [28.5,  "note", 42, 0.25, 0.5],
+                    [29.5,  "note", 42, 0.25, 0.5],
+                    [30,    "note", 42, 0.25, 0.5],
+                    [31,    "note", 42, 0.25, 0.5],
+                    [31.5,  "note", 42, 0.25, 0.5],
+                    [32.5,  "note", 42, 0.25, 0.5],
+                    [33,    "note", 42, 0.25, 0.5],
+
+                    [36,    "note", 42, 0.25, 0.25],
+                    [36.25, "note", 42, 0.25, 0.25],
+                    [36.5,  "note", 42, 0.25, 0.25],
+                    [37.75, "note", 42, 0.25, 0.25],
+                    [38,    "note", 42, 0.25, 0.25],
+                    [38.25, "note", 42, 0.25, 0.25],
+                    [39.5,  "note", 42, 0.25, 0.25],
+                    [39.75, "note", 42, 0.25, 0.25],
+                    [40,    "note", 42, 0.25, 0.25],
+                    [41.25, "note", 42, 0.25, 0.25],
+                    [41.5,  "note", 42, 0.25, 0.25],
+                    [41.75, "note", 42, 0.25, 0.25],
+
+                    [48,    "note", 42, 0.25, 0.25],
+                    [48.125,"note", 42, 0.25, 0.25],
+                    [48.25, "note", 42, 0.25, 0.25],
+                    [48.375,"note", 42, 0.25, 0.25],
+                    [49.75, "note", 42, 0.25, 0.25],
+                    [49.875,"note", 42, 0.25, 0.25],
+                    [50,    "note", 42, 0.25, 0.25],
+                    [50.125,"note", 42, 0.25, 0.25],
+                    [51.5,  "note", 42, 0.25, 0.25],
+                    [51.625,"note", 42, 0.25, 0.25],
+                    [51.75, "note", 42, 0.25, 0.25],
+                    [51.875,"note", 42, 0.25, 0.25],
+                    [53.25, "note", 42, 0.25, 0.25],
+                    [53.375,"note", 42, 0.25, 0.25],
+                    [53.5,  "note", 42, 0.25, 0.25],
+                    [53.625,"note", 42, 0.25, 0.25],
+
+                    [56,    "note", 42, 0.25, 0.25],
+                    [56.25, "note", 42, 0.25, 0.25],
+                    [56.5,  "note", 42, 0.25, 0.25],
+                    [56.75, "note", 42, 0.25, 0.25],
+                    [57,    "note", 42, 0.25, 0.25],
+                    [57.25, "note", 42, 0.25, 0.25],
+                    [57.5,  "note", 42, 0.25, 0.25],
+                    [57.75, "note", 42, 0.25, 0.25],
+                    [58,    "note", 42, 0.25, 0.25],
+                    [58.25, "note", 42, 0.25, 0.25],
+                    [58.5,  "note", 42, 0.25, 0.25],
+                    [58.75, "note", 42, 0.25, 0.25],
+                    [59,    "note", 42, 0.25, 0.25],
+                    [59.25, "note", 42, 0.25, 0.25],
+                    [59.5,  "note", 42, 0.25, 0.25],
+                    [59.75, "note", 42, 0.25, 0.25],
+                    [60,    "note", 42, 0.25, 0.25],
+                    [60.25, "note", 42, 0.25, 0.25],
+                    [60.5,  "note", 42, 0.25, 0.25],
+                    [60.75, "note", 42, 0.25, 0.25],
+                    [61,    "note", 42, 0.25, 0.25],
+                    [61.25, "note", 42, 0.25, 0.25],
+                    [61.5,  "note", 42, 0.25, 0.25],
+                    [61.75, "note", 42, 0.25, 0.25]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1 y-start" clef="percussion" src="#percussion-32" debug>
+            <script type="application/json" id="percussion-32">{
+                "events": [
+                    [0, "meter", 4, 1],
+
+                    [6,     "note", 42, 0.25, 1],
+                    [9,     "note", 42, 0.25, 1],
+                    [12,    "note", 42, 0.25, 1],
+                    [15,    "note", 42, 0.25, 1],
+
+                    [18,    "note", 42, 0.25, 1],
+                    [19,    "note", 42, 0.25, 1],
+                    [21,    "note", 42, 0.25, 1],
+                    [22,    "note", 42, 0.25, 1],
+                    [24,    "note", 42, 0.25, 1],
+                    [25,    "note", 42, 0.25, 1],
+
+                    [28,    "note", 42, 0.25, 0.5],
+                    [28.5,  "note", 42, 0.25, 0.5],
+                    [29.5,  "note", 42, 0.25, 0.5],
+                    [30,    "note", 42, 0.25, 0.5],
+                    [31,    "note", 42, 0.25, 0.5],
+                    [31.5,  "note", 42, 0.25, 0.5],
+                    [32.5,  "note", 42, 0.25, 0.5],
+                    [33,    "note", 42, 0.25, 0.5],
+
+                    [36,    "note", 42, 0.25, 0.25],
+                    [36.25, "note", 42, 0.25, 0.25],
+                    [36.5,  "note", 42, 0.25, 0.25],
+                    [37.75, "note", 42, 0.25, 0.25],
+                    [38,    "note", 42, 0.25, 0.25],
+                    [38.25, "note", 42, 0.25, 0.25],
+                    [39.5,  "note", 42, 0.25, 0.25],
+                    [39.75, "note", 42, 0.25, 0.25],
+                    [40,    "note", 42, 0.25, 0.25],
+                    [41.25, "note", 42, 0.25, 0.25],
+                    [41.5,  "note", 42, 0.25, 0.25],
+                    [41.75, "note", 42, 0.25, 0.25],
+
+                    [48,    "note", 42, 0.25, 0.25],
+                    [48.125,"note", 42, 0.25, 0.25],
+                    [48.25, "note", 42, 0.25, 0.25],
+                    [48.375,"note", 42, 0.25, 0.25],
+                    [49.75, "note", 42, 0.25, 0.25],
+                    [49.875,"note", 42, 0.25, 0.25],
+                    [50,    "note", 42, 0.25, 0.25],
+                    [50.125,"note", 42, 0.25, 0.25],
+                    [51.5,  "note", 42, 0.25, 0.25],
+                    [51.625,"note", 42, 0.25, 0.25],
+                    [51.75, "note", 42, 0.25, 0.25],
+                    [51.875,"note", 42, 0.25, 0.25],
+                    [53.25, "note", 42, 0.25, 0.25],
+                    [53.375,"note", 42, 0.25, 0.25],
+                    [53.5,  "note", 42, 0.25, 0.25],
+                    [53.625,"note", 42, 0.25, 0.25],
+
+                    [56,    "note", 42, 0.25, 0.25],
+                    [56.25, "note", 42, 0.25, 0.25],
+                    [56.5,  "note", 42, 0.25, 0.25],
+                    [56.75, "note", 42, 0.25, 0.25],
+                    [57,    "note", 42, 0.25, 0.25],
+                    [57.25, "note", 42, 0.25, 0.25],
+                    [57.5,  "note", 42, 0.25, 0.25],
+                    [57.75, "note", 42, 0.25, 0.25],
+                    [58,    "note", 42, 0.25, 0.25],
+                    [58.25, "note", 42, 0.25, 0.25],
+                    [58.5,  "note", 42, 0.25, 0.25],
+                    [58.75, "note", 42, 0.25, 0.25],
+                    [59,    "note", 42, 0.25, 0.25],
+                    [59.25, "note", 42, 0.25, 0.25],
+                    [59.5,  "note", 42, 0.25, 0.25],
+                    [59.75, "note", 42, 0.25, 0.25],
+                    [60,    "note", 42, 0.25, 0.25],
+                    [60.25, "note", 42, 0.25, 0.25],
+                    [60.5,  "note", 42, 0.25, 0.25],
+                    [60.75, "note", 42, 0.25, 0.25],
+                    [61,    "note", 42, 0.25, 0.25],
+                    [61.25, "note", 42, 0.25, 0.25],
+                    [61.5,  "note", 42, 0.25, 0.25],
+                    [61.75, "note", 42, 0.25, 0.25]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x2 y-start" clef="percussion" src="#percussion-33" debug>
+            <script type="application/json" id="percussion-33">{
+                "events": [
+                    [0, "meter", 5, 1],
+
+                    [6,     "note", 42, 0.25, 1],
+                    [9,     "note", 42, 0.25, 1],
+                    [12,    "note", 42, 0.25, 1],
+                    [15,    "note", 42, 0.25, 1],
+
+                    [18,    "note", 42, 0.25, 1],
+                    [19,    "note", 42, 0.25, 1],
+                    [21,    "note", 42, 0.25, 1],
+                    [22,    "note", 42, 0.25, 1],
+                    [24,    "note", 42, 0.25, 1],
+                    [25,    "note", 42, 0.25, 1],
+
+                    [28,    "note", 42, 0.25, 0.5],
+                    [28.5,  "note", 42, 0.25, 0.5],
+                    [29.5,  "note", 42, 0.25, 0.5],
+                    [30,    "note", 42, 0.25, 0.5],
+                    [31,    "note", 42, 0.25, 0.5],
+                    [31.5,  "note", 42, 0.25, 0.5],
+                    [32.5,  "note", 42, 0.25, 0.5],
+                    [33,    "note", 42, 0.25, 0.5],
+
+                    [36,    "note", 42, 0.25, 0.25],
+                    [36.25, "note", 42, 0.25, 0.25],
+                    [36.5,  "note", 42, 0.25, 0.25],
+                    [37.75, "note", 42, 0.25, 0.25],
+                    [38,    "note", 42, 0.25, 0.25],
+                    [38.25, "note", 42, 0.25, 0.25],
+                    [39.5,  "note", 42, 0.25, 0.25],
+                    [39.75, "note", 42, 0.25, 0.25],
+                    [40,    "note", 42, 0.25, 0.25],
+                    [41.25, "note", 42, 0.25, 0.25],
+                    [41.5,  "note", 42, 0.25, 0.25],
+                    [41.75, "note", 42, 0.25, 0.25],
+
+                    [48,    "note", 42, 0.25, 0.25],
+                    [48.125,"note", 42, 0.25, 0.25],
+                    [48.25, "note", 42, 0.25, 0.25],
+                    [48.375,"note", 42, 0.25, 0.25],
+                    [49.75, "note", 42, 0.25, 0.25],
+                    [49.875,"note", 42, 0.25, 0.25],
+                    [50,    "note", 42, 0.25, 0.25],
+                    [50.125,"note", 42, 0.25, 0.25],
+                    [51.5,  "note", 42, 0.25, 0.25],
+                    [51.625,"note", 42, 0.25, 0.25],
+                    [51.75, "note", 42, 0.25, 0.25],
+                    [51.875,"note", 42, 0.25, 0.25],
+                    [53.25, "note", 42, 0.25, 0.25],
+                    [53.375,"note", 42, 0.25, 0.25],
+                    [53.5,  "note", 42, 0.25, 0.25],
+                    [53.625,"note", 42, 0.25, 0.25],
+
+                    [56,    "note", 42, 0.25, 0.25],
+                    [56.25, "note", 42, 0.25, 0.25],
+                    [56.5,  "note", 42, 0.25, 0.25],
+                    [56.75, "note", 42, 0.25, 0.25],
+                    [57,    "note", 42, 0.25, 0.25],
+                    [57.25, "note", 42, 0.25, 0.25],
+                    [57.5,  "note", 42, 0.25, 0.25],
+                    [57.75, "note", 42, 0.25, 0.25],
+                    [58,    "note", 42, 0.25, 0.25],
+                    [58.25, "note", 42, 0.25, 0.25],
+                    [58.5,  "note", 42, 0.25, 0.25],
+                    [58.75, "note", 42, 0.25, 0.25],
+                    [59,    "note", 42, 0.25, 0.25],
+                    [59.25, "note", 42, 0.25, 0.25],
+                    [59.5,  "note", 42, 0.25, 0.25],
+                    [59.75, "note", 42, 0.25, 0.25],
+                    [60,    "note", 42, 0.25, 0.25],
+                    [60.25, "note", 42, 0.25, 0.25],
+                    [60.5,  "note", 42, 0.25, 0.25],
+                    [60.75, "note", 42, 0.25, 0.25],
+                    [61,    "note", 42, 0.25, 0.25],
+                    [61.25, "note", 42, 0.25, 0.25],
+                    [61.5,  "note", 42, 0.25, 0.25],
+                    [61.75, "note", 42, 0.25, 0.25]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1 y-start" clef="percussion" src="#percussion-34" debug>
+            <script type="application/json" id="percussion-34">{
+                "events": [
+                    [0, "meter", 3.5, 0.5],
+
+                    [6,     "note", 42, 0.25, 1],
+                    [9,     "note", 42, 0.25, 1],
+                    [12,    "note", 42, 0.25, 1],
+                    [15,    "note", 42, 0.25, 1],
+
+                    [18,    "note", 42, 0.25, 1],
+                    [19,    "note", 42, 0.25, 1],
+                    [21,    "note", 42, 0.25, 1],
+                    [22,    "note", 42, 0.25, 1],
+                    [24,    "note", 42, 0.25, 1],
+                    [25,    "note", 42, 0.25, 1],
+
+                    [28,    "note", 42, 0.25, 0.5],
+                    [28.5,  "note", 42, 0.25, 0.5],
+                    [29.5,  "note", 42, 0.25, 0.5],
+                    [30,    "note", 42, 0.25, 0.5],
+                    [31,    "note", 42, 0.25, 0.5],
+                    [31.5,  "note", 42, 0.25, 0.5],
+                    [32.5,  "note", 42, 0.25, 0.5],
+                    [33,    "note", 42, 0.25, 0.5],
+
+                    [36,    "note", 42, 0.25, 0.25],
+                    [36.25, "note", 42, 0.25, 0.25],
+                    [36.5,  "note", 42, 0.25, 0.25],
+                    [37.75, "note", 42, 0.25, 0.25],
+                    [38,    "note", 42, 0.25, 0.25],
+                    [38.25, "note", 42, 0.25, 0.25],
+                    [39.5,  "note", 42, 0.25, 0.25],
+                    [39.75, "note", 42, 0.25, 0.25],
+                    [40,    "note", 42, 0.25, 0.25],
+                    [41.25, "note", 42, 0.25, 0.25],
+                    [41.5,  "note", 42, 0.25, 0.25],
+                    [41.75, "note", 42, 0.25, 0.25],
+
+                    [48,    "note", 42, 0.25, 0.25],
+                    [48.125,"note", 42, 0.25, 0.25],
+                    [48.25, "note", 42, 0.25, 0.25],
+                    [48.375,"note", 42, 0.25, 0.25],
+                    [49.75, "note", 42, 0.25, 0.25],
+                    [49.875,"note", 42, 0.25, 0.25],
+                    [50,    "note", 42, 0.25, 0.25],
+                    [50.125,"note", 42, 0.25, 0.25],
+                    [51.5,  "note", 42, 0.25, 0.25],
+                    [51.625,"note", 42, 0.25, 0.25],
+                    [51.75, "note", 42, 0.25, 0.25],
+                    [51.875,"note", 42, 0.25, 0.25],
+                    [53.25, "note", 42, 0.25, 0.25],
+                    [53.375,"note", 42, 0.25, 0.25],
+                    [53.5,  "note", 42, 0.25, 0.25],
+                    [53.625,"note", 42, 0.25, 0.25],
+
+                    [56,    "note", 42, 0.25, 0.25],
+                    [56.25, "note", 42, 0.25, 0.25],
+                    [56.5,  "note", 42, 0.25, 0.25],
+                    [56.75, "note", 42, 0.25, 0.25],
+                    [57,    "note", 42, 0.25, 0.25],
+                    [57.25, "note", 42, 0.25, 0.25],
+                    [57.5,  "note", 42, 0.25, 0.25],
+                    [57.75, "note", 42, 0.25, 0.25],
+                    [58,    "note", 42, 0.25, 0.25],
+                    [58.25, "note", 42, 0.25, 0.25],
+                    [58.5,  "note", 42, 0.25, 0.25],
+                    [58.75, "note", 42, 0.25, 0.25],
+                    [59,    "note", 42, 0.25, 0.25],
+                    [59.25, "note", 42, 0.25, 0.25],
+                    [59.5,  "note", 42, 0.25, 0.25],
+                    [59.75, "note", 42, 0.25, 0.25],
+                    [60,    "note", 42, 0.25, 0.25],
+                    [60.25, "note", 42, 0.25, 0.25],
+                    [60.5,  "note", 42, 0.25, 0.25],
+                    [60.75, "note", 42, 0.25, 0.25],
+                    [61,    "note", 42, 0.25, 0.25],
+                    [61.25, "note", 42, 0.25, 0.25],
+                    [61.5,  "note", 42, 0.25, 0.25],
+                    [61.75, "note", 42, 0.25, 0.25]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x2 y-start" clef="percussion" src="#percussion-35" debug>
+            <script type="application/json" id="percussion-35">{
+                "events": [
+                    [0, "meter", 6, 0.5],
+
+                    [6,     "note", 42, 0.25, 1],
+                    [9,     "note", 42, 0.25, 1],
+                    [12,    "note", 42, 0.25, 1],
+                    [15,    "note", 42, 0.25, 1],
+
+                    [18,    "note", 42, 0.25, 1],
+                    [19,    "note", 42, 0.25, 1],
+                    [21,    "note", 42, 0.25, 1],
+                    [22,    "note", 42, 0.25, 1],
+                    [24,    "note", 42, 0.25, 1],
+                    [25,    "note", 42, 0.25, 1],
+
+                    [28,    "note", 42, 0.25, 0.5],
+                    [28.5,  "note", 42, 0.25, 0.5],
+                    [29.5,  "note", 42, 0.25, 0.5],
+                    [30,    "note", 42, 0.25, 0.5],
+                    [31,    "note", 42, 0.25, 0.5],
+                    [31.5,  "note", 42, 0.25, 0.5],
+                    [32.5,  "note", 42, 0.25, 0.5],
+                    [33,    "note", 42, 0.25, 0.5],
+
+                    [36,    "note", 42, 0.25, 0.25],
+                    [36.25, "note", 42, 0.25, 0.25],
+                    [36.5,  "note", 42, 0.25, 0.25],
+                    [37.75, "note", 42, 0.25, 0.25],
+                    [38,    "note", 42, 0.25, 0.25],
+                    [38.25, "note", 42, 0.25, 0.25],
+                    [39.5,  "note", 42, 0.25, 0.25],
+                    [39.75, "note", 42, 0.25, 0.25],
+                    [40,    "note", 42, 0.25, 0.25],
+                    [41.25, "note", 42, 0.25, 0.25],
+                    [41.5,  "note", 42, 0.25, 0.25],
+                    [41.75, "note", 42, 0.25, 0.25],
+
+                    [48,    "note", 42, 0.25, 0.25],
+                    [48.125,"note", 42, 0.25, 0.25],
+                    [48.25, "note", 42, 0.25, 0.25],
+                    [48.375,"note", 42, 0.25, 0.25],
+                    [49.75, "note", 42, 0.25, 0.25],
+                    [49.875,"note", 42, 0.25, 0.25],
+                    [50,    "note", 42, 0.25, 0.25],
+                    [50.125,"note", 42, 0.25, 0.25],
+                    [51.5,  "note", 42, 0.25, 0.25],
+                    [51.625,"note", 42, 0.25, 0.25],
+                    [51.75, "note", 42, 0.25, 0.25],
+                    [51.875,"note", 42, 0.25, 0.25],
+                    [53.25, "note", 42, 0.25, 0.25],
+                    [53.375,"note", 42, 0.25, 0.25],
+                    [53.5,  "note", 42, 0.25, 0.25],
+                    [53.625,"note", 42, 0.25, 0.25],
+
+                    [56,    "note", 42, 0.25, 0.25],
+                    [56.25, "note", 42, 0.25, 0.25],
+                    [56.5,  "note", 42, 0.25, 0.25],
+                    [56.75, "note", 42, 0.25, 0.25],
+                    [57,    "note", 42, 0.25, 0.25],
+                    [57.25, "note", 42, 0.25, 0.25],
+                    [57.5,  "note", 42, 0.25, 0.25],
+                    [57.75, "note", 42, 0.25, 0.25],
+                    [58,    "note", 42, 0.25, 0.25],
+                    [58.25, "note", 42, 0.25, 0.25],
+                    [58.5,  "note", 42, 0.25, 0.25],
+                    [58.75, "note", 42, 0.25, 0.25],
+                    [59,    "note", 42, 0.25, 0.25],
+                    [59.25, "note", 42, 0.25, 0.25],
+                    [59.5,  "note", 42, 0.25, 0.25],
+                    [59.75, "note", 42, 0.25, 0.25],
+                    [60,    "note", 42, 0.25, 0.25],
+                    [60.25, "note", 42, 0.25, 0.25],
+                    [60.5,  "note", 42, 0.25, 0.25],
+                    [60.75, "note", 42, 0.25, 0.25],
+                    [61,    "note", 42, 0.25, 0.25],
+                    [61.25, "note", 42, 0.25, 0.25],
+                    [61.5,  "note", 42, 0.25, 0.25],
+                    [61.75, "note", 42, 0.25, 0.25]
+                ]
+            }</script>
+        </scribe-music>
+
+        <!--h2 class="x1">Drums</h2>
+
+        <h3 class="x1">Swing</h3>
+
+        <scribe-music class="x1 y-start" clef="drum" src="#drum-1">
+            <script type="application/json" id="drum-1">{
                 "events": [
                     [0, "meter", 4, 1],
                     [2,    "note", "F3", 0.1, 0.6],
@@ -118,8 +691,45 @@
             }</script>
         </scribe-music>
 
-        <scribe-music class="x1" clef="drum" src="#drum-1" debug>
-            <script type="application/json" id="drum-1">{
+        <scribe-music class="x1 y-start" clef="drum" src="#drum-2" swing>
+            <script type="application/json" id="drum-2">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [2,    "note", "F3", 0.1, 0.6],
+                    [3,    "note", "F3", 0.1, 0.2],
+                    [3.63, "note", "F3", 0.1, 0.2]
+                ]
+            }</script>
+        </scribe-music>
+
+        <h3 class="x1">Shuffle</h3>
+
+        <scribe-music class="x1 y-start" clef="drum" src="#drum-3">
+            <script type="application/json" id="drum-3">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [2,    "note", "F3", 0.1, 0.2],
+                    [2.33, "note", "F3", 0.1, 0.2],
+                    [2.5,  "note", "F3", 0.1, 0.2],
+                    [2.83, "note", "F3", 0.1, 0.2]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1 y-start" clef="drum" src="#drum-4" shuffle>
+            <script type="application/json" id="drum-4">{
+                "events": [
+                    [0, "meter", 4, 1],
+                    [2,    "note", "F3", 0.1, 0.2],
+                    [2.33, "note", "F3", 0.1, 0.2],
+                    [2.5,  "note", "F3", 0.1, 0.2],
+                    [2.83, "note", "F3", 0.1, 0.2]
+                ]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1 y-start" clef="drum" src="#drum-5" debug>
+            <script type="application/json" id="drum-5">{
                 "events": [
                     [0, "meter", 4, 1],
                     [0,     "note", 42, 0.1, 1],
@@ -133,8 +743,8 @@
             }</script>
         </scribe-music>
 
-        <scribe-music class="x1" clef="drum" src="#drum-2" debug>
-            <script type="application/json" id="drum-2">{
+        <scribe-music class="x1 y-start" clef="drum" src="#drum-6" debug>
+            <script type="application/json" id="drum-6">{
                 "events": [
                     [0, "meter", 4, 1],
 
@@ -146,9 +756,9 @@
             }</script>
         </scribe-music>
 
-        <h3 class="x1 2x">Dotted</h3>
+        <h3 class="x1">Dotted</h3>
 
-        <scribe-music class="x1" clef="drum" src="#drum-10" debug>
+        <scribe-music class="x1 y-start" clef="drum" src="#drum-10" debug>
             <script type="application/json" id="drum-10">{
                 "events": [
                     [0, "meter", 5, 1],
@@ -158,7 +768,7 @@
             }</script>
         </scribe-music>
 
-        <scribe-music class="x1" clef="drum" src="#drum-11" debug>
+        <scribe-music class="x1 y-start" clef="drum" src="#drum-11" debug>
             <script type="application/json" id="drum-11">{
                 "events": [
                     [0, "meter", 3, 1],
@@ -168,7 +778,7 @@
             }</script>
         </scribe-music>
 
-        <scribe-music class="x1" clef="drum" src="#drum-12" debug>
+        <scribe-music class="x1 y-start" clef="drum" src="#drum-12" debug>
             <script type="application/json" id="drum-12">{
                 "events": [
                     [0, "meter", 3, 1],
@@ -182,7 +792,7 @@
             }</script>
         </scribe-music>
 
-        <scribe-music class="x1" clef="drum" src="#drum-13" debug>
+        <scribe-music class="x1 y-start" clef="drum" src="#drum-13" debug>
             <script type="application/json" id="drum-13">{
                 "events": [
                     [0, "meter", 4, 1],
@@ -192,9 +802,9 @@
             }</script>
         </scribe-music>
 
-        <h3 class="x1 2x">Long durations</h3>
+        <h3 class="x1">Long durations</h3>
 
-        <scribe-music class="x1" clef="drum" src="#drum-20" debug>
+        <scribe-music class="x1 y-start" clef="drum" src="#drum-20" debug>
             <script type="application/json" id="drum-20">{
                 "events": [
                     [0, "meter", 4, 1],
@@ -216,9 +826,9 @@
             }</script>
         </scribe-music>
 
-        <h3 class="x1 2x">Tuplets</h3>
+        <h3 class="x1">Tuplets</h3>
 
-        <scribe-music class="x1" clef="drum" src="#drum-21" debug>
+        <scribe-music class="x1 y-start" clef="drum" src="#drum-21" debug>
             <script type="application/json" id="drum-21">{
                 "events": [
                     [0, "meter", 4, 1],
@@ -259,7 +869,7 @@
             }</script>
         </scribe-music>
 
-        <scribe-music class="x1" clef="drum" src="#drum-22" debug>
+        <scribe-music class="x1 y-start" clef="drum" src="#drum-22" debug>
             <script type="application/json" id="drum-22">{
                 "events": [
                     [0, "meter", 4, 1],
@@ -300,7 +910,7 @@
             }</script>
         </scribe-music>
 
-        <scribe-music class="x1" clef="drum" src="#drum-23" debug>
+        <scribe-music class="x1 y-start" clef="drum" src="#drum-23" debug>
             <script type="application/json" id="drum-23">{
                 "events": [
                     [0, "meter", 4, 1],
@@ -341,9 +951,9 @@
             }</script>
         </scribe-music>
 
-        <h3 class="x1 2x">Chart</h3>
+        <h3 class="x1">Chart</h3>
 
-        <scribe-music class="x1" clef="drum" src="#drum-30" swing debug>
+        <scribe-music class="x1 y-start" clef="drum" src="#drum-30" swing debug>
             <script type="application/json" id="drum-30">{
                 "events": [
                     [0, "meter", 4, 1],

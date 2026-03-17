@@ -83,7 +83,7 @@ export function renderElements(sequence, excludes, clef, keyname, meter, duratio
     const iterator = new SequenceIterator(events, sequence.sequences, transforms);
 
     // Create bar elements
-    const bars = createBars(iterator, excludes, stave, settings);
+    const bars     = createBars(iterator, excludes, stave, settings);
     const elements = bars.reduce(toBarElements, []);
 
 //const keysig = elements[0].querySelectorAll('.acci:not([data-beat])');
@@ -122,7 +122,8 @@ export function renderElements(sequence, excludes, clef, keyname, meter, duratio
 const heads = [
     create('span', { html: glyphs.head1, style: 'width: min-content;' }),
     create('span', { html: glyphs.head2, style: 'width: min-content;' }),
-    create('span', { html: glyphs.head4, style: 'width: min-content;' })
+    create('span', { html: glyphs.head4, style: 'width: min-content;' }),
+    create('span', { html: glyphs.headX, style: 'width: min-content;' })
 ];
 
 function remove(element) {
@@ -137,6 +138,7 @@ export function renderStyle(element, root = element) {
     const head1Width = rect(heads[0]).width;
     const head2Width = rect(heads[1]).width;
     const head3Width = rect(heads[2]).width;
+    const headXWidth = rect(heads[3]).width;
     const computed   = window.getComputedStyle(heads[0]);
     const fontSize   = px(computed.fontSize);
 
@@ -159,6 +161,7 @@ export function renderStyle(element, root = element) {
     return `--head-1-size: ${ truncate(6, head1Width / fontSize) }; `
         + `--head-2-size: ${ truncate(6, head2Width / fontSize) }; `
         + `--head-4-size: ${ truncate(6, head3Width / fontSize) }; `
+        + `--head-x-size: ${ truncate(6, headXWidth / fontSize) }; `
         + `--signature-width: ${ (2.25 + count * 0.625 + 0.625).toFixed(4) }em;`;
 }
 

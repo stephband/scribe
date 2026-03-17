@@ -16,19 +16,25 @@ const barDivisions = {
     // 2/2
     '2,2': [2],
     // 3/2
-    '3,2': [2,4],
+    '3,2': [2, 4],
     // 2/4
     '2,1': [1],
     // 3/4
-    '3,1': [1,2],
+    '3,1': [1, 2],
     // 4/4
     '4,1': [2],
+    // 5/4
+    '5,1': [1.5,3],
+    // 5/8
+    '2.5,0.5': [1.5],
     // 6/8
     '3,0.5': [1.5],
     // 6/8
     '3,1.5': [1.5],
+    // 7/8
+    '3.5,0.5': [1, 2],
     // 12/8
-    '12,0.5': [1.5,3,4.5]
+    '6,0.5': [1.5, 3, 4.5]
 };
 
 const rslashbass = /\/\{(\d{1,2})\}$/;
@@ -117,6 +123,7 @@ function createBarSymbols(symbols, bar, stave, key, accidentals, events, setting
         }
 
         case "meter": {
+            console.log('METER', event[3] === 1.5, event[2] / 0.5, event[2] / event[3], event);
             symbols.push({
                 type:        'timesig',
                 beat:        0,

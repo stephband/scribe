@@ -333,9 +333,16 @@ in their duration span. */
 }
 
 .bar > .up-beam {
-	margin-left: calc(-1em * var(--stem-width));
+    /*margin-left: calc(-1 * var(--bar-column-gap) - 1px);*/
+	/*margin-left: calc(-1em * var(--stem-width));*/
 	margin-right: calc(-1 * var(--bar-column-gap));
-	transform: translate3d(calc(1em * var(--head-1-size)), calc(1em * var(--translate-y, 0)), 0);
+    /* TODO: This doesnt take account of different head sizes */
+	transform: translate3d(calc(1em * var(--head-1-size) - 1px), calc(1em * var(--translate-y, 0)), 0);
+}
+
+.bar > .beam-note:has([data-glyph="headX"]) + .up-beam {
+    /* TODO: This does, but the selector is dodgy, it doesnt target exactly what we need to target */
+    transform: translate3d(calc(1em * var(--head-x-size) - 0.5px), calc(1em * var(--translate-y, 0) - 0.2px), 0);
 }
 
 .bar > .down-beam {
