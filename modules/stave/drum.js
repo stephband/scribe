@@ -6,6 +6,7 @@ import config            from '../config.js';
 import Stave             from './stave.js';
 import { eq, gte, lte, lt, gt } from '../number/float.js';
 import nearest           from '../number/nearest.js';
+import grainPow2         from '../number/grain-pow-2.js';
 import { floorPow2 }     from '../number/power-of-2.js';
 import push              from '../object/push.js';
 import { createAccents } from '../symbol/accent.js';
@@ -24,7 +25,6 @@ const assign  = Object.assign;
 const { abs, ceil, floor, min, max, pow, sqrt, round } = Math;
 const symbols = [];
 const notes   = [];
-const NOTESYMBOLS = [];
 
 
 function toDrumSlug(number) {
@@ -119,6 +119,13 @@ function getNotesDuration(divisions, b1, b2) {
         noteDurations.includes(b2 - b1) ? b2 - b1 : undefined : // floorPow2(min(1, b2 - b1)) :
         // Duration up to next bar division
         noteDurations.includes(v2 - b1) ? v2 - b1 : undefined ; // floorPow2(min(1, v2 - b1)) ;
+}
+
+function getGrain(divisions, beat) {
+    const minGrain = 0.125;
+    const maxGrain = 1;
+    const div      = getDivisionBefore(divisions, beat);
+    return grainPow2(minGrain, maxGrain, beat - div);
 }
 
 export default class DrumStave extends Stave {
@@ -266,7 +273,7 @@ export default class DrumStave extends Stave {
         return this.pitches[j];
     }
 
-    createSymbols(symbols, part, key, tuplet, notes, beat, duration, settings, fn) {
+    createSymbols(symbols, divisions, part, key, tuplet, notes, beat, duration, settings, fn) {
         // Inside this fn beat is relative to bar
         const stave = this;
 
@@ -286,7 +293,8 @@ export default class DrumStave extends Stave {
         let n = -1;
         while (noteSymbols[++n]) symbols.push(assign(noteSymbols[n], {
             beat,
-            duration
+            duration,
+            grain: grainPow2(divisions, beat)
         }));
 
         // Return note symbols
@@ -340,7 +348,7 @@ export default class DrumStave extends Stave {
                         // Impose max note duration, drum notation only has black notes
                         const d = min(1, division);
                         // Insert note symbols
-                        noteSymbols = this.createSymbols(symbols, part, key, tuplet, notes, beat - startBeat, d, settings);
+                        noteSymbols = this.createSymbols(symbols, barDivisions, part, key, tuplet, notes, beat - startBeat, d, settings);
                         // If division is short enough for a beam
                         if (division < 0.5) {
                             // ...make sure there is a beam
@@ -430,7 +438,7 @@ export default class DrumStave extends Stave {
                         // Impose max note duration, drum notation only has black notes
                         const d = min(1, division);
                         // Insert note symbols
-                        noteSymbols = this.createSymbols(symbols, part, key, tuplet, notes, beat - startBeat, d, settings);
+                        noteSymbols = this.createSymbols(symbols, barDivisions, part, key, tuplet, notes, beat - startBeat, d, settings);
                         // Update beat to division end
                         beat = data.beat + i * division + division;
                     }
