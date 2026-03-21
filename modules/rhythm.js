@@ -55,6 +55,11 @@ function count1s(n) {
     return count;
 }
 
+function hasMultipleHoles(divisor, rhythm) {
+    const c = count1s(rhythm);
+    return divisor > c - 1;
+}
+
 export function hasHoles(divisor, rhythm) {
     return rhythm < pow(2, divisor) - 1;
 }
@@ -87,6 +92,8 @@ function compare(beat, duration, divisor, rhythm, length, count, r, i, score, re
             if (rhythm === 2 || rhythm === 3) return score;
             break;
         default:
+            // Reject higher order rhythms with more than one hole
+            if (hasMultipleHoles(divisor, rhythm)) return score;
             // Reject higher order rhythms with consecutive holes
             if (hasConsecutiveHoles(divisor, rhythm)) return score;
     }
@@ -117,7 +124,7 @@ function compare(beat, duration, divisor, rhythm, length, count, r, i, score, re
     // densities while large divisions remain largely unaffected.
     // THE CHOSEN POWER IS A BIT ARBITRARY, NEEDS SOME FURTHER INVESTIGATION
     const density = rhythmicDensity(divisor, rhythm);
-    const densityWeight = pow(density, 0.122  / division); // Can't be higher than 0.125 or [0.375, 0.75] is misidentified as triplets
+    const densityWeight = pow(density, 0.111111 / division); // Can't be higher than 0.125 or [0.375, 0.75] is misidentified as triplets
     //const densityWeight = pow((count1s(rhythm) + 1) / (divisor + 1), 0.125 / (duration / (divisor + 1)));
     //const densityWeight = pow(density, 0.24 / duration);    // Can't be higher than 0.24 or [0.375, 0.75] is misidentified as triplets
 

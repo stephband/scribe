@@ -320,8 +320,8 @@ export default class DrumStave extends Stave {
         let data, previousData;
         while (data = detectRhythm(beat, stopBeat - beat, events, n + 1, { maxDivision: 1 })) {
             // Tuplet
-            const tuplet   = createTuplet(settings, stave, part, startBeat, data);
             const { rhythm, duration, divisor } = data;
+            const tuplet   = createTuplet(settings, stave, part, startBeat, data);
             const division = duration / divisor;
             const r        = rhythm.toString(2);
 
