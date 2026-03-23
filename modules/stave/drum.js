@@ -110,20 +110,29 @@ function getDivisionAfter(divisions, beat) {
     return divisions[n];
 }
 
-function getNotesDuration(divisions, b1, b2) {
-    const v1 = getDivisionBefore(divisions, b1);
-    const v2 = getDivisionAfter(divisions, b1);
-    const v3 = getDivisionBefore(divisions, b2);
-    return v1 === v3 ?
-        // Duration up to rhythm divisor
-        noteDurations.includes(b2 - b1) ? b2 - b1 : undefined : // floorPow2(min(1, b2 - b1)) :
-        // Duration up to next bar division
-        noteDurations.includes(v2 - b1) ? v2 - b1 : undefined ; // floorPow2(min(1, v2 - b1)) ;
+function getNotesDuration(divisions, grain, b1, b2, v1, v2, v3) {
+    let j = noteDurations.length;
+
+    // Reject noteDurations greater than grain
+    while (noteDurations[--j] > grain);
+    ++j;
+
+    // Reject noteDurations greater than available space up to b2 or bar
+    // division, whichever is first
+    const b3 = v1 === v3 ? b2 : v2 ;
+    while (noteDurations[--j] > b3 - b1);
+
+    // If that duration does not span exactly to b2 or bar division
+    return b1 + noteDurations[j] !== b3 ?
+        // ...reject dotted durations
+        floorPow2(noteDurations[j]) :
+        // ...use duration as-is
+        noteDurations[j] ;
 }
 
 function getGrain(divisions, beat) {
     const minGrain = 0.125;
-    const maxGrain = 1;
+    const maxGrain = 2;
     const div      = getDivisionBefore(divisions, beat);
     return grainPow2(minGrain, maxGrain, beat - div);
 }
@@ -294,7 +303,7 @@ export default class DrumStave extends Stave {
         while (noteSymbols[++n]) symbols.push(assign(noteSymbols[n], {
             beat,
             duration,
-            grain: grainPow2(divisions, beat)
+            grain: getGrain(divisions, beat)
         }));
 
         // Return note symbols
@@ -315,25 +324,32 @@ export default class DrumStave extends Stave {
         // events array should already start with events at beat
         //while ((event = events[++n]) && lte(beat, event[0] + event[4], P24));
         while ((event = events[++n]) && lt(beat, event[0], P24));
-        --n;
 
+console.log(beat, n);
         let data, previousData;
-        while (data = detectRhythm(beat, stopBeat - beat, events, n + 1, { maxDivision: 1 })) {
-            // Tuplet
-            const { rhythm, duration, divisor } = data;
+        while (data = detectRhythm(beat, stopBeat - beat, events, n, { maxDivision: 1 })) {
+            // Normalise rhythm based on settings, create tuplet where needed
             const tuplet   = createTuplet(settings, stave, part, startBeat, data);
+            const { rhythm, duration, divisor } = data;
             const division = duration / divisor;
             const r        = rhythm.toString(2);
 
+console.group(`Rhythm ${ r } from beat ${ startBeat } at ${ data.beat }, duration ${ duration } / ${ division }, event ${ n } -----------`);
+
             if (tuplet) {
-                // Push it in
-                symbols.push(tuplet);
+                // if there is a beam, close it
+                if (beam) {
+                    // ...push last note symbols on to it
+                    if (noteSymbols && noteSymbols.length) push(beam, ...noteSymbols);
+                    // ...and close it
+                    beam = closeBeam(symbols, stave, part, beam);
+                }
                 // Fill with rests up to start of tuplet
                 createRests(symbols, settings.restDurations, barDivisor, this, part, beat - startBeat, data.beat - startBeat);
                 // Set beat to start of tuplet
                 beat = data.beat;
-                // if there is a beam, close it
-                if (beam) beam = closeBeam(symbols, stave, part, beam);
+                // Push tuplet in
+                symbols.push(tuplet);
                 // Loop through tuplet divisions
                 let i = -1;
                 while (++i < divisor) {
@@ -341,8 +357,8 @@ export default class DrumStave extends Stave {
                     if (r[r.length - 1 - i] === '1') {
                         // Fill notes with events playing during division
                         notes.length = 0;
-                        while ((event = events[++n]) && event[0] < beat + 0.5 * division) notes.push(event);
                         --n;
+                        while ((event = events[++n]) && event[0] < beat + 0.5 * division) notes.push(event);
                         // Sort notes by pitch order, descending (ascending row order)
                         //if (stave.pitched) notes.sort(byRow);
                         // Impose max note duration, drum notation only has black notes
@@ -370,6 +386,8 @@ export default class DrumStave extends Stave {
 
                     // Set beat to division end
                     beat = data.beat + i * division + division;
+                    // Don't modify durations on next iteration in duplet mode
+                    noteSymbols = undefined;
                 }
                 // Close tuplet
                 closeTuplet(this, part, tuplet);
@@ -384,16 +402,19 @@ export default class DrumStave extends Stave {
                     if (r[r.length - 1 - i] === '1') {
                         // Render up to division
                         if (noteSymbols && noteSymbols.length) {
-                            const b1 = noteSymbols[0].beat;
-                            const b2 = data.beat + i * division - startBeat;
-                            const v1 = getDivisionBefore(barDivisions, b1);
-                            const v2 = getDivisionAfter(barDivisions, b1);
-                            const v3 = getDivisionBefore(barDivisions, b2);
-                            const duration = v1 === v3 ?
-                                // Duration up to rhythm divisor
-                                noteDurations.includes(b2 - b1) ? b2 - b1 : noteSymbols[0].duration : // floorPow2(min(1, b2 - b1)) :
-                                // Duration up to next bar division
-                                noteDurations.includes(v2 - b1) ? v2 - b1 : noteSymbols[0].duration ; // floorPow2(min(1, v2 - b1)) ;
+                            const grain    = noteSymbols[0].grain;
+                            const b1       = noteSymbols[0].beat;
+                            const b2       = data.beat + i * division - startBeat;
+                            const v1       = getDivisionBefore(barDivisions, b1);
+                            const v2       = getDivisionAfter(barDivisions, b1);
+                            const v3       = getDivisionBefore(barDivisions, b2);
+                            const duration = getNotesDuration(barDivisions, grain, b1, b2, v1, v2, v3);
+
+console.log(duration);
+
+                            // Extend duration of notes
+                            setDurations(noteSymbols, duration);
+                            beat = b1 + duration + startBeat;
 
                             // If last notes have a duration too long for a beam
                             if (gte(1, duration, P24)) {
@@ -401,7 +422,12 @@ export default class DrumStave extends Stave {
                                 if (beam) beam = closeBeam(symbols, stave, part, beam);
                             }
                             // If notes are in the same bar division as rhythm division
-                            else if (v1 === v3) {
+                            else if (v1 === v3 && (
+                                // ...and note stop brings us up to division
+                                beat === b2 + startBeat
+                                // ...or note duration is the same duration as the gap
+                                || duration === b2 + startBeat - beat
+                            )) {
                                 // ...make sure there is a beam
                                 if (!beam) beam = createBeam(part, b1);
                                 // ...and push note symbols on to it
@@ -414,10 +440,6 @@ export default class DrumStave extends Stave {
                                 // ...and close it
                                 beam = closeBeam(symbols, stave, part, beam);
                             }
-
-                            // Extend duration of notes
-                            setDurations(noteSymbols, duration);
-                            beat = b1 + duration + startBeat;
                         }
 
                         // If gap is bigger than division stop the beam
@@ -431,12 +453,12 @@ export default class DrumStave extends Stave {
                         // Fill notes with events playing during division, leaving event
                         // as first event in the next division
                         notes.length = 0;
-                        while ((event = events[++n]) && event[0] < beat + 0.5 * division) notes.push(event);
                         --n;
+                        while ((event = events[++n]) && event[0] < beat + 0.5 * division) notes.push(event);
                         // Sort notes by pitch order, descending (ascending row order)
                         //if (stave.pitched) notes.sort(byRow);
-                        // Impose max note duration, drum notation only has black notes
-                        const d = min(1, division);
+                        // Impose max note duration of 1 drum notation only has black notes
+                        const d = min(1, data.duration - i * division);
                         // Insert note symbols
                         noteSymbols = this.createSymbols(symbols, barDivisions, part, key, tuplet, notes, beat - startBeat, d, settings);
                         // Update beat to division end
@@ -447,13 +469,23 @@ export default class DrumStave extends Stave {
 
             // Update beat
             beat = data.beat + data.duration;
-            n = data.index + data.count - 1;
+            if (n !== data.index + data.count) throw new Error(`Something's up with note events`);
+console.groupEnd();
+
         }
 
         if (noteSymbols && noteSymbols.length) {
+            const grain    = noteSymbols[0].grain;
             const b1       = noteSymbols[0].beat;
             const b2       = stopBeat - startBeat;
-            const duration = getNotesDuration(barDivisions, b1, b2) || noteSymbols[0].duration;
+            const v1       = getDivisionBefore(barDivisions, b1);
+            const v2       = getDivisionAfter(barDivisions, b1);
+            const v3       = getDivisionBefore(barDivisions, b2);
+            const duration = getNotesDuration(barDivisions, grain, b1, b2, v1, v2, v3);
+
+            // Extend duration of notes
+            setDurations(noteSymbols, duration);
+            beat = b1 + duration + startBeat;
 
             // If duration is not beamable, close beam
             if (gte(1, duration, P24)) {

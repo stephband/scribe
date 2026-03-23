@@ -57,7 +57,7 @@ function count1s(n) {
 
 function hasMultipleHoles(divisor, rhythm) {
     const c = count1s(rhythm);
-    return divisor > c - 1;
+    return divisor > c + 1;
 }
 
 export function hasHoles(divisor, rhythm) {
@@ -256,7 +256,7 @@ function run(minDivision, maxDivision, startBeat, maxDuration, rhythm, count, ev
     return result;
 }
 
-export default function detectRhythm(beat, duration, events, index = 0, options) {
+export default function detectRhythm(beat, duration, events, index = 0, options, drift = 0) {
     const minDivision       = options?.minDivision   || defaults.minDivision;
     const maxDivision       = options?.maxDivision   || defaults.maxDivision;
     const stopBeatInfluence = options?.stopBeatInfluence || defaults.stopBeatInfluence;
@@ -268,37 +268,35 @@ export default function detectRhythm(beat, duration, events, index = 0, options)
     let n = index - 1;
     while (events[++n] !== undefined && events[n][0] < beat);
 
-    // If no event in window, quick out
-    if (!events[n]) return;
-    if (events[n][0] >= beat + duration) return;
-
     // If events were found before beat they are assumed to be hangovers from
     // the end of a previous analysis window that were not counted as rhythm,
-    // they are now counted as rhythm in slot 0
+    // they are now counted as rhythm in the first division
     const count  = n - index;
     const rhythm = count ? 1 : 0 ;
-
-    // The return object
     const result = {
         // Start beat of rhythmic analysis window
         beat,
         // Duration of rhythmic analysis window
         duration,
         // Number of divisions over duration
-        divisor: 1,
+        divisor: 2,
         // Rhythm bitmap identifier
         rhythm,
         // Phase offset in beats, whether the performance is pushing or dragging
-        drift: 0,
+        drift,
         // Index of first event in rhythm
         index,
         // Number of events counted in rhythm
         count
     };
 
+    // If no event in window, quick out
+    if (!events[n] || events[n][0] >= beat + duration) return count ?
+        result :
+        undefined ;
+
     // Run the analysis
     if (DEBUG) analytics.length = 0;
-
     return run(minDivision, maxDivision, beat, duration, rhythm, count, events, n, result, stopBeatInfluence);
 }
 

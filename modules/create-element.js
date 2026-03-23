@@ -41,15 +41,6 @@ const clefGlyphs = {
     'percussion':  glyphs.clefDrum
 }
 
-const restGlyphs = {
-    // Triplet rests
-    '1.33': glyphs.rest2,
-    '0.67': glyphs.rest1,
-    '0.33': glyphs.rest05,
-    '0.17': glyphs.rest025,
-    '0.08': glyphs.rest0125
-};
-
 //                    (C         )(7            )(sus      )(♭9      )(/G              )
 const rchordparts = /^([A-G][♭♯]?)([∆\-ø+°♭♯\d]*)([a-zA-Z]*)([♭♯]?\d+)?(?:\/([A-G][♭♯]?))?$/;
 
@@ -57,6 +48,18 @@ function toEventIds(symbol) {
     let n = -1, string = '';
     while (symbol[++n]) string += (string ? ' ' : '') + identify(symbol[n].event);
     return string;
+}
+
+
+function toRestGlyph(duration) {
+    // Duplet or dotted rest
+    const glyph = glyphs['rest' + (duration + '').replace('.', '')];
+    if (glyph) return glyph;
+
+    // Tuplet rest
+    let d = 0.0625;
+    while (duration > (d *= 2));
+    return glyphs['rest' + (d + '').replace('.', '')];
 }
 
 function toChordHTML($0, $root, $ext, $sub, $sup, $bass) {
@@ -254,9 +257,7 @@ export default overload(get('type'), {
 
     rest: (symbol) => create('span', {
         class: "rest",
-        html: restGlyphs[symbol.duration.toFixed(2)]
-            || glyphs['rest' + (symbol.duration + '').replace('.', '')]
-            || '',
+        html: toRestGlyph(symbol.duration),
         data: {
             beat:     truncate(4, symbol.beat),
             pitch:    symbol.pitch,

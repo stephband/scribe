@@ -182,12 +182,12 @@ Flags
 .up-note.top-note[data-duration="0.125"]::before,
 .up-note.top-note[data-duration^="0.11"]::before,
 .up-note.top-note[data-duration="0.1"]::before,
-.up-note.top-note[data-duration^="0.08"]::before      { content: '\E244'; }
+.up-note.top-note[data-duration^="0.08"]::before      { content: '\E244'; background: red; }
 .down-note.bottom-note[data-duration^="0.18"]::before,
 .down-note.bottom-note[data-duration="0.125"]::before,
 .down-note.bottom-note[data-duration^="0.11"]::before,
 .down-note.bottom-note[data-duration="0.1"]::before,
-.down-note.bottom-note[data-duration^="0.08"]::before { content: '\E245'; }
+.down-note.bottom-note[data-duration^="0.08"]::before { content: '\E245'; background: red; }
 
 /* Notes that are beamed get no flag */
 .note[data-beam]::before { content: none !important; }

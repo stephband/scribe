@@ -43,9 +43,9 @@
     --bar-line-size:     0.05rem;
     /* Compress column-gap below 800px viewport to fit more information
        on mobile (0.08vw becomes 0.04em at 800px viewport). */
-    --bar-column-gap:    min(0.08vw, 0.02em);
-    --bar-padding-left:  0.3em;
-    --bar-padding-right: 0.15em;
+    --bar-column-gap:    min(0.06vw, 0.015em);
+    --bar-padding-left:  0.25em;
+    --bar-padding-right: 0.1875em;
     /* Widths of note heads in em (measured and overridden on render) */
     --head-1-size:       0.337402;
     --head-1-size:       0.390137;

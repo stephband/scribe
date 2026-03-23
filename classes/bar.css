@@ -207,6 +207,10 @@
 	justify-self: start;
 }
 
+.bar > .note {
+    margin-right: 0.09375em;
+}
+
 .bar > .cluster-note.up-note {
     margin-left: calc(1em * var(--head-1-size));
 }
@@ -501,9 +505,12 @@ in their duration span. */
 
 .bar > .barrepeat {
     justify-self: center;
-    margin-left: 0.5em;
-    margin-right: 0.5em;
-    grid-column-end: span calc(var(--columns-per-beat) * var(--duration));
+    /* A bar repeat spans a whole bar, which may have unequal left and right
+       paddings, but we want to centre the symbol */
+    margin-left: calc(0.625em - var(--bar-padding-left));
+    margin-right: calc(0.625em - var(--bar-padding-right));
+    grid-column: bar-begin / bar-end;
+    /*grid-column-end: span calc(var(--columns-per-beat) * var(--duration));*/
 }
 
 .end-bar + .bar::before {

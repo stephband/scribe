@@ -22,3 +22,7 @@
 .down-beam > .beam-path-32 {
     transform: translateY(-3.3333333px);
 }
+
+svg:has([d*="NaN"]) {
+    box-shadow: 0 0 0.3125rem 0.1875rem color(display-p3 1 0 0.131) !important;
+}

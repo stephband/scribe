@@ -1,6 +1,10 @@
 
 import create from 'dom/create.js';
 import rect   from 'dom/rect.js';
+import { ceilPow2 } from './number/power-of-2.js';
+import { eq, gte, lte, lt, gt } from './number/float.js';
+
+import { P24, GR }       from './constants.js';
 
 /* Beams */
 
@@ -26,7 +30,7 @@ function renderPathData(range, xs, beam, beat, duration) {
 
     const x0 = beam.length === 1 ?
         // If beat is divisible by 2 x duration the sub beam projects forward
-        beat % (duration * 2) === 0 ?
+        beat % duration === 0 ?
             // Forward tail beam starts at i0
             xs[i0] :
             // Backward tail beam starts before i0
@@ -36,7 +40,7 @@ function renderPathData(range, xs, beam, beat, duration) {
 
     const x1 = beam.length === 1 ?
         // If beat is divisible by 2 x duration the sub beam projects forward
-        beat % (duration * 2) === 0 ?
+        beat % duration === 0 ?
             // Forward tail beam stops after i0
             xs[i0] + 0.5 * (xs[i0 + 1] - xs[i0]) :
             // Backward tail beam stops at i0
@@ -44,22 +48,32 @@ function renderPathData(range, xs, beam, beat, duration) {
         // Beam spans whole duration
         xs[beam[beam.length - 1]] ;
 
-    return `M${ x0 }, ${ -range * x0 - 0.5 * beamThickness }
-        L${ x1 },${ -range * x1 - 0.5 * beamThickness }
-        L${ x1 },${ -range * x1 + 0.5 * beamThickness }
-        L${ x0 }, ${ -range * x0 + 0.5 * beamThickness }
-        Z` ;
+    return `M${ x0 },${ -range * x0 - 0.5 * beamThickness } L${ x1 },${ -range * x1 - 0.5 * beamThickness } L${ x1 },${ -range * x1 + 0.5 * beamThickness } L${ x0 },${ -range * x0 + 0.5 * beamThickness } Z` ;
+}
+
+function renderPath(svg, beats, xs, beam, range, duration, n) {
+    svg.appendChild(create('path', {
+        // Remember duration is the duration of the beam above this one
+        class: `beam-path-${ 8 / duration } beam-path`,
+        d: renderPathData(range, xs, beam, beats[n - 1], duration)
+    }));
 }
 
 function createBeamPaths(svg, beats, durations, xs, i, range, duration) {
     // Don't render anything shorter than triplet 32nd note beams
-    if (duration < 0.0833) return;
+    if (duration < 1/6) return;
 
     let n = i - 1;
     let beam;
 
     while (durations[++n]) {
-        if (durations[n] <= duration) {
+        // If beam division is a half duration or less
+        if (durations[n] <= 0.5 * duration
+            // ...or a dotted half duration
+            || durations[n] === 0.75 * duration
+            // ...or double dotted half duration
+            || durations[n] === 0.875 * duration
+        ) {
             // Push to existing beam
             if (beam) { beam.push(n); }
             // Or start new beam
@@ -67,12 +81,7 @@ function createBeamPaths(svg, beats, durations, xs, i, range, duration) {
         }
         // Render beam
         else if (beam) {
-            svg.appendChild(create('path', {
-                // Remember duration is the duration of the beam above this one
-                class: `beam-path-${ 4 / duration } beam-path`,
-                d: renderPathData(range, xs, beam, beats[n - 1], duration)
-            }));
-
+            renderPath(svg, beats, xs, beam, range, duration, n);
             createBeamPaths(svg, beats, durations, xs, beam[0], range, duration / 2);
             beam = undefined;
         }
@@ -80,13 +89,8 @@ function createBeamPaths(svg, beats, durations, xs, i, range, duration) {
 
     // Render beam
     if (beam) {
-        svg.appendChild(create('path', {
-            class: `beam-path-${ 4 / duration } beam-path`,
-            d: renderPathData(range, xs, beam, beats[n - 1], duration)
-        }));
-
+        renderPath(svg, beats, xs, beam, range, duration, n);
         createBeamPaths(svg, beats, durations, xs, beam[0], range, duration / 2);
-        beam = undefined;
     }
 }
 
@@ -108,5 +112,5 @@ export function renderBeam(svg) {
     const xs     = boxes.map((box) => (box.x - firstX) / (lastX - firstX));
 
     removeBeamPaths(svg);
-    createBeamPaths(svg, beats, durations, xs, 0, -range, 0.25);
+    createBeamPaths(svg, beats, durations, xs, 0, -range, 0.5);
 }
