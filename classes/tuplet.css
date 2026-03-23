@@ -12,12 +12,20 @@
     justify-items: stretch;
     align-items: baseline;
     margin-left: calc(-2em * var(--stem-width));
-    margin-right: calc(-2em * var(--stem-width));
+    margin-right: calc(var(--note-margin-right, 0em) - 3em * var(--stem-width));
 }
 
 .up-tuplet[data-rhythm^="1"] {
-    /* Move the left position by one head width to center number on beam */
+    /* Move the left position by a head width to center number on beam */
     margin-left: calc(1em * var(--head-1-size) - 3em * var(--stem-width));
+}
+
+[data-stave="drum"] .up-tuplet[data-rhythm^="1"],
+[data-stave="percussion"] .up-tuplet[data-rhythm^="1"] {
+    /* Move the left position by a head-x width to center number on beam
+       TODO: this should probably respond to circled x heads and work on any
+       stave, needs HTML to expose type of first head */
+    margin-left: calc(1em * var(--head-x-size) - 3em * var(--stem-width));
 }
 
 .tuplet::before,

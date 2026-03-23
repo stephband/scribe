@@ -55,7 +55,7 @@
     --acci-margin-right: 0.0833;
     /* Space around notes */
     --note-margin-left:  0;
-    --note-margin-right: 0;
+    --note-margin-right: 0.09375em;
     /* Space around rests */
     --rest-margin-left:  0;
     --rest-margin-right: 0;

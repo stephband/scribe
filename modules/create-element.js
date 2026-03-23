@@ -72,6 +72,15 @@ function toChordHTML($0, $root, $ext, $sub, $sup, $bass) {
         + ($bass ? '<span class="glyph glyph-slash">' + glyphs.chordBassSlash + '</span><span class="chord-bass">' + toHTML($bass) + '</span>' : '');
 }
 
+function toRhythmBinary(length, number) {
+    // Get binary string
+    const string = number.toString(2);
+    // Pad with 0s up to length and render in reverse order
+    return Array
+        .from({ length }, (n, i) => string[string.length - 1 - i] || '0')
+        .join('');
+}
+
 export default overload(get('type'), {
     barrepeat: (symbol) => create('span', {
         class: 'barrepeat',
@@ -215,11 +224,12 @@ export default overload(get('type'), {
         class: `${ symbol.stemup ? 'up' : 'down' }-beam beam`,
         viewBox: `0 ${ (symbol.range < 0 ? symbol.range : 0) - 0.5 } 1 ${ abs(symbol.range) + 1 }`,
         preserveAspectRatio: "none",
-        style: `--duration: ${ truncate(4, symbol.duration) }; ${ symbol.y ? '--translate-y:' + (symbol.y * 0.125) + ';' : '' } height: ${ (abs(symbol.range) + beamThickness) * 0.125 }em; align-self: ${ symbol.range < 0 ? 'end' : 'start' };`,
+        style: `--duration: ${ truncate(6, symbol.duration) }; ${ symbol.y ? '--translate-y:' + (symbol.y * 0.125) + ';' : '' } height: ${ (abs(symbol.range) + beamThickness) * 0.125 }em; align-self: ${ symbol.range < 0 ? 'end' : 'start' };`,
         html: `<path class="beam-path" d="M0,${ -0.5 * beamThickness } L1,${ symbol.range - 0.5 * beamThickness } L1,${ symbol.range + 0.5 * beamThickness } L0,${ 0.5 * beamThickness } Z"></path>`,
         data: {
             beat:     truncate(4, symbol.beat),
             pitch:    symbol.pitch,
+            divisor:  symbol.divisor,
             part:     symbol.part.name,
             beam:     symbol.id,
             events:   toEventIds(symbol)
@@ -249,10 +259,12 @@ export default overload(get('type'), {
             duration: truncate(4, symbol.duration),
             divisor:  symbol.divisor,
             // Rhythm is a binary number
-            rhythm:   symbol.rhythm.toString(2).split('').reverse().join(''),
+            rhythm:   toRhythmBinary(symbol.divisor, symbol.rhythm),
             part:     symbol.part.name
         },
-        style: `--angle: ${ symbol.angle }deg;`
+        style: symbol.angle ?
+            `--angle: ${ symbol.angle }deg;` :
+            undefined
     }),
 
     rest: (symbol) => create('span', {

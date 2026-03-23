@@ -208,7 +208,7 @@
 }
 
 .bar > .note {
-    margin-right: 0.09375em;
+    margin-right: var(--note-margin-right, 0.09375em);
 }
 
 .bar > .cluster-note.up-note {
@@ -318,9 +318,13 @@ in their duration span. */
     grid-column-end: span calc(1 + round(var(--duration) * var(--columns-per-beat) * (var(--divisor) - 1) / var(--divisor)));
 }
 
-.bar > .tuplet[data-duration="4"],
-.bar > .tuplet[data-duration="8"] {
-    /* Account for minim and whole rests, symbols that span multiple columns */
+.bar > .tuplet[data-duration="4"][data-divisor="3"][data-rhythm$="0"],  /* 4 beat triplet ending in rest */
+.bar > .tuplet[data-duration="8"][data-divisor="3"][data-rhythm$="0"],  /* 8 beat triplet ending in rest */
+.bar > .tuplet[data-duration="8"][data-divisor="5"][data-rhythm$="0"],  /* 8 beat quintuplet ending in rest */
+.bar > .tuplet[data-duration="8"][data-divisor="6"][data-rhythm$="0"],  /* 8 beat sextuplet ending in rest */
+.bar > .tuplet[data-duration="8"][data-divisor="7"][data-rhythm$="0"],  /* 8 beat septuplet ending in rest */
+.bar > .tuplet[data-duration="8"][data-divisor="8"][data-rhythm$="0"] { /* 8 beat nonuplet ending in rest */
+    /* Make tuplets span minim and whole rests, symbols that span multiple columns */
     grid-column-end: span calc(round(var(--duration) * var(--columns-per-beat) - 1));
 }
 
@@ -334,6 +338,14 @@ in their duration span. */
     /* Beams span from first head to last head. Their duration is set to the
        difference between the two (not to the total duration) */
     grid-column-end: span calc(round(nearest, var(--duration) * var(--columns-per-beat)));
+}
+
+/* A few tuplet beams need to special-cased due to durations not rounding
+   to the same columns as their notes */
+.bar > .beam[data-beat="0.4"],   /* A quintuplet 8th-note beam starting on the second note */
+.bar > .beam[data-beat*=".44"],  /* A nonuplet 8th-note beam starting on the second note */
+.bar > .beam[data-beat*=".11"] { /* A nonuplet 32nd-note beam starting on the second note */
+    grid-column-end: span calc(round(down, var(--duration) * var(--columns-per-beat)));
 }
 
 .bar > .up-beam {

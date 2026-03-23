@@ -1,5 +1,7 @@
 import last from '../object/last.js';
+import map  from '../object/map.js';
 import { stemupFromPitches } from './stem.js';
+
 
 
 const assign = Object.assign;
@@ -149,7 +151,7 @@ export function closeBeam(symbols, stave, part, beam) {
         y: positions[0],
         pitch: stemup ?
             top.pitch :
-            bottom.pitch ,
+            bottom.pitch,
         stemup,
         range,
         id: ++beamId

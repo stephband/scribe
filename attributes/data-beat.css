@@ -75,7 +75,6 @@
 [data-beat^="1.9"]  { --beat: 1.9; }
 [data-beat^="1.91"] { --beat: 1.9166666667; }
 
-
 [data-beat^="2"]    { --beat: 2; }
 [data-beat^="2.08"] { --beat: 2.0833333333; }
 [data-beat^="2.1"]  { --beat: 2.1; }

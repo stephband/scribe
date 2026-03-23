@@ -60,7 +60,7 @@ export function closeTuplet(stave, part, tuplet) {
     const avgPitch  = toNoteName(avgNumber);
     if (avgNumber > centreNumber) centreNumber = avgNumber;
 
-    tuplet.pitch  = toNoteName(centreNumber);
+    if (stave.pitched) tuplet.pitch = toNoteName(centreNumber);
     tuplet.stemup = stemup;
 
     const diff = lastNumber - firstNumber;

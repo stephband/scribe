@@ -130,6 +130,48 @@ function getNotesDuration(divisions, grain, b1, b2, v1, v2, v3) {
         noteDurations[j] ;
 }
 
+function updateNotesDuration(symbols, barDivisions, stave, part, beam, noteSymbols, startBeat, stopBeat) {
+    console.log(symbols, barDivisions, stave, part, beam, noteSymbols, startBeat, stopBeat);
+    const grain    = noteSymbols[0].grain;
+    const b1       = noteSymbols[0].beat;
+    const b2       = stopBeat - startBeat;
+    const v1       = getDivisionBefore(barDivisions, b1);
+    const v2       = getDivisionAfter(barDivisions, b1);
+    const v3       = getDivisionBefore(barDivisions, b2);
+    const duration = getNotesDuration(barDivisions, grain, b1, b2, v1, v2, v3);
+
+    // Extend duration of notes
+    setDurations(noteSymbols, duration);
+    const beat = b1 + duration + startBeat;
+
+    // If last notes have a duration too long for a beam
+    if (gte(1, duration, P24)) {
+        // ...and there is a beam, close it
+        if (beam) beam = closeBeam(symbols, stave, part, beam);
+    }
+    // If notes are in the same bar division as rhythm division
+    else if (v1 === v3 && (
+        // ...and note stop brings us up to division
+        beat === b2 + startBeat
+        // ...or note duration is the same duration as the gap
+        || duration === b2 + startBeat - beat
+    )) {
+        // ...make sure there is a beam
+        if (!beam) beam = createBeam(part, b1);
+        // ...and push note symbols on to it
+        push(beam, ...noteSymbols);
+    }
+    // If there is a beam
+    else if (beam) {
+        // ...push last note symbols on to it
+        push(beam, ...noteSymbols);
+        // ...and close it
+        beam = closeBeam(symbols, stave, part, beam);
+    }
+
+    return { beat, beam };
+}
+
 function getGrain(divisions, beat) {
     const minGrain = 0.125;
     const maxGrain = 2;
@@ -325,7 +367,6 @@ export default class DrumStave extends Stave {
         //while ((event = events[++n]) && lte(beat, event[0] + event[4], P24));
         while ((event = events[++n]) && lt(beat, event[0], P24));
 
-console.log(beat, n);
         let data, previousData;
         while (data = detectRhythm(beat, stopBeat - beat, events, n, { maxDivision: 1 })) {
             // Normalise rhythm based on settings, create tuplet where needed
@@ -334,8 +375,7 @@ console.log(beat, n);
             const division = duration / divisor;
             const r        = rhythm.toString(2);
 
-console.group(`Rhythm ${ r } from beat ${ startBeat } at ${ data.beat }, duration ${ duration } / ${ division }, event ${ n } -----------`);
-
+//console.group(`Rhythm ${ r } from beat ${ startBeat } at ${ data.beat }, duration ${ duration } / ${ division }, event ${ n } -----------`);
             if (tuplet) {
                 // if there is a beam, close it
                 if (beam) {
@@ -386,7 +426,7 @@ console.group(`Rhythm ${ r } from beat ${ startBeat } at ${ data.beat }, duratio
 
                     // Set beat to division end
                     beat = data.beat + i * division + division;
-                    // Don't modify durations on next iteration in duplet mode
+                    // Don't modify duration of last notes on next iteration
                     noteSymbols = undefined;
                 }
                 // Close tuplet
@@ -398,108 +438,53 @@ console.group(`Rhythm ${ r } from beat ${ startBeat } at ${ data.beat }, duratio
                 // Loop through rhythm divisions
                 let i = -1;
                 while (++i < divisor) {
-                    // Query the binary string from its end (the first division) backwards
-                    if (r[r.length - 1 - i] === '1') {
-                        // Render up to division
-                        if (noteSymbols && noteSymbols.length) {
-                            const grain    = noteSymbols[0].grain;
-                            const b1       = noteSymbols[0].beat;
-                            const b2       = data.beat + i * division - startBeat;
-                            const v1       = getDivisionBefore(barDivisions, b1);
-                            const v2       = getDivisionAfter(barDivisions, b1);
-                            const v3       = getDivisionBefore(barDivisions, b2);
-                            const duration = getNotesDuration(barDivisions, grain, b1, b2, v1, v2, v3);
+                    // Query the binary string from its end (the first division)
+                    // backwards, ignore empty divisions
+                    if (r[r.length - 1 - i] !== '1') continue;
 
-console.log(duration);
-
-                            // Extend duration of notes
-                            setDurations(noteSymbols, duration);
-                            beat = b1 + duration + startBeat;
-
-                            // If last notes have a duration too long for a beam
-                            if (gte(1, duration, P24)) {
-                                // ...and there is a beam, close it
-                                if (beam) beam = closeBeam(symbols, stave, part, beam);
-                            }
-                            // If notes are in the same bar division as rhythm division
-                            else if (v1 === v3 && (
-                                // ...and note stop brings us up to division
-                                beat === b2 + startBeat
-                                // ...or note duration is the same duration as the gap
-                                || duration === b2 + startBeat - beat
-                            )) {
-                                // ...make sure there is a beam
-                                if (!beam) beam = createBeam(part, b1);
-                                // ...and push note symbols on to it
-                                push(beam, ...noteSymbols);
-                            }
-                            // If there is a beam
-                            else if (beam) {
-                                // ...push last note symbols on to it
-                                push(beam, ...noteSymbols);
-                                // ...and close it
-                                beam = closeBeam(symbols, stave, part, beam);
-                            }
-                        }
-
-                        // If gap is bigger than division stop the beam
-                        if (beam && gt(division, data.beat + i * division - beat, P24)) {
-                            beam = closeBeam(symbols, stave, part, beam);
-                        }
-                        // Fill gap with rests
-                        createRests(symbols, settings.restDurations, barDivisor, this, part, beat - startBeat, data.beat + i * division - startBeat);
-                        // Update beat to division beginning
-                        beat = data.beat + i * division;
-                        // Fill notes with events playing during division, leaving event
-                        // as first event in the next division
-                        notes.length = 0;
-                        --n;
-                        while ((event = events[++n]) && event[0] < beat + 0.5 * division) notes.push(event);
-                        // Sort notes by pitch order, descending (ascending row order)
-                        //if (stave.pitched) notes.sort(byRow);
-                        // Impose max note duration of 1 drum notation only has black notes
-                        const d = min(1, data.duration - i * division);
-                        // Insert note symbols
-                        noteSymbols = this.createSymbols(symbols, barDivisions, part, key, tuplet, notes, beat - startBeat, d, settings);
-                        // Update beat to division end
-                        beat = data.beat + i * division + division;
+                    // Update note durations to this division
+                    if (noteSymbols && noteSymbols.length) {
+                        const o = updateNotesDuration(symbols, barDivisions, stave, part, beam, noteSymbols, startBeat, data.beat + i * division);
+                        beat = o.beat;
+                        beam = o.beam;
                     }
+
+                    // If gap is bigger than division stop the beam
+                    if (beam && gt(division, data.beat + i * division - beat, P24)) {
+                        beam = closeBeam(symbols, stave, part, beam);
+                    }
+
+                    // Fill gap with rests
+                    createRests(symbols, settings.restDurations, barDivisor, this, part, beat - startBeat, data.beat + i * division - startBeat);
+                    // Update beat to division beginning
+                    beat = data.beat + i * division;
+                    // Fill notes with events playing during division, leaving event
+                    // as first event in the next division
+                    notes.length = 0;
+                    --n;
+                    while ((event = events[++n]) && event[0] < beat + 0.5 * division) notes.push(event);
+                    // Sort notes by pitch order, descending (ascending row order)
+                    //if (stave.pitched) notes.sort(byRow);
+                    // Impose max note duration of 1 drum notation only has black notes
+                    const d = min(1, data.duration - i * division);
+                    // Insert note symbols
+                    noteSymbols = this.createSymbols(symbols, barDivisions, part, key, tuplet, notes, beat - startBeat, d, settings);
+                    // Update beat to division end
+                    beat = data.beat + i * division + division;
                 }
             }
 
             // Update beat
             beat = data.beat + data.duration;
-            if (n !== data.index + data.count) throw new Error(`Something's up with note events`);
-console.groupEnd();
-
+if (DEBUG && n !== data.index + data.count) throw new Error(`Something's up with note events`);
+//console.groupEnd();
         }
 
+        // Update note durations to end of bar
         if (noteSymbols && noteSymbols.length) {
-            const grain    = noteSymbols[0].grain;
-            const b1       = noteSymbols[0].beat;
-            const b2       = stopBeat - startBeat;
-            const v1       = getDivisionBefore(barDivisions, b1);
-            const v2       = getDivisionAfter(barDivisions, b1);
-            const v3       = getDivisionBefore(barDivisions, b2);
-            const duration = getNotesDuration(barDivisions, grain, b1, b2, v1, v2, v3);
-
-            // Extend duration of notes
-            setDurations(noteSymbols, duration);
-            beat = b1 + duration + startBeat;
-
-            // If duration is not beamable, close beam
-            if (gte(1, duration, P24)) {
-                // ...and there is a beam, close it
-                if (beam) beam = closeBeam(symbols, stave, part, beam);
-            }
-            else if (beam) {
-                // Push note symbols on to it
-                push(beam, ...noteSymbols);
-            }
-
-            // Set duration of notes
-            setDurations(noteSymbols, duration);
-            beat = nearest(P24, b1 + duration + startBeat);
+            const o = updateNotesDuration(symbols, barDivisions, stave, part, beam, noteSymbols, startBeat, stopBeat);
+            beat = o.beat;
+            beam = o.beam;
         }
 
         // If there's still a beam close it
