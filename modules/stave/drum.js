@@ -130,19 +130,18 @@ function getNotesDuration(divisions, grain, b1, b2, v1, v2, v3) {
         noteDurations[j] ;
 }
 
-function updateNotesDuration(symbols, barDivisions, stave, part, beam, noteSymbols, startBeat, stopBeat) {
-    console.log(symbols, barDivisions, stave, part, beam, noteSymbols, startBeat, stopBeat);
+function updateNotesDuration(symbols, barDivisions, stave, part, beam, noteSymbols, startBeat, stopBeat, beat = stopBeat) {
     const grain    = noteSymbols[0].grain;
     const b1       = noteSymbols[0].beat;
-    const b2       = stopBeat - startBeat;
+    const b2       = beat - startBeat;
     const v1       = getDivisionBefore(barDivisions, b1);
     const v2       = getDivisionAfter(barDivisions, b1);
-    const v3       = getDivisionBefore(barDivisions, b2);
+    const v3       = beat === stopBeat ? b2 : getDivisionBefore(barDivisions, b2) ;
     const duration = getNotesDuration(barDivisions, grain, b1, b2, v1, v2, v3);
 
     // Extend duration of notes
     setDurations(noteSymbols, duration);
-    const beat = b1 + duration + startBeat;
+    beat = b1 + duration + startBeat;
 
     // If last notes have a duration too long for a beam
     if (gte(1, duration, P24)) {
@@ -377,13 +376,14 @@ export default class DrumStave extends Stave {
 
 //console.group(`Rhythm ${ r } from beat ${ startBeat } at ${ data.beat }, duration ${ duration } / ${ division }, event ${ n } -----------`);
             if (tuplet) {
-                // if there is a beam, close it
-                if (beam) {
-                    // ...push last note symbols on to it
-                    if (noteSymbols && noteSymbols.length) push(beam, ...noteSymbols);
-                    // ...and close it
-                    beam = closeBeam(symbols, stave, part, beam);
+                // Update note durations to this division
+                if (noteSymbols && noteSymbols.length) {
+                    const o = updateNotesDuration(symbols, barDivisions, stave, part, beam, noteSymbols, startBeat, stopBeat, data.beat);
+                    beat = o.beat;
+                    beam = undefined;
                 }
+                // if there is a beam, close it
+                if (beam) beam = closeBeam(symbols, stave, part, beam);
                 // Fill with rests up to start of tuplet
                 createRests(symbols, settings.restDurations, barDivisor, this, part, beat - startBeat, data.beat - startBeat);
                 // Set beat to start of tuplet
@@ -444,7 +444,7 @@ export default class DrumStave extends Stave {
 
                     // Update note durations to this division
                     if (noteSymbols && noteSymbols.length) {
-                        const o = updateNotesDuration(symbols, barDivisions, stave, part, beam, noteSymbols, startBeat, data.beat + i * division);
+                        const o = updateNotesDuration(symbols, barDivisions, stave, part, beam, noteSymbols, startBeat, stopBeat, data.beat + i * division);
                         beat = o.beat;
                         beam = o.beam;
                     }
@@ -486,12 +486,11 @@ if (DEBUG && n !== data.index + data.count) throw new Error(`Something's up with
             beat = o.beat;
             beam = o.beam;
         }
-
         // If there's still a beam close it
         if (beam) beam = closeBeam(symbols, stave, part, beam);
         // Create rests to stopBeat
         createRests(symbols, settings.restDurations, barDivisor, this, part, beat - startBeat, stopBeat - startBeat);
-
+        // Return symbols
         return symbols;
     }
 }
