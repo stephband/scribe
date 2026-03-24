@@ -1,5 +1,8 @@
 
 import { rflat, rsharp, rdoubleflat, rdoublesharp } from '../pitch.js';
+import { lt } from '../number/float.js';
+import { P24 } from '../constants.js';
+
 
 function createAccidental(part, accidentals, beat, note, clump, cluster) {
     const { pitch, event, row } = note;
@@ -61,7 +64,7 @@ export function createAccidentals(symbols, bar, part, accidentals, beat, notes) 
 
     while (note = notes[++n]) {
         // If event started before this bar we don't require an accidental
-        if (lt(bar.beat, note.event[0], p16)) continue;
+        if (lt(bar.beat, note.event[0], P24)) continue;
 
         // Find existing accidental above this one
         above = getAccidentalAboveRowAtBeat(symbols, beat, note.row);

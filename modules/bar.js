@@ -8,33 +8,43 @@ import toStopBeat from './event/to-stop-beat.js';
 import { keyToNumbers, keyWeightsForEvent, chooseKeyFromWeights } from './keys.js';
 import { byFatherCharlesPitch, accidentalChars } from './pitch.js';
 import { major } from './scale.js';
-import { createPart } from './part.js';
 import getStopBeat from './event/to-stop-beat.js';
 import config     from './config.js';
 
 const barDivisions = {
+    // The last number in bar divisions is the bar duration
     // 2/2
-    '2,2': [2],
+    '4,2': [2,4],
     // 3/2
-    '3,2': [2, 4],
+    '6,2': [2,4,6],
     // 2/4
-    '2,1': [1],
+    '2,1': [1,2],
     // 3/4
-    '3,1': [1, 2],
+    '3,1': [1,2,3],
     // 4/4
-    '4,1': [2],
+    '4,1': [2,4],
     // 5/4
-    '5,1': [1.5,3],
+    '5,1': [3,5],
+    // 6/4
+    '6,1': [3,6],
+    // 7/4
+    '7,1': [4,7],
+    // 9/4
+    '9,1': [3,6,9],
     // 5/8
-    '2.5,0.5': [1.5],
+    '2.5,0.5': [1.5,2.5],
     // 6/8
-    '3,0.5': [1.5],
+    '3,0.5': [1.5,3],
     // 6/8
-    '3,1.5': [1.5],
+    '3,1.5': [1.5,3],
     // 7/8
-    '3.5,0.5': [1, 2],
+    '3.5,0.5': [1,2,3.5],
+    // 9/8
+    '4.5,0.5': [1.5,3,4.5],
     // 12/8
-    '6,0.5': [1.5, 3, 4.5]
+    '6,0.5': [1.5,3,4.5,6],
+    // 13/8
+    '6.5,0.5': [1.5,3,6.5]
 };
 
 const rslashbass = /\/\{(\d{1,2})\}$/;
@@ -123,7 +133,7 @@ function createBarSymbols(symbols, bar, stave, key, accidentals, events, setting
         }
 
         case "meter": {
-            console.log('METER', event[3] === 1.5, event[2] / 0.5, event[2] / event[3], event);
+            //console.log('METER', event[3] === 1.5, event[2] / 0.5, event[2] / event[3], event);
             symbols.push({
                 type:        'timesig',
                 beat:        0,
@@ -132,7 +142,6 @@ function createBarSymbols(symbols, bar, stave, key, accidentals, events, setting
                 stave,
                 event
             });
-
             break;
         }
 
@@ -141,7 +150,6 @@ function createBarSymbols(symbols, bar, stave, key, accidentals, events, setting
                 type: 'symbol' + event[2],
                 stave
             });
-
             break;
         }
 
@@ -226,7 +234,6 @@ export function createBar(count, beat, duration, divisor, stave, key, events, pa
 
     // Populate accidentals with key signature sharps and flats
     const accidentals = updateAccidentals({}, key);
-
     const bar = {
         type: 'bar',
         beat,
@@ -236,40 +243,34 @@ export function createBar(count, beat, duration, divisor, stave, key, events, pa
         divisions: getDivisions(duration, divisor),
         stave,
         count,
-        symbols
+        symbols,
+        ties: []
     };
 
     // Populate symbols with events
     createBarSymbols(symbols, bar, stave, key, accidentals, events, config);
 
     // Populate symbols with parts
-    const centers = stave.parts.reduce((centers, part) => part.centerRow ?
-        centers.add(part.centerRow) :
-        centers,
-        new Set()
-    );
-    if (!centers.size) centers.add(stave.centerRow);
+    //const centers = stave.parts.reduce((centers, part) => part.centerRow ?
+    //    centers.add(part.centerRow) :
+    //    centers,
+    //    new Set()
+    //);
+    //if (!centers.size) centers.add(stave.centerRow);
 
     let part;
     for (part of stave.parts) {
         const events = parts[part.name];
         if (!events || !events.length) continue;
         // Don't process the default center
-        centers.delete(part.centerRow || stave.centerRow);
-
-        if (stave.createPartSymbols) {
-            const partSymbols = stave.createPartSymbols(key, accidentals, part, events, bar.beat, bar.duration, bar.divisions, bar.divisor, settings);
-            symbols.push.apply(symbols, partSymbols);
-        }
-        else {
-            createPart(symbols, bar, stave, key, accidentals, part, events, settings);
-        }
+        //centers.delete(part.centerRow || stave.centerRow);
+        stave.createPartSymbols(bar, accidentals, part, events, settings);
     }
 
-    let center;
-    for (center of centers) {
-        createPart(symbols, bar, stave, key, accidentals, { centerRow: center }, [], settings);
-    }
+    //let center;
+    //for (center of centers) {
+    //    //stave.createPartSymbols(bar, accidentals, { centerRow: center }, events, settings);
+    //}
 
     return bar;
 }

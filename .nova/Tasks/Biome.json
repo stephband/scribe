@@ -1,0 +1,8 @@
+{
+    "actions": {
+        "build": {
+            "command": "/opt/homebrew/bin/biome",
+            "args": ["check", "$ProjectFolder"]
+        }
+    }
+}

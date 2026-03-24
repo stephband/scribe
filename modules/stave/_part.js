@@ -3,24 +3,32 @@ import by              from 'fn/by.js';
 import get             from 'fn/get.js';
 import { toNoteName, toNoteNumber, toRootName, toRootNumber } from 'midi/note.js';
 import { keyToRootNumber } from 'sequence/modules/event/keys.js';
-import { keyWeightsForEvent, chooseKeyFromWeights } from './keys.js';
-import { rflat, rsharp, rdoubleflat, rdoublesharp } from './pitch.js';
-import { getDivision } from './bar.js';
-import { detectTuplet, rhythmHasHoles } from './tuplet.js';
-import { round as roundTo, eq, gte, lte, lt, gt } from './number/float.js';
-import { floorPow2, ceilPow2, isPowerOf2 } from './number/power-of-2.js';
-import grainPow2       from './number/grain-pow-2.js';
-import push            from './object/push.js';
-import last            from './object/last.js';
-import lengthOf        from './object/length-of.js';
-import map             from './object/map.js';
-import getDuration     from './event/to-duration.js';
-import getStopBeat     from './event/to-stop-beat.js';
-import config          from './config.js';
+import { keyWeightsForEvent, chooseKeyFromWeights } from '../keys.js';
+import { rflat, rsharp, rdoubleflat, rdoublesharp } from '../pitch.js';
+import { getDivision } from '../bar.js';
+import { detectTuplet, rhythmHasHoles } from '../tuplet.js';
+import { round as roundTo, eq, gte, lte, lt, gt } from '../number/float.js';
+import { floorPow2, ceilPow2, isPowerOf2 } from '../number/power-of-2.js';
+import grainPow2       from '../number/grain-pow-2.js';
+import push            from '../object/push.js';
+import last            from '../object/last.js';
+import lengthOf        from '../object/length-of.js';
+import map             from '../object/map.js';
+import getDuration     from '../event/to-duration.js';
+import getStopBeat     from '../event/to-stop-beat.js';
+import config          from '../config.js';
+import { createAccents }         from '../symbol/accent.js';
+import { createAccidentals }     from '../symbol/accidental.js';
+import { createBeam, closeBeam } from '../symbol/beam.js';
+import { createLedges }          from '../symbol/ledge.js';
+import { createNotes }           from '../symbol/note.js';
+import { stemupFromRows, stemupFromPitches, stemupFromSymbols } from '../symbol/stem.js';
+import { closeTuplet }           from '../symbol/tuplet.js';
 
 
 const assign = Object.assign;
 const { abs, ceil, floor, min, max, pow, sqrt, round } = Math;
+
 
 /* When dealing with rounding errors we only really need beat grid-level
    precision, our display grid has 24 slots but we only need to compare the
@@ -48,284 +56,6 @@ function byPitch(a, b) {
     return toNoteNumber(a[2]) < toNoteNumber(b[2]) ? 1 : -1;
 }
 
-function createNoteSymbols(stave, key, part, notes) {
-    if (!notes.length) return [];
-
-    const symbols = [];
-    let n = -1, event;
-    while (event = notes[++n]) {
-        const events     = event.scribeEvents;
-        const index      = event.scribeIndex;
-        const keyWeights = keyWeightsForEvent(events, index, key);
-        const keyNumber  = chooseKeyFromWeights(keyWeights);
-        const pitch      = stave.getSpelling(keyNumber, event[2], true);
-        const row        = stave.getRow(part, pitch);
-
-        // Is note not on the stave?
-        if (!row) continue;
-
-        // Create symbols with pitch, row
-        symbols.push({
-            type: 'note',
-            pitch,
-            dynamic: event[3],
-            part,
-            row,
-            stave,
-            event
-        });
-    }
-
-    if (symbols.length === 0) return symbols;
-
-    // Sort by row order
-    symbols.sort(byRow);
-
-    // Assign top and bottom to highest and lowest note symbols
-    const top    = symbols[0];
-    const bottom = symbols[symbols.length - 1];
-    top.top       = true;
-    bottom.bottom = true;
-
-    // Figure out stemup, note that this may be overidden by beam
-    const minRow = top.row;
-    const maxRow = bottom.row;
-    const stemup = part.stemup === undefined ?
-        stemupFromRows(stave, part, minRow, maxRow) :
-        part.stemup ;
-
-    // Assign stemHeight to top and bottom symbols
-    const stemHeight = 1 + (maxRow - minRow) / 8;
-    top.stemHeight    = stemHeight;
-    bottom.stemHeight = stemHeight;
-
-    // Loop forward through rows
-    let c = 0;
-    n = -1;
-    while (symbols[++n]) {
-        // Assign stemup to all symbols
-        symbols[n].stemup = stemup;
-
-        // Detect cluster in downward order
-        if (n > 0 && symbols[n].row - symbols[n - 1].row === 1) symbols[n].clusterdown = ++c;
-        else c = 0;
-    }
-
-    // Loop backward through rows
-    c = 0;
-    n = symbols.length - 1;
-    while (n--) {
-        // Detect cluster in upward order
-        if (symbols[n + 1].row - symbols[n].row === 1) symbols[n].clusterup = ++c;
-        else c = 0;
-    }
-
-    return symbols;
-}
-
-
-/* DONE Pitches */
-
-function getMinPitchRow(stave, part, pitches) {
-    let n = -1, row = 0;
-    let pitch, r;
-    while (pitches[++n]) {
-        r = stave.getRow(part, pitches[n]);
-        // r may be out of range oof this stave
-        if (r === undefined) continue;
-        // The bigger r, the lower the pitch
-        if (r > row) {
-            row   = r;
-            pitch = pitches[n];
-        }
-    }
-    return { row, pitch };
-}
-
-function getMaxPitchRow(stave, part, pitches) {
-    let n = -1, row = 128;
-    let pitch, r;
-    while (pitches[++n]) {
-        r = stave.getRow(part, pitches[n]);
-        // r may be out of range oof this stave
-        if (r === undefined) continue;
-        // The smaller r, the higher the pitch
-        if (r < row) {
-            row   = r;
-            pitch = pitches[n];
-        }
-    }
-    return { row, pitch };
-}
-
-
-/* DONE Stems */
-
-function stemupFromRows(stave, part, minRow, maxRow) {
-    const centerRow = part.centerRow || stave.centerRow;
-    const minDiff   = minRow - centerRow;
-    const maxDiff   = maxRow - centerRow;
-    return maxDiff + minDiff > 0;
-}
-
-function stemupFromPitches(stave, part, pitches) {
-    const { row: minRow } = getMinPitchRow(stave, part, pitches);
-    const { row: maxRow } = getMaxPitchRow(stave, part, pitches);
-    return stemupFromRows(stave, part, minRow, maxRow);
-}
-
-function stemupFromSymbols(stave, part, symbols) {
-    const pitches = [];
-    let n = -1, symbol;
-    while (symbol = symbols[++n]) {
-        if (symbol.type === 'note') pitches.push(symbol.pitch);
-    }
-    return stemupFromPitches(stave, part, pitches);
-}
-
-
-/* Beams */
-
-let beamId = 0;
-
-function closeBeam(symbols, stave, part, beam) {
-    // Scan through beam symbols to find note not on beat of beam
-    let n = -1;
-    while (beam[++n] && beam[n].beat === beam.beat);
-    // If there is only notes on start beat of beam, no beam needed
-    if (!beam[n]) return symbols;
-
-    const startBeat = beam[0].beat;
-    const stopBeat  = last(beam).beat;
-    const duration  = stopBeat - startBeat;
-    const stemup = part.stemup === undefined ?
-        // Calculate stem up or down
-        stemupFromPitches(stave, part, map(get('pitch'), beam)) :
-        // Get stem direction from part
-        part.stemup ;
-
-    // If part has beam (drum stave) beams are in a fixed position
-    if (part.beam) {
-        let note, row;
-
-        // Apply beamed properties to note symbols
-        n = -1;
-        while (note = beam[++n]) {
-            note.stemup = stemup;
-            note.beam   = beam;
-            // Set stem height on all notes. TODO: This is hard-coded to drum
-            // stave, we need to get row of part.beam, which is a named row at
-            // the moment
-            row = stave.getRow(part, note.pitch);
-            note.stemHeight = stemup ?
-                0.125 + row / 8 :
-                2.8125 - row / 8 ;
-        }
-
-        //console.log('TODO: Beam has fixed position according to part', part.beam);
-        // Push the beam into symbols
-        symbols.push(assign(beam, {
-            duration,
-            stemup,
-            range: 0,
-            id: ++beamId
-        }));
-
-        return symbols;
-    }
-
-    // Calculate beam positions
-    const rows = [];
-
-    let note;
-    n = -1;
-    while (note = beam[++n]) {
-        let row = stave.getRow(part, note.pitch);
-        // row may be out of range of this stave
-        if (row === undefined) continue;
-
-        let r;
-
-        // Find highest or lowest pitch at beat of note
-        while (beam[++n] && eq(beam[n].beat, note.beat, p24)) {
-            r = stave.getRow(part, beam[n].pitch);
-            // row may be out of range of this stave
-            if (r === undefined) continue;
-            if (stemup) { if (r < row) row = r; }
-            else        { if (r > row) row = r; }
-        }
-        --n;
-
-        // Push it into pitches
-        rows.push(row);
-    }
-
-    const beamLength = rows.length - 1;
-    const beginRow   = rows.slice(0, floor(0.5 * rows.length)).reduce(average, 0);
-    const endRow     = rows.slice(ceil(0.5 * rows.length)).reduce(average, 0);
-    // This (0.2 + 0.1 * beamLength) determines the angle of the beam
-    const positions  = Array.from(rows, (r, i) => (0.2 + 0.1 * beamLength) * i * (endRow - beginRow) / beamLength);
-    const range      = positions[positions.length - 1] - positions[0];
-
-    let diff = stemup ? -50 : 50, d;
-    n = rows.length;
-    while (n--) {
-        d = positions[n] - rows[n];
-        diff = stemup ?
-            d > diff ? d : diff :
-            d < diff ? d : diff ;
-    }
-
-    n = rows.length;
-    while (n--) positions[n] -= diff + rows[0];
-
-    // Apply beamed properties to note symbols and stem heights
-    let r = -1, top, bottom;
-    n = -1;
-    while (note = beam[++n]) {
-        ++r;
-        const beamHeight = (positions[r] - rows[r] + rows[0]) / 8;
-        note.stemup = stemup;
-        note.beam   = beam;
-
-        // Keep top start note
-        if (r === 0) top = note;
-
-        // Find all other notes at beat
-        while (beam[++n] && eq(beam[n].beat, note.beat, p16)) {
-            beam[n].stemup = stemup;
-            beam[n].beam   = beam;
-        }
-
-        --n;
-
-        // Keep bottom start note
-        if (r === 0) bottom = beam[n];
-
-        // if stemup set stemHeight on lowest note...
-        if (stemup) {
-            beam[n].stemHeight = 1 + (beam[n].row - note.row) / 8 - beamHeight ;
-        }
-        // ...otherwise set stemHeight on highest note
-        else {
-            note.stemHeight = 1 + (beam[n].row - note.row) / 8 + beamHeight ;
-        }
-    }
-
-    // Push the beam into symbols
-    symbols.push(assign(beam, {
-        duration,
-        y: positions[0],
-        pitch: stemup ?
-            top.pitch :
-            bottom.pitch ,
-        stemup,
-        range,
-        id: ++beamId
-    }));
-
-    return symbols;
-}
 
 
 /* Rests */
@@ -475,213 +205,7 @@ function createRests(symbols, durations, bar, stave, part, beat, tobeat) {
 }
 
 
-/* Accidentals */
-
-function createAccidental(part, accidentals, beat, note, clump, cluster) {
-    const { pitch, event, row } = note;
-    const acci =
-        rsharp.test(pitch) ? 1 :
-        rflat.test(pitch) ? -1 :
-        undefined ;
-
-    // Line name is note name + octave (no # or b)
-    const line = pitch[0] + pitch.slice(-1);
-
-    // If accidental is already in bar's current accidentals do nothing
-    if (acci === accidentals[line]) return;
-
-    // Alter current state of bar accidentals
-    accidentals[line] = acci;
-
-    // Return accidental symbol
-    return {
-        type: 'acci',
-        beat,
-        pitch,
-        row,
-        // An index of overlapping accidentals
-        clump,
-        // Whether the corresponding note head is on the wrong side of its stem
-        cluster,
-        part,
-        event,
-        value: acci || 0
-    };
-}
-
-function getAccidentalAboveRowAtBeat(symbols, beat, maxRow) {
-    let n = -1, symbol, row = 0, o;
-    while (symbol = symbols[++n]) if (
-        symbol.type === 'acci'
-        && symbol.beat === beat
-        && symbol.row < maxRow
-        && symbol.row > row
-    ) {
-        row = symbol.row;
-        o = n;
-    }
-
-    return symbols[o];
-}
-
-function createAccidentals(symbols, bar, part, accidentals, beat, notes) {
-    let n = -1, clump = 0, note, accidental, above;
-
-    // This only looks for clusters within the current part – but its a start
-    const cluster = !!notes.find((note) => note.stemup ?
-        // Stem up, bottom not should not be clustered
-        note.clusterup % 2 === 1 :
-        // Stem down, top note cannot be clustered
-        note.clusterdown % 2 === 1
-    );
-
-    while (note = notes[++n]) {
-        // If event started before this bar we don't require an accidental
-        if (lt(bar.beat, note.event[0], p16)) continue;
-
-        // Find existing accidental above this one
-        above = getAccidentalAboveRowAtBeat(symbols, beat, note.row);
-
-        // Is any new accidental part of a clump
-        clump = above && above.row - note.row < 6 ?
-            above.cluster === cluster ?
-                above.clump + 1 :
-                0 :
-            0 ;
-
-        // Create accidental symbol
-        accidental = createAccidental(part, accidentals, beat, note, clump, cluster);
-
-        // Push it into symbols
-        if (accidental) symbols.push(accidental);
-    }
-}
-
-
-/* Accents */
-
-function createAccents(symbols, stave, part, beat, notes, settings) {
-    // Find max dynamic among all notes
-    let maxDynamic = -Infinity;
-    let n = -1, note, event;
-    while (note = notes[++n]) if (note.dynamic > maxDynamic) {
-        maxDynamic = note.dynamic;
-        event      = note.event;
-    }
-
-    // If max dynamic exceeds accent threshold, create an accent
-    if (notes.length && maxDynamic >= settings.accentThreshold) {
-        const minMaxNote = notes[0].stemup ? notes[notes.length - 1] : notes[0];
-        symbols.push({
-            type:    'accent',
-            beat,
-            pitch:   minMaxNote.pitch,
-            dynamic: maxDynamic,
-            stemup:  minMaxNote.stemup,
-            stave,
-            part,
-            event
-        });
-    }
-}
-
-
-/* Ledger lines */
-
-function createLedges(symbols, stave, part, beat, notes) {
-    // Up ledger lines
-    //const { row: maxRow, pitch: maxPitch } = getMaxPitchRow(stave, part, pitches);
-    const maxRow   = notes[0].row;
-    const maxPitch = notes[0].pitch;
-    // Ledges begin two rows away from topPitch, which is the top line
-    let rows = maxRow - (part.topRow || stave.topRow) + 1;
-    if (rows < 0) symbols.push({
-        type: 'ledge',
-        beat,
-        pitch: maxPitch,
-        part,
-        rows
-    });
-
-    // Down ledger lines
-    //const { row: minRow, pitch: minPitch } = getMinPitchRow(stave, part, pitches);
-    const minRow   = notes[notes.length - 1].row;
-    const minPitch = notes[notes.length - 1].pitch;
-    // Ledges begin two rows away from bottomPitch, which is the bottom line
-    rows = minRow - (part.bottomRow || stave.bottomRow);
-    if (rows > 0)  symbols.push({
-        type: 'ledge',
-        beat,
-        pitch: minPitch,
-        part,
-        rows
-    });
-}
-
-
 /* Symbols */
-
-function closeTuplet(stave, part, tuplet) {
-    const { beat, duration, divisor } = tuplet;
-
-    // Stem direction
-    const stemup = part.stemup === undefined ?
-        stemupFromSymbols(stave, part, tuplet) :
-        part.stemup ;
-
-    // Apply stem direction to notes
-    let n = -1, symbol;
-    while (symbol = tuplet[++n]) {
-        if (symbol.type === 'note' && !symbol.beam) symbol.stemup = stemup;
-    }
-
-    // Decide on tuplet pitch, effectively vertical row position
-    const centreBeat = beat + 0.5 * duration;
-
-    // Encourage lowest pitch to be 1 octave below top line, ensuring
-    // triplet (with appropriate styling) always sits above the top line
-    const lowestPitchNumber = toNoteNumber(stave.topPitch) - 12;
-
-    let centreNumber;
-    let h = lengthOf(tuplet);
-    // Scan backwards through tuplet until last symbol before centre beat
-    while ((symbol = tuplet[--h]) && symbol.beat > centreBeat);
-    ++h;
-
-    // Scan backwards through tuplet that cross centre beat, get highest pitch
-    while ((symbol = tuplet[--h]) && symbol.beat + symbol.duration > centreBeat) {
-        const number = toNoteNumber(symbol.pitch);
-        if (!centreNumber || number > centreNumber) centreNumber = number;
-    }
-
-    // Scan forwards from first symbol finding highest pitch beginning head
-    let firstNumber = lowestPitchNumber;
-    h = -1;
-    while ((symbol = tuplet[++h]) && symbol.beat < beat + p16) {
-        const number = toNoteNumber(symbol.pitch);
-        if (!firstNumber || number > firstNumber) firstNumber = number;
-    }
-
-    // Scan backwards from last symbol finding highest pitch ending symbol
-    let lastNumber = lowestPitchNumber;
-    h = lengthOf(tuplet);
-    while ((symbol = tuplet[--h]) && symbol.beat > beat + duration - (duration / divisor) - p16) {
-        const number = toNoteNumber(symbol.pitch);
-        if (!lastNumber || number > lastNumber) lastNumber = number;
-    }
-
-    const avgNumber = Math.ceil((firstNumber + lastNumber) / 2);
-    const avgPitch  = toNoteName(avgNumber);
-    if (avgNumber > centreNumber) centreNumber = avgNumber;
-
-    tuplet.pitch  = toNoteName(centreNumber);
-    tuplet.stemup = stemup;
-
-    const diff = lastNumber - firstNumber;
-    tuplet.angle = diff < 0 ?
-        4 * sqrt(-diff) :
-        -4 * sqrt(diff) ;
-}
 
 function isAtNextBeatDivisionDuplet(division, beat, stopBeat, duration, notes, n) {
         // Note stops before next beat
@@ -703,14 +227,12 @@ function createSymbols(symbols, bar, stave, key, accidentals, part, notes, beam,
             beam = undefined;
         }
     }
-    else if (!beam) beam = {
-        type: 'beam',
-        beat,
-        part
-    };
+    else if (!beam) {
+        beam = createBeam(part, beat);
+    }
 
     // Insert heads
-    const noteSymbols = createNoteSymbols(stave, key, part, notes);
+    const noteSymbols = createNotes(stave, key, part, notes);
 
     if (noteSymbols.length) {
         // Create ledgers, accidentals and accents
@@ -732,6 +254,9 @@ function createSymbols(symbols, bar, stave, key, accidentals, part, notes, beam,
         if (beam) push(beam, ...noteSymbols);
     }
 
+    // Keep only the last tied notes in bar.ties
+    bar.ties.length = 0;
+
     // Remove notes or insert ties
     let n = notes.length;
     while (n--) {
@@ -739,15 +264,20 @@ function createSymbols(symbols, bar, stave, key, accidentals, part, notes, beam,
         // Remove notes that end before or near next division, we're done with them
         if (fn(division, beat, stopBeat, duration, notes, n)) notes.splice(n, 1);
         // Add tie to remaining notes
-        else symbols.push({
-            type:   'tie',
-            beat,
-            pitch: noteSymbols[n].pitch,
-            duration,
-            stemup: noteSymbols[n].stemup,
-            part,
-            event: notes[n]
-        });
+        else {
+            symbols.push({
+                type:   'tie',
+                beat,
+                pitch: noteSymbols[n].pitch,
+                duration,
+                stemup: noteSymbols[n].stemup,
+                part,
+                event: notes[n]
+            });
+
+            // Keep tied events in ties
+            bar.ties.push(noteSymbols[n].event);
+        }
     }
 
     // Update beat
@@ -909,9 +439,12 @@ if (stopBeat <= beat) {
     return beatbeam;
 }
 
-export function createPart(symbols, bar, stave, key = 0, accidentals = {}, part, events, settings = config) {
+export default function createPart(bar, accidentals, part, events, settings = config) {
+    const key     = bar.key;
+    const symbols = bar.symbols;
+    const notes   = [];
+    const stave   = this;
     const { restDurations } = settings;
-    const notes = [];
 
     let beat = 0;
     let n = -1;
@@ -961,6 +494,5 @@ export function createPart(symbols, bar, stave, key = 0, accidentals = {}, part,
 
     // If there's still a beam close it
     if (beam) closeBeam(symbols, stave, part, beam);
-
     return symbols;
 }

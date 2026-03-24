@@ -1,0 +1,7 @@
+{
+  "co.gwil.deno.config.formatOnSave" : "false",
+  "deno.cacheOnSave" : false,
+  "deno.lint" : true,
+  "deno.suggest.completeFunctionCalls" : true,
+  "deno.unstable" : false
+}

@@ -8,6 +8,7 @@ import { rpitch, rflatsharp, byFatherCharlesPitch, accidentalChars } from '../pi
 import config           from '../config.js';
 import { major }        from '../scale.js';
 import * as glyphs      from "../glyphs.js";
+import createPartSymbols from './_part.js';
 
 
 const accidentals = {
@@ -245,3 +246,5 @@ export default class Stave {
             this.pitches[n] ;
     }
 }
+
+Stave.prototype.createPartSymbols = createPartSymbols;

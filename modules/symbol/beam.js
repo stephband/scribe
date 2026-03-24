@@ -1,9 +1,13 @@
+
+import get             from 'fn/get.js';
+import { eq } from '../number/float.js';
 import last from '../object/last.js';
 import map  from '../object/map.js';
 import { stemupFromPitches } from './stem.js';
+import { P24 } from '../constants.js';
 
 
-
+const { abs, ceil, floor, min, max, pow, sqrt, round } = Math;
 const assign = Object.assign;
 let beamId = 0;
 
@@ -80,7 +84,7 @@ export function closeBeam(symbols, stave, part, beam) {
         let r;
 
         // Find highest or lowest pitch at beat of note
-        while (beam[++n] && eq(beam[n].beat, note.beat, p24)) {
+        while (beam[++n] && eq(beam[n].beat, note.beat, P24)) {
             r = stave.getRow(part, beam[n].pitch);
             // row may be out of range of this stave
             if (r === undefined) continue;
@@ -125,7 +129,7 @@ export function closeBeam(symbols, stave, part, beam) {
         if (r === 0) top = note;
 
         // Find all other notes at beat
-        while (beam[++n] && eq(beam[n].beat, note.beat, p16)) {
+        while (beam[++n] && eq(beam[n].beat, note.beat, P24)) {
             beam[n].stemup = stemup;
             beam[n].beam   = beam;
         }

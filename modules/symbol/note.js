@@ -53,10 +53,10 @@ export function createNotes(stave, key, part, notes) {
         stemupFromRows(stave, part, minRow, maxRow) :
         part.stemup ;
 
-    // Assign stemHeight to top and bottom symbols
+    // Assign stemHeight to top or bottom symbols
     const stemHeight = 1 + (maxRow - minRow) / 8;
-    top.stemHeight    = stemHeight;
-    bottom.stemHeight = stemHeight;
+    if (stemup) bottom.stemHeight = stemHeight;
+    else top.stemHeight = stemHeight;
 
     // Loop forward through rows
     let c = 0;
