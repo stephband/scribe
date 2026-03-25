@@ -1,12 +1,19 @@
 
-import get        from 'fn/get.js';
-import overload   from 'fn/overload.js';
-import { toNoteNumber, toRootName, toRootNumber } from 'midi/note.js';
-import join       from './object/join.js';
-import toStopBeat from './event/to-stop-beat.js';
-import { createBar }  from './bar.js';
-import getStopBeat from './event/to-stop-beat.js';
-import config     from './config.js';
+import get              from 'fn/get.js';
+import overload         from 'fn/overload.js';
+import { toRootName }   from 'midi/note.js';
+import { toKeyNumber, keyToRootNumber, rootToKeyNumber } from 'sequence/modules/event/keys.js';
+import { toChordName }  from 'sequence/modules/event/chords.js';
+import mod12            from './number/mod-12.js';
+import join             from './object/join.js';
+import toStopBeat       from './event/to-stop-beat.js';
+import { getDivisions } from './bar/divisions.js';
+import config           from './config.js';
+import { keyToNumbers, keyWeightsForEvent, chooseKeyFromWeights } from './keys.js';
+import { major }        from './scale.js';
+
+
+const rslashbass = /\/\{(\d{1,2})\}$/;
 
 
 /* Bar repeats */
@@ -136,49 +143,214 @@ function pushEventToPart(stave, parts, event) {
     parts[part.name].push(event);
 }
 
+function updateAccidentals(accidentals, key) {
+    const numbers = keyToNumbers(key);
 
+    numbers.reduce((accidentals, n, i) => {
+        const acci = n - major[i];
+        if (acci !== 0) {
+            const name = toRootName(major[i]);
+            let n = 10;
+            while (n--) accidentals[name + n] = acci;
+        }
+        return accidentals;
+    }, accidentals);
 
+    return accidentals;
+}
 
-function _createBars(sequence, excludes, stave, settings = config) {
-    const bars  = [];
-    const parts = { main: [] };
-    let duration, divisor, event, sequenceEvent, stopBeat;
+function substituteSpelling(settings, name) {
+    if (name === 'C♭' && settings.spellChordRootCFlatAsB)  return 'B';
+    if (name === 'E♯' && settings.spellChordRootESharpAsF) return 'F';
+    if (name === 'B♯' && settings.spellChordRootBSharpAsC) return 'C';
+    if (name === 'F♭' && settings.spellChordRootFFlatAsE)  return 'E';
+    return name;
+}
+
+function createBar(count, beat, duration, divisor, stave, key, symbols, parts, settings) {
+    // Track end of sequence and shove in a double bar line
+    //if (sequence) {
+    //    const sequenceStop = toStopBeat(sequence);
+    //    if (sequenceStop > beat && sequenceStop <= beat + duration) {
+    //        events.push(sequence);
+    //    }
+    //}
+
+    // Create bar
+    const bar = {
+        type: 'bar',
+        count,
+        beat,
+        duration,
+        divisor: divisor || 4,
+        divisions: getDivisions(duration, divisor),
+        key,
+        stave,
+        symbols
+    };
+
+    let part;
+    for (part of stave.parts) {
+        const events = parts[part.name];
+        if (!events || !events.length) continue;
+        // Populate accidentals with key signature sharps and flats
+        const accidentals = updateAccidentals({}, key);
+        // Don't process the default center
+        //centers.delete(part.centerRow || stave.centerRow);
+        stave.createPartSymbols(bar, accidentals, part, events, settings);
+    }
+
+    return bar;
+}
+
+export default function createBars(sequence, excludes, stave, settings = config) {
+    const events = [];
+    const bars   = [];
+    const jsons  = [];
+
+    let beat     = 0;
+    let key      = 0;
+    let stopBeat = 0;
+    let symbols  = [];
+    let parts    = {};
+    let duration, divisor, event, sequenceEvent;
 
     // Extract events from sequence iterator and divide them into parts
     for (event of sequence) {
-        // While event time is beyond current bar end...
+        // While event time is beyond bar end create bar from current state
         while (event[0] >= beat + duration) {
-            // ...create bar using current data
-            const bar = createBar();
+            const bar = createBar(bars.length + 1, beat, duration, divisor, stave, key, symbols, parts, settings);
+
+            // If a sequence event stopped in this bar
+            if (sequenceEvent
+                && toStopBeat(sequenceEvent) > beat
+                && toStopBeat(sequenceEvent) <= beat + duration) {
+                // Push in a double bar line
+                console.log('DOUBLE BAR', event);
+                symbols.push({ type: 'doublebarline', stave, event });
+                sequenceEvent = undefined;
+            }
+
+            detectBarRepeats(bars, jsons, bar);
             bars.push(bar);
+            beat    = bar.beat + bar.duration;
+            symbols = [];
+            parts   = {};
         }
 
-        // Handle event
+        // Handle event types
         switch (event[1]) {
-            case "note":
-                // Note events are pushed to parts
-                pushEventToPart(stave, parts, event);
-                // If event extends beyond bar push it into ties
-                // TEMP!!!
-                //if (stave.pitched) {
-                //    if (stopBeat < toStopBeat(event)) stopBeat = toStopBeat(event);
-                //}
-                break;
-
-            case "sequence":
-                //if (event.events === sequence.events) sequenceEvent = event;
-                if (stopBeat < toStopBeat(event)) stopBeat = toStopBeat(event);
+            // Meter events set bar duration
+            case "key":
+                if (event[0] !== beat) throw new Error(`Scribe "key" event at beat ${ event[0] } not at start of bar at beat ${ beat }`);
+                key = toKeyNumber(event[2]);
+                //updateAccidentals(accidentals, key);
+                // TODO: Key is global and added to the side bar, we need to think about
+                // how to make key signature changes
+                // symbols.push.apply(symbols, stave.createKeySymbols(key));
                 break;
 
             case "meter":
+                if (event[0] !== beat) throw new Error(`Scribe "meter" event at beat ${ event[0] } not at start of bar at beat ${ beat }`);
                 duration = event[2];
                 divisor  = event[3];
-                // If meter event does not land on current bar beat
-                if (event[0] !== beat) throw new Error('Scribe "meter" event not at start of bar');
+                symbols.push({
+                    type:        'timesig',
+                    beat:        0,
+                    numerator:   event[3] === 1.5 ? event[2] / 0.5 : event[2] / event[3],
+                    denominator: event[3] === 1.5 ? 8 : 4 / event[3],
+                    stave,
+                    event
+                });
+                break;
+
+            case "symbol":
+                symbols.push({
+                    type: 'symbol' + event[2],
+                    stave
+                });
+                break;
+
+            case "chord": {
+                const keyWeights = keyWeightsForEvent(events, n, key);
+                const keyNumber  = chooseKeyFromWeights(keyWeights);
+                const extension  = toChordName(event[3]);
+                const slashbass  = rslashbass.exec(extension);
+
+                let root, bass, name;
+
+                if (slashbass) {
+                    const n = parseInt(slashbass[1], 10);
+                    root = stave.getSpelling(keyNumber, mod12(event[2] - n));
+                    bass = stave.getSpelling(keyNumber, event[2]);
+                    name = substituteSpelling(settings, root) + extension.replace(rslashbass, '/' + substituteSpelling(settings, bass));
+                }
+                else {
+                    root = stave.getSpelling(keyNumber, event[2]);
+                    name = substituteSpelling(settings, root) + extension;
+                }
+
+                symbols.push({
+                    type: 'chord',
+                    beat: event[0] - beat,
+                    name,
+                    // Does chord cross into next bar? The symbol should not
+                    duration: event[0] + event[4] > beat + duration ?
+                        duration - event[0] + beat :
+                        event[4],
+                    event,
+                    stave
+                });
+
+                break;
+            }
+
+            case "text":
+                symbols.push({
+                    type: 'text',
+                    beat: event[0] - beat,
+                    // Does chord cross into next bar? The symbol should not
+                    duration: event[0] + event[3] > beat + duration ?
+                        duration - event[0] + beat :
+                        event[3],
+                    value: event[2],
+                    event,
+                    stave
+                });
+                break;
+
+            case "sequence":
+                // If this sequence event comes from the top level sequence
+                // flag a double bar line at the end of the sequence
+                if (event.events === sequence.events) sequenceEvent = event;
+
+                // Extend stop beat
+                stopBeat = stopBeat < toStopBeat(event) ?
+                    toStopBeat(event) :
+                    stopBeat ;
+
+                break;
+
+            case "note":
+                stopBeat = stopBeat < toStopBeat(event) ?
+                    toStopBeat(event) :
+                    stopBeat ;
+
+                pushEventToPart(stave, parts, event);
+                break;
 
             default:
-                parts.main.push(event);
+                console.log('Scribe: ignoring event type "' + event[1] + '"');
         }
+
+        // Store all events for the key analyser. We know event is an object at
+        // this point, as the iterator emits transformed objects, so use the
+        // event to pass the info down
+        event.scribeIndex  = events.length;
+        event.scribeEvents = events;
+
+        // Add to events
+        events.push(event);
     }
 
     // If no meter was declared this is a bar with indeterminate duration,
@@ -186,13 +358,29 @@ function _createBars(sequence, excludes, stave, settings = config) {
     // last event: TODO: check all events, the last may not be the longest
     if (!duration) {
         duration = scribeEvents.length ?
-            getStopBeat(scribeEvents[scribeEvents.length - 1]) :
+            toStopBeat(scribeEvents[scribeEvents.length - 1]) :
             1 ;
     }
 
-    while (beat < stopBeat - duration) {
-        const bar = createBar();
+    // Create bars up to stop beat
+    while (beat < stopBeat) {
+        const bar = createBar(bars.length + 1, beat, duration, divisor, stave, key, symbols, parts, settings);
+
+        // If a sequence event stopped in this bar
+        if (sequenceEvent
+            && toStopBeat(sequenceEvent) > beat
+            && toStopBeat(sequenceEvent) <= beat + duration) {
+            // Flag the bar to make a double bar line
+            bar.doubleBarLine = true;
+            //symbols.push({ type: 'doublebarline', stave, event });
+            sequenceEvent = undefined;
+        }
+
+        detectBarRepeats(bars, jsons, bar);
         bars.push(bar);
+        beat    = bar.beat + bar.duration;
+        symbols = [];
+        parts   = {};
     }
 
     return bars;
@@ -202,6 +390,9 @@ function _createBars(sequence, excludes, stave, settings = config) {
 
 
 
+
+
+/*
 export default function createBars(sequence, excludes, stave, settings = config) {
     const scribeEvents = [];
     const bars  = [];
@@ -349,3 +540,4 @@ if (stave.pitched) {
     // Return bars
     return bars;
 }
+*/

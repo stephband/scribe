@@ -5,7 +5,7 @@ import rect             from 'dom/rect.js';
 import SequenceIterator from 'sequence/modules/sequence-iterator.js';
 import { rootToKeyNumber, toKeyName, toKeyNumber } from 'sequence/modules/event/keys.js';
 import Stave            from './stave.js';
-import createBars       from './create-bars.js';
+import createBars       from './bars.js';
 import createElement    from './create-element.js';
 import { renderBeam }   from './beam.js';
 import * as glyphs      from './glyphs.js';

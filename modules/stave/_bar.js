@@ -53,22 +53,6 @@ function getDivisions(duration, divisor) {
     return barDivisions[duration + ',' + divisor] || nothing;
 }
 
-/**
-getDivision(divisions, b1, b2)
-Gets first bar division from `divisions` where `b1` is before and `b2` after or
-on it.
-**/
-
-export function getDivision(divisions, b1, b2) {
-    let n = -1;
-    while (divisions[++n] && divisions[n] <= b1);
-    // If divisions[n] is undefined, comparison evaluates to false, which is
-    // what we want
-    return b2 > divisions[n] ?
-        divisions[n] :
-        undefined ;
-}
-
 
 
 const ignoreTypes = [];
@@ -97,7 +81,8 @@ function substituteSpelling(settings, name) {
     return name;
 }
 
-function createBarSymbols(symbols, bar, stave, key, accidentals, events, settings) {
+function createBarSymbols(bar, stave, key, accidentals, events, settings) {
+    const { symbols } = bar;
     let n = -1;
     let event;
 
@@ -228,7 +213,7 @@ export function createBar(count, beat, duration, divisor, stave, key, events, pa
     };
 
     // Populate symbols with events
-    createBarSymbols(symbols, bar, stave, key, accidentals, events, config);
+    createBarSymbols(bar, stave, key, accidentals, events, config);
 
     // Populate symbols with parts
     //const centers = stave.parts.reduce((centers, part) => part.centerRow ?

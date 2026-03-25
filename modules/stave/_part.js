@@ -5,7 +5,6 @@ import { toNoteName, toNoteNumber, toRootName, toRootNumber } from 'midi/note.js
 import { keyToRootNumber } from 'sequence/modules/event/keys.js';
 import { keyWeightsForEvent, chooseKeyFromWeights } from '../keys.js';
 import { rflat, rsharp, rdoubleflat, rdoublesharp } from '../pitch.js';
-import { getDivision } from '../bar.js';
 import { detectTuplet, rhythmHasHoles } from '../tuplet.js';
 import { round as roundTo, eq, gte, lte, lt, gt } from '../number/float.js';
 import { floorPow2, ceilPow2, isPowerOf2 } from '../number/power-of-2.js';
@@ -54,6 +53,23 @@ function toMaxStopBeat(n, event) {
 
 function byPitch(a, b) {
     return toNoteNumber(a[2]) < toNoteNumber(b[2]) ? 1 : -1;
+}
+
+
+/**
+getDivision(divisions, b1, b2)
+Gets first bar division from `divisions` where `b1` is before and `b2` after or
+on it.
+**/
+
+function getDivision(divisions, b1, b2) {
+    let n = -1;
+    while (divisions[++n] && divisions[n] <= b1);
+    // If divisions[n] is undefined, comparison evaluates to false, which is
+    // what we want
+    return b2 > divisions[n] ?
+        divisions[n] :
+        undefined ;
 }
 
 
