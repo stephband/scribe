@@ -49,16 +49,7 @@ const barDivisions = {
 
 const rslashbass = /\/\{(\d{1,2})\}$/;
 
-/**
-getBarDivisions(meter)
-Gets bar divisions from `meter` event.
-**/
-
-export function getBarDivisions(meter) {
-    return barDivisions[meter[2] + ',' + meter[3]] || nothing;
-}
-
-export function getDivisions(duration, divisor) {
+function getDivisions(duration, divisor) {
     return barDivisions[duration + ',' + divisor] || nothing;
 }
 
@@ -74,17 +65,6 @@ export function getDivision(divisions, b1, b2) {
     // If divisions[n] is undefined, comparison evaluates to false, which is
     // what we want
     return b2 > divisions[n] ?
-        divisions[n] :
-        undefined ;
-}
-
-export function getLastDivision(divisions, b1, b2) {
-    let n = divisions.length;
-    while (divisions[--n] && divisions[n] >= b2);
-
-    // If divisions[n] is undefined, comparison evaluates to false, which is
-    // what we want
-    return b1 < divisions[n] ?
         divisions[n] :
         undefined ;
 }

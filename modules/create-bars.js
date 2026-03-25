@@ -136,13 +136,79 @@ function pushEventToPart(stave, parts, event) {
     parts[part.name].push(event);
 }
 
+
+
+
+function _createBars(sequence, excludes, stave, settings = config) {
+    const bars  = [];
+    const parts = { main: [] };
+    let duration, divisor, event, sequenceEvent, stopBeat;
+
+    // Extract events from sequence iterator and divide them into parts
+    for (event of sequence) {
+        // While event time is beyond current bar end...
+        while (event[0] >= beat + duration) {
+            // ...create bar using current data
+            const bar = createBar();
+            bars.push(bar);
+        }
+
+        // Handle event
+        switch (event[1]) {
+            case "note":
+                // Note events are pushed to parts
+                pushEventToPart(stave, parts, event);
+                // If event extends beyond bar push it into ties
+                // TEMP!!!
+                //if (stave.pitched) {
+                //    if (stopBeat < toStopBeat(event)) stopBeat = toStopBeat(event);
+                //}
+                break;
+
+            case "sequence":
+                //if (event.events === sequence.events) sequenceEvent = event;
+                if (stopBeat < toStopBeat(event)) stopBeat = toStopBeat(event);
+                break;
+
+            case "meter":
+                duration = event[2];
+                divisor  = event[3];
+                // If meter event does not land on current bar beat
+                if (event[0] !== beat) throw new Error('Scribe "meter" event not at start of bar');
+
+            default:
+                parts.main.push(event);
+        }
+    }
+
+    // If no meter was declared this is a bar with indeterminate duration,
+    // but we do need to know how much duration to render so get it from the
+    // last event: TODO: check all events, the last may not be the longest
+    if (!duration) {
+        duration = scribeEvents.length ?
+            getStopBeat(scribeEvents[scribeEvents.length - 1]) :
+            1 ;
+    }
+
+    while (beat < stopBeat - duration) {
+        const bar = createBar();
+        bars.push(bar);
+    }
+
+    return bars;
+}
+
+
+
+
+
 export default function createBars(sequence, excludes, stave, settings = config) {
     const scribeEvents = [];
     const bars  = [];
-    let ties  = [];
     const jsons = [];
 
     let beat     = 0;
+    let ties     = [];
     let events   = [];
     let parts    = {};
     let key      = 0;
@@ -168,11 +234,8 @@ console.log('ARSE');
             const bar = createBar(bars.length + 1, beat, duration, divisor, stave, key, events, parts, sequenceEvent, settings);
             detectBarRepeats(bars, jsons, bar);
             bars.push(bar);
-            key  = bar.key;
-            // TEMP Support the old way of collecting ties, but also allow the
-            // new way where they are returned by createBar(), if it exists
-            ties = bar.ties || ties;
-            // Update beat, start new accumulators
+            key    = bar.key;
+            ties   = bar.ties;
             beat   = beat + duration;
             events = [];
             parts  = {};
@@ -229,13 +292,9 @@ if (stave.pitched) {
         const bar = createBar(bars.length + 1, beat, duration, divisor, stave, key, events, parts, sequenceEvent, settings);
         detectBarRepeats(bars, jsons, bar);
         bars.push(bar);
-
-        key  = bar.key;
-        // TEMP Support the old way of collecting ties, but also allow the
-        // new way where they are returned by createBar(), if it exists
-        ties = bar.ties || ties;
-        // Update beat, start new arrays
-        beat = beat + duration;
+        key    = bar.key;
+        ties   = bar.ties;
+        beat   = beat + duration;
         events = [];
         parts  = {};
 
@@ -257,13 +316,9 @@ if (stave.pitched) {
         const bar = createBar(bars.length + 1, beat, duration, divisor, stave, key, events, parts, sequenceEvent, settings);
         detectBarRepeats(bars, jsons, bar);
         bars.push(bar);
-
-        key  = bar.key;
-        // TEMP Support the old way of collecting ties, but also allow the
-        // new way where they are returned by createBar(), if it exists
-        ties = bar.ties || ties;
-        // Update beat, start new arrays
-        beat = beat + duration;
+        key    = bar.key;
+        ties   = bar.ties;
+        beat   = beat + duration;
         events = [];
         parts  = {};
 
