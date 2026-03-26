@@ -210,7 +210,7 @@ function createBar(count, beat, duration, divisor, stave, key, symbols, parts, s
         remove(staffs, part.staff);
     }
 
-    // Render rests to any staffs that had no parts
+    // Render whole bar rests to any staffs that had no parts
     let s = staffs.length;
     while (s--) bar.symbols.push({
         type: 'rest',
@@ -228,7 +228,6 @@ function createBar(count, beat, duration, divisor, stave, key, symbols, parts, s
         // Flag the bar to make a double bar line
         bar.doubleBarLine = true;
         //symbols.push({ type: 'doublebarline', stave, event });
-        sequenceEvent = undefined;
     }
 
     return bar;
@@ -256,15 +255,14 @@ export default function createBars(sequence, excludes, stave, settings = config)
             bars.push(bar);
             beat    = bar.beat + bar.duration;
             symbols = [];
+            if (bar.doubleBarLine) sequenceEvent = undefined;
         }
 
         // Handle event types
         switch (event[1]) {
-            // Meter events set bar duration
             case "key":
                 if (event[0] !== beat) throw new Error(`Scribe "key" event at beat ${ event[0] } not at start of bar at beat ${ beat }`);
                 key = toKeyNumber(event[2]);
-                //updateAccidentals(accidentals, key);
                 // TODO: Key is global and added to the side bar, we need to think about
                 // how to make key signature changes
                 // symbols.push.apply(symbols, stave.createKeySymbols(key));
@@ -272,6 +270,7 @@ export default function createBars(sequence, excludes, stave, settings = config)
 
             case "meter":
                 if (event[0] !== beat) throw new Error(`Scribe "meter" event at beat ${ event[0] } not at start of bar at beat ${ beat }`);
+                // Meter events set bar duration
                 duration = event[2];
                 divisor  = event[3];
                 symbols.push({
@@ -359,9 +358,9 @@ export default function createBars(sequence, excludes, stave, settings = config)
                 log('event type "' + event[1] + '" ignored', '');
         }
 
-        // Store all events for the key analyser. We know event is an object at
+        // Store all events for the key analyser: we know event is an object at
         // this point, as the iterator emits transformed objects, so use the
-        // event to pass the info down
+        // event to store information scribe needs for analysis
         event.scribeIndex  = events.length;
         event.scribeEvents = events;
 
@@ -389,6 +388,5 @@ export default function createBars(sequence, excludes, stave, settings = config)
 
     // Always render last bar with a double bar line
     bars[bars.length - 1].doubleBarLine = true;
-
     return bars;
 }
