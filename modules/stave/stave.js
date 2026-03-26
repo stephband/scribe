@@ -138,8 +138,11 @@ export default class Stave {
     .getPart(pitch)
     **/
 
+    staffs = ['main'];
+
     parts = [{
-        name: 'main'
+        name:  'main',
+        staff: 'main'
     }];
 
     getPart(number) {

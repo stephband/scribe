@@ -9,6 +9,7 @@ export default class PercussionStave extends DrumStave {
     rows  = ['','','','','','','','rhythm','','','','','','',''];
     parts = [{
         name:   'rhythm',
+        staff:  'main',
         beam:   'rhythm',
         notes:  '*',
         stemup: true

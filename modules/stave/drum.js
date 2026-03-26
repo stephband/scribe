@@ -97,7 +97,7 @@ function getNotesDuration(divisions, grain, b1, b2, v1, v2, v3) {
     // Reject noteDurations greater than available space up to b2 or bar
     // division, whichever is first
     const b3 = v1 === v3 ? b2 : v2 ;
-console.log('b3', b3);
+//console.log('b3', b3);
     while (noteDurations[--j] > b3 - b1);
 
     // If that duration does not span exactly to b2 or bar division
@@ -256,10 +256,12 @@ export default class DrumStave extends Stave {
 
     parts = [{
         name:   'drums',
+        staff:  'main',
         beam:   'drums-beam',
         stemup: false
     }, {
         name:   'cymbals',
+        staff:  'main',
         beam:   'cymbals-beam',
         stemup: true
     }];

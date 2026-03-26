@@ -17,6 +17,7 @@ A simple piano grand stave which brute splits treble from bass at Bb3.
 
 export default class PianoStave extends Stave {
     type = 'piano';
+
     rows = [
         "rh-A6 soprano-A6 alto-A6",
         "rh-G6 soprano-G6 alto-G6",
@@ -78,9 +79,9 @@ export default class PianoStave extends Stave {
         </span>`;
     }
 
-    staffs = ['bass', 'treble'];
+    staffs = ['treble', 'bass'];
 
-    parts = [{}, {
+    parts = [{
         name:      'lh',
         staff:     'bass',
         topRow:    29,
@@ -149,19 +150,19 @@ export default class PianoStave extends Stave {
     getPart(number) {
         return typeof number === 'number' ?
             number < 60 ?
+                this.parts[0] :
                 this.parts[1] :
-                this.parts[2] :
             /[012]$|[AC-G][b#♭♯𝄫𝄪]*3$/.test(number) ?
-                this.parts[1] :
-                this.parts[2] ;
+                this.parts[0] :
+                this.parts[1] ;
     }
 
     createKeySymbols(key) {
         const keysig  = super.createKeySymbols(key);
         const symbols = [];
         // Add key signature to both staffs
+        symbols.push.apply(symbols, keysig.map((symbol) => assign({}, symbol, { part: this.parts[0] })));
         symbols.push.apply(symbols, keysig.map((symbol) => assign({}, symbol, { part: this.parts[1] })));
-        symbols.push.apply(symbols, keysig.map((symbol) => assign({}, symbol, { part: this.parts[2] })));
         return symbols;
     }
 
@@ -169,12 +170,12 @@ export default class PianoStave extends Stave {
         const symbols = [{
             type:  'clef',
             clef:  'treble',
-            part:  this.parts[1],
+            part:  this.parts[0],
             stave: this
         }, {
             type:  'clef',
             clef:  'bass',
-            part:  this.parts[2],
+            part:  this.parts[1],
             stave: this
         }];
 

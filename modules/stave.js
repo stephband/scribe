@@ -53,14 +53,4 @@ Stave['piano']       = new PianoStave();
 Stave['drum']        = new DrumStave();
 Stave['percussion']  = new PercussionStave();
 
-
-/**
-Stave.create(type)
-Create a stave object by type.
-**/
-Stave.create = (type) => {
-    console.warn('Deprecated: Stave.create(type). Use Stave[type].');
-    return Stave[type];
-}
-
 export default Stave;
