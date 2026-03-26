@@ -1,4 +1,5 @@
 
+import matches           from 'fn/matches.js';
 import slugify           from 'fn/slugify.js';
 import { toDrumName, toNoteNumber } from 'midi/note.js';
 import * as glyphs       from "../glyphs.js";
@@ -331,12 +332,13 @@ export default class DrumStave extends Stave {
         return noteSymbols;
     }
 
-    createPartSymbols(bar, accidentals, part, events, settings) {
+    createPartSymbols(bar, accidentals, name, events, settings) {
         const startBeat = bar.beat;
         const stopBeat  = bar.beat + bar.duration;
         const key       = bar.key;
         const symbols   = bar.symbols;
         const stave     = this;
+        const part      = this.parts.find(matches({ name }));
 
         let beat = startBeat;
         //let n    = 0;
@@ -384,9 +386,6 @@ export default class DrumStave extends Stave {
                         while (events[0] && events[0][0] < beat + 0.5 * division) {
                             notes.push(events.shift());
                         }
-                        //--n;
-                        //while ((event = events[++n]) && event[0] < beat + 0.5 * division) notes.push(event);
-
                         // Sort notes by pitch order, descending (ascending row order)
                         //if (stave.pitched) notes.sort(byRow);
                         // Impose max note duration, drum notation only has black notes
@@ -404,7 +403,7 @@ export default class DrumStave extends Stave {
                     else {
                         // Push in a tuplet division rest
                         symbols.push({
-                            type: 'rest',
+                            type:     'rest',
                             beat:     beat - startBeat,
                             duration: division,
                             stave,
@@ -446,16 +445,11 @@ export default class DrumStave extends Stave {
                     createRests(symbols, settings.restDurations, bar.divisions, this, part, beat - startBeat, data.beat + i * division - startBeat);
                     // Update beat to division beginning
                     beat = data.beat + i * division;
-                    // Fill notes with events playing during division, leaving event
-                    // as first event in the next division
+                    // Fill notes with events playing during division
                     notes.length = 0;
                     while (events[0] && events[0][0] < beat + 0.5 * division) {
                         notes.push(events.shift());
                     }
-                    //--n;
-                    //while ((event = events[++n]) && event[0] < beat + 0.5 * division) {
-                    //    notes.push(event);
-                    //}
 
                     // Sort notes by pitch order, descending (ascending row order)
                     //if (stave.pitched) notes.sort(byRow);

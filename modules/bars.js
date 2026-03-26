@@ -206,7 +206,7 @@ function createBar(count, beat, duration, divisor, stave, key, symbols, parts, s
         if (!events || !events.length) continue;
         // Populate accidentals with key signature sharps and flats
         const accidentals = updateAccidentals({}, key);
-        stave.createPartSymbols(bar, accidentals, part, events, settings);
+        stave.createPartSymbols(bar, accidentals, name, events, settings);
         remove(staffs, part.staff);
     }
 
@@ -216,8 +216,9 @@ function createBar(count, beat, duration, divisor, stave, key, symbols, parts, s
         type: 'rest',
         beat: 0,
         duration,
+        whole: true, // Flag rest as a whole bar rest
         stave,
-        part: { name: staffs[s] }
+        part: {}
     });
 
     // If a sequence event stopped in this bar

@@ -176,27 +176,6 @@ export const chordBracketLeft     = '(';
 export const chordBracketRight    = ')';
 export const chordBassSlash       = '&#xE87B;';
 
-export const chordGlyphs = {
-    "∆♯11": "\uE873\uED6211",
-    "∆": "\uE873",
-    "7": "7",
-    "-7": "\uE8747",
-    "-♭6": "\uE874\uED606",
-    "7sus♭9": "7sus\uED62",
-    "ø": "\uE871",
-    "7♯11": "7\uED6211",
-    "-∆": "\uE874\uE873",
-    "∆♭6": "\uE873\uED606",
-    "-♭9": "\uE874\uED609",
-    "ø7": "\uE8717",
-    "∆♯5": "\uE873\uED625",
-    "7alt": "7alt",
-    "°": "\uE870",
-    "dim": "\uE870",
-    "7♭9": "7\uED60",
-    "+7": "\uE8727",
-};
-
 /* These glyphs are not aligned to centted baseline as other musical symbols
    are - these are intended for use in paragraph text content */
 

@@ -3,7 +3,6 @@ import overload          from 'fn/overload.js';
 import create            from 'dom/create.js';
 import { toNoteNumber }  from 'midi/note.js';
 import * as glyphs       from "./glyphs.js";
-import { chordGlyphs }   from "./glyphs.js";
 import { rflat, rsharp } from './pitch.js';
 import { identify }      from './event.js';
 import { beamThickness } from './beam.js';
@@ -268,8 +267,12 @@ export default overload(get('type'), {
     }),
 
     rest: (symbol) => create('span', {
-        class: "rest",
-        html: toRestGlyph(symbol.duration),
+        class: symbol.whole && symbol.duration > 3 ?
+            'whole-rest rest' :
+            'rest',
+        html: symbol.whole && symbol.duration > 3 ?
+            glyphs.rest4 :
+            toRestGlyph(symbol.duration),
         data: {
             beat:     truncate(4, symbol.beat),
             pitch:    symbol.pitch,
