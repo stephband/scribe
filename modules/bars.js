@@ -203,11 +203,13 @@ function createBar(count, beat, duration, divisor, stave, key, symbols, parts, s
 
     // Render rests to any staffs that had no parts
     let s = staffs.length;
-    while (s--) {
-        const part = stave.parts.find(matches({ staff: staffs[s] }));
-        const accidentals = updateAccidentals({}, key);
-        stave.createPartSymbols(bar, accidentals, part, nothing, settings);
-    }
+    while (s--) bar.symbols.push({
+        type: 'rest',
+        beat: 0,
+        duration,
+        stave,
+        part: { name: staffs[s] }
+    });
 
     // If a sequence event stopped in this bar
     if (sequenceEvent
@@ -229,7 +231,8 @@ export default function createBars(sequence, excludes, stave, settings = config)
 
     let beat     = 0;
     let key      = 0;
-    let stopBeat = 0;
+    // Guarantee the render of at least 1 bar
+    let stopBeat = 1;
     let symbols  = [];
     let parts    = {};
     let duration, divisor, event, sequenceEvent;

@@ -78,13 +78,9 @@ https://web.mit.edu/merolish/Public/drums.pdf
     display: none !important;
 }
 
-.drum-stave > .rest {
-    grid-row: stave-upper;
-}
-
 .drum-stave > .rest[data-duration="4"],
 .drum-stave > .rest[data-duration="6"] {
-    grid-row: 11;
+    grid-row: 10;
 }
 
 .drum-stave > .rest[data-part="drums"] {
