@@ -14,6 +14,7 @@ import { getDivisions } from './bar/divisions.js';
 import config           from './config.js';
 import { keyToNumbers, keyWeightsForEvent, chooseKeyFromWeights } from './keys.js';
 import { major }        from './scale.js';
+import log              from './log.js';
 
 
 const rslashbass = /\/\{(\d{1,2})\}$/;
@@ -145,6 +146,13 @@ function pushEventToPart(stave, parts, event) {
     parts[part.name].push(event);
 }
 
+function hasPart(parts) {
+    // If there are events in any of the part arrays return true
+    for (name in parts) if (parts[name].length) return true;
+    // Otherwise false
+    return false;
+}
+
 /* Accidentals */
 
 function updateAccidentals(accidentals, key) {
@@ -192,6 +200,7 @@ function createBar(count, beat, duration, divisor, stave, key, symbols, parts, s
     const staffs = stave.staffs.slice();
     let name;
     for (name in parts) {
+        // Get part from stave
         const part   = stave.parts.find(matches({ name }));
         const events = parts[name];
         if (!events || !events.length) continue;
@@ -228,13 +237,13 @@ export default function createBars(sequence, excludes, stave, settings = config)
     const events = [];
     const bars   = [];
     const jsons  = [];
+    const parts  = {};
 
     let beat     = 0;
     let key      = 0;
     // Guarantee the render of at least 1 bar
     let stopBeat = 1;
     let symbols  = [];
-    let parts    = {};
     let duration, divisor, event, sequenceEvent;
 
     // Extract events from sequence iterator and divide them into parts
@@ -246,7 +255,6 @@ export default function createBars(sequence, excludes, stave, settings = config)
             bars.push(bar);
             beat    = bar.beat + bar.duration;
             symbols = [];
-            parts   = {};
         }
 
         // Handle event types
@@ -343,15 +351,11 @@ export default function createBars(sequence, excludes, stave, settings = config)
                 break;
 
             case "note":
-                stopBeat = stopBeat < toStopBeat(event) ?
-                    toStopBeat(event) :
-                    stopBeat ;
-
                 pushEventToPart(stave, parts, event);
                 break;
 
             default:
-                console.log('Scribe: ignoring event type "' + event[1] + '"');
+                log('event type "' + event[1] + '" ignored', '');
         }
 
         // Store all events for the key analyser. We know event is an object at
@@ -373,14 +377,13 @@ export default function createBars(sequence, excludes, stave, settings = config)
             1 ;
     }
 
-    // Create bars up to stop beat
-    while (beat < stopBeat) {
+    // Create bars up to stop beat or while parts still has events
+    while (beat < stopBeat || hasPart(parts)) {
         const bar = createBar(bars.length + 1, beat, duration, divisor, stave, key, symbols, parts, sequenceEvent, settings);
         detectBarRepeats(bars, jsons, bar);
         bars.push(bar);
         beat    = bar.beat + bar.duration;
         symbols = [];
-        parts   = {};
     }
 
     // Always render last bar with a double bar line
