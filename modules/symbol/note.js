@@ -7,7 +7,7 @@ import { stemupFromRows } from './stem.js';
 const byRow = by(get('row'));
 
 
-export function createNotes(stave, key, part, notes) {
+export function createNotes(stave, key, part, notes, beat, duration) {
     if (!notes.length) return [];
 
     const symbols = [];
@@ -26,6 +26,8 @@ export function createNotes(stave, key, part, notes) {
         // Create symbols with pitch, row
         symbols.push({
             type: 'note',
+            beat,
+            duration,
             pitch,
             dynamic: event[3],
             part,
