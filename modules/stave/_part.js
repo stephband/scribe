@@ -271,7 +271,7 @@ function createSymbols(symbols, bar, stave, key, accidentals, part, notes, beam,
     }
 
     // Keep only the last tied notes in bar.ties
-    bar.ties.length = 0;
+    //bar.ties.length = 0;
 
     // Remove notes or insert ties
     let n = notes.length;
@@ -292,7 +292,7 @@ function createSymbols(symbols, bar, stave, key, accidentals, part, notes, beam,
             });
 
             // Keep tied events in ties
-            bar.ties.push(noteSymbols[n].event);
+            //bar.ties.push(noteSymbols[n].event);
         }
     }
 

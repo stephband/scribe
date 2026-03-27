@@ -176,9 +176,8 @@ export const chordBracketLeft     = '(';
 export const chordBracketRight    = ')';
 export const chordBassSlash       = '&#xE87B;';
 
-/* These glyphs are not aligned to centted baseline as other musical symbols
+/* These glyphs are not aligned to centred baseline as other musical symbols
    are - these are intended for use in paragraph text content */
-
 export const textNoteShort        = '&#xE1F0;';
 export const textNoteLong         = '&#xE1F1;';
 export const textNote8Short       = '&#xE1F2;';

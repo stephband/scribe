@@ -18,3 +18,7 @@
 .head[data-glyph="headDiamond"] {
     margin-left: 0.04em;
 }
+
+.down-note:has([data-glyph="headDiamond"])::before {
+    margin-left: 0.04em;
+}

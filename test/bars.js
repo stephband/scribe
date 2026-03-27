@@ -2,7 +2,7 @@ import 'https://cdn.jsdelivr.net/gh/stephband/fn@1.5.10/deno/deno-2-support.js';
 
 import { Sequence } from 'sequence/module.js';
 import Stave        from '../modules/stave.js';
-import createBars   from '../modules/bars.js';
+import createBars   from '../modules/bar.js';
 
 // Get the stave controller
 const stave = Stave['treble'];

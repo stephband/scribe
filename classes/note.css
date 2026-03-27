@@ -153,12 +153,14 @@ Flags
     transform: translate(0, calc(var(--stem-height) * 1em));
 }
 
-/* Note durations 0.75, 0.5, and 0.3333 get an 8th note flag */
+/* Note durations 0.875, 0.75, 0.5, and 0.3333 get an 8th note flag */
+.up-note.top-note[data-duration="0.875"]::before,
 .up-note.top-note[data-duration^="0.7"]::before,
 .up-note.top-note[data-duration="0.5"]::before,
 .up-note.top-note[data-duration^="0.4"]::before,
 .up-note.top-note[data-duration^="0.3"]::before,
 .up-note.top-note[data-duration^="0.28"]::before      { content: '\E240'; }
+.down-note.bottom-note[data-duration="0.875"]::before,
 .down-note.bottom-note[data-duration^="0.7"]::before,
 .down-note.bottom-note[data-duration="0.5"]::before,
 .down-note.bottom-note[data-duration^="0.4"]::before,

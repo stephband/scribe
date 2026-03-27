@@ -5,7 +5,7 @@ import rect             from 'dom/rect.js';
 import SequenceIterator from 'sequence/modules/sequence-iterator.js';
 import { rootToKeyNumber, toKeyName, toKeyNumber } from 'sequence/modules/event/keys.js';
 import Stave            from './stave.js';
-import createBars       from './bars.js';
+import createBars       from './bar.js';
 import createElement    from './create-element.js';
 import { renderBeam }   from './beam.js';
 import * as glyphs      from './glyphs.js';
@@ -120,10 +120,11 @@ export function renderElements(sequence, excludes, clef, keyname, meter, duratio
 
 
 const heads = [
-    create('span', { html: glyphs.head1, style: 'width: min-content;' }),
-    create('span', { html: glyphs.head2, style: 'width: min-content;' }),
-    create('span', { html: glyphs.head4, style: 'width: min-content;' }),
-    create('span', { html: glyphs.headX, style: 'width: min-content;' })
+    create('span', { html: glyphs.head1,       style: 'width: min-content;' }),
+    create('span', { html: glyphs.head2,       style: 'width: min-content;' }),
+    create('span', { html: glyphs.head4,       style: 'width: min-content;' }),
+    create('span', { html: glyphs.headX,       style: 'width: min-content;' }),
+    create('span', { html: glyphs.headDiamond, style: 'width: min-content;' })
 ];
 
 function remove(element) {
@@ -135,12 +136,13 @@ export function renderStyle(element, root = element) {
     // and getComputedStyle() won't work on a fragment
     root.append.apply(root, heads);
 
-    const head1Width = rect(heads[0]).width;
-    const head2Width = rect(heads[1]).width;
-    const head3Width = rect(heads[2]).width;
-    const headXWidth = rect(heads[3]).width;
-    const computed   = window.getComputedStyle(heads[0]);
-    const fontSize   = px(computed.fontSize);
+    const head1Width       = rect(heads[0]).width;
+    const head2Width       = rect(heads[1]).width;
+    const head3Width       = rect(heads[2]).width;
+    const headXWidth       = rect(heads[3]).width;
+    const headDiamondWidth = rect(heads[4]).width;
+    const computed         = window.getComputedStyle(heads[0]);
+    const fontSize         = px(computed.fontSize);
 
     if (global.DEBUG) log('post render font-size', fontSize, 'heads', `${ head1Width }, ${ head2Width }, ${ head3Width }`);
 
@@ -162,6 +164,7 @@ export function renderStyle(element, root = element) {
         + `--head-2-size: ${ truncate(6, head2Width / fontSize) }; `
         + `--head-4-size: ${ truncate(6, head3Width / fontSize) }; `
         + `--head-x-size: ${ truncate(6, headXWidth / fontSize) }; `
+        + `--head-diamond-size: ${ truncate(6, headDiamondWidth / fontSize) }; `
         + `--signature-width: ${ (2.25 + count * 0.625 + 0.625).toFixed(4) }em;`;
 }
 

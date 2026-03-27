@@ -51,8 +51,10 @@ function getAccidentalAboveRowAtBeat(symbols, beat, maxRow) {
     return symbols[o];
 }
 
-export function createAccidentals(symbols, bar, part, accidentals, beat, notes) {
-    let n = -1, clump = 0, note, accidental, above;
+export function createAccidentals(symbols, part, accidentals, beat, notes) {
+    let clump = 0;
+    let n     = -1;
+    let note, accidental, above;
 
     // This only looks for clusters within the current part – but its a start
     const cluster = !!notes.find((note) => note.stemup ?
@@ -64,7 +66,8 @@ export function createAccidentals(symbols, bar, part, accidentals, beat, notes) 
 
     while (note = notes[++n]) {
         // If event started before this bar we don't require an accidental
-        if (lt(bar.beat, note.event[0], P24)) continue;
+// TODO
+//        if (lt(bar.beat, note.event[0], P24)) continue;
 
         // Find existing accidental above this one
         above = getAccidentalAboveRowAtBeat(symbols, beat, note.row);
