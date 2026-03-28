@@ -220,35 +220,6 @@ export default class DrumStave extends Stave {
         const j = i < 4 ? 4 : i > 17 ? 17 : i ;
         return this.pitches[j];
     }
-/*
-    createSymbols(symbols, bar, part, key, beat, division, duration, events, n, settings) {
-        // Inside this fn beat is relative to bar
-        const stave = this;
-        const notes = this.getNotesAtBeat(beat + bar.beat, division, events, n);
-
-        // Impose max note duration of 1 drum notation only has black notes
-        duration = min(1, duration);
-
-        // Insert heads
-        const noteSymbols = createNotes(stave, key, part, notes);
-        if (!noteSymbols.length) return noteSymbols;
-
-        // Create ledgers, accidentals and accents
-        createLedges(symbols, stave, part, beat, noteSymbols);
-        createAccents(symbols, stave, part, beat, noteSymbols, settings);
-
-        // Assign beat, duration to note symbols and push into symbols
-        let s = -1;
-        while (noteSymbols[++s]) symbols.push(assign(noteSymbols[s], {
-            beat,
-            duration
-            //grain: getGrain(bar.divisions, beat)
-        }));
-
-        // Return note symbols
-        return noteSymbols;
-    }
-*/
 
     getNotesAtBeat(beat, division, events) {
         // Fill notes with events playing during division
@@ -261,10 +232,10 @@ export default class DrumStave extends Stave {
         return notes;
     }
 
-    createSymbols(symbols, part, key, accidentals, notes, beat, duration, settings) {
+    createSymbols(symbols, bar, part, accidentals, notes, beat, duration, settings) {
         const stave = this;
         // Create note heads
-        const noteSymbols = createNotes(stave, key, part, notes, beat, duration);
+        const noteSymbols = createNotes(stave, bar.key, part, notes, beat, duration);
         // Create ledgers, accidentals and accents
         createLedges(symbols, stave, part, beat, noteSymbols);
         createAccents(symbols, stave, part, beat, noteSymbols, settings);
@@ -276,7 +247,7 @@ export default class DrumStave extends Stave {
         return noteSymbols;
     }
 
-    updateNotesDuration(symbols, bar, part, key, accidentals, beam, notes, startBeat, stopBeat, settings) {
+    updateNotesDuration(symbols, bar, part, accidentals, beam, notes, startBeat, stopBeat, settings) {
         const stave    = this;
         const b1       = startBeat - bar.beat;
         const b2       = stopBeat - bar.beat;
@@ -287,7 +258,7 @@ export default class DrumStave extends Stave {
         const duration = getNotesAtBeatDuration(bar.divisions, grain, b1, b2, v1, v2, v3);
 
         // Create note heads
-        const noteSymbols = createNotes(stave, key, part, notes, b1, duration);
+        const noteSymbols = createNotes(stave, bar.key, part, notes, b1, duration);
         // Drum notation does not tie notes
         notes.length = 0;
 
@@ -325,7 +296,7 @@ export default class DrumStave extends Stave {
         createAccents(symbols, stave, part, b1, noteSymbols, settings);
         // Push in note heads
         symbols.push.apply(symbols, noteSymbols);
-console.log('B', beat);
+
         return { beat, beam, notes };
     }
 }
