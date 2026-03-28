@@ -299,8 +299,8 @@ in their duration span. */
 .bar > .rest[data-duration^="8"],
 .bar > .whole-rest {
 	justify-self: center;
-	margin-left: 0.75em;
-	margin-right: 0.75em;
+	margin-left: 0.625em;
+	margin-right: 0.625em;
     /* Make 2 beat rests and longer span their durations */
     grid-column-end: span calc(round(var(--columns-per-beat) * var(--duration)) - 1);
 }

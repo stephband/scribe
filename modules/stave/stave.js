@@ -367,8 +367,22 @@ export default class Stave {
         return notes;
     }
 
+    createSymbols(symbols, part, key, accidentals, notes, beat, duration, settings) {
+        const stave = this;
+        // Create note heads
+        const noteSymbols = createNotes(stave, key, part, notes, beat, duration);
+        // Create ledgers, accidentals and accents
+        createLedges(symbols, stave, part, beat, noteSymbols);
+        createAccidentals(symbols, part, accidentals, beat, noteSymbols);
+        createAccents(symbols, stave, part, beat, noteSymbols, settings);
+        // Push in note heads
+        symbols.push.apply(symbols, noteSymbols);
+        // Return symbols
+        return noteSymbols;
+    }
+
     // TODO: RENAME THIS METHOD
-    updateNotesDuration(symbols, bar, part, key, beam, notes, startBeat, stopBeat, settings) {
+    updateNotesDuration(symbols, bar, part, key, accidentals, beam, notes, startBeat, stopBeat, settings) {
         const stave    = this;
         const b1       = startBeat - bar.beat;
         const b2       = stopBeat - bar.beat;
@@ -405,19 +419,22 @@ console.log('start', b1, 'stop', b, 'duration', b - b1, 'grain', grain);
         // Duration is longer than 4g double dotted (7g), and that takes us to a more than a 4x grain
         if (b >= b1 + 7 * grain && getGrain(bar.divisions, b1 + 7 * grain) > 4 * grain) {
             b = b1 + 7 * grain;
-            //g = 8 * grain;
             console.log('4g..', grain, 7 * grain);
         }
         // Duration is longer than 2g dotted (3g), and that takes us to a more than a 2x grain
         else if (b >= b1 + 3 * grain && getGrain(bar.divisions, b1 + 3 * grain) > 2 * grain) {
             b = b1 + 3 * grain;
-            //g = 4 * grain;
             console.log('2g.', grain, 3 * grain);
+        }
+        // Duration is longer than 2g, and that takes us to a more than 1x grain,
+        // which can happen if note ends on a bar division
+        else if (b >= b1 + 2 * grain && getGrain(bar.divisions, b1 + 2 * grain) > grain) {
+            b = b1 + 2 * grain;
+            console.log('2g', grain, 2 * grain);
         }
         // Duration is longer than 1g, which always takes us to a more than 1x grain
         else if (b >= b1 + grain) {
             b = b1 + grain;
-            //g = 2 * grain;
             console.log('1g', grain, grain);
         }
         // Loop through smaller grains down to a 32nd
@@ -446,16 +463,17 @@ console.log('start', b1, 'stop', b, 'duration', b - b1, 'grain', grain);
 
         const duration = b - b1;
 
+    //    //const noteSymbols = this.createSymbols(symbols, part, key, accidentals, notes, beat, duration, settings);
+    //    // Create note heads
+    //    const noteSymbols = createNotes(stave, key, part, notes, b1, duration);
+    //    // Create ledgers, accidentals and accents
+    //    createLedges(symbols, stave, part, b1, noteSymbols);
+    //    createAccidentals(symbols, part, accidentals, b1, noteSymbols);
+    //    createAccents(symbols, stave, part, b1, noteSymbols, settings);
+    //    // Push in note heads
+    //    symbols.push.apply(symbols, noteSymbols);
 
-
-        // Create note heads
-        const noteSymbols = createNotes(stave, key, part, notes, b1, duration);
-        // Create ledgers, accidentals and accents
-        createLedges(symbols, stave, part, b1, noteSymbols);
-        createAccidentals(symbols, part, accidentals, b1, noteSymbols);
-        createAccents(symbols, stave, part, b1, noteSymbols, settings);
-        // Push in note heads
-        symbols.push.apply(symbols, noteSymbols);
+        this.createSymbols(symbols, part, key, accidentals, notes, b1, duration, settings);
 
 
         // Splice out all notes that stop before b, events left in notes will be
@@ -523,7 +541,7 @@ console.log('start', b1, 'stop', b, 'duration', b - b1, 'grain', grain);
         let beat = startBeat;
         let bbbbb;
         let n    = 0;
-        let beam, event, tuplet, notes, data;
+        let beam, event, tuplet, notes, data, noteSymbols;
 
         // Loop through detected rhythms
         while (data = detectRhythm(beat, stopBeat - beat, events, 0/*, { maxDivision: 1 }*/)) {
@@ -536,7 +554,7 @@ console.log('start', b1, 'stop', b, 'duration', b - b1, 'grain', grain);
             if (tuplet) {
                 // Update note durations to this division
                 if (notes && notes.length) {
-                    const o = this.updateNotesDuration(symbols, bar, part, key, beam, notes, bbbbb, stopBeat, settings);
+                    const o = this.updateNotesDuration(symbols, bar, part, key, accidentals, beam, notes, bbbbb, stopBeat, settings);
                     beat  = o.beat;
                     beam  = undefined;
                     notes = o.notes;
@@ -558,14 +576,15 @@ console.log('start', b1, 'stop', b, 'duration', b - b1, 'grain', grain);
                         bbbbb = beat;
                         notes = this.getNotesAtBeat(beat, division, events, 0);
                         //noteSymbols = this.createSymbols(symbols, bar, part, key, beat - startBeat, division, division, events, 0, settings);
+                        noteSymbols = this.createSymbols(symbols, part, key, accidentals, notes, beat - startBeat, division, settings);
                         // Push note symbols on to tuplet
-                        //push(tuplet, ...noteSymbols);
+                        push(tuplet, ...noteSymbols);
                         // If division is short enough for a beam
                         if (division < 0.5) {
                             // ...make sure there is a beam
                             if (!beam) beam = createBeam(part, beat - startBeat);
                             // ...and push note symbols on to it
-                            //push(beam, ...noteSymbols);
+                            push(beam, ...noteSymbols);
                         }
                     }
                     else {
@@ -581,6 +600,7 @@ console.log('start', b1, 'stop', b, 'duration', b - b1, 'grain', grain);
 
                     // Set beat to division end
                     beat = data.beat + i * division + division;
+                    bbbbb = beat;
                     // Don't modify duration of last notes on next iteration
                     //noteSymbols = undefined;
                 }
@@ -599,7 +619,7 @@ console.log('start', b1, 'stop', b, 'duration', b - b1, 'grain', grain);
 
                     // Update note durations to this division
                     if (notes && notes.length) {
-                        const o = this.updateNotesDuration(symbols, bar, part, key, beam, notes, bbbbb, data.beat + i * division, settings);
+                        const o = this.updateNotesDuration(symbols, bar, part, key, accidentals, beam, notes, bbbbb, data.beat + i * division, settings);
                         beat  = o.beat;
                         beam  = o.beam;
                         notes = o.notes;
@@ -618,6 +638,7 @@ if (notes.length) { console.log(notes.length + ' notes tied over to this divisio
                     // Insert note symbols
                     bbbbb = beat;
                     notes = this.getNotesAtBeat(beat, division, events, 0);
+console.log(beat, notes.length);
                     // Update beat to division end
                     beat  = data.beat + i * division + division;
                 }
@@ -630,8 +651,8 @@ if (notes.length) { console.log(notes.length + ' notes tied over to this divisio
 if (DEBUG && events.length) throw new Error(`Something's up with note events, it should be empty here`);
 
         // Update note durations to end of bar
-        while (notes && notes.length && beat < bar.beat + bar.duration) {
-            const o = this.updateNotesDuration(symbols, bar, part, key, beam, notes, bbbbb, stopBeat, settings);
+        while (notes && notes.length && bbbbb < bar.beat + bar.duration) {
+            const o = this.updateNotesDuration(symbols, bar, part, key, accidentals, beam, notes, bbbbb, stopBeat, settings);
             beat  = o.beat;
             beam  = o.beam;
             notes = o.notes;

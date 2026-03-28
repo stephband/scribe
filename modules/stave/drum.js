@@ -220,7 +220,7 @@ export default class DrumStave extends Stave {
         const j = i < 4 ? 4 : i > 17 ? 17 : i ;
         return this.pitches[j];
     }
-
+/*
     createSymbols(symbols, bar, part, key, beat, division, duration, events, n, settings) {
         // Inside this fn beat is relative to bar
         const stave = this;
@@ -248,10 +248,11 @@ export default class DrumStave extends Stave {
         // Return note symbols
         return noteSymbols;
     }
+*/
 
     getNotesAtBeat(beat, division, events) {
         // Fill notes with events playing during division
-        notes.length = 0;
+        //notes.length = 0;
         while (events[0] && events[0][0] < beat + 0.5 * division) {
             notes.push(events.shift());
         }
@@ -260,7 +261,22 @@ export default class DrumStave extends Stave {
         return notes;
     }
 
-    updateNotesDuration(symbols, bar, part, key, beam, notes, startBeat, stopBeat, settings) {
+    createSymbols(symbols, part, key, accidentals, notes, beat, duration, settings) {
+        const stave = this;
+        // Create note heads
+        const noteSymbols = createNotes(stave, key, part, notes, beat, duration);
+        // Create ledgers, accidentals and accents
+        createLedges(symbols, stave, part, beat, noteSymbols);
+        createAccents(symbols, stave, part, beat, noteSymbols, settings);
+        // Push in note heads
+        symbols.push.apply(symbols, noteSymbols);
+        // Drum notation does not tie notes
+        notes.length = 0;
+        // Return symbols
+        return noteSymbols;
+    }
+
+    updateNotesDuration(symbols, bar, part, key, accidentals, beam, notes, startBeat, stopBeat, settings) {
         const stave    = this;
         const b1       = startBeat - bar.beat;
         const b2       = stopBeat - bar.beat;
@@ -309,7 +325,7 @@ export default class DrumStave extends Stave {
         createAccents(symbols, stave, part, b1, noteSymbols, settings);
         // Push in note heads
         symbols.push.apply(symbols, noteSymbols);
-
+console.log('B', beat);
         return { beat, beam, notes };
     }
 }
