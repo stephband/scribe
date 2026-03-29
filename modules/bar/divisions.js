@@ -46,9 +46,7 @@ export function getDivisions(duration, divisor) {
 }
 
 export function isDivision(divisions, beat) {
-    let n = -1;
-    while (divisions[++n]) if (eq(divisions[n], beat, P24)) return true;
-    return false;
+    return beat === 0 || divisions.includes(beat);
 }
 
 export function getDivisionBefore(divisions, beat) {

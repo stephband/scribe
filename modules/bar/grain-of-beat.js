@@ -23,7 +23,12 @@ export default function grainOfBeat(divisions, beat) {
     // Division before beat
     const d1 = divisions[n - 1] || 0;
     // Division after beat
-    const d2 = divisions[n];
+    const d2 = n === divisions.length ?
+        // Beat is in the next bar, assume it is in the 1st division
+        d1 + divisions[0] :
+        // Beat is before the end of bar
+        divisions[n] ;
     // Limit max grain to the next grain up from division duration
-    return grainPow2(0.125, ceilPow2(d2 - d1), beat - d1);
+    const maxGrain = ceilPow2(d2 - d1);
+    return grainPow2(0.125, maxGrain, beat - d1);
 }
