@@ -11,6 +11,7 @@ import mod12            from './number/mod-12.js';
 import join             from './object/join.js';
 import toStopBeat       from './event/to-stop-beat.js';
 import { getDivisions } from './bar/divisions.js';
+import createPartSymbols from './bar/part.js';
 import config           from './config.js';
 import { keyToNumbers, keyWeightsForEvent, chooseKeyFromWeights } from './keys.js';
 import { major }        from './scale.js';
@@ -206,7 +207,7 @@ function createBar(count, beat, duration, divisor, stave, key, symbols, parts, s
         if (!events || !events.length) continue;
         // Populate accidentals with key signature sharps and flats
         const accidentals = updateAccidentals({}, key);
-        stave.createPartSymbols(bar, accidentals, name, events, settings);
+        createPartSymbols(bar, stave, accidentals, name, events, settings);
         remove(staffs, part.staff);
     }
 

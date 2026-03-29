@@ -17,7 +17,6 @@ import { createBeam, closeBeam } from '../symbol/beam.js';
 import { closeTuplet }   from '../symbol/tuplet.js';
 import getStopBeat       from '../event/to-stop-beat.js';
 import detectRhythm, { straighten, hasHoles } from '../rhythm.js';
-import { createTuplet }  from '../stave/stave.js';
 import { P24, GR }       from '../constants.js';
 import { getDivisionBefore, getDivisionAfter } from '../bar/divisions.js';
 
@@ -232,7 +231,7 @@ export default class DrumStave extends Stave {
         return notes;
     }
 
-    createSymbols(symbols, bar, part, accidentals, notes, beat, duration, settings) {
+    createNoteSymbols(symbols, bar, part, accidentals, notes, beat, duration, settings) {
         const stave = this;
         // Create note heads
         const noteSymbols = createNotes(stave, bar.key, part, notes, beat, duration);
@@ -247,7 +246,7 @@ export default class DrumStave extends Stave {
         return noteSymbols;
     }
 
-    updateNotesDuration(symbols, bar, part, accidentals, beam, notes, startBeat, stopBeat, settings) {
+    createDupletNoteSymbols(symbols, bar, part, accidentals, beam, notes, n, startBeat, stopBeat, settings) {
         const stave    = this;
         const b1       = startBeat - bar.beat;
         const b2       = stopBeat - bar.beat;
