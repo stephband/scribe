@@ -231,10 +231,10 @@ export default class DrumStave extends Stave {
         return notes;
     }
 
-    createNoteSymbols(symbols, bar, part, accidentals, notes, beat, duration, settings) {
+    createNoteSymbols(symbols, bar, part, accidentals, notes, cutoffBeat, beat, duration, settings) {
         const stave = this;
         // Create note heads
-        const noteSymbols = createNotes(stave, bar.key, part, notes, beat, duration);
+        const noteSymbols = createNotes(stave, bar.key, part, notes, cutoffBeat, beat, duration);
         // Create ledgers, accidentals and accents
         createLedges(symbols, stave, part, beat, noteSymbols);
         createAccents(symbols, stave, part, beat, noteSymbols, settings);
@@ -246,7 +246,7 @@ export default class DrumStave extends Stave {
         return noteSymbols;
     }
 
-    createDupletNoteSymbols(symbols, bar, part, accidentals, beam, notes, n, startBeat, stopBeat, settings) {
+    createDupletNoteSymbols(symbols, bar, part, accidentals, beam, notes, n, startBeat, cutoffBeat, stopBeat, settings) {
         const stave    = this;
         const b1       = startBeat - bar.beat;
         const b2       = stopBeat - bar.beat;
@@ -257,7 +257,7 @@ export default class DrumStave extends Stave {
         const duration = getNotesAtBeatDuration(bar.divisions, grain, b1, b2, v1, v2, v3);
 
         // Create note heads
-        const noteSymbols = createNotes(stave, bar.key, part, notes, b1, duration);
+        const noteSymbols = createNotes(stave, bar.key, part, notes, cutoffBeat, b1, duration);
         // Drum notation does not tie notes
         notes.length = 0;
 

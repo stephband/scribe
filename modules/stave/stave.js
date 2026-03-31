@@ -3,6 +3,7 @@
 import nothing               from 'fn/nothing.js';
 import { noteNames, toNoteName, toNoteNumber, toNoteOctave, toRootName, toRootNumber } from 'midi/note.js';
 import toStopBeat            from '../event/to-stop-beat.js';
+import push                  from '../object/push.js';
 import { eq, gte, lte, lt, gt } from '../number/float.js';
 import mod12                 from '../number/mod-12.js';
 import nearest               from '../number/nearest.js';
@@ -73,32 +74,6 @@ function toRoundedStopBeat(bar, event) {
     // that values over 1/3 bar divisor round up, values under 1/3 bar divisor
     // round down
     return max(bar.divisor, nearest(bar.divisor, toStopBeat(event) - bar.beat + bar.divisor / 6));
-}
-
-export function createTies(symbols, bar, part, notes, noteSymbols, beat, duration) {
-    let n = notes.length;
-    while (n--) {
-        const b4 = toRoundedStopBeat(bar, notes[n]);
-
-        if (b4 <= beat + duration) {
-            notes.splice(n, 1);
-        }
-//           else if (grainOfBeat(bar.divisions, toStopBeat(notes[n]) - bar.beat) < grain) {
-//               console.log('SPLICING OUT NOTE');
-//               notes.splice(n, 1);
-//           }
-        else {
-            symbols.push({
-                type:   'tie',
-                beat,
-                pitch: noteSymbols[n].pitch,
-                duration,
-                stemup: noteSymbols[n].stemup,
-                part,
-                event: notes[n]
-            });
-        }
-    }
 }
 
 
@@ -308,11 +283,13 @@ export default class Stave {
             this.pitches[n] ;
     }
 
-    createNoteSymbols(symbols, bar, part, accidentals, notes, beat, duration, settings) {
+    createNoteSymbols(symbols, bar, part, accidentals, notes, cutoffBeat, beat, duration, settings) {
         const stave = this;
         // Create note heads
-        const noteSymbols = createNotes(stave, bar.key, part, notes, beat, duration);
-        // Create ledgers, accidentals and accents
+        const noteSymbols = createNotes(stave, bar.key, part, notes, cutoffBeat, beat, duration);
+        // Notes may not appear on stave in which case noteSymbols will be empty
+        if (!noteSymbols.length) return noteSymbols;
+        // Create ledges, accidentals and accents
         createLedges(symbols, stave, part, beat, noteSymbols);
         createAccidentals(symbols, part, accidentals, beat, noteSymbols);
         createAccents(symbols, stave, part, beat, noteSymbols, settings);
@@ -322,8 +299,9 @@ export default class Stave {
         return noteSymbols;
     }
 
-    // TODO: RENAME THIS METHOD
-    createDupletNoteSymbols(symbols, bar, part, accidentals, beam, notes, n, startBeat, stopBeat, settings) {
+    createDupletNoteSymbols(symbols, bar, part, accidentals, notes, startBeat, cutoffBeat, stopBeat, settings) {
+        if (DEBUG && cutoffBeat > stopBeat) throw new Error(`createDupletNoteSymbols() cutoffBeat ${ cutoffBeat } cannot be larger than stopBeat ${ stopBeat }`);
+
         const stave = this;
         const b1    = startBeat - bar.beat;
         const b2    = stopBeat  - bar.beat;
@@ -334,26 +312,32 @@ export default class Stave {
         let b = b1;
         let i = -1;
         let event;
-        while (event = notes[++i]) {
-            const b4 = toRoundedStopBeat(bar, notes[i]);
-            // Division of stop beat
-            const d3 = getDivisionBefore(bar.divisions, b4);
-            // If event stops in the same division as b1
-            const b3 = d3 === d1 ? b4 : d3 ;
-            //
+        while (notes[++i] && notes[i][0] < cutoffBeat) {
+            const b3 = toStopBeat(notes[i]) - bar.beat;
+            // If we are filling the whole duration to stopBeat we can break out
             if (b3 >= b2) { b = b2; break; }
+            // Update note stop b
             if (b3 > b)   { b = b3; }
         }
 
         // Do we need this? Can we avoid having to do this?
         if (b === b1) {
-console.log('AVOID THIS? Notes of duration 0! -----------------------');
-            notes.length = 0;
+console.log('AVOID THIS? Notes of duration 0! -----------------------', startBeat, cutoffBeat, stopBeat, notes, i);
+            --i;
+            while (notes[++i] && notes[i][0] < cutoffBeat);
+console.log('AVOID THIS? Notes of duration 0! -----------------------', startBeat, cutoffBeat, stopBeat, notes, i);
+
+            //notes.length = 0;
+            notes.splice(0, i);
             // TODO: Remove ties from symbols??
-            return { beat: bar.beat + b, beam, notes };
+            return { beat: bar.beat + b, removedCount: i };
         }
 
-console.log('start', b1, 'stop', b, 'duration', b - b1, 'grain', grain);
+
+--i;
+while (notes[++i] && notes[i][0] < cutoffBeat);
+console.log('Notes start', b1, 'stop', b, 'duration', b - b1, 'grain', grain, 'count', i);
+
 
         const b3 = b;
         let g = grain;
@@ -362,86 +346,55 @@ console.log('start', b1, 'stop', b, 'duration', b - b1, 'grain', grain);
         // bar end, and that duration is a valid note duration
         if (b >= b2 && b1 === d1 && b2 === d2 && noteDurations.includes(b2 - b1)) {
             b = b2;
-//console.log('start and stop on divisions', grain, b2 - b1);
+console.log('start and stop on divisions', grain, b2 - b1);
         }
-        // Duration is longer than 4g double dotted (7g), and that takes us to a more than a 4x grain
-        else if (b >= b1 + 7 * grain && grainOfBeat(bar.divisions, b1 + 7 * grain) > 4 * grain) {
+        // Duration is longer than 5g and a double dotted 7g takes us to a more
+        // than a 4x grain before b2
+        else if (b >= b1 + 5 * grain && b1 + 7 * grain <= b2 && grainOfBeat(bar.divisions, b1 + 7 * grain) > 4 * grain) {
             b = b1 + 7 * grain;
-//console.log('4g..', grain, 7 * grain);
+console.log('4g..', grain, 7 * grain);
         }
-        // Duration is longer than 2g dotted (3g), and that takes us to a more than a 2x grain
-        else if (b >= b1 + 3 * grain && grainOfBeat(bar.divisions, b1 + 3 * grain) > 2 * grain) {
+        // Duration is longer than 2g and a dotted 3g takes us to a more than a
+        // 2x grain grain before b2
+        else if (b >= b1 + 2 * grain && b1 + 3 * grain <= b2 && grainOfBeat(bar.divisions, b1 + 3 * grain) > 2 * grain) {
             b = b1 + 3 * grain;
-//console.log('2g.', grain, 3 * grain);
+console.log('2g.', grain, 3 * grain);
         }
-        // Duration is longer than 2g, and that takes us to a more than 1x grain,
-        // which can happen if note ends on a bar division
-        else if (b >= b1 + 2 * grain && grainOfBeat(bar.divisions, b1 + 2 * grain) > grain) {
+        // Duration is longer than 1.5g and a 2g takes us to a more than 1x grain
+        // grain before b2, which can happen if note ends on a bar division
+        else if (b >= b1 + 1.5 * grain && b1 + 2 * grain <= b2 && grainOfBeat(bar.divisions, b1 + 2 * grain) > grain) {
             b = b1 + 2 * grain;
-//console.log('2g', grain, 2 * grain);
+console.log('2g', grain, 2 * grain);
         }
-        // Duration is longer than 1g, which always takes us to a more than 1x grain
-        else if (b >= b1 + grain) {
+        // Duration is longer than 0.875g, a 1g always takes us to a more than
+        // 1x grain
+        else if (b >= b1 + 0.875 * grain && b1 + 1 * grain <= b2) {
             b = b1 + grain;
-//console.log('1g', grain, grain, grainOfBeat(bar.divisions, b1 + 2 * grain), b1);
+console.log('1g', grain, grain);
         }
         // Loop through smaller grains down to a 32nd
         else while ((g /= 2) >= 0.125) {
             // Duration is longer than g double dotted, and g is an 8th or more
-            if (b >= b1 + 1.75 * g && g >= 0.5) {
+            if (b >= b1 + 1.625 * g && g >= 0.5) {
                 b = b1 + 1.75 * g;
-//console.log('g..', g, 1.75 * g);
+console.log('g..', g, 1.75 * g);
                 break;
             }
             // Duration is longer than g dotted, and g is an 16th or more
-            if (b >= b1 + 1.5 * g && g >= 0.25) {
+            if (b >= b1 + 1.25 * g && g >= 0.25) {
                 b = b1 + 1.5 * g;
-//console.log('g.', g, 1.5 * g);
+console.log('g.', g, 1.5 * g);
                 break;
             }
             // Duration is longer than g
-            if (b >= b1 + g) {
+            if (b >= b1 + 0.875 * g) {
                 b = b1 + g;
-//console.log('g', g, g);
+console.log('g', g, g);
                 break;
             }
         }
 
-        const duration    = b - b1;
-        const noteSymbols = this.createNoteSymbols(symbols, bar, part, accidentals, notes, b1, duration, settings);
-
-        // Splice out all notes that stop before b, events left in notes will be
-        // tied
-        createTies(symbols, bar, part, notes, noteSymbols, b1, duration);
-
-
-        //// If last notes have a duration too long for a beam
-        //if (gte(1, duration, P24)) {
-        //    // ...and there is a beam, close it
-        //    if (beam) beam = closeBeam(symbols, stave, part, beam);
-        //}
-        //// If notes are in the same bar division as rhythm division
-        //else if (v1 === v3 && (
-        //    // ...and note stop brings us up to division
-        //    beat === b2 + startBeat
-        //    // ...or note duration is the same duration as the gap
-        //    || duration === b2 + startBeat - beat
-        //)) {
-        //    // ...make sure there is a beam
-        //    if (!beam) beam = createBeam(part, b1);
-        //    // ...and push note symbols on to it
-        //    push(beam, ...noteSymbols);
-        //}
-        //// If there is a beam
-        //else if (beam) {
-        //    // ...push last note symbols on to it
-        //    push(beam, ...noteSymbols);
-        //    // ...and close it
-        //    beam = closeBeam(symbols, stave, part, beam);
-        //}
-
-
-        const beat = bar.beat + b;
-        return { beat, beam, notes, n };
+        const duration = b - b1;
+        return this.createNoteSymbols(symbols, bar, part, accidentals, notes, cutoffBeat, b1, duration, settings);
     }
 }

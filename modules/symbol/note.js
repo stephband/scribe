@@ -5,14 +5,17 @@ import { stemupFromRows } from './stem.js';
 
 
 const byRow = by(get('row'));
+const symbols = [];
 
 
-export function createNotes(stave, key, part, notes, beat, duration) {
-    if (!notes.length) return [];
+export function createNotes(stave, key, part, notes, cutoffBeat, beat, duration) {
+    symbols.length = 0;
 
-    const symbols = [];
+    if (!notes.length) return symbols;
+
     let n = -1, event;
-    while (event = notes[++n]) {
+
+    while ((event = notes[++n]) && event[0] < cutoffBeat) {
         const events     = event.scribeEvents;
         const index      = event.scribeIndex;
         const keyWeights = keyWeightsForEvent(events, index, key);
@@ -21,7 +24,10 @@ export function createNotes(stave, key, part, notes, beat, duration) {
         const row        = stave.getRow(part, pitch);
 
         // Is note not on the stave?
-        if (!row) continue;
+        if (row === undefined) {
+            throw new Error('No row for pitch ' + pitch)
+            continue;
+        }
 
         // Create symbols with pitch, row
         symbols.push({

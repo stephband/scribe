@@ -316,6 +316,8 @@ export function straighten(data) {
                 data.divisor = 2;
                 data.rhythm  = 3;
                 break;
+            default:
+                console.log('Unstraightened data', data.rhythm, data);
         }
     }
 
