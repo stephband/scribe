@@ -45,27 +45,6 @@ function setDurations(symbols, duration) {
     return symbols;
 }
 
-function getNotesAtBeatDuration(divisions, grain, b1, b2, v1, v2, v3) {
-    let j = noteDurations.length;
-
-    // Reject noteDurations greater than grain
-    while (noteDurations[--j] > grain);
-    ++j;
-
-    // Reject noteDurations greater than available space up to b2 or bar
-    // division, whichever is first
-    const b3 = v1 === v3 ? b2 : v2 ;
-//console.log('b3', b3);
-    while (noteDurations[--j] > b3 - b1);
-
-    // If that duration does not span exactly to b2 or bar division
-    return b1 + noteDurations[j] !== b3 ?
-        // ...reject dotted durations
-        floorPow2(noteDurations[j]) :
-        // ...use duration as-is
-        noteDurations[j] ;
-}
-
 function getGrain(divisions, beat) {
     const minGrain = 0.125;
     const maxGrain = 2;
@@ -235,18 +214,20 @@ export default class DrumStave extends Stave {
         const stave = this;
         // Create note heads
         const noteSymbols = createNotes(stave, bar.key, part, notes, cutoffBeat, beat, duration);
+        // Notes may not appear on stave in which case noteSymbols will be empty
+        if (!noteSymbols.length) return noteSymbols;
         // Create ledgers, accidentals and accents
         createLedges(symbols, stave, part, beat, noteSymbols);
         createAccents(symbols, stave, part, beat, noteSymbols, settings);
         // Push in note heads
         symbols.push.apply(symbols, noteSymbols);
-        // Drum notation does not tie notes
-        notes.length = 0;
+        // Drum notation does not tie notes so we don't leave consumed events in array
+        notes.splice(0, noteSymbols.length);
         // Return symbols
         return noteSymbols;
     }
 
-    createDupletNoteSymbols(symbols, bar, part, accidentals, beam, notes, n, startBeat, cutoffBeat, stopBeat, settings) {
+    createDupletNoteSymbols(symbols, bar, part, accidentals, notes, startBeat, cutoffBeat, stopBeat, settings) {
         const stave    = this;
         const b1       = startBeat - bar.beat;
         const b2       = stopBeat - bar.beat;
@@ -254,48 +235,35 @@ export default class DrumStave extends Stave {
         const v1       = getDivisionBefore(bar.divisions, b1);
         const v2       = getDivisionAfter(bar.divisions, b1);
         const v3       = getDivisionBefore(bar.divisions, b2);
-        const duration = getNotesAtBeatDuration(bar.divisions, grain, b1, b2, v1, v2, v3);
+
+        let j = noteDurations.length;
+
+        // Reject noteDurations greater than grain
+        while (noteDurations[--j] > grain);
+        ++j;
+
+        // Reject noteDurations greater than available space up to b2 or bar
+        // division, whichever is first
+        const b3 = v1 === v3 ? b2 : v2 ;
+        while (noteDurations[--j] > b3 - b1);
+
+        // If that duration does not span exactly to b2 or bar division
+        const duration = b1 + noteDurations[j] !== b3 ?
+            // ...reject dotted durations
+            floorPow2(noteDurations[j]) :
+            // ...use duration as-is
+            noteDurations[j] ;
 
         // Create note heads
         const noteSymbols = createNotes(stave, bar.key, part, notes, cutoffBeat, b1, duration);
-        // Drum notation does not tie notes
-        notes.length = 0;
-
-        // Extend duration of notes
-        //setDurations(noteSymbols, duration);
-        const beat = b1 + duration + bar.beat;
-
-        // If last notes have a duration too long for a beam
-        if (gte(1, duration, P24)) {
-            // ...and there is a beam, close it
-            if (beam) beam = closeBeam(symbols, stave, part, beam);
-        }
-        // If notes are in the same bar division as rhythm division
-        else if (v1 === v3 && (
-            // ...and note stop brings us up to division
-            beat === b2 + bar.beat
-            // ...or note duration is the same duration as the gap
-            || duration === b2 + bar.beat - beat
-        )) {
-            // ...make sure there is a beam
-            if (!beam) beam = createBeam(part, b1);
-            // ...and push note symbols on to it
-            push(beam, ...noteSymbols);
-        }
-        // If there is a beam
-        else if (beam) {
-            // ...push last note symbols on to it
-            push(beam, ...noteSymbols);
-            // ...and close it
-            beam = closeBeam(symbols, stave, part, beam);
-        }
-
-        // Create ledgers, accidentals and accents
+        // Drum notation does not tie notes so we don't leave consumed events in array
+        notes.splice(0, noteSymbols.length);
+        // Create ledgers and accents
         createLedges(symbols, stave, part, b1, noteSymbols);
         createAccents(symbols, stave, part, b1, noteSymbols, settings);
         // Push in note heads
         symbols.push.apply(symbols, noteSymbols);
-
-        return { beat, beam, notes };
+        // Return symbols
+        return noteSymbols;
     }
 }

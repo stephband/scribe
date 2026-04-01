@@ -89,7 +89,9 @@ function compare(beat, duration, divisor, rhythm, length, count, r, i, score, re
         case 3:
             // Don't permit the triplet rhythms 010 or 110, let them fall
             // through to the shorter duration 001 and 101
-            if (rhythm === 2 || rhythm === 3) return score;
+            if (duration >= 4 && rhythm === 2
+             || duration >= 4 && rhythm === 3
+             || duration >= 4 && rhythm === 4) return score;
             break;
         default:
             // Reject higher order rhythms with more than one hole
@@ -253,7 +255,9 @@ function run(minDivision, maxDivision, startBeat, maxDuration, rhythm, count, ev
         duration /= 2;
     }
 
-    return result;
+    return result.rhythm === 0 ?
+        undefined :
+        result ;
 }
 
 export default function detectRhythm(beat, duration, events, index = 0, options, drift = 0) {

@@ -326,18 +326,17 @@ console.log('AVOID THIS? Notes of duration 0! -----------------------', startBea
             --i;
             while (notes[++i] && notes[i][0] < cutoffBeat);
 console.log('AVOID THIS? Notes of duration 0! -----------------------', startBeat, cutoffBeat, stopBeat, notes, i);
-
             //notes.length = 0;
             notes.splice(0, i);
             // TODO: Remove ties from symbols??
             return { beat: bar.beat + b, removedCount: i };
         }
 
-
+/*
 --i;
 while (notes[++i] && notes[i][0] < cutoffBeat);
-console.log('Notes start', b1, 'stop', b, 'duration', b - b1, 'grain', grain, 'count', i);
-
+console.log('Notes start', b1, 'stop', b, 'duration', b - b1, 'grain', grain, 'count', i, 'bar.divisions', bar.divisions.join(', '));
+*/
 
         const b3 = b;
         let g = grain;
@@ -346,50 +345,57 @@ console.log('Notes start', b1, 'stop', b, 'duration', b - b1, 'grain', grain, 'c
         // bar end, and that duration is a valid note duration
         if (b >= b2 && b1 === d1 && b2 === d2 && noteDurations.includes(b2 - b1)) {
             b = b2;
-console.log('start and stop on divisions', grain, b2 - b1);
+//console.log('start and stop on divisions', grain, b2 - b1);
         }
         // Duration is longer than 5g and a double dotted 7g takes us to a more
         // than a 4x grain before b2
-        else if (b >= b1 + 5 * grain && b1 + 7 * grain <= b2 && grainOfBeat(bar.divisions, b1 + 7 * grain) > 4 * grain) {
+        else if (b > b1 + 6 * grain && b1 + 7 * grain <= b2 && grainOfBeat(bar.divisions, b1 + 7 * grain) > 4 * grain) {
             b = b1 + 7 * grain;
-console.log('4g..', grain, 7 * grain);
+//console.log('4g..', grain, 7 * grain);
         }
         // Duration is longer than 2g and a dotted 3g takes us to a more than a
         // 2x grain grain before b2
-        else if (b >= b1 + 2 * grain && b1 + 3 * grain <= b2 && grainOfBeat(bar.divisions, b1 + 3 * grain) > 2 * grain) {
+        else if (b > b1 + 2.5 * grain && b1 + 3 * grain <= b2 && grainOfBeat(bar.divisions, b1 + 3 * grain) > 2 * grain) {
             b = b1 + 3 * grain;
-console.log('2g.', grain, 3 * grain);
+//console.log('2g.', grain, 3 * grain);
         }
         // Duration is longer than 1.5g and a 2g takes us to a more than 1x grain
         // grain before b2, which can happen if note ends on a bar division
-        else if (b >= b1 + 1.5 * grain && b1 + 2 * grain <= b2 && grainOfBeat(bar.divisions, b1 + 2 * grain) > grain) {
+        else if (b > b1 + 1.5 * grain && b1 + 2 * grain <= b2 && grainOfBeat(bar.divisions, b1 + 2 * grain) > grain) {
             b = b1 + 2 * grain;
-console.log('2g', grain, 2 * grain);
+//console.log('2g', grain, 2 * grain);
         }
         // Duration is longer than 0.875g, a 1g always takes us to a more than
         // 1x grain
-        else if (b >= b1 + 0.875 * grain && b1 + 1 * grain <= b2) {
+        else if (b > b1 + 0.875 * grain && b1 + 1 * grain <= b2) {
             b = b1 + grain;
-console.log('1g', grain, grain);
+//console.log('1g', grain, grain);
+        }
+        // Duration is less than 1 and does not take us to stopBeat so we are
+        // not butting up against the next event, if there is room choose next
+        // pow of 2 duration to avoid dotted 8th and 16ths
+        else if (b - b1 < 1 && b < b2 && b1 + ceilPow2(b - b1) <= b2) {
+            b = b1 + ceilPow2(b - b1);
+//console.log('ceil pow 2', b, b2);
         }
         // Loop through smaller grains down to a 32nd
         else while ((g /= 2) >= 0.125) {
             // Duration is longer than g double dotted, and g is an 8th or more
-            if (b >= b1 + 1.625 * g && g >= 0.5) {
+            if (b > b1 + 1.625 * g && g >= 0.5) {
                 b = b1 + 1.75 * g;
-console.log('g..', g, 1.75 * g);
+//console.log('g..', g, 1.75 * g);
                 break;
             }
             // Duration is longer than g dotted, and g is an 16th or more
-            if (b >= b1 + 1.25 * g && g >= 0.25) {
+            if (b > b1 + 1.25 * g && g >= 0.25) {
                 b = b1 + 1.5 * g;
-console.log('g.', g, 1.5 * g);
+//console.log('g.', g, 1.5 * g);
                 break;
             }
             // Duration is longer than g
-            if (b >= b1 + 0.875 * g) {
+            if (b > b1 + 0.875 * g) {
                 b = b1 + g;
-console.log('g', g, g);
+//console.log('g', g, g);
                 break;
             }
         }

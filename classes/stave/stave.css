@@ -409,7 +409,8 @@
 }
 
 .stave > .tie,
-.stave > .down-tie {
+.stave > .down-tie,
+.stave > .up-note + .tie  {
     align-self: start;
     margin-top: 0.225em;
 }

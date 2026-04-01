@@ -17,7 +17,6 @@ function average(a, n, i, array) {
 }
 
 export function createBeam(part, beat) {
-console.log('beam open');
     return {
         type: 'beam',
         beat,
@@ -27,7 +26,7 @@ console.log('beam open');
 
 export function closeBeam(symbols, stave, part, beam) {
     if (!beam) return;
-console.log('beam close');
+
     // Scan through beam symbols to find note not on beat of beam
     let n = -1;
     while (beam[++n] && beam[n].beat === beam.beat);

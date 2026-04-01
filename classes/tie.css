@@ -8,7 +8,8 @@
     /*background-color: lightblue;*/
 }
 
-.down-tie > path {
+.down-tie > path,
+.up-note + .tie > path {
     transform-origin: center center;
     transform: translateY(0.05px) scale(1, 0.9);
 }
@@ -17,7 +18,8 @@
     /*background-color: yellow;*/
 }
 
-.up-tie > path {
+.up-tie > path,
+.down-note + .tie > path {
     transform-origin: center center;
     transform: translateY(-0.05px) scale(1, -0.9);
 }

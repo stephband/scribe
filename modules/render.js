@@ -165,7 +165,7 @@ export function renderStyle(element, root = element) {
         + `--head-4-size: ${ truncate(6, head3Width / fontSize) }; `
         + `--head-x-size: ${ truncate(6, headXWidth / fontSize) }; `
         + `--head-diamond-size: ${ truncate(6, headDiamondWidth / fontSize) }; `
-        + `--signature-width: ${ (2.25 + count * 0.625 + 0.625).toFixed(4) }em;`;
+        + `--signature-width: ${ (1.5 + count * 0.625 + 0.625).toFixed(4) }em;`;
 }
 
 export function renderDOM(element, root = element) {
