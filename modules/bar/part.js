@@ -136,6 +136,47 @@ function createTies(symbols, bar, part, notes, noteSymbols, beat, duration) {
     }
 }
 
+function fillNotesToBeat(symbols, bar, stave, part, accidentals, notes, state, settings, stopBeat) {
+    let { beat, beam, cutoffBeat, n } = state;
+
+    while (n && beat < stopBeat) {
+        const n1 = notes.length;
+        const noteSymbols = stave.createDupletNoteSymbols(symbols, bar, part, accidentals, notes, beat, cutoffBeat, stopBeat, settings);
+        n -= (n1 - notes.length);
+        const duration    = noteSymbols[0].duration;
+
+        if (n) {
+            // Splice out all notes that stop before notes end, notes left over are tied
+            const n1 = notes.length;
+            createTies(symbols, bar, part, notes, noteSymbols, beat - bar.beat, duration);
+            // Reduce n by the number of notes that were spliced out
+            n -= (n1 - notes.length);
+        }
+
+        // If notes have a duration too long for a beam
+        if (beam) {
+            if (duration >= 1) {
+                // ...and there is a beam, close it
+                beam = closeBeam(symbols, stave, part, beam);
+            }
+            // If there is a beam and it's in the same division as notes
+            else if (getDivisionBefore(bar.divisions, beam.beat) === getDivisionBefore(bar.divisions, beat - bar.beat)) {
+                // ...add notes to beam
+                push(beam, ...noteSymbols);
+            }
+        }
+
+        // Update beat
+        beat += duration;
+    }
+
+    // Update state
+    state.beat = beat;
+    state.beam = beam;
+    state.n    = n;
+    return state;
+}
+
 export default function createPartSymbols(bar, stave, accidentals, name, notes, settings) {
     const startBeat = bar.beat;
     const stopBeat  = bar.beat + bar.duration;
@@ -154,44 +195,21 @@ export default function createPartSymbols(bar, stave, accidentals, name, notes, 
         const division = data.duration / divisor;
         const r        = rhythm.toString(2);
 
-//console.group('Rhythm beat', data.beat, 'duration', data.duration, 'divisor', divisor, 'division', division, 'rhythm', r);
+console.group('Rhythm beat', data.beat, 'duration', data.duration, 'divisor', divisor, 'division', division, 'rhythm', r);
 
         if (tuplet) {
-            while (n && b1 < data.beat) {
-                const n1 = notes.length;
-                const noteSymbols = stave.createDupletNoteSymbols(symbols, bar, part, accidentals, notes, b1, b2, data.beat, settings);
-                n -= (n1 - notes.length);
-                const duration    = noteSymbols[0].duration;
+            // Update note durations to end of bar
+            const state = fillNotesToBeat(symbols, bar, stave, part, accidentals, notes, { beat: b1, beam, cutoffBeat: b2, n }, settings, data.beat);
 
-                if (n) {
-                    // Splice out all notes that stop before notes end, notes left over are tied
-                    const n1 = notes.length;
-                    createTies(symbols, bar, part, notes, noteSymbols, b1 - startBeat, duration);
-                    // Reduce n by the number of notes that were spliced out
-                    n -= (n1 - notes.length);
-                }
-
-                // If notes have a duration too long for a beam
-                if (beam) {
-                    if (duration >= 1) {
-                        // ...and there is a beam, close it
-                        beam = closeBeam(symbols, stave, part, beam);
-                    }
-                    // If there is a beam and it's in the same division as notes
-                    else if (getDivisionBefore(bar.divisions, beam.beat) === getDivisionBefore(bar.divisions, b1 - startBeat)) {
-                        // ...add notes to beam
-                        push(beam, ...noteSymbols);
-                    }
-                }
-
-                // Update b1
-                b1 += duration;
-                beat = b1;
+            if (b1 !== state.beat) {
+                b1   = state.beat;
+                beat = state.beat;
             }
+            beam = state.beam;
+            n    = state.n;
 
             // if there is a beam, close it
             if (beam) beam = closeBeam(symbols, stave, part, beam);
-
             // Gap from beat to division
             const gap = data.beat - beat;
 
@@ -275,6 +293,7 @@ export default function createPartSymbols(bar, stave, accidentals, name, notes, 
                 // backwards, ignore empty divisions
                 if (r[r.length - 1 - i] !== '1') continue;
 //console.group('Duplet beat', data.beat + i * division, 'division', i, n + ' notes from previous division', b1, b2);
+
                 // Update note durations to this division
                 while(n && b1 < data.beat + i * division) {
                     const n1 = notes.length;
@@ -324,39 +343,15 @@ export default function createPartSymbols(bar, stave, accidentals, name, notes, 
 
         // Update beat
         beat = data.beat + data.duration;
-//console.groupEnd();
+console.groupEnd();
     }
 
 //console.group('End of bar from', beat, 'to', stopBeat, 'notes', n, notes.length, b1, b2);
     // Update note durations to end of bar
-    while (n && b1 < stopBeat) {
-        const n1 = notes.length;
-        const noteSymbols = stave.createDupletNoteSymbols(symbols, bar, part, accidentals, notes, b1, b2, stopBeat, settings);
-        n -= (n1 - notes.length);
-        const duration    = noteSymbols[0].duration;
-        if (n) {
-            // Splice out all notes that stop before b, notes left in notes will be tied
-            const n1 = notes.length;
-            createTies(symbols, bar, part, notes, noteSymbols, b1 - startBeat, duration);
-            // Reduce n by the number of notes that were spliced out
-            n -= (n1 - notes.length);
-        }
-        if (beam) {
-            // If notes have a duration too long for a beam
-            if (duration >= 1) {
-                // ...and there is a beam, close it
-                beam = closeBeam(symbols, stave, part, beam);
-            }
-            // If there is a beam and it's in the same division as notes
-            else if (getDivisionBefore(bar.divisions, beam.beat) === getDivisionBefore(bar.divisions, b1 - startBeat)) {
-                // ...add notes to beam
-                push(beam, ...noteSymbols);
-            }
-        }
-
-        beat = b1 + duration;
-        b1 = beat;
-    }
+    const state = fillNotesToBeat(symbols, bar, stave, part, accidentals, notes, { beat: b1, beam, cutoffBeat: b2, n }, settings, stopBeat);
+    beat = state.beat;
+    beam = state.beam;
+    n    = state.n;
 
 //if (n) console.log(n + ' notes tied over to next bar', beat, bar.beat);
 
