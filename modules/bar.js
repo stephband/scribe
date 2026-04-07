@@ -249,6 +249,14 @@ export default function createBars(sequence, excludes, stave, settings = config)
 
     // Extract events from sequence iterator and divide them into parts
     for (event of sequence) {
+        // Store all events for the key analyser: we know event is an object at
+        // this point, as the iterator emits transformed objects, so use the
+        // event to store information scribe needs for analysis
+        event.scribeIndex  = events.length;
+        event.scribeEvents = events;
+        // Add to events
+        events.push(event);
+
         // While event time is beyond end of bar create bar from current state
         while (event[0] >= beat + duration) {
             const bar = createBar(bars.length + 1, beat, duration, divisor, stave, key, symbols, parts, sequenceEvent, settings);
@@ -292,8 +300,9 @@ export default function createBars(sequence, excludes, stave, settings = config)
                 break;
 
             case "chord": {
-                const keyWeights = keyWeightsForEvent(events, n, key);
-                const keyNumber  = chooseKeyFromWeights(keyWeights);
+                //const keyWeights = keyWeightsForEvent(events, events.length - 1, key);
+                //const keyNumber  = chooseKeyFromWeights(keyWeights);
+                const keyNumber  = 0;
                 const extension  = toChordName(event[3]);
                 const slashbass  = rslashbass.exec(extension);
 
@@ -358,15 +367,6 @@ export default function createBars(sequence, excludes, stave, settings = config)
             default:
                 log('event type "' + event[1] + '" ignored', '');
         }
-
-        // Store all events for the key analyser: we know event is an object at
-        // this point, as the iterator emits transformed objects, so use the
-        // event to store information scribe needs for analysis
-        event.scribeIndex  = events.length;
-        event.scribeEvents = events;
-
-        // Add to events
-        events.push(event);
     }
 
     // If no meter was declared this is a bar with indeterminate duration,

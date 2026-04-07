@@ -63,9 +63,7 @@ export default define(element('scribe-music', {
 
     connect: function(shadow, internals) {
         // If Safari
-        if (internals.isSafari) {
-            this.classList.add('safari');
-        }
+        if (internals.isSafari) this.classList.add('safari');
 
         // Update beams on load and resize
         resizes.observe(this, { box: 'content-box' });
@@ -156,7 +154,7 @@ export default define(element('scribe-music', {
 
     load: function(shadow, { style }) {
         // Recalculate when style loads
-        style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
+        if (style) style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
         renderDOM(this, shadow);
     },
 

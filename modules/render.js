@@ -155,6 +155,7 @@ export function renderStyle(element, root = element) {
     // metrics in the font stylesheet?
     const side   = root.querySelector('.side');
     if (!side) return;
+    const sideWidth = rect(side).width;
 
     const key    = side.dataset.key;
     const counts = {'G♭': 6, 'C♯': 5, 'D♭': 5, 'G♯': 4, 'A♭': 4, 'D♯': 3, 'E♭': 3, 'B♭': 2, 'F':  1, 'C':  0, 'G':  1, 'D':  2, 'A':  3, 'E':  4, 'B':  5, 'F♯': 6};
@@ -165,7 +166,7 @@ export function renderStyle(element, root = element) {
         + `--head-4-size: ${ truncate(6, head3Width / fontSize) }; `
         + `--head-x-size: ${ truncate(6, headXWidth / fontSize) }; `
         + `--head-diamond-size: ${ truncate(6, headDiamondWidth / fontSize) }; `
-        + `--signature-width: ${ (1.5 + count * 0.625 + 0.625).toFixed(4) }em;`;
+        + `--signature-width: ${ (0.25 + 2.375 + count * 0.6875 + 0.5).toFixed(6) }em;`;
 }
 
 export function renderDOM(element, root = element) {

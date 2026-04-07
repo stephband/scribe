@@ -100,6 +100,10 @@
     margin-left: 0.03125em;
 }
 
+.signature-stave {
+    padding-right: 0.25em;
+}
+
 .signature-stave > [data-pitch="F♭"] { grid-column: 8; }
 .signature-stave > [data-pitch="C♭"] { grid-column: 7; }
 .signature-stave > [data-pitch="G♭"] { grid-column: 6; }
