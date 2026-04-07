@@ -5,4 +5,4 @@ export const P16 = 1/16;
 export const P24 = 1/24;
 
 // Golden ratio
-export const GR  = 0.618034;
+export const GR  = 0.6180339887498948;
