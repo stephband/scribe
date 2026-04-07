@@ -2,10 +2,10 @@
 //import get                   from 'fn/get.js';
 import nothing               from 'fn/nothing.js';
 import { noteNames, toNoteName, toNoteNumber, toNoteOctave, toRootName, toRootNumber } from 'midi/note.js';
+import mod12                 from 'sequence/modules/number/mod-12.js';
 import toStopBeat            from '../event/to-stop-beat.js';
 import push                  from '../object/push.js';
 import { eq, gte, lte, lt, gt } from '../number/float.js';
-import mod12                 from '../number/mod-12.js';
 import nearest               from '../number/nearest.js';
 import { floorPow2, ceilPow2 } from '../number/power-of-2.js';
 import grainOfBeat           from '../bar/grain-of-beat.js';

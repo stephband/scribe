@@ -7,7 +7,7 @@ import remove           from 'fn/remove.js';
 import { toRootName }   from 'midi/note.js';
 import { toKeyNumber, keyToRootNumber, rootToKeyNumber } from 'sequence/modules/event/keys.js';
 import { toChordName }  from 'sequence/modules/event/chords.js';
-import mod12            from './number/mod-12.js';
+import mod12            from 'sequence/modules/number/mod-12.js';
 import join             from './object/join.js';
 import toStopBeat       from './event/to-stop-beat.js';
 import { getDivisions } from './bar/divisions.js';
