@@ -203,7 +203,16 @@ Dots
     grid-column: 2;
     grid-row: 1;
     /* Move it down a little */
-    transform: translate(0, 0.02em);
+    transform: translate(0, 0.04em);
+}
+
+.cluster-note.up-note::after {
+    grid-column-start: 3;
+}
+
+.cluster-note.up-note > .head {
+    grid-column: 2;
+    margin-left: calc(-0.6em * var(--stem-width));
 }
 
 /* Note durations 6, 3, 1.5, 0.75, 0.375 and 0.1875 get an augmentation dot,

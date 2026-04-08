@@ -139,7 +139,7 @@ function detectBarRepeats(bars, jsons, bar) {
 function pushEventToPart(stave, parts, event) {
     const part = event.target ?
         // TEMP Experimental parts syphoner - but is this the way to do it?
-        stave.parts[event.target] :
+        stave.parts[event.target - 1] :
         // Stave decides on part automatically
         stave.getPart(event[2]) ;
 
