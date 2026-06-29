@@ -31,3 +31,5 @@ select:focus {
 }
 
 label + select { margin-left: 0.25em; }
+
+.FAIL { color: rgb(200, 24, 0); }

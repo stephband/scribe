@@ -85,6 +85,7 @@ function compare(beat, duration, divisor, rhythm, length, count, r, i, score, re
     switch (divisor) {
         case 1:
         case 2:
+        case 4:
             break;
         case 3:
             // Don't permit the triplet rhythms 010 or 110, let them fall
@@ -173,8 +174,10 @@ function test(events, index, beat, duration, divisor, rhythm, count, score, resu
     while (events[++n] !== undefined && events[n][0] < beat + duration) {
         // Each start beat gives this oscillator a kick. Accumulate complex
         // components, they constructively interfere when events align with
-        // resonant frequency, destructively interfere when events are out of phase.
-        const b1 = events[n][0] - beat;
+        // resonant frequency, destructively interfere when events are out of
+        // phase. TEMP: we clamp to beat 0 to account for events that start
+        // before the bar, therefore drift is inaccurate.
+        const b1 = max(0, events[n][0] - beat);
         const p1 = 2 * PI * divisor * b1 / duration;
         r += cos(p1);
         i += sin(p1);
@@ -268,15 +271,6 @@ export default function detectRhythm(beat, duration, events, index = 0, options,
     // Duration must be at least minDivision
     if (duration < minDivision) return;
 
-    // Find first event after index in analysis window
-    let n = index - 1;
-    while (events[++n] !== undefined && events[n][0] < beat);
-
-    // If events were found before beat they are assumed to be hangovers from
-    // the end of a previous analysis window that were not counted as rhythm,
-    // they are now counted as rhythm in the first division
-    const count  = n - index;
-    const rhythm = count ? 1 : 0 ;
     const result = {
         // Start beat of rhythmic analysis window
         beat,
@@ -285,23 +279,39 @@ export default function detectRhythm(beat, duration, events, index = 0, options,
         // Number of divisions over duration
         divisor: 2,
         // Rhythm bitmap identifier
-        rhythm,
+        rhythm: 0,
         // Phase offset in beats, whether the performance is pushing or dragging
         drift,
         // Index of first event in rhythm
         index,
         // Number of events counted in rhythm
-        count
+//        count
+        count: 0
     };
 
+    // Find first event after index in analysis window
+    let n = index - 1;
+    while (events[++n] !== undefined && events[n][0] < beat);
+
     // If no event in window, quick out
-    if (!events[n] || events[n][0] >= beat + duration) return count ?
-        result :
-        undefined ;
+    if (!events[n] || events[n][0] >= beat + duration) {
+        // If events were found before beat they are assumed to be hangovers from
+        // the end of a previous analysis window that were not counted as rhythm,
+        // they are now counted as rhythm in the first division
+        const count = n - index;
+
+        if (count) {
+            result.rhythm = 1;
+            result.count  = count;
+            return result;
+        }
+
+        return undefined;
+    }
 
     // Run the analysis
     if (DEBUG) analytics.length = 0;
-    return run(minDivision, maxDivision, beat, duration, rhythm, count, events, n, result, stopBeatInfluence);
+    return run(minDivision, maxDivision, beat, duration, 0, 0, events, index, result, stopBeatInfluence);
 }
 
 
