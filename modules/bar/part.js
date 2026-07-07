@@ -12,6 +12,7 @@ import { createBeam, closeBeam } from '../symbol/beam.js';
 import { closeTuplet }       from '../symbol/tuplet.js';
 import { getDivisionBefore } from '../bar/divisions.js';
 import detectRhythm, { straighten, hasHoles } from '../rhythm.js';
+//import detectRhythm from '../detect.js';
 import { P24, GR }           from '../constants.js';
 
 
@@ -220,6 +221,7 @@ export default function createPartSymbols(bar, stave, accidentals, name, notes, 
 
     // Loop through detected rhythms
     while (data = detectRhythm(beatAnalysed, stopBeat - beatAnalysed, notes, state.n)) {
+console.log(beatAnalysed, data);
         beatAnalysed = data.beat + data.duration;
 
         // Normalise rhythm based on settings, create tuplet where needed

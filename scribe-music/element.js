@@ -6,10 +6,10 @@ import element, { getInternals } from 'dom/element.js';
 import events                    from 'dom/events.js';
 import { toRootName, toRootNumber } from 'midi/note.js';
 import { Sequence }              from 'sequence/module.js';
+import { timesigToMeter, meterToTimesig } from 'sequence/modules/event/meter.js';
 
 import requestData       from '../modules/request-data.js';
 import parseSource       from '../modules/parse.js';
-import { timesigToMeter, meterToTimesig } from '../modules/timesig.js';
 import Stave             from '../modules/stave.js';
 import { renderElements, renderStyle, renderDOM } from '../modules/render.js';
 import config            from '../modules/config.js';

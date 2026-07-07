@@ -16,7 +16,6 @@ import { createRests }   from '../symbol/rest.js';
 import { createBeam, closeBeam } from '../symbol/beam.js';
 import { closeTuplet }   from '../symbol/tuplet.js';
 import getStopBeat       from '../event/to-stop-beat.js';
-import detectRhythm, { straighten, hasHoles } from '../rhythm.js';
 import { P24, GR }       from '../constants.js';
 import { getDivisionBefore, getDivisionAfter } from '../bar/divisions.js';
 

@@ -2,8 +2,8 @@
 import cache                     from 'fn/cache.js';
 import overload                  from 'fn/overload.js';
 import { toNoteNumber, toRootNumber, toRootName } from 'midi/note.js';
-import { isChordEvent, isNoteEvent } from 'sequence/modules/event.js';
-import { keyToRootNumber, rootToKeyNumber } from 'sequence/modules/event/keys.js';
+import Event                     from 'sequence/modules/event.js';
+import { keyToRootNumber }       from 'sequence/modules/event/key.js';
 import { hsidToNumbers }         from 'sequence/modules/event/hsid.js';
 import mod12                     from 'sequence/modules/number/mod-12.js';
 import toStopBeat                from './event/to-stop-beat.js';
@@ -77,7 +77,7 @@ console.log('x weights', factor, '\n'
 
 const types = {
     note: (weights, event, influence = 1) => {
-        const number = toNoteNumber(event[2]);
+        const number = event[2];
         const probs  = keysContainingNote(number);
 
         return multiplyWeights(weights, probs, influence
@@ -87,7 +87,7 @@ const types = {
     },
 
     chord: (weights, event, influence = 1) => {
-        const r       = toRootNumber(event[2]);
+        const r       = event[2];
         const numbers = hsidToNumbers(event[3]);
 
         let n = numbers.length, probs;
@@ -109,8 +109,8 @@ export function keyWeightsForEvent(events, n, key = 0) {
     const KEYROOT = keyToRootNumber(key);
     const beat    = event[0];
     const weights =
-        isNoteEvent(event)  ? keysContainingNote(toNoteNumber(event[2])) :
-        isChordEvent(event) ? types.chord(Float32Array.of(1,1,1,1,1,1,1,1,1,1,1,1), event) :
+        Event.isNote(event)  ? keysContainingNote(event[2]) :
+        Event.isChord(event) ? types.chord(Float32Array.of(1,1,1,1,1,1,1,1,1,1,1,1), event) :
         0 ;
 
     // Weight by influence of current key
@@ -122,19 +122,19 @@ export function keyWeightsForEvent(events, n, key = 0) {
     // Weight by influence of surrounding events
     let m = n;
     while (event = events[--m]) {
-        const fn = types[event[1]];
+        const fn = types[event.type];
         if (!fn) continue;
 
         const stopBeat = toStopBeat(event);
 
         // Events that are playing concurrently
         if (stopBeat > beat) {
-//console.log('STOPBEAT', event[1]);
+//console.log('STOPBEAT', event.type);
             // Fairly influential 0.5
             fn(weights, event, 0.5);
         }
         // Notes that recently stopped
-        else if (event[1] === 'note' && beat - stopBeat < 3) {
+        else if (Event.isNote(event) && beat - stopBeat < 3) {
             if ((1 - (beat - stopBeat) / 3) > 1) throw new Error('Influence should never be > 1 ' + beat + ' ' + stopBeat);
 //console.log('RECENT NOTE', event[2], 0.25 * (1 - (beat - stopBeat) / 3));
             // Weight by distance from stopBeat to beat
@@ -145,9 +145,9 @@ export function keyWeightsForEvent(events, n, key = 0) {
     m = n;
     // Events in the future
     while ((event = events[++m]) && event[0] - beat < 2) {
-        if (!isNoteEvent(event)) continue;
+        if (!Event.isNote(event)) continue;
 
-        const fn = types[event[1]];
+        const fn = types[event.type];
         if (!fn) continue;
         if ((1 - (event[0] - beat) / 2) > 1) throw new Error('Influence should never be > 1 ' + beat + ' ' + stopBeat);
 //console.log('FUTURE NOTE', event[2], 0.3 * (1 - (event[0] - beat) / 2));

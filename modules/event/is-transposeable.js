@@ -1,5 +1,5 @@
 const types = ['note', 'chord', 'key'];
 
 export default function isTransposeable(event) {
-    return types.includes(event[1]);
+    return types.includes(event.type);
 }

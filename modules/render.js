@@ -3,7 +3,7 @@ import create           from 'dom/create.js';
 import px               from 'dom/parse-length.js';
 import rect             from 'dom/rect.js';
 import SequenceIterator from 'sequence/modules/sequence-iterator.js';
-import { rootToKeyNumber, toKeyName, toKeyNumber } from 'sequence/modules/event/keys.js';
+import { toKeyName, toKeyNumber } from 'sequence/modules/event/key.js';
 import Stave            from './stave.js';
 import createBars       from './bar.js';
 import createElement    from './create-element.js';
@@ -18,11 +18,11 @@ const global = globalThis || window;
 
 
 function isInitialMeterEvent(event) {
-    return event[0] <= 0 && event[1] === 'meter';
+    return event[0] <= 0 && event.type === 'meter';
 }
 
 function isInitialKeyEvent(event) {
-    return event[0] <= 0 && event[1] === 'key';
+    return event[0] <= 0 && event.type === 'key';
 }
 
 function toElements(nodes, symbol) {

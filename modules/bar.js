@@ -5,8 +5,6 @@ import nothing          from 'fn/nothing.js';
 import overload         from 'fn/overload.js';
 import remove           from 'fn/remove.js';
 import { toRootName }   from 'midi/note.js';
-import { toKeyNumber, keyToRootNumber, rootToKeyNumber } from 'sequence/modules/event/keys.js';
-import { toChordName }  from 'sequence/modules/event/chords.js';
 import mod12            from 'sequence/modules/number/mod-12.js';
 import join             from './object/join.js';
 import toStopBeat       from './event/to-stop-beat.js';
@@ -268,10 +266,10 @@ export default function createBars(sequence, excludes, stave, settings = config)
         }
 
         // Handle event types
-        switch (event[1]) {
+        switch (event.type) {
             case "key":
                 if (event[0] !== beat) throw new Error(`Scribe "key" event at beat ${ event[0] } not at start of bar at beat ${ beat }`);
-                key = toKeyNumber(event[2]);
+                key = event[2];
                 // TODO: Key is global and added to the side bar, we need to think about
                 // how to make key signature changes
                 // symbols.push.apply(symbols, stave.createKeySymbols(key));
@@ -303,7 +301,7 @@ export default function createBars(sequence, excludes, stave, settings = config)
                 //const keyWeights = keyWeightsForEvent(events, events.length - 1, key);
                 //const keyNumber  = chooseKeyFromWeights(keyWeights);
                 const keyNumber  = 0;
-                const extension  = toChordName(event[3]);
+                const extension  = event.extension;
                 const slashbass  = rslashbass.exec(extension);
 
                 let root, bass, name;
@@ -365,7 +363,7 @@ export default function createBars(sequence, excludes, stave, settings = config)
                 break;
 
             default:
-                log('event type "' + event[1] + '" ignored', '');
+                log('event type "' + event.type + '" ignored', '');
         }
     }
 
