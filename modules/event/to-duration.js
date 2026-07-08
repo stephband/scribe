@@ -2,7 +2,7 @@
 import get      from 'fn/get.js';
 import overload from 'fn/overload.js';
 
-export default overload(get(1), {
+export default overload(get('type'), {
     chord:    (event) => event[4],
     lyric:    (event) => event[3],
     note:     (event) => event[4],

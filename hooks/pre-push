@@ -1,0 +1,9 @@
+#!/bin/sh
+# Run the test suite before pushing; refuse the push if it fails.
+# Activate once per clone with: git config core.hooksPath hooks
+# Bypass in a pinch with: git push --no-verify
+
+deno test || {
+    echo "✘ deno test failed — push aborted (use --no-verify to override)"
+    exit 1
+}
