@@ -6,7 +6,7 @@ import mod12                 from 'sequence/modules/number/mod-12.js';
 import toStopBeat            from '../event/to-stop-beat.js';
 import push                  from '../object/push.js';
 import { eq, gte, lte, lt, gt } from '../number/float.js';
-import nearest               from '../number/nearest.js';
+import nearest               from 'fn/nearest.js';
 import { floorPow2, ceilPow2 } from '../number/power-of-2.js';
 import grainOfBeat           from '../bar/grain-of-beat.js';
 import { createAccents }     from '../symbol/accent.js';

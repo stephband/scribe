@@ -4,7 +4,7 @@ import overload                  from 'fn/overload.js';
 import { toNoteNumber, toRootNumber, toRootName } from 'midi/note.js';
 import Event                     from 'sequence/modules/event.js';
 import { keyToRootNumber }       from 'sequence/modules/event/key.js';
-import { hsidToNumbers }         from 'sequence/modules/event/hsid.js';
+import { hsidToNumbers }         from 'sequence/modules/harmony/hsid.js';
 import mod12                     from 'sequence/modules/number/mod-12.js';
 import toStopBeat                from './event/to-stop-beat.js';
 import { major }                 from './scale.js';

@@ -6,7 +6,7 @@ import toStopBeat            from '../event/to-stop-beat.js';
 import last                  from '../object/last.js';
 import push                  from '../object/push.js';
 import { eq, gte, lte, lt, gt } from '../number/float.js';
-import nearest               from '../number/nearest.js';
+import nearest               from 'fn/nearest.js';
 import { createRests }       from '../symbol/rest.js';
 import { createBeam, closeBeam } from '../symbol/beam.js';
 import { closeTuplet }       from '../symbol/tuplet.js';
