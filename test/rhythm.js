@@ -222,6 +222,27 @@ Deno.test('Septuplets', () => {
     matches(detect(0, 5, [[0],    [4/7],  [8/7],  [12/7], [16/7], [20/7], [24/7]]),[{ beat: 0,   duration: 4, divisor: 7, rhythm: 127, index: 0, count: 7 }]);
 });
 
+Deno.test('Duplets 0.04 beat push and drag', () => {
+    matches(detect(0, 4, [[0], [0.96], [2]]),    [{ beat: 0, duration: 2, divisor: 2, rhythm: 3, count: 2 }, { beat: 2, duration: 2, rhythm: 1, count: 1 }]);
+    matches(detect(0, 4, [[0], [1.04], [2]]),    [{ beat: 0, duration: 2, divisor: 2, rhythm: 3, count: 2 }, { beat: 2, duration: 2, rhythm: 1, count: 1 }]);
+    matches(detect(0, 4, [[0], [1],    [1.96]]), [{ beat: 0, duration: 2, divisor: 2, rhythm: 3, count: 3 }, { beat: 2, duration: 2, rhythm: 1, count: 0 }]);
+    matches(detect(0, 4, [[0], [1],    [2.04]]), [{ beat: 0, duration: 2, divisor: 2, rhythm: 3, count: 2 }, { beat: 2, duration: 2, rhythm: 1, count: 1 }]);
+    matches(detect(0, 4, [[0.04],  [1],   [2]]), [{ beat: 0, duration: 2, divisor: 2, rhythm: 3, count: 2 }, { beat: 2, duration: 2, rhythm: 1, count: 1 }]);
+    matches(detect(0, 4, [[-0.04], [1],   [2]]), [{ beat: 0, duration: 2, divisor: 2, rhythm: 3, count: 1 }, { beat: 2, duration: 2, rhythm: 1, count: 1 }]);
+});
+
+Deno.test('Triplets 0.02 beat push', () => {
+    const drag = -0.02;
+    matches(detect(0, 4, [            [drag + 1/3]]),                           [{ beat: 0, duration: 0.5, divisor: 3, rhythm: 4, index: 0, count: 1 }]);
+    matches(detect(0, 4, [[drag + 0], [drag + 1/3]]),                           [{ beat: 0, duration: 0.5, divisor: 3, rhythm: 5, index: 1, count: 1 }]);
+    matches(detect(0, 4, [                          [drag + 2/3]]),             [{ beat: 0, duration: 1,   divisor: 3, rhythm: 4, index: 0, count: 1 }]); // Potentially ambiguous
+    matches(detect(0, 4, [[drag + 0],               [drag + 2/3]]),             [{ beat: 0, duration: 1,   divisor: 3, rhythm: 5, index: 1, count: 1 }]); // Potentially ambiguous
+    matches(detect(0, 4, [            [drag + 1/3], [drag + 2/3]]),             [{ beat: 0, duration: 1,   divisor: 3, rhythm: 6, index: 0, count: 2 }]);
+    matches(detect(0, 4, [[drag + 0], [drag + 1/3], [drag + 2/3]]),             [{ beat: 0, duration: 1,   divisor: 3, rhythm: 7, index: 1, count: 2 }]);
+    matches(detect(0, 4, [                          [drag + 2/3], [drag + 1]]), [{ beat: 0, duration: 1,   divisor: 3, rhythm: 4, index: 0, count: 2 }, { beat: 1, duration: 1, rhythm: 1, index: 2, count: 0 }]);
+    matches(detect(0, 4, [[drag + 0],               [drag + 2/3], [drag + 1]]), [{ beat: 0, duration: 1,   divisor: 3, rhythm: 5, index: 1, count: 2 }, { beat: 1, duration: 1, rhythm: 1, index: 3, count: 0 }]);
+});
+
 Deno.test('Triplets 0.02 beat drag', () => {
     const drag = 0.02;
     matches(detect(0, 4, [            [drag + 1/3]]),                           [{ beat: 0, duration: 0.5, divisor: 3, rhythm: 4, index: 0, count: 1 }]);
@@ -233,13 +254,3 @@ Deno.test('Triplets 0.02 beat drag', () => {
     matches(detect(0, 4, [                          [drag + 2/3], [drag + 1]]), [{ beat: 0, duration: 1,   divisor: 3, rhythm: 4, index: 0, count: 1 }, { beat: 1, duration: 1, divisor: 2, rhythm: 1, index: 1, count: 1 }]);
     matches(detect(0, 4, [[drag + 0],               [drag + 2/3], [drag + 1]]), [{ beat: 0, duration: 1,   divisor: 3, rhythm: 5, index: 0, count: 2 }, { beat: 1, duration: 1, divisor: 2, rhythm: 1, index: 2, count: 1 }]);
 });
-/**/
-Deno.test('Push and drag', () => {
-    matches(detect(0, 4, [[0], [0.96], [2]]),    [{ beat: 0, duration: 2, divisor: 2, rhythm: 3, count: 2 }, { beat: 2, duration: 2, rhythm: 1, count: 1 }]);
-    matches(detect(0, 4, [[0], [1.04], [2]]),    [{ beat: 0, duration: 2, divisor: 2, rhythm: 3, count: 2 }, { beat: 2, duration: 2, rhythm: 1, count: 1 }]);
-    matches(detect(0, 4, [[0], [1],    [1.96]]), [{ beat: 0, duration: 2, divisor: 2, rhythm: 3, count: 3 }, { beat: 2, duration: 2, rhythm: 1, count: 0 }]);
-    matches(detect(0, 4, [[0], [1],    [2.04]]), [{ beat: 0, duration: 2, divisor: 2, rhythm: 3, count: 2 }, { beat: 2, duration: 2, rhythm: 1, count: 1 }]);
-    matches(detect(0, 4, [[0.04],  [1],   [2]]), [{ beat: 0, duration: 2, divisor: 2, rhythm: 3, count: 2 }, { beat: 2, duration: 2, rhythm: 1, count: 1 }]);
-    matches(detect(0, 4, [[-0.04], [1],   [2]]), [{ beat: 0, duration: 2, divisor: 2, rhythm: 3, count: 1 }, { beat: 2, duration: 2, rhythm: 1, count: 1 }]);
-});
-/**/

@@ -29,8 +29,14 @@ class TrebleDownStave extends Stave {
 
 class AltoStave extends Stave {
     type = 'alto';
-    clef = glyphs.clefAlto;
+    clef = glyphs.clefC;
     rows = ["B5", "A5", "G5", "F5", "E5", "D5", "C5", "B4", "A4", "G4", "F4", "E4", "D4", "C4", "B3", "A3", "G3", "F3", "E3", "D3", "C3", "B2", "A2", "G2", "F2", "E2", "D2"];
+}
+
+class TenorStave extends Stave {
+    type = 'tenor';
+    clef = glyphs.clefC;
+    rows = ["G5", "F5", "E5", "D5", "C5", "B4", "A4", "G4", "F4", "E4", "D4", "C4", "B3", "A3", "G3", "F3", "E3", "D3", "C3", "B2", "A2", "G2", "F2", "E2", "D2", "C2", "B1"];
 }
 
 class BassStave extends Stave {
@@ -48,6 +54,7 @@ Stave['treble']      = new TrebleStave();
 Stave['treble-up']   = new TrebleUpStave();
 Stave['treble-down'] = new TrebleDownStave();
 Stave['alto']        = new AltoStave();
+Stave['tenor']       = new TenorStave();
 Stave['bass']        = new BassStave();
 Stave['piano']       = new PianoStave();
 Stave['drum']        = new DrumStave();

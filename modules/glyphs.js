@@ -2,7 +2,7 @@
 export const clefTreble       = '&#xE050;';
 export const clefTrebleDown   = '&#xE052;';
 export const clefTrebleUp     = '&#xE053;';
-export const clefAlto         = '&#xE05C;';
+export const clefC            = '&#xE05C;';
 export const clefBass         = '&#xE062;';
 export const clefDrum         = '&#xE069;';
 

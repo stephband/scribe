@@ -16,8 +16,8 @@ Documentation and examples at [stephen.band/scribe](https://stephen.band/scribe)
 To use the `<scribe-music>` custom element, import the CSS and JS from the CDN:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/stephband/scribe@0.4.2/build/scribe-music/element.css" />
-<script type="module" src="https://cdn.jsdelivr.net/gh/stephband/scribe@0.4.2/build/scribe-music/element.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/stephband/scribe@0.5.8/build/scribe-music/element.css" />
+<script type="module" src="https://cdn.jsdelivr.net/gh/stephband/scribe@0.5.8/build/scribe-music/element.js"></script>
 ```
 
 The `<scribe-music>` element is now registered. It renders music notation from
@@ -323,15 +323,40 @@ replaced depending on what you are using as a server).
 make modules
 ```
 
-## Research
+## Contribute
 
-There is a discussion about using CSS grid layout for rendering music notation
-in the blog post <a href="https://cruncher.ch/blog/printing-music-with-css-grid/">Printing Music with CSS Grid</a>.
-Scribe's internals have changed since that post was written but the principal
-layout technique remains the same.
+The Scribe library has two main parts, a symboliser, and an HTML renderer with
+its accompanying CSS library. The symboliser takes some music data and turns it
+into a list of symbol objects. The renderer then consumes that list to produce
+HTML.
+
+Currently the symboliser consumes Sequence JSON. Supporting another music data
+format - MusicXML, say, or ABC - should be a question of writing another
+symboliser. If you are interested in helping with that effort I'd like to hear
+from you.
+
+For CSS developers, there is a discussion about using CSS grid layout for
+rendering music notation in the blog post <a href="https://cruncher.ch/blog/printing-music-with-css-grid/">Printing Music with CSS Grid</a>.
+Scribe's internals have changed since that post was written but principal
+technique remains the same, and it's a good place to get an overview.
+
+Currently support for SMuFL fonts other than JazzFont is untested. One potential
+anticipated problem is that styling will be needed to normalise chord symbols
+for other fonts. If you are interested in helping with that effort I'd like to
+hear from you.
 
 
 ## Changes
+
+### 0.5.x –
+
+Version 0.5 rewrites the rhythm detector to better support drums and percussion.
+
+- Refactors the parts symboliser
+- Rewrites rhythm detection to better support drum and percussion notation
+- Fixes CSS for minor superimposed symbols such as clustered note dots
+- Adds 32nd note tail glyphs to JazzFont
+- Renders whole bar rests as semibrieve rests
 
 ### 0.4.x – The Lead Sheet
 
