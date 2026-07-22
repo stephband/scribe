@@ -35,6 +35,7 @@ const clefGlyphs = {
     'treble-down': glyphs.clefTrebleDown,
     'treble-up':   glyphs.clefTrebleUp,
     'alto':        glyphs.clefC,
+    'tenor':       glyphs.clefC,
     'bass':        glyphs.clefBass,
     'drum':        glyphs.clefDrum,
     'percussion':  glyphs.clefDrum
