@@ -92,7 +92,7 @@ export default overload(get('type'), {
     }),
 
     clef: (symbol) => create('span', {
-        class: `${ symbol.clef }-clef clef`,
+        class: `${ symbol.clef === 'alto' || symbol.clef === 'tenor' ? 'c' : symbol.clef }-clef clef`,
         html: clefGlyphs[symbol.clef]
     }),
 
