@@ -134,12 +134,18 @@ function detectBarRepeats(bars, jsons, bar) {
 
 /* Parts */
 
-function pushEventToPart(stave, parts, event) {
+function pushEventToPart(stave, key, parts, event) {
     const part = event.target ?
         // TEMP Experimental parts syphoner - but is this the way to do it?
         stave.parts[event.target - 1] :
         // Stave decides on part automatically
         stave.getPart(event[2]) ;
+
+    // Does stave support note pitch?
+    const pitch = stave.getSpelling(key, event[2], true);
+    const row   = stave.getRow(part, pitch);
+    // If not don't render it
+    if (row === undefined) return;
 
     const partEvents = parts[part.name] || (parts[part.name] = []);
     parts[part.name].push(event);
@@ -359,7 +365,7 @@ export default function createBars(sequence, excludes, stave, settings = config)
                 break;
 
             case "note":
-                pushEventToPart(stave, parts, event);
+                pushEventToPart(stave, key, parts, event);
                 break;
 
             default:

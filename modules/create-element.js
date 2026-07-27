@@ -195,6 +195,25 @@ export default overload(get('type'), {
         }
     }),
 
+    beam: (symbol, settings) => create('svg', {
+        // 8th note beams can be rendered directly into the grid. Beams for
+        // shorter durations are rendered as a post process once this SVG is in
+        // the DOM and stem positions can be measured. See beam.js.
+        class: `${ symbol.stemup ? 'up' : 'down' }-beam beam`,
+        viewBox: `0 ${ (symbol.range < 0 ? symbol.range : 0) - 0.5 } 1 ${ abs(symbol.range) + 1 }`,
+        preserveAspectRatio: "none",
+        style: `--duration: ${ truncate(6, symbol.duration) }; ${ symbol.y ? '--translate-y:' + (symbol.y * 0.125) + ';' : '' } height: ${ (abs(symbol.range) + beamThickness) * 0.125 }em; align-self: ${ symbol.range < 0 ? 'end' : 'start' };`,
+        html: `<path class="beam-path" d="M0,${ -0.5 * beamThickness } L1,${ symbol.range - 0.5 * beamThickness } L1,${ symbol.range + 0.5 * beamThickness } L0,${ 0.5 * beamThickness } Z"></path>`,
+        data: {
+            beat:     truncate(4, symbol.beat),
+            pitch:    symbol.pitch,
+            divisor:  symbol.divisor,
+            part:     symbol.part.name,
+            beam:     symbol.id,
+            events:   toEventIds(symbol)
+        }
+    }),
+
     note: (symbol) => create('data', {
         class: `${ symbol.stemup ? 'up-note ' : 'down-note ' }${ symbol.top ? 'top-note ' : '' }${ symbol.bottom ? 'bottom-note ' : '' }${
             // Stem up
@@ -214,25 +233,6 @@ export default overload(get('type'), {
             part:     symbol.part.name,
             beam:     symbol.beam && symbol.beam.id,
             event:    identify(symbol.event)
-        }
-    }),
-
-    beam: (symbol, settings) => create('svg', {
-        // 8th note beams can be rendered directly into the grid. Beams for
-        // shorter durations are rendered as a post process once this SVG is in
-        // the DOM and stem positions can be measured. See beam.js.
-        class: `${ symbol.stemup ? 'up' : 'down' }-beam beam`,
-        viewBox: `0 ${ (symbol.range < 0 ? symbol.range : 0) - 0.5 } 1 ${ abs(symbol.range) + 1 }`,
-        preserveAspectRatio: "none",
-        style: `--duration: ${ truncate(6, symbol.duration) }; ${ symbol.y ? '--translate-y:' + (symbol.y * 0.125) + ';' : '' } height: ${ (abs(symbol.range) + beamThickness) * 0.125 }em; align-self: ${ symbol.range < 0 ? 'end' : 'start' };`,
-        html: `<path class="beam-path" d="M0,${ -0.5 * beamThickness } L1,${ symbol.range - 0.5 * beamThickness } L1,${ symbol.range + 0.5 * beamThickness } L0,${ 0.5 * beamThickness } Z"></path>`,
-        data: {
-            beat:     truncate(4, symbol.beat),
-            pitch:    symbol.pitch,
-            divisor:  symbol.divisor,
-            part:     symbol.part.name,
-            beam:     symbol.id,
-            events:   toEventIds(symbol)
         }
     }),
 
@@ -281,6 +281,21 @@ export default overload(get('type'), {
             part:     symbol.part.name
         },
         'aria-hidden': 'true'
+    }),
+
+    warning: (symbol) => create('data', {
+        class: `warning-note note`,
+        style: symbol.stemHeight ? `--stem-height: ${ symbol.stemHeight };` : undefined,
+        html:  symbol.stave.getNoteHTML(symbol.pitch, symbol.dynamic, symbol.duration),
+        title: `${ symbol.pitch } (${ toNoteNumber(symbol.pitch) })`,
+        data: {
+            beat:     truncate(4, symbol.beat),
+            duration: truncate(4, symbol.duration),
+            pitch:    symbol.pitch,
+            part:     symbol.part.name,
+            beam:     symbol.beam && symbol.beam.id,
+            event:    identify(symbol.event)
+        }
     }),
 
     default: (function (types) {
