@@ -250,26 +250,28 @@ export default class Stave {
         return name + accidental + o;
     }
 
-    createKeySymbols(key) {
-        const numbers = keyToNumbers(key);
+    createKeySymbols(event) {
+        const numbers = keyToNumbers(event[2]);
         return Array.from(numbers, (n, i) => (n - major[i] && {
             type:  'acci',
+            beat:  event.beat,
             pitch: toRootName(major[i]) + accidentalChars[n - major[i]],
             value: n - major[i],
-            part:  this.parts[0]
+            part:  this.parts[0],
+            event
         }))
         .filter((o) => !!o)
         .sort(byFatherCharlesPitch);
     }
 
-    createSignatureSymbols(key) {
+    createSignatureSymbols(keyEvent) {
         const symbols   = [{
             type: 'clef',
             clef: this.type,
             part: this.parts[0]
         }];
 
-        return symbols.concat(this.createKeySymbols(key));
+        return symbols.concat(this.createKeySymbols(keyEvent));
     }
 
     /**

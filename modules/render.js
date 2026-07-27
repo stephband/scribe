@@ -63,13 +63,15 @@ text = glyphs.textNoteShort
 export function renderElements(sequence, excludes, clef, keyname, meter, duration = Infinity, transpose = 0, displace = 0, settings = config) {
     const events = sequence.events;
 
-    // If events contains no initial meter and meter is set, insert a meter event
-    const meterEvent = events.find(isInitialMeterEvent);
-    if (!meterEvent && meter) events.unshift([0, 'meter', meter[2], meter[3]]);
+    // If events contains no initial key and key is available insert a key event
+    let keyEvent = sequence.find({ beat: 0, type: 'key' })
+        || keyname
+        && sequence.create({ beat: 0, type: 'key', name: keyname }) ;
 
-    // If events contains no initial key and keyname is set, insert a key event
-    const keyEvent = events.find(isInitialKeyEvent);
-    if (!keyEvent && keyname) events.unshift([0, 'key', keyname]);
+    // If events contains no initial meter and meter is available insert a meter event
+    let meterEvent = sequence.find({ beat: 0, type: 'meter' })
+        || meter
+        && sequence.create({ beat: 0, type: 'meter', 2: meter[2], 3: meter[3] }) ;
 
     // Get the stave controller
     const stave = Stave[clef || 'treble'];
@@ -86,28 +88,25 @@ export function renderElements(sequence, excludes, clef, keyname, meter, duratio
     const bars     = createBars(iterator, excludes, stave, settings);
     const elements = bars.reduce(toBarElements, []);
 
-//const keysig = elements[0].querySelectorAll('.acci:not([data-beat])');
-
     // Creates stave with clef and key signature
-    const bar0      = bars[0];
-    const key       = toKeyNumber(bar0.key);
-    const signature = stave.createSignatureSymbols(key);
+    if (!keyEvent) keyEvent = Event.of({ beat: 0, type: "key", name: bars[0].key });
+    const signature = stave.createSignatureSymbols(keyEvent);
 
     // Quick and dirty way of rendering clefs into left hand side bar
     const sidebar = create('div', {
         class: `${ stave.type }-stave signature-stave stave`,
         children: signature.map(createElement),
         data: {
-            key: stave.pitched ?
-                toKeyName(key) :
-                undefined
+            key: stave.pitched ? toKeyName(keyEvent.name) : undefined
         }
     });
 
     const column = create('div', {
         id: 'side',
         class: 'side',
-        data: { key: toKeyName(key) }
+        data: {
+            key: keyEvent.name
+        }
     });
 
     let n = 24;
@@ -156,17 +155,18 @@ export function renderStyle(element, root = element) {
     const side   = root.querySelector('.side');
     if (!side) return;
     const sideWidth = rect(side).width;
+    const key       = side.dataset.key;
+    const counts    = {'G♭': 6, 'C♯': 5, 'D♭': 5, 'G♯': 4, 'A♭': 4, 'D♯': 3, 'E♭': 3, 'B♭': 2, 'F':  1, 'C':  0, 'G':  1, 'D':  2, 'A':  3, 'E':  4, 'B':  5, 'F♯': 6};
+    const count     = counts[key];
 
-    const key    = side.dataset.key;
-    const counts = {'G♭': 6, 'C♯': 5, 'D♭': 5, 'G♯': 4, 'A♭': 4, 'D♯': 3, 'E♭': 3, 'B♭': 2, 'F':  1, 'C':  0, 'G':  1, 'D':  2, 'A':  3, 'E':  4, 'B':  5, 'F♯': 6};
-    const count  = counts[key];
-
-    return `--head-1-size: ${ truncate(6, head1Width / fontSize) }; `
-        + `--head-2-size: ${ truncate(6, head2Width / fontSize) }; `
-        + `--head-4-size: ${ truncate(6, head3Width / fontSize) }; `
-        + `--head-x-size: ${ truncate(6, headXWidth / fontSize) }; `
-        + `--head-diamond-size: ${ truncate(6, headDiamondWidth / fontSize) }; `
-        + `--signature-width: ${ (0.25 + 2.375 + count * 0.6875 + 0.5).toFixed(6) }em;`;
+    return `
+        --head-1-size: ${ truncate(6, head1Width / fontSize) };
+        --head-2-size: ${ truncate(6, head2Width / fontSize) };
+        --head-4-size: ${ truncate(6, head3Width / fontSize) };
+        --head-x-size: ${ truncate(6, headXWidth / fontSize) };
+        --head-diamond-size: ${ truncate(6, headDiamondWidth / fontSize) };
+        --signature-width: ${ (0.25 + 2.375 + count * 0.5 + 0.5).toFixed(6) }em;
+    `;
 }
 
 export function renderDOM(element, root = element) {
