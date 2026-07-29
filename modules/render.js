@@ -2,8 +2,9 @@
 import create           from 'dom/create.js';
 import px               from 'dom/parse-length.js';
 import rect             from 'dom/rect.js';
+import Transform        from 'sequence/modules/transform.js';
 import SequenceIterator from 'sequence/modules/sequence-iterator.js';
-import { toKeyName, toKeyNumber } from 'sequence/modules/event/key.js';
+import { toKeyName }    from 'sequence/modules/event/key.js';
 import Stave            from './stave.js';
 import createBars       from './bar.js';
 import createElement    from './create-element.js';
@@ -16,14 +17,6 @@ import log              from './log.js';
 
 const global = globalThis || window;
 
-
-function isInitialMeterEvent(event) {
-    return event[0] <= 0 && event.type === 'meter';
-}
-
-function isInitialKeyEvent(event) {
-    return event[0] <= 0 && event.type === 'key';
-}
 
 function toElements(nodes, symbol) {
     const element = createElement(symbol);
@@ -60,7 +53,7 @@ text = glyphs.textNoteShort
     + glyphs.note05Up
 */
 
-export function renderElements(sequence, excludes, clef, keyname, meter, duration = Infinity, transpose = 0, displace = 0, settings = config) {
+export function renderElements(sequence, excludes, clef, keyname, meter, transpose = 0, displace = 0, settings = config) {
     const events = sequence.events;
 
     // If events contains no initial key and key is available insert a key event
@@ -77,12 +70,12 @@ export function renderElements(sequence, excludes, clef, keyname, meter, duratio
     const stave = Stave[clef || 'treble'];
 
     // Make transforms list
-    const transforms = [];
-    if (transpose) transforms.push("transpose", transpose);
-    if (displace)  transforms.push("displace", displace);
+    const array = [];
+    if (transpose) array.push("transpose", transpose);
+    if (displace)  array.push("displace", displace);
 
     // Create sequence object
-    const iterator = new SequenceIterator(events, sequence.sequences, transforms);
+    const iterator = new SequenceIterator(events, sequence.sequences, Transform.from(array));
 
     // Create bar elements
     const bars     = createBars(iterator, excludes, stave, settings);
@@ -140,7 +133,7 @@ export function renderStyle(element, root = element) {
     const head3Width       = rect(heads[2]).width;
     const headXWidth       = rect(heads[3]).width;
     const headDiamondWidth = rect(heads[4]).width;
-    const computed         = window.getComputedStyle(heads[0]);
+    const computed         = getComputedStyle(heads[0]);
     const fontSize         = px(computed.fontSize);
 
     if (global.DEBUG) log('post render font-size', fontSize, 'heads', `${ head1Width }, ${ head2Width }, ${ head3Width }`);
@@ -154,7 +147,6 @@ export function renderStyle(element, root = element) {
     // metrics in the font stylesheet?
     const side   = root.querySelector('.side');
     if (!side) return;
-    const sideWidth = rect(side).width;
     const key       = side.dataset.key;
     const counts    = {'G♭': 6, 'C♯': 5, 'D♭': 5, 'G♯': 4, 'A♭': 4, 'D♯': 3, 'E♭': 3, 'B♭': 2, 'F':  1, 'C':  0, 'G':  1, 'D':  2, 'A':  3, 'E':  4, 'B':  5, 'F♯': 6};
     const count     = counts[key];

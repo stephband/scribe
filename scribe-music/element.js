@@ -90,7 +90,7 @@ export default define(element('scribe-music', {
                 // Create an initial [0, "meter", ...] event
                 internals.meter.value,
                 // Duration is a number
-                internals.duration.value,
+                //internals.duration.value,
                 // Transpose is a number
                 internals.transpose.value,
                 // Beat is a number
