@@ -21,7 +21,7 @@ https://web.mit.edu/merolish/Public/drums.pdf
         /* Ride Cymbal, Ride Bell */
         [ride-cymbal ride-cymbal-1 ride-cymbal-2 ride-bell] 0.125em
         /* Closed Hi-hat, Open Hi-hat */
-        [hi-hat closed-hi-hat open-hi-hat stave-top cymbals] 0.125em
+        [hi-hat closed-hi-hat open-hi-hat stave-top] 0.125em
         /* High tom, Cowbell */
         [high-tom cowbell] 0.125em
         /* Low mid tom, High mid tom */
@@ -36,7 +36,7 @@ https://web.mit.edu/merolish/Public/drums.pdf
         [low-floor-tom]    0.125em
         /* Bass drum, Low bass drum, High bass drum */
         [bass-drum low-bass-drum high-bass-drum]        0.125em
-        [stave-lower drums] 0.125em
+        [stave-lower] 0.125em
         /* Pedal Hi-hat */
         [pedal-hi-hat stave-bottom] 0.125em
         [foot barcount]    0.125em
@@ -70,9 +70,6 @@ https://web.mit.edu/merolish/Public/drums.pdf
 .drum-stave > [data-pitch="splash-cymbal"]  { grid-row: splash-cymbal; }
 .drum-stave > [data-pitch="chinese-cymbal"] { grid-row: chinese-cymbal; }
 
-
-/* TEMP */
-.drum-stave > .ledge,
 /* Just a precaution. */
 .drum-stave > .acci {
     display: none !important;
@@ -83,13 +80,9 @@ https://web.mit.edu/merolish/Public/drums.pdf
     grid-row: 10;
 }
 
-.drum-stave > .rest[data-part="drums"] {
-    grid-row: drums;
-}
-
-.drum-stave > .rest[data-part="cymbals"] {
-    grid-row: cymbals;
-}
+.drum-stave > .rest { font-size: 0.9375em; }
+.drum-stave > .rest[data-part="lower"] { grid-row: stave-lower; }
+.drum-stave > .rest[data-part="upper"] { grid-row: stave-top; }
 
 .drum-stave > .up-beam.beam   {
     --translate-y: -0.0625;
@@ -117,6 +110,4 @@ https://web.mit.edu/merolish/Public/drums.pdf
 .drum-stave > .beam-note[data-pitch^="snare"]       { --stem-height: 1.5; }
 .drum-stave > .beam-note[data-pitch="pedal-hi-hat"] { --stem-height: 0.7; }
 
-.drum-stave > .tuplet[data-part="cymbals"] {
-    grid-row: cymbals;
-}
+.drum-stave > .tuplet[data-part="upper"] { grid-row: stave-top; }

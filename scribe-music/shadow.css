@@ -47,9 +47,14 @@
     --bar-padding-left:  0.25em;
     --bar-padding-right: 0.1875em;
     /* Widths of note heads in em (measured and overridden on render) */
-    --head-1-size:       0.337402;
-    --head-1-size:       0.390137;
-    --head-1-size:       0.455078;
+    /* For Jazz Font */
+    --head-1-size: 0.341261;
+    --head-2-size: 0.39469;
+    --head-4-size: 0.459323;
+    --head-x-size: 0.298172;
+    --head-diamond-size: 0.27749;
+    --acci-flat-size:    0.27749;
+    --acci-sharp-size:   0.27749;
     /* Space around accidentals */
     --acci-margin-left:  0.0875;
     --acci-margin-right: 0.0833;
@@ -59,6 +64,8 @@
     /* Space around rests */
     --rest-margin-left:  0;
     --rest-margin-right: 0;
+    /* Space between key and time signature */
+    --acci-timesig-gap:  0.25;
     /* Default height of stem */
     --stem-height:     1;
     /* Thickness of stem */
@@ -68,6 +75,8 @@
     --stem-align-down: -0.04;
     /* Width of signature column */
     --signature-width: 2em;
+
+
 
     position: relative;
     display: flex;
@@ -134,6 +143,14 @@
 
 .side > .bar + .bar > .clef {
     display: block;
+}
+
+.side + .bar > .acci:not([data-beat]) {
+    display: none;
+}
+
+.side + .bar > .acci:not([data-beat]) + .timesig {
+    margin-left: 0 !important;
 }
 
 .side + .bar.drum-stave,

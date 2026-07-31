@@ -156,6 +156,35 @@
     /* If they are preceded by a stave, move them right */
     --clef-acci-gap: 0.9em;
 }
+
+.bar > .acci-flat:not([data-beat]) + .acci:not([data-beat])                                                                                                                               { margin-left: calc(1em * var(--acci-flat-size)); }
+.bar > .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                                                                      { margin-left: calc(2em * var(--acci-flat-size)); }
+.bar > .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                                             { margin-left: calc(3em * var(--acci-flat-size)); }
+.bar > .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                    { margin-left: calc(4em * var(--acci-flat-size)); }
+.bar > .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                           { margin-left: calc(5em * var(--acci-flat-size)); }
+.bar > .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])  { margin-left: calc(6em * var(--acci-flat-size)); }
+
+.bar > .acci-sharp:not([data-beat]) + .acci:not([data-beat])                                                                                                                              { margin-left: calc(1em * var(--acci-sharp-size)); }
+.bar > .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                                                                     { margin-left: calc(2em * var(--acci-sharp-size)); }
+.bar > .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                                            { margin-left: calc(3em * var(--acci-sharp-size)); }
+.bar > .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                   { margin-left: calc(4em * var(--acci-sharp-size)); }
+.bar > .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                          { margin-left: calc(5em * var(--acci-sharp-size)); }
+.bar > .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) { margin-left: calc(6em * var(--acci-sharp-size)); }
+
+.bar > .acci-flat:not([data-beat]) + .timesig                                                                                                                               { margin-left: calc(1em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
+.bar > .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                                                                      { margin-left: calc(2em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
+.bar > .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                                             { margin-left: calc(3em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
+.bar > .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                    { margin-left: calc(4em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
+.bar > .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                           { margin-left: calc(5em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
+.bar > .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig  { margin-left: calc(6em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
+
+.bar > .acci-sharp:not([data-beat]) + .timesig                                                                                                                              { margin-left: calc(1em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
+.bar > .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                                                                     { margin-left: calc(2em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
+.bar > .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                                            { margin-left: calc(3em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
+.bar > .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                   { margin-left: calc(4em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
+.bar > .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                          { margin-left: calc(5em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
+.bar > .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig { margin-left: calc(6em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
+
 /*
 .bar > .timesig,
 .bar > .clef + .timesig,

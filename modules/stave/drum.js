@@ -124,7 +124,7 @@ export default class DrumStave extends Stave {
         40: true, // Snare drum 2
         41: true, // Low floor tom
         42: true, // Closed Hi-Hat
-        43: true, // High floot tom
+        43: true, // High floor tom
         45: true, // Low tom
         47: true, // Low mid tim
         48: true, // High mid tom
@@ -132,40 +132,45 @@ export default class DrumStave extends Stave {
         56: true  // Cowbell
     };
 
+    getGlyphName(number, dynamic, duration) {
+        return this.#headnames[number]
+            || super.getGlyphName(number, dynamic, duration) ;
+    }
+
     getNoteHTML(pitch, dynamic, duration) {
         const number    = toNoteNumber(pitch);
-        const name      = this.#headnames[number];
+        const name      = this.getGlyphName(number, dynamic, duration);
         const ghostable = this.#ghostables[number];
-        const html      = name ?
-            `<span class="head" data-glyph="${ name }">${ glyphs[name] }</span>` :
-            this.getHeadHTML(pitch, dynamic, duration) ;
-
         // Ghost note gets brackets
         return ghostable && dynamic < config.ghostThreshold ? `
             <span class="pre" data-glyph="headBracketLeft">${ glyphs.headBracketLeft }</span>
-            ${ html }
+            <span class="head" data-glyph="${ name }">${ glyphs[name] }</span>
             <span class="post" data-glyph="headBracketRight">${ glyphs.headBracketRight }</span>
             ` :
-            html ;
+            `<span class="head" data-glyph="${ name }">${ glyphs[name] }</span>` ;
     }
 
     parts = [{
-        name:   'drums',
+        name:   'upper',
         staff:  'main',
-        beam:   'drums-beam',
-        stemup: false
-    }, {
-        name:   'cymbals',
-        staff:  'main',
-        beam:   'cymbals-beam',
+        beam:   'up-beam',
         stemup: true
+    }, {
+        name:   'lower',
+        staff:  'main',
+        beam:   'down-beam',
+        stemup: false
     }];
 
     getPart(number) {
         // Split drums stave into drums and cymbals parts
-        return [35, 36, 37, 38, 40, 41, 43, 44, 45, 47, 48, 50].includes(toNoteNumber(number)) ?
+        /*return [35, 36, 37, 38, 40, 41, 43, 44, 45, 47, 48, 50].includes(toNoteNumber(number)) ?
             this.parts[0] :
-            this.parts[1] ;
+            this.parts[1] ;*/
+        // Split drum stave into hands and feet
+        return [35, 36, 44].includes(toNoteNumber(number)) ?
+            this.parts[1] :
+            this.parts[0] ;
     }
 
     /**
@@ -227,13 +232,13 @@ export default class DrumStave extends Stave {
     }
 
     createDupletNoteSymbols(symbols, bar, part, accidentals, notes, startBeat, cutoffBeat, stopBeat, settings) {
-        const stave    = this;
-        const b1       = startBeat - bar.beat;
-        const b2       = stopBeat - bar.beat;
-        const grain    = getGrain(bar.divisions, b1);
-        const v1       = getDivisionBefore(bar.divisions, b1);
-        const v2       = getDivisionAfter(bar.divisions, b1);
-        const v3       = getDivisionBefore(bar.divisions, b2);
+        const stave = this;
+        const b1    = startBeat - bar.beat;
+        const b2    = stopBeat - bar.beat;
+        const grain = getGrain(bar.divisions, b1);
+        const v1    = getDivisionBefore(bar.divisions, b1);
+        const v2    = getDivisionAfter(bar.divisions, b1);
+        const v3    = getDivisionBefore(bar.divisions, b2);
 
         let j = noteDurations.length;
 

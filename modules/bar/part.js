@@ -210,9 +210,8 @@ export default function createPartSymbols(bar, stave, accidentals, name, notes, 
     const symbols   = bar.symbols;
     const part      = stave.parts.find(matches({ name }));
 
-    let beat = startBeat;
     let beatAnalysed = bar.beat;
-    let tuplet, data, n = 0;
+    let data;
 
     state.beatConsumed = bar.beat;
     state.beat = bar.beat;
@@ -221,7 +220,7 @@ export default function createPartSymbols(bar, stave, accidentals, name, notes, 
 
     // Loop through detected rhythms
     while (data = detectRhythm(beatAnalysed, stopBeat - beatAnalysed, notes, state.n)) {
-console.log(beatAnalysed, data);
+//console.log(beatAnalysed, data);
         beatAnalysed = data.beat + data.duration;
 
         // Normalise rhythm based on settings, create tuplet where needed

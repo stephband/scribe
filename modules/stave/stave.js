@@ -63,19 +63,6 @@ const noteDurations = [
     8
 ];
 
-function setDurations(symbols, duration) {
-    let n = symbols.length;
-    while (n--) symbols[n].duration = duration;
-    return symbols;
-}
-
-function toRoundedStopBeat(bar, event) {
-    // The event's stop beat rounded to the nearest bar divisor in such a way
-    // that values over 1/3 bar divisor round up, values under 1/3 bar divisor
-    // round down
-    return max(bar.divisor, nearest(bar.divisor, toStopBeat(event) - bar.beat + bar.divisor / 6));
-}
-
 
 /* Stave */
 
@@ -96,16 +83,11 @@ export default class Stave {
     rows = nothing;
 
     /**
-    .getNoteHTML(pitch, dynamic, duration)
-    Get the HTML content used for a note of given `pitch`, `dynamic` and
-    `duration`. For normal chromatic staves only `duration` really matters, but
-    percussion staves may replace heads based on pitch and dynamics.
+    getGlyphName(pitch, dynamic, duration)
     **/
-
-    getHeadHTML(pitch, dynamic, duration) {
-        const name =
+    getGlyphName(number, dynamic, duration) {
             // Semibreve
-            duration >= 4 ? 'head4' :
+        return duration >= 4 ? 'head4' :
             // Triplet semibreve
             Math.fround(duration) === Math.fround(2.666666667) ? 'head4' :
             // Minim
@@ -114,16 +96,22 @@ export default class Stave {
             Math.fround(duration) === Math.fround(1.333333333) ? 'head2' :
             // Everything else
             'head1' ;
-
-        return `<span class="head" data-glyph="${ name }">${ glyphs[name] }</span>`;
     }
 
+    /**
+    .getNoteHTML(pitch, dynamic, duration)
+    Get the HTML content used for a note of given `pitch`, `dynamic` and
+    `duration`. For normal chromatic staves only `duration` really matters, but
+    percussion staves may replace heads based on pitch and dynamics.
+    **/
     getNoteHTML(pitch, dynamic, duration) {
+        const number = toNoteNumber(pitch);
+        const name   = this.getGlyphName(number, dynamic, duration);
         return dynamic < config.ghostThreshold ? `
             <span class="pre" data-glyph="headBracketLeft">${ glyphs.headBracketLeft }</span>
-            ${ this.getHeadHTML(pitch, dynamic, duration) }
+            <span class="head" data-glyph="${ name }">${ glyphs[name] }</span>
             <span class="post" data-glyph="headBracketRight">${ glyphs.headBracketRight }</span>` :
-            this.getHeadHTML(pitch, dynamic, duration) ;
+            `<span class="head" data-glyph="${ name }">${ glyphs[name] }</span>` ;
     }
 
     /**
@@ -254,7 +242,7 @@ export default class Stave {
         const numbers = keyToNumbers(event[2]);
         return Array.from(numbers, (n, i) => (n - major[i] && {
             type:  'acci',
-            beat:  event.beat,
+            //beat:  event.beat,
             pitch: toRootName(major[i]) + accidentalChars[n - major[i]],
             value: n - major[i],
             part:  this.parts[0],

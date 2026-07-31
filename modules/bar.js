@@ -278,7 +278,7 @@ export default function createBars(sequence, excludes, stave, settings = config)
                 key = event[2];
                 // TODO: Key is global and added to the side bar, we need to think about
                 // how to make key signature changes
-                // symbols.push.apply(symbols, stave.createKeySymbols(key));
+                symbols.push.apply(symbols, stave.createKeySymbols(event));
                 break;
 
             case "meter":
