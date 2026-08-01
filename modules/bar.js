@@ -1,19 +1,13 @@
 
-import get              from 'fn/get.js';
-import matches          from 'fn/matches.js';
-import nothing          from 'fn/nothing.js';
-import overload         from 'fn/overload.js';
-import remove           from 'fn/remove.js';
-import { toRootName }   from 'midi/note.js';
-import mod12            from 'sequence/modules/number/mod-12.js';
-import join             from './object/join.js';
-import toStopBeat       from './event/to-stop-beat.js';
-import { getDivisions } from './bar/divisions.js';
-import createPartSymbols from './bar/part.js';
-import config           from './config.js';
-import { keyToNumbers, keyWeightsForEvent, chooseKeyFromWeights } from './keys.js';
-import { major }        from './scale.js';
-import log              from './log.js';
+import matches                from 'fn/matches.js';
+import remove                 from 'fn/remove.js';
+import mod12                  from 'sequence/modules/number/mod-12.js';
+import toStopBeat             from './event/to-stop-beat.js';
+import { getDivisions }       from './bar/divisions.js';
+import createPartSymbols      from './bar/part.js';
+import config                 from './config.js';
+import { accidentalsFromKey } from './accidentals.js';
+import log                    from './log.js';
 
 
 const rslashbass = /\/\{(\d{1,2})\}$/;
@@ -158,24 +152,6 @@ function hasPart(parts) {
     return false;
 }
 
-/* Accidentals */
-
-function updateAccidentals(accidentals, key) {
-    const numbers = keyToNumbers(key);
-
-    numbers.reduce((accidentals, n, i) => {
-        const acci = n - major[i];
-        if (acci !== 0) {
-            const name = toRootName(major[i]);
-            let n = 10;
-            while (n--) accidentals[name + n] = acci;
-        }
-        return accidentals;
-    }, accidentals);
-
-    return accidentals;
-}
-
 /* Chords */
 
 function substituteSpelling(settings, name) {
@@ -210,7 +186,7 @@ function createBar(count, beat, duration, divisor, stave, key, symbols, parts, s
         const events = parts[name];
         if (!events || !events.length) continue;
         // Populate accidentals with key signature sharps and flats
-        const accidentals = updateAccidentals({}, key);
+        const accidentals = accidentalsFromKey(key);
         createPartSymbols(bar, stave, accidentals, name, events, settings);
         remove(staffs, part.staff);
     }
@@ -238,7 +214,7 @@ function createBar(count, beat, duration, divisor, stave, key, symbols, parts, s
     return bar;
 }
 
-export default function createBars(sequence, excludes, stave, settings = config) {
+export default function createBars(sequence, stave, settings = config) {
     const events = [];
     const bars   = [];
     const jsons  = [];

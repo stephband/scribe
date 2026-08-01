@@ -4,35 +4,22 @@ import nothing               from 'fn/nothing.js';
 import { noteNames, toNoteName, toNoteNumber, toNoteOctave, toRootName, toRootNumber } from 'midi/note.js';
 import mod12                 from 'sequence/modules/number/mod-12.js';
 import toStopBeat            from '../event/to-stop-beat.js';
-import push                  from '../object/push.js';
-import { eq, gte, lte, lt, gt } from '../number/float.js';
-import nearest               from 'fn/nearest.js';
-import { floorPow2, ceilPow2 } from '../number/power-of-2.js';
+import { ceilPow2 }          from '../number/power-of-2.js';
 import grainOfBeat           from '../bar/grain-of-beat.js';
 import { createAccents }     from '../symbol/accent.js';
 import { createAccidentals } from '../symbol/accidental.js';
 import { createLedges }      from '../symbol/ledge.js';
 import { createNotes }       from '../symbol/note.js';
-import { createBeam, closeBeam } from '../symbol/beam.js';
 import { getDivisionBefore } from '../bar/divisions.js';
+import { accidentalsFromKey }from '../accidentals.js';
 import { keyToNumbers }      from '../keys.js';
 import { rpitch, rflatsharp, byFatherCharlesPitch, accidentalChars } from '../pitch.js';
 import config                from '../config.js';
 import { major }             from '../scale.js';
 import * as glyphs           from "../glyphs.js";
-import { P24, GR }           from '../constants.js';
 
-const accidentals = {
-    '-2': '𝄫',
-    '-1': '♭',
-    '0':  '',
-    '1':  '♯',
-    '2':  '𝄪'
-};
 
-const global = globalThis || window;
-const assign = Object.assign;
-const { abs, ceil, floor, min, max, pow, sqrt, round } = Math;
+const { floor } = Math;
 
 const keys = {
     //                                             C      D       E  F      G      A       B
@@ -189,11 +176,15 @@ export default class Stave {
     .getPitch(row)
     Returns the pitch of a given row number.
     **/
-    getPitch(row) {
+    getPitch(row, key = 0) {
         const names = this.rows[row];
-        return names ?
-            names.split(/\s+/)[0] :
-            undefined ;
+        if (!names) return;
+        const name        = names.split(/\s+/)[0];
+        const accidentals = accidentalsFromKey(key);
+        const modifier    = accidentals[name];
+        return modifier ?
+            name[0] + accidentalChars[modifier] + name.slice(1) :
+            name ;
     }
 
     /**
@@ -206,7 +197,7 @@ export default class Stave {
         if (!withOctave) {
             const n = toRootNumber(pitch);
             const a = keyData.spellings[n];
-            return noteNames[mod12(n - a)] + accidentals[a];
+            return noteNames[mod12(n - a)] + accidentalChars[a];
         }
 
         let n, a, o;
@@ -229,7 +220,7 @@ export default class Stave {
 
         // key.spellings makes sure name is a natural note name
         const name = noteNames[mod12(n - a)];
-        const accidental = accidentals[a];
+        const accidental = accidentalChars[a];
 
         if (window.DEBUG && name === undefined) {
             throw new Error('Incorrect spelling for pitch number ' + n + ': "' + name + '"');
@@ -274,15 +265,14 @@ export default class Stave {
     }
 
     createNoteSymbols(symbols, bar, part, accidentals, notes, cutoffBeat, beat, duration, settings) {
-        const stave = this;
         // Create note heads
-        const noteSymbols = createNotes(stave, bar.key, part, notes, cutoffBeat, beat, duration);
+        const noteSymbols = createNotes(this, bar.key, part, notes, cutoffBeat, beat, duration);
         // Notes may not appear on stave in which case noteSymbols will be empty
         if (!noteSymbols.length) return noteSymbols;
         // Create ledges, accidentals and accents
-        createLedges(symbols, stave, part, beat, noteSymbols);
+        createLedges(symbols, this, part, beat, noteSymbols);
         createAccidentals(symbols, part, accidentals, beat, noteSymbols);
-        createAccents(symbols, stave, part, beat, noteSymbols, settings);
+        createAccents(symbols, this, part, beat, noteSymbols, settings);
         // Push in note heads
         symbols.push.apply(symbols, noteSymbols);
         // Return symbols
@@ -292,7 +282,6 @@ export default class Stave {
     createDupletNoteSymbols(symbols, bar, part, accidentals, notes, startBeat, cutoffBeat, stopBeat, settings) {
         if (DEBUG && cutoffBeat > stopBeat) throw new Error(`createDupletNoteSymbols() cutoffBeat ${ cutoffBeat } cannot be larger than stopBeat ${ stopBeat }`);
 
-        const stave = this;
         const b1    = startBeat - bar.beat;
         const b2    = stopBeat  - bar.beat;
         const grain = grainOfBeat(bar.divisions, b1);
@@ -301,7 +290,6 @@ export default class Stave {
 
         let b = b1;
         let i = -1;
-        let event;
         while (notes[++i] && notes[i][0] < cutoffBeat) {
             const b3 = toStopBeat(notes[i]) - bar.beat;
             // If we are filling the whole duration to stopBeat we can break out
@@ -328,7 +316,6 @@ while (notes[++i] && notes[i][0] < cutoffBeat);
 console.log('Notes start', b1, 'stop', b, 'duration', b - b1, 'grain', grain, 'count', i, 'bar.divisions', bar.divisions.join(', '));
 */
 
-        const b3 = b;
         let g = grain;
 
         // Note starts on a bar division, stops on (or crosses) a bar division or

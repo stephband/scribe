@@ -53,7 +53,7 @@ text = glyphs.textNoteShort
     + glyphs.note05Up
 */
 
-export function renderElements(sequence, excludes, clef, keyname, meter, transpose = 0, displace = 0, settings = config) {
+export function renderElements(sequence, clef, keyname, meter, transpose = 0, displace = 0, settings = config) {
     const events = sequence.events;
 
     // If events contains no initial key and key is available insert a key event
@@ -78,7 +78,7 @@ export function renderElements(sequence, excludes, clef, keyname, meter, transpo
     const iterator = new SequenceIterator(events, sequence.sequences, Transform.from(array));
 
     // Create bar elements
-    const bars     = createBars(iterator, excludes, stave, settings);
+    const bars     = createBars(iterator, stave, settings);
     const elements = bars.reduce(toBarElements, []);
 
     // Creates stave with clef and key signature

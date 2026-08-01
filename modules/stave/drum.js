@@ -186,6 +186,16 @@ export default class DrumStave extends Stave {
         return i > -1 ? i : undefined ;
     }
 
+    /**
+    .getPitch(row)
+    Returns the first pitch name of a given row number.
+    **/
+    getPitch(row) {
+        const names = this.rows[row];
+        if (!names) return;
+        return names.split(/\s+/)[0];
+    }
+
     getSpelling(key, number) {
         return toDrumSlug(number);
     }

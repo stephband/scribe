@@ -1,16 +1,13 @@
 
-import cache                     from 'fn/cache.js';
-import overload                  from 'fn/overload.js';
-import { toNoteNumber, toRootNumber, toRootName } from 'midi/note.js';
-import Event                     from 'sequence/modules/event.js';
-import { keyToRootNumber }       from 'sequence/modules/event/key.js';
-import { hsidToNumbers }         from 'sequence/modules/harmony/hsid.js';
-import mod12                     from 'sequence/modules/number/mod-12.js';
-import toStopBeat                from './event/to-stop-beat.js';
-import { major }                 from './scale.js';
+import cache               from 'fn/cache.js';
+import { toRootNumber }    from 'midi/note.js';
+import Event               from 'sequence/modules/event.js';
+import { keyToRootNumber } from 'sequence/modules/event/key.js';
+import { hsidToNumbers }   from 'sequence/modules/harmony/hsid.js';
+import mod12               from 'sequence/modules/number/mod-12.js';
+import toStopBeat          from './event/to-stop-beat.js';
+import { major }           from './scale.js';
 
-
-const { abs } = Math;
 
 const degreeWeights = Float32Array.of(
 //  Root b9   9    min3 maj3 11   #11  5    b6   13   7    maj7
@@ -34,12 +31,6 @@ const modulationWeights = [
     (4/6       + 0     + 0),    // 7
     (1/6       + 0     + 0)     // maj7
 ];
-
-const factors = {
-    3: [10/16, 13/16, 10/16],
-    4: [10/16, 13/16, 10/16, 12/16]
-};
-
 
 export const keyToNumbers = cache((key) => {
     const root = keyToRootNumber(key);

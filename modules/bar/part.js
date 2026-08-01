@@ -5,23 +5,16 @@ import matches               from 'fn/matches.js';
 import toStopBeat            from '../event/to-stop-beat.js';
 import last                  from '../object/last.js';
 import push                  from '../object/push.js';
-import { eq, gte, lte, lt, gt } from '../number/float.js';
 import nearest               from 'fn/nearest.js';
 import { createRests }       from '../symbol/rest.js';
 import { createBeam, closeBeam } from '../symbol/beam.js';
 import { closeTuplet }       from '../symbol/tuplet.js';
 import { getDivisionBefore } from '../bar/divisions.js';
-import detectRhythm, { straighten, hasHoles } from '../rhythm.js';
+import detectRhythm, { straighten } from '../rhythm.js';
 //import detectRhythm from '../detect.js';
-import { P24, GR }           from '../constants.js';
 
 
 const state = {};
-
-
-
-
-
 
 
 // --------------
@@ -206,7 +199,6 @@ function advanceToConsumed(state, notes, beat) {
 export default function createPartSymbols(bar, stave, accidentals, name, notes, settings) {
     const startBeat = bar.beat;
     const stopBeat  = bar.beat + bar.duration;
-    const key       = bar.key;
     const symbols   = bar.symbols;
     const part      = stave.parts.find(matches({ name }));
 

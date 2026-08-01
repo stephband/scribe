@@ -1,7 +1,5 @@
 
-import { rflat, rsharp, rdoubleflat, rdoublesharp } from '../pitch.js';
-import { lt } from '../number/float.js';
-import { P24 } from '../constants.js';
+import { rflat, rsharp } from '../pitch.js';
 
 
 function createAccidental(part, accidentals, beat, note, clump, cluster) {
