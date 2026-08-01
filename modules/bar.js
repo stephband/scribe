@@ -136,13 +136,13 @@ function pushEventToPart(stave, key, parts, event) {
         stave.getPart(event[2]) ;
 
     // Does stave support note pitch?
-    const pitch = stave.getSpelling(key, event[2], true);
+    const pitch = stave.getSpelling(event[2], key, true);
     const row   = stave.getRow(part, pitch);
     // If not don't render it
     if (row === undefined) return;
 
     const partEvents = parts[part.name] || (parts[part.name] = []);
-    parts[part.name].push(event);
+    partEvents.push(event);
 }
 
 function hasPart(parts) {
@@ -290,12 +290,12 @@ export default function createBars(sequence, stave, settings = config) {
 
                 if (slashbass) {
                     const n = parseInt(slashbass[1], 10);
-                    root = stave.getSpelling(keyNumber, mod12(event[2] - n));
-                    bass = stave.getSpelling(keyNumber, event[2]);
+                    root = stave.getSpelling(mod12(event[2] - n), keyNumber);
+                    bass = stave.getSpelling(event[2], keyNumber);
                     name = substituteSpelling(settings, root) + extension.replace(rslashbass, '/' + substituteSpelling(settings, bass));
                 }
                 else {
-                    root = stave.getSpelling(keyNumber, event[2]);
+                    root = stave.getSpelling(event[2], keyNumber);
                     name = substituteSpelling(settings, root) + extension;
                 }
 

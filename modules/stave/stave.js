@@ -173,6 +173,13 @@ export default class Stave {
     }
 
     /**
+    .getPitches(key)
+    **/
+    getPitches(key) {
+        throw new Error('TODO!!!');
+    }
+
+    /**
     .getPitch(row)
     Returns the pitch of a given row number.
     **/
@@ -188,10 +195,10 @@ export default class Stave {
     }
 
     /**
-    .getSpelling(key, pitch, withOctave)
+    .getSpelling(pitch, key, withOctave)
     Gets spelling of a given pitch. Returns a pitch name string.
     **/
-    getSpelling(key, pitch, withOctave = false) {
+    getSpelling(pitch, key = 0, withOctave = false) {
         const keyData = keys[key];
 
         if (!withOctave) {
@@ -251,17 +258,6 @@ export default class Stave {
         }];
 
         return symbols.concat(this.createKeySymbols(keyEvent));
-    }
-
-    /**
-    .yRatioToPitch(y)
-    Used for converting pointer movements to pitch changes.
-    **/
-    yRatioToPitch(y) {
-        const n = floor(y * this.pitches.length);
-        return n < 0 ? this.pitches[0] :
-            n > this.pitches.length - 1 ? this.pitches[this.pitches.length - 1] :
-            this.pitches[n] ;
     }
 
     createNoteSymbols(symbols, bar, part, accidentals, notes, cutoffBeat, beat, duration, settings) {

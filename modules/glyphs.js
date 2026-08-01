@@ -45,6 +45,7 @@ export const head2            = '&#xE0A3;';
 export const head4            = '&#xE0A2;';
 export const headBracketLeft  = '&#xE0F5;';
 export const headBracketRight = '&#xE0F6;';
+export const headSlashed1     = '&#xE0CF;';
 export const headSlashed2     = '&#xE0D0;';
 export const headDiamond      = '&#xE0DB;';
 export const headDiamondWide  = '&#xE0DC;';

@@ -21,7 +21,7 @@ export function createNotes(stave, key, part, notes, cutoffBeat, beat, duration)
         const keyWeights = keyWeightsForEvent(events, index, key);
         const keyNumber  = chooseKeyFromWeights(keyWeights);
         // These things have already been found in bar.js, do we need to do it again?
-        const pitch      = stave.getSpelling(keyNumber, event[2], true);
+        const pitch      = stave.getSpelling(event[2], keyNumber, true);
         const row        = stave.getRow(part, pitch);
 
         // Create symbols with pitch, row

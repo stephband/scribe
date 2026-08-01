@@ -1,29 +1,18 @@
 
-import matches           from 'fn/matches.js';
 import slugify           from 'fn/slugify.js';
 import { toDrumName, toNoteNumber } from 'midi/note.js';
 import * as glyphs       from "../glyphs.js";
 import config            from '../config.js';
 import Stave             from './stave.js';
-import { eq, gte, lte, lt, gt } from '../number/float.js';
 import grainPow2         from '../number/grain-pow-2.js';
 import { floorPow2 }     from '../number/power-of-2.js';
-import push              from '../object/push.js';
 import { createAccents } from '../symbol/accent.js';
 import { createLedges }  from '../symbol/ledge.js';
 import { createNotes }   from '../symbol/note.js';
-import { createRests }   from '../symbol/rest.js';
-import { createBeam, closeBeam } from '../symbol/beam.js';
-import { closeTuplet }   from '../symbol/tuplet.js';
-import getStopBeat       from '../event/to-stop-beat.js';
-import { P24, GR }       from '../constants.js';
 import { getDivisionBefore, getDivisionAfter } from '../bar/divisions.js';
 
 
-const global = globalThis || window;
-const assign = Object.assign;
 const notes  = [];
-const { abs, ceil, floor, min, max, pow, sqrt, round } = Math;
 const noteDurations = [
     0.125,
     0.25,  0.375,
@@ -31,17 +20,49 @@ const noteDurations = [
     1,     1.5,    1.75
 ];
 
+// Pitches differs from rows. Pitches is the list of intruments cycled through
+// while dragging or up/down keying a note in The Dots.
+// TODO: Arguably it should not live here.
+const pitches = [
+    /* Splash, Chinese */
+    toDrumSlug(55),
+    toDrumSlug(52),
+    /* Crash 2 */
+    toDrumSlug(57),
+    /* Crash 1 */
+    toDrumSlug(49),
+    /* Ride Bell, Ride Cymbal */
+    toDrumSlug(53),
+    toDrumSlug(51),
+    /* Open Hi-hat, Closed Hi-hat */
+    toDrumSlug(46),
+    toDrumSlug(42),
+    /* Cowbell, High tom */
+    toDrumSlug(56),
+    toDrumSlug(50),
+    /* Low mid tom */
+    toDrumSlug(48),
+    /* Snare drum 2 (rimshot), Snare drum 1, Side stick */
+    toDrumSlug(40),
+    toDrumSlug(38),
+    toDrumSlug(37),
+    /* Sticks, Tambourine, Low tom */
+    toDrumSlug(31),
+    toDrumSlug(54),
+    toDrumSlug(45),
+    /* High floor tom */
+    toDrumSlug(43),
+    /* Low floor tom */
+    toDrumSlug(41),
+    /* Low bass drum, High bass drum */
+    toDrumSlug(35),
+    /* Pedal Hi-hat */
+    toDrumSlug(44)
+];
+
 
 function toDrumSlug(number) {
     return slugify(toDrumName(number));
-}
-
-
-
-function setDurations(symbols, duration) {
-    let n = symbols.length;
-    while (n--) symbols[n].duration = duration;
-    return symbols;
 }
 
 function getGrain(divisions, beat) {
@@ -74,8 +95,8 @@ export default class DrumStave extends Stave {
         toDrumSlug(50) + ' ' + toDrumSlug(56),
         /* Low mid tom, High mid tom */
         toDrumSlug(48) + ' ' + toDrumSlug(47),
-        /* Snare drum 1, Snare drum 2 */
-        toDrumSlug(38) + ' ' + toDrumSlug(40),
+        /* Snare drum 2 (rimshot), Snare drum 1, Side stick */
+        toDrumSlug(40) + ' ' + toDrumSlug(38) + ' ' + toDrumSlug(37),
         /* Low tom, Sticks, Hand clap, Tambourine */
         toDrumSlug(45) + ' ' + toDrumSlug(31) + ' ' + toDrumSlug(39) + ' ' + toDrumSlug(54),
         /* High floor tom */
@@ -100,6 +121,7 @@ export default class DrumStave extends Stave {
         31: 'headX',          // Sticks
         37: 'headCircle',     // Side Stick
         39: 'headX',          // Hand Clap
+        40: 'headSlashed2',   // Rim shot
         42: 'headX',          // Closed Hi-Hat
         44: 'headX',          // Pedal Hi-Hat
         46: 'headCircleX',    // Open Hi-Hat
@@ -107,7 +129,7 @@ export default class DrumStave extends Stave {
         51: 'headX',          // Ride Cymbal 1
         52: 'headCircleX',    // Chinese Cymbal
         53: 'headDiamond',    // Ride Bell
-        54: 'headX',          // Tambourine
+        54: 'headTriangleUp', // Tambourine
         55: 'headX',          // Splash Cymbal
         56: 'headTriangleUp', // Cowbell
         57: 'headCircleX',    // Crash Symbol 2
@@ -162,6 +184,9 @@ export default class DrumStave extends Stave {
         stemup: false
     }];
 
+    /**
+    .getPart(number)
+    **/
     getPart(number) {
         // Split drums stave into drums and cymbals parts
         /*return [35, 36, 37, 38, 40, 41, 43, 44, 45, 47, 48, 50].includes(toNoteNumber(number)) ?
@@ -179,11 +204,18 @@ export default class DrumStave extends Stave {
     **/
     getRow(part, n) {
         const pitch = typeof n === 'string' ? n : toDrumSlug(n) ;
-        if (!pitch) throw new Error('Number not found for pitch ' + n);
+        if (!pitch) throw new Error(`DrumStave pitch for number ${ n } not found`);
         const i = this.rows.findIndex((row) => row.includes(pitch));
         //if (global.DEBUG && i === -1) throw new Error('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name);
         if (i === -1) console.warn('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name);
         return i > -1 ? i : undefined ;
+    }
+
+    /**
+    .getPitches()
+    **/
+    getPitches() {
+        return pitches;
     }
 
     /**
@@ -196,7 +228,10 @@ export default class DrumStave extends Stave {
         return names.split(/\s+/)[0];
     }
 
-    getSpelling(key, number) {
+    /**
+    .getSpelling(number)
+    **/
+    getSpelling(number) {
         return toDrumSlug(number);
     }
 
@@ -205,12 +240,6 @@ export default class DrumStave extends Stave {
             type: 'clef',
             clef: this.type
         }];
-    }
-
-    yRatioToPitch(y) {
-        const i = floor(y * this.rows.length);
-        const j = i < 4 ? 4 : i > 17 ? 17 : i ;
-        return this.pitches[j];
     }
 
     getNotesAtBeat(beat, division, events) {
