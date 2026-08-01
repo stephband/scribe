@@ -95,8 +95,8 @@ export default class DrumStave extends Stave {
         toDrumSlug(50) + ' ' + toDrumSlug(56),
         /* Low mid tom, High mid tom */
         toDrumSlug(48) + ' ' + toDrumSlug(47),
-        /* Snare drum 2 (rimshot), Snare drum 1, Side stick */
-        toDrumSlug(40) + ' ' + toDrumSlug(38) + ' ' + toDrumSlug(37),
+        /* Snare drum 1, Snare drum 2 (rimshot), Side stick */
+        toDrumSlug(38) + ' ' + toDrumSlug(40) + ' ' + toDrumSlug(37),
         /* Low tom, Sticks, Hand clap, Tambourine */
         toDrumSlug(45) + ' ' + toDrumSlug(31) + ' ' + toDrumSlug(39) + ' ' + toDrumSlug(54),
         /* High floor tom */
