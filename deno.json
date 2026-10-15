@@ -1,14 +1,14 @@
 {
     "imports": {
         "dom/":      "https://cdn.jsdelivr.net/gh/stephband/dom@1.4.9/modules/",
-        "fn/":       "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.6/modules/",
-        "bolt/":     "https://cdn.jsdelivr.net/gh/stephband/bolt-2@1.0.8/",
+        "fn/":       "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.7/modules/",
+        "bolt/":     "https://cdn.jsdelivr.net/gh/stephband/bolt-2@1.0.9/",
         "midi/":     "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.2/modules/",
-        "sequence/": "https://cdn.jsdelivr.net/gh/soundio/sequence@0.3.14/"
+        "sequence/": "https://cdn.jsdelivr.net/gh/soundio/sequence@0.4.1/"
     },
 
     "tasks": {
-        "test": "deno run --allow-read test/tuplets.js"
+        "test": "deno test --allow-read test.js"
     },
 
     "lock": false

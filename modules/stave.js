@@ -6,9 +6,6 @@ import PercussionStave from './stave/percussion.js';
 import PianoStave      from './stave/piano.js';
 
 
-const assign = Object.assign;
-
-
 class TrebleUpStave extends Stave {
     type = 'treble-up';
     clef = glyphs.clefTrebleUp;

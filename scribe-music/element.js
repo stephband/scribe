@@ -49,7 +49,7 @@ export default define(element('scribe-music', {
         internals.beat      = Signal.of(0);
         internals.duration  = Signal.of(Infinity);
         internals.transpose = Signal.of(0);
-        internals.excludes  = Signal.of([]);
+        //internals.excludes  = Signal.of([]);
         internals.swingAsStraight8ths  = Signal.of(false);
         internals.swingAsStraight16ths = Signal.of(false);
         internals.debug     = Signal.of(false);
@@ -82,7 +82,7 @@ export default define(element('scribe-music', {
                 // Events from data
                 Sequence.from(internals.data.value),
                 // Excludes is an array
-                internals.excludes.value,
+                //internals.excludes.value,
                 // Clef is a string
                 internals.clef.value,
                 // Key name
@@ -329,8 +329,25 @@ export default define(element('scribe-music', {
 
             // src points to a hash in current document
             if (window.location.origin === url.origin && window.location.pathname === url.pathname) {
-                const script = this.getRootNode().getElementById(url.hash.slice(1));
-                if (!script) throw new Error('<scribe-music> src script "' + src + '" not found in document');
+                const id = url.hash.slice(1);
+                const findScript = () => {
+                    const root = this.getRootNode();
+                    return (root && root.getElementById ? root.getElementById(id) : document.getElementById(id))
+                        || this.querySelector('#' + id);
+                };
+
+                const script = findScript();
+                if (!script) {
+                    if (document.readyState === 'loading') {
+                        window.addEventListener('DOMContentLoaded', () => {
+                            const script = findScript();
+                            if (!script) throw new Error('<scribe-music> src script "' + src + '" not found in document');
+                            this.data = JSON.parse(script.textContent);
+                        }, { once: true });
+                        return;
+                    }
+                    throw new Error('<scribe-music> src script "' + src + '" not found in document');
+                }
                 this.data = JSON.parse(script.textContent);
             }
             else {
@@ -362,11 +379,11 @@ export default define(element('scribe-music', {
         attribute: function(value) { this.debug = value !== null; },
         get: function() { return getInternals(this).debug.value; },
         set: function(value) { getInternals(this).debug.value = !!value; }
-    },
+    }/*,
 
     excludes: {
         attribute: function(string) { return getInternals(this).excludes.value = string.split(/\s+/); },
-    }
+    }*/
 }, 'stephband.band/scribe/'), {
     // Define ScribeMusic.styleheet as the stylesheet signal
     stylesheet: {

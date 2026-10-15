@@ -19,6 +19,7 @@ import { major }             from '../scale.js';
 import * as glyphs           from "../glyphs.js";
 
 
+const DEBUG = globalThis.DEBUG;
 const { floor } = Math;
 
 const keys = {
@@ -167,7 +168,7 @@ export default class Stave {
         const name = typeof pitch === 'string' ? pitch : toNoteName(pitch) ;
         const row  = name.replace(rflatsharp, '');
         const i    = this.rows.indexOf(row);
-        //if (global.DEBUG && i === -1) throw new Error('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name);
+        //if (DEBUG && i === -1) throw new Error('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name);
         if (i === -1) console.warn('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name);
         return i > -1 ? i : undefined ;
     }
@@ -229,7 +230,7 @@ export default class Stave {
         const name = noteNames[mod12(n - a)];
         const accidental = accidentalChars[a];
 
-        if (window.DEBUG && name === undefined) {
+        if (DEBUG && name === undefined) {
             throw new Error('Incorrect spelling for pitch number ' + n + ': "' + name + '"');
         }
 

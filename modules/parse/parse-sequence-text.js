@@ -5,7 +5,8 @@ const lengths = {
     key:   1, /* A-G */
     meter: 2, /* duration division */
     rate:  1, /* rate */
-    lyric: 2, /* string, duration */
+    lyric: 2, /* duration, string */
+    text:  2, /* duration, string */
 };
 
 const rnote = /^[ABCDEFG][b♭#♯]{0,1}-?\d$/;

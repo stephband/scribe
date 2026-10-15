@@ -37,8 +37,8 @@
     }</script>
 
     <!-- Import <scribe-music> -->
-    <link rel="stylesheet" href="./build/scribe-music/element.css" />
-    <script type="module" src="./build/scribe-music/element.js"></script>
+    <link rel="stylesheet" href="./scribe-music/element.css" />
+    <script type="module" src="./scribe-music/element.js"></script>
 
     <style>
     @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/elements/html.css';
@@ -47,7 +47,6 @@
     @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/striped-table.css';
     @import './assets/font.css';
 
-    @import './build/scribe-music/element.css';
     @import './fonts/ash.css';
     @import './fonts/bravura.css';
     @import './fonts/broadway.css';
@@ -713,8 +712,8 @@
                     <tr>
                         <td><code>beat</code></td>
                         <td><code class="string">"text"</code></td>
-                        <td><code>string</code></td>
                         <td><code>duration</code></td>
+                        <td><code>string</code></td>
                         <td></td>
                         <td></td>
                     </tr>
@@ -733,15 +732,14 @@
             Sequence events may carry transforms for the sequences they cue:
             </p>
 
-            <pre class="9x @1-8x @3-5x"><code class="json" id="dolphin-dance-intro">[<span class="number">0</span>, <span class="string">"sequence"</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">16</span>, <span class="string">"transpose"</span>, <span class="number">-3</span>, <span class="string">"rate"</span>, <span class="number">2</span>]</code></pre>
+            <pre class="9x @1-8x @3-5x"><code class="json">[<span class="number">0</span>, <span class="string">"sequence"</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">16</span>, <span class="string">"transpose"</span>, <span class="number">-3</span>, <span class="string">"rate"</span>, <span class="number">2</span>]</code></pre>
 
             <p class="9x @1-6x @2-5x @3-3x">
             This renders as:
             </p>
 
-            <scribe-music class="9x @1-7x @3-4x" clef="treble" src="#dolphin-dance-intro-transformed">
-                <script type="application/json" id="dolphin-dance-intro-transformed">{"name":"Dolphin Dance","events":[[0,"key","Eb"],[0,"meter",4,1],[0,"sequence",1,0,16,"transpose",-3,"rate",2]],"sequences":[{"id":1,"name":"Intro","events":[[0,"chord",3,"∆",4],[2,"note",67,0.1,0.5],[2.5,"note",68,0.1,0.5],[3,"note",70,0.1,0.5],[3.5,"note",65,0.1,3.5],[4,"chord",10,"-",4],[8,"chord",3,"∆",4],[10,"note",67,0.1,0.5],[10.5,"note",68,0.1,0.5],[11,"note",70,0.1,0.5],[11.5,"note",65,0.1,3.5],[12,"chord",2,"ø",2],[14,"chord",7,"7alt",2]]}]}</script>
-            </scribe-music>
+            <script type="application/json" id="dolphin-dance-intro-transformed">{"name":"Dolphin Dance","events":[[0,"key","Eb"],[0,"meter",4,1],[0,"sequence",1,0,16,"transpose",-3,"rate",2]],"sequences":[{"id":1,"name":"Intro","events":[[0,"chord",3,"∆",4],[2,"note",67,0.1,0.5],[2.5,"note",68,0.1,0.5],[3,"note",70,0.1,0.5],[3.5,"note",65,0.1,3.5],[4,"chord",10,"-",4],[8,"chord",3,"∆",4],[10,"note",67,0.1,0.5],[10.5,"note",68,0.1,0.5],[11,"note",70,0.1,0.5],[11.5,"note",65,0.1,3.5],[12,"chord",2,"ø",2],[14,"chord",7,"7alt",2]]}]}</script>
+            <scribe-music class="9x @1-7x @3-4x" clef="treble" src="#dolphin-dance-intro-transformed"></scribe-music>
 
             <p class="9x @1-6x @2-5x @3-3x">
             Notice that all 16 beats are still rendered – the duration of the event itself is not transformed – but the rate of the melody is transposed down a minor third and is twice as fast.

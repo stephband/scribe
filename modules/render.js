@@ -2,6 +2,7 @@
 import create           from 'dom/create.js';
 import px               from 'dom/parse-length.js';
 import rect             from 'dom/rect.js';
+import Event            from 'sequence/modules/event.js';
 import Transform        from 'sequence/modules/transform.js';
 import SequenceIterator from 'sequence/modules/sequence-iterator.js';
 import { toKeyName }    from 'sequence/modules/event/key.js';
@@ -28,11 +29,12 @@ export function toBarElements(elements, bar) {
     elements.push(create('div', {
         class: `${ bar.stave.type }-stave stave ${ bar.doubleBarLine ? 'end-bar ' : '' }bar${ bar.error ? ' error ': '' }`,
         data: {
-            beat:     bar.beat,
-            duration: bar.duration,
-            count:    bar.count,
-            stave:    bar.stave.type,
-            key:      bar.stave.pitched ?
+            beat:      bar.beat,
+            duration:  bar.duration,
+            divisions: bar.divisions,
+            count:     bar.count,
+            stave:     bar.stave.type,
+            key:       bar.stave.pitched ?
                 toKeyName(bar.key) :
                 undefined
         },
@@ -59,20 +61,20 @@ export function renderElements(sequence, clef, keyname, meter, transpose = 0, di
     // If events contains no initial key and key is available insert a key event
     let keyEvent = sequence.find({ beat: 0, type: 'key' })
         || keyname
-        && sequence.create({ beat: 0, type: 'key', name: keyname }) ;
+        && sequence.create(0, 'key', keyname) ;
 
     // If events contains no initial meter and meter is available insert a meter event
     let meterEvent = sequence.find({ beat: 0, type: 'meter' })
         || meter
-        && sequence.create({ beat: 0, type: 'meter', 2: meter[2], 3: meter[3] }) ;
+        && sequence.create(0, 'meter', meter[2], meter[3]) ;
 
     // Get the stave controller
     const stave = Stave[clef || 'treble'];
 
     // Make transforms list
     const array = [];
-    if (transpose) array.push("transpose", transpose);
-    if (displace)  array.push("displace", displace);
+    if (transpose) array.push(Transform.TYPES.transpose, transpose);
+    if (displace)  array.push(Transform.TYPES.displace, displace);
 
     // Create sequence object
     const iterator = new SequenceIterator(events, sequence.sequences, Transform.from(array));
@@ -82,7 +84,7 @@ export function renderElements(sequence, clef, keyname, meter, transpose = 0, di
     const elements = bars.reduce(toBarElements, []);
 
     // Creates stave with clef and key signature
-    if (!keyEvent) keyEvent = Event.of({ beat: 0, type: "key", name: bars[0].key });
+    if (!keyEvent) keyEvent = Event.key(0, bars[0].key);
     const signature = stave.createSignatureSymbols(keyEvent);
 
     // Quick and dirty way of rendering clefs into left hand side bar
@@ -152,8 +154,8 @@ export function renderStyle(element, root = element) {
     const side   = root.querySelector('.side');
     if (!side) return;
     const key    = side.dataset.key;
-    const counts = {'G♭': 6, 'C♯': 5, 'D♭': 5, 'G♯': 4, 'A♭': 4, 'D♯': 3, 'E♭': 3, 'B♭': 2, 'F':  1, 'C':  0, 'G':  1, 'D':  2, 'A':  3, 'E':  4, 'B':  5, 'F♯': 6};
-    const count  = counts[key];
+    const counts = { 'C♭': 7, 'G♭': 6, 'D♭': 5, 'A♭': 4, 'E♭': 3, 'B♭': 2, 'F':  1, 'C':  0, 'G':  1, 'D':  2, 'A':  3, 'E':  4, 'B':  5, 'F♯': 6, 'C♯': 7 };
+    const count  = counts[key] || 0;
     return `
         --head-1-size:       ${ truncate(6, head1Width / fontSize) };
         --head-2-size:       ${ truncate(6, head2Width / fontSize) };

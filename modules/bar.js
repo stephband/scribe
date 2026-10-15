@@ -2,8 +2,8 @@
 import matches                from 'fn/matches.js';
 import remove                 from 'fn/remove.js';
 import mod12                  from 'sequence/modules/number/mod-12.js';
+import { getDivisions }       from 'sequence/modules/event/meter.js';
 import toStopBeat             from './event/to-stop-beat.js';
-import { getDivisions }       from './bar/divisions.js';
 import createPartSymbols      from './bar/part.js';
 import config                 from './config.js';
 import { accidentalsFromKey } from './accidentals.js';
@@ -318,11 +318,11 @@ export default function createBars(sequence, stave, settings = config) {
                 symbols.push({
                     type: 'text',
                     beat: event[0] - beat,
-                    // Does chord cross into next bar? The symbol should not
-                    duration: event[0] + event[3] > beat + duration ?
+                    // Does text cross into next bar? The symbol should not
+                    duration: event[0] + event[2] > beat + duration ?
                         duration - event[0] + beat :
-                        event[3],
-                    value: event[2],
+                        event[2],
+                    value: event[3],
                     event,
                     stave
                 });

@@ -3,11 +3,10 @@ import overload          from 'fn/overload.js';
 import create            from 'dom/create.js';
 import { toNoteNumber }  from 'midi/note.js';
 import * as glyphs       from "./glyphs.js";
-import { rflat, rsharp } from './pitch.js';
 import { identify }      from './event.js';
 import { beamThickness } from './beam.js';
 import { toHTML }        from './html.js';
-import map               from './object/map.js';
+import map               from "./store.js";
 import truncate          from './number/truncate.js';
 import config            from './config.js';
 
@@ -49,8 +48,13 @@ function toEventIds(symbol) {
     while (symbol[++n]) string += (string ? ' ' : '') + identify(symbol[n].event);
     return string;
 }
-
-
+/*
+function toStackIds(sequencer, string = '') {
+    return sequencer.parent ?
+        toStackIds(sequencer.parent, ('' + identify(sequencer.event)) + (string ? ' ' + string : string)) :
+        string ;
+}
+*/
 function toRestGlyph(duration) {
     // Duplet or dotted rest
     const glyph = glyphs['rest' + (duration + '').replace('.', '')];
@@ -81,6 +85,11 @@ function toRhythmBinary(length, number) {
         .join('');
 }
 
+function store(element, data) {
+    map.set(element, data);
+    return element;
+}
+
 export default overload(get('type'), {
     barrepeat: (symbol) => create('span', {
         class: 'barrepeat',
@@ -96,29 +105,27 @@ export default overload(get('type'), {
         html: clefGlyphs[symbol.clef]
     }),
 
-    chord: (symbol) => {
-        return create('abbr', {
-            class: "chord chord-abbr",
-            title: "",
-            html: symbol.name.replace(rchordparts, toChordHTML),
-            data: {
-                beat:     truncate(4, symbol.beat),
-                duration: truncate(4, symbol.duration),
-                event:    identify(symbol.event)
-            }
-        });
-    },
+    chord: (symbol) => store(create('abbr', {
+        class: "chord chord-abbr",
+        title: "",
+        html: symbol.name.replace(rchordparts, toChordHTML),
+        data: {
+            beat:     truncate(4, symbol.beat),
+            duration: truncate(4, symbol.duration),
+            event:    identify(symbol.event)
+        }
+    }), symbol.event),
 
     timesig: (symbol) => symbol.stave.getTimeSigHTML ?
         create('fragment', symbol.stave.getTimeSigHTML(symbol.numerator, symbol.denominator, identify(symbol.event))) :
-        create('span', {
+        store(create('span', {
             class: "timesig",
             html: `<sup>${ glyphs['timeSig' + symbol.numerator] }</sup>
                 <sub>${ glyphs['timeSig' + symbol.denominator] }</sub>`,
             data: {
                 event: identify(symbol.event)
             }
-        }),
+        }), symbol.event),
 
     symbolcoda: (symbol) => create('p', {
         html: glyphs.coda,
@@ -130,7 +137,7 @@ export default overload(get('type'), {
         class: "barcount"
     }),
 
-    text: (symbol) => create('span', {
+    text: (symbol) => store(create('span', {
         class: "lyric",
         part:  "lyric",
         html: symbol.value,
@@ -139,9 +146,9 @@ export default overload(get('type'), {
             duration: truncate(4, symbol.duration),
             event:    identify(symbol.event)
         }
-    }),
+    }), symbol.event),
 
-    acci: (symbol) => create('span', {
+    acci: (symbol) => store(create('span', {
         class: (acciClasses[symbol.value] || 'acci') + (symbol.clump ? ' acci-' + symbol.clump : '' ) + (symbol.cluster ? ' acci-cluster' : ''),
         html: acciGlyphs[symbol.value] || glyphs.acciNatural,
         data: {
@@ -150,13 +157,13 @@ export default overload(get('type'), {
             part:  symbol.part.name,
             event: symbol.event && identify(symbol.event)
         }
-    }),
+    }), symbol.event),
 
     accent: (symbol) => {
         const isMarcato   = symbol.dynamic >= config.marcatoThreshold;
         const isDrumStave = symbol.stave.type === 'drum' || symbol.stave.type === 'percussion';
 
-        return create('span', {
+        return store(create('span', {
             class: `${ symbol.stemup ? 'up' : 'down' }-accent accent${ isMarcato ? ' marcato-accent' : '' }`,
             html: isDrumStave ?
                     isMarcato ? symbol.stemup ? glyphs.marcatoUp : glyphs.marcatoDown :
@@ -170,7 +177,7 @@ export default overload(get('type'), {
                 part:  symbol.part.name,
                 event: identify(symbol.event)
             }
-        });
+        }), symbol.event);
     },
 
     ledge: (symbol) => create('svg', {
@@ -214,7 +221,7 @@ export default overload(get('type'), {
         }
     }),
 
-    note: (symbol) => create('data', {
+    note: (symbol) => store(create('data', {
         class: `${ symbol.stemup ? 'up-note ' : 'down-note ' }${ symbol.top ? 'top-note ' : '' }${ symbol.bottom ? 'bottom-note ' : '' }${
             // Stem up
             symbol.stemup ?
@@ -232,11 +239,12 @@ export default overload(get('type'), {
             pitch:    symbol.pitch,
             part:     symbol.part.name,
             beam:     symbol.beam && symbol.beam.id,
-            event:    identify(symbol.event)
+            event:    identify(symbol.event),
+//            stack:    toStackIds(symbol.event.sequencer)
         }
-    }),
+    }), symbol.event),
 
-    tie: (symbol) => create('svg', {
+    tie: (symbol) => store(create('svg', {
         class: `${ symbol.stemup ? 'down' : 'up' }-tie tie`,
         viewBox: `0 0 1 1`,
         preserveAspectRatio: "none",
@@ -248,7 +256,7 @@ export default overload(get('type'), {
             part:     symbol.part.name,
             event:    identify(symbol.event)
         }
-    }),
+    }), symbol.event),
 
     tuplet: (symbol) => create('span', {
         class: `${ symbol.stemup ? 'up' : 'down' }-tuplet tuplet`,
@@ -283,7 +291,7 @@ export default overload(get('type'), {
         'aria-hidden': 'true'
     }),
 
-    warning: (symbol) => create('data', {
+    warning: (symbol) => store(create('data', {
         class: `warning-note note`,
         style: symbol.stemHeight ? `--stem-height: ${ symbol.stemHeight };` : undefined,
         html:  symbol.stave.getNoteHTML(symbol.pitch, symbol.dynamic, symbol.duration),
@@ -296,7 +304,7 @@ export default overload(get('type'), {
             beam:     symbol.beam && symbol.beam.id,
             event:    identify(symbol.event)
         }
-    }),
+    }), symbol.event),
 
     default: (function (types) {
         return function (symbol) {
