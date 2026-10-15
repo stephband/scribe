@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../fonts/bravura.css"],
+  "sourcesContent": ["\n@font-face {\n    font-family: BravuraText;\n    src: url('../fonts/Bravura/redist/woff/BravuraText.woff2') format('woff2');\n    font-weight: normal;\n    font-style: normal;\n}\n\n@font-face {\n    font-family: Bravura;\n    src: url('../fonts/Bravura/redist/woff/Bravura.woff2') format('woff2');\n    font-weight: normal;\n    font-style: normal;\n}\n\n.bravura-font {\n    font-family: Bravura, BravuraText;\n}\n"],
+  "mappings": ";;;;AACA,WACI,YAAa,YACb,IAAK,uDAAsD,OAAO,SAClE,YAAa,IACb,WAAY,MAChB,CAEA,WACI,YAAa,QACb,IAAK,mDAAkD,OAAO,SAC9D,YAAa,IACb,WAAY,MAChB,CAEA,CAAC,aACG,YAAa,OAAO,CAAE,WAC1B",
+  "names": []
+}
