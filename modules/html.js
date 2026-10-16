@@ -1,7 +1,7 @@
 
 import * as glyphs from "./glyphs.js";
 
-const raccidental = /♮|(bb|𝄫)|(##|𝄪)|(b|♭)|(#|♯)|(∆)|(-)|(ø)|(°)|(\+)|(\d+)/g;
+const raccidental = /♮|(bb|𝄫)|(##|𝄪)|(b|♭)|(#|♯)|(∆)|(-)|(ø)|(°)|(\+)|(\d+)/gu;
 const htmls = {
     0: `<span class="glyph glyph-natural">${ glyphs.acciNatural }</span>`,
     1: `<span class="glyph glyph-doubleflat">${ glyphs.acciDoubleFlat }</span>`,

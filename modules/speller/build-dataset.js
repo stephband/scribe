@@ -1,6 +1,6 @@
 import { toKeyNumber } from 'sequence/modules/event/key.js';
-import transpose from '../transpose.js';
-import { encode, encodeTargets } from '../sequence-encoder.js';
+import transpose from './transpose.js';
+import { encode, encodeTargets } from './sequence-encoder.js';
 
 /**
  * Builds training dataset from an object or array of Sequences annotated with

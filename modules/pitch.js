@@ -1,13 +1,13 @@
 
 
-export const rrootname    = /^([A-G])([b#♭♯𝄫𝄪])?/;
-export const rpitch       = /^([A-G])([b#♭♯𝄫𝄪])?(-?\d)?$/;
-export const rflat        = /b|♭/;
-export const rsharp       = /#|♯/;
-export const rdoubleflat  = /bb|𝄫/;
-export const rdoublesharp = /##|𝄪/;
-export const rflatsharp   = /b|♭|#|♯/g;
-export const raccidental  = /(♮)|(bb|𝄫)|(##|𝄪)|(b|♭)|(#|♯)/g;
+export const rrootname    = /^([A-G])(bb|𝄫|##|𝄪|[b#♭♯])?/u;
+export const rpitch       = /^([A-G])(bb|𝄫|##|𝄪|[b#♭♯])?(-?\d)?$/u;
+export const rflat        = /b|♭/u;
+export const rsharp       = /#|♯/u;
+export const rdoubleflat  = /bb|𝄫/u;
+export const rdoublesharp = /##|𝄪/u;
+export const rflatsharp   = /bb|𝄫|##|𝄪|b|♭|#|♯/gu;
+export const raccidental  = /(♮)|(bb|𝄫)|(##|𝄪)|(b|♭)|(#|♯)/gu;
 
 export const accidentalChars = {
     '-2': '𝄫',

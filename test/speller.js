@@ -1,9 +1,15 @@
-import * as defaultTests from '../modules/speller/data/scales.js';
+import * as chromatic from '../modules/speller/data/chromatic.js';
+import * as major     from '../modules/speller/data/major.js';
+import * as triads    from '../modules/speller/data/triads.js';
+
 import SpellerNetwork from '../modules/speller/speller-network.js';
 import weights from '../modules/speller/speller-weights.js';
 import { toKeyName } from 'sequence/modules/event/key.js';
 import { renderElements, renderStyle, renderDOM } from '../modules/render.js';
 import truncate from '../modules/number/truncate.js';
+
+const assign = Object.assign;
+const tests  = assign({}, chromatic, major, triads);
 
 function renderNotation(sequence, clef = 'treble', keyName = 'C', meter = [0, 'meter', 4, 1]) {
     const container = document.createElement('div');
@@ -22,7 +28,7 @@ function refreshLayout(root) {
     });
 }
 
-export function runSpellerTests(testSource = defaultTests, containerId = 'tests-container', summaryId = 'summary-container') {
+export function runSpellerTests(testSource = tests, containerId = 'tests-container', summaryId = 'summary-container') {
     const container = document.getElementById(containerId);
     const summaryEl = document.getElementById(summaryId);
     if (!container) return;

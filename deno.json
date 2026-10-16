@@ -4,12 +4,13 @@
         "fn/":       "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.7/modules/",
         "bolt/":     "https://cdn.jsdelivr.net/gh/stephband/bolt-2@1.0.9/",
         "neuron/":   "https://cdn.jsdelivr.net/gh/stephband/neuron@0.1.0/",
-        "midi/":     "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.2/modules/",
+        "midi/":     "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.4/modules/",
         "sequence/": "https://cdn.jsdelivr.net/gh/soundio/sequence@0.4.1/"
     },
 
     "tasks": {
-        "test": "deno test --allow-read test.js"
+        "test":  "deno test --allow-read test.js",
+        "train": "deno run -A modules/speller/train.js"
     },
 
     "lock": false

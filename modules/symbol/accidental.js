@@ -1,16 +1,18 @@
 
-import { rflat, rsharp } from '../pitch.js';
+import { rflat, rsharp, rdoubleflat, rdoublesharp, rflatsharp } from '../pitch.js';
 
 
 function createAccidental(part, accidentals, beat, note, clump, cluster) {
     const { pitch, event, row } = note;
     const acci =
-        rsharp.test(pitch) ? 1 :
-        rflat.test(pitch) ? -1 :
+        rdoublesharp.test(pitch) ? 2 :
+        rdoubleflat.test(pitch)  ? -2 :
+        rsharp.test(pitch)       ? 1 :
+        rflat.test(pitch)        ? -1 :
         undefined ;
 
-    // Line name is note name + octave (no # or b)
-    const line = pitch[0] + pitch.slice(-1);
+    // Line name is note name + octave (no #, b, 𝄪, 𝄫)
+    const line = pitch.replace(rflatsharp, '');
 
     // If accidental is already in bar's current accidentals do nothing
     if (acci === accidentals[line]) return;

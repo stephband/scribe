@@ -11,9 +11,9 @@ import { createAccidentals } from '../symbol/accidental.js';
 import { createLedges }      from '../symbol/ledge.js';
 import { createNotes }       from '../symbol/note.js';
 import { getDivisionBefore } from '../bar/divisions.js';
-import { accidentalsFromKey }from '../accidentals.js';
+import { accidentalsFromKey } from '../accidentals.js';
 import { keyToNumbers }      from '../keys.js';
-import { rpitch, rflatsharp, byFatherCharlesPitch, accidentalChars } from '../pitch.js';
+import { rrootname, rpitch, rflatsharp, byFatherCharlesPitch, accidentalChars } from '../pitch.js';
 import config                from '../config.js';
 import { major }             from '../scale.js';
 import * as glyphs           from "../glyphs.js";
@@ -203,6 +203,19 @@ export default class Stave {
         const keyData = keys[key];
 
         if (!withOctave) {
+            if (typeof pitch === 'string') {
+                const match = rrootname.exec(pitch);
+                if (match) {
+                    const [, letter, accidental] = match;
+                    const acc =
+                        accidental === '##' || accidental === '𝄪' ? '𝄪' :
+                        accidental === 'bb' || accidental === '𝄫' ? '𝄫' :
+                        accidental === '#'  || accidental === '♯' ? '♯' :
+                        accidental === 'b'  || accidental === '♭' ? '♭' :
+                        (accidental || '');
+                    return letter + acc;
+                }
+            }
             const n = toRootNumber(pitch);
             const a = keyData.spellings[n];
             return noteNames[mod12(n - a)] + accidentalChars[a];
@@ -213,12 +226,17 @@ export default class Stave {
         if (typeof pitch === 'string') {
             // [BRANCH 2026-spelling]: If pitch is already an explicit note string (e.g. "C#4", "Db4", "C4"),
             // preserve its spelling rather than deconstructing to MIDI and re-spelling via keyData.spellings.
-            // Normalize ASCII '#' -> '♯' and 'b' -> '♭'.
+            // Normalize ASCII '#' -> '♯', 'b' -> '♭', '##' -> '𝄪', 'bb' -> '𝄫'.
             const match = rpitch.exec(pitch);
             if (match) {
                 const [, letter, accidental, octave] = match;
                 if (octave !== undefined) {
-                    const acc = accidental === '#' ? '♯' : accidental === 'b' ? '♭' : (accidental || '');
+                    const acc =
+                        accidental === '##' || accidental === '𝄪' ? '𝄪' :
+                        accidental === 'bb' || accidental === '𝄫' ? '𝄫' :
+                        accidental === '#'  || accidental === '♯' ? '♯' :
+                        accidental === 'b'  || accidental === '♭' ? '♭' :
+                        (accidental || '');
                     return letter + acc + octave;
                 }
             }

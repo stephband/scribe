@@ -152,7 +152,7 @@ export default class PianoStave extends Stave {
             number < 60 ?
                 this.parts[0] :
                 this.parts[1] :
-            /[012]$|[AC-G][b#♭♯𝄫𝄪]*3$/.test(number) ?
+            /[012]$|[AC-G](?:bb|𝄫|##|𝄪|[b#♭♯])*3$/u.test(number) ?
                 this.parts[0] :
                 this.parts[1] ;
     }

@@ -1,7 +1,14 @@
 import { exportAsModule, serializeWeights } from "neuron/modules/serialize.js";
 import { SpellerNetwork } from "./speller-network.js";
-import { buildTrainingDataset } from "./data/build-dataset.js";
-import * as defaultSequences from "./data/scales.js";
+import { buildTrainingDataset } from "./build-dataset.js";
+
+import * as chromatic from "./data/chromatic.js";
+import * as major     from "./data/major.js";
+import * as triads    from "./data/triads.js";
+
+const assign = Object.assign;
+const sequences = assign({}, chromatic, major, triads);
+
 
 console.log("=== Pitch Speller Sequence Training & Weight Serialization ===\n");
 
@@ -9,7 +16,7 @@ console.log("=== Pitch Speller Sequence Training & Weight Serialization ===\n");
 console.log(
     "1. Generating training dataset with Line-of-Fifths augmentations from sequences...",
 );
-const dataset = buildTrainingDataset(defaultSequences);
+const dataset = buildTrainingDataset(sequences);
 console.log(
     `   ✓ Generated ${dataset.length} augmented sequences covering keys from G♭ to F♯.`,
 );
@@ -26,19 +33,25 @@ const network = new SpellerNetwork();
 
 // 3. Train the Network
 console.log("\n3. Training network using BPTT and Adam optimizer...");
-const { duration } = network.train(dataset, {
-    epochs: 30,
-    lr: 0.01,
+const res1 = network.train(dataset, {
+    epochs: 20,
+    lr: 0.008,
     logInterval: 10,
 });
-console.log(`\n   ✓ Training completed in ${duration} seconds.`);
+const res2 = network.train(dataset, {
+    epochs: 15,
+    lr: 0.002,
+    logInterval: 15,
+});
+const totalDuration = (res1.duration + res2.duration).toFixed(2);
+console.log(`\n   ✓ Training completed in ${totalDuration} seconds.`);
 
 // 4. Validate on Sequences
 console.log("\n4. Evaluating Model on Sequences...");
 let totalValidNotes = 0;
 let totalValidMatches = 0;
 
-for (const [name, seq] of Object.entries(defaultSequences)) {
+for (const [name, seq] of Object.entries(sequences)) {
     const preds = network.predictSequence(seq);
     const notes = seq.events.filter((e) => e.type === "note");
     let matches = 0;
