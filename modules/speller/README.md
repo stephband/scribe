@@ -107,31 +107,31 @@ Inputs per note: [Pitch Class (12), Duration (4), Delta Beat (8), Key (15)] (t =
      beats).
    - Timing: 8-bucket one-hot inter-onset delta beats $\Delta\text{beat}$ ($0$ for $< 1/16$, and $1/16$ to $4$ beats).
    - Current Key Signature: 15-dimensional one-hot vector ($C\flat = -7$ to $C\sharp = +7$), tracking key signature changes across the sequence.
-2. **Layer 1 (Key Tracker)**: A BiGRU ($H = 48$) aggregates harmonic context
-   across the timeline. Multi-Task Head 1 projects layer 1 activations to the
+2. **Layer 1 (Key Tracker)**: A BiGRU ($H_0 = 24$) aggregates harmonic context
+   across the timeline. Multi-Task Head 1 projects layer 1 activations ($48$ dims) to the
    15-class local key distribution.
-3. **Layer 2 (Spelling Classifier)**: Receives layer 1 hidden states and refines
+3. **Layer 2 (Spelling Classifier)**: A smaller BiGRU ($H_1 = 12$) receives layer 1 hidden states and refines
    representations for individual note spelling. Multi-Task Head 2 projects
-   layer 2 activations to the 5 accidental classes (`𝄫`, `♭`, `♮`, `♯`, `𝄪`), which combine with the note's MIDI pitch class to resolve the exact TPC in $[-15, +19]$.
+   layer 2 activations ($24$ dims) to the 5 accidental classes (`𝄫`, `♭`, `♮`, `♯`, `𝄪`), which combine with the note's MIDI pitch class to resolve the exact TPC in $[-15, +19]$.
 4. **Loss Function**:
    $$\mathcal{L} = \mathcal{L}_{\text{spelling}} + \lambda_{\text{key}} \mathcal{L}_{\text{key}}$$
    with $\lambda_{\text{key}} = 0.3$.
 
 ### Layer-by-Layer Inventory
 
-| Component                                                                  | Tensor Name                                                                                                                                                      | Dimensions                                                                                                                       | Float Count                                                        | Purpose                                                                                                                                                                                                                |
-| :------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Layer 0 (Context BiGRU)**<br>• Forward GRU<br><br><br><br>• Backward GRU | <br>`layer0_Wih_fwd`<br>`layer0_Whh_fwd`<br>`layer0_bih_fwd`<br>`layer0_bhh_fwd`<br>`layer0_Wih_bwd`<br>`layer0_Whh_bwd`<br>`layer0_bih_bwd`<br>`layer0_bhh_bwd` | <br>$[144 \times 39]$<br>$[144 \times 48]$<br>$[144]$<br>$[144]$<br>$[144 \times 39]$<br>$[144 \times 48]$<br>$[144]$<br>$[144]$ | <br>5,616<br>6,912<br>144<br>144<br>5,616<br>6,912<br>144<br>144   | Processes raw note features ($D_{\text{in}}=39$) across sequence time steps to aggregate broad harmonic context.<br><br>Produces concatenated output:<br>$H_1 = [h_{\text{fwd}} ; h_{\text{bwd}}] \in \mathbb{R}^{96}$ |
-| **Head 1 (Local Key Head)**                                                | `head_key_W`<br>`head_key_b`                                                                                                                                     | $[15 \times 96]$<br>$[15]$                                                                                                       | 1,440<br>15                                                        | Tapped directly from Layer 0 output ($96$ dims). Classifies local key into 15 standard key coordinates ($-7$ to $+7$)                                                                                                  |
-| **Layer 1 (Tonal BiGRU)**<br>• Forward GRU<br><br><br><br>• Backward GRU   | <br>`layer1_Wih_fwd`<br>`layer1_Whh_fwd`<br>`layer1_bih_fwd`<br>`layer1_bhh_fwd`<br>`layer1_Wih_bwd`<br>`layer1_Whh_bwd`<br>`layer1_bih_bwd`<br>`layer1_bhh_bwd` | <br>$[144 \times 96]$<br>$[144 \times 48]$<br>$[144]$<br>$[144]$<br>$[144 \times 96]$<br>$[144 \times 48]$<br>$[144]$<br>$[144]$ | <br>13,824<br>6,912<br>144<br>144<br>13,824<br>6,912<br>144<br>144 | Receives Layer 0 hidden states ($D_{\text{in}}=96$) to resolve individual note spelling ambiguities.<br><br>Produces concatenated output:<br>$H_2 = [h_{\text{fwd}} ; h_{\text{bwd}}] \in \mathbb{R}^{96}$             |
-| **Head 2 (Spelling Head)**                                                 | `head_spelling_W`<br>`head_spelling_b`                                                                                                                           | $[5 \times 96]$<br>$[5]$                                                                                                         | 480<br>5                                                           | Tapped from Layer 1 output ($96$ dims). Classifies note accidental into 5 classes (`𝄫`, `♭`, `♮`, `♯`, `𝄪`)                                                                                                            |
-| **Total**                                                                  | **20 tensors**                                                                                                                                                   |                                                                                                                                  | **69,620**                                                         | **~272.0 KiB (raw Float32Array)**                                                                                                                                                                                      |
+| Component                                                                  | Tensor Name                                                                                                                                                      | Dimensions                                                                                                                     | Float Count                                                      | Purpose                                                                                                                                                                                                                |
+| :------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Layer 0 (Context BiGRU)**<br>• Forward GRU<br><br><br><br>• Backward GRU | <br>`layer0_Wih_fwd`<br>`layer0_Whh_fwd`<br>`layer0_bih_fwd`<br>`layer0_bhh_fwd`<br>`layer0_Wih_bwd`<br>`layer0_Whh_bwd`<br>`layer0_bih_bwd`<br>`layer0_bhh_bwd` | <br>$[72 \times 39]$<br>$[72 \times 24]$<br>$[72]$<br>$[72]$<br>$[72 \times 39]$<br>$[72 \times 24]$<br>$[72]$<br>$[72]$       | <br>2,808<br>1,728<br>72<br>72<br>2,808<br>1,728<br>72<br>72     | Processes raw note features ($D_{\text{in}}=39$) across sequence time steps to aggregate broad harmonic context.<br><br>Produces concatenated output:<br>$H_1 = [h_{\text{fwd}} ; h_{\text{bwd}}] \in \mathbb{R}^{48}$ |
+| **Head 1 (Local Key Head)**                                                | `head_key_W`<br>`head_key_b`                                                                                                                                     | $[15 \times 48]$<br>$[15]$                                                                                                     | 720<br>15                                                        | Tapped directly from Layer 0 output ($48$ dims). Classifies local key into 15 standard key coordinates ($-7$ to $+7$)                                                                                                  |
+| **Layer 1 (Tonal BiGRU)**<br>• Forward GRU<br><br><br><br>• Backward GRU   | <br>`layer1_Wih_fwd`<br>`layer1_Whh_fwd`<br>`layer1_bih_fwd`<br>`layer1_bhh_fwd`<br>`layer1_Wih_bwd`<br>`layer1_Whh_bwd`<br>`layer1_bih_bwd`<br>`layer1_bhh_bwd` | <br>$[36 \times 48]$<br>$[36 \times 12]$<br>$[36]$<br>$[36]$<br>$[36 \times 48]$<br>$[36 \times 12]$<br>$[36]$<br>$[36]$       | <br>1,728<br>432<br>36<br>36<br>1,728<br>432<br>36<br>36         | Receives Layer 0 hidden states ($D_{\text{in}}=48$) to resolve individual note spelling ambiguities.<br><br>Produces concatenated output:<br>$H_2 = [h_{\text{fwd}} ; h_{\text{bwd}}] \in \mathbb{R}^{24}$             |
+| **Head 2 (Spelling Head)**                                                 | `head_spelling_W`<br>`head_spelling_b`                                                                                                                           | $[5 \times 24]$<br>$[5]$                                                                                                       | 120<br>5                                                         | Tapped from Layer 1 output ($24$ dims). Classifies note accidental into 5 classes (`𝄫`, `♭`, `♮`, `♯`, `𝄪`)                                                                                                            |
+| **Total**                                                                  | **20 tensors**                                                                                                                                                   |                                                                                                                                | **14,684**                                                       | **~57.4 KiB (raw Float32Array)**                                                                                                                                                                                       |
 
 ---
 
 ### Why the Numbers Look the Way They Do
 
-#### 1. The Fused 3-Gate Structure ($144$ rows)
+#### 1. The Fused 3-Gate Structure ($3 \times H$ rows)
 
 A GRU cell contains 3 internal gates:
 
@@ -142,26 +142,17 @@ A GRU cell contains 3 internal gates:
 Each gate has its own input transformation $W_{x}$ and recurrent transformation
 $W_{h}$. To allow fast, contiguous GEMM matrix multiplication in both CPU and
 WebGPU shaders, all 3 gates are fused into a single parameter matrix with
-$3 \times H = 3 \times 48 = 144$ rows:
+$3 \times H$ rows ($72$ rows for Layer 0 with $H_0 = 24$, and $36$ rows for Layer 1 with $H_1 = 12$).
 
-- Rows $0 \dots 47$: Reset gate
-- Rows $48 \dots 95$: Update gate
-- Rows $96 \dots 143$: Candidate state
+#### 2. Asymmetric Layer Sizing ($H_0 = 24, H_1 = 12$)
 
-#### 2. Why Layer 1 is Bigger than Layer 0 ($42\text{k}$ vs $25.6\text{k}$)
+- **Layer 0** tracks 15-class local harmonic key transitions from the $39$-dimensional input features, using $H_0 = 24$ per direction ($48$ bidirectional).
+- **Layer 1** only needs to resolve the 5-class accidental choice given Layer 0's harmonic context, so it uses a narrower hidden state of $H_1 = 12$ per direction ($24$ bidirectional), reducing Layer 1's parameter count by nearly $10\times$ compared to $H_1 = 48$ ($4,464$ floats vs $42,048$ floats).
 
-- **Layer 0** takes raw feature vectors ($D_{\text{in}} = 39$), so its input
-  matrix $W_{ih}$ is $[144 \times 39] = 5,616$ floats per direction.
-- **Layer 1** takes the concatenated forward and backward states of Layer 0
-  ($48 + 48 = 96$), so its input matrix $W_{ih}$ is $[144 \times 96] = 13,824$
-  floats per direction.
-- The recurrent matrices $W_{hh}$ ($[144 \times 48] = 6,912$) are identical in
-  size for both layers because both layers use hidden dimension $H = 48$.
+#### 3. Output Heads ($15 \times 48$ and $5 \times 24$)
 
-#### 3. Output Heads ($15 \times 96$ and $5 \times 96$)
-
-- The **local key classifier** projects the $96$-dimensional bidirectional hidden state of Layer 0 onto the $15$ standard key coordinates ($C\flat = -7$ up to $C\sharp = +7$), requiring $15 \times 96 = 1,440$ weights and $15$ biases.
-- The **accidental spelling classifier** projects the $96$-dimensional bidirectional hidden state of Layer 1 onto the $5$ accidental classes (`𝄫`, `♭`, `♮`, `♯`, `𝄪`), requiring $5 \times 96 = 480$ weights and $5$ biases.
+- The **local key classifier** projects the $48$-dimensional bidirectional hidden state of Layer 0 onto the $15$ standard key coordinates ($C\flat = -7$ up to $C\sharp = +7$), requiring $15 \times 48 = 720$ weights and $15$ biases.
+- The **accidental spelling classifier** projects the $24$-dimensional bidirectional hidden state of Layer 1 onto the $5$ accidental classes (`𝄫`, `♭`, `♮`, `♯`, `𝄪`), requiring $5 \times 24 = 120$ weights and $5$ biases.
 
 ---
 
@@ -266,11 +257,10 @@ deno run test/test-rnn-pipeline.js
 
 ## 7. Model Footprint
 
-- **Parameter Count**: 22 parameter tensors (input projection, forward/backward
-  GRU gate weights, and 2 classification heads).
-- **Binary Weight Size**: ~292 KB raw `Float32Array` buffer
+- **Parameter Count**: 20 parameter tensors (`14,684` floats across 2 BiGRU layers and 2 classification heads).
+- **Binary Weight Size**: ~57.4 KB raw `Float32Array` buffer
   (`speller-weights.bin`).
-- **ES Module Size**: ~390 KB base64-encoded zero-dependency module
+- **ES Module Size**: ~76.7 KB base64-encoded zero-dependency module
   (`speller-weights.js`).
 - **Dependencies**: Zero external ML libraries (no TensorFlow, ONNX, or PyTorch
   runtimes required).

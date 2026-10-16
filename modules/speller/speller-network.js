@@ -7,7 +7,7 @@ import { decodePredictions, encode } from "./sequence-encoder.js";
  * SpellerNetwork: Musical Pitch Speller & Local Key Tracker
  *
  * Specialized configuration of RecurrentNetwork for Sequence streams:
- * - 2-layer BiGRU (hiddenDim = 48 per direction)
+ * - 2-layer BiGRU (Layer 0 hiddenDim = 24, Layer 1 hiddenDim = 12 per direction)
  * - Input features: 39 dims per note event (12 pitch class + 4 duration + 8 delta + 15 key)
  * - Multi-task Head 1: Local key classification (15 classes [-7..7]) with accidental simplicity prior
  * - Multi-task Head 2: Accidental spelling classification (5 classes [𝄫, ♭, ♮, ♯, 𝄪])
