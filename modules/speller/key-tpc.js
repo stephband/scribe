@@ -20,10 +20,11 @@ export const TPC_OFFSET = 15;  // Index = coordinate + 15
  * Maps Line-of-Fifths coordinate (-15 to +19) to 0-based Softmax class index (0 to 34)
  */
 export function tpcToClass(n) {
-  if (n < -15 || n > 19) {
-    throw new Error(`TPC coordinate ${n} outside valid range [-15, 19]`);
+  const num = typeof n === "number" ? n : toKeyNumber(String(n).replace(/\d+$/, ""));
+  if (num < -15 || num > 19) {
+    throw new Error(`TPC coordinate ${num} outside valid range [-15, 19]`);
   }
-  return n + TPC_OFFSET;
+  return num + TPC_OFFSET;
 }
 
 /**

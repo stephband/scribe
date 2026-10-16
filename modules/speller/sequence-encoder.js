@@ -1,6 +1,6 @@
 import roundPow2 from "sequence/modules/number/round-pow-2.js";
 import { toNoteNumber } from "midi/note.js";
-import { classToTpc, toKeyName, tpcToClass } from "./key-tpc.js";
+import { classToTpc, toKeyName, toKeyNumber, tpcToClass } from "./key-tpc.js";
 
 export { roundPow2 };
 export const FEATURE_DIM = 32;
@@ -60,19 +60,26 @@ export function deltaToBucketIndex(delta) {
  * @returns {Object} { features: Float32Array, noteCount: number, initialKey: number, notes: Array }
  */
 export function encode(events, options = {}) {
-    let initialKey = options.initialKey ?? 0; // Default to C (0)
+    let initialKey = options.initialKey !== undefined
+        ? (typeof options.initialKey === "number" ? options.initialKey : toKeyNumber(options.initialKey))
+        : null;
     const list = events.events || events;
     const notes = [];
 
     for (const e of list) {
         const type = e.type || e[1];
         if (type === "key" || type === 5) {
-            if (notes.length === 0) {
-                initialKey = e[2];
+            if (initialKey === null) {
+                const keyVal = e[2];
+                initialKey = typeof keyVal === "number" ? keyVal : toKeyNumber(keyVal);
             }
         } else if (type === "note" || type === 2) {
             notes.push(e);
         }
+    }
+
+    if (initialKey === null) {
+        initialKey = 0; // Default to C (0)
     }
 
     const T = notes.length;

@@ -103,7 +103,15 @@
         margin-top: 0.25rem;
     }
 
+    .metric-sub {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-top: 0.25rem;
+        font-weight: 500;
+    }
+
     .metric-success .metric-val { color: var(--accent-success); }
+    .metric-warn .metric-val { color: var(--accent-warn); }
     .metric-highlight .metric-val { color: var(--accent-info); }
 
     /* Tests Layout */
@@ -139,6 +147,13 @@
         color: var(--text-color);
     }
 
+    .test-scores {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
     .badge {
         display: inline-flex;
         align-items: center;
@@ -148,6 +163,12 @@
         border-radius: 9999px;
         background: #e2e8f0;
         color: #334155;
+    }
+
+    .badge-lbl {
+        opacity: 0.7;
+        font-weight: 500;
+        margin-right: 0.25rem;
     }
 
     .badge-success {
@@ -160,6 +181,11 @@
         color: #c2410c;
     }
 
+    .badge-neutral {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
     .scribe .error {
         color: #dc2626 !important;
         fill: #dc2626 !important;
@@ -167,6 +193,7 @@
 
     .scribe .lyric.error {
         font-weight: 700;
+        color: var(--accent-warn) !important;
     }
     </style>
 </head>

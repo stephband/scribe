@@ -1,4 +1,4 @@
-import createScale from './create-scale.js';
+import { createScale } from './create-data.js';
 
 export const chromaticInC = createScale('Chromatic', 'C', 0.25,
     'C4', 'C',

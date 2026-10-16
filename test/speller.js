@@ -1,6 +1,7 @@
-import * as chromatic from '../modules/speller/data/chromatic.js';
-import * as major     from '../modules/speller/data/major.js';
-import * as triads    from '../modules/speller/data/triads.js';
+import * as chromatic from '../data/chromatic.js';
+import * as major     from '../data/major.js';
+import * as triads    from '../data/triads.js';
+import * as tetrads   from '../data/tetrads.js';
 
 import SpellerNetwork from '../modules/speller/speller-network.js';
 import weights from '../modules/speller/speller-weights.js';
@@ -9,7 +10,7 @@ import { renderElements, renderStyle, renderDOM } from '../modules/render.js';
 import truncate from '../modules/number/truncate.js';
 
 const assign = Object.assign;
-const tests  = assign({}, chromatic, major, triads);
+const tests  = assign({}, chromatic, major, triads, tetrads);
 
 function renderNotation(sequence, clef = 'treble', keyName = 'C', meter = [0, 'meter', 4, 1]) {
     const container = document.createElement('div');
@@ -39,7 +40,8 @@ export function runSpellerTests(testSource = tests, containerId = 'tests-contain
     const sequences = Object.values(testSource);
 
     let totalNotes = 0;
-    let totalMatches = 0;
+    let totalSpellingMatches = 0;
+    let totalKeyMatches = 0;
 
     sequences.forEach((seq, index) => {
         const notes = seq.events.filter(e => e.type === 'note');
@@ -52,7 +54,8 @@ export function runSpellerTests(testSource = tests, containerId = 'tests-contain
         const keyName = toKeyName(keyEvent ? keyEvent[2] : 0);
         const predictions = speller.predictSequence(seq);
 
-        let matches = 0;
+        let spellingMatches = 0;
+        let keyMatches = 0;
         const diffs = [];
 
         notes.forEach((note, i) => {
@@ -69,9 +72,10 @@ export function runSpellerTests(testSource = tests, containerId = 'tests-contain
             const spellingMatch = !expectedSpelling || expectedSpelling === pred.spelling;
             const keyMatch = !expectedKey || expectedKey === pred.keyName;
 
-            if (spellingMatch && keyMatch) {
-                matches++;
-            } else {
+            if (spellingMatch) spellingMatches++;
+            if (keyMatch) keyMatches++;
+
+            if (!spellingMatch || !keyMatch) {
                 diffs.push({
                     note,
                     pred,
@@ -84,13 +88,16 @@ export function runSpellerTests(testSource = tests, containerId = 'tests-contain
         });
 
         totalNotes += notes.length;
-        totalMatches += matches;
+        totalSpellingMatches += spellingMatches;
+        totalKeyMatches += keyMatches;
 
-        const accuracyPct = ((matches / notes.length) * 100).toFixed(0);
-        const isPerfect = matches === notes.length;
+        const isSpellingPerfect = spellingMatches === notes.length;
+        const isKeyPerfect = keyMatches === notes.length;
+        const spellingPct = ((spellingMatches / notes.length) * 100).toFixed(0);
+        const keyPct = ((keyMatches / notes.length) * 100).toFixed(0);
 
         const header = document.createElement('header');
-        header.className = `test-header ${isPerfect ? 'perfect' : 'has-diffs'}`;
+        header.className = `test-header ${isSpellingPerfect ? 'perfect' : 'has-diffs'}`;
         header.id = `test-${index + 1}`;
         header.innerHTML = `
             <div class="test-title">
@@ -98,8 +105,13 @@ export function runSpellerTests(testSource = tests, containerId = 'tests-contain
                 <span class="test-key badge">Key: ${keyName}</span>
                 <span class="test-count badge">${notes.length} notes</span>
             </div>
-            <div class="test-score badge ${isPerfect ? 'badge-success' : 'badge-warn'}">
-                ${matches}/${notes.length} (${accuracyPct}%)
+            <div class="test-scores">
+                <span class="badge ${isSpellingPerfect ? 'badge-success' : 'badge-warn'}" title="Spelling accuracy">
+                    <span class="badge-lbl">Spelling:</span>${spellingMatches}/${notes.length} (${spellingPct}%)
+                </span>
+                <span class="badge ${isKeyPerfect ? 'badge-success' : 'badge-neutral'}" title="Key prediction accuracy">
+                    <span class="badge-lbl">Key:</span>${keyMatches}/${notes.length} (${keyPct}%)
+                </span>
             </div>
         `;
         container.appendChild(header);
@@ -107,19 +119,19 @@ export function runSpellerTests(testSource = tests, containerId = 'tests-contain
         // Render the sequence
         const stave = renderNotation(seq, 'treble', keyName);
 
-        // Style discrepancy symbols with the error class
+        // Style discrepancy symbols
         diffs.forEach(({ note, pred, spellingMatch, keyMatch, expectedSpelling, expectedKey }) => {
             const beat = truncate(4, note[0]);
             const beatSelector = note[0] === 0 ? '[data-beat="0"]' : `[data-beat^="${beat}"]`;
 
-            // Give rendered note/accidental symbols the error class
-            stave.querySelectorAll(`${beatSelector}[data-pitch="${pred.spelling}"]`)
-                .forEach(el => {
-                    el.classList.add('error');
-                    el.title = !spellingMatch
-                        ? `Expected: ${expectedSpelling}, Predicted: ${pred.spelling}`
-                        : `Expected key: ${expectedKey}, Predicted key: ${pred.keyName}`;
-                });
+            // Give rendered note/accidental symbols the error class ONLY when spelling differed
+            if (!spellingMatch) {
+                stave.querySelectorAll(`${beatSelector}[data-pitch="${pred.spelling}"]`)
+                    .forEach(el => {
+                        el.classList.add('error');
+                        el.title = `Expected: ${expectedSpelling}, Predicted: ${pred.spelling}`;
+                    });
+            }
 
             // If key differed, give the local key text symbol the error class
             if (!keyMatch) {
@@ -135,7 +147,8 @@ export function runSpellerTests(testSource = tests, containerId = 'tests-contain
     });
 
     if (summaryEl) {
-        const overallPct = totalNotes ? ((totalMatches / totalNotes) * 100).toFixed(1) : '100.0';
+        const overallSpellingPct = totalNotes ? ((totalSpellingMatches / totalNotes) * 100).toFixed(1) : '100.0';
+        const overallKeyPct = totalNotes ? ((totalKeyMatches / totalNotes) * 100).toFixed(1) : '100.0';
         summaryEl.innerHTML = `
             <div class="summary-metric">
                 <span class="metric-val">${sequences.length}</span>
@@ -145,13 +158,15 @@ export function runSpellerTests(testSource = tests, containerId = 'tests-contain
                 <span class="metric-val">${totalNotes}</span>
                 <span class="metric-lbl">Total Notes</span>
             </div>
-            <div class="summary-metric">
-                <span class="metric-val">${totalMatches}</span>
-                <span class="metric-lbl">Matches</span>
+            <div class="summary-metric ${totalSpellingMatches === totalNotes ? 'metric-success' : 'metric-highlight'}">
+                <span class="metric-val">${overallSpellingPct}%</span>
+                <span class="metric-lbl">Spelling Accuracy</span>
+                <span class="metric-sub">${totalSpellingMatches} / ${totalNotes} notes</span>
             </div>
-            <div class="summary-metric ${totalMatches === totalNotes ? 'metric-success' : 'metric-highlight'}">
-                <span class="metric-val">${overallPct}%</span>
-                <span class="metric-lbl">Overall Accuracy</span>
+            <div class="summary-metric ${totalKeyMatches === totalNotes ? 'metric-success' : ''}">
+                <span class="metric-val">${overallKeyPct}%</span>
+                <span class="metric-lbl">Key Accuracy</span>
+                <span class="metric-sub">${totalKeyMatches} / ${totalNotes} notes</span>
             </div>
         `;
     }
