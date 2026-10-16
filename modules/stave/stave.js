@@ -199,8 +199,7 @@ export default class Stave {
     Gets spelling of a given pitch. Returns a pitch name string.
     **/
     getSpelling(pitch, key = 0, withOctave = false) {
-        const k = typeof key === 'number' ? key : toKeyNumber(key || 0);
-        const keyData = keys[k] || keys[0];
+        const keyData = keys[key];
 
         if (!withOctave) {
             if (typeof pitch === 'string') {

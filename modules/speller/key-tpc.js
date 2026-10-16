@@ -62,6 +62,52 @@ export function classToKey(idx) {
   return idx - KEY_OFFSET;
 }
 
+export const NUM_ACCIDENTALS = 5; // -2 (𝄫), -1 (♭), 0 (♮), +1 (♯), +2 (𝄪)
+export const ACC_OFFSET = 2;      // Index = accOffset + 2 in [0..4]
+
+/**
+ * Maps Line-of-Fifths TPC coordinate (-15 to +19) to 0-based accidental class index (0 to 4)
+ * representing [𝄫, ♭, ♮, ♯, 𝄪]
+ */
+export function tpcToAccClass(n) {
+  const num = typeof n === "number" ? n : toKeyNumber(String(n).replace(/\d+$/, ""));
+  if (num < -15 || num > 19) {
+    throw new Error(`TPC coordinate ${num} outside valid range [-15, 19]`);
+  }
+  const accOffset = Math.floor((num + 1) / 7); // -2..+2
+  return accOffset + ACC_OFFSET;
+}
+
+/**
+ * Maps 0-based accidental class index (0 to 4) and MIDI note / pitch class
+ * back to the exact Line-of-Fifths TPC coordinate (-15 to +19).
+ * If the predicted accidental bucket does not contain a spelling for the given
+ * pitch class, snaps to the nearest valid accidental bucket for that pitch class.
+ */
+export function accClassToTpc(accClass, midi) {
+  if (accClass < 0 || accClass >= NUM_ACCIDENTALS) {
+    throw new Error(`Accidental class index ${accClass} outside valid range [0, ${NUM_ACCIDENTALS - 1}]`);
+  }
+  const midiNum = typeof midi === "string" ? toNoteNumber(midi) : midi;
+  const pc = ((midiNum % 12) + 12) % 12;
+
+  let bestTpc = 0;
+  let bestDist = Infinity;
+
+  for (let tpc = -15; tpc <= 19; tpc++) {
+    if ((((tpc * 7) % 12) + 12) % 12 === pc) {
+      const candidateAccClass = Math.floor((tpc + 1) / 7) + ACC_OFFSET;
+      const dist = Math.abs(candidateAccClass - accClass);
+      if (dist < bestDist || (dist === bestDist && Math.abs(tpc) < Math.abs(bestTpc))) {
+        bestDist = dist;
+        bestTpc = tpc;
+      }
+    }
+  }
+
+  return bestTpc;
+}
+
 /**
  * Calculates MIDI pitch class (0 to 11, where C = 0) from Line-of-Fifths coordinate
  */

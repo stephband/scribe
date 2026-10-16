@@ -45,6 +45,7 @@ export default class SpellerRNN extends RNN {
         const decoded = decodePredictions(
             outputs.spelling.preds,
             outputs.key.preds,
+            encoded.notes,
         );
 
         return decoded.map((d, i) => {

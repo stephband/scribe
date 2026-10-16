@@ -8,9 +8,9 @@ import { decodePredictions, encode } from "./sequence-encoder.js";
  *
  * Specialized configuration of RecurrentNetwork for Sequence streams:
  * - 2-layer BiGRU (hiddenDim = 48 per direction)
- * - Input features: 47 dims per note event (including 15-class one-hot current key signature)
+ * - Input features: 39 dims per note event (12 pitch class + 4 duration + 8 delta + 15 key)
  * - Multi-task Head 1: Local key classification (15 classes [-7..7]) with accidental simplicity prior
- * - Multi-task Head 2: Tonal pitch-class (TPC) spelling classification (35 classes [-15..19])
+ * - Multi-task Head 2: Accidental spelling classification (5 classes [𝄫, ♭, ♮, ♯, 𝄪])
  */
 export default class SpellerNetwork extends RecurrentNetwork {
     static from(weights) {
@@ -109,6 +109,7 @@ export default class SpellerNetwork extends RecurrentNetwork {
         const decoded = decodePredictions(
             forwardOut.predSpelling,
             forwardOut.predKey,
+            encoded.notes,
         );
 
         return decoded.map((d, i) => {
