@@ -1,4 +1,5 @@
 import roundPow2 from "sequence/modules/number/round-pow-2.js";
+import { toNoteNumber } from "midi/note.js";
 import { classToTpc, toKeyName, tpcToClass } from "./key-tpc.js";
 
 export { roundPow2 };
@@ -60,15 +61,16 @@ export function deltaToBucketIndex(delta) {
  */
 export function encode(events, options = {}) {
     let initialKey = options.initialKey ?? 0; // Default to C (0)
+    const list = events.events || events;
     const notes = [];
 
-    for (const e of events) {
-        const type = e[1];
-        if (type === "key") {
+    for (const e of list) {
+        const type = e.type || e[1];
+        if (type === "key" || type === 5) {
             if (notes.length === 0) {
                 initialKey = e[2];
             }
-        } else if (type === "note" || e.type === "note") {
+        } else if (type === "note" || type === 2) {
             notes.push(e);
         }
     }
@@ -85,7 +87,7 @@ export function encode(events, options = {}) {
     for (let t = 0; t < T; t++) {
         const note = notes[t];
         const beat = Number(note[0]);
-        const midi = Number(note[2]);
+        const midi = typeof note[2] === "number" ? note[2] : toNoteNumber(note[2]);
         const duration = Number(note[4]);
 
         const pitchClass = ((midi % 12) + 12) % 12;

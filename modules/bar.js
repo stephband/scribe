@@ -136,7 +136,8 @@ function pushEventToPart(stave, key, parts, event) {
         stave.getPart(event[2]) ;
 
     // Does stave support note pitch?
-    const pitch = stave.getSpelling(event[2], key, true);
+    // [BRANCH 2026-spelling]: Use event.spelling if explicitly defined
+    const pitch = stave.getSpelling(event.spelling || event[2], key, true);
     const row   = stave.getRow(part, pitch);
     // If not don't render it
     if (row === undefined) return;
@@ -353,8 +354,8 @@ export default function createBars(sequence, stave, settings = config) {
     // but we do need to know how much duration to render so get it from the
     // last event: TODO: check all events, the last may not be the longest
     if (!duration) {
-        duration = scribeEvents.length ?
-            toStopBeat(scribeEvents[scribeEvents.length - 1]) :
+        duration = events.length ?
+            toStopBeat(events[events.length - 1]) :
             1 ;
     }
 

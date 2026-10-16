@@ -211,6 +211,19 @@ export default class Stave {
         let n, a, o;
 
         if (typeof pitch === 'string') {
+            // [BRANCH 2026-spelling]: If pitch is already an explicit note string (e.g. "C#4", "Db4", "C4"),
+            // preserve its spelling rather than deconstructing to MIDI and re-spelling via keyData.spellings.
+            // Normalize ASCII '#' -> '♯' and 'b' -> '♭'.
+            const match = rpitch.exec(pitch);
+            if (match) {
+                const [, letter, accidental, octave] = match;
+                if (octave !== undefined) {
+                    const acc = accidental === '#' ? '♯' : accidental === 'b' ? '♭' : (accidental || '');
+                    return letter + acc + octave;
+                }
+            }
+
+            /* --- ORIGINAL CODE START (preserved for easy rollback) ---
             let [notename, letter, accidental, octave] = rpitch.exec(pitch) || [pitch];
             if (octave) {
                 // pitch is note name like "C4", deconstruct it and put it back together
@@ -218,6 +231,7 @@ export default class Stave {
                 a = keyData.spellings[mod12(n)];
                 o = toNoteOctave(n - a);
             }
+            --- ORIGINAL CODE END --- */
         }
         else {
             // pitch is a number

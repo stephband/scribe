@@ -20,8 +20,8 @@ export function createNotes(stave, key, part, notes, cutoffBeat, beat, duration)
         const index      = event.scribeIndex;
         const keyWeights = keyWeightsForEvent(events, index, key);
         const keyNumber  = chooseKeyFromWeights(keyWeights);
-        // These things have already been found in bar.js, do we need to do it again?
-        const pitch      = stave.getSpelling(event[2], keyNumber, true);
+        // [BRANCH 2026-spelling]: Use event.spelling or event.event.spelling if explicitly defined
+        const pitch      = stave.getSpelling(event.spelling || event.event?.spelling || event[2], keyNumber, true);
         const row        = stave.getRow(part, pitch);
 
         // Create symbols with pitch, row

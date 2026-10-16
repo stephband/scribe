@@ -4,6 +4,7 @@ import {
   toKeyName,
   toKeyNumber,
 } from 'sequence/modules/event/key.js';
+import { toNoteNumber } from 'midi/note.js';
 
 export {
   KEYNUMBERS,
@@ -64,4 +65,22 @@ export function isDiatonicInKey(tpc, k) {
  */
 export function getAccidentalCount(n) {
   return Math.abs(n);
+}
+
+const letters = ["F", "C", "G", "D", "A", "E", "B"];
+const basePcs = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+const accChars = { "-2": "𝄫", "-1": "♭", "0": "", "1": "♯", "2": "𝄪" };
+
+/**
+ * Maps MIDI note number (or pitch string) and Line-of-Fifths TPC (-15..19)
+ * to a spelled pitch string with Unicode accidentals (e.g. "C4", "C♯4", "D♭4")
+ */
+export function tpcToSpelledPitch(midi, tpc) {
+  const midiNum = typeof midi === "string" ? toNoteNumber(midi) : midi;
+  const letter = letters[((tpc + 1) % 7 + 7) % 7];
+  const accOffset = Math.floor((tpc + 1) / 7);
+  const basePc = basePcs[letter];
+  const octave = Math.round((midiNum - basePc - accOffset) / 12) - 1;
+  const acc = accChars[accOffset] ?? "";
+  return letter + acc + octave;
 }

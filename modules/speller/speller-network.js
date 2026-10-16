@@ -1,6 +1,6 @@
 import { RecurrentNetwork } from "neuron/modules/rnn/network-cpu.js";
 import schema from "./schema.js";
-import { keyToClass } from "./key-tpc.js";
+import { keyToClass, tpcToSpelledPitch } from "./key-tpc.js";
 import { decodePredictions, encode } from "./sequence-encoder.js";
 
 /**
@@ -114,10 +114,14 @@ export default class SpellerNetwork extends RecurrentNetwork {
             forwardOut.predKey,
         );
 
-        return decoded.map((d, i) => ({
-            note: encoded.notes[i],
-            ...d,
-        }));
+        return decoded.map((d, i) => {
+            const note = encoded.notes[i];
+            return {
+                note,
+                ...d,
+                spelling: tpcToSpelledPitch(note[2], d.tpc),
+            };
+        });
     }
 }
 

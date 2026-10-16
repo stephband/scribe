@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Scribe — Speller RNN Visualizer</title>
+
+    <meta charset="utf-8" />
+    <meta name="author" content="@stephband" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <script title="load">
+        document.documentElement.className += ' js loading';
+        window.addEventListener('load', () => window.requestAnimationFrame(() => document.documentElement.classList.remove('loading')));
+        window.DEBUG = true;
+    </script>
+
+    <script type="importmap">{
+        "imports": {
+            "bolt/":     "/bolt/",
+            "dom/":      "/dom/modules/",
+            "fn/":       "/fn/modules/",
+            "midi/":     "/midi/modules/",
+            "sequence/": "/sequence/",
+            "neuron/":   "/neuron/"
+        }
+    }</script>
+
+    <link rel="stylesheet" href="../module.css" />
+
+    <style>
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/elements/html.css';
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/atoms.css';
+    @import '../fonts/jazz.css';
+    @import '../fonts/bravura.css';
+
+    :root {
+        --bg-color: #f7f9fa;
+        --card-bg: #ffffff;
+        --border-color: #e2e8f0;
+        --text-color: #1e293b;
+        --text-muted: #64748b;
+        --accent-success: #16a34a;
+        --accent-warn: #ea580c;
+        --accent-info: #2563eb;
+    }
+
+    body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 2rem 1.5rem 5rem 1.5rem;
+    }
+
+    .page-header {
+        margin: 0 0 2rem 0;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .page-desc {
+        color: var(--text-muted);
+        font-size: 1rem;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    /* Summary Bar */
+    .summary-bar {
+        margin: 0 0 2rem 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+        gap: 1rem;
+    }
+
+    .summary-metric {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        padding: 1rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .metric-val {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-color);
+    }
+
+    .metric-lbl {
+        font-size: 0.825rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 0.25rem;
+    }
+
+    .metric-success .metric-val { color: var(--accent-success); }
+    .metric-highlight .metric-val { color: var(--accent-info); }
+
+    /* Tests Layout */
+    .tests-grid {
+        margin: 0;
+        padding: 0;
+    }
+
+    .test-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 2rem 0 0.5rem 0;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--border-color);
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .test-header:first-child {
+        margin-top: 0;
+    }
+
+    .test-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .test-name {
+        font-size: 1.15rem;
+        color: var(--text-color);
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.2rem 0.6rem;
+        border-radius: 9999px;
+        background: #e2e8f0;
+        color: #334155;
+    }
+
+    .badge-success {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .badge-warn {
+        background: #ffedd5;
+        color: #c2410c;
+    }
+
+    .scribe .error {
+        color: #dc2626 !important;
+        fill: #dc2626 !important;
+    }
+
+    .scribe .lyric.error {
+        font-weight: 700;
+    }
+    </style>
+</head>
+<body>
+    <header class="page-header">
+        <h1 class="page-title">Scribe — Speller RNN Visualizer</h1>
+        <p class="page-desc">
+            Visualising note spelling predictions from the <code>neuron</code> BiGRU Speller network against corpus ground truth sequences and Scribe baseline heuristics.
+        </p>
+    </header>
+
+    <section id="summary-container" class="summary-bar">
+        <!-- Rendered by speller.js -->
+    </section>
+
+    <main id="tests-container" class="tests-grid">
+        <!-- Test cards populated by speller.js -->
+    </main>
+
+    <script type="module" src="./speller.js"></script>
+</body>
+</html>

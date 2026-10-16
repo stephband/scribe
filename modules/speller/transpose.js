@@ -1,3 +1,5 @@
+import { toNoteNumber } from "midi/note.js";
+
 /**
  * Transposes a sequence and its target annotations along the Line of Fifths
  *
@@ -45,7 +47,7 @@ export default function transpose(noteEvents, targets, deltaK, initialKey = 0) {
         const e = noteEvents[t];
         const beat = e[0];
         const type = e[1];
-        const oldMidi = e[2];
+        const oldMidi = typeof e[2] === "number" ? e[2] : toNoteNumber(e[2]);
         const gain = e[3];
         const duration = e[4];
 

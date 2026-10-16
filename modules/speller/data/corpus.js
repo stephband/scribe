@@ -1,19 +1,50 @@
+import { Sequence } from "sequence/module.js";
+import Event from "sequence/modules/event.js";
+import { toKeyName } from "sequence/modules/event/key.js";
+import { toNoteNumber } from "midi/note.js";
 import transpose from "../transpose.js";
 import { encode, encodeTargets } from "../sequence-encoder.js";
-import { tpcToMidiPitchClass } from "../key-tpc.js";
+import { tpcToMidiPitchClass, tpcToSpelledPitch } from "../key-tpc.js";
+
+export { tpcToSpelledPitch };
 
 /**
  * Generates an annotated note event and target tuple
- * Note event: [beat, 'note', midi, gain, duration]
+ * Note event: NoteEvent instance with explicit [2] string and .spelling
  * Target: { tpc, key }
  */
 function makeNote(beat, tpc, octave = 4, duration = 1.0, key = 0, gain = 0.8) {
     const pc = tpcToMidiPitchClass(tpc);
     const midi = (octave + 1) * 12 + pc;
+    const pitch = tpcToSpelledPitch(midi, tpc);
+    const note = Event.note(beat, pitch, gain, duration);
+    note[2] = pitch;
+    note.spelling = pitch;
     return {
-        event: [beat, "note", midi, gain, duration],
+        event: note,
         target: { tpc, key },
     };
+}
+
+/**
+ * Builds a Sequence instance with initial key, meter, and target annotations
+ */
+function makeSequence(name, initialKey, notes, targets) {
+    const keyName = toKeyName(initialKey);
+    const events = [
+        Event.key(0, keyName),
+        Event.meter(0, 4, 1),
+        ...notes
+    ];
+    const seq = new Sequence(events);
+    seq.events.forEach((e) => {
+        if (e.spelling) e[2] = e.spelling;
+    });
+    seq.name = name;
+    seq.initialKey = initialKey;
+    seq.targets = targets;
+    seq.notes = seq.events.filter((e) => e.type === "note" || e[1] === 2);
+    return seq;
 }
 
 /**
@@ -35,12 +66,7 @@ export function createBaseProgressions() {
             targets.push(n.target);
             b += 0.5;
         }
-        progressions.push({
-            initialKey: 0,
-            notes,
-            targets,
-            name: "major_scale",
-        });
+        progressions.push(makeSequence("major_scale", 0, notes, targets));
     }
 
     // --- 2. Cadences: I - IV - V7 - I (C major, key = 0) ---
@@ -61,12 +87,7 @@ export function createBaseProgressions() {
                 targets.push(n.target);
             }
         }
-        progressions.push({
-            initialKey: 0,
-            notes,
-            targets,
-            name: "cadence_I_IV_V_I",
-        });
+        progressions.push(makeSequence("cadence_I_IV_V_I", 0, notes, targets));
     }
 
     // --- 3. Secondary Dominants: V/V -> V (D7 -> G in C major) ---
@@ -87,12 +108,7 @@ export function createBaseProgressions() {
                 targets.push(n.target);
             }
         }
-        progressions.push({
-            initialKey: 0,
-            notes,
-            targets,
-            name: "secondary_dominant_V_of_V",
-        });
+        progressions.push(makeSequence("secondary_dominant_V_of_V", 0, notes, targets));
     }
 
     // --- 4. Secondary Dominants: V/ii -> ii (A7 -> Dm in C major) ---
@@ -114,12 +130,7 @@ export function createBaseProgressions() {
                 targets.push(n.target);
             }
         }
-        progressions.push({
-            initialKey: 0,
-            notes,
-            targets,
-            name: "secondary_dominant_V_of_ii",
-        });
+        progressions.push(makeSequence("secondary_dominant_V_of_ii", 0, notes, targets));
     }
 
     // --- 5. Harmonic & Melodic Minor: A minor (key = 0) with G# and F# ---
@@ -148,12 +159,7 @@ export function createBaseProgressions() {
             notes.push(n.event);
             targets.push(n.target);
         }
-        progressions.push({
-            initialKey: 0,
-            notes,
-            targets,
-            name: "a_minor_harmonic_melodic",
-        });
+        progressions.push(makeSequence("a_minor_harmonic_melodic", 0, notes, targets));
     }
 
     // --- 6. Chromatic Passing Notes: Ascending Sharps ---
@@ -183,12 +189,7 @@ export function createBaseProgressions() {
             targets.push(n.target);
             b += 0.5;
         }
-        progressions.push({
-            initialKey: 0,
-            notes,
-            targets,
-            name: "chromatic_ascending_sharps",
-        });
+        progressions.push(makeSequence("chromatic_ascending_sharps", 0, notes, targets));
     }
 
     // --- 7. Chromatic Passing Notes: Descending Flats ---
@@ -218,12 +219,7 @@ export function createBaseProgressions() {
             targets.push(n.target);
             b += 0.5;
         }
-        progressions.push({
-            initialKey: 0,
-            notes,
-            targets,
-            name: "chromatic_descending_flats",
-        });
+        progressions.push(makeSequence("chromatic_descending_flats", 0, notes, targets));
     }
 
     // --- 8. Chromatic Neighbor Tones (Lower chromatic neighbors = #) ---
@@ -244,12 +240,7 @@ export function createBaseProgressions() {
             notes.push(n.event);
             targets.push(n.target);
         }
-        progressions.push({
-            initialKey: 0,
-            notes,
-            targets,
-            name: "chromatic_lower_neighbors",
-        });
+        progressions.push(makeSequence("chromatic_lower_neighbors", 0, notes, targets));
     }
 
     // --- 9. Modal Mixture / Minor Subdominant (iv in major) ---
@@ -270,12 +261,7 @@ export function createBaseProgressions() {
                 targets.push(n.target);
             }
         }
-        progressions.push({
-            initialKey: 0,
-            notes,
-            targets,
-            name: "modal_mixture_minor_iv",
-        });
+        progressions.push(makeSequence("modal_mixture_minor_iv", 0, notes, targets));
     }
 
     // --- 10. Melodic Chromatic Passing: Ascending Sharps and Descending Flats ---
@@ -297,12 +283,7 @@ export function createBaseProgressions() {
             notes.push(n.event);
             targets.push(n.target);
         }
-        progressions.push({
-            initialKey: 0,
-            notes,
-            targets,
-            name: "melodic_chromatic_passing",
-        });
+        progressions.push(makeSequence("melodic_chromatic_passing", 0, notes, targets));
     }
 
     return progressions;
