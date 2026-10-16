@@ -1,7 +1,7 @@
 import RNN from "neuron/modules/rnn.js";
 import { initWebGPU } from "neuron/modules/gpu/context.js";
 import schema from "./schema.js";
-import { keyToClass } from "./key-tpc.js";
+import { tpcToSpelledPitch } from "./key-tpc.js";
 import { decodePredictions, encode } from "./sequence-encoder.js";
 
 /**
@@ -38,20 +38,22 @@ export default class SpellerRNN extends RNN {
      */
     async predictSequence(events, options = {}) {
         const encoded = encode(events, options);
-        const c_init = keyToClass(encoded.initialKey);
         const outputs = await this.predict(
             encoded.features,
             encoded.noteCount,
-            { condition: c_init },
         );
         const decoded = decodePredictions(
             outputs.spelling.preds,
             outputs.key.preds,
         );
 
-        return decoded.map((d, i) => ({
-            note: encoded.notes[i],
-            ...d,
-        }));
+        return decoded.map((d, i) => {
+            const note = encoded.notes[i];
+            return {
+                note,
+                ...d,
+                spelling: tpcToSpelledPitch(note[2], d.tpc),
+            };
+        });
     }
 }

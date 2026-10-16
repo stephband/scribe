@@ -12,10 +12,9 @@ import { createLedges }      from '../symbol/ledge.js';
 import { createNotes }       from '../symbol/note.js';
 import { getDivisionBefore } from '../bar/divisions.js';
 import { accidentalsFromKey } from '../accidentals.js';
-import { keyToNumbers }      from '../keys.js';
-import { rrootname, rpitch, rflatsharp, byFatherCharlesPitch, accidentalChars } from '../pitch.js';
+import { toKeyNumber }       from 'sequence/modules/event/key.js';
+import { rrootname, rpitch, rflatsharp, byFatherCharlesPitch, accidentalChars, fathercharles } from '../pitch.js';
 import config                from '../config.js';
-import { major }             from '../scale.js';
 import * as glyphs           from "../glyphs.js";
 
 
@@ -200,7 +199,8 @@ export default class Stave {
     Gets spelling of a given pitch. Returns a pitch name string.
     **/
     getSpelling(pitch, key = 0, withOctave = false) {
-        const keyData = keys[key];
+        const k = typeof key === 'number' ? key : toKeyNumber(key || 0);
+        const keyData = keys[k] || keys[0];
 
         if (!withOctave) {
             if (typeof pitch === 'string') {
@@ -270,17 +270,40 @@ export default class Stave {
     }
 
     createKeySymbols(event) {
-        const numbers = keyToNumbers(event[2]);
-        return Array.from(numbers, (n, i) => (n - major[i] && {
-            type:  'acci',
-            //beat:  event.beat,
-            pitch: toRootName(major[i]) + accidentalChars[n - major[i]],
-            value: n - major[i],
-            part:  this.parts[0],
-            event
-        }))
-        .filter((o) => !!o)
-        .sort(byFatherCharlesPitch);
+        const key = event && event[2] !== undefined ? event[2] : event;
+        const k   = typeof key === 'number' ? key : toKeyNumber(key || 0);
+
+        if (k > 0) {
+            const count = Math.min(k, 7);
+            const symbols = [];
+            for (let i = 0; i < count; i++) {
+                symbols.push({
+                    type:  'acci',
+                    pitch: fathercharles[i],
+                    value: 1,
+                    part:  this.parts[0],
+                    event
+                });
+            }
+            return symbols;
+        }
+
+        if (k < 0) {
+            const count = Math.min(-k, 7);
+            const symbols = [];
+            for (let i = 0; i < count; i++) {
+                symbols.push({
+                    type:  'acci',
+                    pitch: fathercharles[7 + i],
+                    value: -1,
+                    part:  this.parts[0],
+                    event
+                });
+            }
+            return symbols;
+        }
+
+        return [];
     }
 
     createSignatureSymbols(keyEvent) {

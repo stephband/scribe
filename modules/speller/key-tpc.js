@@ -13,11 +13,15 @@ export {
   toKeyNumber,
 };
 
-export const NUM_CLASSES = 35; // -15 (F𝄫) to +19 (B𝄪) inclusive
+export const NUM_TPCS = 35;    // -15 (F𝄫) to +19 (B𝄪) inclusive
 export const TPC_OFFSET = 15;  // Index = coordinate + 15
+export const NUM_CLASSES = NUM_TPCS;
+
+export const NUM_KEYS = 15;    // -7 (C♭) to +7 (C♯) inclusive
+export const KEY_OFFSET = 7;   // Index = key + 7
 
 /**
- * Maps Line-of-Fifths coordinate (-15 to +19) to 0-based Softmax class index (0 to 34)
+ * Maps Line-of-Fifths TPC coordinate (-15 to +19) to 0-based Softmax class index (0 to 34)
  */
 export function tpcToClass(n) {
   const num = typeof n === "number" ? n : toKeyNumber(String(n).replace(/\d+$/, ""));
@@ -28,17 +32,35 @@ export function tpcToClass(n) {
 }
 
 /**
- * Maps 0-based Softmax class index (0 to 34) back to Line-of-Fifths coordinate (-15 to +19)
+ * Maps 0-based Softmax class index (0 to 34) back to Line-of-Fifths TPC coordinate (-15 to +19)
  */
 export function classToTpc(idx) {
-  if (idx < 0 || idx >= NUM_CLASSES) {
-    throw new Error(`Class index ${idx} outside valid range [0, ${NUM_CLASSES - 1}]`);
+  if (idx < 0 || idx >= NUM_TPCS) {
+    throw new Error(`TPC class index ${idx} outside valid range [0, ${NUM_TPCS - 1}]`);
   }
   return idx - TPC_OFFSET;
 }
 
-export const keyToClass = tpcToClass;
-export const classToKey = classToTpc;
+/**
+ * Maps Key signature coordinate (-7 to +7) to 0-based class index (0 to 14)
+ */
+export function keyToClass(n) {
+  const num = typeof n === "number" ? n : toKeyNumber(String(n).replace(/\d+$/, ""));
+  if (num < -7 || num > 7) {
+    throw new Error(`Key coordinate ${num} outside valid range [-7, 7]`);
+  }
+  return num + KEY_OFFSET;
+}
+
+/**
+ * Maps 0-based class index (0 to 14) back to Key signature coordinate (-7 to +7)
+ */
+export function classToKey(idx) {
+  if (idx < 0 || idx >= NUM_KEYS) {
+    throw new Error(`Key class index ${idx} outside valid range [0, ${NUM_KEYS - 1}]`);
+  }
+  return idx - KEY_OFFSET;
+}
 
 /**
  * Calculates MIDI pitch class (0 to 11, where C = 0) from Line-of-Fifths coordinate

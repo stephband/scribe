@@ -46,10 +46,10 @@ Notes and key signatures are modeled along the continuous **Line of Fifths**
 ... D♭♭(-14) — A♭♭(-13) — E♭♭(-12) — B♭♭(-11) — F♭(-8) — C♭(-7) — G♭(-6) — D♭(-5) — A♭(-4) — E♭(-3) — B♭(-2) — F(-1) — C(0) — G(1) — D(2) — A(3) — E(4) — B(5) — F♯(6) — C♯(7) — G♯(8) — D♯(9) — A♯(10) — E♯(11) — B♯(12) — F𝄪(13) — C𝄪(14) ...
 ```
 
-The model classifies both note spellings and local keys across **35 continuous
-coordinates** ($-15$ to $+19$, covering $F\flat\flat$ to $B\sharp\sharp$):
+The model classifies note spellings across **35 continuous coordinates** ($-15$ to $+19$, covering $F\flat\flat$ to $B\sharp\sharp$) and local keys across **15 standard key signatures** ($-7$ to $+7$, covering $C\flat$ to $C\sharp$):
 
-$$\text{Class Index} = \text{TPC} + 15 \in [0, 34]$$
+$$\text{TPC Class Index} = \text{TPC} + 15 \in [0, 34]$$
+$$\text{Key Class Index} = \text{Key} + 7 \in [0, 14]$$
 
 ### Key Mathematical Invariants
 
@@ -70,7 +70,7 @@ The model uses a **Two-Layer Hierarchical Bidirectional GRU (BiGRU)** with
 multi-task prediction heads:
 
 ```
-Inputs per note: [Pitch Class (12), Duration One-Hot (8), Delta Beat (1)] (t = 1 ... T)
+Inputs per note: [Pitch Class (12), Duration (8), Delta Beat (12), Key (15)] (t = 1 ... T)
                                  │
                                  ▼
 ┌────────────────────────────────────────────────────────────────┐
@@ -79,7 +79,7 @@ Inputs per note: [Pitch Class (12), Duration One-Hot (8), Delta Beat (1)] (t = 1
                                 │
 ┌───────────────────────────────▼────────────────────────────────┐
 │ Layer 1: Bidirectional GRU (Hidden Local Key Context)          │
-│ • Forward GRU (t = 0 → T-1, h_0 initialized with Initial Key)  │
+│ • Forward GRU (t = 0 → T-1)                                    │
 │ • Backward GRU (t = T-1 → 0)                                   │
 │ Output: H1_t = [h_fwd_t ; h_bwd_t]                            │
 └───────────────┬────────────────────────────────┬───────────────┘
@@ -88,7 +88,7 @@ Inputs per note: [Pitch Class (12), Duration One-Hot (8), Delta Beat (1)] (t = 1
 ┌───────────────────────────────┐   ┌────────────────────────────┐
 │ Multi-Task Head 1:            │   │ Layer 2: BiGRU             │
 │ Local Key Classifier          │   │ (Tonal Pitch-Class Layer)  │
-│ (35 classes: F𝄫=-15 to B𝄪=+19)│   │ Output: H2_t               │
+│ (15 classes: C♭=-7 to C♯=+7)  │   │ Output: H2_t               │
 └───────────────────────────────┘   └────────────┬───────────────┘
                                                  │
                                                  ▼
@@ -101,20 +101,19 @@ Inputs per note: [Pitch Class (12), Duration One-Hot (8), Delta Beat (1)] (t = 1
 
 ### Architectural Details
 
-1. **Input Encoding ($32$ features)**:
+1. **Input Encoding ($47$ features)**:
    - Pitch class: 12-dimensional one-hot vector.
    - Duration: 8-bucket one-hot encoding scaled by powers of 2 ($1/16$ to $8$
      beats).
-   - Timing: Normalized inter-onset delta beats $\Delta\text{beat}$.
-2. **Initial Key Priming**: The first layer's forward hidden state $h_0$ is
-   initialized from a projection of the sequence's initial key signature.
-3. **Layer 1 (Key Tracker)**: A BiGRU ($H = 48$) aggregates harmonic context
+   - Timing: 12-bucket one-hot inter-onset delta beats $\Delta\text{beat}$.
+   - Current Key Signature: 15-dimensional one-hot vector ($C\flat = -7$ to $C\sharp = +7$), tracking key signature changes across the sequence.
+2. **Layer 1 (Key Tracker)**: A BiGRU ($H = 48$) aggregates harmonic context
    across the timeline. Multi-Task Head 1 projects layer 1 activations to the
-   local key distribution.
-4. **Layer 2 (Spelling Classifier)**: Receives layer 1 hidden states and refines
+   15-class local key distribution.
+3. **Layer 2 (Spelling Classifier)**: Receives layer 1 hidden states and refines
    representations for individual note spelling. Multi-Task Head 2 projects
-   layer 2 activations to note TPC classes.
-5. **Loss Function**:
+   layer 2 activations to the 35 note TPC classes.
+4. **Loss Function**:
    $$\mathcal{L} = \mathcal{L}_{\text{spelling}} + \lambda_{\text{key}} \mathcal{L}_{\text{key}}$$
    with $\lambda_{\text{key}} = 0.3$.
 
@@ -122,12 +121,11 @@ Inputs per note: [Pitch Class (12), Duration One-Hot (8), Delta Beat (1)] (t = 1
 
 | Component                                                                  | Tensor Name                                                                                                                                                      | Dimensions                                                                                                                       | Float Count                                                        | Purpose                                                                                                                                                                                                                |
 | :------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Initial Key Priming**                                                    | `priming_W`<br>`priming_b`                                                                                                                                       | $[48 \times 35]$<br>$[48]$                                                                                                       | 1,680<br>48                                                        | Projects 1-hot initial key signature ($35$ classes) into initial forward hidden state $h_0$ ($H=48$)                                                                                                                   |
-| **Layer 0 (Context BiGRU)**<br>• Forward GRU<br><br><br><br>• Backward GRU | <br>`layer0_Wih_fwd`<br>`layer0_Whh_fwd`<br>`layer0_bih_fwd`<br>`layer0_bhh_fwd`<br>`layer0_Wih_bwd`<br>`layer0_Whh_bwd`<br>`layer0_bih_bwd`<br>`layer0_bhh_bwd` | <br>$[144 \times 32]$<br>$[144 \times 48]$<br>$[144]$<br>$[144]$<br>$[144 \times 32]$<br>$[144 \times 48]$<br>$[144]$<br>$[144]$ | <br>4,608<br>6,912<br>144<br>144<br>4,608<br>6,912<br>144<br>144   | Processes raw note features ($D_{\text{in}}=32$) across sequence time steps to aggregate broad harmonic context.<br><br>Produces concatenated output:<br>$H_1 = [h_{\text{fwd}} ; h_{\text{bwd}}] \in \mathbb{R}^{96}$ |
-| **Head 1 (Local Key Head)**                                                | `head_key_W`<br>`head_key_b`                                                                                                                                     | $[35 \times 96]$<br>$[35]$                                                                                                       | 3,360<br>35                                                        | Tapped directly from Layer 0 output ($96$ dims). Classifies local key into 35 Line-of-Fifths coordinates                                                                                                               |
+| **Layer 0 (Context BiGRU)**<br>• Forward GRU<br><br><br><br>• Backward GRU | <br>`layer0_Wih_fwd`<br>`layer0_Whh_fwd`<br>`layer0_bih_fwd`<br>`layer0_bhh_fwd`<br>`layer0_Wih_bwd`<br>`layer0_Whh_bwd`<br>`layer0_bih_bwd`<br>`layer0_bhh_bwd` | <br>$[144 \times 47]$<br>$[144 \times 48]$<br>$[144]$<br>$[144]$<br>$[144 \times 47]$<br>$[144 \times 48]$<br>$[144]$<br>$[144]$ | <br>6,768<br>6,912<br>144<br>144<br>6,768<br>6,912<br>144<br>144   | Processes raw note features ($D_{\text{in}}=47$) across sequence time steps to aggregate broad harmonic context.<br><br>Produces concatenated output:<br>$H_1 = [h_{\text{fwd}} ; h_{\text{bwd}}] \in \mathbb{R}^{96}$ |
+| **Head 1 (Local Key Head)**                                                | `head_key_W`<br>`head_key_b`                                                                                                                                     | $[15 \times 96]$<br>$[15]$                                                                                                       | 1,440<br>15                                                        | Tapped directly from Layer 0 output ($96$ dims). Classifies local key into 15 standard key coordinates ($-7$ to $+7$)                                                                                                  |
 | **Layer 1 (Tonal BiGRU)**<br>• Forward GRU<br><br><br><br>• Backward GRU   | <br>`layer1_Wih_fwd`<br>`layer1_Whh_fwd`<br>`layer1_bih_fwd`<br>`layer1_bhh_fwd`<br>`layer1_Wih_bwd`<br>`layer1_Whh_bwd`<br>`layer1_bih_bwd`<br>`layer1_bhh_bwd` | <br>$[144 \times 96]$<br>$[144 \times 48]$<br>$[144]$<br>$[144]$<br>$[144 \times 96]$<br>$[144 \times 48]$<br>$[144]$<br>$[144]$ | <br>13,824<br>6,912<br>144<br>144<br>13,824<br>6,912<br>144<br>144 | Receives Layer 0 hidden states ($D_{\text{in}}=96$) to resolve individual note spelling ambiguities.<br><br>Produces concatenated output:<br>$H_2 = [h_{\text{fwd}} ; h_{\text{bwd}}] \in \mathbb{R}^{96}$             |
-| **Head 2 (Spelling Head)**                                                 | `head_spelling_W`<br>`head_spelling_b`                                                                                                                           | $[35 \times 96]$<br>$[35]$                                                                                                       | 3,360<br>35                                                        | Tapped from Layer 1 output ($96$ dims). Classifies note spelling into 35 TPC classes                                                                                                                                   |
-| **Total**                                                                  | **22 tensors**                                                                                                                                                   |                                                                                                                                  | **74,182**                                                         | **~289.8 KiB (raw Float32Array)**                                                                                                                                                                                      |
+| **Head 2 (Spelling Head)**                                                 | `head_spelling_W`<br>`head_spelling_b`                                                                                                                           | $[35 \times 96]$<br>$[35]$                                                                                                       | 3,360<br>35                                                        | Tapped from Layer 1 output ($96$ dims). Classifies note spelling into 35 TPC classes ($-15$ to $+19$)                                                                                                                  |
+| **Total**                                                                  | **20 tensors**                                                                                                                                                   |                                                                                                                                  | **74,834**                                                         | **~292.3 KiB (raw Float32Array)**                                                                                                                                                                                      |
 
 ---
 
@@ -150,23 +148,20 @@ $3 \times H = 3 \times 48 = 144$ rows:
 - Rows $48 \dots 95$: Update gate
 - Rows $96 \dots 143$: Candidate state
 
-#### 2. Why Layer 1 is Bigger than Layer 0 ($42\text{k}$ vs $23.6\text{k}$)
+#### 2. Why Layer 1 is Bigger than Layer 0 ($42\text{k}$ vs $27.9\text{k}$)
 
-- **Layer 0** takes raw feature vectors ($D_{\text{in}} = 32$), so its input
-  matrix $W_{ih}$ is $[144 \times 32] = 4,608$ floats per direction.
+- **Layer 0** takes raw feature vectors ($D_{\text{in}} = 47$), so its input
+  matrix $W_{ih}$ is $[144 \times 47] = 6,768$ floats per direction.
 - **Layer 1** takes the concatenated forward and backward states of Layer 0
   ($48 + 48 = 96$), so its input matrix $W_{ih}$ is $[144 \times 96] = 13,824$
-  floats per direction (exactly $3\times$ larger).
+  floats per direction.
 - The recurrent matrices $W_{hh}$ ($[144 \times 48] = 6,912$) are identical in
   size for both layers because both layers use hidden dimension $H = 48$.
 
-#### 3. Output Heads ($35 \times 96$)
+#### 3. Output Heads ($15 \times 96$ and $35 \times 96$)
 
-Both the local key classifier and note spelling classifier project the
-$96$-dimensional bidirectional hidden states
-($48 \text{ forward} + 48 \text{ backward}$) onto the $35$ Line-of-Fifths
-coordinates ($F\flat\flat = -15$ up to $B\sharp\sharp = +19$), requiring
-$35 \times 96 = 3,360$ weights and $35$ biases each.
+- The **local key classifier** projects the $96$-dimensional bidirectional hidden state of Layer 0 onto the $15$ standard key coordinates ($C\flat = -7$ up to $C\sharp = +7$), requiring $15 \times 96 = 1,440$ weights and $15$ biases.
+- The **note spelling classifier** projects the $96$-dimensional bidirectional hidden state of Layer 1 onto the $35$ Line-of-Fifths TPC coordinates ($F\flat\flat = -15$ up to $B\sharp\sharp = +19$), requiring $35 \times 96 = 3,360$ weights and $35$ biases.
 
 ---
 

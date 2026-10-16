@@ -1,6 +1,6 @@
 import { RecurrentNetwork } from "neuron/modules/rnn/network-cpu.js";
 import schema from "./schema.js";
-import { keyToClass, tpcToSpelledPitch } from "./key-tpc.js";
+import { tpcToSpelledPitch } from "./key-tpc.js";
 import { decodePredictions, encode } from "./sequence-encoder.js";
 
 /**
@@ -8,9 +8,9 @@ import { decodePredictions, encode } from "./sequence-encoder.js";
  *
  * Specialized configuration of RecurrentNetwork for Sequence streams:
  * - 2-layer BiGRU (hiddenDim = 48 per direction)
- * - Priming state: conditioned on initial key signature along the Line of Fifths (35 classes)
- * - Multi-task Head 1: Local key classification with accidental simplicity prior
- * - Multi-task Head 2: Tonal pitch-class (TPC) spelling classification
+ * - Input features: 47 dims per note event (including 15-class one-hot current key signature)
+ * - Multi-task Head 1: Local key classification (15 classes [-7..7]) with accidental simplicity prior
+ * - Multi-task Head 2: Tonal pitch-class (TPC) spelling classification (35 classes [-15..19])
  */
 export default class SpellerNetwork extends RecurrentNetwork {
     static from(weights) {
@@ -26,11 +26,9 @@ export default class SpellerNetwork extends RecurrentNetwork {
      *
      * @param {Float32Array} X - Input features [T x inDim]
      * @param {number} T - Sequence length
-     * @param {number} initialKey - Line-of-Fifths coordinate (-15 to 19)
      */
-    forward(X, T, initialKey = 0) {
-        const c_init = keyToClass(initialKey);
-        const results = super.forward(X, T, { condition: c_init });
+    forward(X, T) {
+        const results = super.forward(X, T);
 
         return {
             probSpelling: results.spelling.probs,
@@ -80,9 +78,9 @@ export default class SpellerNetwork extends RecurrentNetwork {
     /**
      * Complete training step: forward, compute loss, backward, clip gradients, Adam update
      */
-    trainStep(X, T, initialKey, targets, lr = 0.005) {
+    trainStep(X, T, _condition, targets, lr = 0.005) {
         this.zeroGrad();
-        const forwardResults = this.forward(X, T, initialKey);
+        const forwardResults = this.forward(X, T);
         const lossResults = this.computeLoss(targets);
         this.backward(targets);
         const gradNorm = this.clipGradients(5.0);
@@ -107,7 +105,6 @@ export default class SpellerNetwork extends RecurrentNetwork {
         const forwardOut = this.forward(
             encoded.features,
             encoded.noteCount,
-            encoded.initialKey,
         );
         const decoded = decodePredictions(
             forwardOut.predSpelling,

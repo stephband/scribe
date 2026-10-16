@@ -17,7 +17,7 @@ export const accidentalChars = {
     '2':  '𝄪'
 };
 
-const fathercharles = [
+export const fathercharles = [
     // Father Charles Goes Down And Ends Battle,
     'F♯', 'C♯', 'G♯', 'D♯', 'A♯', 'E♯', 'B♯',
     // Battle Ends And Down Goes Charles Father

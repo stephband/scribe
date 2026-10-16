@@ -1,9 +1,7 @@
 
 import * as glyphs from "../glyphs.js";
 import { toNoteName, toRootNumber, toRootName } from 'midi/note.js';
-import { keyToNumbers } from '../keys.js';
 import { rflatsharp, byFatherCharlesPitch, accidentalChars } from '../pitch.js';
-import { major } from '../scale.js';
 import Stave       from './stave.js';
 
 

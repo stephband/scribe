@@ -58,7 +58,7 @@ let totalNotes = 0;
 for (const s of dataset) totalNotes += s.noteCount;
 console.log(`   ✓ Total training dataset size: ${totalNotes} note events.`);
 
-// 2. Initialize SpellerNetwork (Hierarchical BiGRU: 32 -> 2x48 -> 35 classes)
+// 2. Initialize SpellerNetwork (Hierarchical BiGRU: 47 -> 2x48 -> 15 keys / 35 TPCs)
 console.log(
     "\n2. Initializing SpellerNetwork...",
 );

@@ -20,9 +20,9 @@ export default function transpose(noteEvents, targets, deltaK, initialKey = 0) {
         semitoneShift -= 12;
     }
 
-    // 2. Check bounds across all target TPCs
+    // 2. Check bounds across initialKey (-7..7), target keys (-7..7), and target TPCs (-15..19)
     const newInitialKey = initialKey + deltaK;
-    if (newInitialKey < -15 || newInitialKey > 19) return null;
+    if (newInitialKey < -7 || newInitialKey > 7) return null;
 
     const newTargets = [];
     for (let t = 0; t < targets.length; t++) {
@@ -33,8 +33,8 @@ export default function transpose(noteEvents, targets, deltaK, initialKey = 0) {
         const newTpc = oldTpc + deltaK;
         const newKey = oldKey + deltaK;
 
-        // Validate bounds in 35-class range [-15, 19]
-        if (newTpc < -15 || newTpc > 19 || newKey < -15 || newKey > 19) {
+        // Validate TPC in 35-class range [-15, 19] and key in 15-class range [-7, 7]
+        if (newTpc < -15 || newTpc > 19 || newKey < -7 || newKey > 7) {
             return null;
         }
 

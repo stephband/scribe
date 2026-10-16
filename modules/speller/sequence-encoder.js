@@ -1,9 +1,9 @@
 import roundPow2 from "sequence/modules/number/round-pow-2.js";
 import { toNoteNumber } from "midi/note.js";
-import { classToTpc, toKeyName, toKeyNumber, tpcToClass } from "./key-tpc.js";
+import { classToKey, classToTpc, keyToClass, NUM_KEYS, toKeyName, toKeyNumber, tpcToClass } from "./key-tpc.js";
 
 export { roundPow2 };
-export const FEATURE_DIM = 32;
+export const FEATURE_DIM = 32 + NUM_KEYS; // 47
 
 /**
  * Maps arbitrary continuous duration in beats to an 8-bucket index [0..7]:
@@ -49,10 +49,11 @@ export function deltaToBucketIndex(delta) {
 
 /**
  * Encodes a sequence of events into numeric feature matrices for the BiGRU network:
- * - D_in = 32 dimensions:
+ * - D_in = 47 dimensions:
  *   - [0..11]:  One-hot Pitch Class (12)
  *   - [12..19]: One-hot Duration Buckets (8)
  *   - [20..31]: One-hot Inter-Onset Delta Timing (12)
+ *   - [32..46]: One-hot Current Key Signature (15, C♭=-7 to C♯=+7)
  * - Meter-agnostic & Octave-invariant.
  *
  * @param {Array} events - Array of Sequence events
@@ -63,18 +64,23 @@ export function encode(events, options = {}) {
     let initialKey = options.initialKey !== undefined
         ? (typeof options.initialKey === "number" ? options.initialKey : toKeyNumber(options.initialKey))
         : null;
+    let currentKey = initialKey ?? 0;
+
     const list = events.events || events;
     const notes = [];
+    const noteKeys = [];
 
     for (const e of list) {
         const type = e.type || e[1];
         if (type === "key" || type === 5) {
+            const keyVal = e[2];
+            currentKey = typeof keyVal === "number" ? keyVal : toKeyNumber(keyVal);
             if (initialKey === null) {
-                const keyVal = e[2];
-                initialKey = typeof keyVal === "number" ? keyVal : toKeyNumber(keyVal);
+                initialKey = currentKey;
             }
         } else if (type === "note" || type === 2) {
             notes.push(e);
+            noteKeys.push(currentKey);
         }
     }
 
@@ -112,6 +118,10 @@ export function encode(events, options = {}) {
         const deltaBucket = deltaToBucketIndex(delta);
         features[offset + 20 + deltaBucket] = 1.0;
 
+        // 4. One-hot 15-class current key signature: features 32..46
+        const keyClass = keyToClass(noteKeys[t]);
+        features[offset + 32 + keyClass] = 1.0;
+
         prevBeat = beat;
     }
 
@@ -140,7 +150,7 @@ export function encodeTargets(annotatedNotes) {
         const key = item.key !== undefined ? item.key : item[1];
 
         targetSpelling[t] = tpcToClass(tpc);
-        targetKey[t] = tpcToClass(key);
+        targetKey[t] = keyToClass(key);
     }
 
     return { targetSpelling, targetKey };
@@ -150,7 +160,7 @@ export function encodeTargets(annotatedNotes) {
  * Decodes model prediction class indices [T] back to note names and TPC coordinates
  *
  * @param {Uint32Array|Array} predSpellingClasses - Predicted spelling class indices [0..34]
- * @param {Uint32Array|Array} [predKeyClasses=null] - Predicted key class indices [0..34]
+ * @param {Uint32Array|Array} [predKeyClasses=null] - Predicted key class indices [0..14]
  * @returns {Array} Array of { tpc, key, name, keyName }
  */
 export function decodePredictions(predSpellingClasses, predKeyClasses = null) {
@@ -159,7 +169,7 @@ export function decodePredictions(predSpellingClasses, predKeyClasses = null) {
 
     for (let t = 0; t < T; t++) {
         const tpc = classToTpc(predSpellingClasses[t]);
-        const key = predKeyClasses ? classToTpc(predKeyClasses[t]) : null;
+        const key = predKeyClasses ? classToKey(predKeyClasses[t]) : null;
 
         results.push({
             tpc,
