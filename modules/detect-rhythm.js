@@ -24,11 +24,10 @@ each a nameable musical principle rather than a magic exponent:
 
 
 
-import { floorPow2, ceilPow2 } from './number/power-of-2.js';
+import { floorPow2 } from './number/power-of-2.js';
 
 
 const DEBUG  = globalThis.DEBUG;
-const assign = Object.assign;
 const { cos, sin, round, PI } = Math;
 const primes = [2, 3, 5, 7, 9];
 

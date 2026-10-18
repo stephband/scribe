@@ -111,7 +111,7 @@ function updateBeamWithNoteSymbols(symbols, bar, stave, part, beam, noteSymbols)
     return beam;
 }
 
-function createTies(symbols, bar, part, state, notes, noteSymbols) {
+function createTies(symbols, bar, part, state, notes, noteSymbols, tolerance = 0.125) {
     // No notes to tie
     if (!state.n) return;
 
@@ -121,7 +121,7 @@ function createTies(symbols, bar, part, state, notes, noteSymbols) {
         const b4 = toStopBeat(event) - bar.beat;
 
         // If there is less than a 32nd of this note left splice it out
-        if (beat + duration > b4 - 0.125) {
+        if (beat + duration > b4 - tolerance) {
             const i = notes.indexOf(event);
             notes.splice(i, 1);
             --state.n;
@@ -242,7 +242,7 @@ export default function createPartSymbols(bar, stave, accidentals, name, notes, 
                     const noteSymbols = stave.createNoteSymbols(symbols, bar, part, accidentals, notes, state.beatConsumed, state.beat - startBeat, division, settings);
                     // Reduce n by the number of notes that were spliced out
                     state.n -= length - notes.length;
-                    createTies(symbols, bar, part, state, notes, noteSymbols);
+                    createTies(symbols, bar, part, state, notes, noteSymbols, 0.5 * division);
                     // If division is short enough for a beam
                     if (division < 0.5) {
                         // ...make sure there is a beam
@@ -292,7 +292,7 @@ export default function createPartSymbols(bar, stave, accidentals, name, notes, 
                     const noteSymbols = stave.createDupletNoteSymbols(symbols, bar, part, accidentals, notes, state.beat, state.beatConsumed, divisionBeat, settings);
                     state.n -= length - notes.length;
                     const duration    = noteSymbols[0].duration;
-                    createTies(symbols, bar, part, state, notes, noteSymbols);
+                    createTies(symbols, bar, part, state, notes, noteSymbols, 0.5 * division);
                     // Close, open or extend beam based on note symbols and bar divisions
                     state.beam = updateBeamWithNoteSymbols(symbols, bar, stave, part, state.beam, noteSymbols);
                     state.beat += duration;

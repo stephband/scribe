@@ -25,7 +25,7 @@ export default class SpellerRNN extends RNN {
         return new SpellerRNN(device, weights);
     }
 
-    constructor(device, weights) {
+    constructor(device, weights = null) {
         super(device, schema, weights);
     }
 

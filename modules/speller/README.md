@@ -110,9 +110,9 @@ Inputs per note: [Pitch Class (12), Duration (4), Delta Beat (8), Key (15)] (t =
 2. **Layer 1 (Key Tracker)**: A BiGRU ($H_0 = 24$) aggregates harmonic context
    across the timeline. Multi-Task Head 1 projects layer 1 activations ($48$ dims) to the
    15-class local key distribution.
-3. **Layer 2 (Spelling Classifier)**: A smaller BiGRU ($H_1 = 12$) receives layer 1 hidden states and refines
+3. **Layer 2 (Spelling Classifier)**: A smaller BiGRU ($H_1 = 8$) receives layer 1 hidden states and refines
    representations for individual note spelling. Multi-Task Head 2 projects
-   layer 2 activations ($24$ dims) to the 5 accidental classes (`𝄫`, `♭`, `♮`, `♯`, `𝄪`), which combine with the note's MIDI pitch class to resolve the exact TPC in $[-15, +19]$.
+   layer 2 activations ($16$ dims) to the 5 accidental classes (`𝄫`, `♭`, `♮`, `♯`, `𝄪`), which combine with the note's MIDI pitch class to resolve the exact TPC in $[-15, +19]$.
 4. **Loss Function**:
    $$\mathcal{L} = \mathcal{L}_{\text{spelling}} + \lambda_{\text{key}} \mathcal{L}_{\text{key}}$$
    with $\lambda_{\text{key}} = 0.3$.
@@ -123,9 +123,9 @@ Inputs per note: [Pitch Class (12), Duration (4), Delta Beat (8), Key (15)] (t =
 | :------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Layer 0 (Context BiGRU)**<br>• Forward GRU<br><br><br><br>• Backward GRU | <br>`layer0_Wih_fwd`<br>`layer0_Whh_fwd`<br>`layer0_bih_fwd`<br>`layer0_bhh_fwd`<br>`layer0_Wih_bwd`<br>`layer0_Whh_bwd`<br>`layer0_bih_bwd`<br>`layer0_bhh_bwd` | <br>$[72 \times 39]$<br>$[72 \times 24]$<br>$[72]$<br>$[72]$<br>$[72 \times 39]$<br>$[72 \times 24]$<br>$[72]$<br>$[72]$       | <br>2,808<br>1,728<br>72<br>72<br>2,808<br>1,728<br>72<br>72     | Processes raw note features ($D_{\text{in}}=39$) across sequence time steps to aggregate broad harmonic context.<br><br>Produces concatenated output:<br>$H_1 = [h_{\text{fwd}} ; h_{\text{bwd}}] \in \mathbb{R}^{48}$ |
 | **Head 1 (Local Key Head)**                                                | `head_key_W`<br>`head_key_b`                                                                                                                                     | $[15 \times 48]$<br>$[15]$                                                                                                     | 720<br>15                                                        | Tapped directly from Layer 0 output ($48$ dims). Classifies local key into 15 standard key coordinates ($-7$ to $+7$)                                                                                                  |
-| **Layer 1 (Tonal BiGRU)**<br>• Forward GRU<br><br><br><br>• Backward GRU   | <br>`layer1_Wih_fwd`<br>`layer1_Whh_fwd`<br>`layer1_bih_fwd`<br>`layer1_bhh_fwd`<br>`layer1_Wih_bwd`<br>`layer1_Whh_bwd`<br>`layer1_bih_bwd`<br>`layer1_bhh_bwd` | <br>$[36 \times 48]$<br>$[36 \times 12]$<br>$[36]$<br>$[36]$<br>$[36 \times 48]$<br>$[36 \times 12]$<br>$[36]$<br>$[36]$       | <br>1,728<br>432<br>36<br>36<br>1,728<br>432<br>36<br>36         | Receives Layer 0 hidden states ($D_{\text{in}}=48$) to resolve individual note spelling ambiguities.<br><br>Produces concatenated output:<br>$H_2 = [h_{\text{fwd}} ; h_{\text{bwd}}] \in \mathbb{R}^{24}$             |
-| **Head 2 (Spelling Head)**                                                 | `head_spelling_W`<br>`head_spelling_b`                                                                                                                           | $[5 \times 24]$<br>$[5]$                                                                                                       | 120<br>5                                                         | Tapped from Layer 1 output ($24$ dims). Classifies note accidental into 5 classes (`𝄫`, `♭`, `♮`, `♯`, `𝄪`)                                                                                                            |
-| **Total**                                                                  | **20 tensors**                                                                                                                                                   |                                                                                                                                | **14,684**                                                       | **~57.4 KiB (raw Float32Array)**                                                                                                                                                                                       |
+| **Layer 1 (Tonal BiGRU)**<br>• Forward GRU<br><br><br><br>• Backward GRU   | <br>`layer1_Wih_fwd`<br>`layer1_Whh_fwd`<br>`layer1_bih_fwd`<br>`layer1_bhh_fwd`<br>`layer1_Wih_bwd`<br>`layer1_Whh_bwd`<br>`layer1_bih_bwd`<br>`layer1_bhh_bwd` | <br>$[24 \times 48]$<br>$[24 \times 8]$<br>$[24]$<br>$[24]$<br>$[24 \times 48]$<br>$[24 \times 8]$<br>$[24]$<br>$[24]$         | <br>1,152<br>192<br>24<br>24<br>1,152<br>192<br>24<br>24         | Receives Layer 0 hidden states ($D_{\text{in}}=48$) to resolve individual note spelling ambiguities.<br><br>Produces concatenated output:<br>$H_2 = [h_{\text{fwd}} ; h_{\text{bwd}}] \in \mathbb{R}^{16}$             |
+| **Head 2 (Spelling Head)**                                                 | `head_spelling_W`<br>`head_spelling_b`                                                                                                                           | $[5 \times 16]$<br>$[5]$                                                                                                       | 80<br>5                                                          | Tapped from Layer 1 output ($16$ dims). Classifies note accidental into 5 classes (`𝄫`, `♭`, `♮`, `♯`, `𝄪`)                                                                                                            |
+| **Total**                                                                  | **20 tensors**                                                                                                                                                   |                                                                                                                                | **12,964**                                                       | **~50.6 KiB (`Float32`) / ~12.7 KiB (`Int8`)**                                                                                                                                                                         |
 
 ---
 
@@ -142,17 +142,17 @@ A GRU cell contains 3 internal gates:
 Each gate has its own input transformation $W_{x}$ and recurrent transformation
 $W_{h}$. To allow fast, contiguous GEMM matrix multiplication in both CPU and
 WebGPU shaders, all 3 gates are fused into a single parameter matrix with
-$3 \times H$ rows ($72$ rows for Layer 0 with $H_0 = 24$, and $36$ rows for Layer 1 with $H_1 = 12$).
+$3 \times H$ rows ($72$ rows for Layer 0 with $H_0 = 24$, and $24$ rows for Layer 1 with $H_1 = 8$).
 
-#### 2. Asymmetric Layer Sizing ($H_0 = 24, H_1 = 12$)
+#### 2. Asymmetric Layer Sizing ($H_0 = 24, H_1 = 8$)
 
 - **Layer 0** tracks 15-class local harmonic key transitions from the $39$-dimensional input features, using $H_0 = 24$ per direction ($48$ bidirectional).
-- **Layer 1** only needs to resolve the 5-class accidental choice given Layer 0's harmonic context, so it uses a narrower hidden state of $H_1 = 12$ per direction ($24$ bidirectional), reducing Layer 1's parameter count by nearly $10\times$ compared to $H_1 = 48$ ($4,464$ floats vs $42,048$ floats).
+- **Layer 1** only needs to resolve the 5-class accidental choice given Layer 0's harmonic context, so it uses a narrower hidden state of $H_1 = 8$ per direction ($16$ bidirectional), reducing Layer 1's parameter count by $15\times$ compared to $H_1 = 48$ ($2,784$ floats vs $42,048$ floats).
 
-#### 3. Output Heads ($15 \times 48$ and $5 \times 24$)
+#### 3. Output Heads ($15 \times 48$ and $5 \times 16$)
 
 - The **local key classifier** projects the $48$-dimensional bidirectional hidden state of Layer 0 onto the $15$ standard key coordinates ($C\flat = -7$ up to $C\sharp = +7$), requiring $15 \times 48 = 720$ weights and $15$ biases.
-- The **accidental spelling classifier** projects the $24$-dimensional bidirectional hidden state of Layer 1 onto the $5$ accidental classes (`𝄫`, `♭`, `♮`, `♯`, `𝄪`), requiring $5 \times 24 = 120$ weights and $5$ biases.
+- The **accidental spelling classifier** projects the $16$-dimensional bidirectional hidden state of Layer 1 onto the $5$ accidental classes (`𝄫`, `♭`, `♮`, `♯`, `𝄪`), requiring $5 \times 16 = 80$ weights and $5$ biases.
 
 ---
 
@@ -160,17 +160,15 @@ $3 \times H$ rows ($72$ rows for Layer 0 with $H_0 = 24$, and $36$ rows for Laye
 
 ```
 speller/
-├── transpose.js             # Line-of-Fifths transposition augmentation
-├── data/
-│   └── corpus.js            # Curated musical progressions and training corpus
-├── speller-rnn.js           # WebGPU-accelerated pitch speller inference
-├── schema.js                # Recurrent neural network architecture definition
-├── key-tpc.js               # Coordinate math, Line of Fifths conversions & constants
-├── sequence-encoder.js      # Encodes Sequence note events to tensors & decodes output
-├── speller-network.js       # CPU SpellerNetwork class (BPTT, training & inference)
-├── speller-weights.bin      # Pre-trained weights in raw binary format (Float32Array)
-├── speller-weights.js       # Pre-trained weights bundled as a self-contained ES module
-└── train.js                 # Training pipeline and weight serialization script
+├── speller-rnn.js               # WebGPU-accelerated pitch speller inference
+├── schema.js                    # Recurrent neural network architecture definition
+├── key-tpc.js                   # Coordinate math, Line of Fifths conversions & constants
+├── sequence-encoder.js          # Encodes Sequence note events to tensors & decodes output
+├── speller-network.js           # CPU SpellerNetwork class (BPTT, training & inference)
+├── speller-weights-32b.bin      # Pre-trained weights in raw Float32 binary format (~50.6 KB)
+├── speller-weights-8b.bin       # Pre-trained weights in quantized Int8 binary format (~12.7 KB)
+├── speller-weights-8b.js        # Pre-trained Int8 weights bundled as a self-contained ES module (~17.1 KB)
+└── train.js                     # Training pipeline and weight serialization script
 ```
 
 ---
@@ -181,13 +179,11 @@ speller/
 
 ```javascript
 import { SpellerNetwork } from "./speller/speller-network.js";
-import deserializeWeights from "./modules/deserialize.js";
 
-// Load pre-trained weights from binary or ES module
-const weightBuffer = await Deno.readFile("./speller/speller-weights.bin");
+// Load pre-trained weights from binary (-8b.bin or -32b.bin) or ES module
+const weightBuffer = await Deno.readFile("./speller/speller-weights-8b.bin");
 
-const speller = new SpellerNetwork();
-speller.loadWeights(deserializeWeights(weightBuffer));
+const speller = SpellerNetwork.from(weightBuffer);
 
 // Input: Sequence note event array
 const events = [
@@ -214,7 +210,7 @@ console.log(results);
 import SpellerRNN from "./speller/speller-rnn.js";
 
 // Initializes WebGPU, validates byte length, and loads weights in one step:
-const weightBuffer = await Deno.readFile("./speller/speller-weights.bin");
+const weightBuffer = await Deno.readFile("./speller/speller-weights-8b.bin");
 const gpuSpeller = await SpellerRNN.from(weightBuffer);
 
 const results = await gpuSpeller.predictSequence(events);
@@ -257,10 +253,12 @@ deno run test/test-rnn-pipeline.js
 
 ## 7. Model Footprint
 
-- **Parameter Count**: 20 parameter tensors (`14,684` floats across 2 BiGRU layers and 2 classification heads).
-- **Binary Weight Size**: ~57.4 KB raw `Float32Array` buffer
-  (`speller-weights.bin`).
-- **ES Module Size**: ~76.7 KB base64-encoded zero-dependency module
-  (`speller-weights.js`).
+- **Parameter Count**: 20 parameter tensors (`12,964` floats across 2 BiGRU layers and 2 classification heads).
+- **Float32 Binary Weight Size**: ~50.6 KB raw `Float32Array` buffer
+  (`speller-weights-32b.bin`).
+- **Int8 Binary Weight Size**: ~12.7 KB quantized `Int8Array` buffer with 4-byte scale header
+  (`speller-weights-8b.bin`).
+- **ES Module Size**: ~17.1 KB base64-encoded zero-dependency module
+  (`speller-weights-8b.js`).
 - **Dependencies**: Zero external ML libraries (no TensorFlow, ONNX, or PyTorch
   runtimes required).

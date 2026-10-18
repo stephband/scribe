@@ -1,21 +1,32 @@
-import * as chromatic from '../data/chromatic.js';
-import * as major     from '../data/major.js';
-import * as triads    from '../data/triads.js';
-import * as tetrads   from '../data/tetrads.js';
+import * as chromatic         from '../data/chromatic.js';
+import * as major             from '../data/major.js';
+import * as melodic           from '../data/melodic.js';
+import * as bebop             from '../data/bebop.js';
+import * as diminished        from '../data/diminished.js';
+import * as triads            from '../data/triads.js';
+import * as tetrads           from '../data/tetrads.js';
+import * as alteredDiminished from '../data/altered-diminished.js';
+import * as giantSteps        from '../data/giant-steps.js';
+import * as bach              from '../data/bach.js';
+import * as major251s         from "../data/major-ii-v-i.js";
+import * as minor251s         from "../data/minor-ii-v-i.js";
+import * as substitutions     from "../data/substitutions.js";
+import * as blues             from "../data/blues.js";
 
 import SpellerNetwork from '../modules/speller/speller-network.js';
-import weights from '../modules/speller/speller-weights.js';
+import weights from '../modules/speller/speller-weights-8b.js';
 import { toKeyName } from 'sequence/modules/event/key.js';
 import { renderElements, renderStyle, renderDOM } from '../modules/render.js';
+import { identify } from '../modules/event.js';
 import truncate from '../modules/number/truncate.js';
 
 const assign = Object.assign;
-const tests  = assign({}, chromatic, major, triads, tetrads);
+const tests  = assign({}, alteredDiminished, substitutions, blues, giantSteps, chromatic, major, melodic, bebop, diminished, triads, tetrads, bach, major251s, minor251s);
 
 function renderNotation(sequence, clef = 'treble', keyName = 'C', meter = [0, 'meter', 4, 1]) {
     const container = document.createElement('div');
     container.className = 'scribe';
-    container.append(...renderElements(sequence, clef, keyName, meter));
+    container.append(...renderElements(sequence, clef, keyName, meter, 0, 0, sequence.options));
     return container;
 }
 
@@ -120,13 +131,23 @@ export function runSpellerTests(testSource = tests, containerId = 'tests-contain
         const stave = renderNotation(seq, 'treble', keyName);
 
         // Style discrepancy symbols
+        const bars = Array.from(stave.querySelectorAll('.bar'));
         diffs.forEach(({ note, pred, spellingMatch, keyMatch, expectedSpelling, expectedKey }) => {
-            const beat = truncate(4, note[0]);
-            const beatSelector = note[0] === 0 ? '[data-beat="0"]' : `[data-beat^="${beat}"]`;
+            const noteBeat = note[0];
+            const barEl = bars.find((b) => {
+                const barBeat = Number(b.dataset.beat);
+                const barDur  = Number(b.dataset.duration);
+                return noteBeat >= barBeat && noteBeat < barBeat + barDur;
+            }) || stave;
+            const barBeat = barEl.dataset?.beat !== undefined ? Number(barEl.dataset.beat) : 0;
+            const beat = truncate(4, noteBeat - barBeat);
+            const beatSelector = `[data-beat="${beat}"]`;
+
+            const eventId = identify(note);
 
             // Give rendered note/accidental symbols the error class ONLY when spelling differed
             if (!spellingMatch) {
-                stave.querySelectorAll(`${beatSelector}[data-pitch="${pred.spelling}"]`)
+                barEl.querySelectorAll(`.note${beatSelector}, .acci${beatSelector}, .note[data-event="${eventId}"], .acci[data-event="${eventId}"]`)
                     .forEach(el => {
                         el.classList.add('error');
                         el.title = `Expected: ${expectedSpelling}, Predicted: ${pred.spelling}`;
@@ -135,7 +156,7 @@ export function runSpellerTests(testSource = tests, containerId = 'tests-contain
 
             // If key differed, give the local key text symbol the error class
             if (!keyMatch) {
-                stave.querySelectorAll(`.lyric${beatSelector}`)
+                barEl.querySelectorAll(`.lyric${beatSelector}`)
                     .forEach(el => {
                         el.classList.add('error');
                         el.title = `Expected key: ${expectedKey}, Predicted key: ${pred.keyName}`;

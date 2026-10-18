@@ -1,15 +1,26 @@
 import { exportAsModule, serializeWeights } from "neuron/modules/serialize.js";
+import { toKeyNumber } from "sequence/modules/event/key.js";
 import { SpellerNetwork } from "./speller-network.js";
 import { encode, encodeTargets } from "./sequence-encoder.js";
-import { toKeyNumber } from "./key-tpc.js";
 
-import * as chromatic from "../../data/chromatic.js";
-import * as major     from "../../data/major.js";
-import * as triads    from "../../data/triads.js";
-import * as tetrads   from "../../data/tetrads.js";
+import * as chromatic  from "../../data/chromatic.js";
+import * as major      from "../../data/major.js";
+import * as melodic    from "../../data/melodic.js";
+import * as bebop      from "../../data/bebop.js";
+import * as diminished from "../../data/diminished.js";
+import * as triads     from "../../data/triads.js";
+import * as tetrads    from "../../data/tetrads.js";
+import * as bach       from "../../data/bach.js";
+import * as alteredDiminished from '../../data/altered-diminished.js';
+import * as giantSteps        from '../../data/giant-steps.js';
+import * as major251s     from "../../data/major-ii-v-i.js";
+import * as minor251s     from "../../data/minor-ii-v-i.js";
+import * as substitutions from "../../data/substitutions.js";
+import * as blues         from "../../data/blues.js";
+
 
 const assign = Object.assign;
-const sequences = assign({}, chromatic, major, triads, tetrads);
+const sequences = assign({}, chromatic, major, melodic, bebop, diminished, triads, tetrads, bach, major251s, minor251s, substitutions, blues, alteredDiminished, giantSteps);
 
 
 console.log("=== Pitch Speller Sequence Training & Weight Serialization ===\n");
@@ -42,9 +53,7 @@ for (const [name, seq] of Object.entries(sequences)) {
 
     dataset.push({
         features: enc.features,
-        noteCount: enc.noteCount,
         length: enc.noteCount,
-        initialKey: initialKey,
         targets: encodeTargets(targets),
         name: seq.name || name,
     });
@@ -55,25 +64,25 @@ console.log(
 );
 
 let totalNotes = 0;
-for (const s of dataset) totalNotes += s.noteCount;
+for (const s of dataset) totalNotes += s.length;
 console.log(`   ✓ Total training dataset size: ${totalNotes} note events.`);
 
-// 2. Initialize SpellerNetwork (Hierarchical BiGRU: 39 -> 24 -> 12 -> 15 keys / 5 accidentals)
+// 2. Initialize SpellerNetwork (Hierarchical BiGRU: 39 -> 24 -> 8 -> 25 keys / 5 accidentals)
 console.log(
     "\n2. Initializing SpellerNetwork...",
 );
 const network = new SpellerNetwork();
 
-// 3. Train the Network (40 Epochs)
-console.log("\n3. Training network using BPTT and Adam optimizer (40 epochs)...");
+// 3. Train the Network (50 Epochs)
+console.log("\n3. Training network using BPTT and Adam optimizer (50 epochs)...");
 const res1 = network.train(dataset, {
-    epochs: 25,
+    epochs: 20,
     lr: 0.008,
     logInterval: 5,
 });
 const res2 = network.train(dataset, {
-    epochs: 15,
-    lr: 0.002,
+    epochs: 30,
+    lr: 0.003,
     logInterval: 5,
 });
 const totalDuration = (res1.duration + res2.duration).toFixed(2);
@@ -124,17 +133,26 @@ console.log(
 
 // 5. Serialize Trained Weights
 console.log("\n5. Serializing Trained Weights...");
-const binaryWeights = serializeWeights(network);
-const binPath = new URL("./speller-weights.bin", import.meta.url);
-await Deno.writeFile(binPath, binaryWeights);
+const binary32 = serializeWeights(network, 32);
+const bin32Path = new URL("./speller-weights-32b.bin", import.meta.url);
+await Deno.writeFile(bin32Path, binary32);
 console.log(
-    `   ✓ Exported binary weights: ${binPath.pathname} (${
-        (binaryWeights.byteLength / 1024).toFixed(1)
+    `   ✓ Exported Float32 binary weights: ${bin32Path.pathname} (${
+        (binary32.byteLength / 1024).toFixed(1)
     } KB)`,
 );
 
-const jsModuleCode = exportAsModule(network, "../modules/deserialize.js");
-const jsPath = new URL("./speller-weights.js", import.meta.url);
+const binary8 = serializeWeights(network, 8);
+const bin8Path = new URL("./speller-weights-8b.bin", import.meta.url);
+await Deno.writeFile(bin8Path, binary8);
+console.log(
+    `   ✓ Exported Int8 binary weights:    ${bin8Path.pathname} (${
+        (binary8.byteLength / 1024).toFixed(1)
+    } KB)`,
+);
+
+const jsModuleCode = exportAsModule(network, 8);
+const jsPath = new URL("./speller-weights-8b.js", import.meta.url);
 await Deno.writeTextFile(jsPath, jsModuleCode);
 console.log(
     `   ✓ Exported self-contained ES module: ${jsPath.pathname} (${

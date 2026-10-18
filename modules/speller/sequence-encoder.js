@@ -1,9 +1,9 @@
 import floorPow2 from "sequence/modules/number/floor-pow-2.js";
+import { toKeyName, toKeyNumber } from "sequence/modules/event/key.js";
 import { toNoteNumber } from "midi/note.js";
-import { accClassToTpc, classToKey, classToTpc, keyToClass, NUM_KEYS, toKeyName, toKeyNumber, tpcToAccClass } from "./key-tpc.js";
+import { accClassToTpc, classToKey, inKeyToClass, keyToClass, NUM_IN_KEYS, tpcToAccClass } from "./key-tpc.js";
 
-export { floorPow2 };
-export const FEATURE_DIM = 24 + NUM_KEYS; // 39 (12 pitch class + 4 duration + 8 delta + 15 key)
+export const FEATURE_DIM = 24 + NUM_IN_KEYS; // 39 (12 pitch class + 4 duration + 8 delta + 15 key)
 
 /**
  * Maps arbitrary continuous duration in beats to a 4-bucket index [0..3]:
@@ -111,7 +111,7 @@ export function encode(events, options = {}) {
         features[offset + 16 + deltaBucket] = 1.0;
 
         // 4. One-hot 15-class current key signature: features 24..38
-        const keyClass = keyToClass(noteKeys[t]);
+        const keyClass = inKeyToClass(noteKeys[t]);
         features[offset + 24 + keyClass] = 1.0;
 
         prevBeat = beat;
@@ -126,46 +126,44 @@ export function encode(events, options = {}) {
 }
 
 /**
- * Prepares ground truth training target arrays from annotated notes
+ * Prepares ground truth training target arrays keyed by head name ("spelling", "key")
  *
  * @param {Array} annotatedNotes - Array of { tpc, key } or [tpc, key]
- * @returns {Object} { targetSpelling: Uint32Array, targetKey: Uint32Array }
+ * @returns {Object} { spelling: Uint32Array, key: Uint32Array }
  */
 export function encodeTargets(annotatedNotes) {
     const T = annotatedNotes.length;
-    const targetSpelling = new Uint32Array(T);
-    const targetKey = new Uint32Array(T);
+    const spelling = new Uint32Array(T);
+    const key = new Uint32Array(T);
 
     for (let t = 0; t < T; t++) {
         const item = annotatedNotes[t];
-        const tpc = item.tpc !== undefined ? item.tpc : item[0];
-        const key = item.key !== undefined ? item.key : item[1];
+        const tpcVal = item.tpc !== undefined ? item.tpc : item[0];
+        const keyVal = item.key !== undefined ? item.key : item[1];
 
-        targetSpelling[t] = tpcToAccClass(tpc);
-        targetKey[t] = keyToClass(key);
+        spelling[t] = tpcToAccClass(tpcVal);
+        key[t] = keyToClass(keyVal);
     }
 
-    return { targetSpelling, targetKey };
+    return { spelling, key };
 }
 
 /**
  * Decodes model prediction class indices [T] back to note names and TPC coordinates
  *
  * @param {Uint32Array|Array} predSpellingClasses - Predicted accidental class indices [0..4]
- * @param {Uint32Array|Array} [predKeyClasses=null] - Predicted key class indices [0..14]
- * @param {Array} [notes=null] - Original note events (used to combine MIDI pitch class with accidental class)
+ * @param {Uint32Array|Array} [predKeyClasses=null] - Predicted key class indices [0..24]
+ * @param {Array} notes - Original note events (used to combine MIDI pitch class with accidental class)
  * @returns {Array} Array of { tpc, key, name, keyName }
  */
-export function decodePredictions(predSpellingClasses, predKeyClasses = null, notes = null) {
+export function decodePredictions(predSpellingClasses, predKeyClasses, notes) {
     const T = predSpellingClasses.length;
     const results = [];
 
     for (let t = 0; t < T; t++) {
-        const note = notes ? notes[t] : null;
-        const midi = note ? (note[2] !== undefined ? note[2] : (note.pitch ?? note.midi ?? note)) : null;
-        const tpc = midi !== null && midi !== undefined
-            ? accClassToTpc(predSpellingClasses[t], midi)
-            : classToTpc(predSpellingClasses[t]);
+        const note = notes[t];
+        const midi = note[2] !== undefined ? note[2] : (note.pitch ?? note.midi ?? note);
+        const tpc = accClassToTpc(predSpellingClasses[t], midi);
         const key = predKeyClasses ? classToKey(predKeyClasses[t]) : null;
 
         results.push({

@@ -23,6 +23,7 @@ const { floor } = Math;
 
 const keys = {
     //                                             C      D       E  F      G      A       B
+    '-8': { name: 'F♭', symbol: 'F♭∆', spellings: [0, -1, 0, -1, -1, 0, -1, 0, -1, -2, -1, -1] },
     '-7': { name: 'C♭', symbol: 'C♭∆', spellings: [0, -1, 0, -1, -1, 0, -1, 0, -1, 0, -1, -1] },  // (Should have Ebb?)
     '-6': { name: 'G♭', symbol: 'G♭∆', spellings: [0, -1, 0, -1, -1, 0, -1, 0, -1, 0, -1, -1] },  // (Should have Ebb?)
     '-5': { name: 'D♭', symbol: 'D♭∆', spellings: [0, -1, 0, -1, -1, 0, -1, 0, -1, 0, -1, -1] },
@@ -37,7 +38,8 @@ const keys = {
     '4':  { name: 'E',  symbol: 'E∆',  spellings: [0,  1, 0,  1,  0, 1,  1, 0,  1, 0,  1,  0] },
     '5':  { name: 'B',  symbol: 'B∆',  spellings: [1,  1, 0,  1,  0, 1,  1, 0,  1, 0,  1,  0] },
     '6':  { name: 'F♯', symbol: 'F♯∆', spellings: [1,  1, 0,  1,  2, 1,  1, 0,  1, 0,  1,  0] }, // (Should have G##?)
-    '7':  { name: 'C♯', symbol: 'C♯∆', spellings: [1,  1, 0,  1,  2, 1,  1, 0,  1, 0,  1,  2] }  // (Should have G##?)
+    '7':  { name: 'C♯', symbol: 'C♯∆', spellings: [1,  1, 0,  1,  2, 1,  1, 0,  1, 0,  1,  2] }, // (Should have G##?)
+    '8':  { name: 'G♯', symbol: 'G♯∆', spellings: [1,  1, 0,  1,  2, 1,  1, 2,  1, 0,  1,  2] }
 };
 
 const noteDurations = [

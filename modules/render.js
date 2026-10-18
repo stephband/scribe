@@ -55,8 +55,9 @@ text = glyphs.textNoteShort
     + glyphs.note05Up
 */
 
-export function renderElements(sequence, clef, keyname, meter, transpose = 0, displace = 0, settings = config) {
-    const events = sequence.events;
+export function renderElements(sequence, clef, keyname, meter, transpose = 0, displace = 0, options) {
+    const settings = options ? Object.assign({}, config, options) : config;
+    const events   = sequence.events;
 
     // If events contains no initial key and key is available insert a key event
     let keyEvent = sequence.find({ beat: 0, type: 'key' })
@@ -154,7 +155,7 @@ export function renderStyle(element, root = element) {
     const side   = root.querySelector('.side');
     if (!side) return;
     const key    = side.dataset.key;
-    const counts = { 'C♭': 7, 'G♭': 6, 'D♭': 5, 'A♭': 4, 'E♭': 3, 'B♭': 2, 'F':  1, 'C':  0, 'G':  1, 'D':  2, 'A':  3, 'E':  4, 'B':  5, 'F♯': 6, 'C♯': 7 };
+    const counts = { 'F♭': 7, 'C♭': 7, 'G♭': 6, 'D♭': 5, 'A♭': 4, 'E♭': 3, 'B♭': 2, 'F':  1, 'C':  0, 'G':  1, 'D':  2, 'A':  3, 'E':  4, 'B':  5, 'F♯': 6, 'C♯': 7, 'G♯': 7 };
     const count  = counts[key] || 0;
     return `
         --head-1-size:       ${ truncate(6, head1Width / fontSize) };

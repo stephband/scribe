@@ -8,8 +8,8 @@ export default {
     spellChordRootFFlatAsE:  true,
 
     // Swing and shuffle interpretation
-    swingAsStraight8ths:  true,
-    swingAsStraight16ths: true,
+    swingAsStraight8ths:  false,
+    swingAsStraight16ths: false,
 
     // Accent thresholds
     marcatoThreshold: parseGain('-6dB'),
