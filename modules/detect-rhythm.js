@@ -223,7 +223,7 @@ function detectBestFit(beat, duration, events, index, rhythmIndex = index, rhyth
             if (eventSpan > d / 2) {
                 const span = array.reduce((sum, r) => sum + r.duration, 0);
                 if (span < d) {
-                    bfit *= (span / d);
+                    bfit *= pow(span / d, 1 / (d * d));
                 }
             }
         }
