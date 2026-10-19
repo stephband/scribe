@@ -28,7 +28,7 @@ import { floorPow2 } from './number/power-of-2.js';
 
 
 const DEBUG  = globalThis.DEBUG;
-const { cos, sin, round, PI } = Math;
+const { cos, sin, round, PI, abs, pow } = Math;
 const primes = [2, 3, 5, 7, 9];
 
 function count1s(n) {
@@ -45,6 +45,7 @@ const minDivision = 1/12;
 function test(beat, duration, divisor, events, index, rhythmIndex, rhythmCount) {
     let score  = 0;
     let phase  = 0;
+    let beatError = 0;
     // Where rhythmIndex lags index there is rhythm in the first slot. It does
     // not count towards score, as it was counted in the previous analysis window.
     if (DEBUG && rhythmIndex > index) throw new Error('rhythmIndex should never be > index');
@@ -53,16 +54,21 @@ function test(beat, duration, divisor, events, index, rhythmIndex, rhythmCount) 
     // Run the analysis
     let n = index - 1;
     while (events[++n] !== undefined && events[n][0] < beat + duration) {
-        const b = events[n][0] - beat;
+        const time = events[n][0];
+        const b = time - beat;
         const x = b * divisor / duration;
-        score += cos(x * 2 * PI);
-        phase += sin(x * 2 * PI);
 
         // Build rhythm bitmap, where each bit represents a division
         // bit 0 = first division
         // bit 1 = second division
         // and so on
         const slot = round(x);
+        const gridBeat = slot * duration / divisor;
+        beatError += abs(b - gridBeat);
+
+        score += cos(x * 2 * PI);
+        phase += sin(x * 2 * PI);
+
         if (slot < divisor) {
             rhythm |= (1 << slot);
             rhythmCount += 1;
@@ -87,7 +93,8 @@ function test(beat, duration, divisor, events, index, rhythmIndex, rhythmCount) 
         rhythmCount,
         // --- internal only?
         score,
-        phase
+        phase,
+        beatError
     };
 }
 
@@ -108,10 +115,11 @@ function detectRhythmPrime(beat, duration, events, index, rhythmIndex) {
         rhythmIndex,
         rhythmCount,
         score: 0,
-        phase: 0
+        phase: 0,
+        beatError: Infinity
     } : undefined ;
     let score  = 0;
-    //let result;
+    let minError = Infinity;
 
     // Find highest prime that allows division greater than minDivision
     let p = primes.length;
@@ -121,8 +129,14 @@ function detectRhythmPrime(beat, duration, events, index, rhythmIndex) {
     // Descend through remaining primes, keep highest scoring rhythm
     while (primes[--p]) {
         const data = test(beat, duration, primes[p], events, index, rhythmIndex, rhythmCount);
-        if (data.score / data.count >= score) {
-            score = data.score / data.count;
+        const fit = data.count ? data.score / data.count : 0;
+        const err = data.count ? data.beatError / data.count : Infinity;
+
+        // Choose higher score, break ties with smaller beat error (e.g. swing triplets vs duplets at 0.60),
+        // and on equal error prefer simpler prime (descending prime order)
+        if (fit > score + 1e-9 || (abs(fit - score) <= 1e-9 && err <= minError + 1e-9)) {
+            score = fit;
+            minError = err;
             result = data;
         }
     }
@@ -146,7 +160,8 @@ function detectBestFit(beat, duration, events, index, rhythmIndex = index, rhyth
 
     const d    = floorPow2(duration);
     const a    = detectRhythmPrime(beat, d, events, i, r, indent);
-    const afit = a && a.count ? a.score / a.count : 0 ;
+    // Include event count coverage bonus: pow(count, 0.1)
+    const afit = a && a.count ? (a.score / a.count) * pow(a.count, 0.1) : 0 ;
 
 /*console.log(indent + beat.toFixed(3),
     'index', index,
@@ -173,8 +188,8 @@ function detectBestFit(beat, duration, events, index, rhythmIndex = index, rhyth
             r = a.rhythmIndex + a.rhythmCount;
         }
     }
-    // A fit of 1 cannot be beaten: fast accept a
-    else if (afit === 1) {
+    // A perfect fit (score == count) cannot be beaten: fast accept a
+    else if (a && a.count && a.score === a.count && (a.count > 1 || d <= 1)) {
         rhythms.push(a);
         i = a.index + a.count ;
         r = a.rhythmIndex + a.rhythmCount;
@@ -198,14 +213,23 @@ function detectBestFit(beat, duration, events, index, rhythmIndex = index, rhyth
             r = last.rhythmIndex + last.rhythmCount;
         }
 
-        // Fit by overall average score of all events
+        // Fit by overall average score of all events, weighted by event count coverage pow(count, 0.1)
         const count = i - index;
-        const bfit  = count && array.reduce(sumScore, 0) / count;
-        // Fit by average of fit of all rhythms
-        //const count = i - index;
-        //const bfit = count && array.reduce(sumAverages, 0) / array.length;
+        let bfit  = count && array.reduce((sum, r) => sum + r.score * pow(r.count, 0.1), 0) / count;
 
-        if (bfit > afit) {
+        // When events span across more than half of window d, penalize array if it fails to span full d
+        if (a && a.count && bfit && count > 1) {
+            const eventSpan = events[i - 1][0] - events[index][0];
+            if (eventSpan > d / 2) {
+                const span = array.reduce((sum, r) => sum + r.duration, 0);
+                if (span < d) {
+                    bfit *= (span / d);
+                }
+            }
+        }
+
+        // Require meaningful improvement over afit to justify splitting
+        if (bfit > afit + 1e-4) {
 //console.log(indent + '↙', bfit);
             rhythms.push.apply(rhythms, array);
         }

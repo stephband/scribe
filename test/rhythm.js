@@ -254,3 +254,80 @@ Deno.test('Triplets 0.02 beat drag', () => {
     matches(detect(0, 4, [                          [drag + 2/3], [drag + 1]]), [{ beat: 0, duration: 1,   divisor: 3, rhythm: 4, index: 0, count: 1 }, { beat: 1, duration: 1, divisor: 2, rhythm: 1, index: 1, count: 1 }]);
     matches(detect(0, 4, [[drag + 0],               [drag + 2/3], [drag + 1]]), [{ beat: 0, duration: 1,   divisor: 3, rhythm: 5, index: 0, count: 2 }, { beat: 1, duration: 1, divisor: 2, rhythm: 1, index: 2, count: 1 }]);
 });
+
+Deno.test('Swing 8ths (60% and 65%)', () => {
+    // Single beat 60% swing (modern bop, e.g. Scofield)
+    matches(detect(0, 1, [[0], [0.60]]), [{ beat: 0, duration: 1, divisor: 3, rhythm: 5, index: 0, count: 2 }]);
+    // Single beat 65% swing (classic bop, e.g. Rollins)
+    matches(detect(0, 1, [[0], [0.65]]), [{ beat: 0, duration: 1, divisor: 3, rhythm: 5, index: 0, count: 2 }]);
+    // Offbeat swing 8th note
+    matches(detect(0, 1, [[0.60]]), [{ beat: 0, duration: 1, divisor: 3, rhythm: 4, index: 0, count: 1 }]);
+    matches(detect(0, 1, [[0.65]]), [{ beat: 0, duration: 1, divisor: 3, rhythm: 4, index: 0, count: 1 }]);
+
+    // Multi-beat lines of 60% swing
+    matches(detect(0, 4, [[0], [0.60], [1.0], [1.60], [2.0], [2.60], [3.0], [3.60]]), [
+        { beat: 0, duration: 1, divisor: 3, rhythm: 5, count: 2 },
+        { beat: 1, duration: 1, divisor: 3, rhythm: 5, count: 2 },
+        { beat: 2, duration: 1, divisor: 3, rhythm: 5, count: 2 },
+        { beat: 3, duration: 1, divisor: 3, rhythm: 5, count: 2 }
+    ]);
+
+    // Multi-beat lines of 65% swing
+    matches(detect(0, 4, [[0], [0.65], [1.0], [1.65], [2.0], [2.65], [3.0], [3.65]]), [
+        { beat: 0, duration: 1, divisor: 3, rhythm: 5, count: 2 },
+        { beat: 1, duration: 1, divisor: 3, rhythm: 5, count: 2 },
+        { beat: 2, duration: 1, divisor: 3, rhythm: 5, count: 2 },
+        { beat: 3, duration: 1, divisor: 3, rhythm: 5, count: 2 }
+    ]);
+
+    // Syncopated offbeat swing setup (John Scofield — G7 Half-Whole Diminished line)
+    matches(detect(0, 4, [[0.60], [1.0], [1.60], [2.0], [2.60], [3.0], [3.60]]), [
+        { beat: 0, duration: 1, divisor: 3, rhythm: 4, count: 1 },
+        { beat: 1, duration: 1, divisor: 3, rhythm: 5, count: 2 },
+        { beat: 2, duration: 1, divisor: 3, rhythm: 5, count: 2 },
+        { beat: 3, duration: 1, divisor: 3, rhythm: 5, count: 2 }
+    ]);
+
+    // Continuous swing range check (0.60 to 0.70 detected as swing 8ths without dead-zone fracturing)
+    for (let r = 60; r <= 70; r++) {
+        matches(detect(0, 1, [[0], [r / 100]]), [{ beat: 0, duration: 1, divisor: 3, rhythm: 5, count: 2 }]);
+    }
+
+    // Straight 8ths range check (0.50 to 0.59 detected as straight 8ths duplets)
+    for (let r = 50; r <= 59; r++) {
+        matches(detect(0, 1, [[0], [r / 100]]), [{ beat: 0, duration: 1, divisor: 2, rhythm: 3, count: 2 }]);
+    }
+});
+
+Deno.test('Swing 8ths push and drag', () => {
+    // 60% swing with push (-0.01) and drag (+0.01)
+    matches(detect(0, 2, [[0], [0.59], [1.0], [1.59]]), [
+        { beat: 0, duration: 1, divisor: 2, rhythm: 3, count: 2 },
+        { beat: 1, duration: 1, divisor: 2, rhythm: 3, count: 2 }
+    ]);
+    matches(detect(0, 2, [[0], [0.61], [1.0], [1.61]]), [
+        { beat: 0, duration: 1, divisor: 3, rhythm: 5, count: 2 },
+        { beat: 1, duration: 1, divisor: 3, rhythm: 5, count: 2 }
+    ]);
+    matches(detect(0, 2, [[0], [0.66], [1.0], [1.66]]), [
+        { beat: 0, duration: 1, divisor: 3, rhythm: 5, count: 2 },
+        { beat: 1, duration: 1, divisor: 3, rhythm: 5, count: 2 }
+    ]);
+    matches(detect(0, 2, [[0], [1.25]]), [
+        { beat: 0, duration: 1,   divisor: 2, rhythm: 1, count: 1 },
+        { beat: 1, duration: 0.5, divisor: 2, rhythm: 2, count: 1 }
+    ]);
+    matches(detect(0, 2, [[0], [0.625]]), [
+        { beat: 0, duration: 1, divisor: 3, rhythm: 5, count: 2 }
+    ]);
+});
+
+Deno.test('Chords with human timing spread', () => {
+    // Chords with slight flams / non-identical timestamps across notes
+    const chordTrack = [[-0.008], [0.0], [0.012], [0.995], [1.002], [1.01]];
+    matches(detect(0, 2, chordTrack), [
+        { beat: 0, duration: 2, divisor: 2, rhythm: 3 }
+    ]);
+});
+
+
