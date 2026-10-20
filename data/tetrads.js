@@ -1,7 +1,7 @@
 
 import { createTetrads } from './create-data.js';
 
-export const tetradsGb = createTetrads('G♭ tetrads open ⬇︎', 'G♭', 1,
+export const tetradsGb = createTetrads('G♭ tetrads open ⬇︎', 'F', 1,
     'G♭4', 'G♭',   'F5', 'G♭',  'B♭5', 'G♭',  'D♭6', 'G♭',  // G♭∆
      'F4', 'G♭',  'E♭5', 'G♭',  'A♭5', 'G♭',  'C♭6', 'G♭',  // Fø
      'E4', 'A',    'D5', 'A',   'G♯5', 'A',    'B5', 'A',   // E7
@@ -17,7 +17,7 @@ export const tetradsGb = createTetrads('G♭ tetrads open ⬇︎', 'G♭', 1,
     'G♭3', 'G♭',   'F4', 'G♭',  'B♭4', 'G♭',  'D♭5', 'G♭'   // G♭∆
 );
 
-export const tetradsDb = createTetrads('D♭ tetrads open ⬇︎', 'D♭', 1,
+export const tetradsDb = createTetrads('D♭ tetrads open ⬇︎', 'C', 1,
     'D♭4', 'D♭',   'C5', 'D♭',   'F5', 'D♭',  'A♭5', 'D♭',  // D♭∆
      'C4', 'D♭',  'B♭4', 'D♭',  'E♭5', 'D♭',  'G♭5', 'D♭',  // Cø
      'B3', 'E',    'A4', 'E',   'D♯5', 'E',   'F♯5', 'E',   // B7
@@ -33,7 +33,7 @@ export const tetradsDb = createTetrads('D♭ tetrads open ⬇︎', 'D♭', 1,
     'D♭3', 'D♭',   'C4', 'D♭',   'F4', 'D♭',  'A♭4', 'D♭'   // D♭∆
 );
 
-export const tetradsAb = createTetrads('A♭ tetrads open ⬇︎', 'A♭', 1,
+export const tetradsAb = createTetrads('A♭ tetrads open ⬇︎', 'G', 1,
     'A♭4', 'A♭',   'G5', 'A♭',   'C6', 'A♭',  'E♭6', 'A♭',  // A♭∆
      'G4', 'A♭',   'F5', 'A♭',  'B♭5', 'A♭',  'D♭6', 'A♭',  // Gø
     'G♭4', 'C♭',  'F♭5', 'C♭',  'B♭5', 'C♭',  'D♭6', 'C♭',  // G♭7
@@ -49,7 +49,7 @@ export const tetradsAb = createTetrads('A♭ tetrads open ⬇︎', 'A♭', 1,
     'A♭3', 'A♭',   'G4', 'A♭',   'C5', 'A♭',  'E♭5', 'A♭'   // A♭∆
 );
 
-export const tetradsEb = createTetrads('E♭ tetrads open ⬇︎', 'E♭', 1,
+export const tetradsEb = createTetrads('E♭ tetrads open ⬇︎', 'F', 1,
     'E♭4', 'E♭',   'D5', 'E♭',   'G5', 'E♭',  'B♭5', 'E♭',  // E♭∆
      'D4', 'E♭',   'C5', 'E♭',   'F5', 'E♭',  'A♭5', 'E♭',  // Dø
     'D♭4', 'G♭',  'C♭5', 'G♭',   'F5', 'G♭',  'A♭5', 'G♭',  // D♭7
@@ -81,7 +81,7 @@ export const tetradsBb = createTetrads('B♭ tetrads open ⬇︎', 'B♭', 1,
     'B♭3', 'B♭',   'A4', 'B♭',   'D5', 'B♭',   'F5', 'B♭'   // B♭∆
 );
 
-export const tetradsF = createTetrads('F tetrads open ⬇︎', 'F', 1,
+export const tetradsF = createTetrads('F tetrads open ⬇︎', 'E', 1,
      'F4', 'F',    'E5', 'F',    'A5', 'F',    'C6', 'F',   // F∆
      'E4', 'F',    'D5', 'F',    'G5', 'F',   'B♭5', 'F',   // Eø
     'E♭4', 'A♭',  'D♭5', 'A♭',   'G5', 'A♭',  'B♭5', 'A♭',  // E♭7
@@ -97,7 +97,7 @@ export const tetradsF = createTetrads('F tetrads open ⬇︎', 'F', 1,
      'F3', 'F',    'E4', 'F',    'A4', 'F',    'C5', 'F'    // F∆
 );
 
-export const tetradsC = createTetrads('C tetrads open ⬇︎', 'C', 1,
+export const tetradsC = createTetrads('C tetrads open ⬇︎', 'A', 1,
      'C5', 'C',   'B5', 'C',   'E6', 'C',   'G6', 'C',  // C∆
      'B4', 'C',   'A5', 'C',   'D6', 'C',   'F6', 'C',  // Bø
     'B♭4', 'E♭', 'A♭5', 'E♭',  'D6', 'E♭',  'F6', 'E♭',  // B♭7
@@ -113,7 +113,7 @@ export const tetradsC = createTetrads('C tetrads open ⬇︎', 'C', 1,
      'C4', 'C',   'B4', 'C',   'E5', 'C',   'G5', 'C'   // C∆
 );
 
-export const tetradsG = createTetrads('G tetrads open ⬇︎', 'G', 1,
+export const tetradsG = createTetrads('G tetrads open ⬇︎', 'D', 1,
      'G4', 'G',   'F♯5', 'G',   'B5', 'G',   'D6', 'G',   // G∆
     'F♯4', 'G',    'E5', 'G',   'A5', 'G',   'C6', 'G',   // F♯ø
      'F4', 'B♭',  'E♭5', 'B♭',  'A5', 'B♭',  'C6', 'B♭',  // F7
@@ -129,7 +129,7 @@ export const tetradsG = createTetrads('G tetrads open ⬇︎', 'G', 1,
      'G3', 'G',   'F♯4', 'G',   'B4', 'G',   'D5', 'G'   // G∆
 );
 
-export const tetradsD = createTetrads('D tetrads open ⬇︎', 'D', 1,
+export const tetradsD = createTetrads('D tetrads open ⬇︎', 'C', 1,
      'D5', 'D',   'C♯6', 'D',   'F♯6', 'D',   'A6', 'D',   // D∆
     'C♯5', 'D',    'B5', 'D',    'E6', 'D',   'G6', 'D',   // C♯ø
      'C5', 'F',   'B♭5', 'F',    'E6', 'F',   'G6', 'F',   // C7
@@ -145,7 +145,7 @@ export const tetradsD = createTetrads('D tetrads open ⬇︎', 'D', 1,
      'D4', 'D',   'C♯5', 'D',   'F♯5', 'D',   'A5', 'D'   // D∆
 );
 
-export const tetradsA = createTetrads('A tetrads open ⬇︎', 'A', 1,
+export const tetradsA = createTetrads('A tetrads open ⬇︎', 'A♭', 1,
      'A4', 'A',   'G♯5', 'A',   'C♯6', 'A',   'E6', 'A',   // A∆
     'G♯4', 'A',   'F♯5', 'A',    'B5', 'A',   'D6', 'A',   // G♯ø
      'G4', 'C',    'F5', 'C',    'B5', 'C',   'D6', 'C',   // G7
@@ -161,7 +161,7 @@ export const tetradsA = createTetrads('A tetrads open ⬇︎', 'A', 1,
      'A3', 'A',   'G♯4', 'A',   'C♯5', 'A',   'E5', 'A'   // A∆
 );
 
-export const tetradsE = createTetrads('E tetrads open ⬇︎', 'E', 1,
+export const tetradsE = createTetrads('E tetrads open ⬇︎', 'D♭', 1,
      'E5', 'E',   'D♯6', 'E',   'G♯6', 'E',   'B6', 'E',   // E∆
     'D♯5', 'E',   'C♯6', 'E',   'F♯6', 'E',   'A6', 'E',   // D♯ø
      'D5', 'G',    'C6', 'G',   'F♯6', 'G',   'A6', 'G',   // D7
@@ -177,7 +177,7 @@ export const tetradsE = createTetrads('E tetrads open ⬇︎', 'E', 1,
      'E4', 'E',   'D♯5', 'E',   'G♯5', 'E',   'B5', 'E'   // E∆
 );
 
-export const tetradsB = createTetrads('B tetrads open ⬇︎', 'B', 1,
+export const tetradsB = createTetrads('B tetrads open ⬇︎', 'F', 1,
      'B4', 'B',   'A♯5', 'B',   'D♯6', 'B',  'F♯6', 'B',   // B∆
     'A♯4', 'B',   'G♯5', 'B',   'C♯6', 'B',   'E6', 'B',   // A♯ø
      'A4', 'D',    'G5', 'D',   'C♯6', 'D',   'E6', 'D',   // A7

@@ -7,7 +7,7 @@ import { createMelody, createSequence } from './create-data.js';
  * 1. Sonny Rollins — "Tenor Madness" / "Blue 7" 12-Bar Bop-Blues Chorus (65% swing: 0.65 / 0.35)
  * 2. Wynton Marsalis — New Orleans / Hard-Bop 12-Bar Blues Chorus (60% swing: 0.6 / 0.4)
  * 3. John Scofield — Funk-Jazz / Mixo-Blues 12-Bar Chorus (60% swing: 0.6 / 0.4)
- * 4. Charlie Parker / Chet Baker — "Blues for Alice" (Bird Blues in C, 65% swing: 0.65 / 0.35)
+ * 4. Charlie Parker / Chet Baker — "Blues for Alice" (Bird Blues in C: 0.65 / 0.35)
  * 5. 12-Bar Jazz Blues Comping Voicings (with F♯°7, A7♭9, Dm9 – G13)
  */
 
@@ -42,7 +42,7 @@ export const rollinsBluesInC = createMelody('Sonny Rollins — 12-Bar Jazz Blues
      'F5', 0.65, 'C',   'D5', 0.35, 'C',   'C5', 0.65, 'C',   'A4', 0.35, 'C',
     // Bar 10: G7♭9 — B4 - D5 - F5 - A♭5 - G5 - F5 - D♯5 - D5
      'B4', 0.65, 'C',   'D5', 0.35, 'C',   'F5', 0.65, 'C',  'A♭5', 0.35,'E♭',
-     'G5', 0.65, 'C',   'F5', 0.35, 'C',  'D♯5', 0.65, 'E',   'D5', 0.35, 'C',
+     'G5', 0.65, 'C',   'F5', 0.35, 'C',  'E♭5', 0.65, 'A♭',  'D5', 0.35, 'C',
     // Bar 11: C7 – A7 — C5 - G4 - E4 - G4 - C♯5 - E5 - G4 - B♭4
      'C5', 0.65, 'C',   'G4', 0.35, 'C',   'E4', 0.65, 'C',   'G4', 0.35, 'C',
     'C♯5', 0.65, 'D',   'E5', 0.35, 'D',   'G4', 0.65, 'F',  'B♭4', 0.35, 'F',
@@ -132,8 +132,8 @@ export const scofieldFunkBluesInC = createMelody('John Scofield — Funk-Jazz 12
      'F5', 0.6,  'C',  'D♯5', 0.4,  'E',   'E5', 1.0,  'C',   'C5', 2.0,  'C'
 );
 
-// 4. Charlie Parker / Chet Baker — "Blues for Alice" (Bird Blues in C, 65% swing: 0.65 / 0.35)
-export const birdBluesInC = createMelody('Charlie Parker — "Blues for Alice" (Bird Blues in C, 65% Swing)', 'C', 4, { swingAsStraight8ths: true },
+// 4. Charlie Parker / Chet Baker — "Blues for Alice" (Bird Blues in C: 0.65 / 0.35)
+export const birdBluesInC = createMelody('Charlie Parker — "Blues for Alice" (Bird Blues in C)', 'C', 4, { swingAsStraight8ths: true },
     // Bar 1: C∆ — Descending major 7th line (G5 - E5 - C5 - B4 - A4 - G4 - E4)
      'G5', 1.0,  'C',   'E5', 0.65, 'C',   'C5', 0.35, 'C',   'B4', 0.65, 'C',
      'A4', 0.35, 'C',   'G4', 0.65, 'C',   'E4', 0.35, 'C',
@@ -163,7 +163,7 @@ export const birdBluesInC = createMelody('Charlie Parker — "Blues for Alice" (
      'E5', 0.65, 'C',   'D5', 0.35, 'C',   'C5', 0.65, 'C',   'A4', 0.35, 'C',
     // Bar 10: G7♭9 — B4 - D5 - F5 - A♭5 - G5 - F5 - D♯5 - D5
      'B4', 0.65, 'C',   'D5', 0.35, 'C',   'F5', 0.65, 'C',  'A♭5', 0.35,'E♭',
-     'G5', 0.65, 'C',   'F5', 0.35, 'C',  'D♯5', 0.65, 'E',   'D5', 0.35, 'C',
+     'G5', 0.65, 'C',   'F5', 0.35, 'C',  'E♭5', 0.65, 'A♭',  'D5', 0.35, 'C',
     // Bar 11: C∆ – A7♭9 — E5 - C5 - G4 - E4 - C♯4 - E4 - G4 - B♭4
      'E5', 0.65, 'C',   'C5', 0.35, 'C',   'G4', 0.65, 'C',   'E4', 0.35, 'D',
     'C♯4', 0.65, 'D',   'E4', 0.35, 'D',   'G4', 0.65, 'F',  'B♭4', 0.35, 'F',

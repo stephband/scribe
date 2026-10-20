@@ -14,7 +14,7 @@ import { createMelody, createSequence } from './create-data.js';
  */
 
 // 1. Sonny Rollins — Tritone Substitution II–subV–I (Dm7 – D♭7♯11 – C∆9) (65% swing: 0.65 / 0.35)
-export const rollinsTritoneSubInC = createMelody('Sonny Rollins — Tritone Sub (Dm7 – D♭7♯11 – C∆, 65% Swing)', 'C', 4, { swingAsStraight8ths: true },
+export const rollinsTritoneSubInC = createMelody('Sonny Rollins — Tritone Sub (Dm7 – D♭7♯11 – C∆)', 'C', 4, { swingAsStraight8ths: true },
     // Bar 1: Dm7 — Swung 8th-note line up the Dm9 arpeggio
      'D4', 0.65, 'C',   'F4', 0.35, 'C',   'A4', 0.65, 'C',   'C5', 0.35, 'C',
      'E5', 0.65, 'C',   'D5', 0.35, 'C',   'C5', 0.65, 'C',   'A4', 0.35, 'C',
@@ -29,7 +29,7 @@ export const rollinsTritoneSubInC = createMelody('Sonny Rollins — Tritone Sub 
 );
 
 // 2. Chet Baker — Backdoor Progression / Minor 3rd Sub (Fm9 – B♭13♯11 – C∆9) (65% swing: 0.65 / 0.35)
-export const chetBakerBackdoorInC = createMelody('Chet Baker — Backdoor Cadence (Fm7 – B♭7♯11 – C∆, 65% Swing)', 'C', 4, { swingAsStraight8ths: true },
+export const chetBakerBackdoorInC = createMelody('Chet Baker — Backdoor Cadence (Fm7 – B♭7♯11 – C∆)', 'C', 4, { swingAsStraight8ths: true },
     // Bar 1: Fm9 — Lyrical swung 8th line from the 9th (G4 -> A♭4 -> C5 -> E♭5 -> C5 -> A♭4)
     null,  0.65, null,  'G4', 0.35,'E♭',  'A♭4', 0.65,'E♭',   'C5', 0.35,'E♭',
     'E♭5', 1.0, 'E♭',   'C5', 0.65,'E♭',  'A♭4', 0.35,'E♭',
