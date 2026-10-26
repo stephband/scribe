@@ -16,20 +16,20 @@ export function createNotes(stave, key, part, notes, cutoffBeat, beat, duration)
     let n = -1, event;
 
     while ((event = notes[++n]) && event[0] < cutoffBeat) {
-        const events     = event.scribeEvents;
-        const index      = event.scribeIndex;
-        const keyWeights = keyWeightsForEvent(events, index, key);
-        const keyNumber  = chooseKeyFromWeights(keyWeights);
-        // [BRANCH 2026-spelling]: Use event.spelling or event.event.spelling if explicitly defined
-        const pitch      = stave.getSpelling(event.spelling || event.event?.spelling || event[2], keyNumber, true);
-        const row        = stave.getRow(part, pitch);
+        //const events     = event.scribeEvents;
+        //const index      = event.scribeIndex;
+        //const keyWeights = keyWeightsForEvent(events, index, key);
+        //const keyNumber  = chooseKeyFromWeights(keyWeights);
+        // [BRANCH 2026-spelling]: Use event.spelledPitch or event.event.spelledPitch if explicitly defined
+        //const pitch      = stave.getSpelling(event.spelledPitch || event.event?.spelledPitch || event.spelling || event.event?.spelling || event[2], keyNumber, true);
+        //const row        = stave.getRow(part, pitch);
 
         // Create symbols with pitch, row
         symbols.push({
             type: 'note',
             beat,
             duration,
-            pitch,
+            //pitch,
             dynamic: event[3],
             part,
             row,

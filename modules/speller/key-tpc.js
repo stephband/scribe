@@ -61,7 +61,7 @@ export function tpcToAccClass(n) {
  * If the predicted accidental bucket does not contain a spelling for the given
  * pitch class, snaps to the nearest valid accidental bucket for that pitch class.
  */
-export function accClassToTpc(accClass, midi) {
+export function accidentalToTpc(accClass, midi) {
   if (accClass < 0 || accClass >= NUM_ACCIDENTALS) {
     throw new Error(`Accidental class index ${accClass} outside valid range [0, ${NUM_ACCIDENTALS - 1}]`);
   }

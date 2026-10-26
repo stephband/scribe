@@ -1,21 +1,21 @@
 import { exportAsModule, serializeWeights } from "neuron/modules/serialize.js";
-import { toKeyNumber } from "sequence/modules/event/key.js";
+import { toKeyName, toKeyNumber } from "sequence/modules/event/key.js";
 import { SpellerNetwork } from "./speller-network.js";
 import { encode, encodeTargets } from "./sequence-encoder.js";
 
-import * as chromatic  from "../../data/chromatic.js";
-import * as major      from "../../data/major.js";
-import * as melodic    from "../../data/melodic.js";
-import * as bebop      from "../../data/bebop.js";
-import * as diminished from "../../data/diminished.js";
-import * as triads     from "../../data/triads.js";
-import * as tetrads    from "../../data/tetrads.js";
+import * as chromatic  from "../../data/scales/chromatic.js";
+import * as major      from "../../data/scales/major.js";
+import * as melodic    from "../../data/scales/melodic.js";
+import * as bebop      from "../../data/scales/bebop.js";
+import * as diminished from "../../data/scales/diminished.js";
+import * as triads     from "../../data/scales/triads.js";
+import * as tetrads    from "../../data/scales/tetrads.js";
 import * as bach       from "../../data/bach.js";
-import * as alteredDiminished from '../../data/altered-diminished.js';
+import * as alteredDiminished from '../../data/scales/altered-diminished.js';
 import * as giantSteps        from '../../data/giant-steps.js';
-import * as major251s     from "../../data/major-ii-v-i.js";
-import * as minor251s     from "../../data/minor-ii-v-i.js";
-import * as substitutions from "../../data/substitutions.js";
+import * as major251s     from "../../data/scales/major-ii-v-i.js";
+import * as minor251s     from "../../data/scales/minor-ii-v-i.js";
+import * as substitutions from "../../data/scales/substitutions.js";
 import * as blues         from "../../data/blues.js";
 
 
@@ -40,7 +40,7 @@ for (const [name, seq] of Object.entries(sequences)) {
     if (!enc.noteCount) continue;
 
     const targets = enc.notes.map((n) => {
-        const spelling = n.expectedSpelling ?? n.spelling ?? n[2];
+        const spelling = n.expectedSpelling ?? n.spelledPitch ?? n.spelling ?? n[2];
         const key = n.expectedKey ?? n.key;
         const tpc = typeof spelling === "number"
             ? spelling
@@ -95,16 +95,17 @@ let totalSpellingMatches = 0;
 let totalKeyMatches = 0;
 
 for (const [name, seq] of Object.entries(sequences)) {
-    const preds = network.predictSequence(seq);
+    const preds = network.process(seq);
     const notes = seq.events.filter((e) => e.type === "note");
     let spellingMatches = 0;
     let keyMatches = 0;
 
-    notes.forEach((note, i) => {
+    notes.forEach((note) => {
         const expectedSpelling = note.expectedSpelling;
         const expectedKey = note.expectedKey;
-        const spellingMatch = !expectedSpelling || expectedSpelling === preds[i].spelling;
-        const keyMatch = !expectedKey || expectedKey === preds[i].keyName;
+        const noteKeyName = toKeyName(note.spelledKey);
+        const spellingMatch = !expectedSpelling || expectedSpelling === note.spelledPitch;
+        const keyMatch = !expectedKey || expectedKey === noteKeyName;
         if (spellingMatch) spellingMatches++;
         if (keyMatch) keyMatches++;
     });

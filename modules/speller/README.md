@@ -194,7 +194,7 @@ const events = [
     [2.5, "note", 67, 0.8, 1.0], // G4
 ];
 
-const results = speller.predictSequence(events);
+const results = speller.process(events);
 console.log(results);
 // [
 //   { tpc: 0,  name: 'C',  key: 0, keyName: 'C' },
@@ -213,7 +213,7 @@ import SpellerRNN from "./speller/speller-rnn.js";
 const weightBuffer = await Deno.readFile("./speller/speller-weights-8b.bin");
 const gpuSpeller = await SpellerRNN.from(weightBuffer);
 
-const results = await gpuSpeller.predictSequence(events);
+const results = await gpuSpeller.process(events);
 console.log(results);
 ```
 

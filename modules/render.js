@@ -55,7 +55,7 @@ text = glyphs.textNoteShort
     + glyphs.note05Up
 */
 
-export function renderElements(sequence, clef, keyname, meter, transpose = 0, displace = 0, options) {
+export async function renderElements(sequence, clef, keyname, meter, transpose = 0, displace = 0, options) {
     const settings = options ? Object.assign({}, config, options) : config;
     const events   = sequence.events;
 
@@ -81,7 +81,7 @@ export function renderElements(sequence, clef, keyname, meter, transpose = 0, di
     const iterator = new SequenceIterator(events, sequence.sequences, Transform.from(array));
 
     // Create bar elements
-    const bars     = createBars(iterator, stave, settings);
+    const bars     = await createBars(iterator, stave, settings);
     const elements = bars.reduce(toBarElements, []);
 
     // Creates stave with clef and key signature
@@ -112,7 +112,6 @@ export function renderElements(sequence, clef, keyname, meter, transpose = 0, di
     elements.unshift(column);
     return elements;
 }
-
 
 const heads = [
     create('span', { html: glyphs.head1,       style: 'width: min-content;' }),

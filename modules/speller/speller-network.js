@@ -28,26 +28,23 @@ export default class SpellerNetwork extends RecurrentNetwork {
      * @param {Object} options - Optional overrides (e.g. initialKey)
      * @returns {Array} Array of decoded note objects with predicted TPC coordinates and names
      */
-    predictSequence(events, options = {}) {
+    process(events, options = {}) {
         const encoded = encode(events, options);
         const outputs = this.forward(
             encoded.features,
             encoded.noteCount,
         );
-        const decoded = decodePredictions(
+        decodePredictions(
             outputs.spelling.preds,
             outputs.key.preds,
             encoded.notes,
         );
 
-        return decoded.map((d, i) => {
-            const note = encoded.notes[i];
-            return {
-                note,
-                ...d,
-                spelling: tpcToSpelledPitch(note[2], d.tpc),
-            };
-        });
+        return encoded.notes;
+    }
+
+    predictSequence(events, options = {}) {
+        return this.process(events, options);
     }
 }
 

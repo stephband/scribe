@@ -88,6 +88,7 @@ function test(beat, duration, divisor, events, index, rhythmIndex, rhythmCount, 
             phase: 0,
             drift: 0,
             beatError: 0,
+            delta,
             deltaOut: (1 - config.lambda) * delta
         };
     }
@@ -127,6 +128,7 @@ function test(beat, duration, divisor, events, index, rhythmIndex, rhythmCount, 
         phase: phaseAngle,
         drift: phaseDriftBeats,
         beatError,
+        delta,
         deltaOut
     };
 }
@@ -153,6 +155,7 @@ function detectRhythmPrime(beat, duration, events, index, rhythmIndex, delta = 0
         phase: 0,
         drift: 0,
         beatError: Infinity,
+        delta,
         deltaOut: (1 - config.lambda) * delta
     } : undefined;
 
@@ -281,6 +284,8 @@ function detectBestFit(beat, duration, events, index, rhythmIndex = index, rhyth
     return dState;
 }
 
+
+
 /**
 detect(beat, duration, events, index = 0, options = {})
 Top-level entry point for EPL-MQ rhythm detection.
@@ -294,7 +299,7 @@ export default function detect(beat, duration, events, index = 0, options = {}) 
 
     if (!events[n] || events[n][0] >= beat + duration) return undefined;
 
-    const rhythms = [];
-    detectBestFit(beat, duration, events, n, index, rhythms, '', 0, config);
-    return rhythms;
+    const tuplets = [];
+    detectBestFit(beat, duration, events, n, index, tuplets, '', 0, config);
+    return tuplets;
 }

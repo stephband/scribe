@@ -75,10 +75,10 @@ export default define(element('scribe-music', {
         }
 
         // Listens to changes
-        return Signal.frame(() => {
+        return Signal.frame(async () => {
             if (!internals.data.value) return;
 
-            const elements = internals.data.value && renderElements(
+            const elements = internals.data.value && await renderElements(
                 // Events from data
                 Sequence.from(internals.data.value),
                 // Excludes is an array

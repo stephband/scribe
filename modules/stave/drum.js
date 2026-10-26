@@ -172,7 +172,7 @@ export default class DrumStave extends Stave {
             `<span class="head" data-glyph="${ name }">${ glyphs[name] }</span>` ;
     }
 
-    parts = [{
+    voices = [{
         name:   'upper',
         staff:  'main',
         beam:   'up-beam',
@@ -188,21 +188,21 @@ export default class DrumStave extends Stave {
     .getPart(number)
     **/
     getPart(number) {
-        // Split drums stave into drums and cymbals parts
+        // Split drums stave into drums and cymbals voices
         /*return [35, 36, 37, 38, 40, 41, 43, 44, 45, 47, 48, 50].includes(toNoteNumber(number)) ?
-            this.parts[0] :
-            this.parts[1] ;*/
+            this.voices[0] :
+            this.voices[1] ;*/
         // Split drum stave into hands and feet
         return [35, 36, 44].includes(toNoteNumber(number)) ?
-            this.parts[1] :
-            this.parts[0] ;
+            this.voices[1] :
+            this.voices[0] ;
     }
 
     /**
     .getRow(pitch)
     Returns the row index of a given pitch name or number.
     **/
-    getRow(part, n) {
+    getRow(voice, n) {
         const pitch = typeof n === 'string' ? n : toDrumSlug(n) ;
         if (!pitch) throw new Error(`DrumStave pitch for number ${ n } not found`);
         const i = this.rows.findIndex((row) => row.includes(pitch));
@@ -253,15 +253,15 @@ export default class DrumStave extends Stave {
         return notes;
     }
 
-    createNoteSymbols(symbols, bar, part, accidentals, notes, cutoffBeat, beat, duration, settings) {
+    createNoteSymbols(symbols, bar, voice, accidentals, notes, cutoffBeat, beat, duration, settings) {
         const stave = this;
         // Create note heads
-        const noteSymbols = createNotes(stave, bar.key, part, notes, cutoffBeat, beat, duration);
+        const noteSymbols = createNotes(stave, bar.key, voice, notes, cutoffBeat, beat, duration);
         // Notes may not appear on stave in which case noteSymbols will be empty
         if (!noteSymbols.length) return noteSymbols;
         // Create ledgers, accidentals and accents
-        createLedges(symbols, stave, part, beat, noteSymbols);
-        createAccents(symbols, stave, part, beat, noteSymbols, settings);
+        createLedges(symbols, stave, voice, beat, noteSymbols);
+        createAccents(symbols, stave, voice, beat, noteSymbols, settings);
         // Push in note heads
         symbols.push.apply(symbols, noteSymbols);
         // Drum notation does not tie notes so we don't leave consumed events in array
@@ -270,7 +270,7 @@ export default class DrumStave extends Stave {
         return noteSymbols;
     }
 
-    createDupletNoteSymbols(symbols, bar, part, accidentals, notes, startBeat, cutoffBeat, stopBeat, settings) {
+    createDupletNoteSymbols(symbols, bar, voice, accidentals, notes, startBeat, cutoffBeat, stopBeat, settings) {
         const stave = this;
         const b1    = startBeat - bar.beat;
         const b2    = stopBeat - bar.beat;
@@ -298,12 +298,12 @@ export default class DrumStave extends Stave {
             noteDurations[j] ;
 
         // Create note heads
-        const noteSymbols = createNotes(stave, bar.key, part, notes, cutoffBeat, b1, duration);
+        const noteSymbols = createNotes(stave, bar.key, voice, notes, cutoffBeat, b1, duration);
         // Drum notation does not tie notes so we don't leave consumed events in array
         notes.splice(0, noteSymbols.length);
         // Create ledgers and accents
-        createLedges(symbols, stave, part, b1, noteSymbols);
-        createAccents(symbols, stave, part, b1, noteSymbols, settings);
+        createLedges(symbols, stave, voice, b1, noteSymbols);
+        createAccents(symbols, stave, voice, b1, noteSymbols, settings);
         // Push in note heads
         symbols.push.apply(symbols, noteSymbols);
         // Return symbols

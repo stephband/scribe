@@ -363,3 +363,32 @@ Deno.test("EPL-MQ: Elastic Restoring Spring back to absolute pulse", () => {
     matches(result[1], { beat: 1, duration: 1, divisor: 2, rhythm: 3 });
     matches(result[2], { beat: 3, duration: 1, divisor: 2, rhythm: 3 });
 });
+
+Deno.test("EPL-MQ: Per-slot rhythm event counts", () => {
+    // 1. Single upbeat note in a duplet: { rhythm: 2, 0: 0, 1: 1 }
+    const upbeat = detect(0, 1, [[0.5]]);
+    equals(upbeat.length, 1);
+    matches(upbeat[0], { rhythm: 2, divisor: 2, 0: 0, 1: 1 });
+
+    // 2. Thick 7-note chord on upbeat: { rhythm: 2, 0: 0, 1: 7 }
+    const chordUpbeat = detect(0, 1, [
+        [0.49], [0.50], [0.50], [0.51], [0.50], [0.495], [0.505]
+    ]);
+    equals(chordUpbeat.length, 1);
+    matches(chordUpbeat[0], { rhythm: 2, divisor: 2, 0: 0, 1: 7 });
+
+    // 3. Duplet with 1 note on downbeat, 1 note on upbeat: { rhythm: 3, 0: 1, 1: 1 }
+    const twoNotes = detect(0, 1, [[0.0], [0.5]]);
+    equals(twoNotes.length, 1);
+    matches(twoNotes[0], { rhythm: 3, divisor: 2, 0: 1, 1: 1 });
+
+    // 4. Triplet with 2 notes on slot 0, 0 on slot 1, 1 on slot 2: { rhythm: 5, 0: 2, 1: 0, 2: 1 }
+    const triplet = detect(0, 1, [[0.0], [0.0], [2 / 3]]);
+    equals(triplet.length, 1);
+    matches(triplet[0], { rhythm: 5, divisor: 3, 0: 2, 1: 0, 2: 1 });
+
+    // 5. Triplet with slot 2 only: { rhythm: 4, 0: 0, 1: 0, 2: 1 }
+    const tripletSlot2 = detect(0, 1, [[2 / 3]]);
+    equals(tripletSlot2.length, 1);
+    matches(tripletSlot2[0], { rhythm: 4, divisor: 3, 0: 0, 1: 0, 2: 1 });
+});

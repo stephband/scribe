@@ -79,7 +79,7 @@ export default class PianoStave extends Stave {
 
     staffs = ['treble', 'bass'];
 
-    parts = [{
+    voices = [{
         name:      'lh',
         staff:     'bass',
         topRow:    29,
@@ -148,19 +148,19 @@ export default class PianoStave extends Stave {
     getPart(number) {
         return typeof number === 'number' ?
             number < 60 ?
-                this.parts[0] :
-                this.parts[1] :
+                this.voices[0] :
+                this.voices[1] :
             /[012]$|[AC-G](?:bb|𝄫|##|𝄪|[b#♭♯])*3$/u.test(number) ?
-                this.parts[0] :
-                this.parts[1] ;
+                this.voices[0] :
+                this.voices[1] ;
     }
 
     createKeySymbols(key) {
         const keysig  = super.createKeySymbols(key);
         const symbols = [];
         // Add key signature to both staffs
-        symbols.push.apply(symbols, keysig.map((symbol) => assign({}, symbol, { part: this.parts[0] })));
-        symbols.push.apply(symbols, keysig.map((symbol) => assign({}, symbol, { part: this.parts[1] })));
+        symbols.push.apply(symbols, keysig.map((symbol) => assign({}, symbol, { part: this.voices[0] })));
+        symbols.push.apply(symbols, keysig.map((symbol) => assign({}, symbol, { part: this.voices[1] })));
         return symbols;
     }
 
@@ -168,12 +168,12 @@ export default class PianoStave extends Stave {
         const symbols = [{
             type:  'clef',
             clef:  'treble',
-            part:  this.parts[0],
+            part:  this.voices[0],
             stave: this
         }, {
             type:  'clef',
             clef:  'bass',
-            part:  this.parts[1],
+            part:  this.voices[1],
             stave: this
         }];
 

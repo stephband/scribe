@@ -1,7 +1,7 @@
 import floorPow2 from "sequence/modules/number/floor-pow-2.js";
 import { toKeyName, toKeyNumber } from "sequence/modules/event/key.js";
 import { toNoteNumber } from "midi/note.js";
-import { accClassToTpc, classToKey, inKeyToClass, keyToClass, NUM_IN_KEYS, tpcToAccClass } from "./key-tpc.js";
+import { accidentalToTpc, classToKey, inKeyToClass, keyToClass, NUM_IN_KEYS, tpcToAccClass, tpcToSpelledPitch } from "./key-tpc.js";
 
 export const FEATURE_DIM = 24 + NUM_IN_KEYS; // 39 (12 pitch class + 4 duration + 8 delta + 15 key)
 
@@ -151,28 +151,21 @@ export function encodeTargets(annotatedNotes) {
 /**
  * Decodes model prediction class indices [T] back to note names and TPC coordinates
  *
- * @param {Uint32Array|Array} predSpellingClasses - Predicted accidental class indices [0..4]
- * @param {Uint32Array|Array} [predKeyClasses=null] - Predicted key class indices [0..24]
+ * @param {Uint32Array|Array} pitches - Predicted accidental class indices [0..4]
+ * @param {Uint32Array|Array} [keys=null] - Predicted key class indices [0..24]
  * @param {Array} notes - Original note events (used to combine MIDI pitch class with accidental class)
  * @returns {Array} Array of { tpc, key, name, keyName }
  */
-export function decodePredictions(predSpellingClasses, predKeyClasses, notes) {
-    const T = predSpellingClasses.length;
-    const results = [];
+export function decodePredictions(accidentals, keys, notes) {
+    let i = -1;
+    while (++i < accidentals.length) {
+        const note  = notes[i];
+        const tpc   = accidentalToTpc(accidentals[i], note[2]);
 
-    for (let t = 0; t < T; t++) {
-        const note = notes[t];
-        const midi = note[2] !== undefined ? note[2] : (note.pitch ?? note.midi ?? note);
-        const tpc = accClassToTpc(predSpellingClasses[t], midi);
-        const key = predKeyClasses ? classToKey(predKeyClasses[t]) : null;
-
-        results.push({
-            tpc,
-            key,
-            name: toKeyName(tpc),
-            keyName: key !== null ? toKeyName(key) : null,
-        });
+        note.tpc          = tpc;
+        note.spelledKey   = classToKey(keys[i]);
+        note.spelledPitch = tpcToSpelledPitch(note[2], tpc);
     }
 
-    return results;
+    return notes;
 }

@@ -232,11 +232,11 @@ export default overload(get('type'), {
         }${ symbol.beam ? 'beam-note ' : '' }note`,
         style: symbol.stemHeight ? `--stem-height: ${ symbol.stemHeight };` : undefined,
         html:  symbol.stave.getNoteHTML(symbol.pitch, symbol.dynamic, symbol.duration),
-        title: `${ symbol.pitch } (${ toNoteNumber(symbol.pitch) })`,
+        title: `${ symbol.event.spelledPitch } (${ symbol.event[2] })`,
         data: {
             beat:     truncate(4, symbol.beat),
             duration: truncate(4, symbol.duration),
-            pitch:    symbol.pitch,
+            pitch:    symbol.event.spelledPitch,
             part:     symbol.part.name,
             beam:     symbol.beam && symbol.beam.id,
             event:    identify(symbol.event),

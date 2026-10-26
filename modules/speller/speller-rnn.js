@@ -36,25 +36,21 @@ export default class SpellerRNN extends RNN {
      * @param {Object} options - Optional overrides
      * @returns {Promise<Array>} Decoded array of notes with predicted TPCs and keys
      */
-    async predictSequence(events, options = {}) {
+    async process(events, options = {}) {
         const encoded = encode(events, options);
+
         const outputs = await this.predict(
             encoded.features,
             encoded.noteCount,
         );
-        const decoded = decodePredictions(
+
+        // Assigns { tpc, spelledKey, spelledPitch } to note events
+        decodePredictions(
             outputs.spelling.preds,
             outputs.key.preds,
-            encoded.notes,
+            encoded.notes
         );
 
-        return decoded.map((d, i) => {
-            const note = encoded.notes[i];
-            return {
-                note,
-                ...d,
-                spelling: tpcToSpelledPitch(note[2], d.tpc),
-            };
-        });
+        return encoded.notes;
     }
 }

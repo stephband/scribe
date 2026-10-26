@@ -151,21 +151,21 @@ export default class Stave {
 
     staffs = ['main'];
 
-    parts = [{
+    voices = [{
         name:  'main',
         staff: 'main'
     }];
 
     getPart(number) {
-        return this.parts[0];
+        return this.voices[0];
     }
 
     /**
-    .getRow(part, pitch)
+    .getRow(voice, pitch)
     Returns the row index of a given pitch name or number. Multi-staff staves
     require part to know which staff they are positioned upon.
     **/
-    getRow(part, pitch) {
+    getRow(voice, pitch) {
         const name = typeof pitch === 'string' ? pitch : toNoteName(pitch) ;
         const row  = name.replace(rflatsharp, '');
         const i    = this.rows.indexOf(row);
@@ -282,7 +282,7 @@ export default class Stave {
                     type:  'acci',
                     pitch: fathercharles[i],
                     value: 1,
-                    part:  this.parts[0],
+                    part:  this.voices[0],
                     event
                 });
             }
@@ -297,7 +297,7 @@ export default class Stave {
                     type:  'acci',
                     pitch: fathercharles[7 + i],
                     value: -1,
-                    part:  this.parts[0],
+                    part:  this.voices[0],
                     event
                 });
             }
@@ -311,7 +311,7 @@ export default class Stave {
         const symbols   = [{
             type: 'clef',
             clef: this.type,
-            part: this.parts[0]
+            part: this.voices[0]
         }];
 
         return symbols.concat(this.createKeySymbols(keyEvent));

@@ -7,7 +7,7 @@ import DrumStave from './drum.js';
 export default class PercussionStave extends DrumStave {
     type  = 'percussion';
     rows  = ['','','','','','','','rhythm','','','','','','',''];
-    parts = [{
+    voices = [{
         name:   'rhythm',
         staff:  'main',
         beam:   'rhythm',
@@ -15,18 +15,18 @@ export default class PercussionStave extends DrumStave {
         stemup: true
     }];
 
-    constructor(parts) {
+    constructor(voices) {
         super();
 
-        // Generate percussion stave of varying number of parts
-        if (parts) {
-            if (parts.length > 5) throw new Error(`PercussionStave() ${ parts.length } parts exceeds maximum number of 5 parts`);
+        // Generate percussion stave of varying number of voices
+        if (voices) {
+            if (voices.length > 5) throw new Error(`PercussionStave() ${ voices.length } voices exceeds maximum number of 5 voices`);
 
-            this.parts = parts;
+            this.voices = voices;
 
-            this.rows  = Array.from({ length: parts.length * 2 + 13 }, (v, i) => {
+            this.rows  = Array.from({ length: voices.length * 2 + 13 }, (v, i) => {
                 const n = (i - 7 / 2);
-                return parts[n] ? parts[n].name : '';
+                return voices[n] ? voices[n].name : '';
             });
 
             this.style = {
@@ -40,7 +40,7 @@ export default class PercussionStave extends DrumStave {
 
     getPart(number) {
         // Find part for this note number
-        return this.parts.find((part) => part.notes === '*' || part.notes.includes(number));
+        return this.voices.find((voice) => voice.notes === '*' || voice.notes.includes(number));
     }
 
     get maxPitch() {
@@ -59,7 +59,7 @@ export default class PercussionStave extends DrumStave {
         return this.rows[8];
     }
 
-    getRow(part, pitch) {
+    getRow(voice, pitch) {
         return this.centerRow ;
     }
 }
