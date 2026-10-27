@@ -18,29 +18,18 @@ function average(a, n, i, array) {
     return a + n / array.length;
 }
 
-function pushSubBeam(symbols, main, beats, sub, levelDuration, level) {
-    const startBeat = main.beat;
-    const totalDur  = main.duration;
-    const i0        = sub[0];
+function pushSubBeam(symbols, main, beats, positions, sub, levelDuration, level) {
+    const i0      = sub[0];
+    const isStub  = sub.length === 1;
+    const forward = isStub && (i0 === 0 || eq(beats[i0] % levelDuration, 0, P24));
 
-    const b0 = sub.length === 1 ?
-        // If at start of beam or beat is divisible by levelDuration, stub projects forward
-        (i0 === 0 || eq(beats[i0] % levelDuration, 0, P24)) ?
-            beats[i0] :
-            // Backward stub starts before i0
-            beats[i0] - 0.4 * (beats[i0] - beats[i0 - 1]) :
-        beats[i0];
+    const iStart = isStub ? (forward ? i0 : i0 - 1) : i0;
+    const iEnd   = isStub ? (forward ? i0 + 1 : i0) : sub[sub.length - 1];
 
-    const b1 = sub.length === 1 ?
-        (i0 === 0 || eq(beats[i0] % levelDuration, 0, P24)) ?
-            // Forward stub stops after i0
-            beats[i0] + 0.5 * (beats[i0 + 1] - beats[i0]) :
-            // Backward stub stops at i0
-            beats[i0] :
-        beats[sub[sub.length - 1]];
-
-    const x0 = (b0 - startBeat) / totalDur;
-    const x1 = (b1 - startBeat) / totalDur;
+    const b0      = beats[iStart];
+    const b1      = beats[iEnd];
+    const y0      = positions ? positions[iStart] : 0;
+    const y1      = positions ? positions[iEnd]   : 0;
     const yOffset = (main.stemup ? 1 : -1) * level * beamSpacing;
 
     symbols.push({
@@ -50,14 +39,16 @@ function pushSubBeam(symbols, main, beats, sub, levelDuration, level) {
         stemup:   main.stemup,
         beat:     b0,
         duration: b1 - b0,
-        y:        (main.y || 0) + x0 * main.range + yOffset,
-        range:    (x1 - x0) * main.range,
+        x0:       isStub && !forward ? 0.6 : 0,
+        x1:       isStub && forward  ? 0.5 : 1,
+        y:        y0 + yOffset,
+        range:    y1 - y0,
         divisor:  8 / levelDuration,
         id:       main.id
     });
 }
 
-function createSubBeams(symbols, main, beats, durations, i = 0, levelDuration = 0.5, level = 1) {
+function createSubBeams(symbols, main, beats, durations, positions, i = 0, levelDuration = 0.5, level = 1) {
     // Don't render anything shorter than triplet 32nd note beams
     if (levelDuration < 1 / 6) return;
 
@@ -68,23 +59,23 @@ function createSubBeams(symbols, main, beats, durations, i = 0, levelDuration = 
         // If beam division is a half duration or less
         if (durations[n] <= 0.5 * levelDuration
             // ...or a dotted half duration
-            || eq(durations[n], 0.75 * levelDuration, P24)
+            || durations[n] === 0.75 * levelDuration
             // ...or double dotted half duration
-            || eq(durations[n], 0.875 * levelDuration, P24)
+            || durations[n] === 0.875 * levelDuration
         ) {
             if (sub) sub.push(n);
             else sub = [n];
         }
         else if (sub) {
-            pushSubBeam(symbols, main, beats, sub, levelDuration, level);
-            createSubBeams(symbols, main, beats, durations, sub[0], levelDuration / 2, level + 1);
+            pushSubBeam(symbols, main, beats, positions, sub, levelDuration, level);
+            createSubBeams(symbols, main, beats, durations, positions, sub[0], levelDuration / 2, level + 1);
             sub = undefined;
         }
     }
 
     if (sub) {
-        pushSubBeam(symbols, main, beats, sub, levelDuration, level);
-        createSubBeams(symbols, main, beats, durations, sub[0], levelDuration / 2, level + 1);
+        pushSubBeam(symbols, main, beats, positions, sub, levelDuration, level);
+        createSubBeams(symbols, main, beats, durations, positions, sub[0], levelDuration / 2, level + 1);
     }
 }
 
@@ -242,5 +233,5 @@ export function closeBeam(symbols, stave, part, beam) {
         id: ++beamId
     }));
 
-    createSubBeams(symbols, beam, beats, durations);
+    createSubBeams(symbols, beam, beats, durations, positions);
 }

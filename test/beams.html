@@ -117,8 +117,60 @@
             }</script>
         </scribe-music>
 
-        <scribe-music class="x1 no-wrap" clef="drum" src="#beams-2" debug>
+        <scribe-music class="x1 no-wrap" clef="treble" src="#beams-2" debug>
             <script type="application/json" id="beams-2">{
+                "events": [
+                    [0, "key", "F"],
+                    [0, "meter", 4, 1],
+                    [0, "sequence", 1, 0, 16]
+                ],
+
+                "sequences": [{
+                    "id": 1,
+                    "name": "Head",
+                    "events": [
+                        [0,    "note",  "E5",  0.1, 0.75],
+                        [0,    "note",  "C3",  0.1, 0.75],
+                        [0.75, "note",  "E5",  0.1, 0.25],
+                        [0.75, "note",  "C3",  0.1, 0.25],
+                        [2,    "note",  "E5",  0.1, 0.375],
+                        [2,    "note",  "C3",  0.1, 0.375],
+                        [2.375,"note",  "E5",  0.1, 0.125],
+                        [2.375,"note",  "C3",  0.1, 0.125],
+
+                        [4,    "note",  "E6",  0.1, 0.75],
+                        [4,    "note",  "C4",  0.1, 0.75],
+                        [4.75, "note",  "E6",  0.1, 0.25],
+                        [4.75, "note",  "C4",  0.1, 0.25],
+                        [6,    "note",  "E6",  0.1, 0.375],
+                        [6,    "note",  "C4",  0.1, 0.375],
+                        [6.375,"note",  "E6",  0.1, 0.125],
+                        [6.375,"note",  "C4",  0.1, 0.125],
+
+                        [8,    "note",  "A5",  0.1, 0.75],
+                        [8,    "note",  "C3",  0.1, 0.75],
+                        [8.75, "note",  "E5",  0.1, 0.25],
+                        [8.75, "note",  "D3",  0.1, 0.25],
+                        [9,    "note",  "B4",  0.1, 0.25],
+                        [9,    "note",  "E3",  0.1, 0.25],
+                        [9.25, "note",  "F4",  0.1, 0.75],
+                        [9.25, "note",  "F3",  0.1, 0.75],
+
+                        [12,   "note",  "D6",  0.1, 0.25],
+                        [12,   "note",  "D5",  0.1, 0.25],
+                        [12.25,"note",  "E6",  0.1, 0.75],
+                        [12.25,"note",  "B4",  0.1, 0.75],
+                        [13,   "note",  "F6",  0.1, 0.75],
+                        [13,   "note",  "F4",  0.1, 0.75],
+                        [13.75,"note",  "G6",  0.1, 0.25],
+                        [13.75,"note",  "C4",  0.1, 0.25]
+                    ]
+                }]
+            }</script>
+        </scribe-music>
+
+        <scribe-music class="x1 no-wrap" clef="drum" src="#beams-3" debug>
+            <script type="application/json" id="beams-3">{
                 "events": [
                     [0,  "sequence", 1, 0, 8]
                 ],

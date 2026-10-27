@@ -86,7 +86,7 @@ function metricQuantise(settings, sequence, parts, buffers, tree) {
     let stopBeat = 1;
 //    let symbols  = [];
     let event;
-//    let sequenceEvent;
+    let sequenceEvent;
 
     let count = 0;
 

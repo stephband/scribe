@@ -153,8 +153,9 @@ export async function renderDOM(sequence, clef, keyname, meter, transpose = 0, d
 
     return fragment;
 }
-
+/*
 export function renderBeams(element, root = element) {
     // Render beams
     root.querySelectorAll('.beam').forEach(renderBeam);
 }
+*/

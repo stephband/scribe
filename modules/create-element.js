@@ -235,21 +235,27 @@ const createSymbolElement = overload(get('type'), {
         }
     }),
 
-    beam: (symbol, settings) => create('svg', {
-        class: `${ symbol.stemup ? 'up' : 'down' }-beam beam`,
-        viewBox: `0 ${ (symbol.range < 0 ? symbol.range : 0) - 0.5 } 1 ${ abs(symbol.range) + 1 }`,
-        preserveAspectRatio: "none",
-        style: `--beat: ${ truncate(6, symbol.beat) }; --duration: ${ truncate(6, symbol.duration) }; ${ symbol.y ? '--translate-y:' + (symbol.y * 0.125) + ';' : '' } height: ${ (abs(symbol.range) + beamThickness) * 0.125 }em; align-self: ${ symbol.range < 0 ? 'end' : 'start' };`,
-        html: `<path class="beam-path" d="M0,${ -0.5 * beamThickness } L1,${ symbol.range - 0.5 * beamThickness } L1,${ symbol.range + 0.5 * beamThickness } L0,${ 0.5 * beamThickness } Z"></path>`,
-        data: {
-            beat:     truncate(4, symbol.beat),
-            pitch:    symbol.pitch,
-            divisor:  symbol.divisor,
-            part:     symbol.part.name,
-            beam:     symbol.id,
-            events:   symbol.length ? toEventIds(symbol) : undefined
-        }
-    }),
+    beam: (symbol, settings) => {
+        const x0 = symbol.x0 || 0;
+        const x1 = symbol.x1 || 1;
+        const y0 = x0 * symbol.range;
+        const y1 = x1 * symbol.range;
+        return create('svg', {
+            class: `${ symbol.stemup ? 'up' : 'down' }-beam beam`,
+            viewBox: `0 ${ (symbol.range < 0 ? symbol.range : 0) - 0.5 } 1 ${ abs(symbol.range) + 1 }`,
+            preserveAspectRatio: "none",
+            style: `--beat: ${ truncate(6, symbol.beat) }; --duration: ${ truncate(6, symbol.duration) }; ${ symbol.y ? '--translate-y:' + (symbol.y * 0.125) + ';' : '' } height: ${ (abs(symbol.range) + beamThickness) * 0.125 }em; align-self: ${ symbol.range < 0 ? 'end' : 'start' };`,
+            html: `<path class="beam-path" d="M${ x0 },${ y0 - 0.5 * beamThickness } L${ x1 },${ y1 - 0.5 * beamThickness } L${ x1 },${ y1 + 0.5 * beamThickness } L${ x0 },${ y0 + 0.5 * beamThickness } Z"></path>`,
+            data: {
+                beat:     truncate(4, symbol.beat),
+                pitch:    symbol.pitch,
+                divisor:  symbol.divisor,
+                part:     symbol.part.name,
+                beam:     symbol.id,
+                events:   symbol.length ? toEventIds(symbol) : undefined
+            }
+        });
+    },
 
     note: (symbol) => store(create('data', {
         class: `${ symbol.stemup ? 'up-note ' : 'down-note ' }${ symbol.top ? 'top-note ' : '' }${ symbol.bottom ? 'bottom-note ' : '' }${
