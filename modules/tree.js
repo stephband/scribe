@@ -313,24 +313,24 @@ function spell(notes) {
 }
 
 
-function updateBeamWithNoteSymbols(symbols, bar, stave, part, beam, noteSymbols) {
+function updateBeamWithNoteSymbols(symbols, bar, stave, voice, beam, noteSymbols) {
     const { beat, duration } = noteSymbols[0];
 
     // If notes have a duration too long for a beam
     if (duration >= 1) {
         // ...and there is a beam, close it
-        if (beam) beam = closeBeam(symbols, stave, part, beam);
+        if (beam) beam = closeBeam(symbols, stave, voice, beam);
         return;
     }
 
     // If there is a beam and notes are in a new bar division
     if (beam && getDivisionBefore(bar.divisions, beam.beat) !== getDivisionBefore(bar.divisions, beat)) {
-        beam = closeBeam(symbols, stave, part, beam);
+        beam = closeBeam(symbols, stave, voice, beam);
     }
 
     // Make sure there is a beam
     if (!beam) {
-        beam = createBeam(part, beat);
+        beam = createBeam(beat, voice);
     }
 
     // Push note symbols on to it
@@ -424,7 +424,7 @@ function fillTupletToBeat(settings, bar, stave, voice, accidentals, notes, symbo
         const noteSymbols = stave.createNoteSymbols(symbols, bar, voice, accidentals, notes, beat - bar.beat, division, settings);
         createTies(symbols, bar, voice, notes, noteSymbols, 0.5 * division);
         if (division < 0.5) {
-            if (!beam) beam = createBeam(voice, beat - bar.beat);
+            if (!beam) beam = createBeam(beat - bar.beat, voice);
             push(beam, ...noteSymbols);
         }
         push(tupletSymbol, ...noteSymbols);

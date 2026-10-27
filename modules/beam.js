@@ -1,10 +1,9 @@
 
 import create from 'dom/create.js';
 import rect   from 'dom/rect.js';
-import { ceilPow2 } from './number/power-of-2.js';
-import { eq, gte, lte, lt, gt } from './number/float.js';
-
-import { P24, GR }       from './constants.js';
+//import { ceilPow2 } from './number/power-of-2.js';
+//import { eq, gte, lte, lt, gt } from './number/float.js';
+//import { P24, GR }       from './constants.js';
 
 /* Beams */
 

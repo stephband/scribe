@@ -7,12 +7,12 @@ import { stemupFromPitches } from './stem.js';
 import { P24 } from '../constants.js';
 
 
-const { abs, ceil, floor, min, max, pow, sqrt, round } = Math;
+const { ceil, floor } = Math;
 const assign = Object.assign;
+
 let beamId = 0;
 
-
-const beamSpacing = 1.5;
+const beamSpacing = 1.6;
 
 function average(a, n, i, array) {
     return a + n / array.length;
@@ -35,7 +35,7 @@ function pushSubBeam(symbols, main, beats, positions, sub, levelDuration, level)
 
     symbols.push({
         type:     'beam',
-        part:     main.part,
+        voice:    main.voice,
         pitch:    main.pitch,
         stemup:   main.stemup,
         beat:     b0,
@@ -79,11 +79,11 @@ function createSubBeams(symbols, main, beats, durations, positions, i = 0, level
     }
 }
 
-export function createBeam(part, beat) {
+export function createBeam(beat, voice) {
     return {
         type: 'beam',
         beat,
-        part
+        voice
     };
 }
 

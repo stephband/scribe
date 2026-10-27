@@ -5,7 +5,7 @@ import { toNoteNumber }  from 'midi/note.js';
 import { toKeyName }     from 'sequence/modules/event/key.js';
 import * as glyphs       from "./glyphs.js";
 import { identify }      from './event.js';
-import { beamThickness } from './beam.js';
+//import { beamThickness } from './beam.js';
 import { toHTML }        from './html.js';
 import map               from "./store.js";
 import truncate          from './number/truncate.js';
@@ -97,7 +97,7 @@ function store(element, data) {
 
 export function createBarElement(bar) {
     const { beat, duration, divisions, count } = bar;
-    const element = create('div', {
+    const element = create('music-bar', {
         class: `${ bar.doubleBarLine ? 'end-bar ' : '' }bar${ bar.error ? ' error ': '' }`,
         data: { beat, duration, divisions, count }
     });
@@ -108,7 +108,7 @@ export function createBarElement(bar) {
 }
 
 export function createPartElement({ stave, key, symbols }) {
-    const element = create('div', {
+    const element = create('music-stave', {
         class: `${ stave.type }-stave stave`,
         data: {
             stave: stave.type,
@@ -181,7 +181,7 @@ const createSymbolElement = overload(get('type'), {
         }
     }), symbol.event),
 
-    acci: (symbol) => store(create('span', {
+    acci: (symbol) => store(create('music-acci', {
         class: (acciClasses[symbol.value] || 'acci') + (symbol.clump ? ' acci-' + symbol.clump : '' ) + (symbol.cluster ? ' acci-cluster' : ''),
         html: acciGlyphs[symbol.value] || glyphs.acciNatural,
         data: {
@@ -235,20 +235,20 @@ const createSymbolElement = overload(get('type'), {
         }
     }),
 
-    beam: (symbol) => create('span', {
+    beam: (symbol) => create('music-beam', {
         class: `${ symbol.stemup ? 'up' : 'down' }-beam ${ symbol.range < 0 ? 'rise-beam ' : '' }${ symbol.stub ? symbol.stub + '-beam ' : '' }beam`,
         style: `--beat: ${ truncate(6, symbol.beat) }; --duration: ${ truncate(6, symbol.duration) };${ symbol.y ? ' --translate-y: ' + truncate(6, symbol.y * 0.125) + ';' : '' }${ symbol.range ? ' --range: ' + truncate(6, abs(symbol.range)) + ';' : '' }`,
         data: {
             beat:     truncate(4, symbol.beat),
             pitch:    symbol.pitch,
             divisor:  symbol.divisor,
-            part:     symbol.part.name,
+            voice:    symbol.voice.name,
             beam:     symbol.id,
             events:   symbol.length ? toEventIds(symbol) : undefined
         }
     }),
 
-    note: (symbol) => store(create('data', {
+    note: (symbol) => store(create('music-note', {
         class: `${ symbol.stemup ? 'up-note ' : 'down-note ' }${ symbol.top ? 'top-note ' : '' }${ symbol.bottom ? 'bottom-note ' : '' }${
             // Stem up
             symbol.stemup ?
@@ -285,7 +285,7 @@ const createSymbolElement = overload(get('type'), {
         }
     }), event),
 
-    tuplet: ({ beat, duration, divisor, rhythm, voice, pitch, stemup, angle }) => create('span', {
+    tuplet: ({ beat, duration, divisor, rhythm, voice, pitch, stemup, angle }) => create('music-tuplet', {
         class: `${ stemup ? 'up' : 'down' }-tuplet tuplet`,
         html: glyphs['tuplet' + divisor],
         data: {
@@ -302,7 +302,7 @@ const createSymbolElement = overload(get('type'), {
             undefined
     }),
 
-    rest: ({ beat, duration, part, pitch, whole }) => create('span', {
+    rest: ({ beat, duration, part, pitch, whole }) => create('music-rest', {
         class: whole && duration > 3 ?
             'whole-rest rest' :
             'rest',

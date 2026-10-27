@@ -8,7 +8,7 @@ import SequenceIterator from 'sequence/modules/sequence-iterator.js';
 import Stave            from './stave.js';
 import createTree       from './tree.js';
 import { createBarElement } from './create-element.js';
-import { renderBeam }   from './beam.js';
+//import { renderBeam }   from './beam.js';
 import * as glyphs      from './glyphs.js';
 import truncate         from './number/truncate.js';
 import config           from './config.js';
