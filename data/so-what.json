@@ -1,6 +1,15 @@
 {
 "name": "So What",
 "author": { "name": "Miles Davis / Bill Evans" },
+
+"objects": [
+    { "id": 2, "name": "Trumpet" },
+    { "id": 3, "name": "Alto sax" },
+    { "id": 4, "name": "Tenor sax" },
+    { "id": 5, "name": "Trombone" },
+    { "id": 6, "name": "Bass" }
+],
+
 "events": [
     [0,  "key", "C"],
     [0,  "meter", 4, 1],

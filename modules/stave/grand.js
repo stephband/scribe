@@ -1,7 +1,7 @@
 
 import * as glyphs from "../glyphs.js";
-import { toNoteName, toRootNumber, toRootName } from 'midi/note.js';
-import { rflatsharp, byFatherCharlesPitch, accidentalChars } from '../pitch.js';
+import { toNoteName } from 'midi/note.js';
+import { rflatsharp } from '../pitch.js';
 import Stave       from './stave.js';
 
 
@@ -13,8 +13,8 @@ const assign = Object.assign;
 A simple piano grand stave which brute splits treble from bass at Bb3.
 **/
 
-export default class PianoStave extends Stave {
-    type = 'piano';
+export default class GrandStave extends Stave {
+    type = 'grand';
 
     rows = [
         "rh-A6 soprano-A6 alto-A6",

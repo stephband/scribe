@@ -107,9 +107,10 @@ export function createBarElement(bar) {
     return element;
 }
 
-export function createPartElement({ stave, key, symbols }) {
+export function createPartElement({ name, stave, key, symbols }) {
     const element = create('music-stave', {
         class: `${ stave.type }-stave stave`,
+        title: `${ name }`,
         data: {
             stave: stave.type,
             key:   stave.pitched ?

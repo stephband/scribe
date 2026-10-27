@@ -15,6 +15,7 @@ import { createBeam, closeBeam } from './symbol/beam.js';
 import { closeTuplet }           from './symbol/tuplet.js';
 import { isTupletSymbol }        from './tuplet.js';
 import { P24 }                   from './constants.js';
+import { toDisplay }             from './display.js';
 import log                       from './log.js';
 import toStopBeat                from './event/to-stop-beat.js';
 
@@ -22,29 +23,34 @@ import toStopBeat                from './event/to-stop-beat.js';
 const { values } = Object;
 
 
-function toStave(settings, id) {
-    // TODO
-    return Stave.treble;
+
+function toPartName(settings, event) {
+    if (!event.object) return 0;
+    return event.object.name;
 }
 
-function toPart(settings, event) {
-    // TODO
-    return event.target || 0;
-}
-
-function toPartIndex(settings, name) {
+/*function toPartIndex(settings, name) {
     // TODO
     return 0;
-}
+}*/
 
 function getPart(settings, bar, name) {
-    const index = toPartIndex(settings, name);
-    return bar[index] || (bar[index] = {
-        type:    'part',
-        stave:   toStave(settings, name),
-        key:     bar.key,
-        symbols: []
-    });
+    //const index = toPartIndex(settings, name);
+    let i = -1;
+    while (bar[++i]) if (bar[i].name === name) {
+        return bar[i];
+    }
+
+    const display = toDisplay(name);
+console.log(name, display);
+    return bar[i] = {
+        type:      'part',
+        name,
+        stave:     Stave[display.staff],
+        transpose: display.transpose,
+        key:       bar.key,
+        symbols:   []
+    };
 }
 
 function toVoice(settings, stave, event) {
@@ -178,9 +184,9 @@ function metricQuantise(settings, sequence, parts, buffers, tree) {
                 break;
 
             case "note": {
-                const partName  = toPart(settings, event);
-                const stave     = toStave(settings, partName);
-                const voiceName = toVoice(settings, stave, event);
+                const partName  = toPartName(settings, event);
+                const part      = getPart(settings, bar, partName);
+                const voiceName = toVoice(settings, part.stave, event);
                 //const staveType = toStave(settings, event.part);
                 // Push
 //                pushEventToPart(stave, key, parts, event);
@@ -194,14 +200,11 @@ function metricQuantise(settings, sequence, parts, buffers, tree) {
 
                 event.part  = partName;
                 event.voice = voiceName;
-                event.stave = stave;
+                event.stave = part.stave;
 
                 // Push note into global part
                 if (!parts[partName]) parts[partName] = [];
                 parts[partName].push(event);
-
-                // Create bar part object
-                const part = getPart(settings, bar, partName);
 
                 // Push note into part.voice buffer
                 const name = partName + '.' + voiceName;
@@ -387,13 +390,13 @@ console.log('Bar', bar.count, '-------------------------------------');
     while (bar[++n]) symbolisePart(settings, buffers, bar, bar[n], n);
 }
 
-function symbolisePart(settings, buffers, bar, part, name) {
+function symbolisePart(settings, buffers, bar, part) {
     const { stave, key, symbols } = part;
     // Loop over voices
     let n = -1;
     let notes;
     while (part[++n]) {
-        notes = buffers[name + '.' + n];
+        notes = buffers[part.name + '.' + n];
         symboliseVoice(settings, bar, part, stave, key, notes, symbols, part[n]);
     }
 }
@@ -523,7 +526,7 @@ export default async function createTree(sequence, settings = config) {
 
     // Create sequence object
     // Make iterator
-    const iterator = new SequenceIterator(events, sequence.sequences, Transform.from(array));
+    const iterator = new SequenceIterator(events, sequence.sequences, Transform.from(array), null, sequence);
     const parts    = {};
     const buffers  = {};
     const tree     = {};

@@ -3,7 +3,7 @@ import * as glyphs     from "./glyphs.js";
 import Stave           from './stave/stave.js';
 import DrumStave       from './stave/drum.js';
 import PercussionStave from './stave/percussion.js';
-import PianoStave      from './stave/piano.js';
+import GrandStave      from './stave/grand.js';
 
 
 class TrebleUpStave extends Stave {
@@ -53,7 +53,7 @@ Stave['treble-down'] = new TrebleDownStave();
 Stave['alto']        = new AltoStave();
 Stave['tenor']       = new TenorStave();
 Stave['bass']        = new BassStave();
-Stave['piano']       = new PianoStave();
+Stave['grand']       = new GrandStave();
 Stave['drum']        = new DrumStave();
 Stave['percussion']  = new PercussionStave();
 
