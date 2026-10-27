@@ -373,7 +373,7 @@ in their duration span. */
 
 /* Beams */
 
-.bar .beam {
+.bar music-beam {
 	justify-self: stretch;
 	width: auto;
 	max-width: none;

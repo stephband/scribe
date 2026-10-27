@@ -1,4 +1,4 @@
-.beam {
+music-beam {
     --beam-thickness: calc(1.1 * 0.125em);
 
     background: currentColor;
@@ -12,7 +12,7 @@
     );
 }
 
-.beam.rise-beam {
+music-beam.rise-beam {
     align-self: end;
     clip-path: polygon(
         0%   calc(100% - var(--beam-thickness)),
@@ -22,12 +22,12 @@
     );
 }
 
-.bar .beam.forward-beam {
+.bar music-beam.forward-beam {
     justify-self: start;
     width: 50%;
 }
 
-.bar .beam.back-beam {
+.bar music-beam.back-beam {
     justify-self: end;
     width: 40%;
 }

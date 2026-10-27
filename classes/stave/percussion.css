@@ -49,11 +49,11 @@ https://web.mit.edu/merolish/Public/drums.pdf
     display: none !important;
 }
 
-.percussion-stave > .beam {
+.percussion-stave > music-beam {
     grid-row-start: stave-center;
 }
 
-.percussion-stave > .up-beam.beam {
+.percussion-stave > music-beam.up-beam {
     /* Related to beamThickness in beam.js - TODO: expose beamThickness as CSS var */
     --translate-y: 0.00625;
 }

@@ -213,21 +213,9 @@ const createSymbolElement = overload(get('type'), {
         }), symbol.event);
     },
 
-    ledge: (symbol) => create('svg', {
-        class:   `${ symbol.rows < 0 ? 'up' : 'down' }-ledge ledge`,
-        viewBox: symbol.rows < 0 ?
-            // Up ledge start from 1 row above stave.topRow
-            `0 ${ 9 + symbol.rows - 0.5 } 5 ${ abs(symbol.rows) }` :
-            // Down ledge starts from 1 row below stave.bottomRow
-            `0 -0.5 5 ${ abs(symbol.rows) }` ,
-        preserveAspectRatio: "xMidYMin",
-        html: `
-            <line x1="0" x2="5" y1="0" y2="0"></line>
-            <line x1="0" x2="5" y1="2" y2="2"></line>
-            <line x1="0" x2="5" y1="4" y2="4"></line>
-            <line x1="0" x2="5" y1="6" y2="6"></line>
-            <line x1="0" x2="5" y1="8" y2="8"></line>
-        `,
+    ledge: (symbol) => create('music-ledge', {
+        class: `${ symbol.rows < 0 ? 'up' : 'down' }-ledge ledge`,
+        style: `--rows: ${ abs(symbol.rows) };`,
         data: {
             beat:  truncate(4, symbol.beat),
             pitch: symbol.pitch,
@@ -236,7 +224,7 @@ const createSymbolElement = overload(get('type'), {
     }),
 
     beam: (symbol) => create('music-beam', {
-        class: `${ symbol.stemup ? 'up' : 'down' }-beam ${ symbol.range < 0 ? 'rise-beam ' : '' }${ symbol.stub ? symbol.stub + '-beam ' : '' }beam`,
+        class: `${ symbol.stemup ? 'up' : 'down' }-beam ${ symbol.range < 0 ? 'rise-beam ' : '' }${ symbol.stub ? symbol.stub + '-beam' : '' }`,
         style: `--beat: ${ truncate(6, symbol.beat) }; --duration: ${ truncate(6, symbol.duration) };${ symbol.y ? ' --translate-y: ' + truncate(6, symbol.y * 0.125) + ';' : '' }${ symbol.range ? ' --range: ' + truncate(6, abs(symbol.range)) + ';' : '' }`,
         data: {
             beat:     truncate(4, symbol.beat),

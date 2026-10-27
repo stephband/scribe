@@ -347,9 +347,7 @@
 }
 
 .stave > .ledge {
-    /* Stretch ledge from one named row to another plus 1 */
-    align-self: stretch;
-    height: auto;
+    align-self: start;
     overflow: hidden;
 }
 
@@ -383,7 +381,7 @@
     align-self: center;
 }*/
 
-.stave > .beam {
+.stave > music-beam {
     align-self: stretch;
     width: auto;
 }

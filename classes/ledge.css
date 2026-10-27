@@ -1,23 +1,37 @@
 
-.ledge {
-    overflow: hidden;
-    width: 0.55em;
-    vector-effect: non-scaling-stroke;
-    stroke: currentcolor;
-    stroke-width: 0.05em;
-    stroke-linejoin: round;
-    stroke-linecap: round;
-    fill: none;
-    /* Make sure ledge svgs are unconstrained by other styles */
+.stave > .ledge {
+    --ledge-thickness: 0.03125em;
+
+    width: 0.625em;
     min-width: 0;
     max-width: none;
+    height: calc(var(--rows, 1) * 0.125em);
+    background-repeat: repeat-y;
+    background-size: 100% 0.25em;
 }
 
-.ledge line {
-    vector-effect: non-scaling-stroke;
-    stroke: currentcolor;
-    stroke-width: 0.03125em;
-    stroke-linejoin: round;
-    stroke-linecap: round;
-    fill: none;
+.up-ledge {
+    background-position: 0 bottom;
+    background-image: linear-gradient(
+        to top,
+        transparent 0,
+        transparent calc(0.0625em - 0.5 * var(--ledge-thickness)),
+        currentcolor calc(0.0625em - 0.5 * var(--ledge-thickness)),
+        currentcolor calc(0.0625em + 0.5 * var(--ledge-thickness)),
+        transparent calc(0.0625em + 0.5 * var(--ledge-thickness)),
+        transparent 100%
+    );
+}
+
+.down-ledge {
+    background-position: 0 top;
+    background-image: linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent calc(0.0625em - 0.5 * var(--ledge-thickness)),
+        currentcolor calc(0.0625em - 0.5 * var(--ledge-thickness)),
+        currentcolor calc(0.0625em + 0.5 * var(--ledge-thickness)),
+        transparent calc(0.0625em + 0.5 * var(--ledge-thickness)),
+        transparent 100%
+    );
 }
