@@ -30,6 +30,7 @@ function pushSubBeam(symbols, main, beats, positions, sub, levelDuration, level)
     const b1      = beats[iEnd];
     const y0      = positions ? positions[iStart] : 0;
     const y1      = positions ? positions[iEnd]   : 0;
+    const dy      = y1 - y0;
     const yOffset = (main.stemup ? 1 : -1) * level * beamSpacing;
 
     symbols.push({
@@ -39,10 +40,9 @@ function pushSubBeam(symbols, main, beats, positions, sub, levelDuration, level)
         stemup:   main.stemup,
         beat:     b0,
         duration: b1 - b0,
-        x0:       isStub && !forward ? 0.6 : 0,
-        x1:       isStub && forward  ? 0.5 : 1,
-        y:        y0 + yOffset,
-        range:    y1 - y0,
+        stub:     isStub ? (forward ? 'forward' : 'back') : undefined,
+        y:        (isStub && !forward ? y0 + 0.6 * dy : y0) + yOffset,
+        range:    isStub ? (forward ? 0.5 * dy : 0.4 * dy) : dy,
         divisor:  8 / levelDuration,
         id:       main.id
     });
