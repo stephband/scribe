@@ -12,8 +12,80 @@ const assign = Object.assign;
 let beamId = 0;
 
 
+const beamSpacing = 1.5;
+
 function average(a, n, i, array) {
     return a + n / array.length;
+}
+
+function pushSubBeam(symbols, main, beats, sub, levelDuration, level) {
+    const startBeat = main.beat;
+    const totalDur  = main.duration;
+    const i0        = sub[0];
+
+    const b0 = sub.length === 1 ?
+        // If at start of beam or beat is divisible by levelDuration, stub projects forward
+        (i0 === 0 || eq(beats[i0] % levelDuration, 0, P24)) ?
+            beats[i0] :
+            // Backward stub starts before i0
+            beats[i0] - 0.4 * (beats[i0] - beats[i0 - 1]) :
+        beats[i0];
+
+    const b1 = sub.length === 1 ?
+        (i0 === 0 || eq(beats[i0] % levelDuration, 0, P24)) ?
+            // Forward stub stops after i0
+            beats[i0] + 0.5 * (beats[i0 + 1] - beats[i0]) :
+            // Backward stub stops at i0
+            beats[i0] :
+        beats[sub[sub.length - 1]];
+
+    const x0 = (b0 - startBeat) / totalDur;
+    const x1 = (b1 - startBeat) / totalDur;
+    const yOffset = (main.stemup ? 1 : -1) * level * beamSpacing;
+
+    symbols.push({
+        type:     'beam',
+        part:     main.part,
+        pitch:    main.pitch,
+        stemup:   main.stemup,
+        beat:     b0,
+        duration: b1 - b0,
+        y:        (main.y || 0) + x0 * main.range + yOffset,
+        range:    (x1 - x0) * main.range,
+        divisor:  8 / levelDuration,
+        id:       main.id
+    });
+}
+
+function createSubBeams(symbols, main, beats, durations, i = 0, levelDuration = 0.5, level = 1) {
+    // Don't render anything shorter than triplet 32nd note beams
+    if (levelDuration < 1 / 6) return;
+
+    let n = i - 1;
+    let sub;
+
+    while (durations[++n]) {
+        // If beam division is a half duration or less
+        if (durations[n] <= 0.5 * levelDuration
+            // ...or a dotted half duration
+            || eq(durations[n], 0.75 * levelDuration, P24)
+            // ...or double dotted half duration
+            || eq(durations[n], 0.875 * levelDuration, P24)
+        ) {
+            if (sub) sub.push(n);
+            else sub = [n];
+        }
+        else if (sub) {
+            pushSubBeam(symbols, main, beats, sub, levelDuration, level);
+            createSubBeams(symbols, main, beats, durations, sub[0], levelDuration / 2, level + 1);
+            sub = undefined;
+        }
+    }
+
+    if (sub) {
+        pushSubBeam(symbols, main, beats, sub, levelDuration, level);
+        createSubBeams(symbols, main, beats, durations, sub[0], levelDuration / 2, level + 1);
+    }
 }
 
 export function createBeam(part, beat) {
@@ -42,6 +114,9 @@ export function closeBeam(symbols, stave, part, beam) {
         // Get stem direction from part
         part.stemup ;
 
+    const beats     = [];
+    const durations = [];
+
     // If part has beam (drum stave) beams are in a fixed position
     if (part.beam) {
         let note, row;
@@ -51,24 +126,27 @@ export function closeBeam(symbols, stave, part, beam) {
         while (note = beam[++n]) {
             note.stemup = stemup;
             note.beam   = beam;
-            // Set stem height on all notes. TODO: This is hard-coded to drum
-            // stave, we need to get row of part.beam, which is a named row at
-            // the moment
             row = stave.getRow(part, note.pitch);
             note.stemHeight = stemup ?
                 0.125 + row / 8 :
                 2.8125 - row / 8 ;
+
+            if (!beats.length || !eq(beats[beats.length - 1], note.beat, P24)) {
+                beats.push(note.beat);
+                durations.push(note.duration);
+            }
         }
 
-        //console.log('TODO: Beam has fixed position according to part', part.beam);
         // Push the beam into symbols
         symbols.push(assign(beam, {
             duration,
+            y: 0,
             stemup,
             range: 0,
             id: ++beamId
         }));
 
+        createSubBeams(symbols, beam, beats, durations);
         return;
     }
 
@@ -96,6 +174,8 @@ export function closeBeam(symbols, stave, part, beam) {
 
         // Push it into pitches
         rows.push(row);
+        beats.push(note.beat);
+        durations.push(note.duration);
     }
 
     const beamLength = rows.length - 1;
@@ -161,4 +241,6 @@ export function closeBeam(symbols, stave, part, beam) {
         range,
         id: ++beamId
     }));
+
+    createSubBeams(symbols, beam, beats, durations);
 }

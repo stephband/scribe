@@ -377,17 +377,8 @@ in their duration span. */
 	justify-self: stretch;
 	width: auto;
 	max-width: none;
-    /* Beams span from first head to last head. Their duration is set to the
-       difference between the two (not to the total duration) */
-    grid-column-end: span calc(round(nearest, var(--duration) * var(--columns-per-beat)));
-}
-
-/* A few tuplet beams need to special-cased due to durations not rounding
-   to the same columns as their notes */
-.bar .beam[data-beat="0.4"],   /* A quintuplet 8th-note beam starting on the second note */
-.bar .beam[data-beat*=".44"],  /* A nonuplet 8th-note beam starting on the second note */
-.bar .beam[data-beat*=".11"] { /* A nonuplet 32nd-note beam starting on the second note */
-    grid-column-end: span calc(round(down, var(--duration) * var(--columns-per-beat)));
+    /* Beams span from first head column to last head column */
+    grid-column-end: span calc(round((var(--beat) + var(--duration)) * var(--columns-per-beat)) - round(var(--beat) * var(--columns-per-beat)));
 }
 
 .bar .up-beam {

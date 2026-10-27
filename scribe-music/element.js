@@ -6,7 +6,7 @@ import { timesigToMeter, meterToTimesig } from 'sequence/modules/event/meter.js'
 
 import requestData       from '../modules/request-data.js';
 import Stave             from '../modules/stave.js';
-import { renderDOM, renderStyle, renderBeams, remove } from '../modules/render-dom.js';
+import { renderDOM, renderStyle, remove } from '../modules/render-dom.js';
 import config            from '../modules/config.js';
 
 const assign = Object.assign;
@@ -15,13 +15,6 @@ const define = Object.defineProperties;
 /* ScribeMusic.stylesheet */
 const shadowCSSUrl = new URL('shadow.css', import.meta.url);
 const stylesheet = Signal.of();
-
-/* Element resizing */
-const resizes = new ResizeObserver((entries) => {
-    for (const entry of entries) {
-        renderBeams(getInternals(entry.target).shadowRoot);
-    }
-});
 
 
 /* Register <scribe-music> */
@@ -63,7 +56,6 @@ export default define(element('scribe-music', {
             switch (e.type) {
                 case 'loadingdone':
                     internals.style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
-                    renderBeams(this, shadow);
                     break;
             }
         };
@@ -73,8 +65,7 @@ export default define(element('scribe-music', {
         // If Safari
         if (internals.isSafari) this.classList.add('safari');
 
-        // Update beams on load and resize
-        resizes.observe(this, { box: 'content-box' });
+        // Update style on font load
         document.fonts.addEventListener('loadingdone', internals);
 
         // If there is no src use text content as data
@@ -115,9 +106,6 @@ export default define(element('scribe-music', {
             shadow.querySelectorAll('.side, .bar').forEach(remove);
             shadow.appendChild(fragment);
 
-            // Render beams
-            renderBeams(this, shadow);
-
             // DEBUG
 /*
             // Does bar contain symbols that add up to longer than bar?
@@ -151,11 +139,9 @@ export default define(element('scribe-music', {
     load: function(shadow, internals) {
         // Recalculate when style loads
         internals.style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
-        renderBeams(this, shadow);
     },
 
     disconnect: function(shadow, internals) {
-        resizes.unobserve(this);
         document.fonts.removeEventListener('loadingdone', internals);
     }
 }, {
