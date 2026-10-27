@@ -83,6 +83,7 @@
     flex-wrap: wrap;
     flex-direction: row;
     column-gap: 0;
+    row-gap: 3em;
     align-content: start;
 
     /* Encourage scribe not to stretch vertically when in a grid context – it
@@ -118,6 +119,8 @@
     top: 0;
     bottom: 0;
     left: 0;
+    display: grid;
+    row-gap: inherit;
     padding-top: 1em;
     min-width: var(--signature-width);
     grid-column: 1;
@@ -136,7 +139,11 @@
     overflow: hidden;
 }
 
-.side > .signature-stave {
+.side music-sig {
+    display: block;
+}
+
+.side .signature-stave {
     width: auto;
     min-width: 100%;
 }

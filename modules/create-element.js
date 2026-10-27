@@ -124,6 +124,28 @@ export function createPartElement({ name, stave, key, symbols }) {
     return element;
 }
 
+export function createSigElement(bar0, keyName) {
+    const element = create('music-sig');
+    let n = -1;
+    while (bar0[++n]) {
+        const part = bar0[n];
+        const stave = part.stave;
+        const staveElement = create('music-stave', {
+            class: `${ stave.type }-stave signature-stave stave`,
+            data: {
+                part:  part.name,
+                stave: stave.type,
+                key:   stave.pitched ? keyName : undefined
+            }
+        });
+        const symbols = stave.createSignatureSymbols(keyName);
+        let i = -1;
+        while (symbols[++i]) staveElement.appendChild(createSymbolElement(symbols[i]));
+        element.appendChild(staveElement);
+    }
+    return element;
+}
+
 const createSymbolElement = overload(get('type'), {
     barrepeat: (symbol) => create('span', {
         class: 'barrepeat',
@@ -134,7 +156,7 @@ const createSymbolElement = overload(get('type'), {
         }
     }),
 
-    clef: (symbol) => create('span', {
+    clef: (symbol) => create('music-clef', {
         class: `${ symbol.clef === 'alto' || symbol.clef === 'tenor' ? 'c' : symbol.clef }-clef clef`,
         html: clefGlyphs[symbol.clef]
     }),

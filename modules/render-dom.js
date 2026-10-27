@@ -5,9 +5,10 @@ import rect             from 'dom/rect.js';
 import Event            from 'sequence/modules/event.js';
 import Transform        from 'sequence/modules/transform.js';
 import SequenceIterator from 'sequence/modules/sequence-iterator.js';
+import { toKeyName }      from 'sequence/modules/event/key.js';
 import Stave            from './stave.js';
 import createTree       from './tree.js';
-import { createBarElement } from './create-element.js';
+import { createBarElement, createSigElement } from './create-element.js';
 //import { renderBeam }   from './beam.js';
 import * as glyphs      from './glyphs.js';
 import truncate         from './number/truncate.js';
@@ -122,34 +123,25 @@ export async function renderDOM(sequence, clef, keyname, meter, transpose = 0, d
         fragment.appendChild(element);
     }
 
-/*
-    // Creates stave with clef and key signature
-    if (!keyEvent) keyEvent = Event.key(0, bars[0].key);
-    const signature = stave.createSignatureSymbols(keyEvent);
+    // Create side column with signatures
+    if (tree[0]) {
+        const bar0 = tree[0];
+        const keyName = toKeyName(bar0.key);
+        const sig = createSigElement(bar0, keyName);
 
-    // Quick and dirty way of rendering clefs into left hand side bar
-    const sidebar = create('div', {
-        class: `${ stave.type }-stave signature-stave stave`,
-        children: signature.map(createElement),
-        data: {
-            key: stave.pitched ? toKeyName(keyEvent.name) : undefined
-        }
-    });
+        const column = create('header', {
+            id: 'side',
+            class: 'side',
+            data: {
+                key: keyName
+            }
+        });
 
-    const column = create('div', {
-        id: 'side',
-        class: 'side',
-        data: {
-            key: keyEvent.name
-        }
-    });
+        let n = 24;
+        while (n--) column.appendChild(sig.cloneNode(true));
 
-    let n = 24;
-    while (n--) column.appendChild(sidebar.cloneNode(true));
-
-    // Return array of elements
-    elements.unshift(column);
-*/
+        fragment.prepend(column);
+    }
 
     return fragment;
 }
