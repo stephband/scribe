@@ -1,6 +1,4 @@
 
-//import create           from 'dom/create.js';
-import Event            from 'sequence/modules/event.js';
 import { getDivisions } from 'sequence/modules/event/meter.js';
 import Transform        from 'sequence/modules/transform.js';
 import SequenceIterator from 'sequence/modules/sequence-iterator.js';
@@ -9,22 +7,19 @@ import Stave  from './stave.js';
 import { accidentalsFromKey } from './accidentals.js';
 import quantise from './quantise.js';
 import speller  from './speller.js';
+import last                      from './object/last.js';
+import push                      from './object/push.js';
+import { getDivisionBefore }     from './bar/divisions.js';
 import { createRests }           from './symbol/rest.js';
 import { createBeam, closeBeam } from './symbol/beam.js';
 import { closeTuplet }           from './symbol/tuplet.js';
 import { isTupletSymbol }        from './tuplet.js';
+import { P24 }                   from './constants.js';
+import toStopBeat                from './event/to-stop-beat.js';
 
 
-const { assign, values } = Object;
+const { values } = Object;
 
-
-// TEMP
-
-function getConstructorName(object) {
-    return object.constructor.name;
-}
-
-// -----
 
 function toStave(settings, id) {
     // TODO
@@ -44,7 +39,9 @@ function toPartIndex(settings, name) {
 function getPart(settings, bar, name) {
     const index = toPartIndex(settings, name);
     return bar[index] || (bar[index] = {
-        type: 'part',
+        type:    'part',
+        stave:   toStave(settings, name),
+        key:     bar.key,
         symbols: []
     });
 }
@@ -61,7 +58,10 @@ function toVoiceIndex(settings, name) {
 
 function getVoice(settings, part, name) {
     const index = toVoiceIndex(settings, name);
-    return part[index] || (part[index] = { type: 'voice' });
+    return part[index] || (part[index] = {
+        type: 'voice',
+        name
+    });
 }
 
 function quantiseNotesFromBuffers(settings, bar, buffers) {
@@ -76,11 +76,10 @@ function quantiseNotesFromBuffers(settings, bar, buffers) {
     }
 }
 
-function metricQuantise(sequence, parts, settings) {
+function metricQuantise(settings, sequence, parts, buffers, tree) {
 //    const events = [];
-    const bars   = [];
+//    const bars   = [];
 //    const jsons  = [];
-    const buffers = {};
 
 //    let keyEvent;
     // Guarantee the render of at least 1 bar
@@ -89,14 +88,15 @@ function metricQuantise(sequence, parts, settings) {
     let event;
 //    let sequenceEvent;
 
+    let count = 0;
+
     let bar = {
-        type: 'bar',
-        count: bars.length + 1,
-        beat: 0,
-        key: 0,
+        type:     'bar',
+        count:    ++count,
+        beat:     0,
+        key:      0,
         duration: Infinity,
-        divisor: 0,
-        divisions: getDivisions(bar.duration, bar.divisor)
+        divisor:  0
     };
 
     // Extract events from sequence iterator and divide them into voices
@@ -112,7 +112,7 @@ function metricQuantise(sequence, parts, settings) {
         // While event time is beyond end of bar create bar from current state
         while (event[0] >= bar.beat + bar.duration) {
             quantiseNotesFromBuffers(settings, bar, buffers);
-            bars.push(bar);
+            push(tree, bar);
 
 //            const bar = createBar(bars.length + 1, beat, duration, divisor, stave, key, symbols, parts, sequenceEvent, settings);
 //            detectBarRepeats(bars, jsons, bar);
@@ -120,7 +120,7 @@ function metricQuantise(sequence, parts, settings) {
             // Start new bar
             bar = {
                 type:      'bar',
-                count:     bars.length + 1,
+                count:     ++count,
                 beat:      bar.beat + bar.duration,
                 key:       bar.key,
                 duration:  bar.duration,
@@ -163,8 +163,9 @@ function metricQuantise(sequence, parts, settings) {
             case "meter":
                 if (event[0] !== bar.beat) throw new Error(`Scribe "meter" event at beat ${ event[0] } not at start of bar at beat ${ beat }`);
                 // Meter events set bar meter
-                bar.duration = event[2];
-                bar.divisor  = event[3];
+                bar.duration  = event[2];
+                bar.divisor   = event[3];
+                bar.divisions = getDivisions(bar.duration, bar.divisor);
 //                symbols.push({
 //                    type:        'timesig',
 //                    beat:        0,
@@ -284,12 +285,12 @@ function metricQuantise(sequence, parts, settings) {
     // Create bars up to stop beat or while voices still has events
     while (stopBeat > bar.beat + bar.duration) {
         quantiseNotesFromBuffers(settings, bar, buffers);
-        bars.push(bar);
+        push(tree, bar);
 
         // Start new bar
         bar = {
             type:      'bar',
-            count:     bars.length + 1,
+            count:     ++count,
             beat:      bar.beat + bar.duration,
             key:       bar.key,
             duration:  bar.duration,
@@ -299,11 +300,11 @@ function metricQuantise(sequence, parts, settings) {
     }
 
     quantiseNotesFromBuffers(settings, bar, buffers);
-    bars.push(bar);
+    push(tree, bar);
 
     // Always render last bar with a double bar line
 //    bar.doubleBarLine = true;
-    return bars;
+    return tree;
 }
 
 function spell(notes) {
@@ -312,35 +313,94 @@ function spell(notes) {
 }
 
 
+function updateBeamWithNoteSymbols(symbols, bar, stave, part, beam, noteSymbols) {
+    const { beat, duration } = noteSymbols[0];
 
+    // If notes have a duration too long for a beam
+    if (duration >= 1) {
+        // ...and there is a beam, close it
+        if (beam) beam = closeBeam(symbols, stave, part, beam);
+        return;
+    }
 
-const notes = [];
+    // If there is a beam and notes are in a new bar division
+    if (beam && getDivisionBefore(bar.divisions, beam.beat) !== getDivisionBefore(bar.divisions, beat)) {
+        beam = closeBeam(symbols, stave, part, beam);
+    }
 
-function symboliseBars(settings, bars) {
-    // Loop over bars
-    let n = -1;
-    while (bars[++n]) symboliseBar(settings, bars[n]);
+    // Make sure there is a beam
+    if (!beam) {
+        beam = createBeam(part, beat);
+    }
+
+    // Push note symbols on to it
+    push(beam, ...noteSymbols);
+
+    return beam;
 }
 
-function symboliseBar(settings, bar) {
+function createTies(symbols, bar, part, notes, noteSymbols, tolerance = 0.125) {
+    // No notes to tie
+    if (!notes.length) return;
+
+    let n = -1;
+    while (noteSymbols[++n]) {
+        const { beat, event, pitch, duration, stemup } = noteSymbols[n];
+        const b4 = toStopBeat(event) - bar.beat;
+
+        // If there is less than a 32nd of this note left splice it out
+        if (beat + duration > b4 - tolerance) {
+            const i = notes.indexOf(event);
+            notes.splice(i, 1);
+        }
+        // Otherwise leave it in and create a tie symbol
+        else {
+            symbols.push({
+                type: 'tie',
+                beat,
+                pitch,
+                duration,
+                // TODO: We now handle this in CSS with .note + .tie selector
+                stemup,
+                part,
+                event
+            });
+        }
+    }
+}
+
+
+// Symbolise
+
+function symboliseTree(settings, bars, buffers) {
+    // Loop over bars
+    let n = -1;
+    while (bars[++n]) symboliseBar(settings, buffers, bars[n]);
+    return bars;
+}
+
+function symboliseBar(settings, buffers, bar) {
 console.log('Bar', bar.count, '-------------------------------------');
     // Loop over parts
     let n = -1;
-    while (bar[++n]) symbolisePart(settings, bar, bar[n]);
+    while (bar[++n]) symbolisePart(settings, buffers, bar, bar[n], n);
 }
 
-function symbolisePart(settings, bar, part) {
+function symbolisePart(settings, buffers, bar, part, name) {
     const { stave, key, symbols } = part;
-//console.log('PART', part);
     // Loop over voices
     let n = -1;
-    while (part[++n]) symboliseVoice(settings, bar, part, stave, key, symbols, part[n]);
+    let notes;
+    while (part[++n]) {
+        notes = buffers[name + '.' + n];
+        symboliseVoice(settings, bar, part, stave, key, notes, symbols, part[n]);
+    }
 }
 
 function fillToBeat(settings, bar, stave, voice, accidentals, notes, symbols, beam, beat, stopBeat) {
     // 1. While there are active notes sounding before stopBeat, emit note symbols
     while (notes.length && beat < stopBeat) {
-        const noteSymbols = stave.createDupletNoteSymbols(symbols, bar, voice, accidentals, notes, beat, Infinity, stopBeat, settings);
+        const noteSymbols = stave.createDupletNoteSymbols(symbols, bar, voice, accidentals, notes, beat, stopBeat, settings);
         const duration    = noteSymbols[0].duration;
         // Splices finished notes out of `notes`, or emits a tie symbol & keeps sustained notes in `notes`
         createTies(symbols, bar, voice, notes, noteSymbols);
@@ -361,7 +421,7 @@ function fillToBeat(settings, bar, stave, voice, accidentals, notes, symbols, be
 function fillTupletToBeat(settings, bar, stave, voice, accidentals, notes, symbols, tupletSymbol, beam, beat, stopBeat, division) {
     // 1. While there are active notes sounding before stopBeat, emit tuplet-division note symbols
     while (notes.length && beat < stopBeat - P24) {
-        const noteSymbols = stave.createNoteSymbols(symbols, bar, voice, accidentals, notes, Infinity, beat - bar.beat, division, settings);
+        const noteSymbols = stave.createNoteSymbols(symbols, bar, voice, accidentals, notes, beat - bar.beat, division, settings);
         createTies(symbols, bar, voice, notes, noteSymbols, 0.5 * division);
         if (division < 0.5) {
             if (!beam) beam = createBeam(voice, beat - bar.beat);
@@ -384,10 +444,9 @@ function fillTupletToBeat(settings, bar, stave, voice, accidentals, notes, symbo
     return beam;
 }
 
-function symboliseVoice(settings, bar, part, stave, key, symbols, voice) {
+function symboliseVoice(settings, bar, part, stave, key, notes, symbols, voice) {
     const { tuplets } = voice;
     const accidentals = accidentalsFromKey(key);
-    notes.length = 0;
 
     let beat = bar.beat;
     let beam;
@@ -411,17 +470,19 @@ function symboliseVoice(settings, bar, part, stave, key, symbols, voice) {
                 divisor:  tuplet.divisor,
                 rhythm:   tuplet.rhythm,
                 stave,
-                part:     voice
+                voice
             };
             symbols.push(symbol);
 
             // Loop through tuplet events
             let i = -1, event;
             while (event = tuplet[++i]) {
+                // When the next event is at a new beat, resolve everything up to event[0]
                 if (event[0] > beat) {
                     beam = fillTupletToBeat(settings, bar, stave, voice, accidentals, notes, symbols, symbol, beam, beat, event[0], division);
                     beat = event[0];
                 }
+                // Add this event to the active chord at `beat`
                 notes.push(event);
             }
 
@@ -455,30 +516,30 @@ function symboliseVoice(settings, bar, part, stave, key, symbols, voice) {
     if (notes.length) console.log(notes.length + ' notes tied over to next bar');
 }
 
-export default async function render(sequence, settings = config) {
+export default async function createTree(sequence, settings = config) {
     const events = sequence.events;
     const array  = [];
 
     // Create sequence object
     // Make iterator
     const iterator = new SequenceIterator(events, sequence.sequences, Transform.from(array));
-    const parts = {};
+    const parts    = {};
+    const buffers  = {};
+    const tree     = {};
 
     // 1. Sort out timing
     // Loop over iterator, extract events into bars, parts and voices, and
     // quantise events
-    const bars = metricQuantise(iterator, parts, settings);
+    metricQuantise(settings, iterator, parts, buffers, tree);
 
     // 2. Sort out pitch
     // Assign note spelling per-part
     await Promise.all(values(parts).map(spell));
 
-    // Loop over bars
-    symboliseBars(settings, bars);
+    // 3. Loop over bars, parts, voices and populate with symbols
+    symboliseTree(settings, tree, buffers);
 
-
-
-    //const fragment = create('fragment');
-    // Create bar elements - add to fragment?
-    //return fragment;
+    // Return tree object
+    return tree;
 }
+

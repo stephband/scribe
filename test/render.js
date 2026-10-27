@@ -8,10 +8,10 @@ import {
 } from 'jsr:@std/assert@1';
 
 import { Sequence } from 'sequence/module.js';
-import render       from '../modules/process.js';
+import createTree   from '../modules/tree.js';
 
 Deno.test('Render', async () => {
-    await render(new Sequence([
+    await createTree(new Sequence([
         [0, "key", "Bb"],
         [0, "meter", 4, 1],
         [1.333, "note", "D4", 0.1, 0.333],

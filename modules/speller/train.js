@@ -40,7 +40,7 @@ for (const [name, seq] of Object.entries(sequences)) {
     if (!enc.noteCount) continue;
 
     const targets = enc.notes.map((n) => {
-        const spelling = n.expectedSpelling ?? n.spelledPitch ?? n.spelling ?? n[2];
+        const spelling = n.expectedSpelling ?? n.pitchSpelling ?? n.spelling ?? n[2];
         const key = n.expectedKey ?? n.key;
         const tpc = typeof spelling === "number"
             ? spelling
@@ -103,8 +103,8 @@ for (const [name, seq] of Object.entries(sequences)) {
     notes.forEach((note) => {
         const expectedSpelling = note.expectedSpelling;
         const expectedKey = note.expectedKey;
-        const noteKeyName = toKeyName(note.spelledKey);
-        const spellingMatch = !expectedSpelling || expectedSpelling === note.spelledPitch;
+        const noteKeyName = toKeyName(note.keySpelling);
+        const spellingMatch = !expectedSpelling || expectedSpelling === note.pitchSpelling;
         const keyMatch = !expectedKey || expectedKey === noteKeyName;
         if (spellingMatch) spellingMatches++;
         if (keyMatch) keyMatches++;

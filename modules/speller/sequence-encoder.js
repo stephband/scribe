@@ -162,9 +162,9 @@ export function decodePredictions(accidentals, keys, notes) {
         const note  = notes[i];
         const tpc   = accidentalToTpc(accidentals[i], note[2]);
 
-        note.tpc          = tpc;
-        note.spelledKey   = classToKey(keys[i]);
-        note.spelledPitch = tpcToSpelledPitch(note[2], tpc);
+        note.tpc           = tpc;
+        note.keySpelling   = classToKey(keys[i]);
+        note.pitchSpelling = tpcToSpelledPitch(note[2], tpc);
     }
 
     return notes;

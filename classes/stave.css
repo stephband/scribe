@@ -85,7 +85,7 @@
     align-self: center;
 }
 
-.bar > .acci:not([data-beat]) {
+.bar .acci:not([data-beat]) {
     /* Accidental with no beat belongs to key signature in the first column */
     grid-column-start: 1;
     justify-self: start;

@@ -1,6 +1,6 @@
 import by  from 'fn/by.js';
 import get from 'fn/get.js';
-import { keyWeightsForEvent, chooseKeyFromWeights } from '../keys.js';
+//import { keyWeightsForEvent, chooseKeyFromWeights } from '../keys.js';
 import { stemupFromRows } from './stem.js';
 
 
@@ -8,31 +8,31 @@ const byRow = by(get('row'));
 const symbols = [];
 
 
-export function createNotes(stave, key, part, notes, cutoffBeat, beat, duration) {
+export function createNotes(stave, key, part, notes, beat, duration) {
     symbols.length = 0;
 
     if (!notes.length) return symbols;
 
     let n = -1, event;
 
-    while ((event = notes[++n]) && event[0] < cutoffBeat) {
+    while (event = notes[++n]) {
         //const events     = event.scribeEvents;
         //const index      = event.scribeIndex;
         //const keyWeights = keyWeightsForEvent(events, index, key);
         //const keyNumber  = chooseKeyFromWeights(keyWeights);
-        // [BRANCH 2026-spelling]: Use event.spelledPitch or event.event.spelledPitch if explicitly defined
-        //const pitch      = stave.getSpelling(event.spelledPitch || event.event?.spelledPitch || event.spelling || event.event?.spelling || event[2], keyNumber, true);
-        //const row        = stave.getRow(part, pitch);
+        // [BRANCH 2026-spelling]: Use event.pitchSpelling or event.event.pitchSpelling if explicitly defined
+        //const pitch      = stave.getSpelling(event.pitchSpelling || event.event?.pitchSpelling || event.spelling || event.event?.spelling || event[2], keyNumber, true);
+        const pitch = event.pitchSpelling;
 
         // Create symbols with pitch, row
         symbols.push({
             type: 'note',
             beat,
             duration,
-            //pitch,
+            pitch,
             dynamic: event[3],
             part,
-            row,
+            row: stave.getRow(part, pitch),
             stave,
             event
         });

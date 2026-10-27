@@ -44,7 +44,7 @@ export default class SpellerRNN extends RNN {
             encoded.noteCount,
         );
 
-        // Assigns { tpc, spelledKey, spelledPitch } to note events
+        // Assigns { tpc, keySpelling, pitchSpelling } to note events
         decodePredictions(
             outputs.spelling.preds,
             outputs.key.preds,

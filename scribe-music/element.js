@@ -1,17 +1,12 @@
 
 import Signal                    from 'fn/signal.js';
-import rect                      from 'dom/rect.js';
-import create                    from 'dom/create.js';
 import element, { getInternals } from 'dom/element.js';
-import events                    from 'dom/events.js';
-import { toRootName, toRootNumber } from 'midi/note.js';
 import { Sequence }              from 'sequence/module.js';
 import { timesigToMeter, meterToTimesig } from 'sequence/modules/event/meter.js';
 
 import requestData       from '../modules/request-data.js';
-import parseSource       from '../modules/parse.js';
 import Stave             from '../modules/stave.js';
-import { renderElements, renderStyle, renderDOM } from '../modules/render.js';
+import { renderDOM, renderStyle, renderBeams, remove } from '../modules/render-dom.js';
 import config            from '../modules/config.js';
 
 const assign = Object.assign;
@@ -24,7 +19,7 @@ const stylesheet = Signal.of();
 /* Element resizing */
 const resizes = new ResizeObserver((entries) => {
     for (const entry of entries) {
-        renderDOM(getInternals(entry.target).shadowRoot);
+        renderBeams(getInternals(entry.target).shadowRoot);
     }
 });
 
@@ -34,12 +29,16 @@ const resizes = new ResizeObserver((entries) => {
 export default define(element('scribe-music', {
     shadow: `
         <link rel="stylesheet" href="${ shadowCSSUrl }" />
+        <style></style>
     `,
 
     construct: function(shadow, internals) {
         // Listen to updates to ScribeMusic.stylesheet and update the link
-        const link = shadow.querySelector('link');
+        const link  = shadow.querySelector('link');
         if (stylesheet.value) link.href = stylesheet.value;
+
+        // Shadow elements
+        internals.style = shadow.querySelector('style');
 
         // Set up listeners for attribute/property changes
         internals.data      = Signal.of();
@@ -59,6 +58,15 @@ export default define(element('scribe-music', {
             && !navigator.userAgent.includes('Chrome/')
             && !navigator.userAgent.includes('Edge/')
             && !navigator.userAgent.includes('Gecko/');
+
+        internals.handleEvent = (e) => {
+            switch (e.type) {
+                case 'loadingdone':
+                    internals.style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
+                    renderBeams(this, shadow);
+                    break;
+            }
+        };
     },
 
     connect: function(shadow, internals) {
@@ -67,18 +75,19 @@ export default define(element('scribe-music', {
 
         // Update beams on load and resize
         resizes.observe(this, { box: 'content-box' });
+        document.fonts.addEventListener('loadingdone', internals);
 
         // If there is no src use text content as data
         if (!this.src) {
             const source = this.textContent.trim();
-            internals.data.value = parseSource(this.type, source);
+            internals.data.value = Sequence.parse(source);
         }
 
         // Listens to changes
         return Signal.frame(async () => {
             if (!internals.data.value) return;
 
-            const elements = internals.data.value && await renderElements(
+            const fragment = await renderDOM(
                 // Events from data
                 Sequence.from(internals.data.value),
                 // Excludes is an array
@@ -103,24 +112,11 @@ export default define(element('scribe-music', {
             );
 
             // Clear the shadow DOM of bars and style and put new elements in it
-            shadow.querySelectorAll('.side, .bar, style').forEach((element) => element.remove());
-            shadow.append.apply(shadow, elements);
-            if (!elements) return;
-
-            const style = internals.style = create('style', `:host { ${ renderStyle(this, shadow) } }`);
-            shadow.appendChild(style);
+            shadow.querySelectorAll('.side, .bar').forEach(remove);
+            shadow.appendChild(fragment);
 
             // Render beams
-            renderDOM(this, shadow);
-
-            // Annoyingly we must wait for fonts to load – this is a safety
-            // render as we cannot gaurantee fonts have loaded on load()
-            // callback as the font stylesheet must be imported outside the
-            // shadow DOM so we cannot track it
-            setTimeout(() => {
-                style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
-                renderDOM(this, shadow);
-            }, 2000);
+            renderBeams(this, shadow);
 
             // DEBUG
 /*
@@ -152,14 +148,15 @@ export default define(element('scribe-music', {
         });
     },
 
-    load: function(shadow, { style }) {
+    load: function(shadow, internals) {
         // Recalculate when style loads
-        if (style) style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
-        renderDOM(this, shadow);
+        internals.style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
+        renderBeams(this, shadow);
     },
 
-    disconnect: function() {
+    disconnect: function(shadow, internals) {
         resizes.unobserve(this);
+        document.fonts.removeEventListener('loadingdone', internals);
     }
 }, {
     clef: {

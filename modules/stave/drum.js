@@ -253,10 +253,10 @@ export default class DrumStave extends Stave {
         return notes;
     }
 
-    createNoteSymbols(symbols, bar, voice, accidentals, notes, cutoffBeat, beat, duration, settings) {
+    createNoteSymbols(symbols, bar, voice, accidentals, notes, beat, duration, settings) {
         const stave = this;
         // Create note heads
-        const noteSymbols = createNotes(stave, bar.key, voice, notes, cutoffBeat, beat, duration);
+        const noteSymbols = createNotes(stave, bar.key, voice, notes, beat, duration);
         // Notes may not appear on stave in which case noteSymbols will be empty
         if (!noteSymbols.length) return noteSymbols;
         // Create ledgers, accidentals and accents
@@ -270,8 +270,7 @@ export default class DrumStave extends Stave {
         return noteSymbols;
     }
 
-    createDupletNoteSymbols(symbols, bar, voice, accidentals, notes, startBeat, cutoffBeat, stopBeat, settings) {
-        const stave = this;
+    createDupletNoteSymbols(symbols, bar, voice, accidentals, notes, startBeat, stopBeat, settings) {
         const b1    = startBeat - bar.beat;
         const b2    = stopBeat - bar.beat;
         const grain = getGrain(bar.divisions, b1);
@@ -297,16 +296,6 @@ export default class DrumStave extends Stave {
             // ...use duration as-is
             noteDurations[j] ;
 
-        // Create note heads
-        const noteSymbols = createNotes(stave, bar.key, voice, notes, cutoffBeat, b1, duration);
-        // Drum notation does not tie notes so we don't leave consumed events in array
-        notes.splice(0, noteSymbols.length);
-        // Create ledgers and accents
-        createLedges(symbols, stave, voice, b1, noteSymbols);
-        createAccents(symbols, stave, voice, b1, noteSymbols, settings);
-        // Push in note heads
-        symbols.push.apply(symbols, noteSymbols);
-        // Return symbols
-        return noteSymbols;
+        return this.createNoteSymbols(symbols, bar, voice, accidentals, notes, b1, duration, settings);
     }
 }

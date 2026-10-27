@@ -1,6 +1,5 @@
 
-//import parseABC          from './parse/parse-abc.js';
-import parseSequenceText from './parse/parse-sequence-text.js';
+import Sequence from 'sequence/module.js';
 
 
 /* Parse data
@@ -40,7 +39,7 @@ export default function parseSource(type, source) {
 */
     // Data is step sequence text
     else if (type === 'sequence' || type === 'text/plain') {
-        return { events: parseSequenceText(source) };
+        return Sequence.parse(source);
     }
     // Data is JSON
     else {

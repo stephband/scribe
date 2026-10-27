@@ -6,6 +6,8 @@
     --column-beat-0: 3;
     --barline-thickness: 0.04em;
 
+    font-size: 2em;
+
 	display: grid;
 	grid-auto-columns: 0px;
 	align-content: stretch;
@@ -13,8 +15,8 @@
 	justify-content: stretch;
 	justify-items: stretch;
 	column-gap:    var(--bar-column-gap);
-	padding-left:  var(--bar-padding-left);
-	padding-right: var(--bar-padding-right);
+	padding-left:  0;
+	padding-right: 0;
 
     /* Default alignment to prevent bar stretching vertically in a flexbox */
     align-self: start;
@@ -34,7 +36,22 @@
         [bar-end];
 }
 
-.bar[data-duration]::after {
+.bar > .stave {
+    /* Keep stave the same scale as bar */
+    font-size: 1em;
+    /* Make stave inherit the horizontal grid */
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    column-gap: var(--bar-column-gap);
+    align-content: stretch;
+    align-items: stretch;
+    justify-content: stretch;
+    justify-items: stretch;
+    padding-left:  var(--bar-padding-left);
+    padding-right: var(--bar-padding-right);
+}
+
+.bar[data-duration] > .stave::after {
     content: '';
     grid-column: -1;
     grid-row: stave-top / stave-bottom;
@@ -47,7 +64,7 @@
     background: currentcolor;
 }
 
-.end-bar[data-duration]::after {
+.end-bar[data-duration] > .stave::after {
     width: 0.11em;
     border-left: var(--barline-thickness) solid currentcolor;
     border-right: var(--barline-thickness) solid currentcolor;
@@ -75,7 +92,7 @@
     align-self: stretch;
 }
 
-.bar > [data-beat] {
+.bar [data-beat] {
     /* Place symbol with a beat in its beat column */
     grid-column-start: calc(var(--column-beat-0) + round(var(--beat) * var(--columns-per-beat)));
 }
@@ -122,18 +139,18 @@
 }
 */
 
-.bar + .bar > .clef {
+.bar + .bar .clef {
     display: none;
 }
 
-.bar > .clef {
+.bar .clef {
     justify-self: start;
     grid-column: 1 / span 1;
     margin-left: -0.125em;
     margin-right: 0.25em;
 }
 
-.bar > .timesig {
+.bar .timesig {
     justify-self: start;
     grid-column: 1 / span 1;
     margin-left: 0;
@@ -142,7 +159,7 @@
     --timesig-gap: 0.5em;
 }
 
-.bar > .acci:not([data-beat]) + .timesig {
+.bar .acci:not([data-beat]) + .timesig {
     /* If they are preceded by a stave, move them right */
     --timesig-gap:   0.3em;
     --clef-acci-gap: 0.9em;
@@ -152,57 +169,57 @@
 
 /* Sort out ordering of clef / keysig / timesig */
 
-.bar > .clef ~ .acci:not([data-beat]) {
+.bar .clef ~ .acci:not([data-beat]) {
     /* If they are preceded by a stave, move them right */
     --clef-acci-gap: 0.9em;
 }
 
-.bar > .acci-flat:not([data-beat]) + .acci:not([data-beat])                                                                                                                               { margin-left: calc(1em * var(--acci-flat-size)); }
-.bar > .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                                                                      { margin-left: calc(2em * var(--acci-flat-size)); }
-.bar > .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                                             { margin-left: calc(3em * var(--acci-flat-size)); }
-.bar > .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                    { margin-left: calc(4em * var(--acci-flat-size)); }
-.bar > .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                           { margin-left: calc(5em * var(--acci-flat-size)); }
-.bar > .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])  { margin-left: calc(6em * var(--acci-flat-size)); }
+.bar .acci-flat:not([data-beat]) + .acci:not([data-beat])                                                                                                                               { margin-left: calc(1em * var(--acci-flat-size)); }
+.bar .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                                                                      { margin-left: calc(2em * var(--acci-flat-size)); }
+.bar .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                                             { margin-left: calc(3em * var(--acci-flat-size)); }
+.bar .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                    { margin-left: calc(4em * var(--acci-flat-size)); }
+.bar .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                           { margin-left: calc(5em * var(--acci-flat-size)); }
+.bar .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])  { margin-left: calc(6em * var(--acci-flat-size)); }
 
-.bar > .acci-sharp:not([data-beat]) + .acci:not([data-beat])                                                                                                                              { margin-left: calc(1em * var(--acci-sharp-size)); }
-.bar > .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                                                                     { margin-left: calc(2em * var(--acci-sharp-size)); }
-.bar > .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                                            { margin-left: calc(3em * var(--acci-sharp-size)); }
-.bar > .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                   { margin-left: calc(4em * var(--acci-sharp-size)); }
-.bar > .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                          { margin-left: calc(5em * var(--acci-sharp-size)); }
-.bar > .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) { margin-left: calc(6em * var(--acci-sharp-size)); }
+.bar .acci-sharp:not([data-beat]) + .acci:not([data-beat])                                                                                                                              { margin-left: calc(1em * var(--acci-sharp-size)); }
+.bar .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                                                                     { margin-left: calc(2em * var(--acci-sharp-size)); }
+.bar .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                                            { margin-left: calc(3em * var(--acci-sharp-size)); }
+.bar .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                   { margin-left: calc(4em * var(--acci-sharp-size)); }
+.bar .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                          { margin-left: calc(5em * var(--acci-sharp-size)); }
+.bar .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) { margin-left: calc(6em * var(--acci-sharp-size)); }
 
-.bar > .acci-flat:not([data-beat]) + .timesig                                                                                                                               { margin-left: calc(1em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
-.bar > .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                                                                      { margin-left: calc(2em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
-.bar > .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                                             { margin-left: calc(3em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
-.bar > .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                    { margin-left: calc(4em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
-.bar > .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                           { margin-left: calc(5em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
-.bar > .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig  { margin-left: calc(6em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-flat:not([data-beat]) + .timesig                                                                                                                               { margin-left: calc(1em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                                                                      { margin-left: calc(2em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                                             { margin-left: calc(3em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                    { margin-left: calc(4em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                           { margin-left: calc(5em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig  { margin-left: calc(6em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
 
-.bar > .acci-sharp:not([data-beat]) + .timesig                                                                                                                              { margin-left: calc(1em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
-.bar > .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                                                                     { margin-left: calc(2em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
-.bar > .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                                            { margin-left: calc(3em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
-.bar > .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                   { margin-left: calc(4em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
-.bar > .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                          { margin-left: calc(5em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
-.bar > .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig { margin-left: calc(6em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-sharp:not([data-beat]) + .timesig                                                                                                                              { margin-left: calc(1em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                                                                     { margin-left: calc(2em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                                            { margin-left: calc(3em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                   { margin-left: calc(4em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                          { margin-left: calc(5em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig { margin-left: calc(6em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
 
 /*
-.bar > .timesig,
-.bar > .clef + .timesig,
-.bar > .clef + .timesig + .timesig {
+.bar .timesig,
+.bar .clef + .timesig,
+.bar .clef + .timesig + .timesig {
     --clef-timesig: 1em;
     margin-left: var(--clef-timesig);
 }
 */
 
-.bar > .drum-clef + .timesig,
-.bar > .percussion-clef + .timesig {
+.bar .drum-clef + .timesig,
+.bar .percussion-clef + .timesig {
 	--clef-timesig: 0.2em;
 }
 
 
 /* Accidentals */
 
-.bar > .acci {
+.bar .acci {
     grid-column-end: span 1;
     justify-self: end;
     margin-left:  var(--acci-margin-left);
@@ -214,38 +231,38 @@
     grid-column-start: calc(var(--column-beat-0) + round(var(--beat) * var(--columns-per-beat)) - 1);
 }
 
-.bar > .acci-1 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.27em) }
-.bar > .acci-2 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.54em) }
-.bar > .acci-3 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.09em) }
-.bar > .acci-4 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.36em) }
-.bar > .acci-5 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.63em) }
+.bar .acci-1 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.27em) }
+.bar .acci-2 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.54em) }
+.bar .acci-3 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.09em) }
+.bar .acci-4 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.36em) }
+.bar .acci-5 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.63em) }
 
-.bar > .acci-cluster        { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 1em * var(--head-1-size)) }
-.bar > .acci-cluster.acci-1 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.27em + 1em * var(--head-1-size)) }
-.bar > .acci-cluster.acci-2 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.54em + 1em * var(--head-1-size)) }
-.bar > .acci-cluster.acci-3 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.09em + 1em * var(--head-1-size)) }
-.bar > .acci-cluster.acci-4 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.36em + 1em * var(--head-1-size)) }
-.bar > .acci-cluster.acci-5 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.63em + 1em * var(--head-1-size)) }
+.bar .acci-cluster        { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 1em * var(--head-1-size)) }
+.bar .acci-cluster.acci-1 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.27em + 1em * var(--head-1-size)) }
+.bar .acci-cluster.acci-2 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.54em + 1em * var(--head-1-size)) }
+.bar .acci-cluster.acci-3 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.09em + 1em * var(--head-1-size)) }
+.bar .acci-cluster.acci-4 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.36em + 1em * var(--head-1-size)) }
+.bar .acci-cluster.acci-5 { margin-right: calc(-1 * var(--bar-column-gap) + 1em * var(--acci-margin-right) + 0.63em + 1em * var(--head-1-size)) }
 
 
 /* Notes and ledges */
 
-.bar > .note,
-.bar > .ledge {
+.bar .note,
+.bar .ledge {
 	grid-column-end: span 1;
 	justify-self: start;
 }
 
-.bar > .note {
+.bar .note {
     margin-right: var(--note-margin-right, 0.09375em);
 }
 
-.bar > .cluster-note.up-note {
+.bar .cluster-note.up-note {
     margin-left: calc(1em * var(--head-1-size));
 }
 
 /* ------------------------------------------------ Too hacky --------------- */
-.bar > .cluster-note.down-note {
+.bar .cluster-note.down-note {
     justify-self: end;
     /* Push cluster notes on down stems into preceding column */
     /* TODO: This is going to cause a problem with accidentals!! It doesnt really
@@ -254,13 +271,13 @@
     margin-right: calc(-1em * var(--stem-width) + -1 * var(--bar-column-gap) - 0.003em);
 }
 
-.bar > .cluster-note.down-note::before {
+.bar .cluster-note.down-note::before {
     /* Move flag back into position */
     transform: translate(calc(1em * var(--head-1-size)), calc(var(--stem-height) * 1em));
 }
 /* -------------------------------------------------------------------------- */
 
-.bar > .ledge {
+.bar .ledge {
     width: 0.625em;
 	/* Make ledger take up same space as head */
 	margin-left:  calc(-0.5 * (0.625em - 1em * var(--head-1-size)));
@@ -270,7 +287,7 @@
 
 /* Accents */
 
-.bar > .accent {
+.bar .accent {
     grid-column-end: span 1;
     justify-self: start;
     width: calc(1em * var(--head-1-size));
@@ -282,31 +299,31 @@
 Short rests inhabit one column, longer rests are centered
 in their duration span. */
 
-.bar > .rest {
+.bar .rest {
 	justify-self: start;
     grid-column-end: span 1;
 }
 
 /* Anything shorter than a quarter rest */
-.bar > .rest[data-duration^="."],
-.bar > .rest[data-duration^="0."] {
+.bar .rest[data-duration^="."],
+.bar .rest[data-duration^="0."] {
     margin-left:  0.03125em;
     margin-right: 0.03125em;
 }
 
 /* Triplet quarter rest */
-.bar > .rest[data-duration="0.66"],
+.bar .rest[data-duration="0.66"],
 /* A quarter rest */
-.bar > .rest[data-duration="1"],
+.bar .rest[data-duration="1"],
 /* A dotted quarter rest */
-.bar > .rest[data-duration^="1.5"],
+.bar .rest[data-duration^="1.5"],
 /* A double dotted quarter rest */
-.bar > .rest[data-duration^="1.75"] {
+.bar .rest[data-duration^="1.75"] {
 	margin-left:  0.0625em;
     margin-right: 0.0625em;
 }
 
-.bar > .rest[data-duration^="1.33"] {
+.bar .rest[data-duration^="1.33"] {
     justify-self: center;
     margin-left: 0.5em;
     margin-right: 0.5em;
@@ -314,14 +331,14 @@ in their duration span. */
     grid-column-end: span calc(round(var(--columns-per-beat) * var(--duration)) - 1);
 }
 
-.bar > .rest[data-duration="2"],
-.bar > .rest[data-duration="3"],
-.bar > .rest[data-duration="3.5"],
-.bar > .rest[data-duration^="4"],
-.bar > .rest[data-duration^="6"],
-.bar > .rest[data-duration^="7"],
-.bar > .rest[data-duration^="8"],
-.bar > .whole-rest {
+.bar .rest[data-duration="2"],
+.bar .rest[data-duration="3"],
+.bar .rest[data-duration="3.5"],
+.bar .rest[data-duration^="4"],
+.bar .rest[data-duration^="6"],
+.bar .rest[data-duration^="7"],
+.bar .rest[data-duration^="8"],
+.bar .whole-rest {
 	justify-self: center;
 	margin-left: 0.625em;
 	margin-right: 0.625em;
@@ -329,26 +346,26 @@ in their duration span. */
     grid-column-end: span calc(round(var(--columns-per-beat) * var(--duration)) - 1);
 }
 
-.bar > .rest[data-duration="1"] + .rest[data-duration="2"] {
+.bar .rest[data-duration="1"] + .rest[data-duration="2"] {
     margin-left: 0.5em;
 }
 
 
 /* Tuplets */
 
-.bar > .tuplet {
+.bar .tuplet {
     justify-self: stretch;
     align-self: center;
     /* Make tuplets span their heads and rests and no more */
     grid-column-end: span calc(1 + round(var(--duration) * var(--columns-per-beat) * (var(--divisor) - 1) / var(--divisor)));
 }
 
-.bar > .tuplet[data-duration="4"][data-divisor="3"][data-rhythm$="0"],  /* 4 beat triplet ending in rest */
-.bar > .tuplet[data-duration="8"][data-divisor="3"][data-rhythm$="0"],  /* 8 beat triplet ending in rest */
-.bar > .tuplet[data-duration="8"][data-divisor="5"][data-rhythm$="0"],  /* 8 beat quintuplet ending in rest */
-.bar > .tuplet[data-duration="8"][data-divisor="6"][data-rhythm$="0"],  /* 8 beat sextuplet ending in rest */
-.bar > .tuplet[data-duration="8"][data-divisor="7"][data-rhythm$="0"],  /* 8 beat septuplet ending in rest */
-.bar > .tuplet[data-duration="8"][data-divisor="8"][data-rhythm$="0"] { /* 8 beat nonuplet ending in rest */
+.bar .tuplet[data-duration="4"][data-divisor="3"][data-rhythm$="0"],  /* 4 beat triplet ending in rest */
+.bar .tuplet[data-duration="8"][data-divisor="3"][data-rhythm$="0"],  /* 8 beat triplet ending in rest */
+.bar .tuplet[data-duration="8"][data-divisor="5"][data-rhythm$="0"],  /* 8 beat quintuplet ending in rest */
+.bar .tuplet[data-duration="8"][data-divisor="6"][data-rhythm$="0"],  /* 8 beat sextuplet ending in rest */
+.bar .tuplet[data-duration="8"][data-divisor="7"][data-rhythm$="0"],  /* 8 beat septuplet ending in rest */
+.bar .tuplet[data-duration="8"][data-divisor="8"][data-rhythm$="0"] { /* 8 beat nonuplet ending in rest */
     /* Make tuplets span minim and whole rests, symbols that span multiple columns */
     grid-column-end: span calc(round(var(--duration) * var(--columns-per-beat) - 1));
 }
@@ -356,7 +373,7 @@ in their duration span. */
 
 /* Beams */
 
-.bar > .beam {
+.bar .beam {
 	justify-self: stretch;
 	width: auto;
 	max-width: none;
@@ -367,13 +384,13 @@ in their duration span. */
 
 /* A few tuplet beams need to special-cased due to durations not rounding
    to the same columns as their notes */
-.bar > .beam[data-beat="0.4"],   /* A quintuplet 8th-note beam starting on the second note */
-.bar > .beam[data-beat*=".44"],  /* A nonuplet 8th-note beam starting on the second note */
-.bar > .beam[data-beat*=".11"] { /* A nonuplet 32nd-note beam starting on the second note */
+.bar .beam[data-beat="0.4"],   /* A quintuplet 8th-note beam starting on the second note */
+.bar .beam[data-beat*=".44"],  /* A nonuplet 8th-note beam starting on the second note */
+.bar .beam[data-beat*=".11"] { /* A nonuplet 32nd-note beam starting on the second note */
     grid-column-end: span calc(round(down, var(--duration) * var(--columns-per-beat)));
 }
 
-.bar > .up-beam {
+.bar .up-beam {
     /*margin-left: calc(-1 * var(--bar-column-gap) - 1px);*/
 	/*margin-left: calc(-1em * var(--stem-width));*/
 	margin-right: calc(-1 * var(--bar-column-gap));
@@ -381,13 +398,13 @@ in their duration span. */
 	transform: translate3d(calc(1em * var(--head-1-size) - 1px), calc(1em * var(--translate-y, 0)), 0);
 }
 
-.bar > .beam-note:has([data-glyph="headX"]) + .up-beam {
+.bar .beam-note:has([data-glyph="headX"]) + .up-beam {
     /* TODO: This does, but the selector is dodgy, it doesnt target exactly what
        we need to target, it gets the last note of a beam rather than the first */
     transform: translate3d(calc(1em * var(--head-x-size) - 0.5px), calc(1em * var(--translate-y, 0) - 0.2px), 0);
 }
 
-.bar > .down-beam {
+.bar .down-beam {
 	margin-left:  0;
 	margin-right: calc(-1em * var(--stem-width) - var(--bar-column-gap));
 	transform: translate3d(0, calc(1em * var(--translate-y, 0)), 0);
@@ -395,7 +412,7 @@ in their duration span. */
 
 /* Words */
 
-.bar > .chord {
+.bar .chord {
 	justify-self: start;
 	margin-left:  0;
 	margin-right: 0.25em;
@@ -403,7 +420,7 @@ in their duration span. */
     grid-column-end: span calc(round(nearest, var(--duration) * var(--columns-per-beat)));
 }
 
-.bar > .lyric {
+.bar .lyric {
 	justify-self: start;
     /* Move words away from descending stalks just a fraction */
 	margin-left:  0.125em;
@@ -411,7 +428,7 @@ in their duration span. */
     grid-column-end: span calc(round(nearest, var(--duration) * var(--columns-per-beat)));
 }
 
-.bar > .tie {
+.bar .tie {
 	justify-self: stretch;
 	/* Make tie span from end of one head to start of next. */
 	margin-left: calc(1.125em * var(--head-1-size));
@@ -420,94 +437,94 @@ in their duration span. */
     grid-column-end: span calc(round(var(--duration) * var(--columns-per-beat)) - 1);
 }
 
-.bar[data-duration="1"] > .tie[data-beat^="0"][data-duration^="1"],
-.bar[data-duration="1"] > .tie[data-beat^="0.25"][data-duration^="0.75"],
-.bar[data-duration="1"] > .tie[data-beat^="0.33"][data-duration^="0.66"],
-.bar[data-duration="1"] > .tie[data-beat^="0.5"][data-duration^="0.5"],
-.bar[data-duration="1"] > .tie[data-beat^="0.62"][data-duration^="0.37"],
-.bar[data-duration="1"] > .tie[data-beat^="0.66"][data-duration^="0.33"],
-.bar[data-duration="1"] > .tie[data-beat^="0.75"][data-duration^="0.25"],
-.bar[data-duration="1"] > .tie[data-beat^="0.83"][data-duration^="0.16"],
-.bar[data-duration="1"] > .tie[data-beat^="0.87"][data-duration^="0.12"],
-.bar[data-duration="1"] > .tie[data-beat^="0.91"][data-duration^="0.08"],
+.bar[data-duration="1"] .tie[data-beat^="0"][data-duration^="1"],
+.bar[data-duration="1"] .tie[data-beat^="0.25"][data-duration^="0.75"],
+.bar[data-duration="1"] .tie[data-beat^="0.33"][data-duration^="0.66"],
+.bar[data-duration="1"] .tie[data-beat^="0.5"][data-duration^="0.5"],
+.bar[data-duration="1"] .tie[data-beat^="0.62"][data-duration^="0.37"],
+.bar[data-duration="1"] .tie[data-beat^="0.66"][data-duration^="0.33"],
+.bar[data-duration="1"] .tie[data-beat^="0.75"][data-duration^="0.25"],
+.bar[data-duration="1"] .tie[data-beat^="0.83"][data-duration^="0.16"],
+.bar[data-duration="1"] .tie[data-beat^="0.87"][data-duration^="0.12"],
+.bar[data-duration="1"] .tie[data-beat^="0.91"][data-duration^="0.08"],
 
-.bar[data-duration="2"] > .tie[data-beat^="0"][data-duration^="2"],
-.bar[data-duration="2"] > .tie[data-beat^="0.5"][data-duration^="1.5"],
-.bar[data-duration="2"] > .tie[data-beat^="0.66"][data-duration^="1.33"],
-.bar[data-duration="2"] > .tie[data-beat^="1"][data-duration^="1"],
-.bar[data-duration="2"] > .tie[data-beat^="1.25"][data-duration^="0.75"],
-.bar[data-duration="2"] > .tie[data-beat^="1.33"][data-duration^="0.66"],
-.bar[data-duration="2"] > .tie[data-beat^="1.5"][data-duration^="0.5"],
-.bar[data-duration="2"] > .tie[data-beat^="1.62"][data-duration^="0.37"],
-.bar[data-duration="2"] > .tie[data-beat^="1.66"][data-duration^="0.33"],
-.bar[data-duration="2"] > .tie[data-beat^="1.75"][data-duration^="0.25"],
-.bar[data-duration="2"] > .tie[data-beat^="1.83"][data-duration^="0.16"],
-.bar[data-duration="2"] > .tie[data-beat^="1.87"][data-duration^="0.12"],
-.bar[data-duration="2"] > .tie[data-beat^="1.91"][data-duration^="0.08"],
+.bar[data-duration="2"] .tie[data-beat^="0"][data-duration^="2"],
+.bar[data-duration="2"] .tie[data-beat^="0.5"][data-duration^="1.5"],
+.bar[data-duration="2"] .tie[data-beat^="0.66"][data-duration^="1.33"],
+.bar[data-duration="2"] .tie[data-beat^="1"][data-duration^="1"],
+.bar[data-duration="2"] .tie[data-beat^="1.25"][data-duration^="0.75"],
+.bar[data-duration="2"] .tie[data-beat^="1.33"][data-duration^="0.66"],
+.bar[data-duration="2"] .tie[data-beat^="1.5"][data-duration^="0.5"],
+.bar[data-duration="2"] .tie[data-beat^="1.62"][data-duration^="0.37"],
+.bar[data-duration="2"] .tie[data-beat^="1.66"][data-duration^="0.33"],
+.bar[data-duration="2"] .tie[data-beat^="1.75"][data-duration^="0.25"],
+.bar[data-duration="2"] .tie[data-beat^="1.83"][data-duration^="0.16"],
+.bar[data-duration="2"] .tie[data-beat^="1.87"][data-duration^="0.12"],
+.bar[data-duration="2"] .tie[data-beat^="1.91"][data-duration^="0.08"],
 
-.bar[data-duration="3"] > .tie[data-beat^="0"][data-duration^="3"],
-.bar[data-duration="3"] > .tie[data-beat^="1"][data-duration^="2"],
-.bar[data-duration="3"] > .tie[data-beat^="1.5"][data-duration^="1.5"],
-.bar[data-duration="3"] > .tie[data-beat^="1.66"][data-duration^="1.33"],
-.bar[data-duration="3"] > .tie[data-beat^="2"][data-duration^="1"],
-.bar[data-duration="3"] > .tie[data-beat^="2.25"][data-duration^="0.75"],
-.bar[data-duration="3"] > .tie[data-beat^="2.33"][data-duration^="0.66"],
-.bar[data-duration="3"] > .tie[data-beat^="2.5"][data-duration^="0.5"],
-.bar[data-duration="3"] > .tie[data-beat^="2.62"][data-duration^="0.37"],
-.bar[data-duration="3"] > .tie[data-beat^="2.66"][data-duration^="0.33"],
-.bar[data-duration="3"] > .tie[data-beat^="2.75"][data-duration^="0.25"],
-.bar[data-duration="3"] > .tie[data-beat^="2.83"][data-duration^="0.16"],
-.bar[data-duration="3"] > .tie[data-beat^="2.87"][data-duration^="0.12"],
-.bar[data-duration="3"] > .tie[data-beat^="2.91"][data-duration^="0.08"],
+.bar[data-duration="3"] .tie[data-beat^="0"][data-duration^="3"],
+.bar[data-duration="3"] .tie[data-beat^="1"][data-duration^="2"],
+.bar[data-duration="3"] .tie[data-beat^="1.5"][data-duration^="1.5"],
+.bar[data-duration="3"] .tie[data-beat^="1.66"][data-duration^="1.33"],
+.bar[data-duration="3"] .tie[data-beat^="2"][data-duration^="1"],
+.bar[data-duration="3"] .tie[data-beat^="2.25"][data-duration^="0.75"],
+.bar[data-duration="3"] .tie[data-beat^="2.33"][data-duration^="0.66"],
+.bar[data-duration="3"] .tie[data-beat^="2.5"][data-duration^="0.5"],
+.bar[data-duration="3"] .tie[data-beat^="2.62"][data-duration^="0.37"],
+.bar[data-duration="3"] .tie[data-beat^="2.66"][data-duration^="0.33"],
+.bar[data-duration="3"] .tie[data-beat^="2.75"][data-duration^="0.25"],
+.bar[data-duration="3"] .tie[data-beat^="2.83"][data-duration^="0.16"],
+.bar[data-duration="3"] .tie[data-beat^="2.87"][data-duration^="0.12"],
+.bar[data-duration="3"] .tie[data-beat^="2.91"][data-duration^="0.08"],
 
-.bar[data-duration="4"] > .tie[data-beat^="0"][data-duration^="4"],
-.bar[data-duration="4"] > .tie[data-beat^="1"][data-duration^="3"],
-.bar[data-duration="4"] > .tie[data-beat^="2"][data-duration^="2"],
-.bar[data-duration="4"] > .tie[data-beat^="2.5"][data-duration^="1.5"],
-.bar[data-duration="4"] > .tie[data-beat^="2.66"][data-duration^="1.33"],
-.bar[data-duration="4"] > .tie[data-beat^="3"][data-duration^="1"],
-.bar[data-duration="4"] > .tie[data-beat^="3.25"][data-duration^="0.75"],
-.bar[data-duration="4"] > .tie[data-beat^="3.33"][data-duration^="0.66"],
-.bar[data-duration="4"] > .tie[data-beat^="3.5"][data-duration^="0.5"],
-.bar[data-duration="4"] > .tie[data-beat^="3.62"][data-duration^="0.37"],
-.bar[data-duration="4"] > .tie[data-beat^="3.66"][data-duration^="0.33"],
-.bar[data-duration="4"] > .tie[data-beat^="3.75"][data-duration^="0.25"],
-.bar[data-duration="4"] > .tie[data-beat^="3.83"][data-duration^="0.16"],
-.bar[data-duration="4"] > .tie[data-beat^="3.87"][data-duration^="0.12"],
-.bar[data-duration="4"] > .tie[data-beat^="3.91"][data-duration^="0.08"],
+.bar[data-duration="4"] .tie[data-beat^="0"][data-duration^="4"],
+.bar[data-duration="4"] .tie[data-beat^="1"][data-duration^="3"],
+.bar[data-duration="4"] .tie[data-beat^="2"][data-duration^="2"],
+.bar[data-duration="4"] .tie[data-beat^="2.5"][data-duration^="1.5"],
+.bar[data-duration="4"] .tie[data-beat^="2.66"][data-duration^="1.33"],
+.bar[data-duration="4"] .tie[data-beat^="3"][data-duration^="1"],
+.bar[data-duration="4"] .tie[data-beat^="3.25"][data-duration^="0.75"],
+.bar[data-duration="4"] .tie[data-beat^="3.33"][data-duration^="0.66"],
+.bar[data-duration="4"] .tie[data-beat^="3.5"][data-duration^="0.5"],
+.bar[data-duration="4"] .tie[data-beat^="3.62"][data-duration^="0.37"],
+.bar[data-duration="4"] .tie[data-beat^="3.66"][data-duration^="0.33"],
+.bar[data-duration="4"] .tie[data-beat^="3.75"][data-duration^="0.25"],
+.bar[data-duration="4"] .tie[data-beat^="3.83"][data-duration^="0.16"],
+.bar[data-duration="4"] .tie[data-beat^="3.87"][data-duration^="0.12"],
+.bar[data-duration="4"] .tie[data-beat^="3.91"][data-duration^="0.08"],
 
-.bar[data-duration="5"] > .tie[data-beat^="1"][data-duration^="4"],
-.bar[data-duration="5"] > .tie[data-beat^="2"][data-duration^="3"],
-.bar[data-duration="5"] > .tie[data-beat^="3"][data-duration^="2"],
-.bar[data-duration="5"] > .tie[data-beat^="3.5"][data-duration^="1.5"],
-.bar[data-duration="5"] > .tie[data-beat^="3.66"][data-duration^="1.33"],
-.bar[data-duration="5"] > .tie[data-beat^="4"][data-duration^="1"],
-.bar[data-duration="5"] > .tie[data-beat^="4.25"][data-duration^="0.75"],
-.bar[data-duration="5"] > .tie[data-beat^="4.33"][data-duration^="0.66"],
-.bar[data-duration="5"] > .tie[data-beat^="4.5"][data-duration^="0.5"],
-.bar[data-duration="5"] > .tie[data-beat^="4.62"][data-duration^="0.37"],
-.bar[data-duration="5"] > .tie[data-beat^="4.66"][data-duration^="0.33"],
-.bar[data-duration="5"] > .tie[data-beat^="4.75"][data-duration^="0.25"],
-.bar[data-duration="5"] > .tie[data-beat^="4.83"][data-duration^="0.16"],
-.bar[data-duration="5"] > .tie[data-beat^="4.87"][data-duration^="0.12"],
-.bar[data-duration="5"] > .tie[data-beat^="4.91"][data-duration^="0.08"],
+.bar[data-duration="5"] .tie[data-beat^="1"][data-duration^="4"],
+.bar[data-duration="5"] .tie[data-beat^="2"][data-duration^="3"],
+.bar[data-duration="5"] .tie[data-beat^="3"][data-duration^="2"],
+.bar[data-duration="5"] .tie[data-beat^="3.5"][data-duration^="1.5"],
+.bar[data-duration="5"] .tie[data-beat^="3.66"][data-duration^="1.33"],
+.bar[data-duration="5"] .tie[data-beat^="4"][data-duration^="1"],
+.bar[data-duration="5"] .tie[data-beat^="4.25"][data-duration^="0.75"],
+.bar[data-duration="5"] .tie[data-beat^="4.33"][data-duration^="0.66"],
+.bar[data-duration="5"] .tie[data-beat^="4.5"][data-duration^="0.5"],
+.bar[data-duration="5"] .tie[data-beat^="4.62"][data-duration^="0.37"],
+.bar[data-duration="5"] .tie[data-beat^="4.66"][data-duration^="0.33"],
+.bar[data-duration="5"] .tie[data-beat^="4.75"][data-duration^="0.25"],
+.bar[data-duration="5"] .tie[data-beat^="4.83"][data-duration^="0.16"],
+.bar[data-duration="5"] .tie[data-beat^="4.87"][data-duration^="0.12"],
+.bar[data-duration="5"] .tie[data-beat^="4.91"][data-duration^="0.08"],
 
-.bar[data-duration="6"] > .tie[data-beat^="0"][data-duration^="6"],
-.bar[data-duration="6"] > .tie[data-beat^="2"][data-duration^="4"],
-.bar[data-duration="6"] > .tie[data-beat^="3"][data-duration^="3"],
-.bar[data-duration="6"] > .tie[data-beat^="4"][data-duration^="2"],
-.bar[data-duration="6"] > .tie[data-beat^="4.5"][data-duration^="1.5"],
-.bar[data-duration="6"] > .tie[data-beat^="4.66"][data-duration^="1.33"],
-.bar[data-duration="6"] > .tie[data-beat^="5"][data-duration^="1"],
-.bar[data-duration="6"] > .tie[data-beat^="5.25"][data-duration^="0.75"],
-.bar[data-duration="6"] > .tie[data-beat^="5.33"][data-duration^="0.66"],
-.bar[data-duration="6"] > .tie[data-beat^="5.5"][data-duration^="0.5"],
-.bar[data-duration="6"] > .tie[data-beat^="5.62"][data-duration^="0.37"],
-.bar[data-duration="6"] > .tie[data-beat^="5.66"][data-duration^="0.33"],
-.bar[data-duration="6"] > .tie[data-beat^="5.75"][data-duration^="0.25"],
-.bar[data-duration="6"] > .tie[data-beat^="5.83"][data-duration^="0.16"],
-.bar[data-duration="6"] > .tie[data-beat^="5.87"][data-duration^="0.12"],
-.bar[data-duration="6"] > .tie[data-beat^="5.91"][data-duration^="0.08"] {
+.bar[data-duration="6"] .tie[data-beat^="0"][data-duration^="6"],
+.bar[data-duration="6"] .tie[data-beat^="2"][data-duration^="4"],
+.bar[data-duration="6"] .tie[data-beat^="3"][data-duration^="3"],
+.bar[data-duration="6"] .tie[data-beat^="4"][data-duration^="2"],
+.bar[data-duration="6"] .tie[data-beat^="4.5"][data-duration^="1.5"],
+.bar[data-duration="6"] .tie[data-beat^="4.66"][data-duration^="1.33"],
+.bar[data-duration="6"] .tie[data-beat^="5"][data-duration^="1"],
+.bar[data-duration="6"] .tie[data-beat^="5.25"][data-duration^="0.75"],
+.bar[data-duration="6"] .tie[data-beat^="5.33"][data-duration^="0.66"],
+.bar[data-duration="6"] .tie[data-beat^="5.5"][data-duration^="0.5"],
+.bar[data-duration="6"] .tie[data-beat^="5.62"][data-duration^="0.37"],
+.bar[data-duration="6"] .tie[data-beat^="5.66"][data-duration^="0.33"],
+.bar[data-duration="6"] .tie[data-beat^="5.75"][data-duration^="0.25"],
+.bar[data-duration="6"] .tie[data-beat^="5.83"][data-duration^="0.16"],
+.bar[data-duration="6"] .tie[data-beat^="5.87"][data-duration^="0.12"],
+.bar[data-duration="6"] .tie[data-beat^="5.91"][data-duration^="0.08"] {
     /* Stretch ties over following bar line */
     /* - bar start gap - half of head width */
     margin-right: -0.375em;

@@ -1,7 +1,7 @@
 {
     "imports": {
         "dom/":      "https://cdn.jsdelivr.net/gh/stephband/dom@1.4.9/modules/",
-        "fn/":       "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.7/modules/",
+        "fn/":       "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.8/modules/",
         "bolt/":     "https://cdn.jsdelivr.net/gh/stephband/bolt-2@1.0.9/",
         "neuron/":   "https://cdn.jsdelivr.net/gh/stephband/neuron@0.1.1/",
         "midi/":     "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.5/modules/",

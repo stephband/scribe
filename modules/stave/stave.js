@@ -317,9 +317,9 @@ export default class Stave {
         return symbols.concat(this.createKeySymbols(keyEvent));
     }
 
-    createNoteSymbols(symbols, bar, part, accidentals, notes, cutoffBeat, beat, duration, settings) {
+    createNoteSymbols(symbols, bar, part, accidentals, notes, beat, duration, settings) {
         // Create note heads
-        const noteSymbols = createNotes(this, bar.key, part, notes, cutoffBeat, beat, duration);
+        const noteSymbols = createNotes(this, bar.key, part, notes, beat, duration);
         // Notes may not appear on stave in which case noteSymbols will be empty
         if (!noteSymbols.length) return noteSymbols;
         // Create ledges, accidentals and accents
@@ -332,9 +332,7 @@ export default class Stave {
         return noteSymbols;
     }
 
-    createDupletNoteSymbols(symbols, bar, part, accidentals, notes, startBeat, cutoffBeat, stopBeat, settings) {
-        if (DEBUG && cutoffBeat > stopBeat) throw new Error(`createDupletNoteSymbols() cutoffBeat ${ cutoffBeat } cannot be larger than stopBeat ${ stopBeat }`);
-
+    createDupletNoteSymbols(symbols, bar, part, accidentals, notes, startBeat, stopBeat, settings) {
         const b1    = startBeat - bar.beat;
         const b2    = stopBeat  - bar.beat;
         const grain = grainOfBeat(bar.divisions, b1);
@@ -343,31 +341,13 @@ export default class Stave {
 
         let b = b1;
         let i = -1;
-        while (notes[++i] && notes[i][0] < cutoffBeat) {
+        while (notes[++i]) {
             const b3 = toStopBeat(notes[i]) - bar.beat;
             // If we are filling the whole duration to stopBeat we can break out
             if (b3 >= b2) { b = b2; break; }
             // Update note stop b
             if (b3 > b)   { b = b3; }
         }
-
-        // Do we need this? Can we avoid having to do this?
-        if (b === b1) {
-console.log('AVOID THIS? Notes of duration 0! -----------------------', startBeat, cutoffBeat, stopBeat, notes, i);
-            --i;
-            while (notes[++i] && notes[i][0] < cutoffBeat);
-console.log('AVOID THIS? Notes of duration 0! -----------------------', startBeat, cutoffBeat, stopBeat, notes, i);
-            //notes.length = 0;
-            notes.splice(0, i);
-            // TODO: Remove ties from symbols??
-            return { beat: bar.beat + b, removedCount: i };
-        }
-
-/*
---i;
-while (notes[++i] && notes[i][0] < cutoffBeat);
-console.log('Notes start', b1, 'stop', b, 'duration', b - b1, 'grain', grain, 'count', i, 'bar.divisions', bar.divisions.join(', '));
-*/
 
         let g = grain;
 
@@ -431,6 +411,6 @@ console.log('Notes start', b1, 'stop', b, 'duration', b - b1, 'grain', grain, 'c
         }
 
         const duration = b - b1;
-        return this.createNoteSymbols(symbols, bar, part, accidentals, notes, cutoffBeat, b1, duration, settings);
+        return this.createNoteSymbols(symbols, bar, part, accidentals, notes, b1, duration, settings);
     }
 }

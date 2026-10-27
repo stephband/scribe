@@ -2,6 +2,7 @@ import get               from 'fn/get.js';
 import overload          from 'fn/overload.js';
 import create            from 'dom/create.js';
 import { toNoteNumber }  from 'midi/note.js';
+import { toKeyName }     from 'sequence/modules/event/key.js';
 import * as glyphs       from "./glyphs.js";
 import { identify }      from './event.js';
 import { beamThickness } from './beam.js';
@@ -9,6 +10,7 @@ import { toHTML }        from './html.js';
 import map               from "./store.js";
 import truncate          from './number/truncate.js';
 import config            from './config.js';
+
 
 
 const abs = Math.abs;
@@ -90,7 +92,38 @@ function store(element, data) {
     return element;
 }
 
-export default overload(get('type'), {
+
+// Elements
+
+export function createBarElement(bar) {
+    const { beat, duration, divisions, count } = bar;
+    const element = create('div', {
+        class: `${ bar.doubleBarLine ? 'end-bar ' : '' }bar${ bar.error ? ' error ': '' }`,
+        data: { beat, duration, divisions, count }
+    });
+
+    let n = -1;
+    while (bar[++n]) element.appendChild(createPartElement(bar[n]));
+    return element;
+}
+
+export function createPartElement({ stave, key, symbols }) {
+    const element = create('div', {
+        class: `${ stave.type }-stave stave`,
+        data: {
+            stave: stave.type,
+            key:   stave.pitched ?
+                toKeyName(key) :
+                undefined
+        }
+    });
+
+    let n = -1;
+    while (symbols[++n]) element.appendChild(createSymbolElement(symbols[n]));
+    return element;
+}
+
+const createSymbolElement = overload(get('type'), {
     barrepeat: (symbol) => create('span', {
         class: 'barrepeat',
         html: glyphs['barRepeat' + symbol.count],
@@ -105,16 +138,16 @@ export default overload(get('type'), {
         html: clefGlyphs[symbol.clef]
     }),
 
-    chord: (symbol) => store(create('abbr', {
+    chord: ({ beat, duration, name, event }) => store(create('abbr', {
         class: "chord chord-abbr",
         title: "",
-        html: symbol.name.replace(rchordparts, toChordHTML),
+        html: name.replace(rchordparts, toChordHTML),
         data: {
-            beat:     truncate(4, symbol.beat),
-            duration: truncate(4, symbol.duration),
-            event:    identify(symbol.event)
+            beat:     truncate(4, beat),
+            duration: truncate(4, duration),
+            event:    identify(event)
         }
-    }), symbol.event),
+    }), event),
 
     timesig: (symbol) => symbol.stave.getTimeSigHTML ?
         create('fragment', symbol.stave.getTimeSigHTML(symbol.numerator, symbol.denominator, identify(symbol.event))) :
@@ -232,11 +265,11 @@ export default overload(get('type'), {
         }${ symbol.beam ? 'beam-note ' : '' }note`,
         style: symbol.stemHeight ? `--stem-height: ${ symbol.stemHeight };` : undefined,
         html:  symbol.stave.getNoteHTML(symbol.pitch, symbol.dynamic, symbol.duration),
-        title: `${ symbol.event.spelledPitch } (${ symbol.event[2] })`,
+        title: `${ symbol.event.pitchSpelling } (${ symbol.event[2] })`,
         data: {
             beat:     truncate(4, symbol.beat),
             duration: truncate(4, symbol.duration),
-            pitch:    symbol.event.spelledPitch,
+            pitch:    symbol.event.pitchSpelling,
             part:     symbol.part.name,
             beam:     symbol.beam && symbol.beam.id,
             event:    identify(symbol.event),
@@ -244,49 +277,49 @@ export default overload(get('type'), {
         }
     }), symbol.event),
 
-    tie: (symbol) => store(create('svg', {
-        class: `${ symbol.stemup ? 'down' : 'up' }-tie tie`,
+    tie: ({ beat, duration, pitch, part, stemup, event }) => store(create('svg', {
+        class: `${ stemup ? 'down' : 'up' }-tie tie`,
         viewBox: `0 0 1 1`,
         preserveAspectRatio: "none",
         html: `<path class="tie-path" transform="translate(0, 0.14) scale(1 0.6)" d="M0.979174733,0.0124875307 C0.650597814,1.1195554 0.135029714,1.00095361 0.0165376402,0.026468657 C0.0113570514,0.0135475362 0.00253387291,0.00218807553 0,0 C0.0977526897,1.29523004 0.656681642,1.37089992 1,2.43111793e-08 C0.991901367,2.43111797e-08 0.987703936,0.01248753 0.979174733,0.0124875307 Z M0.979174733,0.0124875307"></path>`,
         data: {
-            beat:     truncate(4, symbol.beat),
-            pitch:    symbol.pitch,
-            duration: truncate(4, symbol.duration),
-            part:     symbol.part.name,
-            event:    identify(symbol.event)
+            beat:     truncate(4, beat),
+            pitch,
+            duration: truncate(4, duration),
+            part:     part.name,
+            event:    identify(event)
         }
-    }), symbol.event),
+    }), event),
 
-    tuplet: (symbol) => create('span', {
-        class: `${ symbol.stemup ? 'up' : 'down' }-tuplet tuplet`,
-        html: glyphs['tuplet' + symbol.divisor],
+    tuplet: ({ beat, duration, divisor, rhythm, voice, pitch, stemup, angle }) => create('span', {
+        class: `${ stemup ? 'up' : 'down' }-tuplet tuplet`,
+        html: glyphs['tuplet' + divisor],
         data: {
-            beat:     truncate(4, symbol.beat),
-            pitch:    symbol.pitch,
-            duration: truncate(4, symbol.duration),
-            divisor:  symbol.divisor,
+            beat: truncate(4, beat),
+            pitch,
+            duration: truncate(4, duration),
+            divisor,
             // Rhythm is a binary number
-            rhythm:   toRhythmBinary(symbol.divisor, symbol.rhythm),
-            part:     symbol.part.name
+            rhythm: toRhythmBinary(divisor, rhythm),
+            part: voice.name
         },
-        style: symbol.angle ?
-            `--angle: ${ symbol.angle }deg;` :
+        style: angle ?
+            `--angle: ${ angle }deg;` :
             undefined
     }),
 
-    rest: (symbol) => create('span', {
-        class: symbol.whole && symbol.duration > 3 ?
+    rest: ({ beat, duration, part, pitch, whole }) => create('span', {
+        class: whole && duration > 3 ?
             'whole-rest rest' :
             'rest',
-        html: symbol.whole && symbol.duration > 3 ?
+        html: whole && duration > 3 ?
             glyphs.rest4 :
-            toRestGlyph(symbol.duration),
+            toRestGlyph(duration),
         data: {
-            beat:     truncate(4, symbol.beat),
-            pitch:    symbol.pitch,
-            duration: truncate(4, symbol.duration),
-            part:     symbol.part.name
+            beat:     truncate(4, beat),
+            pitch,
+            duration: truncate(4, duration),
+            part:     part.name
         },
         'aria-hidden': 'true'
     }),

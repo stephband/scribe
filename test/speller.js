@@ -16,7 +16,7 @@ import * as blues             from "../data/blues.js";
 import SpellerRNN from '../modules/speller/speller-rnn.js';
 import weights from '../modules/speller/speller-weights-8b.js';
 import { toKeyName } from 'sequence/modules/event/key.js';
-import { renderElements, renderStyle, renderDOM } from '../modules/render.js';
+import { renderDOM, renderStyle, renderBeams } from '../modules/render.js';
 import { identify } from '../modules/event.js';
 import truncate from '../modules/number/truncate.js';
 
@@ -89,15 +89,15 @@ export async function runSpellerTests(testSource = tests, containerId = 'tests-c
         predictedNotes.forEach((note) => {
             const expectedSpelling = note.expectedSpelling;
             const expectedKey = note.expectedKey;
-            const predKeyName = toKeyName(note.spelledKey);
+            const predKeyName = toKeyName(note.keySpelling);
 
-            note[2] = note.spelledPitch;
-            note.spelling = note.spelledPitch;
+            note[2] = note.pitchSpelling;
+            note.spelling = note.pitchSpelling;
             note.resultKey = predKeyName;
 
             seq.create(note[0], 'text', note[4], note.resultKey);
 
-            const spellingMatch = !expectedSpelling || expectedSpelling === note.spelledPitch;
+            const spellingMatch = !expectedSpelling || expectedSpelling === note.pitchSpelling;
             const keyMatch = !expectedKey || expectedKey === predKeyName;
 
             if (spellingMatch) spellingMatches++;
@@ -110,7 +110,7 @@ export async function runSpellerTests(testSource = tests, containerId = 'tests-c
                     keyMatch,
                     expectedSpelling,
                     expectedKey,
-                    predictedSpelling: note.spelledPitch,
+                    predictedSpelling: note.pitchSpelling,
                     predictedKey: predKeyName
                 });
             }
