@@ -15,6 +15,7 @@ import { createBeam, closeBeam } from './symbol/beam.js';
 import { closeTuplet }           from './symbol/tuplet.js';
 import { isTupletSymbol }        from './tuplet.js';
 import { P24 }                   from './constants.js';
+import log                       from './log.js';
 import toStopBeat                from './event/to-stop-beat.js';
 
 
