@@ -2,17 +2,17 @@
 import create           from 'dom/create.js';
 import px               from 'dom/parse-length.js';
 import rect             from 'dom/rect.js';
-import Event            from 'sequence/modules/event.js';
-import Transform        from 'sequence/modules/transform.js';
-import SequenceIterator from 'sequence/modules/sequence-iterator.js';
+//import Event            from 'sequence/modules/event.js';
+//import Transform        from 'sequence/modules/transform.js';
+//import SequenceIterator from 'sequence/modules/sequence-iterator.js';
 import { toKeyName }      from 'sequence/modules/event/key.js';
-import Stave            from './stave.js';
+//import Stave            from './stave.js';
 import createTree       from './tree.js';
 import { createBarElement, createSigElement } from './create-element.js';
 //import { renderBeam }   from './beam.js';
 import * as glyphs      from './glyphs.js';
 import truncate         from './number/truncate.js';
-import config           from './config.js';
+//import config           from './config.js';
 import log              from './log.js';
 
 

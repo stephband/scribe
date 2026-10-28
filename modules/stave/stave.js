@@ -1,7 +1,7 @@
 
 //import get                   from 'fn/get.js';
 import nothing               from 'fn/nothing.js';
-import { noteNames, toNoteName, toNoteNumber, toNoteOctave, toRootName, toRootNumber } from 'midi/note.js';
+import { noteNames, toNoteName, toNoteNumber, toNoteOctave, toRootNumber } from 'midi/note.js';
 import mod12                 from 'sequence/modules/number/mod-12.js';
 import toStopBeat            from '../event/to-stop-beat.js';
 import { ceilPow2 }          from '../number/power-of-2.js';
@@ -13,7 +13,7 @@ import { createNotes }       from '../symbol/note.js';
 import { getDivisionBefore } from '../bar/divisions.js';
 import { accidentalsFromKey } from '../accidentals.js';
 import { toKeyNumber }       from 'sequence/modules/event/key.js';
-import { rrootname, rpitch, rflatsharp, byFatherCharlesPitch, accidentalChars, fathercharles } from '../pitch.js';
+import { rrootname, rpitch, rflatsharp, accidentalChars, fathercharles } from '../pitch.js';
 import config                from '../config.js';
 import * as glyphs           from "../glyphs.js";
 
@@ -200,7 +200,7 @@ export default class Stave {
     .getSpelling(pitch, key, withOctave)
     Gets spelling of a given pitch. Returns a pitch name string.
     **/
-    getSpelling(pitch, key = 0, withOctave = false) {
+/*    getSpelling(pitch, key = 0, withOctave = false) {
         const keyData = keys[key];
 
         if (!withOctave) {
@@ -250,7 +250,7 @@ export default class Stave {
                 a = keyData.spellings[mod12(n)];
                 o = toNoteOctave(n - a);
             }
-            --- ORIGINAL CODE END --- */
+            --- ORIGINAL CODE END --- * /
         }
         else {
             // pitch is a number
@@ -269,7 +269,7 @@ export default class Stave {
 
         return name + accidental + o;
     }
-
+*/
     createKeySymbols(event) {
         const key = event && event[2] !== undefined ? event[2] : event;
         const k   = typeof key === 'number' ? key : toKeyNumber(key || 0);
