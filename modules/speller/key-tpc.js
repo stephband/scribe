@@ -90,6 +90,17 @@ const basePcs = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
 const accChars = { "-2": "𝄫", "-1": "♭", "0": "", "1": "♯", "2": "𝄪" };
 
 /**
+ * Maps Line-of-Fifths TPC (-15..19) to an octave-free spelled root string
+ * with Unicode accidentals (e.g. "C", "C♯", "D♭")
+ */
+export function tpcToSpelledRoot(tpc) {
+  const letter = letters[((tpc + 1) % 7 + 7) % 7];
+  const accOffset = Math.floor((tpc + 1) / 7);
+  const acc = accChars[accOffset] ?? "";
+  return letter + acc;
+}
+
+/**
  * Maps MIDI note number (or pitch string) and Line-of-Fifths TPC (-15..19)
  * to a spelled pitch string with Unicode accidentals (e.g. "C4", "C♯4", "D♭4")
  */

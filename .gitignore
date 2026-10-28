@@ -1,9 +1,12 @@
 .claude/
 .venv/
+.nova/
 archive/*
-phil-taylor-tests/*
 *.m4a
 *.wav
 *.mp3
 AGENTS.md
 CLAUDE.md
+TODO.md
+*.local
+*.local.*

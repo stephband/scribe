@@ -1,5 +1,6 @@
 
 import insert from 'fn/insert.js';
+import Event  from 'sequence/modules/event.js';
 import { getDivisions } from 'sequence/modules/event/meter.js';
 import byBeat           from 'sequence/modules/events/by-priority.js';
 import Transform        from 'sequence/modules/transform.js';
@@ -58,32 +59,48 @@ function getPart(settings, bar, name) {
 }
 
 function toVoice(settings, stave, event) {
+    if (event.type === 'chord') return 'chord';
     // TODO
-    return 0;
-}
-
-function toVoiceIndex(settings, name) {
-    // TODO
-    return 0;
+    return '0';
 }
 
 function getVoice(settings, part, name) {
-    const index = toVoiceIndex(settings, name);
-    return part[index] || (part[index] = {
+    let i = -1;
+    while (part[++i]) if (part[i].name === name) {
+        return part[i];
+    }
+
+    const voice = {
         type: 'voice',
         name
-    });
+    };
+
+    push(part, voice);
+    return voice;
 }
 
 function quantiseNotesFromBuffers(settings, bar, buffers) {
     let name;
     for (name in buffers) {
+        const buffer = buffers[name];
+        if (!buffer.length) continue;
+
         const [partname, voicename] = name.split('.');
         const part = getPart(settings, bar, partname);
-        const tuplets = quantise(bar.beat, bar.duration, buffers[name]);
-        if (!tuplets) continue;
-        const voice = getVoice(settings, part, voicename);
-        voice.tuplets = tuplets;
+
+        if (voicename === 'chord') {
+            if (buffer[0][0] >= bar.beat + bar.duration) continue;
+            const voice = getVoice(settings, part, voicename);
+            while (buffer[0] && buffer[0][0] < bar.beat + bar.duration) {
+                push(voice, buffer.shift());
+            }
+        }
+        else {
+            const tuplets = quantise(bar.beat, bar.duration, buffer);
+            if (!tuplets) continue;
+            const voice = getVoice(settings, part, voicename);
+            voice.tuplets = tuplets;
+        }
     }
 }
 
@@ -100,14 +117,11 @@ function flagEndBar(bar, sequenceEvent) {
 }
 
 function metricQuantise(settings, sequence, parts, buffers, tree) {
-//    const events = [];
-//    const bars   = [];
 //    const jsons  = [];
 
     let keyEvent;
     // Guarantee the render of at least 1 bar
     let stopBeat = 1;
-//    let symbols  = [];
     let event;
     let sequenceEvent;
     let count = 0;
@@ -172,7 +186,7 @@ function metricQuantise(settings, sequence, parts, buffers, tree) {
 
             case "key": {
                 if (event[0] !== bar.beat) throw new Error(`Scribe "key" event at beat ${ event[0] } not at start of bar at beat ${ bar.beat }`);
-                bar.keyEvent = keyEvent = event;
+                keyEvent = event;
                 bar.key = event[2];
 //                keyEvent = event;
                 // TODO: Key is global and added to the side bar, we need to think about
@@ -180,8 +194,14 @@ function metricQuantise(settings, sequence, parts, buffers, tree) {
 //                symbols.push.apply(symbols, stave.createKeySymbols(event));
 
                 // Push copy of key event to parts (it may get transpose mutated)
-                let part;
-                for (part in parts) parts[part].push(Event.from(event));
+                let name;
+                for (part in parts) {
+                    const clone = Event.from(event);
+                    parts[name].push(clone);
+
+                    const part = getPart(settings, bar, name);
+                    part.keyEvent = clone;
+                }
                 break;
             }
 
@@ -196,7 +216,8 @@ function metricQuantise(settings, sequence, parts, buffers, tree) {
                 bar.divisions = getDivisions(bar.duration, bar.divisor);
                 break;
 
-            case "note": {
+            case "note":
+            case "chord": {
                 const partName  = toPartName(settings, event);
                 const part      = getPart(settings, bar, partName);
                 const voiceName = toVoice(settings, part.stave, event);
@@ -215,11 +236,11 @@ function metricQuantise(settings, sequence, parts, buffers, tree) {
                 event.voice = voiceName;
                 event.stave = part.stave;
 
-                // Push note into global part
-                if (!parts[partName]) parts[partName] = keyEvent ? [keyEvent] : [];
+                // Push event into global part
+                if (!parts[partName]) parts[partName] = keyEvent ? [Event.from(keyEvent)] : [];
                 parts[partName].push(event);
 
-                // Push note into part.voice buffer
+                // Push event into part.voice buffer
                 const name = partName + '.' + voiceName;
                 if (!buffers[name]) buffers[name] = [];
                 const buffer = buffers[name];
@@ -233,41 +254,6 @@ function metricQuantise(settings, sequence, parts, buffers, tree) {
                     stave
                 });
                 break;
-
-//            case "chord": {
-//                //const keyWeights = keyWeightsForEvent(events, events.length - 1, key);
-//                //const keyNumber  = chooseKeyFromWeights(keyWeights);
-//                const keyNumber  = 0;
-//                const extension  = event.extension;
-//                const slashbass  = rslashbass.exec(extension);
-//
-//                let root, bass, name;
-//
-//                if (slashbass) {
-//                    const n = parseInt(slashbass[1], 10);
-//                    root = stave.getSpelling(mod12(event[2] - n), keyNumber);
-//                    bass = stave.getSpelling(event[2], keyNumber);
-//                    name = substituteSpelling(settings, root) + extension.replace(rslashbass, '/' + substituteSpelling(settings, bass));
-//                }
-//                else {
-//                    root = stave.getSpelling(event[2], keyNumber);
-//                    name = substituteSpelling(settings, root) + extension;
-//                }
-//
-//                symbols.push({
-//                    type: 'chord',
-//                    beat: event[0] - beat,
-//                    name,
-//                    // Does chord cross into next bar? The symbol should not
-//                    duration: event[0] + event[4] > beat + duration ?
-//                        duration - event[0] + beat :
-//                        event[4],
-//                    event,
-//                    stave
-//                });
-//
-//                break;
-//            }
 
 //            case "text":
 //                symbols.push({
@@ -390,6 +376,39 @@ function createTies(symbols, bar, voice, notes, noteSymbols, tolerance = 0.125) 
 
 // Symbolise
 
+const rslashbass = /\/\{(\d{1,2})\}$/;
+
+function substituteSpelling(settings, name) {
+    if (name === 'C♭' && settings.spellChordRootCFlatAsB)  return 'B';
+    if (name === 'E♯' && settings.spellChordRootESharpAsF) return 'F';
+    if (name === 'B♯' && settings.spellChordRootBSharpAsC) return 'C';
+    if (name === 'F♭' && settings.spellChordRootFFlatAsE)  return 'E';
+    return name;
+}
+
+function symboliseChords(settings, bar, stave, symbols, voice) {
+    let i = -1, event;
+    while (event = voice[++i]) {
+        const extension = event.extension;
+        const root      = substituteSpelling(settings, event.rootSpelling);
+        const name      = event.bassSpelling ?
+            root + extension.replace(rslashbass, '/' + substituteSpelling(settings, event.bassSpelling)) :
+            root + extension ;
+
+        symbols.push({
+            type: 'chord',
+            beat: event[0] - bar.beat,
+            name,
+            // Does chord cross into next bar? The symbol should not
+            duration: event[0] + event[4] > bar.beat + bar.duration ?
+                bar.duration - event[0] + bar.beat :
+                event[4],
+            event,
+            stave
+        });
+    }
+}
+
 function symboliseTree(settings, parts, buffers, tree) {
     // Loop over bars
     let n = -1;
@@ -411,9 +430,9 @@ function symbolisePart(settings, buffers, bar, part) {
 
     // Push in key signature
     // TODO: wrong event object. This has not gone through the part transpose transform :/
-    if (bar.keyEvent) {
-        console.log('WOOOOOO', bar.keyEvent);
-        symbols.push.apply(symbols, stave.createKeySymbols(bar.keyEvent));
+    if (part.keyEvent) {
+        console.log('WOOOOOO', part.keyEvent);
+        symbols.push.apply(symbols, stave.createKeySymbols(part.keyEvent));
     }
 
     // Push in time signature
@@ -426,19 +445,25 @@ function symbolisePart(settings, buffers, bar, part) {
         event:       bar.meterEvent
     });
 
-    const l = symbols.length;
-
     // Loop over voices
     let n = -1;
-    let notes;
+    let hasNotes = false;
     while (part[++n]) {
-        notes = buffers[part.name + '.' + n];
-        symboliseVoice(settings, bar, part, stave, key, notes, symbols, part[n]);
+        const voice = part[n];
+        if (voice.name === 'chord') {
+            symboliseChords(settings, bar, stave, symbols, voice);
+        }
+        else {
+            const notes = buffers[part.name + '.' + voice.name];
+            const l = symbols.length;
+            symboliseVoice(settings, bar, part, stave, key, notes, symbols, voice);
+            if (symbols.length > l) hasNotes = true;
+        }
     }
 
-    // If no symbols were created for this part in this bar, fill with a whole
-    // bar rest
-    if (symbols.length === l) symbols.push({
+    // If no note/rest symbols were created for this part in this bar, fill with
+    // a whole bar rest
+    if (!hasNotes) symbols.push({
         type:     'rest',
         beat:     0,
         duration: bar.duration,
@@ -585,7 +610,7 @@ export default async function createTree(sequence, settings = config) {
     // 2. Sort out pitch
     // Assign note spelling per-part
     // TODO!!! settings.showAtConcertPitch
-    if (true) {
+    if (false) {
         // Spell parts in concert
         await spell([].concat.apply([], values(parts)).sort(byBeat));
     }

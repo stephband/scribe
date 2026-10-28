@@ -1,9 +1,13 @@
 import floorPow2 from "sequence/modules/number/floor-pow-2.js";
 import { toKeyName, toKeyNumber } from "sequence/modules/event/key.js";
-import { toNoteNumber } from "midi/note.js";
-import { accidentalToTpc, classToKey, inKeyToClass, keyToClass, NUM_IN_KEYS, tpcToAccClass, tpcToSpelledPitch } from "./key-tpc.js";
+import { toChordHSID, toChordName } from "sequence/modules/event/chord.js";
+import { hsidToNumbers } from "sequence/modules/harmony/hsid.js";
+import { toNoteNumber, toRootNumber } from "midi/note.js";
+import { accidentalToTpc, classToKey, inKeyToClass, keyToClass, NUM_IN_KEYS, tpcToAccClass, tpcToSpelledPitch, tpcToSpelledRoot } from "./key-tpc.js";
 
 export const FEATURE_DIM = 24 + NUM_IN_KEYS; // 39 (12 pitch class + 4 duration + 8 delta + 15 key)
+
+const rslashbass = /\/\{(\d{1,2})\}$/;
 
 /**
  * Maps arbitrary continuous duration in beats to a 4-bucket index [0..3]:
@@ -61,6 +65,7 @@ export function encode(events, options = {}) {
     const list = events.events || events;
     const notes = [];
     const noteKeys = [];
+    let T = 0;
 
     for (const e of list) {
         const type = e.type || e[1];
@@ -73,6 +78,13 @@ export function encode(events, options = {}) {
         } else if (type === "note" || type === 2) {
             notes.push(e);
             noteKeys.push(currentKey);
+            T += 1;
+        } else if (type === "chord" || type === 7) {
+            const hsid = typeof e[3] === "number" ? e[3] : toChordHSID(e[3]);
+            const numbers = hsidToNumbers(hsid);
+            notes.push(e);
+            noteKeys.push(currentKey);
+            T += numbers.length;
         }
     }
 
@@ -80,7 +92,6 @@ export function encode(events, options = {}) {
         initialKey = 0; // Default to C (0)
     }
 
-    const T = notes.length;
     if (T === 0) {
         throw new Error("Sequence contains no note events to encode");
     }
@@ -88,33 +99,64 @@ export function encode(events, options = {}) {
     // Allocate flat Float32Array: shape [T x FEATURE_DIM]
     const features = new Float32Array(T * FEATURE_DIM);
     let prevBeat = 0;
+    let t = 0;
 
-    for (let t = 0; t < T; t++) {
-        const note = notes[t];
-        const beat = Number(note[0]);
-        const midi = typeof note[2] === "number" ? note[2] : toNoteNumber(note[2]);
-        const duration = Number(note[4]);
-
-        const pitchClass = ((midi % 12) + 12) % 12;
-        const offset = t * FEATURE_DIM;
-
-        // 1. One-hot pitch class: features 0..11
-        features[offset + pitchClass] = 1.0;
-
-        // 2. One-hot 4-bucket duration: features 12..15
+    for (let i = 0; i < notes.length; i++) {
+        const event = notes[i];
+        const type = event.type || event[1];
+        const beat = Number(event[0]);
+        const duration = Number(event[4]);
         const durBucket = durationToBucketIndex(duration);
-        features[offset + 12 + durBucket] = 1.0;
+        const keyClass = inKeyToClass(noteKeys[i]);
 
-        // 3. One-hot 8-bucket inter-onset delta timing: features 16..23
-        const delta = t === 0 ? 0.0 : Math.max(0.0, beat - prevBeat);
-        const deltaBucket = deltaToBucketIndex(delta);
-        features[offset + 16 + deltaBucket] = 1.0;
+        if (type === "chord" || type === 7) {
+            const root = typeof event[2] === "number" ? event[2] : toRootNumber(event[2]);
+            const hsid = typeof event[3] === "number" ? event[3] : toChordHSID(event[3]);
+            const numbers = hsidToNumbers(hsid);
 
-        // 4. One-hot 15-class current key signature: features 24..38
-        const keyClass = inKeyToClass(noteKeys[t]);
-        features[offset + 24 + keyClass] = 1.0;
+            for (let k = 0; k < numbers.length; k++) {
+                const pitchClass = (((root + numbers[k]) % 12) + 12) % 12;
+                const offset = t * FEATURE_DIM;
 
-        prevBeat = beat;
+                // 1. One-hot pitch class: features 0..11
+                features[offset + pitchClass] = 1.0;
+
+                // 2. One-hot 4-bucket duration: features 12..15
+                features[offset + 12 + durBucket] = 1.0;
+
+                // 3. One-hot 8-bucket inter-onset delta timing: features 16..23
+                const delta = t === 0 ? 0.0 : Math.max(0.0, beat - prevBeat);
+                const deltaBucket = deltaToBucketIndex(delta);
+                features[offset + 16 + deltaBucket] = 1.0;
+
+                // 4. One-hot 15-class current key signature: features 24..38
+                features[offset + 24 + keyClass] = 1.0;
+
+                prevBeat = beat;
+                t++;
+            }
+        } else {
+            const midi = typeof event[2] === "number" ? event[2] : toNoteNumber(event[2]);
+            const pitchClass = ((midi % 12) + 12) % 12;
+            const offset = t * FEATURE_DIM;
+
+            // 1. One-hot pitch class: features 0..11
+            features[offset + pitchClass] = 1.0;
+
+            // 2. One-hot 4-bucket duration: features 12..15
+            features[offset + 12 + durBucket] = 1.0;
+
+            // 3. One-hot 8-bucket inter-onset delta timing: features 16..23
+            const delta = t === 0 ? 0.0 : Math.max(0.0, beat - prevBeat);
+            const deltaBucket = deltaToBucketIndex(delta);
+            features[offset + 16 + deltaBucket] = 1.0;
+
+            // 4. One-hot 15-class current key signature: features 24..38
+            features[offset + 24 + keyClass] = 1.0;
+
+            prevBeat = beat;
+            t++;
+        }
     }
 
     return {
@@ -151,20 +193,49 @@ export function encodeTargets(annotatedNotes) {
 /**
  * Decodes model prediction class indices [T] back to note names and TPC coordinates
  *
- * @param {Uint32Array|Array} pitches - Predicted accidental class indices [0..4]
+ * @param {Uint32Array|Array} accidentals - Predicted accidental class indices [0..4]
  * @param {Uint32Array|Array} [keys=null] - Predicted key class indices [0..24]
- * @param {Array} notes - Original note events (used to combine MIDI pitch class with accidental class)
- * @returns {Array} Array of { tpc, key, name, keyName }
+ * @param {Array} notes - Original note and chord events
+ * @returns {Array} Array of events with assigned spelling properties
  */
 export function decodePredictions(accidentals, keys, notes) {
     let i = -1;
-    while (++i < accidentals.length) {
-        const note  = notes[i];
-        const tpc   = accidentalToTpc(accidentals[i], note[2]);
+    let t = 0;
+    while (++i < notes.length) {
+        const event = notes[i];
+        const type  = event.type || event[1];
 
-        note.tpc           = tpc;
-        note.keySpelling   = classToKey(keys[i]);
-        note.pitchSpelling = tpcToSpelledPitch(note[2], tpc);
+        if (type === "chord" || type === 7) {
+            const root      = typeof event[2] === "number" ? event[2] : toRootNumber(event[2]);
+            const hsid      = typeof event[3] === "number" ? event[3] : toChordHSID(event[3]);
+            const numbers   = hsidToNumbers(hsid);
+            const extension = event.extension ?? toChordName(hsid);
+            const slashbass = rslashbass.exec(extension);
+            const tpc       = accidentalToTpc(accidentals[t], root);
+
+            event.tpc         = tpc;
+            event.keySpelling = classToKey(keys[t]);
+
+            if (slashbass) {
+                const n       = parseInt(slashbass[1], 10);
+                const k       = numbers.indexOf(12 - n);
+                const rootNum = (root + 12 - n) % 12;
+                const rootTpc = accidentalToTpc(accidentals[t + (k > -1 ? k : 0)], rootNum);
+                event.rootSpelling = tpcToSpelledRoot(rootTpc);
+                event.bassSpelling = tpcToSpelledRoot(tpc);
+            } else {
+                event.rootSpelling = tpcToSpelledRoot(tpc);
+            }
+
+            t += numbers.length;
+        } else {
+            const tpc = accidentalToTpc(accidentals[t], event[2]);
+
+            event.tpc           = tpc;
+            event.keySpelling   = classToKey(keys[t]);
+            event.pitchSpelling = tpcToSpelledPitch(event[2], tpc);
+            t += 1;
+        }
     }
 
     return notes;
