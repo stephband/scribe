@@ -79,8 +79,8 @@ export function renderStyle(element, root = element) {
         --head-diamond-size: ${ truncate(6, headDiamondWidth / fontSize) };
         --acci-flat-size:    ${ truncate(6, acciFlatWidth / fontSize) };
         --acci-sharp-size:   ${ truncate(6, acciSharpWidth / fontSize) };
-        --signature-width: ${ (0.25 + 2.375 + count * 0.5 + 0.5).toFixed(6) }em;
-    `;
+        --signature-width: calc(var(--signature-label) + var(--signature-gap) + ${ (0.25 + 2.375 + count * 0.5 + 0.5).toFixed(6) }em);
+    `;               // label and gap | margin | clef | accidentals | margin
 }
 
 export async function renderDOM(sequence, clef, keyname, meter, transpose = 0, displace = 0, options) {

@@ -21,6 +21,7 @@
 @import '../classes/tie.css';
 @import '../classes/lyric.css';
 @import '../classes/svg.css';
+@import '../classes/part.css';
 
 :host *,
 :host ::before,
@@ -75,7 +76,10 @@
     --stem-align-down: -0.04;
     /* Width of signature column */
     --signature-width: 2em;
-
+    /* Size of signature label column */
+    --signature-label: 0.3125em;
+    /* Gap between part label and signature stave */
+    --signature-gap: 0.1875em;
 
 
     position: relative;
@@ -140,8 +144,59 @@
 }
 
 .side music-sig {
-    display: block;
+    display: grid;
 }
+
+music-sig {
+    font-size: 2em;
+    display: grid;
+    grid-template-columns: var(--signature-label, 0.3125em) min-content;
+    column-gap: var(--signature-gap, 0.125em);
+}
+
+music-sig > .part-name {
+    grid-column: 1;
+    align-self: center;
+    justify-self: center;
+}
+
+music-sig > music-stave {
+    grid-column: 2;
+    /* Keep stave the same scale as bar */
+    font-size: 1em !important;
+    padding-left: calc(1px + 0.125em) !important;
+}
+
+
+/* Score group line */
+
+music-sig > music-stave::before {
+    content: '';
+    grid-column: 1;
+    grid-row: stave-top / -1;
+    justify-self: start;
+    align-self: stretch;
+    width: 1px /*var(--barline-thickness, 0.04em);*/;
+    margin-left: calc(-1px - 0.125em);
+    margin-top: 0.0625em;
+    margin-bottom: -0.25em;
+    background: currentcolor;
+}
+
+music-sig > music-stave ~ music-stave::before {
+    grid-row: 1 / -1;
+    margin-top: -0.25em;
+    margin-bottom: -0.25em;
+}
+
+music-sig > music-stave ~ music-stave:last-child::before {
+    grid-row: 1 / stave-bottom;
+    margin-top: -0.25em;
+    margin-bottom: 0.0625em;
+}
+
+
+
 
 .side .signature-stave {
     width: auto;

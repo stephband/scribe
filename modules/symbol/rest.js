@@ -190,7 +190,7 @@ function getDuration(durations, divisions, b1, b2) {
         durations[d] ;
 }
 
-export function createRests(symbols, durations, divisions, stave, part, startBeat, stopBeat) {
+export function createRests(symbols, durations, divisions, stave, voice, startBeat, stopBeat) {
     let beat = startBeat;
 
     // Insert rests beat - stopBeat
@@ -201,7 +201,7 @@ export function createRests(symbols, durations, divisions, stave, part, startBea
             beat,
             duration,
             stave,
-            part
+            voice
         });
         beat += duration;
     }

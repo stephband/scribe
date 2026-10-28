@@ -1,0 +1,10 @@
+.part-name {
+    font-family: system-ui;
+    font-size: 0.3125em;
+    line-height: 1em;
+    font-weight: 400;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
+    text-transform: uppercase;
+    rotate: -90deg;
+}

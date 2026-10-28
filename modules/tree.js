@@ -1,5 +1,7 @@
 
+import insert from 'fn/insert.js';
 import { getDivisions } from 'sequence/modules/event/meter.js';
+import byBeat           from 'sequence/modules/events/by-priority.js';
 import Transform        from 'sequence/modules/transform.js';
 import SequenceIterator from 'sequence/modules/sequence-iterator.js';
 import config from './config.js';
@@ -15,12 +17,12 @@ import { createBeam, closeBeam } from './symbol/beam.js';
 import { closeTuplet }           from './symbol/tuplet.js';
 import { isTupletSymbol }        from './tuplet.js';
 import { P24 }                   from './constants.js';
-import { toDisplay }             from './display.js';
+import { toDisplay, byDisplayOrder } from './display.js';
 import log                       from './log.js';
 import toStopBeat                from './event/to-stop-beat.js';
 
 
-const { values } = Object;
+const { entries, values } = Object;
 
 
 
@@ -42,8 +44,7 @@ function getPart(settings, bar, name) {
     }
 
     const display = toDisplay(name);
-console.log(name, display);
-    return bar[i] = {
+    const part = {
         type:      'part',
         name,
         stave:     Stave[display.staff],
@@ -51,6 +52,9 @@ console.log(name, display);
         key:       bar.key,
         symbols:   []
     };
+
+    insert(byDisplayOrder, bar, part);
+    return part;
 }
 
 function toVoice(settings, stave, event) {
@@ -83,18 +87,29 @@ function quantiseNotesFromBuffers(settings, bar, buffers) {
     }
 }
 
+// Flags bar with a double bar line if the top-level sequence event stops
+// inside it. Returns true if bar was flagged.
+function flagEndBar(bar, sequenceEvent) {
+    if (!sequenceEvent) return false;
+    const stopBeat = toStopBeat(sequenceEvent);
+    if (stopBeat > bar.beat && stopBeat <= bar.beat + bar.duration) {
+        bar.doubleBarLine = true;
+        return true;
+    }
+    return false;
+}
+
 function metricQuantise(settings, sequence, parts, buffers, tree) {
 //    const events = [];
 //    const bars   = [];
 //    const jsons  = [];
 
-//    let keyEvent;
+    let keyEvent;
     // Guarantee the render of at least 1 bar
     let stopBeat = 1;
 //    let symbols  = [];
     let event;
     let sequenceEvent;
-
     let count = 0;
 
     let bar = {
@@ -119,6 +134,7 @@ function metricQuantise(settings, sequence, parts, buffers, tree) {
         // While event time is beyond end of bar create bar from current state
         while (event[0] >= bar.beat + bar.duration) {
             quantiseNotesFromBuffers(settings, bar, buffers);
+            if (flagEndBar(bar, sequenceEvent)) sequenceEvent = undefined;
             push(tree, bar);
 
 //            const bar = createBar(bars.length + 1, beat, duration, divisor, stave, key, symbols, parts, sequenceEvent, settings);
@@ -155,32 +171,29 @@ function metricQuantise(settings, sequence, parts, buffers, tree) {
                 break;
 
             case "key": {
-                if (event[0] !== bar.beat) throw new Error(`Scribe "key" event at beat ${ event[0] } not at start of bar at beat ${ beat }`);
+                if (event[0] !== bar.beat) throw new Error(`Scribe "key" event at beat ${ event[0] } not at start of bar at beat ${ bar.beat }`);
+                bar.keyEvent = keyEvent = event;
                 bar.key = event[2];
 //                keyEvent = event;
                 // TODO: Key is global and added to the side bar, we need to think about
                 // how to make key signature changes
 //                symbols.push.apply(symbols, stave.createKeySymbols(event));
-                // Push key event to spellables
-//                let part;
-//                for (part in spellables) spellables[part].push(event);
+
+                // Push copy of key event to parts (it may get transpose mutated)
+                let part;
+                for (part in parts) parts[part].push(Event.from(event));
                 break;
             }
 
             case "meter":
-                if (event[0] !== bar.beat) throw new Error(`Scribe "meter" event at beat ${ event[0] } not at start of bar at beat ${ beat }`);
+                if (event[0] !== bar.beat) throw new Error(`Scribe "meter" event at beat ${ event[0] } not at start of bar at beat ${ bar.beat }`);
+                // Store the event on the bar, timesig symbols are created per
+                // part in symbolisePart()
+                bar.meterEvent = event;
                 // Meter events set bar meter
                 bar.duration  = event[2];
                 bar.divisor   = event[3];
                 bar.divisions = getDivisions(bar.duration, bar.divisor);
-//                symbols.push({
-//                    type:        'timesig',
-//                    beat:        0,
-//                    numerator:   event[3] === 1.5 ? event[2] / 0.5 : event[2] / event[3],
-//                    denominator: event[3] === 1.5 ? 8 : 4 / event[3],
-//                    stave,
-//                    event
-//                });
                 break;
 
             case "note": {
@@ -203,7 +216,7 @@ function metricQuantise(settings, sequence, parts, buffers, tree) {
                 event.stave = part.stave;
 
                 // Push note into global part
-                if (!parts[partName]) parts[partName] = [];
+                if (!parts[partName]) parts[partName] = keyEvent ? [keyEvent] : [];
                 parts[partName].push(event);
 
                 // Push note into part.voice buffer
@@ -289,6 +302,7 @@ function metricQuantise(settings, sequence, parts, buffers, tree) {
     // Create bars up to stop beat or while voices still has events
     while (stopBeat > bar.beat + bar.duration) {
         quantiseNotesFromBuffers(settings, bar, buffers);
+        if (flagEndBar(bar, sequenceEvent)) sequenceEvent = undefined;
         push(tree, bar);
 
         // Start new bar
@@ -307,7 +321,7 @@ function metricQuantise(settings, sequence, parts, buffers, tree) {
     push(tree, bar);
 
     // Always render last bar with a double bar line
-//    bar.doubleBarLine = true;
+    bar.doubleBarLine = true;
     return tree;
 }
 
@@ -376,22 +390,44 @@ function createTies(symbols, bar, part, notes, noteSymbols, tolerance = 0.125) {
 
 // Symbolise
 
-function symboliseTree(settings, bars, buffers) {
+function symboliseTree(settings, parts, buffers, tree) {
     // Loop over bars
     let n = -1;
-    while (bars[++n]) symboliseBar(settings, buffers, bars[n]);
-    return bars;
+    while (tree[++n]) symboliseBar(settings, parts, buffers, tree[n]);
+    return tree;
 }
 
-function symboliseBar(settings, buffers, bar) {
-console.log('Bar', bar.count, '-------------------------------------');
-    // Loop over parts
-    let n = -1;
-    while (bar[++n]) symbolisePart(settings, buffers, bar, bar[n], n);
+function symboliseBar(settings, parts, buffers, bar) {
+    // Ensure all score parts exist on this bar
+    let name;
+    for (name in parts) {
+        const part = getPart(settings, bar, name);
+        symbolisePart(settings, buffers, bar, part);
+    }
 }
 
 function symbolisePart(settings, buffers, bar, part) {
     const { stave, key, symbols } = part;
+
+    // Push in key signature
+    // TODO: wrong event object. This has not gone through the part transpose transform :/
+    if (bar.keyEvent) {
+        console.log('WOOOOOO', bar.keyEvent);
+        symbols.push.apply(symbols, stave.createKeySymbols(bar.keyEvent));
+    }
+
+    // Push in time signature
+    if (bar.meterEvent) symbols.push({
+        type:        'timesig',
+        beat:        0,
+        numerator:   bar.meterEvent[3] === 1.5 ? bar.meterEvent[2] / 0.5 : bar.meterEvent[2] / bar.meterEvent[3],
+        denominator: bar.meterEvent[3] === 1.5 ? 8 : 4 / bar.meterEvent[3],
+        stave,
+        event:       bar.meterEvent
+    });
+
+    const l = symbols.length;
+
     // Loop over voices
     let n = -1;
     let notes;
@@ -399,6 +435,16 @@ function symbolisePart(settings, buffers, bar, part) {
         notes = buffers[part.name + '.' + n];
         symboliseVoice(settings, bar, part, stave, key, notes, symbols, part[n]);
     }
+
+    // If no symbols were created for this part in this bar, fill with a whole
+    // bar rest
+    if (symbols.length === l) symbols.push({
+        type:     'rest',
+        beat:     0,
+        duration: bar.duration,
+        whole:    true,
+        stave
+    });
 }
 
 function fillToBeat(settings, bar, stave, voice, accidentals, notes, symbols, beam, beat, stopBeat) {
@@ -441,7 +487,7 @@ function fillTupletToBeat(settings, bar, stave, voice, accidentals, notes, symbo
             beat:     beat - bar.beat,
             duration: division,
             stave,
-            part:     voice
+            voice
         });
         beat += division;
     }
@@ -538,10 +584,23 @@ export default async function createTree(sequence, settings = config) {
 
     // 2. Sort out pitch
     // Assign note spelling per-part
-    await Promise.all(values(parts).map(spell));
+    // TODO!!! settings.showAtConcertPitch
+    if (true) {
+        // Spell parts in concert
+        await spell([].concat.apply([], values(parts)).sort(byBeat));
+    }
+    else {
+        // Spell parts in part transposition
+        await Promise.all(entries(parts).map(([name, events]) => {
+            const display   = toDisplay(name);
+            const transform = Transform.of('transpose', display.transpose || 0);
+            events.forEach((event) => transform.apply(event));
+            return spell(events);
+        }));
+    }
 
     // 3. Loop over bars, parts, voices and populate with symbols
-    symboliseTree(settings, tree, buffers);
+    symboliseTree(settings, parts, buffers, tree);
 
     // Return tree object
     return tree;

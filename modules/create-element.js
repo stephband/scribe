@@ -130,6 +130,10 @@ export function createSigElement(bar0, keyName) {
     while (bar0[++n]) {
         const part = bar0[n];
         const stave = part.stave;
+        const labelElement = create('h2', {
+            class: `part-name`,
+            text: part.name
+        });
         const staveElement = create('music-stave', {
             class: `${ stave.type }-stave signature-stave stave`,
             data: {
@@ -141,6 +145,7 @@ export function createSigElement(bar0, keyName) {
         const symbols = stave.createSignatureSymbols(keyName);
         let i = -1;
         while (symbols[++i]) staveElement.appendChild(createSymbolElement(symbols[i]));
+        element.appendChild(labelElement);
         element.appendChild(staveElement);
     }
     return element;
@@ -313,7 +318,7 @@ const createSymbolElement = overload(get('type'), {
             undefined
     }),
 
-    rest: ({ beat, duration, part, pitch, whole }) => create('music-rest', {
+    rest: ({ beat, duration, voice, pitch, whole }) => create('music-rest', {
         class: whole && duration > 3 ?
             'whole-rest rest' :
             'rest',
@@ -321,10 +326,10 @@ const createSymbolElement = overload(get('type'), {
             glyphs.rest4 :
             toRestGlyph(duration),
         data: {
-            beat:     truncate(4, beat),
-            pitch,
+            beat: truncate(4, beat),
             duration: truncate(4, duration),
-            part:     part.name
+            pitch,
+            voice
         },
         'aria-hidden': 'true'
     }),

@@ -563,10 +563,12 @@ in their duration span. */
     content: attr(data-count);
     position: absolute;
     grid-column: 1;
-    grid-row: barcount;
-    left: calc(-1 * var(--bar-padding-left) / 0.3125 - 1em);/* - 1em / 0.3125);*/
-    top: 0;
+    grid-row: 1;
+    left: 0; /*calc(-1 * var(--bar-padding-left));/* - 1em / 0.3125);*/
+    top: 2em;
     width: 2em;
+    margin-left: -1em;
+    margin-right: -1em;
     font-family: system-ui;
     font-size: 0.3125em;
     line-height: 0.8em;

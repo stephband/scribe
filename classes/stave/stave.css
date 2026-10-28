@@ -278,12 +278,12 @@
 .stave > [data-pitch="N2"]   { grid-row: N2; }
 .stave > [data-pitch="N1"]   { grid-row: N1; }
 .stave > [data-pitch="N0"]   { grid-row: N0; }
-
+/*
 .stave::before {
-    /* Clef */
+    /* Clef * /
     align-self: center;
 }
-
+*/
 .stave > svg {
     grid-column: 1 / span -1;
     grid-row: stave-top / stave-bottom;
