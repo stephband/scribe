@@ -134,6 +134,13 @@
     max-height: 100%;
 }
 
+:host > music-bar,
+.scribe > music-bar {
+    flex: 1 0 min-content;
+    /* Make bar lines overlap */
+    margin-left: calc(-1 * var(--bar-line-size, 1px));
+}
+
 
 
 .side {
@@ -204,29 +211,24 @@ music-sig > music-stave ~ music-stave:last-child::before {
     min-width: 100%;
 }
 
-.side > .bar + .bar > .clef {
+.side + music-bar ~ music-bar .clef {
     display: block;
 }
 
-.side + .bar > .acci:not([beat]) {
+.side + music-bar .acci:not([beat]) {
     display: none;
 }
 
-.side + .bar > .acci:not([beat]) + .timesig {
+.side + music-bar .acci:not([beat]) + .timesig {
     margin-left: 0 !important;
 }
 
-.side + .bar.drum-stave,
-.side + .bar.percussion-stave {
+.side + music-bar .drum-stave,
+.side + music-bar .percussion-stave {
     --bar-padding-left: 0.125em;
 }
 
-:host > .bar,
-.scribe > .bar {
-    flex: 1 0 min-content;
-    /* Make bar lines overlap */
-    margin-left: calc(-1 * var(--bar-line-size, 1px));
-}
+
 
 
 svg {
