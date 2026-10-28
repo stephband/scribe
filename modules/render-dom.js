@@ -15,7 +15,7 @@ import truncate         from './number/truncate.js';
 //import config           from './config.js';
 import log              from './log.js';
 
-
+const { max } = Math;
 const global = globalThis || window;
 const heads = [
     create('span', { html: glyphs.head1,       style: 'width: min-content;' }),
@@ -26,6 +26,9 @@ const heads = [
     create('span', { html: glyphs.acciFlat,    style: 'width: min-content;' }),
     create('span', { html: glyphs.acciSharp,   style: 'width: min-content;' })
 ];
+
+const counts = { 'F♭': 7, 'C♭': 7, 'G♭': 6, 'D♭': 5, 'A♭': 4, 'E♭': 3, 'B♭': 2, 'F':  1, 'C':  0, 'G':  1, 'D':  2, 'A':  3, 'E':  4, 'B':  5, 'F♯': 6, 'C♯': 7, 'G♯': 7 };
+
 
 /* Glyphs for triplet mark d d = d 3 d, instead of saying Swing 8ths, for example
 text = glyphs.textNoteShort
@@ -67,10 +70,11 @@ export function renderStyle(element, root = element) {
     // TODO: sort out a better system of getting the key signature metrics in here.
     // One that isn't going to rely on the font so much? Or maybe include the
     // metrics in the font stylesheet?
-    const side   = root.querySelector('.side');
-    const key    = side && (side.getAttribute('key') || side.dataset.key);
-    const counts = { 'F♭': 7, 'C♭': 7, 'G♭': 6, 'D♭': 5, 'A♭': 4, 'E♭': 3, 'B♭': 2, 'F':  1, 'C':  0, 'G':  1, 'D':  2, 'A':  3, 'E':  4, 'B':  5, 'F♯': 6, 'C♯': 7, 'G♯': 7 };
-    const count  = counts[key] || 0;
+    const staves = root.querySelectorAll('.side [key]');
+    const c = Array.from(staves).map((element) => counts[element.getAttribute('key')] || 0);
+    c.push(0);
+    const count = Math.max.apply(Math, c);
+console.log('COUNT', count, (0.25 + 2.375 + count * 0.625 + 0.5).toFixed(6));
     return `
         --head-1-size:       ${ truncate(6, head1Width / fontSize) };
         --head-2-size:       ${ truncate(6, head2Width / fontSize) };
@@ -79,7 +83,7 @@ export function renderStyle(element, root = element) {
         --head-diamond-size: ${ truncate(6, headDiamondWidth / fontSize) };
         --acci-flat-size:    ${ truncate(6, acciFlatWidth / fontSize) };
         --acci-sharp-size:   ${ truncate(6, acciSharpWidth / fontSize) };
-        --signature-width: calc(var(--signature-label) + var(--signature-gap) + ${ (0.25 + 2.375 + count * 0.5 + 0.5).toFixed(6) }em);
+        --signature-width: calc(var(--signature-label) + var(--signature-gap) + ${ (0.25 + 2.375 + count * 0.625 + 0.5).toFixed(6) }em);
     `;               // label and gap | margin | clef | accidentals | margin
 }
 
@@ -126,13 +130,11 @@ export async function renderDOM(sequence, clef, keyname, meter, transpose = 0, d
     // Create side column with signatures
     if (tree[0]) {
         const bar0 = tree[0];
-        const keyName = toKeyName(bar0.key);
-        const sig = createSigElement(bar0, keyName);
+        const sig = createSigElement(bar0);
 
         const column = create('header', {
             id: 'side',
-            class: 'side',
-            key: keyName
+            class: 'side'
         });
 
         let n = 24;

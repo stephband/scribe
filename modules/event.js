@@ -7,13 +7,15 @@ let id = 0;
 
 export function original(event) {
     // Get original event
-    while (event.event) event = event.event;
+    while (event && typeof event === 'object' && event.event) event = event.event;
     return event;
 }
 
 export function identify(event) {
+    if (!event || typeof event !== 'object') return;
     // Get original event
     event = original(event);
+    if (!event || typeof event !== 'object') return;
     // If it has an id assigned return it
     if (event[$id]) return event[$id];
     // Increment id, assign it to symbol

@@ -150,7 +150,7 @@
 music-sig {
     font-size: 2em;
     display: grid;
-    grid-template-columns: var(--signature-label, 0.3125em) min-content;
+    grid-template-columns: var(--signature-label, 0.3125em);
     column-gap: var(--signature-gap, 0.125em);
 }
 
@@ -158,6 +158,7 @@ music-sig > .part-name {
     grid-column: 1;
     align-self: center;
     justify-self: center;
+    margin: 0;
 }
 
 music-sig > music-stave {

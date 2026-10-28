@@ -105,6 +105,7 @@ export default define(element('scribe-music', {
             // Clear the shadow DOM of bars and style and put new elements in it
             shadow.querySelectorAll('.side, .bar').forEach(remove);
             shadow.appendChild(fragment);
+            internals.style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
 
             // DEBUG
 /*

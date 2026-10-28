@@ -23,7 +23,7 @@ import log                       from './log.js';
 import toStopBeat                from './event/to-stop-beat.js';
 
 
-const { entries, values } = Object;
+const { assign, entries, values } = Object;
 
 
 
@@ -45,12 +45,15 @@ function getPart(settings, bar, name) {
     }
 
     const display = toDisplay(name);
+    const transpose = settings.showAtConcertPitch ? 0 : (display.transpose || 0);
+    const key = transpose ? Event.of(0, 'key', bar.key).transpose(transpose)[2] : bar.key;
+
     const part = {
         type:      'part',
         name,
         stave:     Stave[display.staff],
-        transpose: display.transpose,
-        key:       bar.key,
+        transpose,
+        key,
         symbols:   []
     };
 
@@ -119,6 +122,7 @@ function flagEndBar(bar, sequenceEvent) {
 function metricQuantise(settings, sequence, parts, buffers, tree) {
 //    const jsons  = [];
 
+    const keyEvents = [];
     let keyEvent;
     // Guarantee the render of at least 1 bar
     let stopBeat = 1;
@@ -186,22 +190,13 @@ function metricQuantise(settings, sequence, parts, buffers, tree) {
 
             case "key": {
                 if (event[0] !== bar.beat) throw new Error(`Scribe "key" event at beat ${ event[0] } not at start of bar at beat ${ bar.beat }`);
-                keyEvent = event;
+                bar.keyEvent = keyEvent = event;
                 bar.key = event[2];
-//                keyEvent = event;
-                // TODO: Key is global and added to the side bar, we need to think about
-                // how to make key signature changes
-//                symbols.push.apply(symbols, stave.createKeySymbols(event));
+                keyEvents.push(event);
 
-                // Push copy of key event to parts (it may get transpose mutated)
+                // Push copy of key event to parts already discovered
                 let name;
-                for (part in parts) {
-                    const clone = Event.from(event);
-                    parts[name].push(clone);
-
-                    const part = getPart(settings, bar, name);
-                    part.keyEvent = clone;
-                }
+                for (name in parts) parts[name].push(Event.from(event));
                 break;
             }
 
@@ -237,7 +232,9 @@ function metricQuantise(settings, sequence, parts, buffers, tree) {
                 event.stave = part.stave;
 
                 // Push event into global part
-                if (!parts[partName]) parts[partName] = keyEvent ? [Event.from(keyEvent)] : [];
+                if (!parts[partName]) {
+                    parts[partName] = keyEvents.map((e) => Event.from(e));
+                }
                 parts[partName].push(event);
 
                 // Push event into part.voice buffer
@@ -426,13 +423,19 @@ function symboliseBar(settings, parts, buffers, bar) {
 }
 
 function symbolisePart(settings, buffers, bar, part) {
-    const { stave, key, symbols } = part;
+    const { stave, symbols } = part;
+    const transpose = settings.showAtConcertPitch ? 0 : (part.transpose || 0);
+    const key = settings.showAtConcertPitch ? bar.key : part.key;
+    part.transpose = transpose;
+    part.key = key;
 
     // Push in key signature
-    // TODO: wrong event object. This has not gone through the part transpose transform :/
-    if (part.keyEvent) {
-        console.log('WOOOOOO', part.keyEvent);
-        symbols.push.apply(symbols, stave.createKeySymbols(part.keyEvent));
+    if (bar.keyEvent) {
+        const keyEvent = transpose ?
+            Event.from(bar.keyEvent).transpose(transpose) :
+            bar.keyEvent ;
+
+        symbols.push.apply(symbols, stave.createKeySymbols(keyEvent));
     }
 
     // Push in time signature
@@ -592,6 +595,7 @@ function symboliseVoice(settings, bar, part, stave, key, notes, symbols, voice) 
 }
 
 export default async function createTree(sequence, settings = config) {
+    if (settings !== config) settings = assign({}, config, settings);
     const events = sequence.events;
     const array  = [];
 
@@ -610,7 +614,8 @@ export default async function createTree(sequence, settings = config) {
     // 2. Sort out pitch
     // Assign note spelling per-part
     // TODO!!! settings.showAtConcertPitch
-    if (false) {
+    settings.showAtConcertPitch = false;
+    if (settings.showAtConcertPitch) {
         // Spell parts in concert
         await spell([].concat.apply([], values(parts)).sort(byBeat));
     }

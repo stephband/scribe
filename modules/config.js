@@ -1,6 +1,8 @@
 import parseGain from 'sequence/modules/parse/parse-gain.js';
 
 export default {
+    showAtConcertPitch: false,
+
     // Spelling
     spellChordRootCFlatAsB:  true,
     spellChordRootBSharpAsC: true,

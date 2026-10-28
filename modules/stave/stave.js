@@ -273,6 +273,7 @@ export default class Stave {
     createKeySymbols(event) {
         const key = event && event[2] !== undefined ? event[2] : event;
         const k   = typeof key === 'number' ? key : toKeyNumber(key || 0);
+        const ev  = event && typeof event === 'object' ? event : undefined;
 
         if (k > 0) {
             const count = Math.min(k, 7);
@@ -283,7 +284,7 @@ export default class Stave {
                     pitch: fathercharles[i],
                     value: 1,
                     voice: this.voices[0],
-                    event
+                    event: ev
                 });
             }
             return symbols;
@@ -298,7 +299,7 @@ export default class Stave {
                     pitch: fathercharles[7 + i],
                     value: -1,
                     voice: this.voices[0],
-                    event
+                    event: ev
                 });
             }
             return symbols;

@@ -105,6 +105,7 @@
     padding-right: 0.25em;
 }
 
+.signature-stave > music-clef   { grid-column: 1; }
 .signature-stave > [pitch="F♭"] { grid-column: 8; }
 .signature-stave > [pitch="C♭"] { grid-column: 7; }
 .signature-stave > [pitch="G♭"] { grid-column: 6; }

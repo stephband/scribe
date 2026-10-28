@@ -122,12 +122,13 @@ export function createPartElement({ name, stave, key, symbols }) {
     return element;
 }
 
-export function createSigElement(bar0, keyName) {
+export function createSigElement(bar0, defaultKeyName) {
     const element = create('music-sig');
     let n = -1;
     while (bar0[++n]) {
         const part = bar0[n];
         const stave = part.stave;
+        const keyName = toKeyName(part.key !== undefined ? part.key : (defaultKeyName || bar0.key || 0));
         const labelElement = create('h2', {
             class: `part-name`,
             text: part.name
@@ -197,14 +198,17 @@ const createSymbolElement = overload(get('type'), {
         event:    identify(symbol.event)
     }), symbol.event),
 
-    acci: (symbol) => store(create('music-acci', {
-        class: (acciClasses[symbol.value] || 'acci') + (symbol.clump ? ' acci-' + symbol.clump : '' ) + (symbol.cluster ? ' acci-cluster' : ''),
-        html: acciGlyphs[symbol.value] || glyphs.acciNatural,
-        beat:  symbol.beat && truncate(4, symbol.beat),
-        pitch: symbol.pitch,
-        voice: (symbol.voice && symbol.voice.name) || (symbol.part && symbol.part.name),
-        event: symbol.event && identify(symbol.event)
-    }), symbol.event),
+    acci: (symbol) => {
+        const element = create('music-acci', {
+            class: (acciClasses[symbol.value] || 'acci') + (symbol.clump ? ' acci-' + symbol.clump : '' ) + (symbol.cluster ? ' acci-cluster' : ''),
+            html:  acciGlyphs[symbol.value] || glyphs.acciNatural,
+            beat:  symbol.beat && truncate(4, symbol.beat),
+            pitch: symbol.pitch,
+            voice: (symbol.voice && symbol.voice.name) || (symbol.part && symbol.part.name),
+            event: symbol.event ? identify(symbol.event) : undefined
+        });
+        return symbol.event ? store(element, symbol.event) : element;
+    },
 
     accent: (symbol) => {
         const isMarcato   = symbol.dynamic >= config.marcatoThreshold;
