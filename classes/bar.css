@@ -51,7 +51,7 @@
     padding-right: var(--bar-padding-right);
 }
 
-.bar[data-duration] > .stave::after {
+.bar[duration] > .stave::after {
     content: '';
     grid-column: -1;
     grid-row: stave-top / stave-bottom;
@@ -64,7 +64,7 @@
     background: currentcolor;
 }
 
-.end-bar[data-duration] > .stave::after {
+.end-bar[duration] > .stave::after {
     width: 0.11em;
     border-left: var(--barline-thickness) solid currentcolor;
     border-right: var(--barline-thickness) solid currentcolor;
@@ -92,7 +92,7 @@
     align-self: stretch;
 }
 
-.bar [data-beat] {
+.bar [beat] {
     /* Place symbol with a beat in its beat column */
     grid-column-start: calc(var(--column-beat-0) + round(var(--beat) * var(--columns-per-beat)));
 }
@@ -159,7 +159,7 @@
     --timesig-gap: 0.5em;
 }
 
-.bar .acci:not([data-beat]) + .timesig {
+.bar .acci:not([beat]) + .timesig {
     /* If they are preceded by a stave, move them right */
     --timesig-gap:   0.3em;
     --clef-acci-gap: 0.9em;
@@ -169,38 +169,38 @@
 
 /* Sort out ordering of clef / keysig / timesig */
 
-.bar .clef ~ .acci:not([data-beat]) {
+.bar .clef ~ .acci:not([beat]) {
     /* If they are preceded by a stave, move them right */
     --clef-acci-gap: 0.9em;
 }
 
-.bar .acci-flat:not([data-beat]) + .acci:not([data-beat])                                                                                                                               { margin-left: calc(1em * var(--acci-flat-size)); }
-.bar .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                                                                      { margin-left: calc(2em * var(--acci-flat-size)); }
-.bar .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                                             { margin-left: calc(3em * var(--acci-flat-size)); }
-.bar .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                    { margin-left: calc(4em * var(--acci-flat-size)); }
-.bar .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                           { margin-left: calc(5em * var(--acci-flat-size)); }
-.bar .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])  { margin-left: calc(6em * var(--acci-flat-size)); }
+.bar .acci-flat:not([beat]) + .acci:not([beat])                                                                                                                               { margin-left: calc(1em * var(--acci-flat-size)); }
+.bar .acci-flat:not([beat]) + .acci:not([beat]) + .acci:not([beat])                                                                                                      { margin-left: calc(2em * var(--acci-flat-size)); }
+.bar .acci-flat:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat])                                                                             { margin-left: calc(3em * var(--acci-flat-size)); }
+.bar .acci-flat:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat])                                                    { margin-left: calc(4em * var(--acci-flat-size)); }
+.bar .acci-flat:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat])                           { margin-left: calc(5em * var(--acci-flat-size)); }
+.bar .acci-flat:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat])  { margin-left: calc(6em * var(--acci-flat-size)); }
 
-.bar .acci-sharp:not([data-beat]) + .acci:not([data-beat])                                                                                                                              { margin-left: calc(1em * var(--acci-sharp-size)); }
-.bar .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                                                                     { margin-left: calc(2em * var(--acci-sharp-size)); }
-.bar .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                                            { margin-left: calc(3em * var(--acci-sharp-size)); }
-.bar .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                                                   { margin-left: calc(4em * var(--acci-sharp-size)); }
-.bar .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat])                          { margin-left: calc(5em * var(--acci-sharp-size)); }
-.bar .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) { margin-left: calc(6em * var(--acci-sharp-size)); }
+.bar .acci-sharp:not([beat]) + .acci:not([beat])                                                                                                                              { margin-left: calc(1em * var(--acci-sharp-size)); }
+.bar .acci-sharp:not([beat]) + .acci:not([beat]) + .acci:not([beat])                                                                                                     { margin-left: calc(2em * var(--acci-sharp-size)); }
+.bar .acci-sharp:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat])                                                                            { margin-left: calc(3em * var(--acci-sharp-size)); }
+.bar .acci-sharp:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat])                                                   { margin-left: calc(4em * var(--acci-sharp-size)); }
+.bar .acci-sharp:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat])                          { margin-left: calc(5em * var(--acci-sharp-size)); }
+.bar .acci-sharp:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) { margin-left: calc(6em * var(--acci-sharp-size)); }
 
-.bar .acci-flat:not([data-beat]) + .timesig                                                                                                                               { margin-left: calc(1em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
-.bar .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                                                                      { margin-left: calc(2em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
-.bar .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                                             { margin-left: calc(3em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
-.bar .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                    { margin-left: calc(4em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
-.bar .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                           { margin-left: calc(5em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
-.bar .acci-flat:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig  { margin-left: calc(6em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-flat:not([beat]) + .timesig                                                                                                                               { margin-left: calc(1em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-flat:not([beat]) + .acci:not([beat]) + .timesig                                                                                                      { margin-left: calc(2em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-flat:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .timesig                                                                             { margin-left: calc(3em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-flat:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .timesig                                                    { margin-left: calc(4em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-flat:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .timesig                           { margin-left: calc(5em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-flat:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .timesig  { margin-left: calc(6em * var(--acci-flat-size) + 1em * var(--acci-timesig-gap)); }
 
-.bar .acci-sharp:not([data-beat]) + .timesig                                                                                                                              { margin-left: calc(1em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
-.bar .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                                                                     { margin-left: calc(2em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
-.bar .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                                            { margin-left: calc(3em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
-.bar .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                                                   { margin-left: calc(4em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
-.bar .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig                          { margin-left: calc(5em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
-.bar .acci-sharp:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .acci:not([data-beat]) + .timesig { margin-left: calc(6em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-sharp:not([beat]) + .timesig                                                                                                                              { margin-left: calc(1em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-sharp:not([beat]) + .acci:not([beat]) + .timesig                                                                                                     { margin-left: calc(2em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-sharp:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .timesig                                                                            { margin-left: calc(3em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-sharp:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .timesig                                                   { margin-left: calc(4em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-sharp:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .timesig                          { margin-left: calc(5em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
+.bar .acci-sharp:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .acci:not([beat]) + .timesig { margin-left: calc(6em * var(--acci-sharp-size) + 1em * var(--acci-timesig-gap)); }
 
 /*
 .bar .timesig,
@@ -305,25 +305,25 @@ in their duration span. */
 }
 
 /* Anything shorter than a quarter rest */
-.bar .rest[data-duration^="."],
-.bar .rest[data-duration^="0."] {
+.bar .rest[duration^="."],
+.bar .rest[duration^="0."] {
     margin-left:  0.03125em;
     margin-right: 0.03125em;
 }
 
 /* Triplet quarter rest */
-.bar .rest[data-duration="0.66"],
+.bar .rest[duration="0.66"],
 /* A quarter rest */
-.bar .rest[data-duration="1"],
+.bar .rest[duration="1"],
 /* A dotted quarter rest */
-.bar .rest[data-duration^="1.5"],
+.bar .rest[duration^="1.5"],
 /* A double dotted quarter rest */
-.bar .rest[data-duration^="1.75"] {
+.bar .rest[duration^="1.75"] {
 	margin-left:  0.0625em;
     margin-right: 0.0625em;
 }
 
-.bar .rest[data-duration^="1.33"] {
+.bar .rest[duration^="1.33"] {
     justify-self: center;
     margin-left: 0.5em;
     margin-right: 0.5em;
@@ -331,13 +331,13 @@ in their duration span. */
     grid-column-end: span calc(round(var(--columns-per-beat) * var(--duration)) - 1);
 }
 
-.bar .rest[data-duration="2"],
-.bar .rest[data-duration="3"],
-.bar .rest[data-duration="3.5"],
-.bar .rest[data-duration^="4"],
-.bar .rest[data-duration^="6"],
-.bar .rest[data-duration^="7"],
-.bar .rest[data-duration^="8"],
+.bar .rest[duration="2"],
+.bar .rest[duration="3"],
+.bar .rest[duration="3.5"],
+.bar .rest[duration^="4"],
+.bar .rest[duration^="6"],
+.bar .rest[duration^="7"],
+.bar .rest[duration^="8"],
 .bar .whole-rest {
 	justify-self: center;
 	margin-left: 0.625em;
@@ -346,7 +346,7 @@ in their duration span. */
     grid-column-end: span calc(round(var(--columns-per-beat) * var(--duration)) - 1);
 }
 
-.bar .rest[data-duration="1"] + .rest[data-duration="2"] {
+.bar .rest[duration="1"] + .rest[duration="2"] {
     margin-left: 0.5em;
 }
 
@@ -360,12 +360,12 @@ in their duration span. */
     grid-column-end: span calc(1 + round(var(--duration) * var(--columns-per-beat) * (var(--divisor) - 1) / var(--divisor)));
 }
 
-.bar .tuplet[data-duration="4"][data-divisor="3"][data-rhythm$="0"],  /* 4 beat triplet ending in rest */
-.bar .tuplet[data-duration="8"][data-divisor="3"][data-rhythm$="0"],  /* 8 beat triplet ending in rest */
-.bar .tuplet[data-duration="8"][data-divisor="5"][data-rhythm$="0"],  /* 8 beat quintuplet ending in rest */
-.bar .tuplet[data-duration="8"][data-divisor="6"][data-rhythm$="0"],  /* 8 beat sextuplet ending in rest */
-.bar .tuplet[data-duration="8"][data-divisor="7"][data-rhythm$="0"],  /* 8 beat septuplet ending in rest */
-.bar .tuplet[data-duration="8"][data-divisor="8"][data-rhythm$="0"] { /* 8 beat nonuplet ending in rest */
+.bar .tuplet[duration="4"][divisor="3"][rhythm$="0"],  /* 4 beat triplet ending in rest */
+.bar .tuplet[duration="8"][divisor="3"][rhythm$="0"],  /* 8 beat triplet ending in rest */
+.bar .tuplet[duration="8"][divisor="5"][rhythm$="0"],  /* 8 beat quintuplet ending in rest */
+.bar .tuplet[duration="8"][divisor="6"][rhythm$="0"],  /* 8 beat sextuplet ending in rest */
+.bar .tuplet[duration="8"][divisor="7"][rhythm$="0"],  /* 8 beat septuplet ending in rest */
+.bar .tuplet[duration="8"][divisor="8"][rhythm$="0"] { /* 8 beat nonuplet ending in rest */
     /* Make tuplets span minim and whole rests, symbols that span multiple columns */
     grid-column-end: span calc(round(var(--duration) * var(--columns-per-beat) - 1));
 }
@@ -389,7 +389,7 @@ in their duration span. */
 	transform: translate3d(calc(1em * var(--head-1-size) - 1px), calc(1em * var(--translate-y, 0)), 0);
 }
 
-.bar .beam-note:has([data-glyph="headX"]) + .up-beam {
+.bar .beam-note:has([glyph="headX"]) + .up-beam {
     /* TODO: This does, but the selector is dodgy, it doesnt target exactly what
        we need to target, it gets the last note of a beam rather than the first */
     transform: translate3d(calc(1em * var(--head-x-size) - 0.5px), calc(1em * var(--translate-y, 0) - 0.2px), 0);
@@ -428,94 +428,94 @@ in their duration span. */
     grid-column-end: span calc(round(var(--duration) * var(--columns-per-beat)) - 1);
 }
 
-.bar[data-duration="1"] .tie[data-beat^="0"][data-duration^="1"],
-.bar[data-duration="1"] .tie[data-beat^="0.25"][data-duration^="0.75"],
-.bar[data-duration="1"] .tie[data-beat^="0.33"][data-duration^="0.66"],
-.bar[data-duration="1"] .tie[data-beat^="0.5"][data-duration^="0.5"],
-.bar[data-duration="1"] .tie[data-beat^="0.62"][data-duration^="0.37"],
-.bar[data-duration="1"] .tie[data-beat^="0.66"][data-duration^="0.33"],
-.bar[data-duration="1"] .tie[data-beat^="0.75"][data-duration^="0.25"],
-.bar[data-duration="1"] .tie[data-beat^="0.83"][data-duration^="0.16"],
-.bar[data-duration="1"] .tie[data-beat^="0.87"][data-duration^="0.12"],
-.bar[data-duration="1"] .tie[data-beat^="0.91"][data-duration^="0.08"],
+.bar[duration="1"] .tie[beat^="0"][duration^="1"],
+.bar[duration="1"] .tie[beat^="0.25"][duration^="0.75"],
+.bar[duration="1"] .tie[beat^="0.33"][duration^="0.66"],
+.bar[duration="1"] .tie[beat^="0.5"][duration^="0.5"],
+.bar[duration="1"] .tie[beat^="0.62"][duration^="0.37"],
+.bar[duration="1"] .tie[beat^="0.66"][duration^="0.33"],
+.bar[duration="1"] .tie[beat^="0.75"][duration^="0.25"],
+.bar[duration="1"] .tie[beat^="0.83"][duration^="0.16"],
+.bar[duration="1"] .tie[beat^="0.87"][duration^="0.12"],
+.bar[duration="1"] .tie[beat^="0.91"][duration^="0.08"],
 
-.bar[data-duration="2"] .tie[data-beat^="0"][data-duration^="2"],
-.bar[data-duration="2"] .tie[data-beat^="0.5"][data-duration^="1.5"],
-.bar[data-duration="2"] .tie[data-beat^="0.66"][data-duration^="1.33"],
-.bar[data-duration="2"] .tie[data-beat^="1"][data-duration^="1"],
-.bar[data-duration="2"] .tie[data-beat^="1.25"][data-duration^="0.75"],
-.bar[data-duration="2"] .tie[data-beat^="1.33"][data-duration^="0.66"],
-.bar[data-duration="2"] .tie[data-beat^="1.5"][data-duration^="0.5"],
-.bar[data-duration="2"] .tie[data-beat^="1.62"][data-duration^="0.37"],
-.bar[data-duration="2"] .tie[data-beat^="1.66"][data-duration^="0.33"],
-.bar[data-duration="2"] .tie[data-beat^="1.75"][data-duration^="0.25"],
-.bar[data-duration="2"] .tie[data-beat^="1.83"][data-duration^="0.16"],
-.bar[data-duration="2"] .tie[data-beat^="1.87"][data-duration^="0.12"],
-.bar[data-duration="2"] .tie[data-beat^="1.91"][data-duration^="0.08"],
+.bar[duration="2"] .tie[beat^="0"][duration^="2"],
+.bar[duration="2"] .tie[beat^="0.5"][duration^="1.5"],
+.bar[duration="2"] .tie[beat^="0.66"][duration^="1.33"],
+.bar[duration="2"] .tie[beat^="1"][duration^="1"],
+.bar[duration="2"] .tie[beat^="1.25"][duration^="0.75"],
+.bar[duration="2"] .tie[beat^="1.33"][duration^="0.66"],
+.bar[duration="2"] .tie[beat^="1.5"][duration^="0.5"],
+.bar[duration="2"] .tie[beat^="1.62"][duration^="0.37"],
+.bar[duration="2"] .tie[beat^="1.66"][duration^="0.33"],
+.bar[duration="2"] .tie[beat^="1.75"][duration^="0.25"],
+.bar[duration="2"] .tie[beat^="1.83"][duration^="0.16"],
+.bar[duration="2"] .tie[beat^="1.87"][duration^="0.12"],
+.bar[duration="2"] .tie[beat^="1.91"][duration^="0.08"],
 
-.bar[data-duration="3"] .tie[data-beat^="0"][data-duration^="3"],
-.bar[data-duration="3"] .tie[data-beat^="1"][data-duration^="2"],
-.bar[data-duration="3"] .tie[data-beat^="1.5"][data-duration^="1.5"],
-.bar[data-duration="3"] .tie[data-beat^="1.66"][data-duration^="1.33"],
-.bar[data-duration="3"] .tie[data-beat^="2"][data-duration^="1"],
-.bar[data-duration="3"] .tie[data-beat^="2.25"][data-duration^="0.75"],
-.bar[data-duration="3"] .tie[data-beat^="2.33"][data-duration^="0.66"],
-.bar[data-duration="3"] .tie[data-beat^="2.5"][data-duration^="0.5"],
-.bar[data-duration="3"] .tie[data-beat^="2.62"][data-duration^="0.37"],
-.bar[data-duration="3"] .tie[data-beat^="2.66"][data-duration^="0.33"],
-.bar[data-duration="3"] .tie[data-beat^="2.75"][data-duration^="0.25"],
-.bar[data-duration="3"] .tie[data-beat^="2.83"][data-duration^="0.16"],
-.bar[data-duration="3"] .tie[data-beat^="2.87"][data-duration^="0.12"],
-.bar[data-duration="3"] .tie[data-beat^="2.91"][data-duration^="0.08"],
+.bar[duration="3"] .tie[beat^="0"][duration^="3"],
+.bar[duration="3"] .tie[beat^="1"][duration^="2"],
+.bar[duration="3"] .tie[beat^="1.5"][duration^="1.5"],
+.bar[duration="3"] .tie[beat^="1.66"][duration^="1.33"],
+.bar[duration="3"] .tie[beat^="2"][duration^="1"],
+.bar[duration="3"] .tie[beat^="2.25"][duration^="0.75"],
+.bar[duration="3"] .tie[beat^="2.33"][duration^="0.66"],
+.bar[duration="3"] .tie[beat^="2.5"][duration^="0.5"],
+.bar[duration="3"] .tie[beat^="2.62"][duration^="0.37"],
+.bar[duration="3"] .tie[beat^="2.66"][duration^="0.33"],
+.bar[duration="3"] .tie[beat^="2.75"][duration^="0.25"],
+.bar[duration="3"] .tie[beat^="2.83"][duration^="0.16"],
+.bar[duration="3"] .tie[beat^="2.87"][duration^="0.12"],
+.bar[duration="3"] .tie[beat^="2.91"][duration^="0.08"],
 
-.bar[data-duration="4"] .tie[data-beat^="0"][data-duration^="4"],
-.bar[data-duration="4"] .tie[data-beat^="1"][data-duration^="3"],
-.bar[data-duration="4"] .tie[data-beat^="2"][data-duration^="2"],
-.bar[data-duration="4"] .tie[data-beat^="2.5"][data-duration^="1.5"],
-.bar[data-duration="4"] .tie[data-beat^="2.66"][data-duration^="1.33"],
-.bar[data-duration="4"] .tie[data-beat^="3"][data-duration^="1"],
-.bar[data-duration="4"] .tie[data-beat^="3.25"][data-duration^="0.75"],
-.bar[data-duration="4"] .tie[data-beat^="3.33"][data-duration^="0.66"],
-.bar[data-duration="4"] .tie[data-beat^="3.5"][data-duration^="0.5"],
-.bar[data-duration="4"] .tie[data-beat^="3.62"][data-duration^="0.37"],
-.bar[data-duration="4"] .tie[data-beat^="3.66"][data-duration^="0.33"],
-.bar[data-duration="4"] .tie[data-beat^="3.75"][data-duration^="0.25"],
-.bar[data-duration="4"] .tie[data-beat^="3.83"][data-duration^="0.16"],
-.bar[data-duration="4"] .tie[data-beat^="3.87"][data-duration^="0.12"],
-.bar[data-duration="4"] .tie[data-beat^="3.91"][data-duration^="0.08"],
+.bar[duration="4"] .tie[beat^="0"][duration^="4"],
+.bar[duration="4"] .tie[beat^="1"][duration^="3"],
+.bar[duration="4"] .tie[beat^="2"][duration^="2"],
+.bar[duration="4"] .tie[beat^="2.5"][duration^="1.5"],
+.bar[duration="4"] .tie[beat^="2.66"][duration^="1.33"],
+.bar[duration="4"] .tie[beat^="3"][duration^="1"],
+.bar[duration="4"] .tie[beat^="3.25"][duration^="0.75"],
+.bar[duration="4"] .tie[beat^="3.33"][duration^="0.66"],
+.bar[duration="4"] .tie[beat^="3.5"][duration^="0.5"],
+.bar[duration="4"] .tie[beat^="3.62"][duration^="0.37"],
+.bar[duration="4"] .tie[beat^="3.66"][duration^="0.33"],
+.bar[duration="4"] .tie[beat^="3.75"][duration^="0.25"],
+.bar[duration="4"] .tie[beat^="3.83"][duration^="0.16"],
+.bar[duration="4"] .tie[beat^="3.87"][duration^="0.12"],
+.bar[duration="4"] .tie[beat^="3.91"][duration^="0.08"],
 
-.bar[data-duration="5"] .tie[data-beat^="1"][data-duration^="4"],
-.bar[data-duration="5"] .tie[data-beat^="2"][data-duration^="3"],
-.bar[data-duration="5"] .tie[data-beat^="3"][data-duration^="2"],
-.bar[data-duration="5"] .tie[data-beat^="3.5"][data-duration^="1.5"],
-.bar[data-duration="5"] .tie[data-beat^="3.66"][data-duration^="1.33"],
-.bar[data-duration="5"] .tie[data-beat^="4"][data-duration^="1"],
-.bar[data-duration="5"] .tie[data-beat^="4.25"][data-duration^="0.75"],
-.bar[data-duration="5"] .tie[data-beat^="4.33"][data-duration^="0.66"],
-.bar[data-duration="5"] .tie[data-beat^="4.5"][data-duration^="0.5"],
-.bar[data-duration="5"] .tie[data-beat^="4.62"][data-duration^="0.37"],
-.bar[data-duration="5"] .tie[data-beat^="4.66"][data-duration^="0.33"],
-.bar[data-duration="5"] .tie[data-beat^="4.75"][data-duration^="0.25"],
-.bar[data-duration="5"] .tie[data-beat^="4.83"][data-duration^="0.16"],
-.bar[data-duration="5"] .tie[data-beat^="4.87"][data-duration^="0.12"],
-.bar[data-duration="5"] .tie[data-beat^="4.91"][data-duration^="0.08"],
+.bar[duration="5"] .tie[beat^="1"][duration^="4"],
+.bar[duration="5"] .tie[beat^="2"][duration^="3"],
+.bar[duration="5"] .tie[beat^="3"][duration^="2"],
+.bar[duration="5"] .tie[beat^="3.5"][duration^="1.5"],
+.bar[duration="5"] .tie[beat^="3.66"][duration^="1.33"],
+.bar[duration="5"] .tie[beat^="4"][duration^="1"],
+.bar[duration="5"] .tie[beat^="4.25"][duration^="0.75"],
+.bar[duration="5"] .tie[beat^="4.33"][duration^="0.66"],
+.bar[duration="5"] .tie[beat^="4.5"][duration^="0.5"],
+.bar[duration="5"] .tie[beat^="4.62"][duration^="0.37"],
+.bar[duration="5"] .tie[beat^="4.66"][duration^="0.33"],
+.bar[duration="5"] .tie[beat^="4.75"][duration^="0.25"],
+.bar[duration="5"] .tie[beat^="4.83"][duration^="0.16"],
+.bar[duration="5"] .tie[beat^="4.87"][duration^="0.12"],
+.bar[duration="5"] .tie[beat^="4.91"][duration^="0.08"],
 
-.bar[data-duration="6"] .tie[data-beat^="0"][data-duration^="6"],
-.bar[data-duration="6"] .tie[data-beat^="2"][data-duration^="4"],
-.bar[data-duration="6"] .tie[data-beat^="3"][data-duration^="3"],
-.bar[data-duration="6"] .tie[data-beat^="4"][data-duration^="2"],
-.bar[data-duration="6"] .tie[data-beat^="4.5"][data-duration^="1.5"],
-.bar[data-duration="6"] .tie[data-beat^="4.66"][data-duration^="1.33"],
-.bar[data-duration="6"] .tie[data-beat^="5"][data-duration^="1"],
-.bar[data-duration="6"] .tie[data-beat^="5.25"][data-duration^="0.75"],
-.bar[data-duration="6"] .tie[data-beat^="5.33"][data-duration^="0.66"],
-.bar[data-duration="6"] .tie[data-beat^="5.5"][data-duration^="0.5"],
-.bar[data-duration="6"] .tie[data-beat^="5.62"][data-duration^="0.37"],
-.bar[data-duration="6"] .tie[data-beat^="5.66"][data-duration^="0.33"],
-.bar[data-duration="6"] .tie[data-beat^="5.75"][data-duration^="0.25"],
-.bar[data-duration="6"] .tie[data-beat^="5.83"][data-duration^="0.16"],
-.bar[data-duration="6"] .tie[data-beat^="5.87"][data-duration^="0.12"],
-.bar[data-duration="6"] .tie[data-beat^="5.91"][data-duration^="0.08"] {
+.bar[duration="6"] .tie[beat^="0"][duration^="6"],
+.bar[duration="6"] .tie[beat^="2"][duration^="4"],
+.bar[duration="6"] .tie[beat^="3"][duration^="3"],
+.bar[duration="6"] .tie[beat^="4"][duration^="2"],
+.bar[duration="6"] .tie[beat^="4.5"][duration^="1.5"],
+.bar[duration="6"] .tie[beat^="4.66"][duration^="1.33"],
+.bar[duration="6"] .tie[beat^="5"][duration^="1"],
+.bar[duration="6"] .tie[beat^="5.25"][duration^="0.75"],
+.bar[duration="6"] .tie[beat^="5.33"][duration^="0.66"],
+.bar[duration="6"] .tie[beat^="5.5"][duration^="0.5"],
+.bar[duration="6"] .tie[beat^="5.62"][duration^="0.37"],
+.bar[duration="6"] .tie[beat^="5.66"][duration^="0.33"],
+.bar[duration="6"] .tie[beat^="5.75"][duration^="0.25"],
+.bar[duration="6"] .tie[beat^="5.83"][duration^="0.16"],
+.bar[duration="6"] .tie[beat^="5.87"][duration^="0.12"],
+.bar[duration="6"] .tie[beat^="5.91"][duration^="0.08"] {
     /* Stretch ties over following bar line */
     /* - bar start gap - half of head width */
     margin-right: -0.375em;
@@ -560,7 +560,7 @@ in their duration span. */
 
 .end-bar + .bar::before {
     /* Bar count */
-    content: attr(data-count);
+    content: attr(count);
     position: absolute;
     grid-column: 1;
     grid-row: 1;

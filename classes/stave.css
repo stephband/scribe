@@ -85,7 +85,7 @@
     align-self: center;
 }
 
-.bar .acci:not([data-beat]) {
+.bar .acci:not([beat]) {
     /* Accidental with no beat belongs to key signature in the first column */
     grid-column-start: 1;
     justify-self: start;
@@ -97,7 +97,7 @@
     margin-right: 0.25em;
 }
 
-.stave > .acci:not([data-beat]) + .acci:not([data-beat]) {
+.stave > .acci:not([beat]) + .acci:not([beat]) {
     margin-left: 0.03125em;
 }
 
@@ -105,33 +105,33 @@
     padding-right: 0.25em;
 }
 
-.signature-stave > [data-pitch="F♭"] { grid-column: 8; }
-.signature-stave > [data-pitch="C♭"] { grid-column: 7; }
-.signature-stave > [data-pitch="G♭"] { grid-column: 6; }
-.signature-stave > [data-pitch="D♭"] { grid-column: 5; }
-.signature-stave > [data-pitch="A♭"] { grid-column: 4; }
-.signature-stave > [data-pitch="E♭"] { grid-column: 3; }
-.signature-stave > [data-pitch="B♭"] { grid-column: 2; }
-.signature-stave > [data-pitch="F♯"] { grid-column: 2; }
-.signature-stave > [data-pitch="C♯"] { grid-column: 3; }
-.signature-stave > [data-pitch="G♯"] { grid-column: 4; }
-.signature-stave > [data-pitch="D♯"] { grid-column: 5; }
-.signature-stave > [data-pitch="A♯"] { grid-column: 6; }
-.signature-stave > [data-pitch="E♯"] { grid-column: 7; }
-.signature-stave > [data-pitch="B♯"] { grid-column: 8; }
+.signature-stave > [pitch="F♭"] { grid-column: 8; }
+.signature-stave > [pitch="C♭"] { grid-column: 7; }
+.signature-stave > [pitch="G♭"] { grid-column: 6; }
+.signature-stave > [pitch="D♭"] { grid-column: 5; }
+.signature-stave > [pitch="A♭"] { grid-column: 4; }
+.signature-stave > [pitch="E♭"] { grid-column: 3; }
+.signature-stave > [pitch="B♭"] { grid-column: 2; }
+.signature-stave > [pitch="F♯"] { grid-column: 2; }
+.signature-stave > [pitch="C♯"] { grid-column: 3; }
+.signature-stave > [pitch="G♯"] { grid-column: 4; }
+.signature-stave > [pitch="D♯"] { grid-column: 5; }
+.signature-stave > [pitch="A♯"] { grid-column: 6; }
+.signature-stave > [pitch="E♯"] { grid-column: 7; }
+.signature-stave > [pitch="B♯"] { grid-column: 8; }
 
-.signature-stave[data-key="C♯"] { width: 3.45em; }
-.signature-stave[data-key="F♯"] { width: 3.15em; }
-.signature-stave[data-key="B"]  { width: 2.85em; }
-.signature-stave[data-key="E"]  { width: 2.55em; }
-.signature-stave[data-key="A"]  { width: 2.25em; }
-.signature-stave[data-key="D"]  { width: 1.95em; }
-.signature-stave[data-key="G"]  { width: 1.65em; }
+.signature-stave[key="C♯"] { width: 3.45em; }
+.signature-stave[key="F♯"] { width: 3.15em; }
+.signature-stave[key="B"]  { width: 2.85em; }
+.signature-stave[key="E"]  { width: 2.55em; }
+.signature-stave[key="A"]  { width: 2.25em; }
+.signature-stave[key="D"]  { width: 1.95em; }
+.signature-stave[key="G"]  { width: 1.65em; }
 .signature-stave                { width: 1.35em; }
-.signature-stave[data-key="F"]  { width: 1.65em; }
-.signature-stave[data-key="B♭"] { width: 1.95em; }
-.signature-stave[data-key="E♭"] { width: 2.25em; }
-.signature-stave[data-key="A♭"] { width: 2.55em; }
-.signature-stave[data-key="D♭"] { width: 2.85em; }
-.signature-stave[data-key="G♭"] { width: 3.15em; }
-.signature-stave[data-key="C♭"] { width: 3.45em; }
+.signature-stave[key="F"]  { width: 1.65em; }
+.signature-stave[key="B♭"] { width: 1.95em; }
+.signature-stave[key="E♭"] { width: 2.25em; }
+.signature-stave[key="A♭"] { width: 2.55em; }
+.signature-stave[key="D♭"] { width: 2.85em; }
+.signature-stave[key="G♭"] { width: 3.15em; }
+.signature-stave[key="C♭"] { width: 3.45em; }

@@ -111,7 +111,7 @@ export default define(element('scribe-music', {
             // Does bar contain symbols that add up to longer than bar?
             if (internals.debug.value) {
                 shadow.querySelectorAll('.bar').forEach((bar) => {
-                    const duration = parseFloat(bar.dataset.duration);
+                    const duration = parseFloat(bar.getAttribute('duration') || bar.dataset.duration);
                     let total = 0;
                     let b, d;
 
@@ -119,11 +119,12 @@ export default define(element('scribe-music', {
                         return;
                     }
 
-                    bar.querySelectorAll('.rest[data-duration], .note[data-duration]').forEach((element) => {
+                    bar.querySelectorAll('.rest[duration], .note[duration]').forEach((element) => {
                         // Ignore notes that are at same beat as previous notes
-                        if (b !== parseFloat(element.dataset.beat)) {
-                            b = parseFloat(element.dataset.beat);
-                            d = parseFloat(element.dataset.duration);
+                        const beat = parseFloat(element.getAttribute('beat') || element.dataset.beat);
+                        if (b !== beat) {
+                            b = beat;
+                            d = parseFloat(element.getAttribute('duration') || element.dataset.duration);
                             total += d;
                         }
                     });

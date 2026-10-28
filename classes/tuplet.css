@@ -15,13 +15,13 @@
     margin-right: calc(var(--note-margin-right, 0em) - 3em * var(--stem-width));
 }
 
-.up-tuplet[data-rhythm^="1"] {
+.up-tuplet[rhythm^="1"] {
     /* Move the left position by a head width to center number on beam */
     margin-left: calc(1em * var(--head-1-size) - 3em * var(--stem-width));
 }
 
-[data-stave="drum"] .up-tuplet[data-rhythm^="1"],
-[data-stave="percussion"] .up-tuplet[data-rhythm^="1"] {
+[stave="drum"] .up-tuplet[rhythm^="1"],
+[stave="percussion"] .up-tuplet[rhythm^="1"] {
     /* Move the left position by a head-x width to center number on beam
        TODO: this should probably respond to circled x heads and work on any
        stave, needs HTML to expose type of first head */
@@ -59,30 +59,30 @@
     transform-origin: -0.2333em 50%;
 }
 
-.up-tuplet[data-duration^="0."][data-rhythm^="1"][data-rhythm$="1"],
-.up-tuplet[data-duration="1"][data-rhythm^="1"][data-rhythm$="1"],
-.up-tuplet[data-duration="2"]:not([data-divisor="3"])[data-rhythm^="1"][data-rhythm$="1"],
-.up-tuplet[data-duration="4"][data-divisor="9"][data-rhythm^="1"][data-rhythm$="1"],
-.up-tuplet[data-duration="4"][data-divisor="10"][data-rhythm^="1"][data-rhythm$="1"],
-.up-tuplet[data-duration="4"][data-divisor="11"][data-rhythm^="1"][data-rhythm$="1"] {
+.up-tuplet[duration^="0."][rhythm^="1"][rhythm$="1"],
+.up-tuplet[duration="1"][rhythm^="1"][rhythm$="1"],
+.up-tuplet[duration="2"]:not([divisor="3"])[rhythm^="1"][rhythm$="1"],
+.up-tuplet[duration="4"][divisor="9"][rhythm^="1"][rhythm$="1"],
+.up-tuplet[duration="4"][divisor="10"][rhythm^="1"][rhythm$="1"],
+.up-tuplet[duration="4"][divisor="11"][rhythm^="1"][rhythm$="1"] {
     /* Center tuplet numbers on top of beams. A tuplet is definitely beamed if
        its duration is 1 or less and its rhythm is full of 1s.  */
     grid-template-columns: min-content;
     justify-content: center;
 }
 
-.up-tuplet[data-duration^="0."][data-rhythm^="1"][data-rhythm$="1"]::before,
-.up-tuplet[data-duration^="0."][data-rhythm^="1"][data-rhythm$="1"]::after,
-.up-tuplet[data-duration="1"][data-rhythm^="1"][data-rhythm$="1"]::before,
-.up-tuplet[data-duration="1"][data-rhythm^="1"][data-rhythm$="1"]::after,
-.up-tuplet[data-duration="2"]:not([data-divisor="3"])[data-rhythm^="1"][data-rhythm$="1"]::before,
-.up-tuplet[data-duration="2"]:not([data-divisor="3"])[data-rhythm^="1"][data-rhythm$="1"]::after,
-.up-tuplet[data-duration="4"][data-divisor="9"][data-rhythm^="1"][data-rhythm$="1"]::before,
-.up-tuplet[data-duration="4"][data-divisor="9"][data-rhythm^="1"][data-rhythm$="1"]::after,
-.up-tuplet[data-duration="4"][data-divisor="10"][data-rhythm^="1"][data-rhythm$="1"]::before,
-.up-tuplet[data-duration="4"][data-divisor="10"][data-rhythm^="1"][data-rhythm$="1"]::after,
-.up-tuplet[data-duration="4"][data-divisor="11"][data-rhythm^="1"][data-rhythm$="1"]::before,
-.up-tuplet[data-duration="4"][data-divisor="11"][data-rhythm^="1"][data-rhythm$="1"]::after {
+.up-tuplet[duration^="0."][rhythm^="1"][rhythm$="1"]::before,
+.up-tuplet[duration^="0."][rhythm^="1"][rhythm$="1"]::after,
+.up-tuplet[duration="1"][rhythm^="1"][rhythm$="1"]::before,
+.up-tuplet[duration="1"][rhythm^="1"][rhythm$="1"]::after,
+.up-tuplet[duration="2"]:not([divisor="3"])[rhythm^="1"][rhythm$="1"]::before,
+.up-tuplet[duration="2"]:not([divisor="3"])[rhythm^="1"][rhythm$="1"]::after,
+.up-tuplet[duration="4"][divisor="9"][rhythm^="1"][rhythm$="1"]::before,
+.up-tuplet[duration="4"][divisor="9"][rhythm^="1"][rhythm$="1"]::after,
+.up-tuplet[duration="4"][divisor="10"][rhythm^="1"][rhythm$="1"]::before,
+.up-tuplet[duration="4"][divisor="10"][rhythm^="1"][rhythm$="1"]::after,
+.up-tuplet[duration="4"][divisor="11"][rhythm^="1"][rhythm$="1"]::before,
+.up-tuplet[duration="4"][divisor="11"][rhythm^="1"][rhythm$="1"]::after {
     /* Remove tuplet brackets from beamed up tuplets */
     content: none;
 }

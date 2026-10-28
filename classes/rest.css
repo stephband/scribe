@@ -6,43 +6,43 @@
     white-space: nowrap;
 }
 
-.rest[data-duration="0.125"],
-.rest[data-duration="0.1875"] {
+.rest[duration="0.125"],
+.rest[duration="0.1875"] {
     line-height: 0.875em;
 }
 
-.rest[data-duration="0.5"],
-.rest[data-duration="0.75"] {
+.rest[duration="0.5"],
+.rest[duration="0.75"] {
     line-height: 0.625em;
 }
 
-.rest[data-duration^="0.66"] {
+.rest[duration^="0.66"] {
     margin-left: 0.1875em;
 }
 
-.rest[data-duration="2"],
-.rest[data-duration="3"],
-.rest[data-duration="4"],
-.rest[data-duration="6"] {
+.rest[duration="2"],
+.rest[duration="3"],
+.rest[duration="4"],
+.rest[duration="6"] {
     line-height: 0.25em;
 }
 
-.rest[data-duration="2"] {
+.rest[duration="2"] {
     margin-left: 0.75em;
     margin-right: 0.75em;
 }
 
-.rest[data-duration="3"] {
+.rest[duration="3"] {
     margin-left: 0.5em;
     margin-right: 0.5em;
 }
 
-.rest[data-duration="4"] {
+.rest[duration="4"] {
     margin-left: 0.625em;
     margin-right: 0.625em;
 }
 
-.rest[data-duration="6"] {
+.rest[duration="6"] {
     margin-left: 0.575em;
     margin-right: 0.575em;
 }

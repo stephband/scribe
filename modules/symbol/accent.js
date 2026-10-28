@@ -1,5 +1,5 @@
 
-export function createAccents(symbols, stave, part, beat, notes, settings) {
+export function createAccents(symbols, stave, voice, beat, notes, settings) {
     // Find max dynamic among all notes
     let maxDynamic = -Infinity;
     let n = -1, note, event;
@@ -18,7 +18,7 @@ export function createAccents(symbols, stave, part, beat, notes, settings) {
             dynamic: maxDynamic,
             stemup:  minMaxNote.stemup,
             stave,
-            part,
+            voice,
             event
         });
     }

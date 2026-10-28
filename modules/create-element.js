@@ -99,7 +99,7 @@ export function createBarElement(bar) {
     const { beat, duration, divisions, count } = bar;
     const element = create('music-bar', {
         class: `${ bar.doubleBarLine ? 'end-bar ' : '' }bar${ bar.error ? ' error ': '' }`,
-        data: { beat, duration, divisions, count }
+        beat, duration, divisions, count
     });
 
     let n = -1;
@@ -111,12 +111,10 @@ export function createPartElement({ name, stave, key, symbols }) {
     const element = create('music-stave', {
         class: `${ stave.type }-stave stave`,
         title: `${ name }`,
-        data: {
-            stave: stave.type,
-            key:   stave.pitched ?
-                toKeyName(key) :
-                undefined
-        }
+        stave: stave.type,
+        key:   stave.pitched ?
+            toKeyName(key) :
+            undefined
     });
 
     let n = -1;
@@ -136,11 +134,9 @@ export function createSigElement(bar0, keyName) {
         });
         const staveElement = create('music-stave', {
             class: `${ stave.type }-stave signature-stave stave`,
-            data: {
-                part:  part.name,
-                stave: stave.type,
-                key:   stave.pitched ? keyName : undefined
-            }
+            part:  part.name,
+            stave: stave.type,
+            key:   stave.pitched ? keyName : undefined
         });
         const symbols = stave.createSignatureSymbols(keyName);
         let i = -1;
@@ -155,10 +151,8 @@ const createSymbolElement = overload(get('type'), {
     barrepeat: (symbol) => create('span', {
         class: 'barrepeat',
         html: glyphs['barRepeat' + symbol.count],
-        data: {
-            beat: 0,
-            duration: symbol.duration
-        }
+        beat: 0,
+        duration: symbol.duration
     }),
 
     clef: (symbol) => create('music-clef', {
@@ -170,61 +164,52 @@ const createSymbolElement = overload(get('type'), {
         class: "chord chord-abbr",
         title: "",
         html: name.replace(rchordparts, toChordHTML),
-        data: {
-            beat:     truncate(4, beat),
-            duration: truncate(4, duration),
-            event:    identify(event)
-        }
+        beat:     truncate(4, beat),
+        duration: truncate(4, duration),
+        event:    identify(event)
     }), event),
 
     timesig: (symbol) => symbol.stave.getTimeSigHTML ?
         create('fragment', symbol.stave.getTimeSigHTML(symbol.numerator, symbol.denominator, identify(symbol.event))) :
-        store(create('span', {
+        store(create('music-timesig', {
             class: "timesig",
             html: `<sup>${ glyphs['timeSig' + symbol.numerator] }</sup>
                 <sub>${ glyphs['timeSig' + symbol.denominator] }</sub>`,
-            data: {
-                event: identify(symbol.event)
-            }
+            event: identify(symbol.event)
         }), symbol.event),
 
     symbolcoda: (symbol) => create('p', {
         html: glyphs.coda,
         class: "coda"
     }),
-
+/*
     barcount: (symbol) => create('span', {
         html: symbol.text,
         class: "barcount"
     }),
-
+*/
     text: (symbol) => store(create('span', {
         class: "lyric",
         part:  "lyric",
         html: symbol.value,
-        data: {
-            beat:     truncate(4, symbol.beat),
-            duration: truncate(4, symbol.duration),
-            event:    identify(symbol.event)
-        }
+        beat:     truncate(4, symbol.beat),
+        duration: truncate(4, symbol.duration),
+        event:    identify(symbol.event)
     }), symbol.event),
 
     acci: (symbol) => store(create('music-acci', {
         class: (acciClasses[symbol.value] || 'acci') + (symbol.clump ? ' acci-' + symbol.clump : '' ) + (symbol.cluster ? ' acci-cluster' : ''),
         html: acciGlyphs[symbol.value] || glyphs.acciNatural,
-        data: {
-            beat:  symbol.beat && truncate(4, symbol.beat),
-            pitch: symbol.pitch,
-            part:  symbol.part.name,
-            event: symbol.event && identify(symbol.event)
-        }
+        beat:  symbol.beat && truncate(4, symbol.beat),
+        pitch: symbol.pitch,
+        voice: (symbol.voice && symbol.voice.name) || (symbol.part && symbol.part.name),
+        event: symbol.event && identify(symbol.event)
     }), symbol.event),
 
     accent: (symbol) => {
         const isMarcato   = symbol.dynamic >= config.marcatoThreshold;
         const isDrumStave = symbol.stave.type === 'drum' || symbol.stave.type === 'percussion';
-
-        return store(create('span', {
+        return store(create('music-accent', {
             class: `${ symbol.stemup ? 'up' : 'down' }-accent accent${ isMarcato ? ' marcato-accent' : '' }`,
             html: isDrumStave ?
                     isMarcato ? symbol.stemup ? glyphs.marcatoUp : glyphs.marcatoDown :
@@ -232,36 +217,30 @@ const createSymbolElement = overload(get('type'), {
                     isMarcato ? symbol.stemup ? glyphs.marcatoDown : glyphs.marcatoUp :
                 symbol.stemup ? glyphs.accentDown : glyphs.accentUp,
 
-            data: {
-                beat:  truncate(4, symbol.beat),
-                pitch: symbol.pitch,
-                part:  symbol.part.name,
-                event: identify(symbol.event)
-            }
+            beat:  truncate(4, symbol.beat),
+            pitch: symbol.pitch,
+            voice: (symbol.voice && symbol.voice.name) || (symbol.part && symbol.part.name),
+            event: identify(symbol.event)
         }), symbol.event);
     },
 
     ledge: (symbol) => create('music-ledge', {
         class: `${ symbol.rows < 0 ? 'up' : 'down' }-ledge ledge`,
         style: `--rows: ${ abs(symbol.rows) };`,
-        data: {
-            beat:  truncate(4, symbol.beat),
-            pitch: symbol.pitch,
-            part:  symbol.part.name
-        }
+        beat:  truncate(4, symbol.beat),
+        pitch: symbol.pitch,
+        voice: (symbol.voice && symbol.voice.name) || (symbol.part && symbol.part.name)
     }),
 
     beam: (symbol) => create('music-beam', {
         class: `${ symbol.stemup ? 'up' : 'down' }-beam ${ symbol.range < 0 ? 'rise-beam ' : '' }${ symbol.stub ? symbol.stub + '-beam' : '' }`,
         style: `--beat: ${ truncate(6, symbol.beat) }; --duration: ${ truncate(6, symbol.duration) };${ symbol.y ? ' --translate-y: ' + truncate(6, symbol.y * 0.125) + ';' : '' }${ symbol.range ? ' --range: ' + truncate(6, abs(symbol.range)) + ';' : '' }`,
-        data: {
-            beat:     truncate(4, symbol.beat),
-            pitch:    symbol.pitch,
-            divisor:  symbol.divisor,
-            voice:    symbol.voice.name,
-            beam:     symbol.id,
-            events:   symbol.length ? toEventIds(symbol) : undefined
-        }
+        beat:     truncate(4, symbol.beat),
+        pitch:    symbol.pitch,
+        divisor:  symbol.divisor,
+        voice:    (symbol.voice && symbol.voice.name) || (symbol.part && symbol.part.name),
+        beam:     symbol.id,
+        events:   symbol.length ? toEventIds(symbol) : undefined
     }),
 
     note: (symbol) => store(create('music-note', {
@@ -276,43 +255,36 @@ const createSymbolElement = overload(get('type'), {
         style: symbol.stemHeight ? `--stem-height: ${ symbol.stemHeight };` : undefined,
         html:  symbol.stave.getNoteHTML(symbol.pitch, symbol.dynamic, symbol.duration),
         title: `${ symbol.event.pitchSpelling } (${ symbol.event[2] })`,
-        data: {
-            beat:     truncate(4, symbol.beat),
-            duration: truncate(4, symbol.duration),
-            pitch:    symbol.event.pitchSpelling,
-            part:     symbol.part.name,
-            beam:     symbol.beam && symbol.beam.id,
-            event:    identify(symbol.event),
-//            stack:    toStackIds(symbol.event.sequencer)
-        }
+        beat:     truncate(4, symbol.beat),
+        duration: truncate(4, symbol.duration),
+        pitch:    symbol.event.pitchSpelling,
+        voice:    (symbol.voice && symbol.voice.name) || (symbol.part && symbol.part.name),
+        beam:     symbol.beam && symbol.beam.id,
+        event:    identify(symbol.event)
     }), symbol.event),
 
-    tie: ({ beat, duration, pitch, part, stemup, event }) => store(create('svg', {
+    tie: ({ beat, duration, pitch, voice, part, stemup, event }) => store(create('svg', {
         class: `${ stemup ? 'down' : 'up' }-tie tie`,
         viewBox: `0 0 1 1`,
         preserveAspectRatio: "none",
         html: `<path class="tie-path" transform="translate(0, 0.14) scale(1 0.6)" d="M0.979174733,0.0124875307 C0.650597814,1.1195554 0.135029714,1.00095361 0.0165376402,0.026468657 C0.0113570514,0.0135475362 0.00253387291,0.00218807553 0,0 C0.0977526897,1.29523004 0.656681642,1.37089992 1,2.43111793e-08 C0.991901367,2.43111797e-08 0.987703936,0.01248753 0.979174733,0.0124875307 Z M0.979174733,0.0124875307"></path>`,
-        data: {
-            beat:     truncate(4, beat),
-            pitch,
-            duration: truncate(4, duration),
-            part:     part.name,
-            event:    identify(event)
-        }
+        beat:     truncate(4, beat),
+        pitch,
+        duration: truncate(4, duration),
+        voice:    (voice && voice.name) || (part && part.name) || voice,
+        event:    identify(event)
     }), event),
 
     tuplet: ({ beat, duration, divisor, rhythm, voice, pitch, stemup, angle }) => create('music-tuplet', {
         class: `${ stemup ? 'up' : 'down' }-tuplet tuplet`,
         html: glyphs['tuplet' + divisor],
-        data: {
-            beat: truncate(4, beat),
-            pitch,
-            duration: truncate(4, duration),
-            divisor,
-            // Rhythm is a binary number
-            rhythm: toRhythmBinary(divisor, rhythm),
-            part: voice.name
-        },
+        beat: truncate(4, beat),
+        pitch,
+        duration: truncate(4, duration),
+        divisor,
+        // Rhythm is a binary number
+        rhythm: toRhythmBinary(divisor, rhythm),
+        voice: (voice && voice.name) || voice,
         style: angle ?
             `--angle: ${ angle }deg;` :
             undefined
@@ -325,12 +297,10 @@ const createSymbolElement = overload(get('type'), {
         html: whole && duration > 3 ?
             glyphs.rest4 :
             toRestGlyph(duration),
-        data: {
-            beat: truncate(4, beat),
-            duration: truncate(4, duration),
-            pitch,
-            voice
-        },
+        beat: truncate(4, beat),
+        duration: truncate(4, duration),
+        pitch,
+        voice: voice && voice.name ? voice.name : voice,
         'aria-hidden': 'true'
     }),
 
@@ -339,14 +309,12 @@ const createSymbolElement = overload(get('type'), {
         style: symbol.stemHeight ? `--stem-height: ${ symbol.stemHeight };` : undefined,
         html:  symbol.stave.getNoteHTML(symbol.pitch, symbol.dynamic, symbol.duration),
         title: `${ symbol.pitch } (${ toNoteNumber(symbol.pitch) })`,
-        data: {
-            beat:     truncate(4, symbol.beat),
-            duration: truncate(4, symbol.duration),
-            pitch:    symbol.pitch,
-            part:     symbol.part.name,
-            beam:     symbol.beam && symbol.beam.id,
-            event:    identify(symbol.event)
-        }
+        beat:     truncate(4, symbol.beat),
+        duration: truncate(4, symbol.duration),
+        pitch:    symbol.pitch,
+        voice:    (symbol.voice && symbol.voice.name) || (symbol.part && symbol.part.name),
+        beam:     symbol.beam && symbol.beam.id,
+        event:    identify(symbol.event)
     }), symbol.event),
 
     default: (function (types) {

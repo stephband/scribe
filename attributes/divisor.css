@@ -1,0 +1,13 @@
+
+/* Converts divisor attribute, as found on tuplets, to --divisor variable */
+
+[divisor="2"]  { --divisor: 2; }
+[divisor="3"]  { --divisor: 3; }
+[divisor="4"]  { --divisor: 4; }
+[divisor="5"]  { --divisor: 5; }
+[divisor="6"]  { --divisor: 6; }
+[divisor="7"]  { --divisor: 7; }
+[divisor="8"]  { --divisor: 8; }
+[divisor="9"]  { --divisor: 9; }
+[divisor="10"] { --divisor: 10; }
+[divisor="11"] { --divisor: 11; }

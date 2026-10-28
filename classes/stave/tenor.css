@@ -35,17 +35,17 @@
 
 /* Key signature */
 
-.tenor-stave > [data-pitch="F♭"] { grid-row-start: F3; }
-.tenor-stave > [data-pitch="C♭"] { grid-row-start: C4; }
-.tenor-stave > [data-pitch="G♭"] { grid-row-start: G3; }
-.tenor-stave > [data-pitch="D♭"] { grid-row-start: D4; }
-.tenor-stave > [data-pitch="A♭"] { grid-row-start: A3; }
-.tenor-stave > [data-pitch="E♭"] { grid-row-start: E4; }
-.tenor-stave > [data-pitch="B♭"] { grid-row-start: B3; }
-.tenor-stave > [data-pitch="F♯"] { grid-row-start: F3; }
-.tenor-stave > [data-pitch="C♯"] { grid-row-start: C4; }
-.tenor-stave > [data-pitch="G♯"] { grid-row-start: G3; }
-.tenor-stave > [data-pitch="D♯"] { grid-row-start: D4; }
-.tenor-stave > [data-pitch="A♯"] { grid-row-start: A3; }
-.tenor-stave > [data-pitch="E♯"] { grid-row-start: E4; }
-.tenor-stave > [data-pitch="B♯"] { grid-row-start: B3; }
+.tenor-stave > [pitch="F♭"] { grid-row-start: F3; }
+.tenor-stave > [pitch="C♭"] { grid-row-start: C4; }
+.tenor-stave > [pitch="G♭"] { grid-row-start: G3; }
+.tenor-stave > [pitch="D♭"] { grid-row-start: D4; }
+.tenor-stave > [pitch="A♭"] { grid-row-start: A3; }
+.tenor-stave > [pitch="E♭"] { grid-row-start: E4; }
+.tenor-stave > [pitch="B♭"] { grid-row-start: B3; }
+.tenor-stave > [pitch="F♯"] { grid-row-start: F3; }
+.tenor-stave > [pitch="C♯"] { grid-row-start: C4; }
+.tenor-stave > [pitch="G♯"] { grid-row-start: G3; }
+.tenor-stave > [pitch="D♯"] { grid-row-start: D4; }
+.tenor-stave > [pitch="A♯"] { grid-row-start: A3; }
+.tenor-stave > [pitch="E♯"] { grid-row-start: E4; }
+.tenor-stave > [pitch="B♯"] { grid-row-start: B3; }

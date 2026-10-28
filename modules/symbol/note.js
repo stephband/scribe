@@ -8,7 +8,7 @@ const byRow = by(get('row'));
 const symbols = [];
 
 
-export function createNotes(stave, key, part, notes, beat, duration) {
+export function createNotes(stave, key, voice, notes, beat, duration) {
     symbols.length = 0;
 
     if (!notes.length) return symbols;
@@ -31,8 +31,8 @@ export function createNotes(stave, key, part, notes, beat, duration) {
             duration,
             pitch,
             dynamic: event[3],
-            part,
-            row: stave.getRow(part, pitch),
+            voice,
+            row: stave.getRow(voice, pitch),
             stave,
             event
         });
@@ -52,9 +52,9 @@ export function createNotes(stave, key, part, notes, beat, duration) {
     // Figure out stemup, note that this may be overidden by beam
     const minRow = top.row;
     const maxRow = bottom.row;
-    const stemup = part.stemup === undefined ?
-        stemupFromRows(stave, part, minRow, maxRow) :
-        part.stemup ;
+    const stemup = voice.stemup === undefined ?
+        stemupFromRows(stave, voice, minRow, maxRow) :
+        voice.stemup ;
 
     // Assign stemHeight to top or bottom symbols
     const stemHeight = 1 + (maxRow - minRow) / 8;

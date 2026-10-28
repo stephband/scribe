@@ -61,7 +61,7 @@
     position: relative;
 }
 
-.note > .head[data-glyph="headX"] {
+.note > .head[glyph="headX"] {
     width: 100%;
     text-align: center;
 }
@@ -104,22 +104,22 @@ Stems
         scale(1, calc(var(--stem-height) + var(--stem-align-down)));
 }
 
-.up-note.bottom-note[data-duration^="3"] > .head::before,
-.up-note.bottom-note[data-duration^="2"] > .head::before,
-.up-note.bottom-note[data-duration^="1"] > .head::before,
-.up-note.bottom-note[data-duration^="0"] > .head::before,
-.down-note.top-note[data-duration^="3"] > .head::before,
-.down-note.top-note[data-duration^="2"] > .head::before,
-.down-note.top-note[data-duration^="1"] > .head::before,
-.down-note.top-note[data-duration^="0"] > .head::before {
+.up-note.bottom-note[duration^="3"] > .head::before,
+.up-note.bottom-note[duration^="2"] > .head::before,
+.up-note.bottom-note[duration^="1"] > .head::before,
+.up-note.bottom-note[duration^="0"] > .head::before,
+.down-note.top-note[duration^="3"] > .head::before,
+.down-note.top-note[duration^="2"] > .head::before,
+.down-note.top-note[duration^="1"] > .head::before,
+.down-note.top-note[duration^="0"] > .head::before {
     content: '\E210';
 }
 
-.down-note > .head[data-glyph="headX"] {
+.down-note > .head[glyph="headX"] {
     margin-left: 0.02em;
 }
 
-.down-note > .head[data-glyph="headX"]::before {
+.down-note > .head[glyph="headX"]::before {
     /* Stem down */
     left: -0.02em;
 }
@@ -154,45 +154,45 @@ Flags
 }
 
 /* Note durations 0.875, 0.75, 0.5, and 0.3333 get an 8th note flag */
-.up-note.top-note[data-duration="0.875"]::before,
-.up-note.top-note[data-duration^="0.7"]::before,
-.up-note.top-note[data-duration="0.5"]::before,
-.up-note.top-note[data-duration^="0.4"]::before,
-.up-note.top-note[data-duration^="0.3"]::before,
-.up-note.top-note[data-duration^="0.28"]::before      { content: '\E240'; }
-.down-note.bottom-note[data-duration="0.875"]::before,
-.down-note.bottom-note[data-duration^="0.7"]::before,
-.down-note.bottom-note[data-duration="0.5"]::before,
-.down-note.bottom-note[data-duration^="0.4"]::before,
-.down-note.bottom-note[data-duration^="0.3"]::before,
-.down-note.bottom-note[data-duration^="0.28"]::before { content: '\E241'; }
+.up-note.top-note[duration="0.875"]::before,
+.up-note.top-note[duration^="0.7"]::before,
+.up-note.top-note[duration="0.5"]::before,
+.up-note.top-note[duration^="0.4"]::before,
+.up-note.top-note[duration^="0.3"]::before,
+.up-note.top-note[duration^="0.28"]::before      { content: '\E240'; }
+.down-note.bottom-note[duration="0.875"]::before,
+.down-note.bottom-note[duration^="0.7"]::before,
+.down-note.bottom-note[duration="0.5"]::before,
+.down-note.bottom-note[duration^="0.4"]::before,
+.down-note.bottom-note[duration^="0.3"]::before,
+.down-note.bottom-note[duration^="0.28"]::before { content: '\E241'; }
 
 /* Note durations 0.375, 0.25 and 0.1667 get a 16th note flag */
-.up-note.top-note[data-duration^="0.37"]::before,
-.up-note.top-note[data-duration="0.25"]::before,
-.up-note.top-note[data-duration="0.2"]::before,
-.up-note.top-note[data-duration^="0.16"]::before,
-.up-note.top-note[data-duration^="0.14"]::before      { content: '\E242'; }
-.down-note.bottom-note[data-duration^="0.37"]::before,
-.down-note.bottom-note[data-duration="0.25"]::before,
-.down-note.bottom-note[data-duration="0.2"]::before,
-.down-note.bottom-note[data-duration^="0.16"]::before,
-.down-note.bottom-note[data-duration^="0.14"]::before { content: '\E243'; }
+.up-note.top-note[duration^="0.37"]::before,
+.up-note.top-note[duration="0.25"]::before,
+.up-note.top-note[duration="0.2"]::before,
+.up-note.top-note[duration^="0.16"]::before,
+.up-note.top-note[duration^="0.14"]::before      { content: '\E242'; }
+.down-note.bottom-note[duration^="0.37"]::before,
+.down-note.bottom-note[duration="0.25"]::before,
+.down-note.bottom-note[duration="0.2"]::before,
+.down-note.bottom-note[duration^="0.16"]::before,
+.down-note.bottom-note[duration^="0.14"]::before { content: '\E243'; }
 
 /* Note durations 0.1875, 0.125 and 0.0833 get a 32nd note flag */
-.up-note.top-note[data-duration^="0.18"]::before,
-.up-note.top-note[data-duration="0.125"]::before,
-.up-note.top-note[data-duration^="0.11"]::before,
-.up-note.top-note[data-duration="0.1"]::before,
-.up-note.top-note[data-duration^="0.08"]::before      { content: '\E244'; }
-.down-note.bottom-note[data-duration^="0.18"]::before,
-.down-note.bottom-note[data-duration="0.125"]::before,
-.down-note.bottom-note[data-duration^="0.11"]::before,
-.down-note.bottom-note[data-duration="0.1"]::before,
-.down-note.bottom-note[data-duration^="0.08"]::before { content: '\E245'; }
+.up-note.top-note[duration^="0.18"]::before,
+.up-note.top-note[duration="0.125"]::before,
+.up-note.top-note[duration^="0.11"]::before,
+.up-note.top-note[duration="0.1"]::before,
+.up-note.top-note[duration^="0.08"]::before      { content: '\E244'; }
+.down-note.bottom-note[duration^="0.18"]::before,
+.down-note.bottom-note[duration="0.125"]::before,
+.down-note.bottom-note[duration^="0.11"]::before,
+.down-note.bottom-note[duration="0.1"]::before,
+.down-note.bottom-note[duration^="0.08"]::before { content: '\E245'; }
 
 /* Notes that are beamed get no flag */
-.note[data-beam]::before { content: none !important; }
+.note[beam]::before { content: none !important; }
 
 
 /*
@@ -217,18 +217,18 @@ Dots
 
 /* Note durations 6, 3, 1.5, 0.75, 0.375 and 0.1875 get an augmentation dot,
    note durations 7, 3.5, 1.75, 0.875, 0.4375 and 0.21875 get two */
-.note[data-duration^="7"]::after    { content: '\200A\E1E7\E1E7'; }
-.note[data-duration^="6"]::after    { content: '\200A\E1E7'; }
-.note[data-duration="3.5"]::after   { content: '\200A\E1E7\E1E7'; }
-.note[data-duration="3"]::after     { content: '\200A\E1E7'; }
-.note[data-duration^="1.75"]::after { content: '\200A\E1E7\E1E7'; }
-.note[data-duration^="1.5"]::after  { content: '\200A\E1E7'; }
-.note[data-duration^="0.87"]::after { content: '\200A\E1E7\E1E7'; }
-.note[data-duration^="0.7"]::after  { content: '\200A\E1E7'; }
-.note[data-duration^="0.43"]::after { content: '\200A\E1E7\E1E7'; }
-.note[data-duration^="0.37"]::after { content: '\200A\E1E7'; }
-.note[data-duration^="0.21"]::after { content: '\200A\E1E7\E1E7'; }
-.note[data-duration^="0.18"]::after { content: '\200A\E1E7'; }
+.note[duration^="7"]::after    { content: '\200A\E1E7\E1E7'; }
+.note[duration^="6"]::after    { content: '\200A\E1E7'; }
+.note[duration="3.5"]::after   { content: '\200A\E1E7\E1E7'; }
+.note[duration="3"]::after     { content: '\200A\E1E7'; }
+.note[duration^="1.75"]::after { content: '\200A\E1E7\E1E7'; }
+.note[duration^="1.5"]::after  { content: '\200A\E1E7'; }
+.note[duration^="0.87"]::after { content: '\200A\E1E7\E1E7'; }
+.note[duration^="0.7"]::after  { content: '\200A\E1E7'; }
+.note[duration^="0.43"]::after { content: '\200A\E1E7\E1E7'; }
+.note[duration^="0.37"]::after { content: '\200A\E1E7'; }
+.note[duration^="0.21"]::after { content: '\200A\E1E7\E1E7'; }
+.note[duration^="0.18"]::after { content: '\200A\E1E7'; }
 
 .down-note.cluster-note::after {
     /* Don't render dots, they push the head away from stem */

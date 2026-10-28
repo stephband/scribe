@@ -68,7 +68,7 @@ export function renderStyle(element, root = element) {
     // One that isn't going to rely on the font so much? Or maybe include the
     // metrics in the font stylesheet?
     const side   = root.querySelector('.side');
-    const key    = side && side.dataset.key;
+    const key    = side && (side.getAttribute('key') || side.dataset.key);
     const counts = { 'F♭': 7, 'C♭': 7, 'G♭': 6, 'D♭': 5, 'A♭': 4, 'E♭': 3, 'B♭': 2, 'F':  1, 'C':  0, 'G':  1, 'D':  2, 'A':  3, 'E':  4, 'B':  5, 'F♯': 6, 'C♯': 7, 'G♯': 7 };
     const count  = counts[key] || 0;
     return `
@@ -132,9 +132,7 @@ export async function renderDOM(sequence, clef, keyname, meter, transpose = 0, d
         const column = create('header', {
             id: 'side',
             class: 'side',
-            data: {
-                key: keyName
-            }
+            key: keyName
         });
 
         let n = 24;

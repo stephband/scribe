@@ -2,7 +2,7 @@
 import { rflat, rsharp, rdoubleflat, rdoublesharp, rflatsharp } from '../pitch.js';
 
 
-function createAccidental(part, accidentals, beat, note, clump, cluster) {
+function createAccidental(voice, accidentals, beat, note, clump, cluster) {
     const { pitch, event, row } = note;
     const acci =
         rdoublesharp.test(pitch) ? 2 :
@@ -30,7 +30,7 @@ function createAccidental(part, accidentals, beat, note, clump, cluster) {
         clump,
         // Whether the corresponding note head is on the wrong side of its stem
         cluster,
-        part,
+        voice,
         event,
         value: acci || 0
     };
@@ -51,7 +51,7 @@ function getAccidentalAboveRowAtBeat(symbols, beat, maxRow) {
     return symbols[o];
 }
 
-export function createAccidentals(symbols, part, accidentals, beat, notes) {
+export function createAccidentals(symbols, voice, accidentals, beat, notes) {
     let clump = 0;
     let n     = -1;
     let note, accidental, above;
@@ -80,7 +80,7 @@ export function createAccidentals(symbols, part, accidentals, beat, notes) {
             0 ;
 
         // Create accidental symbol
-        accidental = createAccidental(part, accidentals, beat, note, clump, cluster);
+        accidental = createAccidental(voice, accidentals, beat, note, clump, cluster);
 
         // Push it into symbols
         if (accidental) symbols.push(accidental);

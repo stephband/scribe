@@ -87,7 +87,7 @@ export function createBeam(beat, voice) {
     };
 }
 
-export function closeBeam(symbols, stave, part, beam) {
+export function closeBeam(symbols, stave, voice, beam) {
     if (!beam) return;
 
     // Scan through beam symbols to find note not on beat of beam
@@ -99,17 +99,17 @@ export function closeBeam(symbols, stave, part, beam) {
     const startBeat = beam[0].beat;
     const stopBeat  = last(beam).beat;
     const duration  = stopBeat - startBeat;
-    const stemup = part.stemup === undefined ?
+    const stemup = voice.stemup === undefined ?
         // Calculate stem up or down
-        stemupFromPitches(stave, part, map(get('pitch'), beam)) :
-        // Get stem direction from part
-        part.stemup ;
+        stemupFromPitches(stave, voice, map(get('pitch'), beam)) :
+        // Get stem direction from voice
+        voice.stemup ;
 
     const beats     = [];
     const durations = [];
 
-    // If part has beam (drum stave) beams are in a fixed position
-    if (part.beam) {
+    // If voice has beam (drum stave) beams are in a fixed position
+    if (voice.beam) {
         let note, row;
 
         // Apply beamed properties to note symbols
@@ -117,7 +117,7 @@ export function closeBeam(symbols, stave, part, beam) {
         while (note = beam[++n]) {
             note.stemup = stemup;
             note.beam   = beam;
-            row = stave.getRow(part, note.pitch);
+            row = stave.getRow(voice, note.pitch);
             note.stemHeight = stemup ?
                 0.125 + row / 8 :
                 2.8125 - row / 8 ;
@@ -147,7 +147,7 @@ export function closeBeam(symbols, stave, part, beam) {
     let note;
     n = -1;
     while (note = beam[++n]) {
-        let row = stave.getRow(part, note.pitch);
+        let row = stave.getRow(voice, note.pitch);
         // row may be out of range of this stave
         if (row === undefined) continue;
 
@@ -155,7 +155,7 @@ export function closeBeam(symbols, stave, part, beam) {
 
         // Find highest or lowest pitch at beat of note
         while (beam[++n] && eq(beam[n].beat, note.beat, P24)) {
-            r = stave.getRow(part, beam[n].pitch);
+            r = stave.getRow(voice, beam[n].pitch);
             // row may be out of range of this stave
             if (r === undefined) continue;
             if (stemup) { if (r < row) row = r; }

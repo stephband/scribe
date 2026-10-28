@@ -153,19 +153,20 @@ export async function runSpellerTests(testSource = tests, containerId = 'tests-c
         diffs.forEach(({ note, spellingMatch, keyMatch, expectedSpelling, expectedKey, predictedSpelling, predictedKey }) => {
             const noteBeat = note[0];
             const barEl = bars.find((b) => {
-                const barBeat = Number(b.dataset.beat);
-                const barDur  = Number(b.dataset.duration);
+                const barBeat = Number(b.getAttribute('beat') ?? b.dataset?.beat);
+                const barDur  = Number(b.getAttribute('duration') ?? b.dataset?.duration);
                 return noteBeat >= barBeat && noteBeat < barBeat + barDur;
             }) || stave;
-            const barBeat = barEl.dataset?.beat !== undefined ? Number(barEl.dataset.beat) : 0;
+            const barBeatAttr = barEl.getAttribute('beat') ?? barEl.dataset?.beat;
+            const barBeat = barBeatAttr !== null && barBeatAttr !== undefined ? Number(barBeatAttr) : 0;
             const beat = truncate(4, noteBeat - barBeat);
-            const beatSelector = `[data-beat="${beat}"]`;
+            const beatSelector = `[beat="${beat}"], [data-beat="${beat}"]`;
 
             const eventId = identify(note);
 
             // Give rendered note/accidental symbols the error class ONLY when spelling differed
             if (!spellingMatch) {
-                barEl.querySelectorAll(`.note${beatSelector}, .acci${beatSelector}, .note[data-event="${eventId}"], .acci[data-event="${eventId}"]`)
+                barEl.querySelectorAll(`.note${beatSelector}, .acci${beatSelector}, .note[event="${eventId}"], .note[data-event="${eventId}"], .acci[event="${eventId}"], .acci[data-event="${eventId}"]`)
                     .forEach(el => {
                         el.classList.add('error');
                         el.title = `Expected: ${expectedSpelling}, Predicted: ${predictedSpelling}`;

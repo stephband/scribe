@@ -357,7 +357,7 @@ function updateBeamWithNoteSymbols(symbols, bar, stave, voice, beam, noteSymbols
     return beam;
 }
 
-function createTies(symbols, bar, part, notes, noteSymbols, tolerance = 0.125) {
+function createTies(symbols, bar, voice, notes, noteSymbols, tolerance = 0.125) {
     // No notes to tie
     if (!notes.length) return;
 
@@ -380,7 +380,7 @@ function createTies(symbols, bar, part, notes, noteSymbols, tolerance = 0.125) {
                 duration,
                 // TODO: We now handle this in CSS with .note + .tie selector
                 stemup,
-                part,
+                voice,
                 event
             });
         }

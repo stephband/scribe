@@ -33,17 +33,17 @@
 }
 
 /* Map unoctaved pitches to stave lines for key signatures. */
-.bass-stave > [data-pitch="F♭"] { grid-row-start: F2; }
-.bass-stave > [data-pitch="C♭"] { grid-row-start: C3; }
-.bass-stave > [data-pitch="G♭"] { grid-row-start: G2; }
-.bass-stave > [data-pitch="D♭"] { grid-row-start: D3; }
-.bass-stave > [data-pitch="A♭"] { grid-row-start: A2; }
-.bass-stave > [data-pitch="E♭"] { grid-row-start: E3; }
-.bass-stave > [data-pitch="B♭"] { grid-row-start: B2; }
-.bass-stave > [data-pitch="F♯"] { grid-row-start: F3; }
-.bass-stave > [data-pitch="C♯"] { grid-row-start: C3; }
-.bass-stave > [data-pitch="G♯"] { grid-row-start: G3; }
-.bass-stave > [data-pitch="D♯"] { grid-row-start: D3; }
-.bass-stave > [data-pitch="A♯"] { grid-row-start: A2; }
-.bass-stave > [data-pitch="E♯"] { grid-row-start: E3; }
-.bass-stave > [data-pitch="B♯"] { grid-row-start: B2; }
+.bass-stave > [pitch="F♭"] { grid-row-start: F2; }
+.bass-stave > [pitch="C♭"] { grid-row-start: C3; }
+.bass-stave > [pitch="G♭"] { grid-row-start: G2; }
+.bass-stave > [pitch="D♭"] { grid-row-start: D3; }
+.bass-stave > [pitch="A♭"] { grid-row-start: A2; }
+.bass-stave > [pitch="E♭"] { grid-row-start: E3; }
+.bass-stave > [pitch="B♭"] { grid-row-start: B2; }
+.bass-stave > [pitch="F♯"] { grid-row-start: F3; }
+.bass-stave > [pitch="C♯"] { grid-row-start: C3; }
+.bass-stave > [pitch="G♯"] { grid-row-start: G3; }
+.bass-stave > [pitch="D♯"] { grid-row-start: D3; }
+.bass-stave > [pitch="A♯"] { grid-row-start: A2; }
+.bass-stave > [pitch="E♯"] { grid-row-start: E3; }
+.bass-stave > [pitch="B♯"] { grid-row-start: B2; }

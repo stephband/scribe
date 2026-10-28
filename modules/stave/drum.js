@@ -165,11 +165,11 @@ export default class DrumStave extends Stave {
         const ghostable = this.#ghostables[number];
         // Ghost note gets brackets
         return ghostable && dynamic < config.ghostThreshold ? `
-            <span class="pre" data-glyph="headBracketLeft">${ glyphs.headBracketLeft }</span>
-            <span class="head" data-glyph="${ name }">${ glyphs[name] }</span>
-            <span class="post" data-glyph="headBracketRight">${ glyphs.headBracketRight }</span>
+            <span class="pre" glyph="headBracketLeft">${ glyphs.headBracketLeft }</span>
+            <span class="head" glyph="${ name }">${ glyphs[name] }</span>
+            <span class="post" glyph="headBracketRight">${ glyphs.headBracketRight }</span>
             ` :
-            `<span class="head" data-glyph="${ name }">${ glyphs[name] }</span>` ;
+            `<span class="head" glyph="${ name }">${ glyphs[name] }</span>` ;
     }
 
     voices = [{

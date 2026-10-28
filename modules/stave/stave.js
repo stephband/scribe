@@ -97,10 +97,10 @@ export default class Stave {
         const number = toNoteNumber(pitch);
         const name   = this.getGlyphName(number, dynamic, duration);
         return dynamic < config.ghostThreshold ? `
-            <span class="pre" data-glyph="headBracketLeft">${ glyphs.headBracketLeft }</span>
-            <span class="head" data-glyph="${ name }">${ glyphs[name] }</span>
-            <span class="post" data-glyph="headBracketRight">${ glyphs.headBracketRight }</span>` :
-            `<span class="head" data-glyph="${ name }">${ glyphs[name] }</span>` ;
+            <span class="pre" glyph="headBracketLeft">${ glyphs.headBracketLeft }</span>
+            <span class="head" glyph="${ name }">${ glyphs[name] }</span>
+            <span class="post" glyph="headBracketRight">${ glyphs.headBracketRight }</span>` :
+            `<span class="head" glyph="${ name }">${ glyphs[name] }</span>` ;
     }
 
     /**
@@ -282,7 +282,7 @@ export default class Stave {
                     type:  'acci',
                     pitch: fathercharles[i],
                     value: 1,
-                    part:  this.voices[0],
+                    voice: this.voices[0],
                     event
                 });
             }
@@ -297,7 +297,7 @@ export default class Stave {
                     type:  'acci',
                     pitch: fathercharles[7 + i],
                     value: -1,
-                    part:  this.voices[0],
+                    voice: this.voices[0],
                     event
                 });
             }
@@ -311,28 +311,28 @@ export default class Stave {
         const symbols   = [{
             type: 'clef',
             clef: this.type,
-            part: this.voices[0]
+            voice: this.voices[0]
         }];
 
         return symbols.concat(this.createKeySymbols(keyEvent));
     }
 
-    createNoteSymbols(symbols, bar, part, accidentals, notes, beat, duration, settings) {
+    createNoteSymbols(symbols, bar, voice, accidentals, notes, beat, duration, settings) {
         // Create note heads
-        const noteSymbols = createNotes(this, bar.key, part, notes, beat, duration);
+        const noteSymbols = createNotes(this, bar.key, voice, notes, beat, duration);
         // Notes may not appear on stave in which case noteSymbols will be empty
         if (!noteSymbols.length) return noteSymbols;
         // Create ledges, accidentals and accents
-        createLedges(symbols, this, part, beat, noteSymbols);
-        createAccidentals(symbols, part, accidentals, beat, noteSymbols);
-        createAccents(symbols, this, part, beat, noteSymbols, settings);
+        createLedges(symbols, this, voice, beat, noteSymbols);
+        createAccidentals(symbols, voice, accidentals, beat, noteSymbols);
+        createAccents(symbols, this, voice, beat, noteSymbols, settings);
         // Push in note heads
         symbols.push.apply(symbols, noteSymbols);
         // Return symbols
         return noteSymbols;
     }
 
-    createDupletNoteSymbols(symbols, bar, part, accidentals, notes, startBeat, stopBeat, settings) {
+    createDupletNoteSymbols(symbols, bar, voice, accidentals, notes, startBeat, stopBeat, settings) {
         const b1    = startBeat - bar.beat;
         const b2    = stopBeat  - bar.beat;
         const grain = grainOfBeat(bar.divisions, b1);
@@ -411,6 +411,6 @@ export default class Stave {
         }
 
         const duration = b - b1;
-        return this.createNoteSymbols(symbols, bar, part, accidentals, notes, b1, duration, settings);
+        return this.createNoteSymbols(symbols, bar, voice, accidentals, notes, b1, duration, settings);
     }
 }

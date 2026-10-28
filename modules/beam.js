@@ -10,11 +10,11 @@ import rect   from 'dom/rect.js';
 export const beamThickness = 1.1;
 
 function getDataBeat(note) {
-    return parseFloat(note.dataset.beat);
+    return parseFloat(note.getAttribute('beat') || note.dataset.beat);
 }
 
 function getDataDuration(note) {
-    return parseFloat(note.dataset.duration);
+    return parseFloat(note.getAttribute('duration') || note.dataset.duration);
 }
 
 function removeBeamPaths(svg) {
@@ -94,10 +94,10 @@ function createBeamPaths(svg, beats, durations, xs, i, range, duration) {
 }
 
 export function renderBeam(svg) {
-    const id        = svg.dataset.beam;
+    const id        = svg.getAttribute('beam') || svg.dataset.beam;
     const parent    = svg.parentElement;
     /* There is only one .top-note (or .bottom-note) per beam division, select that */
-    const notes     = Array.from(parent.querySelectorAll('.top-note[data-beam="' + id + '"]'));
+    const notes     = Array.from(parent.querySelectorAll('.top-note[beam="' + id + '"], .top-note[data-beam="' + id + '"]'));
     const beats     = notes.map(getDataBeat);
     const durations = notes.map(getDataDuration);
     const box       = svg.viewBox.baseVal;

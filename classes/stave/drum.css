@@ -48,41 +48,41 @@ https://web.mit.edu/merolish/Public/drums.pdf
         [min];
 }
 
-.drum-stave > [data-pitch="pedal-hi-hat"]   { grid-row: pedal-hi-hat; }
-.drum-stave > [data-pitch$="bass-drum"]     { grid-row: bass-drum; }
-.drum-stave > [data-pitch="low-floor-tom"]  { grid-row: low-floor-tom; }
-.drum-stave > [data-pitch="high-floor-tom"] { grid-row: high-floor-tom; }
-.drum-stave > [data-pitch="low-tom"]        { grid-row: low-tom; }
-.drum-stave > [data-pitch="sticks"]         { grid-row: sticks; }
-.drum-stave > [data-pitch="hand-clap"]      { grid-row: hand-clap; }
-.drum-stave > [data-pitch="tambourine"]     { grid-row: tambourine; }
-.drum-stave > [data-pitch^="snare-drum"]    { grid-row: snare-drum; }
-.drum-stave > [data-pitch="side-stick"]     { grid-row: side-stick; }
-.drum-stave > [data-pitch="low-mid-tom"]    { grid-row: low-mid-tom; }
-.drum-stave > [data-pitch="high-mid-tom"]   { grid-row: high-mid-tom; }
-.drum-stave > [data-pitch="high-tom"]       { grid-row: high-tom; }
-.drum-stave > [data-pitch="cowbell"]        { grid-row: cowbell; }
-.drum-stave > [data-pitch="closed-hi-hat"],
-.drum-stave > [data-pitch="open-hi-hat"]    { grid-row: hi-hat; }
-.drum-stave > [data-pitch^="ride"]          { grid-row: ride-cymbal; }
-.drum-stave > [data-pitch="crash-cymbal-1"] { grid-row: crash-cymbal-1; }
-.drum-stave > [data-pitch="crash-cymbal-2"] { grid-row: crash-cymbal-2; }
-.drum-stave > [data-pitch="splash-cymbal"]  { grid-row: splash-cymbal; }
-.drum-stave > [data-pitch="chinese-cymbal"] { grid-row: chinese-cymbal; }
+.drum-stave > [pitch="pedal-hi-hat"]   { grid-row: pedal-hi-hat; }
+.drum-stave > [pitch$="bass-drum"]     { grid-row: bass-drum; }
+.drum-stave > [pitch="low-floor-tom"]  { grid-row: low-floor-tom; }
+.drum-stave > [pitch="high-floor-tom"] { grid-row: high-floor-tom; }
+.drum-stave > [pitch="low-tom"]        { grid-row: low-tom; }
+.drum-stave > [pitch="sticks"]         { grid-row: sticks; }
+.drum-stave > [pitch="hand-clap"]      { grid-row: hand-clap; }
+.drum-stave > [pitch="tambourine"]     { grid-row: tambourine; }
+.drum-stave > [pitch^="snare-drum"]    { grid-row: snare-drum; }
+.drum-stave > [pitch="side-stick"]     { grid-row: side-stick; }
+.drum-stave > [pitch="low-mid-tom"]    { grid-row: low-mid-tom; }
+.drum-stave > [pitch="high-mid-tom"]   { grid-row: high-mid-tom; }
+.drum-stave > [pitch="high-tom"]       { grid-row: high-tom; }
+.drum-stave > [pitch="cowbell"]        { grid-row: cowbell; }
+.drum-stave > [pitch="closed-hi-hat"],
+.drum-stave > [pitch="open-hi-hat"]    { grid-row: hi-hat; }
+.drum-stave > [pitch^="ride"]          { grid-row: ride-cymbal; }
+.drum-stave > [pitch="crash-cymbal-1"] { grid-row: crash-cymbal-1; }
+.drum-stave > [pitch="crash-cymbal-2"] { grid-row: crash-cymbal-2; }
+.drum-stave > [pitch="splash-cymbal"]  { grid-row: splash-cymbal; }
+.drum-stave > [pitch="chinese-cymbal"] { grid-row: chinese-cymbal; }
 
 /* Just a precaution. */
 .drum-stave > .acci {
     display: none !important;
 }
 
-.drum-stave > .rest[data-duration="4"],
-.drum-stave > .rest[data-duration="6"] {
+.drum-stave > .rest[duration="4"],
+.drum-stave > .rest[duration="6"] {
     grid-row: 10;
 }
 
 .drum-stave > .rest { font-size: 0.9375em; }
-.drum-stave > .rest[data-part="lower"] { grid-row: stave-lower; }
-.drum-stave > .rest[data-part="upper"] { grid-row: stave-top; }
+.drum-stave > .rest[voice="lower"] { grid-row: stave-lower; }
+.drum-stave > .rest[voice="upper"] { grid-row: stave-top; }
 
 .drum-stave > music-beam.up-beam   {
     --translate-y: -0.0625;
@@ -106,8 +106,8 @@ https://web.mit.edu/merolish/Public/drums.pdf
     transform: translateY(0.1875em);
 }
 
-.drum-stave > .beam-note[data-pitch^="ride"]        { --stem-height: 0.85; }
-.drum-stave > .beam-note[data-pitch^="snare"]       { --stem-height: 1.5; }
-.drum-stave > .beam-note[data-pitch="pedal-hi-hat"] { --stem-height: 0.7; }
+.drum-stave > .beam-note[pitch^="ride"]        { --stem-height: 0.85; }
+.drum-stave > .beam-note[pitch^="snare"]       { --stem-height: 1.5; }
+.drum-stave > .beam-note[pitch="pedal-hi-hat"] { --stem-height: 0.7; }
 
-.drum-stave > .tuplet[data-part="upper"] { grid-row: stave-top; }
+.drum-stave > .tuplet[voice="upper"] { grid-row: stave-top; }

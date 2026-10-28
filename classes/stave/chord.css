@@ -29,6 +29,6 @@
     display: none !important;
 }
 
-.chord-stave > [data-pitch]  {
+.chord-stave > [pitch]  {
     display: none !important;
 }

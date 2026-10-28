@@ -67,11 +67,11 @@ export default class GrandStave extends Stave {
     ];
 
     getTimeSigHTML(numerator, denominator, eventId) {
-        return `<span class="timesig" data-event="${ eventId }" data-part="rh">
+        return `<span class="timesig" event="${ eventId }" voice="rh">
             <sup>${ glyphs['timeSig' + numerator] }</sup>
             <sub>${ glyphs['timeSig' + denominator] }</sub>
         </span>
-        <span class="timesig" data-event="${ eventId }" data-part="lh">
+        <span class="timesig" event="${ eventId }" voice="lh">
             <sup>${ glyphs['timeSig' + numerator] }</sup>
             <sub>${ glyphs['timeSig' + denominator] }</sub>
         </span>`;
@@ -159,8 +159,8 @@ export default class GrandStave extends Stave {
         const keysig  = super.createKeySymbols(key);
         const symbols = [];
         // Add key signature to both staffs
-        symbols.push.apply(symbols, keysig.map((symbol) => assign({}, symbol, { part: this.voices[0] })));
-        symbols.push.apply(symbols, keysig.map((symbol) => assign({}, symbol, { part: this.voices[1] })));
+        symbols.push.apply(symbols, keysig.map((symbol) => assign({}, symbol, { voice: this.voices[0] })));
+        symbols.push.apply(symbols, keysig.map((symbol) => assign({}, symbol, { voice: this.voices[1] })));
         return symbols;
     }
 
@@ -168,12 +168,12 @@ export default class GrandStave extends Stave {
         const symbols = [{
             type:  'clef',
             clef:  'treble',
-            part:  this.voices[0],
+            voice: this.voices[0],
             stave: this
         }, {
             type:  'clef',
             clef:  'bass',
-            part:  this.voices[1],
+            voice: this.voices[1],
             stave: this
         }];
 

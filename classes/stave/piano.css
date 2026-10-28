@@ -90,13 +90,13 @@
 
 .piano-stave > .rest,
 .piano-stave > .timesig,
-.piano-stave > .rest[data-part="rh"],
-.piano-stave > .timesig[data-part="rh"] {
+.piano-stave > .rest[voice="rh"],
+.piano-stave > .timesig[voice="rh"] {
     grid-row: B4;
 }
 
-.piano-stave > .rest[data-part="lh"],
-.piano-stave > .timesig[data-part="lh"] {
+.piano-stave > .rest[voice="lh"],
+.piano-stave > .timesig[voice="lh"] {
     grid-row: D3;
 }
 
@@ -109,85 +109,85 @@
 }
 
 /* Map left and right hand specific pitches to rows between treble and bass staves */
-[data-part^="rh"][data-pitch^="B"][data-pitch$="3"]  { grid-row: rh-B3; }
-[data-part^="rh"][data-pitch^="A"][data-pitch$="3"]  { grid-row: rh-A3; }
-[data-part^="rh"][data-pitch^="G"][data-pitch$="3"]  { grid-row: rh-G3; }
-[data-part^="rh"][data-pitch^="F"][data-pitch$="3"]  { grid-row: rh-F3; }
-[data-part^="rh"][data-pitch^="E"][data-pitch$="3"]  { grid-row: rh-E3; }
-[data-part^="rh"][data-pitch^="D"][data-pitch$="3"]  { grid-row: rh-D3; }
+[voice^="rh"][pitch^="B"][pitch$="3"]  { grid-row: rh-B3; }
+[voice^="rh"][pitch^="A"][pitch$="3"]  { grid-row: rh-A3; }
+[voice^="rh"][pitch^="G"][pitch$="3"]  { grid-row: rh-G3; }
+[voice^="rh"][pitch^="F"][pitch$="3"]  { grid-row: rh-F3; }
+[voice^="rh"][pitch^="E"][pitch$="3"]  { grid-row: rh-E3; }
+[voice^="rh"][pitch^="D"][pitch$="3"]  { grid-row: rh-D3; }
 /* Fudge */
-[data-part^="alto"][data-pitch^="B"][data-pitch$="3"]  { grid-row: rh-B3; }
-[data-part^="alto"][data-pitch^="A"][data-pitch$="3"]  { grid-row: rh-A3; }
-[data-part^="alto"][data-pitch^="G"][data-pitch$="3"]  { grid-row: rh-G3; }
-[data-part^="alto"][data-pitch^="F"][data-pitch$="3"]  { grid-row: rh-F3; }
-[data-part^="alto"][data-pitch^="E"][data-pitch$="3"]  { grid-row: rh-E3; }
-[data-part^="alto"][data-pitch^="D"][data-pitch$="3"]  { grid-row: rh-D3; }
+[voice^="alto"][pitch^="B"][pitch$="3"]  { grid-row: rh-B3; }
+[voice^="alto"][pitch^="A"][pitch$="3"]  { grid-row: rh-A3; }
+[voice^="alto"][pitch^="G"][pitch$="3"]  { grid-row: rh-G3; }
+[voice^="alto"][pitch^="F"][pitch$="3"]  { grid-row: rh-F3; }
+[voice^="alto"][pitch^="E"][pitch$="3"]  { grid-row: rh-E3; }
+[voice^="alto"][pitch^="D"][pitch$="3"]  { grid-row: rh-D3; }
 
-[data-part^="lh"][data-pitch^="B"][data-pitch$="4"]  { grid-row: lh-B4; }
-[data-part^="lh"][data-pitch^="A"][data-pitch$="4"]  { grid-row: lh-A4; }
-[data-part^="lh"][data-pitch^="G"][data-pitch$="4"]  { grid-row: lh-G4; }
-[data-part^="lh"][data-pitch^="F"][data-pitch$="4"]  { grid-row: lh-F4; }
-[data-part^="lh"][data-pitch^="E"][data-pitch$="4"]  { grid-row: lh-E4; }
-[data-part^="lh"][data-pitch^="D"][data-pitch$="4"]  { grid-row: lh-D4; }
-[data-part^="lh"][data-pitch^="C"][data-pitch$="4"]  { grid-row: lh-C4; }
+[voice^="lh"][pitch^="B"][pitch$="4"]  { grid-row: lh-B4; }
+[voice^="lh"][pitch^="A"][pitch$="4"]  { grid-row: lh-A4; }
+[voice^="lh"][pitch^="G"][pitch$="4"]  { grid-row: lh-G4; }
+[voice^="lh"][pitch^="F"][pitch$="4"]  { grid-row: lh-F4; }
+[voice^="lh"][pitch^="E"][pitch$="4"]  { grid-row: lh-E4; }
+[voice^="lh"][pitch^="D"][pitch$="4"]  { grid-row: lh-D4; }
+[voice^="lh"][pitch^="C"][pitch$="4"]  { grid-row: lh-C4; }
 /* Fudge */
-[data-part^="tenor"][data-pitch^="B"][data-pitch$="4"]  { grid-row: lh-B4; }
-[data-part^="tenor"][data-pitch^="A"][data-pitch$="4"]  { grid-row: lh-A4; }
-[data-part^="tenor"][data-pitch^="G"][data-pitch$="4"]  { grid-row: lh-G4; }
-[data-part^="tenor"][data-pitch^="F"][data-pitch$="4"]  { grid-row: lh-F4; }
-[data-part^="tenor"][data-pitch^="E"][data-pitch$="4"]  { grid-row: lh-E4; }
-[data-part^="tenor"][data-pitch^="D"][data-pitch$="4"]  { grid-row: lh-D4; }
-[data-part^="tenor"][data-pitch^="C"][data-pitch$="4"]  { grid-row: lh-C4; }
+[voice^="tenor"][pitch^="B"][pitch$="4"]  { grid-row: lh-B4; }
+[voice^="tenor"][pitch^="A"][pitch$="4"]  { grid-row: lh-A4; }
+[voice^="tenor"][pitch^="G"][pitch$="4"]  { grid-row: lh-G4; }
+[voice^="tenor"][pitch^="F"][pitch$="4"]  { grid-row: lh-F4; }
+[voice^="tenor"][pitch^="E"][pitch$="4"]  { grid-row: lh-E4; }
+[voice^="tenor"][pitch^="D"][pitch$="4"]  { grid-row: lh-D4; }
+[voice^="tenor"][pitch^="C"][pitch$="4"]  { grid-row: lh-C4; }
 
-[data-part^="bass"][data-pitch^="B"][data-pitch$="4"]  { grid-row: lh-B4; }
-[data-part^="bass"][data-pitch^="A"][data-pitch$="4"]  { grid-row: lh-A4; }
-[data-part^="bass"][data-pitch^="G"][data-pitch$="4"]  { grid-row: lh-G4; }
-[data-part^="bass"][data-pitch^="F"][data-pitch$="4"]  { grid-row: lh-F4; }
-[data-part^="bass"][data-pitch^="E"][data-pitch$="4"]  { grid-row: lh-E4; }
-[data-part^="bass"][data-pitch^="D"][data-pitch$="4"]  { grid-row: lh-D4; }
-[data-part^="bass"][data-pitch^="C"][data-pitch$="4"]  { grid-row: lh-C4; }
+[voice^="bass"][pitch^="B"][pitch$="4"]  { grid-row: lh-B4; }
+[voice^="bass"][pitch^="A"][pitch$="4"]  { grid-row: lh-A4; }
+[voice^="bass"][pitch^="G"][pitch$="4"]  { grid-row: lh-G4; }
+[voice^="bass"][pitch^="F"][pitch$="4"]  { grid-row: lh-F4; }
+[voice^="bass"][pitch^="E"][pitch$="4"]  { grid-row: lh-E4; }
+[voice^="bass"][pitch^="D"][pitch$="4"]  { grid-row: lh-D4; }
+[voice^="bass"][pitch^="C"][pitch$="4"]  { grid-row: lh-C4; }
 
 /* Map unoctaved pitches to stave lines for key signatures. */
-.piano-stave > [data-pitch="F♭"] { grid-row-start: F4; }
-.piano-stave > [data-pitch="C♭"] { grid-row-start: C5; }
-.piano-stave > [data-pitch="G♭"] { grid-row-start: G4; }
-.piano-stave > [data-pitch="D♭"] { grid-row-start: D5; }
-.piano-stave > [data-pitch="A♭"] { grid-row-start: A4; }
-.piano-stave > [data-pitch="E♭"] { grid-row-start: E5; }
-.piano-stave > [data-pitch="B♭"] { grid-row-start: B4; }
-.piano-stave > [data-pitch="F♯"] { grid-row-start: F5; }
-.piano-stave > [data-pitch="C♯"] { grid-row-start: C5; }
-.piano-stave > [data-pitch="G♯"] { grid-row-start: G5; }
-.piano-stave > [data-pitch="D♯"] { grid-row-start: D5; }
-.piano-stave > [data-pitch="A♯"] { grid-row-start: A4; }
-.piano-stave > [data-pitch="E♯"] { grid-row-start: E5; }
-.piano-stave > [data-pitch="B♯"] { grid-row-start: B4; }
+.piano-stave > [pitch="F♭"] { grid-row-start: F4; }
+.piano-stave > [pitch="C♭"] { grid-row-start: C5; }
+.piano-stave > [pitch="G♭"] { grid-row-start: G4; }
+.piano-stave > [pitch="D♭"] { grid-row-start: D5; }
+.piano-stave > [pitch="A♭"] { grid-row-start: A4; }
+.piano-stave > [pitch="E♭"] { grid-row-start: E5; }
+.piano-stave > [pitch="B♭"] { grid-row-start: B4; }
+.piano-stave > [pitch="F♯"] { grid-row-start: F5; }
+.piano-stave > [pitch="C♯"] { grid-row-start: C5; }
+.piano-stave > [pitch="G♯"] { grid-row-start: G5; }
+.piano-stave > [pitch="D♯"] { grid-row-start: D5; }
+.piano-stave > [pitch="A♯"] { grid-row-start: A4; }
+.piano-stave > [pitch="E♯"] { grid-row-start: E5; }
+.piano-stave > [pitch="B♯"] { grid-row-start: B4; }
 
-.piano-stave > [data-pitch="F♭"][data-part="lh"] { grid-row-start: F2; }
-.piano-stave > [data-pitch="C♭"][data-part="lh"] { grid-row-start: C3; }
-.piano-stave > [data-pitch="G♭"][data-part="lh"] { grid-row-start: G2; }
-.piano-stave > [data-pitch="D♭"][data-part="lh"] { grid-row-start: D3; }
-.piano-stave > [data-pitch="A♭"][data-part="lh"] { grid-row-start: A2; }
-.piano-stave > [data-pitch="E♭"][data-part="lh"] { grid-row-start: E3; }
-.piano-stave > [data-pitch="B♭"][data-part="lh"] { grid-row-start: B2; }
-.piano-stave > [data-pitch="F♯"][data-part="lh"] { grid-row-start: F3; }
-.piano-stave > [data-pitch="C♯"][data-part="lh"] { grid-row-start: C3; }
-.piano-stave > [data-pitch="G♯"][data-part="lh"] { grid-row-start: G3; }
-.piano-stave > [data-pitch="D♯"][data-part="lh"] { grid-row-start: D3; }
-.piano-stave > [data-pitch="A♯"][data-part="lh"] { grid-row-start: A2; }
-.piano-stave > [data-pitch="E♯"][data-part="lh"] { grid-row-start: E3; }
-.piano-stave > [data-pitch="B♯"][data-part="lh"] { grid-row-start: B2; }
+.piano-stave > [pitch="F♭"][voice="lh"] { grid-row-start: F2; }
+.piano-stave > [pitch="C♭"][voice="lh"] { grid-row-start: C3; }
+.piano-stave > [pitch="G♭"][voice="lh"] { grid-row-start: G2; }
+.piano-stave > [pitch="D♭"][voice="lh"] { grid-row-start: D3; }
+.piano-stave > [pitch="A♭"][voice="lh"] { grid-row-start: A2; }
+.piano-stave > [pitch="E♭"][voice="lh"] { grid-row-start: E3; }
+.piano-stave > [pitch="B♭"][voice="lh"] { grid-row-start: B2; }
+.piano-stave > [pitch="F♯"][voice="lh"] { grid-row-start: F3; }
+.piano-stave > [pitch="C♯"][voice="lh"] { grid-row-start: C3; }
+.piano-stave > [pitch="G♯"][voice="lh"] { grid-row-start: G3; }
+.piano-stave > [pitch="D♯"][voice="lh"] { grid-row-start: D3; }
+.piano-stave > [pitch="A♯"][voice="lh"] { grid-row-start: A2; }
+.piano-stave > [pitch="E♯"][voice="lh"] { grid-row-start: E3; }
+.piano-stave > [pitch="B♯"][voice="lh"] { grid-row-start: B2; }
 
 /* TODO: The distinction between part and staff and vertical range really needs sorting out */
-.piano-stave > .up-ledge[data-part="soprano"],
-.piano-stave > .up-ledge[data-part="alto"],
-.piano-stave > .up-ledge[data-part="rh"]   { grid-row-end:   rh-top; }
-.piano-stave > .down-ledge[data-part="soprano"],
-.piano-stave > .down-ledge[data-part="alto"],
-.piano-stave > .down-ledge[data-part="rh"] { grid-row-start: rh-bottom; }
-.piano-stave > .up-ledge[data-part="tenor"],
-.piano-stave > .up-ledge[data-part="bass"],
-.piano-stave > .up-ledge[data-part="lh"]   { grid-row-end:   lh-top; }
-.piano-stave > .down-ledge[data-part="tenor"],
-.piano-stave > .down-ledge[data-part="bass"],
-.piano-stave > .down-ledge[data-part="lh"] { grid-row-start: lh-bottom; }
+.piano-stave > .up-ledge[voice="soprano"],
+.piano-stave > .up-ledge[voice="alto"],
+.piano-stave > .up-ledge[voice="rh"]   { grid-row-end:   rh-top; }
+.piano-stave > .down-ledge[voice="soprano"],
+.piano-stave > .down-ledge[voice="alto"],
+.piano-stave > .down-ledge[voice="rh"] { grid-row-start: rh-bottom; }
+.piano-stave > .up-ledge[voice="tenor"],
+.piano-stave > .up-ledge[voice="bass"],
+.piano-stave > .up-ledge[voice="lh"]   { grid-row-end:   lh-top; }
+.piano-stave > .down-ledge[voice="tenor"],
+.piano-stave > .down-ledge[voice="bass"],
+.piano-stave > .down-ledge[voice="lh"] { grid-row-start: lh-bottom; }

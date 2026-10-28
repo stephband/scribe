@@ -10,15 +10,15 @@
     white-space: nowrap;
 }
 
-.head[data-glyph="headX"] {
+.head[glyph="headX"] {
     --stem-align-up:   0.18;
     --stem-align-down: -0.14;
 }
 
-.head[data-glyph="headDiamond"] {
+.head[glyph="headDiamond"] {
     margin-left: 0.04em;
 }
 
-.down-note:has([data-glyph="headDiamond"])::before {
+.down-note:has([glyph="headDiamond"])::before {
     margin-left: 0.04em;
 }
