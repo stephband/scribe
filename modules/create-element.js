@@ -129,7 +129,8 @@ export function createSigElement(bar0, defaultKeyName) {
         const part = bar0[n];
         const stave = part.stave;
         const keyName = toKeyName(part.key !== undefined ? part.key : (defaultKeyName || bar0.key || 0));
-        const labelElement = create('h2', {
+        // Don't display "default" part name
+        const labelElement = part.name === 'default' ? null : create('h2', {
             class: `part-name`,
             text: part.name
         });
@@ -142,7 +143,8 @@ export function createSigElement(bar0, defaultKeyName) {
         const symbols = stave.createSignatureSymbols(keyName);
         let i = -1;
         while (symbols[++i]) staveElement.appendChild(createSymbolElement(symbols[i]));
-        element.appendChild(labelElement);
+        // Don't display "default" part name
+        if (part.name !== 'default') element.appendChild(labelElement);
         element.appendChild(staveElement);
     }
     return element;

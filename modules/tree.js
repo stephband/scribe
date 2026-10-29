@@ -6,11 +6,11 @@ import { getDivisions } from 'sequence/modules/event/meter.js';
 import byBeat           from 'sequence/modules/events/by-priority.js';
 import Transform        from 'sequence/modules/transform.js';
 import SequenceIterator from 'sequence/modules/sequence-iterator.js';
-import config from './config.js';
-import Stave  from './stave.js';
-import { accidentalsFromKey } from './accidentals.js';
-import quantise from './quantise.js';
-import speller  from './speller.js';
+import config                    from './config.js';
+import Stave                     from './stave.js';
+import { accidentalsFromKey }    from './accidentals.js';
+import quantise                  from './quantise.js';
+import speller                   from './speller.js';
 import last                      from './object/last.js';
 import push                      from './object/push.js';
 import { getDivisionBefore }     from './bar/divisions.js';
@@ -26,16 +26,14 @@ import toStopBeat                from './event/to-stop-beat.js';
 
 const { assign, entries, values } = Object;
 
+
 function toDisplayObject(settings, name) {
     const slug = slugify(name);
 
     if (slug === 'default' && settings.display) {
         if (typeof settings.display === 'string') {
             if (!Stave[settings.display]) throw new Error(`Sequence display must be a display object or a stave type string`);
-            return {
-                staff: settings.display,
-                transpose: 0
-            };
+            return { staff: settings.display, transpose: 0 };
         }
 
         return settings.display ;
@@ -60,17 +58,12 @@ function getPart(settings, bar, name) {
     }
 
     const display = toDisplayObject(settings, name);
-    const transpose = settings.showAtConcertPitch ? 0 : (display.transpose || 0);
-    const key = transpose ? Event.of(0, 'key', bar.key).transpose(transpose)[2] : bar.key;
-
-    const part = {
-        type:      'part',
+    const part = assign({
+        type:    'part',
         name,
-        stave:     Stave[display.staff],
-        transpose,
-        key,
-        symbols:   []
-    };
+        stave:   Stave[display.staff],
+        symbols: []
+    }, display);
 
     insert(byDisplayOrder, bar, part);
     return part;
@@ -138,7 +131,7 @@ function metricQuantise(settings, sequence, parts, buffers, tree) {
 //    const jsons  = [];
 
     const keyEvents = [];
-    let keyEvent;
+    //let keyEvent;
     // Guarantee the render of at least 1 bar
     let stopBeat = 1;
     let event;
@@ -156,22 +149,12 @@ function metricQuantise(settings, sequence, parts, buffers, tree) {
 
     // Extract events from sequence iterator and divide them into voices
     for (event of sequence) {
-        // Store all events for the key analyser: we know event is an object at
-        // this point, as the iterator emits transformed objects, so use the
-        // event to store information scribe needs for analysis
-//        event.scribeIndex  = events.length;
-//        event.scribeEvents = events;
-        // Add to events
-//        events.push(event);
-
         // While event time is beyond end of bar create bar from current state
         while (event[0] >= bar.beat + bar.duration) {
             quantiseNotesFromBuffers(settings, bar, buffers);
+//            detectBarRepeats(bars, jsons, bar);
             if (flagEndBar(bar, sequenceEvent)) sequenceEvent = undefined;
             push(tree, bar);
-
-//            const bar = createBar(bars.length + 1, beat, duration, divisor, stave, key, symbols, parts, sequenceEvent, settings);
-//            detectBarRepeats(bars, jsons, bar);
 
             // Start new bar
             bar = {
@@ -183,10 +166,6 @@ function metricQuantise(settings, sequence, parts, buffers, tree) {
                 divisor:   bar.divisor,
                 divisions: bar.divisions
             };
-
-//            beat = beat + duration;
-//            symbols = [];
-//            if (bar.doubleBarLine) sequenceEvent = undefined;
         }
 
         // Handle event types
@@ -205,7 +184,7 @@ function metricQuantise(settings, sequence, parts, buffers, tree) {
 
             case "key": {
                 if (event[0] !== bar.beat) throw new Error(`Scribe "key" event at beat ${ event[0] } not at start of bar at beat ${ bar.beat }`);
-                bar.keyEvent = keyEvent = event;
+                bar.keyEvent = event;
                 bar.key = event[2];
                 keyEvents.push(event);
 
@@ -439,10 +418,14 @@ function symboliseBar(settings, parts, buffers, bar) {
 
 function symbolisePart(settings, buffers, bar, part) {
     const { stave, symbols } = part;
-    const transpose = settings.showAtConcertPitch ? 0 : (part.transpose || 0);
-    const key = settings.showAtConcertPitch ? bar.key : part.key;
-    part.transpose = transpose;
-    part.key = key;
+
+    const transpose = settings.showAtConcertPitch ?
+        0 :
+        part.transpose || 0 ;
+
+    part.key = transpose ?
+        Event.of(0, 'key', bar.key).transpose(transpose)[2] :
+        bar.key ;
 
     // Push in key signature
     if (bar.keyEvent) {
@@ -474,7 +457,7 @@ function symbolisePart(settings, buffers, bar, part) {
         else {
             const notes = buffers[part.name + '.' + voice.name];
             const l = symbols.length;
-            symboliseVoice(settings, bar, part, stave, key, notes, symbols, voice);
+            symboliseVoice(settings, bar, stave, part.key, notes, symbols, voice);
             if (symbols.length > l) hasNotes = true;
         }
     }
@@ -537,7 +520,7 @@ function fillTupletToBeat(settings, bar, stave, voice, accidentals, notes, symbo
     return beam;
 }
 
-function symboliseVoice(settings, bar, part, stave, key, notes, symbols, voice) {
+function symboliseVoice(settings, bar, stave, key, notes, symbols, voice) {
     const { tuplets } = voice;
     const accidentals = accidentalsFromKey(key);
 
