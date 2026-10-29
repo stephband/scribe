@@ -140,13 +140,12 @@ Tests candidate prime divisors descending from 9 down to 2, selecting the best f
 function detectRhythmPrime(beat, duration, events, index, rhythmIndex, delta = 0, config = DEFAULT_CONFIG) {
     if (DEBUG && rhythmIndex > index) throw new Error('rhythmIndex should never be > index');
 
-    let rhythmCount = index - rhythmIndex;
-    let rhythm = rhythmCount === 0 ? 0 : 1;
+    const rhythmCount = index - rhythmIndex;
     let result = rhythm ? {
         beat,
         duration,
         divisor: 1,
-        rhythm,
+        rhythm: rhythmCount === 0 ? 0 : 1,
         index,
         count: 0,
         rhythmIndex,
