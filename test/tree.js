@@ -48,3 +48,19 @@ Deno.test('showAtConcertPitch: true preserves concert key on parts', async () =>
     is(tree[0][0].key, 0);
     is(tree[0][0].transpose, 0);
 });
+
+Deno.test('quantise chords with minDivision 1/3 and primes [2, 3]', async () => {
+    const sequence = new Sequence([
+        [0, "key", "C"],
+        [0, "meter", 4, 1],
+        [0.04, "chord", "C", "", 1],
+        [0.52, "chord", "G", "7", 1]
+    ]);
+    const tree = await createTree(sequence);
+    assert(tree[0]);
+    const part = tree[0][0];
+    const chordSymbols = part.symbols.filter((s) => s.type === 'chord');
+    is(chordSymbols.length, 2);
+    is(chordSymbols[0].beat, 0);
+    is(chordSymbols[1].beat, 0.5);
+});

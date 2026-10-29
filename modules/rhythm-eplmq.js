@@ -14,34 +14,31 @@ import { floorPow2 } from './number/power-of-2.js';
 
 const DEBUG = globalThis.DEBUG;
 const { cos, sin, round, PI, abs, pow, sqrt, atan2, exp } = Math;
-const primes = [2, 3, 5, 7, 9];
 
 function count1s(n) {
     let count = 0;
     while (n) { n &= n - 1; ++count; }
     return count;
 }
-
+/*
 function gaussian(sigma, d) {
     return exp(-(d * d) / (2 * sigma * sigma));
 }
-
-const minDuration = 1 / 8;
-const minDivision = 1 / 12;
-
+*/
 // Default elastic band parameters (all in units of beats)
-export const DEFAULT_CONFIG = {
-    sigma: 0.125, // Elastic drift tolerance in beats
-    alpha: 0.25,  // PLL tracking elasticity (pull toward performer's local phase)
-    lambda: 0.15  // Spring restoring force back toward the absolute beat (0)
-};
+const MIN_DIVISION = 1 / 12;
+const PRIMES       = [2, 3, 5, 7, 9];
+//const sigma       = 0.125; // Elastic drift tolerance in beats
+const alpha        = 0.25;  // PLL tracking elasticity (pull toward performer's local phase)
+const lambda       = 0.15;  // Spring restoring force back toward the absolute beat (0)
+
 
 /**
-test(beat, duration, divisor, events, index, rhythmIndex, rhythmCount, delta, config)
+test(beat, duration, divisor, events, index, rhythmIndex, rhythmCount, delta)
 Evaluates a candidate tuplet divisor over [beat, beat + duration) relative to the
 elastic reference frame shifted by `delta` (in beats).
 **/
-function test(beat, duration, divisor, events, index, rhythmIndex, rhythmCount, delta = 0, config = DEFAULT_CONFIG) {
+function test(beat, duration, divisor, events, index, rhythmIndex, rhythmCount, delta = 0) {
     let rSum = 0;
     let iSum = 0;
     let beatError = 0;
@@ -89,25 +86,25 @@ function test(beat, duration, divisor, events, index, rhythmIndex, rhythmCount, 
             drift: 0,
             beatError: 0,
             delta,
-            deltaOut: (1 - config.lambda) * delta
+            deltaOut: (1 - lambda) * delta
         };
     }
 
     // Complex Phasor Analysis:
     // Amplitude |Z| measures rhythm coherence independently of phase offset.
     // Phase angle phi measures the performer's local drift.
-    const amplitude = sqrt(rSum * rSum + iSum * iSum);
+//    const amplitude = sqrt(rSum * rSum + iSum * iSum);
     const phaseAngle = atan2(iSum, rSum);
     const division = duration / divisor;
     const phaseDriftBeats = (division * phaseAngle) / (2 * PI);
-    const driftWeight = gaussian(config.sigma, phaseDriftBeats);
+//    const driftWeight = gaussian(sigma, phaseDriftBeats);
 
     // Score combines phase alignment (rSum) with coherence (amplitude) weighted by drift
     let score = rSum;
 
     // Critically damped spring update for the elastic reference frame:
     // delta_next = (1 - lambda) * delta + alpha * phaseDriftBeats
-    const deltaOut = (1 - config.lambda) * delta + config.alpha * phaseDriftBeats;
+    const deltaOut = (1 - lambda) * delta + alpha * phaseDriftBeats;
 
     // Downgrade 1_1_0 and 0_1_0 triplets to prefer 101 and 001 triplets
     if (duration > 1/4 && divisor === 3 && (rhythm === 2 || rhythm === 3)) score = 0;
@@ -134,14 +131,14 @@ function test(beat, duration, divisor, events, index, rhythmIndex, rhythmCount, 
 }
 
 /**
-detectRhythmPrime(beat, duration, events, index, rhythmIndex, delta, config)
+detectRhythmPrime(beat, duration, events, index, rhythmIndex, delta)
 Tests candidate prime divisors descending from 9 down to 2, selecting the best fit.
 **/
-function detectRhythmPrime(beat, duration, events, index, rhythmIndex, delta = 0, config = DEFAULT_CONFIG) {
+function detectRhythmPrime(primes, minDivision, beat, duration, events, index, rhythmIndex, delta = 0) {
     if (DEBUG && rhythmIndex > index) throw new Error('rhythmIndex should never be > index');
 
     const rhythmCount = index - rhythmIndex;
-    let result = rhythm ? {
+    let result = rhythmCount ? {
         beat,
         duration,
         divisor: 1,
@@ -155,7 +152,7 @@ function detectRhythmPrime(beat, duration, events, index, rhythmIndex, delta = 0
         drift: 0,
         beatError: Infinity,
         delta,
-        deltaOut: (1 - config.lambda) * delta
+        deltaOut: (1 - lambda) * delta
     } : undefined;
 
     let score = 0;
@@ -168,7 +165,7 @@ function detectRhythmPrime(beat, duration, events, index, rhythmIndex, delta = 0
 
     // Descend through remaining primes, keep highest scoring rhythm
     while (primes[--p]) {
-        const data = test(beat, duration, primes[p], events, index, rhythmIndex, rhythmCount, delta, config);
+        const data = test(beat, duration, primes[p], events, index, rhythmIndex, rhythmCount, delta);
         const fit = data.count ? data.score / data.count : 0;
         const err = data.count ? data.beatError / data.count : Infinity;
 
@@ -185,18 +182,18 @@ function detectRhythmPrime(beat, duration, events, index, rhythmIndex, delta = 0
 }
 
 /**
-detectBestFit(beat, duration, events, index, rhythmIndex, rhythms, indent, delta, config)
+detectBestFit(beat, duration, events, index, rhythmIndex, rhythms, indent, delta)
 Recursive metrical tree search comparing single tuplet candidate `a` against
 bifurcated sub-windows with continuous duration-scaled span penalty and
 elastic phase propagation.
 **/
-function detectBestFit(beat, duration, events, index, rhythmIndex = index, rhythms = [], indent = '', delta = 0, config = DEFAULT_CONFIG) {
+function detectBestFit(primes, minDivision, minDuration, beat, duration, events, index, rhythmIndex = index, rhythms = [], indent = '', delta = 0) {
     let i = index;
     let r = rhythmIndex;
     let dState = delta;
 
     const d = floorPow2(duration);
-    const a = detectRhythmPrime(beat, d, events, i, r, dState, config);
+    const a = detectRhythmPrime(primes, minDivision, beat, d, events, i, r, dState);
     // Event count coverage bonus: pow(count, 0.1)
     const afit = a && a.count ? (a.score / a.count) * pow(a.count, 0.1) : 0;
 
@@ -231,7 +228,7 @@ function detectBestFit(beat, duration, events, index, rhythmIndex = index, rhyth
         let last;
 
         // Window 1: [beat, beat + d/2)
-        dState = detectBestFit(beat, d / 2, events, i, r, array, indent + '| ', dState, config);
+        dState = detectBestFit(primes, minDivision, minDuration, beat, d / 2, events, i, r, array, indent + '| ', dState);
         last = array[array.length - 1];
         if (last) {
             i = last.index + last.count;
@@ -239,7 +236,7 @@ function detectBestFit(beat, duration, events, index, rhythmIndex = index, rhyth
         }
 
         // Window 2: [beat + d/2, beat + d) receives evolved phase state dState
-        dState = detectBestFit(beat + d / 2, d / 2, events, i, r, array, indent + '| ', dState, config);
+        dState = detectBestFit(primes, minDivision, minDuration, beat + d / 2, d / 2, events, i, r, array, indent + '| ', dState);
         last = array[array.length - 1];
         if (last) {
             i = last.index + last.count;
@@ -277,7 +274,7 @@ function detectBestFit(beat, duration, events, index, rhythmIndex = index, rhyth
 
     // Continue consuming duration across the remaining window
     if (beat + d < duration) {
-        return detectBestFit(beat + d, duration - d, events, i, r, rhythms, indent, dState, config);
+        return detectBestFit(primes, minDivision, minDuration, beat + d, duration - d, events, i, r, rhythms, indent, dState);
     }
 
     return dState;
@@ -285,19 +282,19 @@ function detectBestFit(beat, duration, events, index, rhythmIndex = index, rhyth
 
 
 /**
-detect(beat, duration, events, index = 0, options = {})
+detect(beat, duration, events, minDivision = defaults.minDivision, primes = defaults.primes)
 Top-level entry point for EPL-MQ rhythm detection.
 **/
-export default function detect(beat, duration, events, index = 0, options = {}) {
-    const config = Object.assign({}, DEFAULT_CONFIG, options);
+export default function detect(beat, duration, events, minDivision = MIN_DIVISION, primes = PRIMES) {
+    const minDuration = minDivision * primes[0];
 
     // Find first event in analysis window
-    let n = index - 1;
+    let n = -1;
     while (events[++n] !== undefined && events[n][0] < beat);
 
     if (!events[n] || events[n][0] >= beat + duration) return undefined;
 
     const tuplets = [];
-    detectBestFit(beat, duration, events, n, index, tuplets, '', 0, config);
+    detectBestFit(primes, minDivision, minDuration, beat, duration, events, n, 0, tuplets, '', 0);
     return tuplets;
 }

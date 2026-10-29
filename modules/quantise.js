@@ -23,8 +23,8 @@ function quantiseTupletEvents(tuplet, buffer) {
     }
 }
 
-export default function quantise(beat, duration, buffer) {
-    const tuplets = detect(beat, duration, buffer);
+export default function quantise(beat, duration, buffer, minDivision, primes) {
+    const tuplets = detect(beat, duration, buffer, minDivision, primes);
     if (!tuplets) return;
 
     let n = -1;

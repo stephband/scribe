@@ -99,19 +99,13 @@ function quantiseNotesFromBuffers(settings, bar, buffers) {
         const [partname, voicename] = name.split('.');
         const part = getPart(settings, bar, partname);
 
-        if (voicename === 'chord') {
-            if (buffer[0][0] >= bar.beat + bar.duration) continue;
-            const voice = getVoice(settings, part, voicename);
-            while (buffer[0] && buffer[0][0] < bar.beat + bar.duration) {
-                push(voice, buffer.shift());
-            }
-        }
-        else {
-            const tuplets = quantise(bar.beat, bar.duration, buffer);
-            if (!tuplets) continue;
-            const voice = getVoice(settings, part, voicename);
-            voice.tuplets = tuplets;
-        }
+        const tuplets = voicename === 'chord' ?
+            quantise(bar.beat, bar.duration, buffer, 1/3, [2, 3]) :
+            quantise(bar.beat, bar.duration, buffer) ;
+
+        if (!tuplets) continue;
+        const voice = getVoice(settings, part, voicename);
+        voice.tuplets = tuplets;
     }
 }
 
@@ -377,25 +371,29 @@ function substituteSpelling(settings, name) {
 }
 
 function symboliseChords(settings, bar, stave, symbols, voice) {
-    let i = -1, event;
-    while (event = voice[++i]) {
-        const extension = event.extension;
-        const root      = substituteSpelling(settings, event.rootSpelling);
-        const name      = event.bassSpelling ?
-            root + extension.replace(rslashbass, '/' + substituteSpelling(settings, event.bassSpelling)) :
-            root + extension ;
+    const { tuplets } = voice;
+    let t = -1, tuplet;
+    while (tuplet = tuplets[++t]) {
+        let i = -1, event;
+        while (event = tuplet[++i]) {
+            const extension = event.extension;
+            const root      = substituteSpelling(settings, event.rootSpelling);
+            const name      = event.bassSpelling ?
+                root + extension.replace(rslashbass, '/' + substituteSpelling(settings, event.bassSpelling)) :
+                root + extension ;
 
-        symbols.push({
-            type: 'chord',
-            beat: event[0] - bar.beat,
-            name,
-            // Does chord cross into next bar? The symbol should not
-            duration: event[0] + event[4] > bar.beat + bar.duration ?
-                bar.duration - event[0] + bar.beat :
-                event[4],
-            event,
-            stave
-        });
+            symbols.push({
+                type: 'chord',
+                beat: event[0] - bar.beat,
+                name,
+                // Does chord cross into next bar? The symbol should not
+                duration: event[0] + event[4] > bar.beat + bar.duration ?
+                    bar.duration - event[0] + bar.beat :
+                    event[4],
+                event,
+                stave
+            });
+        }
     }
 }
 
@@ -592,6 +590,11 @@ function symboliseVoice(settings, bar, stave, key, notes, symbols, voice) {
 }
 
 export default async function createTree(sequence, transpose = 0, displace = 0, duration = Infinity, settings) {
+    if (typeof transpose === 'object') {
+        settings  = transpose;
+        transpose = 0;
+    }
+
     settings = assign({ display: sequence.display }, config, settings);
 
     // Make transforms list
@@ -603,9 +606,8 @@ export default async function createTree(sequence, transpose = 0, displace = 0, 
         Transform.from(array) :
         Transform.identity ;
 
-    const startBeat  = 0;
-    const stopBeat   = duration - displace;
-    const iterator   = new SequenceIterator(sequence, transform, startBeat, stopBeat);
+    if (!sequence.objects) sequence.objects = [];
+    const iterator   = new SequenceIterator(sequence.events || sequence, sequence.sequences, transform, null, sequence);
     const spellables = {};
     const buffers    = {};
     const tree       = {};
