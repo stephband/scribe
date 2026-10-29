@@ -127,11 +127,10 @@ function flagEndBar(bar, sequenceEvent) {
     return false;
 }
 
-function metricQuantise(settings, sequence, parts, buffers, tree) {
+function metricQuantise(settings, sequence, spellables, buffers, tree) {
 //    const jsons  = [];
 
     const keyEvents = [];
-    //let keyEvent;
     // Guarantee the render of at least 1 bar
     let stopBeat = 1;
     let event;
@@ -190,7 +189,7 @@ function metricQuantise(settings, sequence, parts, buffers, tree) {
 
                 // Push copy of key event to parts already discovered
                 let name;
-                for (name in parts) parts[name].push(Event.from(event));
+                for (name in spellables) spellables[name].push(Event.from(event));
                 break;
             }
 
@@ -226,10 +225,10 @@ function metricQuantise(settings, sequence, parts, buffers, tree) {
                 event.stave = part.stave;
 
                 // Push event into global part
-                if (!parts[partName]) {
-                    parts[partName] = keyEvents.map((e) => Event.from(e));
+                if (!spellables[partName]) {
+                    spellables[partName] = keyEvents.map((e) => Event.from(e));
                 }
-                parts[partName].push(event);
+                spellables[partName].push(event);
 
                 // Push event into part.voice buffer
                 const name = partName + '.' + voiceName;
@@ -592,35 +591,39 @@ function symboliseVoice(settings, bar, stave, key, notes, symbols, voice) {
     if (notes.length) console.log(notes.length + ' notes tied over to next bar');
 }
 
-export default async function createTree(sequence, settings) {
+export default async function createTree(sequence, transpose = 0, displace = 0, duration = Infinity, settings) {
     settings = assign({ display: sequence.display }, config, settings);
 
-    const events = sequence.events;
-    const array  = [];
+    // Make transforms list
+    const array = [];
+    if (transpose) array.push(Transform.TYPES.transpose, transpose);
+    if (displace)  array.push(Transform.TYPES.displace,  displace);
 
-    // Create sequence object
-    // Make iterator
-    const iterator = new SequenceIterator(events, sequence.sequences, Transform.from(array), null, sequence);
-    const parts    = {};
-    const buffers  = {};
-    const tree     = {};
+    const transform = array.length ?
+        Transform.from(array) :
+        Transform.identity ;
+
+    const startBeat  = 0;
+    const stopBeat   = duration - displace;
+    const iterator   = new SequenceIterator(sequence, transform, startBeat, stopBeat);
+    const spellables = {};
+    const buffers    = {};
+    const tree       = {};
 
     // 1. Sort out timing
     // Loop over iterator, extract events into bars, parts and voices, and
     // quantise events
-    metricQuantise(settings, iterator, parts, buffers, tree);
+    metricQuantise(settings, iterator, spellables, buffers, tree);
 
     // 2. Sort out pitch
     // Assign note spelling per-part
-    // TODO!!! settings.showAtConcertPitch
-    settings.showAtConcertPitch = false;
     if (settings.showAtConcertPitch) {
         // Spell parts in concert
-        await spell([].concat.apply([], values(parts)).sort(byBeat));
+        await spell([].concat.apply([], values(spellables)).sort(byBeat));
     }
     else {
         // Spell parts in part transposition
-        await Promise.all(entries(parts).map(([name, events]) => {
+        await Promise.all(entries(spellables).map(([name, events]) => {
             const display   = toDisplayObject(settings, name);
             const transform = Transform.of('transpose', display.transpose || 0);
             events.forEach((event) => transform.apply(event));
@@ -629,7 +632,7 @@ export default async function createTree(sequence, settings) {
     }
 
     // 3. Loop over bars, parts, voices and populate with symbols
-    symboliseTree(settings, parts, buffers, tree);
+    symboliseTree(settings, spellables, buffers, tree);
 
     // Return tree object
     return tree;

@@ -285,7 +285,6 @@ function detectBestFit(beat, duration, events, index, rhythmIndex = index, rhyth
 }
 
 
-
 /**
 detect(beat, duration, events, index = 0, options = {})
 Top-level entry point for EPL-MQ rhythm detection.

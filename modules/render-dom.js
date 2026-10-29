@@ -5,17 +5,17 @@ import rect             from 'dom/rect.js';
 //import Event            from 'sequence/modules/event.js';
 //import Transform        from 'sequence/modules/transform.js';
 //import SequenceIterator from 'sequence/modules/sequence-iterator.js';
-import { toKeyName }      from 'sequence/modules/event/key.js';
+//import { toKeyName }      from 'sequence/modules/event/key.js';
 //import Stave            from './stave.js';
 import createTree       from './tree.js';
 import { createBarElement, createSigElement } from './create-element.js';
 //import { renderBeam }   from './beam.js';
 import * as glyphs      from './glyphs.js';
 import truncate         from './number/truncate.js';
-//import config           from './config.js';
+import config           from './config.js';
 import log              from './log.js';
 
-const { max } = Math;
+
 const global = globalThis || window;
 const heads = [
     create('span', { html: glyphs.head1,       style: 'width: min-content;' }),
@@ -87,39 +87,23 @@ console.log('COUNT', count, (0.25 + 2.375 + count * 0.625 + 0.5).toFixed(6));
     `;               // label and gap | margin | clef | accidentals | margin
 }
 
-export async function renderDOM(sequence, clef, keyname, meter, transpose = 0, displace = 0, options) {
-    const fragment = document.createDocumentFragment();
-
-/*
-    const settings = options ? Object.assign({}, config, options) : config;
-    const events   = sequence.events;
-
+export async function renderDOM(sequence, key, meter, transpose, displace, duration, settings) {
     // If events contains no initial key and key is available insert a key event
-    let keyEvent = sequence.find({ beat: 0, type: 'key' })
-        || keyname
-        && sequence.create(0, 'key', keyname) ;
+    const keyEvent = sequence.find({ beat: 0, type: 'key' })
+        || key
+        && sequence.create(0, 'key', key) ;
 
     // If events contains no initial meter and meter is available insert a meter event
-    let meterEvent = sequence.find({ beat: 0, type: 'meter' })
+    const meterEvent = sequence.find({ beat: 0, type: 'meter' })
         || meter
         && sequence.create(0, 'meter', meter[2], meter[3]) ;
 
-    // Get the stave controller
-    const stave = Stave[clef || 'treble'];
-
-    // Make transforms list
-    const array = [];
-    if (transpose) array.push(Transform.TYPES.transpose, transpose);
-    if (displace)  array.push(Transform.TYPES.displace, displace);
-
-    // Create sequence object
-    const iterator = new SequenceIterator(events, sequence.sequences, Transform.from(array));
-*/
-
     // Create render tree
-    const tree = await createTree(sequence);
+    const tree = await createTree(sequence, transpose, displace, duration, settings);
 
     // Create DOM tree
+    const fragment = document.createDocumentFragment();
+
     let n = -1;
     let bar, element;
     while (bar = tree[++n]) {
@@ -129,13 +113,9 @@ export async function renderDOM(sequence, clef, keyname, meter, transpose = 0, d
 
     // Create side column with signatures
     if (tree[0]) {
-        const bar0 = tree[0];
-        const sig = createSigElement(bar0);
-
-        const column = create('header', {
-            id: 'side',
-            class: 'side'
-        });
+        const bar0   = tree[0];
+        const sig    = createSigElement(bar0);
+        const column = create('header', { id: 'side', class: 'side' });
 
         let n = 24;
         while (n--) column.appendChild(sig.cloneNode(true));
@@ -145,9 +125,3 @@ export async function renderDOM(sequence, clef, keyname, meter, transpose = 0, d
 
     return fragment;
 }
-/*
-export function renderBeams(element, root = element) {
-    // Render beams
-    root.querySelectorAll('.beam').forEach(renderBeam);
-}
-*/

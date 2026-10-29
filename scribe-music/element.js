@@ -35,13 +35,12 @@ export default define(element('scribe-music', {
 
         // Set up listeners for attribute/property changes
         internals.data      = Signal.of();
-        internals.clef      = Signal.of('treble');
+        internals.staff     = Signal.of('treble');
         internals.key       = Signal.of('C');
-        internals.meter     = Signal.of(/*[-4, "meter", 4, 1]*/);
+        internals.meter     = Signal.of();
         internals.beat      = Signal.of(0);
         internals.duration  = Signal.of(Infinity);
         internals.transpose = Signal.of(0);
-        //internals.excludes  = Signal.of([]);
         internals.swingAsStraight8ths  = Signal.of(false);
         internals.swingAsStraight16ths = Signal.of(false);
         internals.debug     = Signal.of(false);
@@ -81,22 +80,21 @@ export default define(element('scribe-music', {
             const fragment = await renderDOM(
                 // Events from data
                 Sequence.from(internals.data.value),
-                // Excludes is an array
-                //internals.excludes.value,
-                // Clef is a string
-                internals.clef.value,
                 // Key name
                 internals.key.value,
                 // Create an initial [0, "meter", ...] event
                 internals.meter.value,
-                // Duration is a number
-                //internals.duration.value,
                 // Transpose is a number
                 internals.transpose.value,
                 // Beat is a number
                 internals.beat.value,
+                // Duration is a number
+                internals.duration.value,
                 // Override settings from attributes
                 assign({}, config, {
+                    display: internals.staff.value ?
+                        { staff: internals.staff.value } :
+                        undefined,
                     swingAsStraight8ths:  internals.swingAsStraight8ths.value,
                     swingAsStraight16ths: internals.swingAsStraight16ths.value
                 })
@@ -147,29 +145,29 @@ export default define(element('scribe-music', {
         document.fonts.removeEventListener('loadingdone', internals);
     }
 }, {
-    clef: {
+    staff: {
         /**
-        clef="treble"
-        Choose the default clef to render. Not that if the rendered sequence
-        contains clef events, they override this choice. Possible clefs are
+        staff="treble"
+        Choose the default staff to render. Not that if the rendered sequence
+        contains staff events, they override this choice. Possible staves are
         `"treble"`, `"bass"`, `"piano"`, `"drum"`, `"percussion"`, `"chord"`.
         **/
-        attribute: function(value) { this.clef = value; },
+        attribute: function(value) { this.staff = value; },
 
         /**
-        .clef = "treble"
-        Choose the default clef to render. Not that if the rendered sequence
-        contains clef events, they override this choice. Possible clefs are
+        .staff = "treble"
+        Choose the default staff to render. Not that if the rendered sequence
+        contains staff events, they override this choice. Possible staves are
         `"treble"`, `"bass"`, `"piano"`, `"drum"`, `"percussion"`, `"chord"`.
         **/
-        get: function() {  return getInternals(this).clef.value; },
+        get: function() {  return getInternals(this).staff.value; },
         set: function(value) {
             if (!Stave[value]) {
-                console.warn('<scribe-music> Attempt to set invalid clef="' + value + '" ignored');
+                console.warn('<scribe-music> Attempt to set invalid staff="' + value + '" ignored');
                 return;
             }
 
-            getInternals(this).clef.value = value;
+            getInternals(this).staff.value = value;
         }
     },
 
@@ -364,11 +362,7 @@ export default define(element('scribe-music', {
         attribute: function(value) { this.debug = value !== null; },
         get: function() { return getInternals(this).debug.value; },
         set: function(value) { getInternals(this).debug.value = !!value; }
-    }/*,
-
-    excludes: {
-        attribute: function(string) { return getInternals(this).excludes.value = string.split(/\s+/); },
-    }*/
+    }
 }, 'stephband.band/scribe/'), {
     // Define ScribeMusic.styleheet as the stylesheet signal
     stylesheet: {
