@@ -145,7 +145,7 @@ export default class GrandStave extends Stave {
         return i > -1 ? i : undefined ;
     }
 
-    getPart(number) {
+    getVoice(number) {
         return typeof number === 'number' ?
             number < 60 ?
                 this.voices[0] :
@@ -153,6 +153,10 @@ export default class GrandStave extends Stave {
             /[012]$|[AC-G](?:bb|𝄫|##|𝄪|[b#♭♯])*3$/u.test(number) ?
                 this.voices[0] :
                 this.voices[1] ;
+    }
+
+    getPart(number) {
+        return this.getVoice(number);
     }
 
     createKeySymbols(key) {

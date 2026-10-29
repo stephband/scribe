@@ -38,9 +38,13 @@ export default class PercussionStave extends DrumStave {
         }
     }
 
-    getPart(number) {
-        // Find part for this note number
+    getVoice(number) {
+        // Find voice for this note number
         return this.voices.find((voice) => voice.notes === '*' || voice.notes.includes(number));
+    }
+
+    getPart(number) {
+        return this.getVoice(number);
     }
 
     get maxPitch() {

@@ -61,7 +61,7 @@ function getPart(settings, bar, name) {
     const part = assign({
         type:    'part',
         name,
-        stave:   Stave[display.staff],
+        stave:   Stave[display.staff || display.clef],
         symbols: []
     }, display);
 
@@ -71,8 +71,9 @@ function getPart(settings, bar, name) {
 
 function toVoice(settings, stave, event) {
     if (event.type === 'chord') return 'chord';
-    // TODO
-    return '0';
+    if (event.voice !== undefined) return event.voice + '';
+    const voice = stave.getVoice ? stave.getVoice(event[2]) : stave.voices?.[0];
+    return voice ? voice.name : '0';
 }
 
 function getVoice(settings, part, name) {
@@ -81,10 +82,11 @@ function getVoice(settings, part, name) {
         return part[i];
     }
 
-    const voice = {
+    const staveVoice = part.stave && part.stave.voices && part.stave.voices.find((v) => v.name === name);
+    const voice = assign({
         type: 'voice',
         name
-    };
+    }, staveVoice);
 
     push(part, voice);
     return voice;
@@ -121,7 +123,7 @@ function flagEndBar(bar, sequenceEvent) {
     return false;
 }
 
-function metricQuantise(settings, sequence, spellables, buffers, tree) {
+function metricQuantise(settings, sequence, parts, spellables, buffers, tree) {
 //    const jsons  = [];
 
     const keyEvents = [];
@@ -218,11 +220,19 @@ function metricQuantise(settings, sequence, spellables, buffers, tree) {
                 event.voice = voiceName;
                 event.stave = part.stave;
 
-                // Push event into global part
-                if (!spellables[partName]) {
-                    spellables[partName] = keyEvents.map((e) => Event.from(e));
+                parts[partName] = true;
+
+                // Push event into global part only if stave is pitched
+                if (part.stave.pitched) {
+                    if (!spellables[partName]) {
+                        spellables[partName] = keyEvents.map((e) => Event.from(e));
+                    }
+                    spellables[partName].push(event);
                 }
-                spellables[partName].push(event);
+                else if (event.type === 'note') {
+                    // Delegate spelling directly to unpitched stave
+                    event.pitchSpelling = part.stave.getSpelling(event[2]);
+                }
 
                 // Push event into part.voice buffer
                 const name = partName + '.' + voiceName;
@@ -425,7 +435,7 @@ function symbolisePart(settings, buffers, bar, part) {
         bar.key ;
 
     // Push in key signature
-    if (bar.keyEvent) {
+    if (stave.pitched && bar.keyEvent) {
         const keyEvent = transpose ?
             Event.from(bar.keyEvent).transpose(transpose) :
             bar.keyEvent ;
@@ -601,13 +611,12 @@ export default async function createTree(sequence, transpose = 0, displace = 0, 
     const array = [];
     if (transpose) array.push(Transform.TYPES.transpose, transpose);
     if (displace)  array.push(Transform.TYPES.displace,  displace);
-
     const transform = array.length ?
         Transform.from(array) :
         Transform.identity ;
 
-    if (!sequence.objects) sequence.objects = [];
-    const iterator   = new SequenceIterator(sequence.events || sequence, sequence.sequences, transform, null, sequence);
+    const iterator   = new SequenceIterator(sequence, transform, 0, duration);
+    const parts      = {};
     const spellables = {};
     const buffers    = {};
     const tree       = {};
@@ -615,7 +624,7 @@ export default async function createTree(sequence, transpose = 0, displace = 0, 
     // 1. Sort out timing
     // Loop over iterator, extract events into bars, parts and voices, and
     // quantise events
-    metricQuantise(settings, iterator, spellables, buffers, tree);
+    metricQuantise(settings, iterator, parts, spellables, buffers, tree);
 
     // 2. Sort out pitch
     // Assign note spelling per-part
@@ -634,7 +643,7 @@ export default async function createTree(sequence, transpose = 0, displace = 0, 
     }
 
     // 3. Loop over bars, parts, voices and populate with symbols
-    symboliseTree(settings, spellables, buffers, tree);
+    symboliseTree(settings, parts, buffers, tree);
 
     // Return tree object
     return tree;

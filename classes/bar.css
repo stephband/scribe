@@ -211,8 +211,15 @@
 }
 */
 
-.bar .drum-clef + .timesig,
-.bar .percussion-clef + .timesig {
+music-sig .drum-clef,
+music-sig .percussion-clef,
+music-bar .drum-clef,
+music-bar .percussion-clef {
+    margin-left: 0.125em;
+}
+
+music-bar .drum-clef + .timesig,
+music-bar .percussion-clef + .timesig {
 	--clef-timesig: 0.2em;
 }
 

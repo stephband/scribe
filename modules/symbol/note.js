@@ -16,13 +16,7 @@ export function createNotes(stave, key, voice, notes, beat, duration) {
     let n = -1, event;
 
     while (event = notes[++n]) {
-        //const events     = event.scribeEvents;
-        //const index      = event.scribeIndex;
-        //const keyWeights = keyWeightsForEvent(events, index, key);
-        //const keyNumber  = chooseKeyFromWeights(keyWeights);
-        // [BRANCH 2026-spelling]: Use event.pitchSpelling or event.event.pitchSpelling if explicitly defined
-        //const pitch      = stave.getSpelling(event.pitchSpelling || event.event?.pitchSpelling || event.spelling || event.event?.spelling || event[2], keyNumber, true);
-        const pitch = event.pitchSpelling;
+        const pitch = event.pitchSpelling || (stave.getSpelling && stave.getSpelling(event[2]));
 
         // Create symbols with pitch, row
         symbols.push({

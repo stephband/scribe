@@ -146,7 +146,7 @@ export default class Stave {
     }
 
     /**
-    .getPart(pitch)
+    .getVoice(pitch)
     **/
 
     staffs = ['main'];
@@ -156,8 +156,12 @@ export default class Stave {
         staff: 'main'
     }];
 
-    getPart(number) {
+    getVoice(number) {
         return this.voices[0];
+    }
+
+    getPart(number) {
+        return this.getVoice(number);
     }
 
     /**
@@ -271,6 +275,8 @@ export default class Stave {
     }
 */
     createKeySymbols(event) {
+        if (!this.pitched) return [];
+
         const key = event && event[2] !== undefined ? event[2] : event;
         const k   = typeof key === 'number' ? key : toKeyNumber(key || 0);
         const ev  = event && typeof event === 'object' ? event : undefined;

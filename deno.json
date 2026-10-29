@@ -5,7 +5,7 @@
         "bolt/":     "https://cdn.jsdelivr.net/gh/stephband/bolt-2@1.0.9/",
         "neuron/":   "https://cdn.jsdelivr.net/gh/stephband/neuron@0.1.1/",
         "midi/":     "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.5/modules/",
-        "sequence/": "https://cdn.jsdelivr.net/gh/soundio/sequence@0.4.4/"
+        "sequence/": "https://cdn.jsdelivr.net/gh/soundio/sequence@0.4.6/"
     },
 
     "tasks": {

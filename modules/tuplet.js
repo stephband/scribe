@@ -1,4 +1,6 @@
 
+import straighten from './rhythm/straighten.js';
+
 export function isTupletSymbol(settings, stave, /*part,*/ data) {
     switch (data.divisor) {
         case 2:

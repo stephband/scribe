@@ -265,6 +265,7 @@ const createSymbolElement = overload(get('type'), {
         duration: truncate(4, symbol.duration),
         pitch:    symbol.event.pitchSpelling,
         voice:    (symbol.voice && symbol.voice.name) || (symbol.part && symbol.part.name),
+        stem:     symbol.stemup ? 'up' : 'down',
         beam:     symbol.beam && symbol.beam.id,
         event:    identify(symbol.event)
     }), symbol.event),

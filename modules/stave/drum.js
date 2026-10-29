@@ -185,17 +185,17 @@ export default class DrumStave extends Stave {
     }];
 
     /**
-    .getPart(number)
+    .getVoice(number)
     **/
-    getPart(number) {
-        // Split drums stave into drums and cymbals voices
-        /*return [35, 36, 37, 38, 40, 41, 43, 44, 45, 47, 48, 50].includes(toNoteNumber(number)) ?
-            this.voices[0] :
-            this.voices[1] ;*/
+    getVoice(number) {
         // Split drum stave into hands and feet
         return [35, 36, 44].includes(toNoteNumber(number)) ?
             this.voices[1] :
             this.voices[0] ;
+    }
+
+    getPart(number) {
+        return this.getVoice(number);
     }
 
     /**
