@@ -1,6 +1,7 @@
 
-import insert from 'fn/insert.js';
-import Event  from 'sequence/modules/event.js';
+import insert  from 'fn/insert.js';
+import slugify from 'fn/slugify.js';
+import Event   from 'sequence/modules/event.js';
 import { getDivisions } from 'sequence/modules/event/meter.js';
 import byBeat           from 'sequence/modules/events/by-priority.js';
 import Transform        from 'sequence/modules/transform.js';
@@ -25,17 +26,31 @@ import toStopBeat                from './event/to-stop-beat.js';
 
 const { assign, entries, values } = Object;
 
+function toDisplayObject(settings, name) {
+    const slug = slugify(name);
 
+    if (slug === 'default' && settings.display) {
+        if (typeof settings.display === 'string') {
+            if (!Stave[settings.display]) throw new Error(`Sequence display must be a display object or a stave type string`);
+            return {
+                staff: settings.display,
+                transpose: 0
+            };
+        }
 
-function toPartName(settings, event) {
-    if (!event.object) return 0;
-    return event.object.name;
+        return settings.display ;
+    }
+
+    return toDisplay(slug);
 }
 
-/*function toPartIndex(settings, name) {
-    // TODO
-    return 0;
-}*/
+function toPartName(settings, event) {
+    // Use the object name as the part name
+    if (event.object && event.object.name) return event.object.name;
+
+    // Use default sequence object default
+    return 'default';
+}
 
 function getPart(settings, bar, name) {
     //const index = toPartIndex(settings, name);
@@ -44,7 +59,7 @@ function getPart(settings, bar, name) {
         return bar[i];
     }
 
-    const display = toDisplay(name);
+    const display = toDisplayObject(settings, name);
     const transpose = settings.showAtConcertPitch ? 0 : (display.transpose || 0);
     const key = transpose ? Event.of(0, 'key', bar.key).transpose(transpose)[2] : bar.key;
 
@@ -594,8 +609,9 @@ function symboliseVoice(settings, bar, part, stave, key, notes, symbols, voice) 
     if (notes.length) console.log(notes.length + ' notes tied over to next bar');
 }
 
-export default async function createTree(sequence, settings = config) {
-    if (settings !== config) settings = assign({}, config, settings);
+export default async function createTree(sequence, settings) {
+    settings = assign({ display: sequence.display }, config, settings);
+
     const events = sequence.events;
     const array  = [];
 
@@ -622,7 +638,7 @@ export default async function createTree(sequence, settings = config) {
     else {
         // Spell parts in part transposition
         await Promise.all(entries(parts).map(([name, events]) => {
-            const display   = toDisplay(name);
+            const display   = toDisplayObject(settings, name);
             const transform = Transform.of('transpose', display.transpose || 0);
             events.forEach((event) => transform.apply(event));
             return spell(events);
