@@ -24,7 +24,7 @@ function getDuration(durations, divisions, b1, b2) {
     // Reject durations greater than available space up to b2 or bar
     // division, whichever is first
     const b3 = v1 === v3 ? b2 : v2 ;
-    while (durations[--d] > b3 - b1);
+    while (d > 0 && durations[--d] > b3 - b1);
 
     // If that duration does not span exactly to b2 or bar division
     return b1 + durations[d] !== b3 ?

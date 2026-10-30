@@ -151,16 +151,16 @@ export function createSigElement(bar0, defaultKeyName) {
 }
 
 const createSymbolElement = overload(get('type'), {
-    barrepeat: (symbol) => create('span', {
+    barrepeat: ({ count, duration }) => create('span', {
         class: 'barrepeat',
-        html: glyphs['barRepeat' + symbol.count],
+        html: glyphs['barRepeat' + count],
         beat: 0,
-        duration: symbol.duration
+        duration
     }),
 
-    clef: (symbol) => create('music-clef', {
-        class: `${ symbol.clef === 'alto' || symbol.clef === 'tenor' ? 'c' : symbol.clef }-clef clef`,
-        html: clefGlyphs[symbol.clef]
+    clef: ({ clef }) => create('music-clef', {
+        class: `${ clef === 'alto' || clef === 'tenor' ? 'c' : clef }-clef clef`,
+        html: clefGlyphs[clef]
     }),
 
     chord: ({ beat, duration, name, event }) => store(create('abbr', {
@@ -172,105 +172,108 @@ const createSymbolElement = overload(get('type'), {
         event:    identify(event)
     }), event),
 
-    timesig: (symbol) => symbol.stave.getTimeSigHTML ?
-        create('fragment', symbol.stave.getTimeSigHTML(symbol.numerator, symbol.denominator, identify(symbol.event))) :
+    timesig: ({ stave, numerator, denominator, event }) => stave.getTimeSigHTML ?
+        create('fragment', stave.getTimeSigHTML(numerator, denominator, identify(event))) :
         store(create('music-timesig', {
             class: "timesig",
-            html: `<sup>${ glyphs['timeSig' + symbol.numerator] }</sup>
-                <sub>${ glyphs['timeSig' + symbol.denominator] }</sub>`,
-            event: identify(symbol.event)
-        }), symbol.event),
+            html: `<sup>${ glyphs['timeSig' + numerator] }</sup>
+                <sub>${ glyphs['timeSig' + denominator] }</sub>`,
+            event: identify(event)
+        }), event),
 
-    symbolcoda: (symbol) => create('p', {
+    symbolcoda: () => create('p', {
         html: glyphs.coda,
         class: "coda"
     }),
 /*
-    barcount: (symbol) => create('span', {
-        html: symbol.text,
+    barcount: ({ text }) => create('span', {
+        html: text,
         class: "barcount"
     }),
 */
-    text: (symbol) => store(create('span', {
+    text: ({ value, beat, duration, event }) => store(create('span', {
         class: "lyric",
         part:  "lyric",
-        html: symbol.value,
-        beat:     truncate(4, symbol.beat),
-        duration: truncate(4, symbol.duration),
-        event:    identify(symbol.event)
-    }), symbol.event),
+        html: value,
+        beat:     truncate(4, beat),
+        duration: truncate(4, duration),
+        event:    identify(event)
+    }), event),
 
-    acci: (symbol) => {
+    acci: ({ value, clump, cluster, beat, pitch, voice, event }) => {
         const element = create('music-acci', {
-            class: (acciClasses[symbol.value] || 'acci') + (symbol.clump ? ' acci-' + symbol.clump : '' ) + (symbol.cluster ? ' acci-cluster' : ''),
-            html:  acciGlyphs[symbol.value] || glyphs.acciNatural,
-            beat:  symbol.beat && truncate(4, symbol.beat),
-            pitch: symbol.pitch,
-            voice: (symbol.voice && symbol.voice.name) || (symbol.part && symbol.part.name),
-            event: symbol.event ? identify(symbol.event) : undefined
+            class: (acciClasses[value] || 'acci') + (clump ? ' acci-' + clump : '' ) + (cluster ? ' acci-cluster' : ''),
+            html:  acciGlyphs[value] || glyphs.acciNatural,
+            beat:  beat && truncate(4, beat),
+            pitch,
+            voice: voice.name,
+            event: event ? identify(event) : undefined
         });
-        return symbol.event ? store(element, symbol.event) : element;
+        return event ? store(element, event) : element;
     },
 
-    accent: (symbol) => {
-        const isMarcato   = symbol.dynamic >= config.marcatoThreshold;
-        const isDrumStave = symbol.stave.type === 'drum' || symbol.stave.type === 'percussion';
+    accent: ({ dynamic, stave, stemup, beat, pitch, voice, event }) => {
+        const isMarcato   = dynamic >= config.marcatoThreshold;
+        const isDrumStave = stave.type === 'drum' || stave.type === 'percussion';
         return store(create('music-accent', {
-            class: `${ symbol.stemup ? 'up' : 'down' }-accent accent${ isMarcato ? ' marcato-accent' : '' }`,
+            class: `${ stemup ? 'up' : 'down' }-accent accent${ isMarcato ? ' marcato-accent' : '' }`,
             html: isDrumStave ?
-                    isMarcato ? symbol.stemup ? glyphs.marcatoUp : glyphs.marcatoDown :
-                symbol.stemup ? glyphs.accentUp : glyphs.accentDown :
-                    isMarcato ? symbol.stemup ? glyphs.marcatoDown : glyphs.marcatoUp :
-                symbol.stemup ? glyphs.accentDown : glyphs.accentUp,
+                    isMarcato ? stemup ? glyphs.marcatoUp : glyphs.marcatoDown :
+                stemup ? glyphs.accentUp : glyphs.accentDown :
+                    isMarcato ? stemup ? glyphs.marcatoDown : glyphs.marcatoUp :
+                stemup ? glyphs.accentDown : glyphs.accentUp,
 
-            beat:  truncate(4, symbol.beat),
-            pitch: symbol.pitch,
-            voice: (symbol.voice && symbol.voice.name) || (symbol.part && symbol.part.name),
-            event: identify(symbol.event)
-        }), symbol.event);
+            beat:  truncate(4, beat),
+            pitch,
+            voice: voice.name,
+            event: identify(event)
+        }), event);
     },
 
-    ledge: (symbol) => create('music-ledge', {
-        class: `${ symbol.rows < 0 ? 'up' : 'down' }-ledge ledge`,
-        style: `--rows: ${ abs(symbol.rows) };`,
-        beat:  truncate(4, symbol.beat),
-        pitch: symbol.pitch,
-        voice: (symbol.voice && symbol.voice.name) || (symbol.part && symbol.part.name)
+    ledge: ({ rows, beat, pitch, voice }) => create('music-ledge', {
+        class: `${ rows < 0 ? 'up' : 'down' }-ledge ledge`,
+        style: `--rows: ${ abs(rows) };`,
+        beat:  truncate(4, beat),
+        pitch,
+        voice: voice.name
     }),
 
-    beam: (symbol) => create('music-beam', {
-        class: `${ symbol.stemup ? 'up' : 'down' }-beam ${ symbol.range < 0 ? 'rise-beam ' : '' }${ symbol.stub ? symbol.stub + '-beam' : '' }`,
-        style: `--beat: ${ truncate(6, symbol.beat) }; --duration: ${ truncate(6, symbol.duration) };${ symbol.y ? ' --translate-y: ' + truncate(6, symbol.y * 0.125) + ';' : '' }${ symbol.range ? ' --range: ' + truncate(6, abs(symbol.range)) + ';' : '' }`,
-        beat:     truncate(4, symbol.beat),
-        pitch:    symbol.pitch,
-        divisor:  symbol.divisor,
-        voice:    (symbol.voice && symbol.voice.name) || (symbol.part && symbol.part.name),
-        beam:     symbol.id,
-        events:   symbol.length ? toEventIds(symbol) : undefined
-    }),
+    beam: (symbol) => {
+        const { stemup, range, stub, beat, duration, y, pitch, divisor, voice, id } = symbol;
+        return create('music-beam', {
+            class: `${ stemup ? 'up' : 'down' }-beam ${ range < 0 ? 'rise-beam ' : '' }${ stub ? stub + '-beam' : '' }`,
+            style: `--beat: ${ truncate(6, beat) }; --duration: ${ truncate(6, duration) };${ y ? ' --translate-y: ' + truncate(6, y * 0.125) + ';' : '' }${ range ? ' --range: ' + truncate(6, abs(range)) + ';' : '' }`,
+            beat:     truncate(4, beat),
+            pitch,
+            divisor,
+            voice:    voice.name,
+            beam:     id,
+            events:   symbol.length ? toEventIds(symbol) : undefined
+        });
+    },
 
-    note: (symbol) => store(create('music-note', {
-        class: `${ symbol.stemup ? 'up-note ' : 'down-note ' }${ symbol.top ? 'top-note ' : '' }${ symbol.bottom ? 'bottom-note ' : '' }${
+    note: ({ stemup, top, bottom, clusterup, clusterdown, beam, stemHeight, stave, pitch, dynamic, duration, event, beat, voice }) => store(create('music-note', {
+        class: `${ stemup ? 'up-note ' : 'down-note ' }${ top ? 'top-note ' : '' }${ bottom ? 'bottom-note ' : '' }${
             // Stem up
-            symbol.stemup ?
+            stemup ?
                 // Stem up, bottom not should not be clustered
-                symbol.clusterup % 2 === 1 ? 'cluster-note ' : '' :
+                clusterup % 2 === 1 ? 'cluster-note ' : '' :
                 // Stem down, top note cannot be clustered
-                symbol.clusterdown % 2 === 1 ? 'cluster-note ' : ''
-        }${ symbol.beam ? 'beam-note ' : '' }note`,
-        style: symbol.stemHeight ? `--stem-height: ${ symbol.stemHeight };` : undefined,
-        html:  symbol.stave.getNoteHTML(symbol.pitch, symbol.dynamic, symbol.duration),
-        title: `${ symbol.event.pitchSpelling } (${ symbol.event[2] })`,
-        beat:     truncate(4, symbol.beat),
-        duration: truncate(4, symbol.duration),
-        pitch:    symbol.event.pitchSpelling,
-        voice:    (symbol.voice && symbol.voice.name) || (symbol.part && symbol.part.name),
-        stem:     symbol.stemup ? 'up' : 'down',
-        beam:     symbol.beam && symbol.beam.id,
-        event:    identify(symbol.event)
-    }), symbol.event),
+                clusterdown % 2 === 1 ? 'cluster-note ' : ''
+        }${ beam ? 'beam-note ' : '' }note`,
+        style: stemHeight ? `--stem-height: ${ stemHeight };` : undefined,
+        html:  stave.getNoteHTML(pitch, dynamic, duration),
+        title: `${ event.pitchSpelling } (${ event[2] })`,
+        beat:     truncate(4, beat),
+        duration: truncate(4, duration),
+        pitch:    event.pitchSpelling,
+        voice:    voice.name,
+        stem:     stemup ? 'up' : 'down',
+        beam:     beam && beam.id,
+        event:    identify(event)
+    }), event),
 
-    tie: ({ beat, duration, pitch, voice, part, stemup, event }) => store(create('svg', {
+    tie: ({ beat, duration, pitch, voice, stemup, event }) => store(create('svg', {
         class: `${ stemup ? 'down' : 'up' }-tie tie`,
         viewBox: `0 0 1 1`,
         preserveAspectRatio: "none",
@@ -278,7 +281,7 @@ const createSymbolElement = overload(get('type'), {
         beat:     truncate(4, beat),
         pitch,
         duration: truncate(4, duration),
-        voice:    (voice && voice.name) || (part && part.name) || voice,
+        voice:    voice.name,
         event:    identify(event)
     }), event),
 
@@ -291,7 +294,7 @@ const createSymbolElement = overload(get('type'), {
         divisor,
         // Rhythm is a binary number
         rhythm: toRhythmBinary(divisor, rhythm),
-        voice: (voice && voice.name) || voice,
+        voice: voice.name,
         style: angle ?
             `--angle: ${ angle }deg;` :
             undefined
@@ -307,22 +310,22 @@ const createSymbolElement = overload(get('type'), {
         beat: truncate(4, beat),
         duration: truncate(4, duration),
         pitch,
-        voice: voice && voice.name ? voice.name : voice,
+        voice: voice.name,
         'aria-hidden': 'true'
     }),
 
-    warning: (symbol) => store(create('data', {
+    warning: ({ stemHeight, stave, pitch, dynamic, duration, beat, voice, beam, event }) => store(create('data', {
         class: `warning-note note`,
-        style: symbol.stemHeight ? `--stem-height: ${ symbol.stemHeight };` : undefined,
-        html:  symbol.stave.getNoteHTML(symbol.pitch, symbol.dynamic, symbol.duration),
-        title: `${ symbol.pitch } (${ toNoteNumber(symbol.pitch) })`,
-        beat:     truncate(4, symbol.beat),
-        duration: truncate(4, symbol.duration),
-        pitch:    symbol.pitch,
-        voice:    (symbol.voice && symbol.voice.name) || (symbol.part && symbol.part.name),
-        beam:     symbol.beam && symbol.beam.id,
-        event:    identify(symbol.event)
-    }), symbol.event),
+        style: stemHeight ? `--stem-height: ${ stemHeight };` : undefined,
+        html:  stave.getNoteHTML(pitch, dynamic, duration),
+        title: `${ pitch } (${ toNoteNumber(pitch) })`,
+        beat:     truncate(4, beat),
+        duration: truncate(4, duration),
+        pitch,
+        voice:    voice.name,
+        beam:     beam && beam.id,
+        event:    identify(event)
+    }), event),
 
     default: (function (types) {
         return function (symbol) {

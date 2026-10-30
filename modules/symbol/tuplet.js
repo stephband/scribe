@@ -7,13 +7,13 @@ import lengthOf    from '../object/length-of.js';
 const { sqrt } = Math;
 
 
-export function closeTuplet(stave, part, tuplet) {
+export function closeTuplet(stave, voice, tuplet) {
     const { beat, duration, divisor } = tuplet;
 
     // Stem direction
-    const stemup = part.stemup === undefined ?
-        stemupFromSymbols(stave, part, tuplet) :
-        part.stemup ;
+    const stemup = voice.stemup === undefined ?
+        stemupFromSymbols(stave, voice, tuplet) :
+        voice.stemup ;
 
     // Apply stem direction to notes
     let n = -1, symbol;

@@ -99,7 +99,7 @@ export async function renderDOM(sequence, key, meter, transpose, displace, durat
         && sequence.create(0, 'meter', meter[2], meter[3]) ;
 
     // Create render tree
-    const tree = await createTree(sequence, transpose, displace, duration, settings);
+    const tree = await createTree(sequence, settings, transpose, displace, duration);
 
     // Create DOM tree
     const fragment = document.createDocumentFragment();

@@ -24,6 +24,7 @@ import log                       from './log.js';
 import toStopBeat                from './event/to-stop-beat.js';
 
 
+const { isInteger } = Number;
 const { assign, entries, values } = Object;
 
 
@@ -102,8 +103,8 @@ function quantiseNotesFromBuffers(settings, bar, buffers) {
         const part = getPart(settings, bar, partname);
 
         const tuplets = voicename === 'chord' ?
-            quantise(bar.beat, bar.duration, buffer, 1/3, [2, 3]) :
-            quantise(bar.beat, bar.duration, buffer) ;
+            quantise(settings, bar, buffer, 1/3, [2, 3]) :
+            quantise(settings, bar, buffer) ;
 
         if (!tuplets) continue;
         const voice = getVoice(settings, part, voicename);
@@ -401,7 +402,8 @@ function symboliseChords(settings, bar, stave, symbols, voice) {
                     bar.duration - event[0] + bar.beat :
                     event[4],
                 event,
-                stave
+                stave,
+                voice
             });
         }
     }
@@ -471,13 +473,35 @@ function symbolisePart(settings, buffers, bar, part) {
 
     // If no note/rest symbols were created for this part in this bar, fill with
     // a whole bar rest
-    if (!hasNotes) symbols.push({
-        type:     'rest',
-        beat:     0,
-        duration: bar.duration,
-        whole:    true,
-        stave
-    });
+    if (!hasNotes) {
+        if (stave.type === 'grand') {
+            symbols.push({
+                type:     'rest',
+                beat:     0,
+                duration: bar.duration,
+                whole:    true,
+                stave,
+                voice:    stave.voices[0]
+            }, {
+                type:     'rest',
+                beat:     0,
+                duration: bar.duration,
+                whole:    true,
+                stave,
+                voice:    stave.voices[1]
+            });
+        }
+        else {
+            symbols.push({
+                type:     'rest',
+                beat:     0,
+                duration: bar.duration,
+                whole:    true,
+                stave,
+                voice:    part[0] || stave.voices[0]
+            });
+        }
+    }
 }
 
 function fillToBeat(settings, bar, stave, voice, accidentals, notes, symbols, beam, beat, stopBeat) {
@@ -528,7 +552,10 @@ function fillTupletToBeat(settings, bar, stave, voice, accidentals, notes, symbo
 }
 
 function symboliseVoice(settings, bar, stave, key, notes, symbols, voice) {
+    const { divisor } = bar;
     const { tuplets } = voice;
+    const swing       = settings.swingAsStraight8ths  && isInteger(divisor);
+    const shuffle     = settings.swingAsStraight16ths && isInteger(divisor * 2);
     const accidentals = accidentalsFromKey(key);
 
     let beat = bar.beat;
@@ -538,7 +565,7 @@ function symboliseVoice(settings, bar, stave, key, notes, symbols, voice) {
     // Loop over voice
     let n = -1;
     while (tuplet = tuplets[++n]) {
-        const isTuplet = isTupletSymbol(settings, stave, tuplet);
+        const isTuplet = isTupletSymbol(swing, shuffle, tuplet);
         if (isTuplet) {
             // Fill up to start of tuplet and close any preceding beam
             beam = fillToBeat(settings, bar, stave, voice, accidentals, notes, symbols, beam, beat, tuplet.beat);
@@ -599,12 +626,7 @@ function symboliseVoice(settings, bar, stave, key, notes, symbols, voice) {
     if (notes.length) console.log(notes.length + ' notes tied over to next bar');
 }
 
-export default async function createTree(sequence, transpose = 0, displace = 0, duration = Infinity, settings) {
-    if (typeof transpose === 'object') {
-        settings  = transpose;
-        transpose = 0;
-    }
-
+export default async function createTree(sequence, settings = {}, transpose = 0, displace = 0, duration = Infinity) {
     settings = assign({ display: sequence.display }, config, settings);
 
     // Make transforms list

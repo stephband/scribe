@@ -9,6 +9,7 @@ import {
 
 import { Sequence } from 'sequence/module.js';
 import createTree   from '../modules/tree.js';
+import quantise     from '../modules/quantise.js';
 
 import Stave        from '../modules/stave/stave.js';
 import { identify } from '../modules/event.js';
@@ -130,3 +131,150 @@ Deno.test('DrumStave stem directions: upper voice (cymbals/hands) stemup true, l
     is(kick.stemup, false);
     is(pedal.stemup, false);
 });
+
+Deno.test('All voice-associated symbols have symbol.voice.name attached', async () => {
+    const sequence = new Sequence([
+        [0, "key", "Eb"],
+        [0, "meter", 4, 1],
+        [0, "note", 63, 0.5, 1], // Eb4 in bar 0
+        [1, "note", 65, 0.5, 1], // F4 in bar 0
+        [4, "note", 67, 0.5, 1]  // G4 in bar 1
+    ]);
+    const tree = await createTree(sequence);
+    assert(tree[0]);
+    assert(tree[1]);
+
+    const bar0Part = tree[0][0];
+    const bar1Part = tree[1][0];
+
+    for (const symbol of bar0Part.symbols) {
+        if (['note', 'rest', 'beam', 'tie', 'tuplet', 'acci', 'accent', 'ledge'].includes(symbol.type)) {
+            assert(symbol.voice, `symbol of type ${symbol.type} should have voice`);
+            is(typeof symbol.voice.name, 'string', `symbol.voice.name should be string on ${symbol.type}`);
+        }
+    }
+
+    for (const symbol of bar1Part.symbols) {
+        if (['note', 'rest', 'beam', 'tie', 'tuplet', 'acci', 'accent', 'ledge'].includes(symbol.type)) {
+            assert(symbol.voice, `symbol of type ${symbol.type} should have voice`);
+            is(typeof symbol.voice.name, 'string', `symbol.voice.name should be string on ${symbol.type}`);
+        }
+    }
+});
+
+Deno.test('Whole bar rest has voice.name attached on empty bars', async () => {
+    const sequence = Sequence.from({
+        objects: [
+            { id: 1, name: "Lead" },
+            { id: 2, name: "Bass" }
+        ],
+        events: [
+            [0, "meter", 4, 1],
+            [0, "sequence", 10, 1, 8],
+            [0, "sequence", 20, 2, 8]
+        ],
+        sequences: [
+            {
+                id: 10,
+                events: [
+                    [0, "note", 60, 1, 1],
+                    [4, "note", 60, 1, 1]
+                ]
+            },
+            {
+                id: 20,
+                events: [
+                    [0, "note", 50, 1, 1]
+                ]
+            }
+        ]
+    });
+    const tree = await createTree(sequence);
+    assert(tree[0]);
+    assert(tree[1]);
+
+    let bar1Bass;
+    let i = -1;
+    while (tree[1][++i]) {
+        if (tree[1][i].name === 'Bass') bar1Bass = tree[1][i];
+    }
+    assert(bar1Bass, 'Bass part should exist on bar 1');
+    const wholeRest = bar1Bass.symbols.find((s) => s.type === 'rest' && s.whole);
+    assert(wholeRest, 'empty bar 1 for Bass should have whole rest');
+    assert(wholeRest.voice, 'whole rest must have voice');
+    is(wholeRest.voice.name, 'main');
+});
+
+Deno.test('Percussion swing straightening quantises swung 8ths to straight 8ths without NaN rests', async () => {
+    const sequence = new Sequence([
+        [0, "meter", 4, 1],
+        [0,    "note", "F3", 0.1, 0.6],
+        [1,    "note", "F3", 0.1, 0.2],
+        [1.63, "note", "F3", 0.1, 0.2],
+        [2,    "note", "F3", 0.1, 0.6],
+        [3,    "note", "F3", 0.1, 0.2],
+        [3.63, "note", "F3", 0.1, 0.2]
+    ]);
+
+    const tree = await createTree(sequence, { display: 'percussion', swingAsStraight8ths: true });
+    assert(tree[0]);
+    const part = tree[0][0];
+    assert(part);
+
+    const rests = part.symbols.filter((s) => s.type === 'rest');
+    for (const rest of rests) {
+        assert(!Number.isNaN(rest.duration), `Rest at beat ${rest.beat} has NaN duration`);
+        assert(rest.duration >= 0.125, `Spurious tiny rest at beat ${rest.beat} with duration ${rest.duration}`);
+    }
+
+    const tuplets = part.symbols.filter((s) => s.type === 'tuplet');
+    is(tuplets.length, 0, 'Straightened swing 8ths should not produce tuplet brackets');
+
+    const notes = part.symbols.filter((s) => s.type === 'note');
+    const noteBeats = notes.map((n) => n.beat);
+    equals(noteBeats, [0, 1, 1.5, 2, 3, 3.5]);
+});
+
+Deno.test('Swing quantisation is restricted to whole beat meters (integer divisor)', async () => {
+    // Meter with divisor 0.5 (non-integer)
+    const sequence305 = new Sequence([
+        [0, "meter", 3, 0.5],
+        [0,    "note", "F3", 0.1, 0.2],
+        [0.66, "note", "F3", 0.1, 0.2]
+    ]);
+
+    const tree305 = await createTree(sequence305, { display: 'percussion', swingAsStraight8ths: true });
+    assert(tree305[0]);
+    const part305 = tree305[0][0];
+    const tuplets305 = part305.symbols.filter((s) => s.type === 'tuplet');
+    // In non-integer divisor meter, triplet tuplet should be preserved, not straightened
+    is(tuplets305.length, 1);
+    is(tuplets305[0].divisor, 3);
+
+    const notes305 = part305.symbols.filter((s) => s.type === 'note');
+    assert(notes305[1].beat > 0.6, `Note in 3/0.5 meter was unexpectedly straightened to ${notes305[1].beat}`);
+
+    // Meter with divisor 1.5 tested directly in quantise
+    const buffer15 = [
+        [0, "note", "F3", 0.1, 0.2],
+        [0.66, "note", "F3", 0.1, 0.2]
+    ];
+    const tuplets15 = quantise({ swingAsStraight8ths: true }, { beat: 0, duration: 3, divisor: 1.5 }, buffer15);
+    is(tuplets15[0].divisor, 3, 'Meter with divisor 1.5 should keep divisor 3 (not straightened)');
+
+    // 2/2 meter has divisor 2 (integer)
+    const sequence22 = new Sequence([
+        [0, "meter", 4, 2],
+        [1,    "note", "F3", 0.1, 0.2],
+        [1.63, "note", "F3", 0.1, 0.2]
+    ]);
+
+    const tree22 = await createTree(sequence22, { display: 'percussion', swingAsStraight8ths: true });
+    assert(tree22[0]);
+    const part22 = tree22[0][0];
+    const notes22 = part22.symbols.filter((s) => s.type === 'note');
+    // Swung note at 1.63 should be straightened to 1.5 in whole beat meter
+    equals(notes22[1].beat, 1.5);
+});
+
+
