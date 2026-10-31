@@ -18,7 +18,6 @@ import { createRests }           from './symbol/rest.js';
 import { createBeam, closeBeam } from './symbol/beam.js';
 import { closeTuplet }           from './symbol/tuplet.js';
 import { isTupletSymbol }        from './tuplet.js';
-import { P24 }                   from './constants.js';
 import { toDisplay, byDisplayOrder } from './display.js';
 import log                       from './log.js';
 import toStopBeat                from './event/to-stop-beat.js';
@@ -93,22 +92,33 @@ function getVoice(settings, part, name) {
     return voice;
 }
 
-function quantiseNotesFromBuffers(settings, bar, buffers) {
+function quantiseNotesFromBuffers(settings, bar, buffers, drifts) {
     let name;
     for (name in buffers) {
         const buffer = buffers[name];
-        if (!buffer.length) continue;
+        // There is nothing to put in this bar
+        if (!buffer.length) {
+            // Reset drift to 0
+            drifts[name] = 0;
+            // Move to next buffer
+            continue;
+        }
 
         const [partname, voicename] = name.split('.');
-        const part = getPart(settings, bar, partname);
+        const part  = getPart(settings, bar, partname);
+        const drift = drifts[name] || 0;
 
         const tuplets = voicename === 'chord' ?
-            quantise(settings, bar, buffer, 1/3, [2, 3]) :
-            quantise(settings, bar, buffer) ;
+            quantise(settings, bar, buffer, 1/3, [2, 3], drift) :
+            quantise(settings, bar, buffer, undefined, undefined, drift) ;
 
         if (!tuplets) continue;
         const voice = getVoice(settings, part, voicename);
         voice.tuplets = tuplets;
+
+        if (tuplets.length) {
+            drifts[name] = tuplets[tuplets.length - 1].driftOut;
+        }
     }
 }
 
@@ -127,6 +137,7 @@ function flagEndBar(bar, sequenceEvent) {
 function metricQuantise(settings, sequence, parts, spellables, buffers, tree) {
 //    const jsons  = [];
 
+    const drifts    = {};
     const keyEvents = [];
     // Guarantee the render of at least 1 bar
     let stopBeat = 1;
@@ -147,7 +158,7 @@ function metricQuantise(settings, sequence, parts, spellables, buffers, tree) {
     for (event of sequence) {
         // While event time is beyond end of bar create bar from current state
         while (event[0] >= bar.beat + bar.duration) {
-            quantiseNotesFromBuffers(settings, bar, buffers);
+            quantiseNotesFromBuffers(settings, bar, buffers, drifts);
 //            detectBarRepeats(bars, jsons, bar);
             if (flagEndBar(bar, sequenceEvent)) sequenceEvent = undefined;
             push(tree, bar);
@@ -282,7 +293,7 @@ function metricQuantise(settings, sequence, parts, spellables, buffers, tree) {
 
     // Create bars up to stop beat or while voices still has events
     while (stopBeat > bar.beat + bar.duration) {
-        quantiseNotesFromBuffers(settings, bar, buffers);
+        quantiseNotesFromBuffers(settings, bar, buffers, drifts);
         if (flagEndBar(bar, sequenceEvent)) sequenceEvent = undefined;
         push(tree, bar);
 
@@ -298,7 +309,7 @@ function metricQuantise(settings, sequence, parts, spellables, buffers, tree) {
         };
     }
 
-    quantiseNotesFromBuffers(settings, bar, buffers);
+    quantiseNotesFromBuffers(settings, bar, buffers, drifts);
     push(tree, bar);
 
     // Always render last bar with a double bar line
@@ -525,32 +536,6 @@ function fillToBeat(settings, bar, stave, voice, accidentals, notes, symbols, be
     return beam;
 }
 
-function fillTupletToBeat(settings, bar, stave, voice, accidentals, notes, symbols, tupletSymbol, beam, beat, stopBeat, division) {
-    // 1. While there are active notes sounding before stopBeat, emit tuplet-division note symbols
-    while (notes.length && beat < stopBeat - P24) {
-        const noteSymbols = stave.createNoteSymbols(symbols, bar, voice, accidentals, notes, beat - bar.beat, division, settings);
-        createTies(symbols, bar, voice, notes, noteSymbols, 0.5 * division);
-        if (division < 0.5) {
-            if (!beam) beam = createBeam(beat - bar.beat, voice);
-            push(beam, ...noteSymbols);
-        }
-        push(tupletSymbol, ...noteSymbols);
-        beat += division;
-    }
-    // 2. Fill any remaining tuplet divisions up to stopBeat with tuplet rests
-    while (beat < stopBeat - P24) {
-        symbols.push({
-            type:     'rest',
-            beat:     beat - bar.beat,
-            duration: division,
-            stave,
-            voice
-        });
-        beat += division;
-    }
-    return beam;
-}
-
 function symboliseVoice(settings, bar, stave, key, notes, symbols, voice) {
     const { divisor } = bar;
     const { tuplets } = voice;
@@ -584,28 +569,42 @@ function symboliseVoice(settings, bar, stave, key, notes, symbols, voice) {
             };
             symbols.push(symbol);
 
-            // Loop through tuplet events
-            let i = -1, event;
-            while (event = tuplet[++i]) {
-                // When the next event is at a new beat, resolve everything up to event[0]
-                if (event[0] > beat) {
-                    beam = fillTupletToBeat(settings, bar, stave, voice, accidentals, notes, symbols, symbol, beam, beat, event[0], division);
-                    beat = event[0];
-                }
-                // Add this event to the active chord at `beat`
-                notes.push(event);
-            }
+            // Deterministic slot loop over tuplet divisions
+            let i = 0;
+            for (let s = 0; s < tuplet.divisor; ++s) {
+                const slotBeat = tuplet.beat + s * division;
 
-            // Fill remaining divisions to end of tuplet
-            const stopBeat = tuplet.beat + tuplet.duration;
-            beam = fillTupletToBeat(settings, bar, stave, voice, accidentals, notes, symbols, symbol, beam, beat, stopBeat, division);
+                // Collect all events belonging to slot s
+                while (tuplet[i] && tuplet[i].slot === s) {
+                    notes.push(tuplet[i++]);
+                }
+
+                if (notes.length) {
+                    const noteSymbols = stave.createNoteSymbols(symbols, bar, voice, accidentals, notes, slotBeat - bar.beat, division, settings);
+                    createTies(symbols, bar, voice, notes, noteSymbols, 0.5 * division);
+                    if (division < 0.5) {
+                        if (!beam) beam = createBeam(slotBeat - bar.beat, voice);
+                        push(beam, ...noteSymbols);
+                    }
+                    push(symbol, ...noteSymbols);
+                }
+                else {
+                    symbols.push({
+                        type:     'rest',
+                        beat:     slotBeat - bar.beat,
+                        duration: division,
+                        stave,
+                        voice
+                    });
+                }
+            }
 
             // Close any beams at tuplet end
             if (beam) beam = closeBeam(symbols, stave, voice, beam);
             // Close tuplet
             closeTuplet(stave, voice, symbol);
             // Update beat
-            beat = stopBeat;
+            beat = tuplet.beat + tuplet.duration;
         }
         else {
             let i = -1, event;

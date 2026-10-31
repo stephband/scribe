@@ -10,6 +10,8 @@ import {
 import { Sequence } from 'sequence/module.js';
 import createTree   from '../modules/tree.js';
 import quantise     from '../modules/quantise.js';
+import grainPow2    from '../modules/number/grain-pow-2.js';
+import grainOfBeat  from '../modules/bar/grain-of-beat.js';
 
 import Stave        from '../modules/stave/stave.js';
 import { identify } from '../modules/event.js';
@@ -276,5 +278,86 @@ Deno.test('Swing quantisation is restricted to whole beat meters (integer diviso
     // Swung note at 1.63 should be straightened to 1.5 in whole beat meter
     equals(notes22[1].beat, 1.5);
 });
+
+Deno.test('Tuplet deterministic slot rendering with empty slot rest and chord', async () => {
+    // Triplet on beat 1 with notes at slot 0 (C4, E4 chord) and slot 2 (G4), slot 1 is empty rest
+    const sequence = new Sequence([
+        [0, "meter", 4, 1],
+        [1.00, "note", 60, 0.1, 0.3], // C4 in slot 0
+        [1.01, "note", 64, 0.1, 0.3], // E4 in slot 0
+        [1.67, "note", 67, 0.1, 0.3]  // G4 in slot 2
+    ]);
+
+    const tree = await createTree(sequence);
+    assert(tree[0]);
+    const part = tree[0][0];
+
+    const tuplets = part.symbols.filter((s) => s.type === 'tuplet');
+    is(tuplets.length, 1);
+    is(tuplets[0].divisor, 3);
+
+    // Symbols in the tuplet bracket: 2 notes in slot 0, 1 note in slot 2
+    assert(tuplets[0][0], 'First note in tuplet');
+    assert(tuplets[0][1], 'Second note in tuplet');
+    assert(tuplets[0][2], 'Third note in tuplet');
+    is(tuplets[0][3], undefined);
+
+    // There should be a triplet rest at beat 1 + 1/3 (slot 1)
+    const tupletRest = part.symbols.find((s) => s.type === 'rest' && Math.abs(s.beat - (1 + 1/3)) < 0.001);
+    assert(tupletRest, 'Expected tuplet rest at slot 1');
+    equals(Math.round(tupletRest.duration * 1000) / 1000, 0.333);
+});
+
+Deno.test('grainPow2 and grainOfBeat on quantised beat divisions', () => {
+    is(grainPow2(0.125, 8, 0), 8);
+    is(grainPow2(0.125, 8, 4), 4);
+    is(grainPow2(0.125, 8, 2), 2);
+    is(grainPow2(0.125, 8, 1), 1);
+    is(grainPow2(0.125, 8, 0.5), 0.5);
+    is(grainPow2(0.125, 8, 0.25), 0.25);
+    is(grainPow2(0.125, 8, 0.125), 0.125);
+    is(grainPow2(0.125, 8, 0.375), 0.125);
+
+    // In a 4/4 bar with divisions [0, 2, 4]
+    const divisions = [0, 2, 4];
+    is(grainOfBeat(divisions, 0), 2);
+    is(grainOfBeat(divisions, 1), 1);
+    is(grainOfBeat(divisions, 1.5), 0.5);
+    is(grainOfBeat(divisions, 2), 2);
+});
+
+Deno.test('PLL spring state (drift) is preserved across bar boundaries', async () => {
+    // 2 bars of quarter notes in 4/4 with consistent laid-back drift (+0.03 beats)
+    const sequence = new Sequence([
+        [0, "meter", 4, 1],
+        [0.03, "note", 60, 0.1, 0.5],
+        [1.03, "note", 60, 0.1, 0.5],
+        [2.03, "note", 60, 0.1, 0.5],
+        [3.03, "note", 60, 0.1, 0.5],
+        [4.03, "note", 60, 0.1, 0.5],
+        [5.03, "note", 60, 0.1, 0.5],
+        [6.03, "note", 60, 0.1, 0.5],
+        [7.03, "note", 60, 0.1, 0.5]
+    ]);
+
+    const tree = await createTree(sequence);
+    assert(tree[0], 'Bar 0 exists');
+    assert(tree[1], 'Bar 1 exists');
+
+    const voice0 = tree[0][0][0];
+    const voice1 = tree[1][0][0];
+
+    const lastTupletBar0 = voice0.tuplets[voice0.tuplets.length - 1];
+    const firstTupletBar1 = voice1.tuplets[0];
+
+    // Bar 0 final tuplet evolved positive drift
+    assert(lastTupletBar0.driftOut > 0.01, `Expected bar 0 last tuplet driftOut > 0.01, got ${lastTupletBar0.driftOut}`);
+
+    // Bar 1 first tuplet inherited that drift from bar 0 instead of resetting to 0
+    is(firstTupletBar1.drift, lastTupletBar0.driftOut);
+});
+
+
+
 
 

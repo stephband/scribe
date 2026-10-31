@@ -4,7 +4,6 @@ import { eq } from '../number/float.js';
 import last from '../object/last.js';
 import map  from '../object/map.js';
 import { stemupFromPitches } from './stem.js';
-import { P24 } from '../constants.js';
 
 
 const { ceil, floor } = Math;
@@ -21,7 +20,7 @@ function average(a, n, i, array) {
 function pushSubBeam(symbols, main, beats, positions, sub, levelDuration, level) {
     const i0      = sub[0];
     const isStub  = sub.length === 1;
-    const forward = isStub && (i0 === 0 || eq(beats[i0] % levelDuration, 0, P24));
+    const forward = isStub && (i0 === 0 || eq(beats[i0] % levelDuration, 0, 0.001));
 
     const iStart = isStub ? (forward ? i0 : i0 - 1) : i0;
     const iEnd   = isStub ? (forward ? i0 + 1 : i0) : sub[sub.length - 1];
@@ -122,7 +121,7 @@ export function closeBeam(symbols, stave, voice, beam) {
                 0.125 + row / 8 :
                 2.8125 - row / 8 ;
 
-            if (!beats.length || !eq(beats[beats.length - 1], note.beat, P24)) {
+            if (!beats.length || beats[beats.length - 1] !== note.beat) {
                 beats.push(note.beat);
                 durations.push(note.duration);
             }
@@ -154,7 +153,7 @@ export function closeBeam(symbols, stave, voice, beam) {
         let r;
 
         // Find highest or lowest pitch at beat of note
-        while (beam[++n] && eq(beam[n].beat, note.beat, P24)) {
+        while (beam[++n] && beam[n].beat === note.beat) {
             r = stave.getRow(voice, beam[n].pitch);
             // row may be out of range of this stave
             if (r === undefined) continue;
@@ -201,7 +200,7 @@ export function closeBeam(symbols, stave, voice, beam) {
         if (r === 0) top = note;
 
         // Find all other notes at beat
-        while (beam[++n] && eq(beam[n].beat, note.beat, P24)) {
+        while (beam[++n] && beam[n].beat === note.beat) {
             beam[n].stemup = stemup;
             beam[n].beam   = beam;
         }

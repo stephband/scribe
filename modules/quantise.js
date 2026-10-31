@@ -28,13 +28,13 @@ function straighten(tuplet) {
 }
 
 function quantiseTupletEvents(tuplet, buffer) {
-    const { beat, divisor, duration, delta } = tuplet;
+    const { beat, divisor, duration, drift } = tuplet;
     let n = -1;
 
     while (buffer.length) {
         const event = buffer[0];
         const time  = event[0];
-        const b     = time - beat - delta;
+        const b     = time - beat - drift;
         const x     = b * divisor / duration;
         const slot  = round(x);
 
@@ -42,16 +42,18 @@ function quantiseTupletEvents(tuplet, buffer) {
         if (slot >= divisor) break;
 
         // Quantise event
-        event[0] = beat + max(0, slot) * duration / divisor;
+        const s     = max(0, slot);
+        event.slot  = s;
+        event[0]    = beat + s * duration / divisor;
         tuplet[++n] = buffer.shift();
         // Are we doing something about duration ??
     }
 }
 
-export default function quantise(settings, bar, buffer, minDivision, primes) {
+export default function quantise(settings, bar, buffer, minDivision, primes, drift = 0) {
     const { beat, duration, divisor } = bar;
 
-    const tuplets = detect(beat, duration, buffer, minDivision, primes);
+    const tuplets = detect(beat, duration, buffer, minDivision, primes, drift);
     if (!tuplets) return;
 
     const swing   = settings.swingAsStraight8ths  && isInteger(divisor);

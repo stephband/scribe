@@ -1,6 +1,4 @@
 
-import mod from 'fn/mod.js';
-import { eq } from './float.js';
 import { floorPow2 } from './power-of-2.js';
 
 /*
@@ -12,8 +10,11 @@ remainder. Where given, `min` and `max` must be power-of-two numbers.
 
 export default function grainPow2(min, max, n) {
     // If n is 0 we can say we are on the maximum grain
-    if (eq(0, n, min / 2)) return floorPow2(max);
+    if (n === 0 || Math.abs(n) < 1e-9) return floorPow2(max);
     let g = floorPow2(max) * 2;
-    while ((g /= 2) > min) if (eq(0, mod(g, n), min / 2)) break;
+    while ((g /= 2) > min) {
+        const rem = n % g;
+        if (rem === 0 || rem < 1e-9 || g - rem < 1e-9) break;
+    }
     return g;
 }

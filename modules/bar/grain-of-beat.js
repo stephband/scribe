@@ -1,17 +1,6 @@
 
-import mod from 'fn/mod.js';
-import { eq } from '../number/float.js';
-import { floorPow2, ceilPow2 } from '../number/power-of-2.js';
-
-
-
-function grainPow2(min, max, n) {
-    // If n is 0 we can say we are on the maximum grain
-    if (eq(0, n, min / 2)) return floorPow2(max);
-    let g = floorPow2(max) * 2;
-    while ((g /= 2) > min) if (eq(0, mod(g, n), min / 2)) break;
-    return g;
-}
+import grainPow2 from '../number/grain-pow-2.js';
+import { ceilPow2 } from '../number/power-of-2.js';
 
 /*
 grainOfBeat(divisions, beat)
