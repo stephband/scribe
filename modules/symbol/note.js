@@ -8,7 +8,7 @@ const byRow = by(get('row'));
 const symbols = [];
 
 
-export function createNotes(stave, key, voice, notes, beat, duration) {
+export function createNotes(stave, key, voice, notes, beat, duration, staccato = false) {
     symbols.length = 0;
 
     if (!notes.length) return symbols;
@@ -19,7 +19,7 @@ export function createNotes(stave, key, voice, notes, beat, duration) {
         const pitch = event.pitchSpelling || (stave.getSpelling && stave.getSpelling(event[2]));
 
         // Create symbols with pitch, row
-        symbols.push({
+        const symbol = {
             type: 'note',
             beat,
             duration,
@@ -29,7 +29,10 @@ export function createNotes(stave, key, voice, notes, beat, duration) {
             row: stave.getRow(voice, pitch),
             stave,
             event
-        });
+        };
+
+        if (staccato) symbol.staccato = true;
+        symbols.push(symbol);
     }
 
     if (symbols.length === 0) return symbols;

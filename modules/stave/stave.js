@@ -20,7 +20,7 @@ import { GR as ratio }       from '../constants.js';
 
 
 const DEBUG = globalThis.DEBUG;
-const { floor } = Math;
+const { floor, min } = Math;
 
 const keys = {
     //                                             C      D       E  F      G      A       B
@@ -325,9 +325,9 @@ export default class Stave {
         return symbols.concat(this.createKeySymbols(keyEvent));
     }
 
-    createNoteSymbols(symbols, bar, voice, accidentals, notes, beat, duration, settings) {
+    createNoteSymbols(symbols, bar, voice, accidentals, notes, beat, duration, settings, staccato = false) {
         // Create note heads
-        const noteSymbols = createNotes(this, bar.key, voice, notes, beat, duration);
+        const noteSymbols = createNotes(this, bar.key, voice, notes, beat, duration, staccato);
         // Notes may not appear on stave in which case noteSymbols will be empty
         if (!noteSymbols.length) return noteSymbols;
         // Create ledges, accidentals and accents
@@ -340,7 +340,7 @@ export default class Stave {
         return noteSymbols;
     }
 
-    createDupletNoteSymbols(symbols, bar, voice, accidentals, notes, startBeat, stopBeat, settings) {
+    createDupletNoteSymbols1(symbols, bar, voice, accidentals, notes, startBeat, stopBeat, settings) {
         const b1    = startBeat - bar.beat;
         const b2    = stopBeat  - bar.beat;
         const grain = grainOfBeat(bar.divisions, b1);
@@ -365,6 +365,7 @@ export default class Stave {
         }
 
         let g = grain;
+        let staccato = false;
 
         // If b1 and b2 are both bar divisions, the event duration passes the
         // threshold to fill the space, and the space is a valid note duration
@@ -401,37 +402,50 @@ export default class Stave {
             b = b1 + 2 * grain;
 //console.log('2g', grain, 2 * grain);
         }
-        // Duration is longer than ratio * g and takes us before or at b2 (a 1g
-        // always takes us to a more than 1x grain)
+        // Duration is longer than (0.5 + 0.5 * ratio) * g (or ratio * g when g <= bar.divisor)
+        // and takes us before or at b2 (a 1g always takes us to a more than 1x grain)
         //     ━━━━
         // ┃.❘.|.❘.┃.❘.|.❘.┃
-        else if (b > b1 + ratio * grain && b1 + 1 * grain <= b2) {
+        else if (b > b1 + (grain > bar.divisor ? (0.5 + 0.5 * ratio) : ratio) * grain && b1 + 1 * grain <= b2) {
             b = b1 + grain;
 //console.log('1g', grain, grain);
         }
         // If b is not at stopBeat (so we are not butting up against the next
-        // event or bar end), duration is less than 1, and if there is room
-        // choose next pow of 2 duration to avoid dotted 8th and 16ths
-        else if (b < b2 && b < b1 + 1 && b1 + ceilPow2(b - b1) <= b2) {
-            b = b1 + ceilPow2(b - b1);
-//console.log('ceil pow 2', b, b2);
+        // event or bar end), duration is min(grain, bar.divisor) or less, and
+        // there is room: quantise to subdivisions with staccato
+        else if (b < b2 && b <= b1 + min(grain, bar.divisor) && b1 + min(grain, bar.divisor) <= b2) {
+            const maxD = min(grain, bar.divisor);
+            let d = 2 * maxD;
+
+            while ((d /= 2) >= 0.125 && b < b1 + ratio * d);
+            if (d < maxD) {
+                d *= 2;
+                staccato = true;
+            }
+
+            b = b1 + d;
         }
         // Loop through smaller grains down to a 32nd
         else while ((g /= 2) >= 0.125) {
             // Duration is longer than g double dotted, and g is an 8th or more
-            if (b > b1 + 1.625 * g && g >= 0.5) {
-                b = b1 + 1.75 * g;
-//console.log('g..', g, 1.75 * g);
-                break;
+            if (b > b1 + (1 + ratio) * g && g >= 0.5) {
+                if (b < b2 && b1 + 2 * g <= b2) {
+                    b = b1 + 2 * g;
+                    break;
+                }
+                if (b1 + 1.75 * g <= b2) {
+                    b = b1 + 1.75 * g;
+                    break;
+                }
             }
             // Duration is longer than g dotted, and g is an 16th or more
-            if (b > b1 + 1.25 * g && g >= 0.25) {
+            if (b > b1 + (1 + 0.5 * ratio) * g && g >= 0.25 && b1 + 1.5 * g <= b2) {
                 b = b1 + 1.5 * g;
 //console.log('g.', g, 1.5 * g);
                 break;
             }
             // Duration is longer than g
-            if (b > b1 + 0.875 * g) {
+            if (b > b1 + (0.5 + 0.5 * ratio) * g && b1 + g <= b2) {
                 b = b1 + g;
 //console.log('g', g, g);
                 break;
@@ -439,6 +453,65 @@ export default class Stave {
         }
 
         const duration = b - b1;
-        return this.createNoteSymbols(symbols, bar, voice, accidentals, notes, b1, duration, settings);
+        return this.createNoteSymbols(symbols, bar, voice, accidentals, notes, b1, duration, settings, staccato);
+    }
+
+    createDupletNoteSymbols(symbols, bar, voice, accidentals, notes, startBeat, stopBeat, settings) {
+        const b1    = startBeat - bar.beat;
+        const b2    = stopBeat  - bar.beat;
+        const grain = grainOfBeat(bar.divisions, b1);
+        const d1    = getDivisionBefore(bar.divisions, b1);
+        const d2    = getDivisionBefore(bar.divisions, b2);
+
+        let b = b1;
+        let i = -1;
+        while (notes[++i]) {
+            const b3 = toStopBeat(notes[i]) - bar.beat;
+            if (b3 >= b2) { b = b2; break; }
+            if (b3 > b)   { b = b3; }
+        }
+
+        let staccato = false;
+
+        // 1. Start and stop on bar divisions
+        if (b1 === d1 && b2 === d2 && b >= (b2 - bar.divisor + ratio * bar.divisor) && noteDurations.includes(b2 - b1)) {
+            b = b2;
+        }
+        // 2. Unified grain search from 4 * grain down to 0.125
+        else {
+            let g = 8 * grain;
+            while ((g /= 2) >= 0.125) {
+                // Double-dotted g (1.75g): rounds up to 2g when < b2, or snaps to 1.75g
+                if (g >= 0.5 && b > b1 + (1 + ratio) * g) {
+                    if (2 * g <= grain && b < b2 && b1 + 2 * g <= b2) {
+                        b = b1 + 2 * g;
+                        break;
+                    }
+                    if (b1 + 1.75 * g <= b2 && (2 * g <= grain || grainOfBeat(bar.divisions, b1 + 1.75 * g) > g)) {
+                        b = b1 + 1.75 * g;
+                        break;
+                    }
+                }
+                // Dotted g (1.5g)
+                if (g >= 0.25 && b > b1 + (1 + 0.5 * ratio) * g && b1 + 1.5 * g <= b2 && (2 * g <= grain || grainOfBeat(bar.divisions, b1 + 1.5 * g) > g)) {
+                    b = b1 + 1.5 * g;
+                    break;
+                }
+                // Whole g (1.0g)
+                if (b > b1 + (g > bar.divisor ? (0.5 + 0.5 * ratio) : ratio) * g) {
+                    if (g < grain && g < bar.divisor && b < b2 && b1 + 2 * g <= b2) {
+                        b = b1 + 2 * g;
+                        staccato = true;
+                        break;
+                    }
+                    if (b1 + g <= b2 && (g <= grain || grainOfBeat(bar.divisions, b1 + g) > g)) {
+                        b = b1 + g;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return this.createNoteSymbols(symbols, bar, voice, accidentals, notes, b1, b - b1, settings, staccato);
     }
 }
