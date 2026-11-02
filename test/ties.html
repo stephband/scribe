@@ -24,6 +24,7 @@
             "dom/":      "/dom/modules/",
             "fn/":       "/fn/modules/",
             "midi/":     "/midi/modules/",
+            "neuron/":   "/neuron/",
             "sequence/": "/sequence/"
         }
     }</script>
@@ -55,6 +56,27 @@
 <body>
     <section class="grid dense-grid" style="row-gap: 0; grid-template-columns: min-content;">
         <h2 class="x1 3x no-wrap">Durations</h2>
+
+        <p class="x1 x-end y-center">0.25</p>
+        <scribe-music class="x2 no-wrap" staff="treble" src="#d-025" debug>
+            <script type="application/json" id="d-0000">{
+                "events": [
+                    [0, "meter", 3, 1],
+                    [0, "note", 60, 0.1, 4]
+                ]
+            }</script>
+        </scribe-music>
+        <scribe-music class="x3 no-wrap" staff="treble" src="#d-025" debug>
+            <script type="application/json" id="d-000">{
+                "events": [
+                    [0, "meter", 3, 0.5],
+                    [0, "note", 60, 0.1, 4]
+                ]
+            }</script>
+        </scribe-music>
+
+
+
         <p class="x1 x-end y-center">4</p>
         <scribe-music class="x2 no-wrap" clef="treble" src="#d-0000" debug>
             <script type="application/json" id="d-0000">{

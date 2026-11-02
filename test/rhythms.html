@@ -24,6 +24,7 @@
             "dom/":      "/dom/modules/",
             "fn/":       "/fn/modules/",
             "midi/":     "/midi/modules/",
+            "neuron/":   "/neuron/",
             "sequence/": "/sequence/"
         }
     }</script>
@@ -56,7 +57,19 @@
 </head>
 <body>
     <section class="grid" style="row-gap: 0;">
-        <h3 class="x1 2x">Problematic rhythms</h3>
+        <h3 class="x1 2x">Note durations</h3>
+
+        <scribe-music class="x1" clef="piano" src="#durations" swing>
+            <script type="sequence" id="overlap-1">{
+                "events": [
+                    [0,  "key",   0],
+                    [0,  "meter", 3, 1.5],
+                    [0,  "sequence", 2, 2, 6]
+                ]
+            }</script>
+        </scribe-music>
+
+        <!--h3 class="x1 2x">Problematic rhythms</h3>
 
         <scribe-music class="x1" clef="treble" src="#rhythm-1" debug>
             <script type="application/json" id="rhythm-1">{
@@ -228,7 +241,7 @@
                 [1.875,"note", "D4", 0.1, 0.125]
               ]
             }</script>
-        </scribe-music-->
+        </scribe-music>
 
         <scribe-music src="#rhythm-16" class="FAIL">
             <script type="application/json" id="rhythm-16">{

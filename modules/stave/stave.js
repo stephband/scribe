@@ -16,6 +16,7 @@ import { toKeyNumber }       from 'sequence/modules/event/key.js';
 import { rrootname, rpitch, rflatsharp, accidentalChars, fathercharles } from '../pitch.js';
 import config                from '../config.js';
 import * as glyphs           from "../glyphs.js";
+import { GR as ratio }       from '../constants.js';
 
 
 const DEBUG = globalThis.DEBUG;
@@ -347,51 +348,71 @@ export default class Stave {
         const d2    = getDivisionBefore(bar.divisions, b2);
 
         let b = b1;
+
+        // Loop through notes
         let i = -1;
         while (notes[++i]) {
             const b3 = toStopBeat(notes[i]) - bar.beat;
-            // If we are filling the whole duration to stopBeat we can break out
-            if (b3 >= b2) { b = b2; break; }
-            // Update note stop b
-            if (b3 > b)   { b = b3; }
+            // If any are longer than the available space, set b to end of space
+            if (b3 >= b2) {
+                b = b2;
+                break;
+            }
+            // Set b to the end of the longest note
+            if (b3 > b)   {
+                b = b3;
+            }
         }
 
         let g = grain;
 
-        // Note starts on a bar division, stops on (or crosses) a bar division or
-        // bar end, and that duration is a valid note duration
-        if (b >= b2 && b1 === d1 && b2 === d2 && noteDurations.includes(b2 - b1)) {
+        // If b1 and b2 are both bar divisions, the event duration passes the
+        // threshold to fill the space, and the space is a valid note duration
+        // ━━━━
+        //     ━━━━
+        // ━━━━━━━━
+        // ┃.❘.|.❘.┃.❘.|.❘.┃
+        if (b1 === d1 && b2 === d2 && b >= (b2 - bar.divisor + ratio * bar.divisor) && noteDurations.includes(b2 - b1)) {
             b = b2;
 //console.log('start and stop on divisions', grain, b2 - b1);
         }
-        // Duration is longer than 5g and a double dotted 7g takes us to a more
-        // than a 4x grain before b2
-        else if (b > b1 + 6 * grain && b1 + 7 * grain <= b2 && grainOfBeat(bar.divisions, b1 + 7 * grain) > 4 * grain) {
+        // If event duration is longer than 5g and a (double dotted) 7g takes us
+        // to a more than a 4x grain before or at b2
+        //  ━━━━━━━
+        // ┃.❘.|.❘.┃.❘.|.❘.┃
+        else if (b > b1 + 5 * grain && b1 + 7 * grain <= b2 && grainOfBeat(bar.divisions, b1 + 7 * grain) > 4 * grain) {
             b = b1 + 7 * grain;
 //console.log('4g..', grain, 7 * grain);
         }
         // Duration is longer than 2g and a dotted 3g takes us to a more than a
-        // 2x grain grain before b2
-        else if (b > b1 + 2.5 * grain && b1 + 3 * grain <= b2 && grainOfBeat(bar.divisions, b1 + 3 * grain) > 2 * grain) {
+        // 2x grain grain before or at b2
+        //  ━━━
+        // ┃.❘.|.❘.┃.❘.|.❘.┃
+        else if (b > b1 + 2 * grain && b1 + 3 * grain <= b2 && grainOfBeat(bar.divisions, b1 + 3 * grain) > 2 * grain) {
             b = b1 + 3 * grain;
 //console.log('2g.', grain, 3 * grain);
         }
         // Duration is longer than 1.5g and a 2g takes us to a more than 1x grain
-        // grain before b2, which can happen if note ends on a bar division
+        // grain before or at b2, which can happen if note ends on a bar division
+        //     ━━━━
+        // ┃.❘.|.❘.┃.❘.|.❘.┃
+        // QUESTIONABLE!!!!
         else if (b > b1 + 1.5 * grain && b1 + 2 * grain <= b2 && grainOfBeat(bar.divisions, b1 + 2 * grain) > grain) {
             b = b1 + 2 * grain;
 //console.log('2g', grain, 2 * grain);
         }
-        // Duration is longer than 0.875g, a 1g always takes us to a more than
-        // 1x grain
-        else if (b > b1 + 0.875 * grain && b1 + 1 * grain <= b2) {
+        // Duration is longer than ratio * g and takes us before or at b2 (a 1g
+        // always takes us to a more than 1x grain)
+        //     ━━━━
+        // ┃.❘.|.❘.┃.❘.|.❘.┃
+        else if (b > b1 + ratio * grain && b1 + 1 * grain <= b2) {
             b = b1 + grain;
 //console.log('1g', grain, grain);
         }
-        // Duration is less than 1 and does not take us to stopBeat so we are
-        // not butting up against the next event, if there is room choose next
-        // pow of 2 duration to avoid dotted 8th and 16ths
-        else if (b - b1 < 1 && b < b2 && b1 + ceilPow2(b - b1) <= b2) {
+        // If b is not at stopBeat (so we are not butting up against the next
+        // event or bar end), duration is less than 1, and if there is room
+        // choose next pow of 2 duration to avoid dotted 8th and 16ths
+        else if (b < b2 && b < b1 + 1 && b1 + ceilPow2(b - b1) <= b2) {
             b = b1 + ceilPow2(b - b1);
 //console.log('ceil pow 2', b, b2);
         }
