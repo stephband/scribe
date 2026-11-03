@@ -481,30 +481,24 @@ export default class Stave {
         else {
             let g = 8 * grain;
             while ((g /= 2) >= 0.125) {
-                // Double-dotted g (1.75g): rounds up to 2g when < b2, or snaps to 1.75g
-                if (g >= 0.5 && b > b1 + (1 + ratio) * g) {
-                    if (2 * g <= grain && b < b2 && b1 + 2 * g <= b2) {
-                        b = b1 + 2 * g;
-                        break;
-                    }
-                    if (b1 + 1.75 * g <= b2 && (2 * g <= grain || grainOfBeat(bar.divisions, b1 + 1.75 * g) > g)) {
-                        b = b1 + 1.75 * g;
-                        break;
-                    }
+                // Double-dotted g (1.75g)
+                if (g >= 0.5 && b > b1 + (1 + ratio) * g && b1 + 1.75 * g <= b2 && (2 * g <= grain ? grainOfBeat(bar.divisions, b1 + 1.5 * g) === 0.5 * g : grainOfBeat(bar.divisions, b1 + 1.75 * g) > g)) {
+                    b = b1 + 1.75 * g;
+                    break;
                 }
                 // Dotted g (1.5g)
-                if (g >= 0.25 && b > b1 + (1 + 0.5 * ratio) * g && b1 + 1.5 * g <= b2 && (2 * g <= grain || grainOfBeat(bar.divisions, b1 + 1.5 * g) > g)) {
+                if (g >= 0.25 && b > b1 + (1 + 0.5 * ratio) * g && b1 + 1.5 * g <= b2 && (2 * g <= grain ? grainOfBeat(bar.divisions, b1 + g) >= g : grainOfBeat(bar.divisions, b1 + 1.5 * g) > g)) {
                     b = b1 + 1.5 * g;
                     break;
                 }
                 // Whole g (1.0g)
-                if (b > b1 + (g > bar.divisor ? (0.5 + 0.5 * ratio) : ratio) * g) {
+                if (b > b1 + (g > 1 || g > grain ? (0.5 + 0.5 * ratio) : ratio) * g) {
                     if (g < grain && g < bar.divisor && b < b2 && b1 + 2 * g <= b2) {
                         b = b1 + 2 * g;
                         staccato = true;
                         break;
                     }
-                    if (b1 + g <= b2 && (g <= grain || grainOfBeat(bar.divisions, b1 + g) > g)) {
+                    if (b1 + g <= b2 && grainOfBeat(bar.divisions, b1 + g) >= (g <= grain ? g : 2 * g)) {
                         b = b1 + g;
                         break;
                     }
