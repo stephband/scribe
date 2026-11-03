@@ -487,7 +487,10 @@ export default class Stave {
                     break;
                 }
                 // Dotted g (1.5g)
-                if (g >= 0.25 && b > b1 + (1 + 0.5 * ratio) * g && b1 + 1.5 * g <= b2 && (2 * g <= grain ? grainOfBeat(bar.divisions, b1 + g) >= g : grainOfBeat(bar.divisions, b1 + 1.5 * g) > g)) {
+                if (g >= 0.25 && b > b1 + (1 + 0.5 * ratio) * g && b1 + 1.5 * g <= b2 && (
+                    grainOfBeat(bar.divisions, b1 + 1.5 * g) > g ||
+                    (2 * g <= grain && (b1 + 1.5 * g === b2 || (b1 + 2 * g <= b2 && grainOfBeat(bar.divisions, b1 + 2 * g) >= 2 * g)))
+                )) {
                     b = b1 + 1.5 * g;
                     break;
                 }
