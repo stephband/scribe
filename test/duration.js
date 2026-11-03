@@ -82,13 +82,13 @@ Deno.test('Notes stopping at end of 4/4 bar', () => {
 
 
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0,       'note', 60, 0.1, 4]),   { pitchSpelling: 'C4' })], 0,       4, config), [{ beat: 0,       duration: 4 }]);     // Whole
-    matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0.5,     'note', 60, 0.1, 3.5]), { pitchSpelling: 'C4' })], 0.5,     4, config), [{ beat: 0.5,     duration: 3.5 }]);   // Double dotted minim
+    matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0.5,     'note', 60, 0.1, 3.5]), { pitchSpelling: 'C4' })], 0.5,     4, config), [{ beat: 0.5,     duration: 0.5 }]);   // Double dotted minim
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([1,       'note', 60, 0.1, 3]),   { pitchSpelling: 'C4' })], 1,       4, config), [{ beat: 1,       duration: 3 }]);     // Dotted minim
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([2,       'note', 60, 0.1, 2]),   { pitchSpelling: 'C4' })], 2,       4, config), [{ beat: 2,       duration: 2 }]);     // Minim
-    matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([4 - 1.75,'note', 60, 0.1, 1.75]),{ pitchSpelling: 'C4' })], 4 - 1.75,4, config), [{ beat: 4 - 1.75,duration: 1.75 }]);  // Double dotted quarter
+    matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([4 - 1.75,'note', 60, 0.1, 1.75]),{ pitchSpelling: 'C4' })], 4 - 1.75,4, config), [{ beat: 4 - 1.75,duration: 0.25 }]);  // Double dotted quarter
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([4 - 1.5, 'note', 60, 0.1, 1.5]), { pitchSpelling: 'C4' })], 4 - 1.5, 4, config), [{ beat: 4 - 1.5, duration: 1.5 }]);   // Dotted quarter
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([4 - 8/8, 'note', 60, 0.1, 8/8]), { pitchSpelling: 'C4' })], 4 - 8/8, 4, config), [{ beat: 4 - 8/8, duration: 8/8 }]);   // Quarter
-    matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([4 - 7/8, 'note', 60, 0.1, 7/8]), { pitchSpelling: 'C4' })], 4 - 7/8, 4, config), [{ beat: 4 - 7/8, duration: 7/8 }]);   // Double dotted 8th
+    matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([4 - 7/8, 'note', 60, 0.1, 7/8]), { pitchSpelling: 'C4' })], 4 - 7/8, 4, config), [{ beat: 4 - 7/8, duration: 1/8 }]);   // Double dotted 8th
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([4 - 6/8, 'note', 60, 0.1, 6/8]), { pitchSpelling: 'C4' })], 4 - 6/8, 4, config), [{ beat: 4 - 6/8, duration: 6/8 }]);   // Dotted 8th
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([4 - 4/8, 'note', 60, 0.1, 4/8]), { pitchSpelling: 'C4' })], 4 - 4/8, 4, config), [{ beat: 4 - 4/8, duration: 4/8 }]);   // 8th
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([4 - 3/8, 'note', 60, 0.1, 3/8]), { pitchSpelling: 'C4' })], 4 - 3/8, 4, config), [{ beat: 4 - 3/8, duration: 3/8 }]);   // Dotted 16th
@@ -162,9 +162,9 @@ Deno.test('Notes at 0.5 in 3/4 bar', () => {
         key:       0
     };
 
-    matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0.5, 'note', 60, 0.1, 3]),   { pitchSpelling: 'C4' })], 0.5, 3, config), [{ beat: 0.5, duration: 1.5 }]);     // Dotted minim
-    matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0.5, 'note', 60, 0.1, 2]),   { pitchSpelling: 'C4' })], 0.5, 3, config), [{ beat: 0.5, duration: 1.5 }]);     // Minim
-    matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0.5, 'note', 60, 0.1, 1.75]),{ pitchSpelling: 'C4' })], 0.5, 3, config), [{ beat: 0.5, duration: 1.5 }]);     // Double dotted quarter
+    matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0.5, 'note', 60, 0.1, 3]),   { pitchSpelling: 'C4' })], 0.5, 3, config), [{ beat: 0.5, duration: 0.5 }]);     // Dotted minim
+    matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0.5, 'note', 60, 0.1, 2]),   { pitchSpelling: 'C4' })], 0.5, 3, config), [{ beat: 0.5, duration: 0.5 }]);     // Minim
+    matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0.5, 'note', 60, 0.1, 1.75]),{ pitchSpelling: 'C4' })], 0.5, 3, config), [{ beat: 0.5, duration: 0.5 }]);     // Double dotted quarter
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0.5, 'note', 60, 0.1, 1.5]), { pitchSpelling: 'C4' })], 0.5, 3, config), [{ beat: 0.5, duration: 1.5 }]);     // Dotted quarter
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0.5, 'note', 60, 0.1, 8/8]), { pitchSpelling: 'C4' })], 0.5, 3, config), [{ beat: 0.5, duration: 0.5 }]);     // Quarter
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0.5, 'note', 60, 0.1, 7/8]), { pitchSpelling: 'C4' })], 0.5, 3, config), [{ beat: 0.5, duration: 0.5 }]);     // Double dotted 8th
@@ -320,9 +320,9 @@ Deno.test('Notes at 0.5 in 7/8 bar', () => {
         key:       0
     };
 
-    matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0.5, 'note', 60, 0.1, 3]),   { pitchSpelling: 'C4' })], 0.5, 3.5, config), [{ beat: 0.5, duration: 1.5 }]);     // Dotted minim
-    matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0.5, 'note', 60, 0.1, 2]),   { pitchSpelling: 'C4' })], 0.5, 3.5, config), [{ beat: 0.5, duration: 1.5 }]);     // Minim
-    matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0.5, 'note', 60, 0.1, 1.75]),{ pitchSpelling: 'C4' })], 0.5, 3.5, config), [{ beat: 0.5, duration: 1.5 }]);     // Double dotted quarter
+    matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0.5, 'note', 60, 0.1, 3]),   { pitchSpelling: 'C4' })], 0.5, 3.5, config), [{ beat: 0.5, duration: 0.5 }]);     // Dotted minim
+    matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0.5, 'note', 60, 0.1, 2]),   { pitchSpelling: 'C4' })], 0.5, 3.5, config), [{ beat: 0.5, duration: 0.5 }]);     // Minim
+    matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0.5, 'note', 60, 0.1, 1.75]),{ pitchSpelling: 'C4' })], 0.5, 3.5, config), [{ beat: 0.5, duration: 0.5 }]);     // Double dotted quarter
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0.5, 'note', 60, 0.1, 1.5]), { pitchSpelling: 'C4' })], 0.5, 3.5, config), [{ beat: 0.5, duration: 1.5 }]);     // Dotted quarter
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0.5, 'note', 60, 0.1, 8/8]), { pitchSpelling: 'C4' })], 0.5, 3.5, config), [{ beat: 0.5, duration: 0.5 }]);     // Quarter
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0.5, 'note', 60, 0.1, 7/8]), { pitchSpelling: 'C4' })], 0.5, 3.5, config), [{ beat: 0.5, duration: 0.5 }]);     // Double dotted 8th

@@ -339,7 +339,7 @@ export default class Stave {
         // Return symbols
         return noteSymbols;
     }
-
+/*
     createDupletNoteSymbols1(symbols, bar, voice, accidentals, notes, startBeat, stopBeat, settings) {
         const b1    = startBeat - bar.beat;
         const b2    = stopBeat  - bar.beat;
@@ -455,7 +455,7 @@ export default class Stave {
         const duration = b - b1;
         return this.createNoteSymbols(symbols, bar, voice, accidentals, notes, b1, duration, settings, staccato);
     }
-
+*/
     createDupletNoteSymbols(symbols, bar, voice, accidentals, notes, startBeat, stopBeat, settings) {
         const b1    = startBeat - bar.beat;
         const b2    = stopBeat  - bar.beat;
@@ -464,14 +464,17 @@ export default class Stave {
         const d2    = getDivisionBefore(bar.divisions, b2);
 
         let b = b1;
+        let tied = false;
         let i = -1;
         while (notes[++i]) {
+            if (notes[i][0] < startBeat) tied = true;
             const b3 = toStopBeat(notes[i]) - bar.beat;
             if (b3 >= b2) { b = b2; break; }
             if (b3 > b)   { b = b3; }
         }
 
         let staccato = false;
+        let g = 4 * grain;
 
         // If b1 and b2 are both bar divisions, the event duration passes the
         // threshold to fill the space, and the space is a valid note duration
@@ -482,34 +485,58 @@ export default class Stave {
         if (b1 === d1 && b2 === d2 && b >= (b2 - bar.divisor + ratio * bar.divisor) && noteDurations.includes(b2 - b1)) {
             b = b2;
         }
-        // 2. Unified grain search from 4 * grain down to 0.125
-        else {
-            let g = 8 * grain;
-            while ((g /= 2) >= 0.125) {
-                // Double-dotted g (1.75g)
-                if (g >= 0.5 && b > b1 + (1 + ratio) * g && b1 + 1.75 * g <= b2 && (2 * g <= grain ? grainOfBeat(bar.divisions, b1 + 1.5 * g) === 0.5 * g : grainOfBeat(bar.divisions, b1 + 1.75 * g) > g)) {
-                    b = b1 + 1.75 * g;
+        // Grain search from 2 * grain down to 0.125
+        else while ((g /= 2) >= 0.125) {
+            // Double-dotted 1.75g
+            if (g >= 0.5                                          // The second dot is at least a 32nd note
+                && 2 * g <= grain                                 // Never start a double-dotted note on a weaker off-beat grain
+                && b > b1 + (1 + ratio) * g                       // Duration passes the double-dotted threshold
+                && b1 + 1.75 * g <= b2                            // Fits within the available window
+                && grainOfBeat(bar.divisions, b1 + 1.5 * g) === 0.5 * g  // The first dot is an internal subdivision rather than a bar division
+            ) {
+                b = b1 + 1.75 * g;
+                break;
+            }
+
+            // Dotted 1.5g
+            if (g >= 0.25                                         // The dot is at least a 32nd note
+                && 0.5 * g <= grain                               // The dot is never coarser than the beat it starts on
+                && b > b1 + (1 + 0.5 * ratio) * g                 // Duration passes the dotted threshold
+                && (g <= grain || b <= b1 + (1 + ratio) * g)      // On a weaker beat, do not overshoot into a note that still needs a tie
+                && b1 + 1.5 * g <= b2                             // Fits within the available window
+                && (grainOfBeat(bar.divisions, b1 + 1.5 * g) > g  // Either lands on a stronger division
+                    || (2 * g <= grain && (                       // Or subdivides a beat...
+                        b1 + 1.5 * g === b2                       // ...and stops at the end of the window
+                        || (b1 + 2 * g <= b2 && grainOfBeat(bar.divisions, b1 + 2 * g) >= 2 * g) // ...or its enclosing 2g unit does not cross a division
+                    ))
+                )
+            ) {
+                b = b1 + 1.5 * g;
+                break;
+            }
+
+            // Whole 1g
+            if (g === 0.125                                       // Catch very short notes so they do not fall through unquantised
+                || b > b1 + (g > 1 || g > grain ? (0.5 + 0.5 * ratio) : ratio) * g // Higher threshold above a beat or grain so smaller dotted notes are not rounded up
+            ) {
+                // Staccato 2g
+                if (!tied                                         // Tied notes cannot be staccato
+                    && g < grain                                  // Shorter than the beat's grain
+                    && g < bar.divisor                            // Shorter than the bar divisor
+                    && b < b2                                     // Followed by silence
+                    && b1 + 2 * g <= b2                           // Room to double the written duration
+                ) {
+                    b = b1 + 2 * g;
+                    staccato = true;
                     break;
                 }
-                // Dotted g (1.5g)
-                if (g >= 0.25 && 0.5 * g <= grain && b > b1 + (1 + 0.5 * ratio) * g && b1 + 1.5 * g <= b2 && (
-                    grainOfBeat(bar.divisions, b1 + 1.5 * g) > g ||
-                    (2 * g <= grain && (b1 + 1.5 * g === b2 || (b1 + 2 * g <= b2 && grainOfBeat(bar.divisions, b1 + 2 * g) >= 2 * g)))
-                )) {
-                    b = b1 + 1.5 * g;
+
+                // Standard 1g
+                if (b1 + g <= b2                                  // Fits within the available window
+                    && grainOfBeat(bar.divisions, b1 + g) >= (g <= grain ? g : 2 * g) // Subdivisions must not cross an irregular division; off-beats must resolve onto a stronger boundary
+                ) {
+                    b = b1 + g;
                     break;
-                }
-                // Whole g (1.0g)
-                if (b > b1 + (g > 1 || g > grain ? (0.5 + 0.5 * ratio) : ratio) * g) {
-                    if (g < grain && g < bar.divisor && b < b2 && b1 + 2 * g <= b2) {
-                        b = b1 + 2 * g;
-                        staccato = true;
-                        break;
-                    }
-                    if (b1 + g <= b2 && grainOfBeat(bar.divisions, b1 + g) >= (g <= grain ? g : 2 * g)) {
-                        b = b1 + g;
-                        break;
-                    }
                 }
             }
         }
