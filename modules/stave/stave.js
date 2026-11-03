@@ -473,7 +473,12 @@ export default class Stave {
 
         let staccato = false;
 
-        // 1. Start and stop on bar divisions
+        // If b1 and b2 are both bar divisions, the event duration passes the
+        // threshold to fill the space, and the space is a valid note duration
+        // ━━━━
+        //     ━━━━
+        // ━━━━━━━━
+        // ┃.❘.|.❘.┃.❘.|.❘.┃
         if (b1 === d1 && b2 === d2 && b >= (b2 - bar.divisor + ratio * bar.divisor) && noteDurations.includes(b2 - b1)) {
             b = b2;
         }
