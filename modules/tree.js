@@ -349,36 +349,6 @@ function updateBeamWithNoteSymbols(symbols, bar, stave, voice, beam, noteSymbols
     return beam;
 }
 
-function createTies(symbols, bar, voice, notes, noteSymbols, tolerance = 0.125) {
-    // No notes to tie
-    if (!notes.length) return;
-
-    let n = -1;
-    while (noteSymbols[++n]) {
-        const { beat, event, pitch, duration, stemup } = noteSymbols[n];
-        const b4 = toStopBeat(event) - bar.beat;
-
-        // If there is less than a 32nd of this note left splice it out
-        if (beat + duration > b4 - tolerance) {
-            const i = notes.indexOf(event);
-            notes.splice(i, 1);
-        }
-        // Otherwise leave it in and create a tie symbol
-        else {
-            symbols.push({
-                type: 'tie',
-                beat,
-                pitch,
-                duration,
-                // TODO: We now handle this in CSS with .note + .tie selector
-                stemup,
-                voice,
-                event
-            });
-        }
-    }
-}
-
 
 // Symbolise
 
@@ -520,8 +490,6 @@ function fillToBeat(settings, bar, stave, voice, accidentals, notes, symbols, be
     while (notes.length && beat < stopBeat) {
         const noteSymbols = stave.createDupletNoteSymbols(symbols, bar, voice, accidentals, notes, beat, stopBeat, settings);
         const duration    = noteSymbols[0].duration;
-        // Splices finished notes out of `notes`, or emits a tie symbol & keeps sustained notes in `notes`
-        createTies(symbols, bar, voice, notes, noteSymbols);
         beam = updateBeamWithNoteSymbols(symbols, bar, stave, voice, beam, noteSymbols);
         beat += duration;
     }
@@ -580,8 +548,7 @@ function symboliseVoice(settings, bar, stave, key, notes, symbols, voice) {
                 }
 
                 if (notes.length) {
-                    const noteSymbols = stave.createNoteSymbols(symbols, bar, voice, accidentals, notes, slotBeat - bar.beat, division, settings);
-                    createTies(symbols, bar, voice, notes, noteSymbols, 0.5 * division);
+                    const noteSymbols = stave.createNoteSymbols(symbols, bar, voice, accidentals, notes, slotBeat - bar.beat, division, settings, false, 0.5 * division);
                     if (division < 0.5) {
                         if (!beam) beam = createBeam(slotBeat - bar.beat, voice);
                         push(beam, ...noteSymbols);

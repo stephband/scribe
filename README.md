@@ -134,7 +134,7 @@ Scribe also parses a shorthand version of this format intended for quick hand
 authoring, basically Sequence JSON structure with all the JSON syntax removed.
 
 ```html
-<scribe-music type="sequence" clef="treble" meter="4/4">
+<scribe-music type="sequence" staff="treble" meter="4/4">
     0 chord Dmaj    4
     0 F#5 0.2 1
     0 A4  0.2 1
@@ -162,14 +162,14 @@ Both an attribute and a property.
 The URL of a JSON file, or a hash reference to a script element in the document.
 
 
-### `clef="treble"`
+### `staff="treble"`
 
 Both an attribute and a property.
 The name of the clef, one of `"treble"`, `"treble-up"`, `"treble-down"`, `"alto"`,
 `"bass"`, `"piano"`, `"drum"` or `"percussion"`. Defaults to `"treble"`.
 
 ```html
-<scribe-music clef="bass">...</scribe-music>
+<scribe-music staff="bass">...</scribe-music>
 ```
 
 ```js

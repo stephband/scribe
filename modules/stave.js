@@ -44,7 +44,7 @@ class BassStave extends Stave {
 
 
 // Register staves by type. Types are the same string used by the clef attribute,
-// as in <scribe-music clef="treble">. Create a stave by type with:
+// as in <scribe-music staff="treble">. Create a stave by type with:
 // Stave.create(type);
 
 Stave['treble']      = new TrebleStave();

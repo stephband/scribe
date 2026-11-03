@@ -110,14 +110,14 @@ let mySong = JSON.stringify(scribe.data);
 ```
 
 
-### `clef="treble"`
+### `staff="treble"`
 
 Both an attribute and a property.
 The name of the clef, one of `"treble"`, `"treble-up"`, `"treble-down"`, `"alto"`,
 `"tenor"`, `"bass"`, `"piano"`, `"drum"` or `"percussion"`. Defaults to `"treble"`.
 
 ```html
-<scribe-music clef="bass" src="..."></scribe-music>
+<scribe-music staff="bass" src="..."></scribe-music>
 ```
 
 ```js

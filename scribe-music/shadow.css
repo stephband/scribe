@@ -112,8 +112,8 @@
     flex: 6 1;
 }
 
-:host([clef="drum"]),
-:host([clef="percussion"]) {
+:host([staff="drum"]),
+:host([staff="percussion"]) {
     --signature-width: 1em;
 }
 

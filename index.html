@@ -484,13 +484,13 @@
 
     <section class="example-section 9x-grid grid">
         <pre class="9x @1-x2 @1-8x"><code class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">src=<span class="attribute-value">"./blue-in-green.json"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</code></pre>
-        <scribe-music class="9x @1-x2 @1-7x @3-6x" clef="treble" src="./data/blue-in-green.json"></scribe-music>
+        <scribe-music class="9x @1-x2 @1-7x @3-6x" staff="treble" src="./data/blue-in-green.json"></scribe-music>
 
         <pre class="9x @1-x2 @1-8x"><code class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">clef=<span class="attribute-value">"drum"</span></span> <span class="attribute">src=<span class="attribute-value">"./caravan-drums.json"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</code></pre>
-        <scribe-music class="9x @1-x2 @1-7x @3-6x" clef="drum" src="./data/caravan-drums.json"></scribe-music>
+        <scribe-music class="9x @1-x2 @1-7x @3-6x" staff="drum" src="./data/caravan-drums.json"></scribe-music>
 
         <pre class="9x @1-x2 @1-8x"><code class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">clef=<span class="attribute-value">"piano"</span></span> <span class="attribute">src=<span class="attribute-value">"./ae-fond-kiss.json"</span></span> <span class="attribute">transpose=<span class="attribute-value">"4"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</code></pre>
-        <scribe-music class="9x @1-x2 @1-7x @3-6x" clef="piano" src="./data/ae-fond-kiss.json" transpose="4"></scribe-music>
+        <scribe-music class="9x @1-x2 @1-7x @3-6x" staff="piano" src="./data/ae-fond-kiss.json" transpose="4"></scribe-music>
 
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">There are more examples on <a href="https://the-dots.app">the-dots.app</a>.</p>
 
@@ -632,7 +632,7 @@
         The result renders as:
         </p>
 
-        <scribe-music class="9x @1-x2 @1-7x @3-6x" clef="treble" src="#dolphin-dance-intro"></scribe-music>
+        <scribe-music class="9x @1-x2 @1-7x @3-6x" staff="treble" src="#dolphin-dance-intro"></scribe-music>
 
         <div class="x-sub-grid y-start-grid grid 9x @1-x2 @1-8x @3-x2 @3-3x">
             <h3 class="font-03 darkpink-fg 9x @1-6x @2-5x @3-3x">Events</h3>
@@ -739,7 +739,7 @@
             </p>
 
             <script type="application/json" id="dolphin-dance-intro-transformed">{"name":"Dolphin Dance","events":[[0,"key","Eb"],[0,"meter",4,1],[0,"sequence",1,0,16,"transpose",-3,"rate",2]],"sequences":[{"id":1,"name":"Intro","events":[[0,"chord",3,"∆",4],[2,"note",67,0.1,0.5],[2.5,"note",68,0.1,0.5],[3,"note",70,0.1,0.5],[3.5,"note",65,0.1,3.5],[4,"chord",10,"-",4],[8,"chord",3,"∆",4],[10,"note",67,0.1,0.5],[10.5,"note",68,0.1,0.5],[11,"note",70,0.1,0.5],[11.5,"note",65,0.1,3.5],[12,"chord",2,"ø",2],[14,"chord",7,"7alt",2]]}]}</script>
-            <scribe-music class="9x @1-7x @3-4x" clef="treble" src="#dolphin-dance-intro-transformed"></scribe-music>
+            <scribe-music class="9x @1-7x @3-4x" staff="treble" src="#dolphin-dance-intro-transformed"></scribe-music>
 
             <p class="9x @1-6x @2-5x @3-3x">
             Notice that all 16 beats are still rendered – the duration of the event itself is not transformed – but the rate of the melody is transposed down a minor third and is twice as fast.
@@ -785,7 +785,7 @@
         Scribe is laid out using flex and grid, sized in relative font sizes, and generally embraces the flow of the web, making it very readable.
         And because it's all CSS it's highly&nbsp;customisable.
         </p>
-        <scribe-music class="x2 no-wrap" clef="treble" src="./data/blue-in-green.json"></scribe-music>
+        <scribe-music class="x2 no-wrap" staff="treble" src="./data/blue-in-green.json"></scribe-music>
         <pre class="x2">mix-blend-mode: color-dodge;</pre>
     </section-->
 
@@ -812,25 +812,25 @@
             <h3 class="petaluma-font">Petaluma</h3>
             <pre>font-family: Petaluma, PetalumaText;</pre>
         </div>
-        <scribe-music class="9x @1-x2 @1-8x @2-x1 @2-4x @2-y5 @2-2y y-start petaluma-font" clef="piano" transpose="3" src="#a-fond"></scribe-music>
+        <scribe-music class="9x @1-x2 @1-8x @2-x1 @2-4x @2-y5 @2-2y y-start petaluma-font" staff="piano" transpose="3" src="#a-fond"></scribe-music>
 
         <div class="9x @1-x2 @1-8x @2-x5 @2-4x @2-y5">
             <h3 class="bravura-font">Bravura</h3>
             <pre>font-family: Bravura, BravuraText;</pre>
         </div>
-        <scribe-music class="9x @1-x2 @1-8x @2-x5 @2-4x @2-y6 @2-2y y-start bravura-font" clef="piano" transpose="3" src="#fare-thee"></scribe-music>
+        <scribe-music class="9x @1-x2 @1-8x @2-x5 @2-4x @2-y6 @2-2y y-start bravura-font" staff="piano" transpose="3" src="#fare-thee"></scribe-music>
 
         <div class="9x @1-x2 @1-8x @2-x2 @2-4x @2-y10">
             <h3 class="broadway-font">Broadway</h3>
             <pre>font-family: Broadway, BroadwayText;</pre>
         </div>
-        <scribe-music class="9x @1-x2 @1-8x @2-x2 @2-4x @2-y8 @2-2y y-start broadway-font" clef="piano" transpose="3" src="#thine-be"></scribe-music>
+        <scribe-music class="9x @1-x2 @1-8x @2-x2 @2-4x @2-y8 @2-2y y-start broadway-font" staff="piano" transpose="3" src="#thine-be"></scribe-music>
 
         <div class="9x @1-x2 @1-8x @2-x6 @2-4x @2-y8">
             <h3 class="ash-font">Ash</h3>
             <pre>font-family: Ash, AshText;</pre>
         </div>
-        <scribe-music class="9x @1-x2 @1-8x @2-x6 @2-4x @2-y9 @2-2y y-start ash-font" clef="piano" transpose="3" src="#where-in"></scribe-music>
+        <scribe-music class="9x @1-x2 @1-8x @2-x6 @2-4x @2-y9 @2-2y y-start ash-font" staff="piano" transpose="3" src="#where-in"></scribe-music>
     </section>
 
     <section class="status-section 9x-grid grid">

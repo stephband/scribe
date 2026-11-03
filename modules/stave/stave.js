@@ -1,27 +1,27 @@
 
 //import get                   from 'fn/get.js';
 import nothing               from 'fn/nothing.js';
-import { noteNames, toNoteName, toNoteNumber, toNoteOctave, toRootNumber } from 'midi/note.js';
-import mod12                 from 'sequence/modules/number/mod-12.js';
+import { toNoteName, toNoteNumber } from 'midi/note.js';
 import toStopBeat            from '../event/to-stop-beat.js';
-import { ceilPow2 }          from '../number/power-of-2.js';
 import grainOfBeat           from '../bar/grain-of-beat.js';
 import { createAccents }     from '../symbol/accent.js';
 import { createAccidentals } from '../symbol/accidental.js';
 import { createLedges }      from '../symbol/ledge.js';
 import { createNotes }       from '../symbol/note.js';
+import { createTies }        from '../symbol/tie.js';
 import { getDivisionBefore } from '../bar/divisions.js';
 import { accidentalsFromKey } from '../accidentals.js';
 import { toKeyNumber }       from 'sequence/modules/event/key.js';
-import { rrootname, rpitch, rflatsharp, accidentalChars, fathercharles } from '../pitch.js';
+import { rflatsharp, accidentalChars, fathercharles } from '../pitch.js';
 import config                from '../config.js';
 import * as glyphs           from "../glyphs.js";
-import { GR as ratio }       from '../constants.js';
+import { GR }                from '../constants.js';
 
 
 const DEBUG = globalThis.DEBUG;
-const { floor, min } = Math;
-
+const { floor } = Math;
+const ratio = GR;
+/*
 const keys = {
     //                                             C      D       E  F      G      A       B
     '-8': { name: 'F♭', symbol: 'F♭∆', spellings: [0, -1, 0, -1, -1, 0, -1, 0, -1, -2, -1, -1] },
@@ -42,7 +42,7 @@ const keys = {
     '7':  { name: 'C♯', symbol: 'C♯∆', spellings: [1,  1, 0,  1,  2, 1,  1, 0,  1, 0,  1,  2] }, // (Should have G##?)
     '8':  { name: 'G♯', symbol: 'G♯∆', spellings: [1,  1, 0,  1,  2, 1,  1, 2,  1, 0,  1,  2] }
 };
-
+*/
 const noteDurations = [
     0.125,
     0.25,  0.375,
@@ -325,7 +325,7 @@ export default class Stave {
         return symbols.concat(this.createKeySymbols(keyEvent));
     }
 
-    createNoteSymbols(symbols, bar, voice, accidentals, notes, beat, duration, settings, staccato = false) {
+    createNoteSymbols(symbols, bar, voice, accidentals, notes, beat, duration, settings, staccato = false, tolerance = 0.125) {
         // Create note heads
         const noteSymbols = createNotes(this, bar.key, voice, notes, beat, duration, staccato);
         // Notes may not appear on stave in which case noteSymbols will be empty
@@ -336,6 +336,8 @@ export default class Stave {
         createAccents(symbols, this, voice, beat, noteSymbols, settings);
         // Push in note heads
         symbols.push.apply(symbols, noteSymbols);
+        // Create ties and splice finished notes out of notes
+        createTies(symbols, bar, voice, notes, noteSymbols, tolerance);
         // Return symbols
         return noteSymbols;
     }
@@ -490,7 +492,7 @@ export default class Stave {
             // Double-dotted 1.75g
             if (g >= 0.5                                          // The second dot is at least a 32nd note
                 && 2 * g <= grain                                 // Never start a double-dotted note on a weaker off-beat grain
-                && b > b1 + (1 + ratio) * g                       // Duration passes the double-dotted threshold
+                && b > b1 + (b2 !== d2 && b1 + 1.75 * g === b2 ? 1.75 * ratio : 1 + ratio) * g // Duration passes the double-dotted threshold (or fills non-division window b2)
                 && b1 + 1.75 * g <= b2                            // Fits within the available window
                 && grainOfBeat(bar.divisions, b1 + 1.5 * g) === 0.5 * g  // The first dot is an internal subdivision rather than a bar division
             ) {
@@ -501,13 +503,13 @@ export default class Stave {
             // Dotted 1.5g
             if (g >= 0.25                                         // The dot is at least a 32nd note
                 && 0.5 * g <= grain                               // The dot is never coarser than the beat it starts on
-                && b > b1 + (1 + 0.5 * ratio) * g                 // Duration passes the dotted threshold
+                && b > b1 + (b2 !== d2 && b1 + 1.5 * g === b2 ? 1.5 * ratio : 1 + 0.5 * ratio) * g // Duration passes the dotted threshold (or fills non-division window b2)
                 && (g <= grain || b <= b1 + (1 + ratio) * g)      // On a weaker beat, do not overshoot into a note that still needs a tie
                 && b1 + 1.5 * g <= b2                             // Fits within the available window
-                && (grainOfBeat(bar.divisions, b1 + 1.5 * g) > g  // Either lands on a stronger division
-                    || (2 * g <= grain && (                       // Or subdivides a beat...
-                        b1 + 1.5 * g === b2                       // ...and stops at the end of the window
-                        || (b1 + 2 * g <= b2 && grainOfBeat(bar.divisions, b1 + 2 * g) >= 2 * g) // ...or its enclosing 2g unit does not cross a division
+                && (grainOfBeat(bar.divisions, b1 + 1.5 * g) > g  // Either lands on a stronger division...
+                    || (2 * g <= grain && (                       // or subdivides a beat...
+                        b1 + 1.5 * g === b2                       // and stops at the end of the window...
+                        || (b1 + 2 * g <= b2 && grainOfBeat(bar.divisions, b1 + 2 * g) >= 2 * g) // or its enclosing 2g unit does not cross a division
                     ))
                 )
             ) {
