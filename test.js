@@ -1,1 +1,2 @@
-import './test/rhythm.js';
+import './test/rhythm-eplmq.js';
+import './test/duration.js';

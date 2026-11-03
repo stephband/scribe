@@ -14,7 +14,7 @@ import config                 from '../modules/config.js';
 
 const assign = Object.assign;
 
-Deno.test('stave.createDupletNoteSymbols() - notes at 0 in 4/4 bar', () => {
+Deno.test('Notes at 0 in 4/4 bar', () => {
     const stave       = Stave.treble;
     const voice       = stave.voices[0];
     const accidentals = accidentalsFromKey(0);
@@ -41,7 +41,7 @@ Deno.test('stave.createDupletNoteSymbols() - notes at 0 in 4/4 bar', () => {
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0, 'note', 60, 0.1, 1/8]), { pitchSpelling: 'C4' })], 0, 4, config), [{ beat: 0, duration: 0.25, staccato: true }]); // 32nd
 });
 
-Deno.test('stave.createDupletNoteSymbols() - notes at 0 in 4/4 bar, analysis window set to duration', () => {
+Deno.test('Notes at 0 in 4/4 bar, analysis window set to duration', () => {
     const stave       = Stave.treble;
     const voice       = stave.voices[0];
     const accidentals = accidentalsFromKey(0);
@@ -68,7 +68,7 @@ Deno.test('stave.createDupletNoteSymbols() - notes at 0 in 4/4 bar, analysis win
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0, 'note', 60, 0.1, 1/8]), { pitchSpelling: 'C4' })], 0, 1/8, config), [{ beat: 0, duration: 1/8 }]);  // 32nd
 });
 
-Deno.test('stave.createDupletNoteSymbols() - notes stopping at end of 4/4 bar', () => {
+Deno.test('Notes stopping at end of 4/4 bar', () => {
     const stave       = Stave.treble;
     const voice       = stave.voices[0];
     const accidentals = accidentalsFromKey(0);
@@ -96,7 +96,7 @@ Deno.test('stave.createDupletNoteSymbols() - notes stopping at end of 4/4 bar', 
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([4 - 1/8, 'note', 60, 0.1, 1/8]), { pitchSpelling: 'C4' })], 4 - 1/8, 4, config), [{ beat: 4 - 1/8, duration: 1/8 }]);   // 32nd
 });
 
-Deno.test('stave.createDupletNoteSymbols() - notes at 0 in 3/4 bar', () => {
+Deno.test('Notes at 0 in 3/4 bar', () => {
     const stave       = Stave.treble;
     const voice       = stave.voices[0];
     const accidentals = accidentalsFromKey(0);
@@ -123,7 +123,7 @@ Deno.test('stave.createDupletNoteSymbols() - notes at 0 in 3/4 bar', () => {
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0, 'note', 60, 0.1, 1/8]), { pitchSpelling: 'C4' })], 0, 3, config), [{ beat: 0, duration: 0.25, staccato: true }]); // 32nd
 });
 
-Deno.test('stave.createDupletNoteSymbols() - notes at 0 in 3/4 bar, analysis window set to duration', () => {
+Deno.test('Notes at 0 in 3/4 bar, analysis window set to duration', () => {
     const stave       = Stave.treble;
     const voice       = stave.voices[0];
     const accidentals = accidentalsFromKey(0);
@@ -150,7 +150,7 @@ Deno.test('stave.createDupletNoteSymbols() - notes at 0 in 3/4 bar, analysis win
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0, 'note', 60, 0.1, 1/8]), { pitchSpelling: 'C4' })], 0, 1/8, config), [{ beat: 0, duration: 1/8 }]);  // 32nd
 });
 
-Deno.test('stave.createDupletNoteSymbols() - notes at 0.5 in 3/4 bar', () => {
+Deno.test('Notes at 0.5 in 3/4 bar', () => {
     const stave       = Stave.treble;
     const voice       = stave.voices[0];
     const accidentals = accidentalsFromKey(0);
@@ -175,7 +175,7 @@ Deno.test('stave.createDupletNoteSymbols() - notes at 0.5 in 3/4 bar', () => {
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0.5, 'note', 60, 0.1, 1/8]), { pitchSpelling: 'C4' })], 0.5, 3, config), [{ beat: 0.5, duration: 0.25, staccato: true }]); // 32nd
 });
 
-Deno.test('stave.createDupletNoteSymbols() - notes at 0 in 6/8 bar', () => {
+Deno.test('Notes at 0 in 6/8 bar', () => {
     const stave       = Stave.treble;
     const voice       = stave.voices[0];
     const accidentals = accidentalsFromKey(0);
@@ -202,7 +202,7 @@ Deno.test('stave.createDupletNoteSymbols() - notes at 0 in 6/8 bar', () => {
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0, 'note', 60, 0.1, 1/8]), { pitchSpelling: 'C4' })], 0, 3, config), [{ beat: 0, duration: 0.25, staccato: true }]); // 32nd
 });
 
-Deno.test('stave.createDupletNoteSymbols() - notes at 0 in 6/8 bar, analysis window set to duration', () => {
+Deno.test('Notes at 0 in 6/8 bar, analysis window set to duration', () => {
     const stave       = Stave.treble;
     const voice       = stave.voices[0];
     const accidentals = accidentalsFromKey(0);
@@ -229,7 +229,7 @@ Deno.test('stave.createDupletNoteSymbols() - notes at 0 in 6/8 bar, analysis win
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0, 'note', 60, 0.1, 1/8]), { pitchSpelling: 'C4' })], 0, 1/8, config), [{ beat: 0, duration: 1/8 }]);  // 32nd
 });
 
-Deno.test('stave.createDupletNoteSymbols() - notes at 0.5 in 6/8 bar', () => {
+Deno.test('Notes at 0.5 in 6/8 bar', () => {
     const stave       = Stave.treble;
     const voice       = stave.voices[0];
     const accidentals = accidentalsFromKey(0);
@@ -254,7 +254,7 @@ Deno.test('stave.createDupletNoteSymbols() - notes at 0.5 in 6/8 bar', () => {
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0.5, 'note', 60, 0.1, 1/8]), { pitchSpelling: 'C4' })], 0.5, 3, config), [{ beat: 0.5, duration: 0.25, staccato: true }]); // 32nd
 });
 
-Deno.test('stave.createDupletNoteSymbols() - notes at 0 in 7/8 bar', () => {
+Deno.test('Notes at 0 in 7/8 bar', () => {
     const stave       = Stave.treble;
     const voice       = stave.voices[0];
     const accidentals = accidentalsFromKey(0);
@@ -281,7 +281,7 @@ Deno.test('stave.createDupletNoteSymbols() - notes at 0 in 7/8 bar', () => {
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0, 'note', 60, 0.1, 1/8]), { pitchSpelling: 'C4' })], 0, 3.5, config), [{ beat: 0, duration: 0.25, staccato: true }]); // 32nd
 });
 
-Deno.test('stave.createDupletNoteSymbols() - notes at 0 in 7/8 bar, analysis window set to duration', () => {
+Deno.test('Notes at 0 in 7/8 bar, analysis window set to duration', () => {
     const stave       = Stave.treble;
     const voice       = stave.voices[0];
     const accidentals = accidentalsFromKey(0);
@@ -308,7 +308,7 @@ Deno.test('stave.createDupletNoteSymbols() - notes at 0 in 7/8 bar, analysis win
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0, 'note', 60, 0.1, 1/8]), { pitchSpelling: 'C4' })], 0, 1/8, config), [{ beat: 0, duration: 1/8 }]);  // 32nd
 });
 
-Deno.test('stave.createDupletNoteSymbols() - notes at 0.5 in 7/8 bar', () => {
+Deno.test('Notes at 0.5 in 7/8 bar', () => {
     const stave       = Stave.treble;
     const voice       = stave.voices[0];
     const accidentals = accidentalsFromKey(0);
@@ -333,7 +333,7 @@ Deno.test('stave.createDupletNoteSymbols() - notes at 0.5 in 7/8 bar', () => {
     matches(stave.createDupletNoteSymbols([], bar, voice, accidentals, [assign(Event.from([0.5, 'note', 60, 0.1, 1/8]), { pitchSpelling: 'C4' })], 0.5, 3.5, config), [{ beat: 0.5, duration: 0.25, staccato: true }]); // 32nd
 });
 
-Deno.test('stave.createDupletNoteSymbols() - notes at 2 in 7/8 bar', () => {
+Deno.test('Notes at 2 in 7/8 bar', () => {
     const stave       = Stave.treble;
     const voice       = stave.voices[0];
     const accidentals = accidentalsFromKey(0);
