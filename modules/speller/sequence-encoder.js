@@ -7,7 +7,7 @@ import { accidentalToTpc, classToKey, inKeyToClass, keyToClass, NUM_IN_KEYS, tpc
 
 export const FEATURE_DIM = 24 + NUM_IN_KEYS; // 39 (12 pitch class + 4 duration + 8 delta + 15 key)
 
-const rslashbass = /\/\{(\d{1,2})\}$/;
+const rslashextension = /^\{(\d{1,2})\}/;
 
 /**
  * Maps arbitrary continuous duration in beats to a 4-bucket index [0..3]:
@@ -210,16 +210,16 @@ export function decodePredictions(accidentals, keys, notes) {
             const hsid      = typeof event[3] === "number" ? event[3] : toChordHSID(event[3]);
             const numbers   = hsidToNumbers(hsid);
             const extension = event.extension ?? toChordName(hsid);
-            const slashbass = rslashbass.exec(extension);
+            const slashext  = rslashextension.exec(extension);
             const tpc       = accidentalToTpc(accidentals[t], root);
 
             event.tpc         = tpc;
             event.keySpelling = classToKey(keys[t]);
 
-            if (slashbass) {
-                const n       = parseInt(slashbass[1], 10);
-                const k       = numbers.indexOf(12 - n);
-                const rootNum = (root + 12 - n) % 12;
+            if (slashext) {
+                const n       = parseInt(slashext[1], 10);
+                const k       = numbers.indexOf(n);
+                const rootNum = (root + n) % 12;
                 const rootTpc = accidentalToTpc(accidentals[t + (k > -1 ? k : 0)], rootNum);
                 event.rootSpelling = tpcToSpelledRoot(rootTpc);
                 event.bassSpelling = tpcToSpelledRoot(tpc);

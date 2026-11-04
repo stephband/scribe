@@ -82,13 +82,13 @@
     --signature-gap: 0.1875em;
 
 
-    position: relative;
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    column-gap: 0;
-    row-gap: 3em;
-    align-content: start;
+    position: relative !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    flex-direction: row !important;
+    column-gap: 0 !important;
+    row-gap: 3em !important;
+    align-content: start !important;
 
     /* Encourage scribe not to stretch vertically when in a grid context – it
        exposes signature staves. Hmm, no don't do this, it causes problems when
@@ -96,13 +96,14 @@
     /* align-self: start; */
 
     /* Make sure bars do not stretch vertically */
-    align-items: start;
+    align-items: start !important;
     z-index: 1;
 
     height: auto;
-    padding-top: 1em;
-    padding-bottom: 1em;
-    padding-left: calc(var(--signature-width) - 1px);
+    padding-top: 1em !important;
+    padding-bottom: 1em !important;
+    padding-left: calc(var(--signature-width) - 1px) !important;
+    padding-right: 0 !important;
 }
 
 :host::after,
@@ -119,14 +120,14 @@
 
 :host > .side,
 .scribe > .side {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    display: grid;
-    row-gap: inherit;
-    padding-top: 1em;
-    min-width: var(--signature-width);
+    position: absolute !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    display: grid !important;
+    row-gap: inherit !important;
+    padding-top: 1em !important;
+    min-width: var(--signature-width) !important;
     grid-column: 1;
     grid-row: 1;
     justify-self: stretch;

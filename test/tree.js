@@ -68,6 +68,42 @@ Deno.test('quantise chords with minDivision 1/3 and primes [2, 3]', async () => 
     is(chordSymbols[1].beat, 0.5);
 });
 
+Deno.test('symbolise slash chords with new extension format {n}/', async () => {
+    const sequence = new Sequence([
+        [0, "key", "C"],
+        [0, "meter", 4, 1],
+        [0, "chord", "E", "{8}/", 2],
+        [2, "chord", "B", "{8}7/", 2]
+    ]);
+    const tree = await createTree(sequence);
+    assert(tree[0]);
+    const part = tree[0][0];
+    const chordSymbols = part.symbols.filter((s) => s.type === 'chord');
+    is(chordSymbols.length, 2);
+    is(chordSymbols[0].beat, 0);
+    is(chordSymbols[0].name, 'C/E');
+    is(chordSymbols[1].beat, 2);
+    is(chordSymbols[1].name, 'G7/B');
+});
+
+Deno.test('symbolise slash chords from chord symbol strings', async () => {
+    const sequence = new Sequence([
+        [0, "key", "C"],
+        [0, "meter", 4, 1],
+        [0, "chord", "C/E", 2],
+        [2, "chord", "G7/B", 2]
+    ]);
+    const tree = await createTree(sequence);
+    assert(tree[0]);
+    const part = tree[0][0];
+    const chordSymbols = part.symbols.filter((s) => s.type === 'chord');
+    is(chordSymbols.length, 2);
+    is(chordSymbols[0].beat, 0);
+    is(chordSymbols[0].name, 'C/E');
+    is(chordSymbols[1].beat, 2);
+    is(chordSymbols[1].name, 'G7/B');
+});
+
 Deno.test('DrumStave delegates spelling directly without RNN speller', async () => {
     const sequence = new Sequence([
         [0, "key", "D"],

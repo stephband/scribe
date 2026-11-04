@@ -190,6 +190,10 @@ function metricQuantise(settings, sequence, parts, spellables, buffers, tree) {
                 break;
 
             case "key": {
+                // Ignore redundant key events that do not change the key
+                if (keyEvents.length && keyEvents[keyEvents.length - 1][2] === event[2]) {
+                    break;
+                }
                 if (event[0] !== bar.beat) throw new Error(`Scribe "key" event at beat ${ event[0] } not at start of bar at beat ${ bar.beat }`);
                 bar.keyEvent = event;
                 bar.key = event[2];
@@ -354,7 +358,7 @@ function updateBeamWithNoteSymbols(symbols, bar, stave, voice, beam, noteSymbols
 
 // Symbolise
 
-const rslashbass = /\/\{(\d{1,2})\}$/;
+const rslashextension = /^\{(\d{1,2})\}/;
 
 function substituteSpelling(settings, name) {
     if (name === 'C♭' && settings.spellChordRootCFlatAsB)  return 'B';
@@ -373,8 +377,8 @@ function symboliseChords(settings, bar, stave, symbols, voice) {
             const extension = event.extension;
             const root      = substituteSpelling(settings, event.rootSpelling);
             const name      = event.bassSpelling ?
-                root + extension.replace(rslashbass, '/' + substituteSpelling(settings, event.bassSpelling)) :
-                root + extension ;
+                extension.replace(rslashextension, root) + substituteSpelling(settings, event.bassSpelling) :
+                root ? root + extension : (event.toChordSymbol ? event.toChordSymbol(bar.key) : event.root + extension);
 
             symbols.push({
                 type: 'chord',
