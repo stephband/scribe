@@ -357,6 +357,24 @@ Deno.test('PLL spring state (drift) is preserved across bar boundaries', async (
     is(firstTupletBar1.drift, lastTupletBar0.driftOut);
 });
 
+Deno.test('Meterless sequence renders as a single bar containing all notes', async () => {
+    const sequence = new Sequence([
+        [0, "note", 60, 0.1, 1],
+        [1, "note", 62, 0.1, 1],
+        [2, "note", 64, 0.1, 1]
+    ]);
+
+    const tree = await createTree(sequence);
+    is(1, Object.keys(tree).length, 'Tree has exactly one bar');
+    is(3, tree[0].duration, 'Bar duration spans all notes');
+    is(tree[0].divisions[0], 3, 'Bar divisions end at bar duration');
+    is(undefined, tree[0].meterEvent, 'Bar has no meterEvent');
+
+    const part = tree[0][0];
+    const notes = part.symbols.filter((s) => s.type === 'note');
+    is(3, notes.length, 'All notes rendered in the single bar');
+});
+
 
 
 

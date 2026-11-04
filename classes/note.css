@@ -125,6 +125,55 @@ Stems
 }
 
 
+/* Accents
+
+
+export const accentUp        = '&#xE4A0;';
+export const accentDown      = '&#xE4A1;';
+export const staccatoUp      = '&#xE4A2;';
+export const staccatoDown    = '&#xE4A3;';
+export const tenutoUp        = '&#xE4A4;';
+export const tenutoDown      = '&#xE4A5;';
+export const marcatoUp       = '&#xE4AC;';
+export const marcatoDown     = '&#xE4AD;';
+*/
+
+.up-note.bottom-note.staccato-note::after,
+.down-note.top-note.staccato-note::after {
+    justify-self: center;
+    align-self: center;
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.up-note.bottom-note.staccato-note::after {
+    content: '\E4A3';
+    margin-top: 0.375em;
+}
+
+.down-note.top-note.staccato-note::after {
+    content: '\E4A2';
+    margin-bottom: 0.5em;
+}
+
+.up-note.bottom-note.tenuto-note::after,
+.down-note.top-note.tenuto-note::after {
+    justify-self: center;
+    align-self: center;
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.up-note.bottom-note.tenuto-note::after {
+    content: '\E4A5';
+    margin-top: 0.375em;
+}
+
+.down-note.top-note.tenuto-note::after {
+    content: '\E4A4';
+    margin-bottom: 0.5em;
+}
+
 /*
 Flags
 */

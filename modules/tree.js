@@ -214,6 +214,10 @@ function metricQuantise(settings, sequence, parts, spellables, buffers, tree) {
 
             case "note":
             case "chord": {
+                // Extend stop beat
+                const endBeat = toStopBeat(event);
+                if (endBeat > stopBeat) stopBeat = endBeat;
+
                 const partName  = toPartName(settings, event);
                 const part      = getPart(settings, bar, partName);
                 const voiceName = toVoice(settings, part.stave, event);
@@ -281,15 +285,13 @@ function metricQuantise(settings, sequence, parts, spellables, buffers, tree) {
         }
     }
 
-    // If no meter was declared this is a bar with indeterminate duration,
-    // but we do need to know how much duration to render so get it from the
-    // last event: TODO: check all events, the last may not be the longest
-//    if (bar.beat + bar.duration > stopBeat) {
-//        bar.duration = stopBeat - bar.beat;
-//        duration = events.length ?
-//            toStopBeat(events[events.length - 1]) :
-//            1 ;
-//    }
+    // If no meter was declared this is a bar with indeterminate duration.
+    // Set duration to contain all notes in a single bar.
+    if (!bar.divisions) {
+        bar.duration  = stopBeat - bar.beat;
+        bar.divisor   = 1;
+        bar.divisions = [bar.duration];
+    }
 
     // Create bars up to stop beat or while voices still has events
     while (stopBeat > bar.beat + bar.duration) {

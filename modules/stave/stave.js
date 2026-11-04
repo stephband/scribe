@@ -21,28 +21,6 @@ import { GR }                from '../constants.js';
 const DEBUG = globalThis.DEBUG;
 const { floor } = Math;
 const ratio = GR;
-/*
-const keys = {
-    //                                             C      D       E  F      G      A       B
-    '-8': { name: 'F♭', symbol: 'F♭∆', spellings: [0, -1, 0, -1, -1, 0, -1, 0, -1, -2, -1, -1] },
-    '-7': { name: 'C♭', symbol: 'C♭∆', spellings: [0, -1, 0, -1, -1, 0, -1, 0, -1, 0, -1, -1] },  // (Should have Ebb?)
-    '-6': { name: 'G♭', symbol: 'G♭∆', spellings: [0, -1, 0, -1, -1, 0, -1, 0, -1, 0, -1, -1] },  // (Should have Ebb?)
-    '-5': { name: 'D♭', symbol: 'D♭∆', spellings: [0, -1, 0, -1, -1, 0, -1, 0, -1, 0, -1, -1] },
-    '-4': { name: 'A♭', symbol: 'A♭∆', spellings: [0, -1, 0, -1, -1, 0, -1, 0, -1, 0, -1, -1] },
-    '-3': { name: 'E♭', symbol: 'E♭∆', spellings: [0, -1, 0, -1,  0, 0, -1, 0, -1, 0, -1, -1] },
-    '-2': { name: 'B♭', symbol: 'B♭∆', spellings: [0, -1, 0, -1,  0, 0, -1, 0, -1, 0, -1,  0] },
-    '-1': { name: 'F',  symbol: 'F∆',  spellings: [0, -1, 0, -1,  0, 0,  1, 0, -1, 0, -1,  0] },
-    '0':  { name: 'C',  symbol: 'C∆',  spellings: [0,  1, 0, -1,  0, 0,  1, 0, -1, 0, -1,  0] },
-    '1':  { name: 'G',  symbol: 'G∆',  spellings: [0,  1, 0, -1,  0, 0,  1, 0,  1, 0, -1,  0] },
-    '2':  { name: 'D',  symbol: 'D∆',  spellings: [0,  1, 0,  1,  0, 0,  1, 0,  1, 0, -1,  0] },
-    '3':  { name: 'A',  symbol: 'A∆',  spellings: [0,  1, 0,  1,  0, 0,  1, 0,  1, 0,  1,  0] },
-    '4':  { name: 'E',  symbol: 'E∆',  spellings: [0,  1, 0,  1,  0, 1,  1, 0,  1, 0,  1,  0] },
-    '5':  { name: 'B',  symbol: 'B∆',  spellings: [1,  1, 0,  1,  0, 1,  1, 0,  1, 0,  1,  0] },
-    '6':  { name: 'F♯', symbol: 'F♯∆', spellings: [1,  1, 0,  1,  2, 1,  1, 0,  1, 0,  1,  0] }, // (Should have G##?)
-    '7':  { name: 'C♯', symbol: 'C♯∆', spellings: [1,  1, 0,  1,  2, 1,  1, 0,  1, 0,  1,  2] }, // (Should have G##?)
-    '8':  { name: 'G♯', symbol: 'G♯∆', spellings: [1,  1, 0,  1,  2, 1,  1, 2,  1, 0,  1,  2] }
-};
-*/
 const noteDurations = [
     0.125,
     0.25,  0.375,
@@ -94,7 +72,7 @@ export default class Stave {
     `duration`. For normal chromatic staves only `duration` really matters, but
     percussion staves may replace heads based on pitch and dynamics.
     **/
-    getNoteHTML(pitch, dynamic, duration) {
+    getNoteHTML(pitch, dynamic, duration, staccato, tenuto) {
         const number = toNoteNumber(pitch);
         const name   = this.getGlyphName(number, dynamic, duration);
         return dynamic < config.ghostThreshold ? `
@@ -201,80 +179,6 @@ export default class Stave {
             name ;
     }
 
-    /**
-    .getSpelling(pitch, key, withOctave)
-    Gets spelling of a given pitch. Returns a pitch name string.
-    **/
-/*    getSpelling(pitch, key = 0, withOctave = false) {
-        const keyData = keys[key];
-
-        if (!withOctave) {
-            if (typeof pitch === 'string') {
-                const match = rrootname.exec(pitch);
-                if (match) {
-                    const [, letter, accidental] = match;
-                    const acc =
-                        accidental === '##' || accidental === '𝄪' ? '𝄪' :
-                        accidental === 'bb' || accidental === '𝄫' ? '𝄫' :
-                        accidental === '#'  || accidental === '♯' ? '♯' :
-                        accidental === 'b'  || accidental === '♭' ? '♭' :
-                        (accidental || '');
-                    return letter + acc;
-                }
-            }
-            const n = toRootNumber(pitch);
-            const a = keyData.spellings[n];
-            return noteNames[mod12(n - a)] + accidentalChars[a];
-        }
-
-        let n, a, o;
-
-        if (typeof pitch === 'string') {
-            // [BRANCH 2026-spelling]: If pitch is already an explicit note string (e.g. "C#4", "Db4", "C4"),
-            // preserve its spelling rather than deconstructing to MIDI and re-spelling via keyData.spellings.
-            // Normalize ASCII '#' -> '♯', 'b' -> '♭', '##' -> '𝄪', 'bb' -> '𝄫'.
-            const match = rpitch.exec(pitch);
-            if (match) {
-                const [, letter, accidental, octave] = match;
-                if (octave !== undefined) {
-                    const acc =
-                        accidental === '##' || accidental === '𝄪' ? '𝄪' :
-                        accidental === 'bb' || accidental === '𝄫' ? '𝄫' :
-                        accidental === '#'  || accidental === '♯' ? '♯' :
-                        accidental === 'b'  || accidental === '♭' ? '♭' :
-                        (accidental || '');
-                    return letter + acc + octave;
-                }
-            }
-
-            /* --- ORIGINAL CODE START (preserved for easy rollback) ---
-            let [notename, letter, accidental, octave] = rpitch.exec(pitch) || [pitch];
-            if (octave) {
-                // pitch is note name like "C4", deconstruct it and put it back together
-                n = toNoteNumber(pitch);
-                a = keyData.spellings[mod12(n)];
-                o = toNoteOctave(n - a);
-            }
-            --- ORIGINAL CODE END --- * /
-        }
-        else {
-            // pitch is a number
-            n = pitch;
-            a = keyData.spellings[mod12(n)];
-            o = toNoteOctave(n - a);
-        }
-
-        // key.spellings makes sure name is a natural note name
-        const name = noteNames[mod12(n - a)];
-        const accidental = accidentalChars[a];
-
-        if (DEBUG && name === undefined) {
-            throw new Error('Incorrect spelling for pitch number ' + n + ': "' + name + '"');
-        }
-
-        return name + accidental + o;
-    }
-*/
     createKeySymbols(event) {
         if (!this.pitched) return [];
 
@@ -341,123 +245,7 @@ export default class Stave {
         // Return symbols
         return noteSymbols;
     }
-/*
-    createDupletNoteSymbols1(symbols, bar, voice, accidentals, notes, startBeat, stopBeat, settings) {
-        const b1    = startBeat - bar.beat;
-        const b2    = stopBeat  - bar.beat;
-        const grain = grainOfBeat(bar.divisions, b1);
-        const d1    = getDivisionBefore(bar.divisions, b1);
-        const d2    = getDivisionBefore(bar.divisions, b2);
 
-        let b = b1;
-
-        // Loop through notes
-        let i = -1;
-        while (notes[++i]) {
-            const b3 = toStopBeat(notes[i]) - bar.beat;
-            // If any are longer than the available space, set b to end of space
-            if (b3 >= b2) {
-                b = b2;
-                break;
-            }
-            // Set b to the end of the longest note
-            if (b3 > b)   {
-                b = b3;
-            }
-        }
-
-        let g = grain;
-        let staccato = false;
-
-        // If b1 and b2 are both bar divisions, the event duration passes the
-        // threshold to fill the space, and the space is a valid note duration
-        // ━━━━
-        //     ━━━━
-        // ━━━━━━━━
-        // ┃.❘.|.❘.┃.❘.|.❘.┃
-        if (b1 === d1 && b2 === d2 && b >= (b2 - bar.divisor + ratio * bar.divisor) && noteDurations.includes(b2 - b1)) {
-            b = b2;
-//console.log('start and stop on divisions', grain, b2 - b1);
-        }
-        // If event duration is longer than 5g and a (double dotted) 7g takes us
-        // to a more than a 4x grain before or at b2
-        //  ━━━━━━━
-        // ┃.❘.|.❘.┃.❘.|.❘.┃
-        else if (b > b1 + 5 * grain && b1 + 7 * grain <= b2 && grainOfBeat(bar.divisions, b1 + 7 * grain) > 4 * grain) {
-            b = b1 + 7 * grain;
-//console.log('4g..', grain, 7 * grain);
-        }
-        // Duration is longer than 2g and a dotted 3g takes us to a more than a
-        // 2x grain grain before or at b2
-        //  ━━━
-        // ┃.❘.|.❘.┃.❘.|.❘.┃
-        else if (b > b1 + 2 * grain && b1 + 3 * grain <= b2 && grainOfBeat(bar.divisions, b1 + 3 * grain) > 2 * grain) {
-            b = b1 + 3 * grain;
-//console.log('2g.', grain, 3 * grain);
-        }
-        // Duration is longer than 1.5g and a 2g takes us to a more than 1x grain
-        // grain before or at b2, which can happen if note ends on a bar division
-        //     ━━━━
-        // ┃.❘.|.❘.┃.❘.|.❘.┃
-        // QUESTIONABLE!!!!
-        else if (b > b1 + 1.5 * grain && b1 + 2 * grain <= b2 && grainOfBeat(bar.divisions, b1 + 2 * grain) > grain) {
-            b = b1 + 2 * grain;
-//console.log('2g', grain, 2 * grain);
-        }
-        // Duration is longer than (0.5 + 0.5 * ratio) * g (or ratio * g when g <= bar.divisor)
-        // and takes us before or at b2 (a 1g always takes us to a more than 1x grain)
-        //     ━━━━
-        // ┃.❘.|.❘.┃.❘.|.❘.┃
-        else if (b > b1 + (grain > bar.divisor ? (0.5 + 0.5 * ratio) : ratio) * grain && b1 + 1 * grain <= b2) {
-            b = b1 + grain;
-//console.log('1g', grain, grain);
-        }
-        // If b is not at stopBeat (so we are not butting up against the next
-        // event or bar end), duration is min(grain, bar.divisor) or less, and
-        // there is room: quantise to subdivisions with staccato
-        else if (b < b2 && b <= b1 + min(grain, bar.divisor) && b1 + min(grain, bar.divisor) <= b2) {
-            const maxD = min(grain, bar.divisor);
-            let d = 2 * maxD;
-
-            while ((d /= 2) >= 0.125 && b < b1 + ratio * d);
-            if (d < maxD) {
-                d *= 2;
-                staccato = true;
-            }
-
-            b = b1 + d;
-        }
-        // Loop through smaller grains down to a 32nd
-        else while ((g /= 2) >= 0.125) {
-            // Duration is longer than g double dotted, and g is an 8th or more
-            if (b > b1 + (1 + ratio) * g && g >= 0.5) {
-                if (b < b2 && b1 + 2 * g <= b2) {
-                    b = b1 + 2 * g;
-                    break;
-                }
-                if (b1 + 1.75 * g <= b2) {
-                    b = b1 + 1.75 * g;
-                    break;
-                }
-            }
-            // Duration is longer than g dotted, and g is an 16th or more
-            if (b > b1 + (1 + 0.5 * ratio) * g && g >= 0.25 && b1 + 1.5 * g <= b2) {
-                b = b1 + 1.5 * g;
-//console.log('g.', g, 1.5 * g);
-                break;
-            }
-            // Duration is longer than g
-            if (b > b1 + (0.5 + 0.5 * ratio) * g && b1 + g <= b2) {
-                b = b1 + g;
-//console.log('g', g, g);
-                break;
-            }
-        }
-
-        const duration = b - b1;
-        return this.createNoteSymbols(symbols, bar, voice, accidentals, notes, b1, duration, settings, staccato);
-    }
-*/
     createDupletNoteSymbols(symbols, bar, voice, accidentals, notes, startBeat, stopBeat, settings) {
         const b1    = startBeat - bar.beat;
         const b2    = stopBeat  - bar.beat;

@@ -252,7 +252,7 @@ const createSymbolElement = overload(get('type'), {
         });
     },
 
-    note: ({ stemup, top, bottom, clusterup, clusterdown, beam, stemHeight, stave, pitch, dynamic, duration, event, beat, voice }) => store(create('music-note', {
+    note: ({ stemup, top, bottom, clusterup, clusterdown, beam, stemHeight, stave, pitch, dynamic, duration, event, beat, voice, staccato, tenuto }) => store(create('music-note', {
         class: `${ stemup ? 'up-note ' : 'down-note ' }${ top ? 'top-note ' : '' }${ bottom ? 'bottom-note ' : '' }${
             // Stem up
             stemup ?
@@ -260,9 +260,9 @@ const createSymbolElement = overload(get('type'), {
                 clusterup % 2 === 1 ? 'cluster-note ' : '' :
                 // Stem down, top note cannot be clustered
                 clusterdown % 2 === 1 ? 'cluster-note ' : ''
-        }${ beam ? 'beam-note ' : '' }note`,
+        }${ beam ? 'beam-note ' : '' }${ staccato ? 'staccato-note ' : '' }${ tenuto ? 'tenuto-note ' : '' }note`,
         style: stemHeight ? `--stem-height: ${ stemHeight };` : undefined,
-        html:  stave.getNoteHTML(pitch, dynamic, duration),
+        html:  stave.getNoteHTML(pitch, dynamic, duration, staccato, tenuto),
         title: `${ event.pitchSpelling } (${ event[2] })`,
         beat:     truncate(4, beat),
         duration: truncate(4, duration),

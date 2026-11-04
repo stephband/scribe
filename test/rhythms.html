@@ -59,14 +59,54 @@
     <section class="grid" style="row-gap: 0;">
         <h3 class="x1 2x">Note durations</h3>
 
-        <scribe-music class="x1" staff="piano" src="#durations" swing>
-            <script type="sequence" id="overlap-1">{
+        <!--scribe-music class="x1" staff="piano" src="#durations" swing>
+            <script type="application/json" id="durations">{
                 "events": [
-                    [0,  "key",   0],
-                    [0,  "meter", 3, 1.5],
-                    [0,  "sequence", 2, 2, 6]
+                    [0,  "meter", 3, 0.5],
+                    [0,  "note",  68, 0.1, 0.0625],
+                    [3,  "note",  68, 0.1, 0.125],
+                    [6,  "note",  68, 0.1, 0.25],
+                    [9,  "note",  68, 0.1, 0.5],
+                    [12, "note",  68, 0.1, 1],
+                    [15, "note",  68, 0.1, 1.5]
                 ]
             }</script>
+        </scribe-music-->
+
+
+
+        <scribe-music class="x1 2x" staff="treble" src="#durations-2" meter="4/4">
+            <script type="text/sequence" id="durations-2">
+                0 C4 0.1 0.5
+                1 C4 0.1 0.9
+                2 C4 0.1 1
+                3 C4 0.1 0.4
+
+                4 A5 0.1 0.4
+                5 A5 0.1 0.9
+                6 A5 0.1 1
+                7 A5 0.1 0.5
+
+                8.0 C4 0.1 0.25
+                8.5 C4 0.1 0.45
+                9.0 C4 0.1 0.5
+                9.5 C4 0.1 0.25
+
+                12.0 A5 0.1 0.25
+                12.5 A5 0.1 0.45
+                13.0 A5 0.1 0.5
+                13.5 A5 0.1 0.25
+
+                16.00 C4 0.1 0.125
+                16.25 C4 0.1 0.2
+                16.50 C4 0.1 0.25
+                16.75 C4 0.1 0.125
+
+                18.00 A5 0.1 0.125
+                18.25 A5 0.1 0.2
+                18.50 A5 0.1 0.25
+                18.75 A5 0.1 0.125
+            </script>
         </scribe-music>
 
         <!--h3 class="x1 2x">Problematic rhythms</h3>

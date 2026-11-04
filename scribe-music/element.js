@@ -16,6 +16,13 @@ const define = Object.defineProperties;
 const shadowCSSUrl = new URL('shadow.css', import.meta.url);
 const stylesheet = Signal.of();
 
+function parseScript(script) {
+    const type = (script.type || script.getAttribute('type') || '').trim().split(';')[0].toLowerCase();
+    return type.endsWith('sequence') ?
+        Sequence.parse(script.textContent) :
+        Sequence.from(JSON.parse(script.textContent)) ;
+}
+
 
 /* Register <scribe-music> */
 
@@ -79,7 +86,7 @@ export default define(element('scribe-music', {
 
             const fragment = await renderDOM(
                 // Events from data
-                Sequence.from(internals.data.value),
+                internals.data.value,
                 // Key name
                 internals.key.value,
                 // Create an initial [0, "meter", ...] event
@@ -325,13 +332,13 @@ export default define(element('scribe-music', {
                         window.addEventListener('DOMContentLoaded', () => {
                             const script = findScript();
                             if (!script) throw new Error('<scribe-music> src script "' + src + '" not found in document');
-                            this.data = JSON.parse(script.textContent);
+                            this.data = parseScript(script);
                         }, { once: true });
                         return;
                     }
                     throw new Error('<scribe-music> src script "' + src + '" not found in document');
                 }
-                this.data = JSON.parse(script.textContent);
+                this.data = parseScript(script);
             }
             else {
                 requestData(this.type, url.href)
@@ -346,7 +353,11 @@ export default define(element('scribe-music', {
     **/
     data: {
         get: function() { return getInternals(this).data.value; },
-        set: function(data) { getInternals(this).data.value = data; },
+        set: function(data) {
+            getInternals(this).data.value = data instanceof Sequence ?
+                data :
+                data ? Sequence.from(data) : null;
+        },
         default: null
     },
 
