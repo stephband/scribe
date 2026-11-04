@@ -23,8 +23,8 @@ export default {
     durationThreshold: GR,
     // Ratio of note duration below which note is accented staccato
     staccatoThreshold: 0.5,
-    // Ratio of note duration above which note is accented tenuto
-    tenutoThreshold:   0.9375,
+    // Ratio of note duration above which note is accented as tenuto
+    tenutoThreshold:   23/24,
 
     // Allowed head durations
     headDurations: [

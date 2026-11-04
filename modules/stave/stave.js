@@ -264,7 +264,7 @@ export default class Stave {
         }
 
         let staccato = false;
-        let g = 4 * grain;
+        let g = Math.max(4 * grain, 1);
 
         // If b1 and b2 are both bar divisions, the event duration passes the
         // threshold to fill the space, and the space is a valid note duration
@@ -280,10 +280,11 @@ export default class Stave {
             while ((g /= 2) >= 0.125) {
                 // Double-dotted 1.75g
                 if (g >= 0.5                                          // The second dot is at least a 32nd note
-                    && 2 * g <= grain                                 // Never start a double-dotted note on a weaker off-beat grain
-                    && b > b1 + (b2 !== d2 && b1 + 1.75 * g === b2 ? 1.75 * durationThreshold : 1 + durationThreshold) * g // Duration passes the double-dotted threshold (or fills non-division window b2)
+                    && (2 * g <= grain && grainOfBeat(bar.divisions, b1 + 1.5 * g) === 0.5 * g // On a stronger grain, first dot is an internal subdivision
+                        || (g === 0.5 && 0.25 * g <= grain && grainOfBeat(bar.divisions, b1 + 1.75 * g) > g) // Double-dotted 8th on 32nd grain resolves onto a stronger division
+                    )
+                    && b > b1 + ((b2 !== d2 || g === 0.5) && b1 + 1.75 * g === b2 ? 1.75 * durationThreshold : 1 + durationThreshold) * g // Duration passes the double-dotted threshold (or fills window b2)
                     && b1 + 1.75 * g <= b2                            // Fits within the available window
-                    && grainOfBeat(bar.divisions, b1 + 1.5 * g) === 0.5 * g  // The first dot is an internal subdivision rather than a bar division
                 ) {
                     b = b1 + 1.75 * g;
                     break;
