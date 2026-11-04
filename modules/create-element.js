@@ -262,7 +262,11 @@ const createSymbolElement = overload(get('type'), {
                 clusterdown % 2 === 1 ? 'cluster-note ' : ''
         }${ beam ? 'beam-note ' : '' }${ staccato ? 'staccato-note ' : '' }${ tenuto ? 'tenuto-note ' : '' }note`,
         style: stemHeight ? `--stem-height: ${ stemHeight };` : undefined,
-        html:  stave.getNoteHTML(pitch, dynamic, duration, staccato, tenuto),
+        html:  `
+            ${ stave.getNoteHTML(pitch, dynamic, duration, staccato, tenuto) }
+            ${ staccato ? `<music-accent class="staccato-accent accent"></music-accent>` : '' }
+            ${ tenuto ? `<music-accent class="tenuto-accent accent"></music-accent>` : '' }
+        `,
         title: `${ event.pitchSpelling } (${ event[2] })`,
         beat:     truncate(4, beat),
         duration: truncate(4, duration),

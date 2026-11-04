@@ -138,41 +138,21 @@ export const marcatoUp       = '&#xE4AC;';
 export const marcatoDown     = '&#xE4AD;';
 */
 
-.up-note.bottom-note.staccato-note::after,
-.down-note.top-note.staccato-note::after {
+.note > .accent {
     justify-self: center;
     align-self: center;
     grid-column: 1;
     grid-row: 1;
 }
 
-.up-note.bottom-note.staccato-note::after {
-    content: '\E4A3';
-    margin-top: 0.375em;
-}
+.top-note[stem="down"] > .accent  { margin-bottom: 0.5em; }
+.bottom-note[stem="up"] > .accent { margin-top: 0.5em; }
 
-.down-note.top-note.staccato-note::after {
-    content: '\E4A2';
-    margin-bottom: 0.5em;
-}
+[stem="down"] > .staccato-accent::before { content: '\E4A2'; }
+[stem="up"]   > .staccato-accent::before { content: '\E4A3'; }
+[stem="down"] > .tenuto-accent::before   { content: '\E4A4'; }
+[stem="up"]   > .tenuto-accent::before   { content: '\E4A5'; }
 
-.up-note.bottom-note.tenuto-note::after,
-.down-note.top-note.tenuto-note::after {
-    justify-self: center;
-    align-self: center;
-    grid-column: 1;
-    grid-row: 1;
-}
-
-.up-note.bottom-note.tenuto-note::after {
-    content: '\E4A5';
-    margin-top: 0.375em;
-}
-
-.down-note.top-note.tenuto-note::after {
-    content: '\E4A4';
-    margin-bottom: 0.5em;
-}
 
 /*
 Flags
