@@ -2,15 +2,14 @@ import toStopBeat from '../event/to-stop-beat.js';
 import config from '../config.js';
 
 const DEBUG = globalThis.DEBUG;
-const { tenutoThreshold } = config;
 
-function toTenutoThreshold(duration) {
+function toTenutoThreshold(settings, duration) {
     return duration > 1 ?
-        duration - 1 + tenutoThreshold :
-        duration * tenutoThreshold ;
+        duration - 1 + settings.tenutoThreshold :
+        duration * settings.tenutoThreshold ;
 }
 
-export function createTies(symbols, bar, voice, notes, noteSymbols, tolerance = 0.125) {
+export function createTies(symbols, bar, voice, notes, noteSymbols, settings, tolerance = 0.125) {
     // No notes to tie
     if (!notes.length) return;
 
@@ -35,7 +34,7 @@ export function createTies(symbols, bar, voice, notes, noteSymbols, tolerance = 
 
             // But if there is nonetheless some overlap beyond quantised
             // duration, and note is not tied from an earlier note...
-            if (b4 > beat + toTenutoThreshold(duration) && event[0] === bar.beat + beat) {
+            if (b4 > beat + toTenutoThreshold(settings, duration) && event[0] === bar.beat + beat) {
                 // Sanity check
                 if (DEBUG && noteSymbols[i].staccato) throw new Error('Note symbol cannot be tenuto and staccato');
                 hasTenuto = true;

@@ -240,7 +240,7 @@ export default class Stave {
         // Push in note heads
         symbols.push.apply(symbols, noteSymbols);
         // Create ties and splice finished notes out of notes
-        createTies(symbols, bar, voice, notes, noteSymbols, tolerance);
+        createTies(symbols, bar, voice, notes, noteSymbols, settings, tolerance);
         // Return symbols
         return noteSymbols;
     }
