@@ -59,21 +59,25 @@
     <section class="grid" style="row-gap: 0;">
         <h3 class="x1 2x">Note durations</h3>
 
-        <!--scribe-music class="x1" staff="piano" src="#durations" swing>
-            <script type="application/json" id="durations">{
-                "events": [
-                    [0,  "meter", 3, 0.5],
-                    [0,  "note",  68, 0.1, 0.0625],
-                    [3,  "note",  68, 0.1, 0.125],
-                    [6,  "note",  68, 0.1, 0.25],
-                    [9,  "note",  68, 0.1, 0.5],
-                    [12, "note",  68, 0.1, 1],
-                    [15, "note",  68, 0.1, 1.5]
-                ]
-            }</script>
-        </scribe-music-->
+        <scribe-music class="x1 2x" staff="treble" src="#durations-1" meter="4/4">
+            <script type="text/sequence" id="durations-1">
+                0      C4 0.1 3.8
+                4.5    C4 0.1 3.3
+                9      C4 0.1 2.8
+                14     C4 0.1 1.8
+                18.25  C4 0.1 1.75
+                22.5   C4 0.1 1.4
+                27     C4 0.1 0.9
+                31.125 C4 0.1 0.8
+                35.25  C4 0.1 0.7
+                39.5   C4 0.1 0.4
+                43.625 C4 0.1 0.35
+                47.75  C4 0.1 0.2
+                51.875 C4 0.1 0.1
+            </script>
+        </scribe-music>
 
-        <h3 class="x1 2x">Staccato and tenuto accents</h3>
+        <!--h3 class="x1 2x">Staccato and tenuto accents</h3>
 
         <scribe-music class="x1 2x" staff="treble" src="#durations-2" meter="4/4">
             <script type="text/sequence" id="durations-2">
