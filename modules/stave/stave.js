@@ -15,12 +15,11 @@ import { toKeyNumber }       from 'sequence/modules/event/key.js';
 import { rflatsharp, accidentalChars, fathercharles } from '../pitch.js';
 import config                from '../config.js';
 import * as glyphs           from "../glyphs.js";
-import { GR }                from '../constants.js';
 
 
 const DEBUG = globalThis.DEBUG;
 const { floor } = Math;
-const ratio = GR;
+const { durationThreshold, staccatoThreshold } = config;
 const noteDurations = [
     0.125,
     0.25,  0.375,
@@ -231,7 +230,7 @@ export default class Stave {
 
     createNoteSymbols(symbols, bar, voice, accidentals, notes, beat, duration, settings, staccato = false, tolerance = 0.125) {
         // Create note heads
-        const noteSymbols = createNotes(this, bar.key, voice, notes, beat, duration, staccato);
+        const noteSymbols = createNotes(this, voice, notes, beat, duration, staccato);
         // Notes may not appear on stave in which case noteSymbols will be empty
         if (!noteSymbols.length) return noteSymbols;
         // Create ledges, accidentals and accents
@@ -247,6 +246,7 @@ export default class Stave {
     }
 
     createDupletNoteSymbols(symbols, bar, voice, accidentals, notes, startBeat, stopBeat, settings) {
+        const { durationThreshold, staccatoThreshold } = settings;
         const b1    = startBeat - bar.beat;
         const b2    = stopBeat  - bar.beat;
         const grain = grainOfBeat(bar.divisions, b1);
@@ -272,7 +272,7 @@ export default class Stave {
         //     ━━━━
         // ━━━━━━━━
         // ┃.❘.|.❘.┃.❘.|.❘.┃
-        if (b1 === d1 && b2 === d2 && b >= (b2 - bar.divisor + ratio * bar.divisor) && noteDurations.includes(b2 - b1)) {
+        if (b1 === d1 && b2 === d2 && b >= (b2 - bar.divisor + durationThreshold * bar.divisor) && noteDurations.includes(b2 - b1)) {
             b = b2;
         }
         // Grain search from 2 * grain down to 0.0625
@@ -281,7 +281,7 @@ export default class Stave {
                 // Double-dotted 1.75g
                 if (g >= 0.5                                          // The second dot is at least a 32nd note
                     && 2 * g <= grain                                 // Never start a double-dotted note on a weaker off-beat grain
-                    && b > b1 + (b2 !== d2 && b1 + 1.75 * g === b2 ? 1.75 * ratio : 1 + ratio) * g // Duration passes the double-dotted threshold (or fills non-division window b2)
+                    && b > b1 + (b2 !== d2 && b1 + 1.75 * g === b2 ? 1.75 * durationThreshold : 1 + durationThreshold) * g // Duration passes the double-dotted threshold (or fills non-division window b2)
                     && b1 + 1.75 * g <= b2                            // Fits within the available window
                     && grainOfBeat(bar.divisions, b1 + 1.5 * g) === 0.5 * g  // The first dot is an internal subdivision rather than a bar division
                 ) {
@@ -292,8 +292,8 @@ export default class Stave {
                 // Dotted 1.5g
                 if (g >= 0.25                                         // The dot is at least a 32nd note
                     && 0.5 * g <= grain                               // The dot is never coarser than the beat it starts on
-                    && b > b1 + (b2 !== d2 && b1 + 1.5 * g === b2 ? 1.5 * ratio : 1 + 0.5 * ratio) * g // Duration passes the dotted threshold (or fills non-division window b2)
-                    && (g <= grain || b <= b1 + (1 + ratio) * g)      // On a weaker beat, do not overshoot into a note that still needs a tie
+                    && b > b1 + (b2 !== d2 && b1 + 1.5 * g === b2 ? 1.5 * durationThreshold : 1 + 0.5 * durationThreshold) * g // Duration passes the dotted threshold (or fills non-division window b2)
+                    && (g <= grain || b <= b1 + (1 + durationThreshold) * g)      // On a weaker beat, do not overshoot into a note that still needs a tie
                     && b1 + 1.5 * g <= b2                             // Fits within the available window
                     && (grainOfBeat(bar.divisions, b1 + 1.5 * g) > g  // Either lands on a stronger division...
                         || (2 * g <= grain && (                       // or subdivides a beat...
@@ -308,7 +308,7 @@ export default class Stave {
 
                 // Whole 1g
                 // Higher threshold above a beat or grain so smaller dotted notes are not rounded up
-                if (b > b1 + (g > 1 || g > grain ? (0.5 + 0.5 * ratio) : ratio) * g) {
+                if (b > b1 + (g > 1 || g > grain ? (0.5 + 0.5 * durationThreshold) : staccatoThreshold) * g) {
                     // Staccato 2g
                     if (!tied                                         // Tied notes cannot be staccato
                         && g < grain                                  // Shorter than the beat's grain

@@ -256,7 +256,7 @@ export default class DrumStave extends Stave {
     createNoteSymbols(symbols, bar, voice, accidentals, notes, beat, duration, settings) {
         const stave = this;
         // Create note heads
-        const noteSymbols = createNotes(stave, bar.key, voice, notes, beat, duration);
+        const noteSymbols = createNotes(stave, voice, notes, beat, duration);
         // Notes may not appear on stave in which case noteSymbols will be empty
         if (!noteSymbols.length) return noteSymbols;
         // Create ledgers, accidentals and accents

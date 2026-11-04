@@ -1,6 +1,5 @@
 import by  from 'fn/by.js';
 import get from 'fn/get.js';
-//import { keyWeightsForEvent, chooseKeyFromWeights } from '../keys.js';
 import { stemupFromRows } from './stem.js';
 
 
@@ -8,7 +7,7 @@ const byRow = by(get('row'));
 const symbols = [];
 
 
-export function createNotes(stave, key, voice, notes, beat, duration, staccato = false) {
+export function createNotes(stave, voice, notes, beat, duration, staccato = false) {
     symbols.length = 0;
 
     if (!notes.length) return symbols;
@@ -19,7 +18,7 @@ export function createNotes(stave, key, voice, notes, beat, duration, staccato =
         const pitch = event.pitchSpelling || (stave.getSpelling && stave.getSpelling(event[2]));
 
         // Create symbols with pitch, row
-        const symbol = {
+        symbols.push({
             type: 'note',
             beat,
             duration,
@@ -28,11 +27,9 @@ export function createNotes(stave, key, voice, notes, beat, duration, staccato =
             voice,
             row: stave.getRow(voice, pitch),
             stave,
+            staccato,
             event
-        };
-
-        if (staccato) symbol.staccato = true;
-        symbols.push(symbol);
+        });
     }
 
     if (symbols.length === 0) return symbols;

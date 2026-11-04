@@ -1,4 +1,5 @@
 import parseGain from 'sequence/modules/parse/parse-gain.js';
+import { GR }    from './constants.js';
 
 export default {
     showAtConcertPitch: false,
@@ -17,6 +18,13 @@ export default {
     marcatoThreshold: parseGain('-6dB'),
     accentThreshold:  parseGain('-12dB'),
     ghostThreshold:   parseGain('-30dB'),
+
+    // Ratio of note duration below which a shorter note duration is displayed
+    durationThreshold: GR,
+    // Ratio of note duration below which note is accented staccato
+    staccatoThreshold: 0.5,
+    // Ratio of note duration above which note is accented tenuto
+    tenutoThreshold:   0.9375,
 
     // Allowed head durations
     headDurations: [
