@@ -31,34 +31,39 @@ const noteDurations = [
 ];
 
 
-/* Downbeat-initiating and upbeat-resolving note guards */
-
 function isDownbeatDoubleDotted(divisions, b1, b2, b, g, grain, d2, durationThreshold) {
-    return 2 * g <= grain                                      // Starts on a strong downbeat grain
-        && grainOfBeat(divisions, b1 + 1.5 * g) === 0.5 * g    // The first dot is an internal subdivision rather than a bar division
-        && b > b1 + (b2 !== d2 && b1 + 1.75 * g === b2 ? 1.75 * durationThreshold : 1 + durationThreshold) * g;
+        // Starts on a strong downbeat grain
+    return 2 * g <= grain
+        && b > b1 + (b2 !== d2 && b1 + 1.75 * g === b2 ? 1.75 * durationThreshold : 1 + durationThreshold) * g
+        // The first dot is an internal subdivision rather than a bar division
+        && grainOfBeat(divisions, b1 + 1.5 * g) === 0.5 * g ;
 }
 
 function isUpbeatDoubleDotted(divisions, b1, b2, b, g, grain, d2, durationThreshold) {
-    return g === 0.5                                           // Only sub-beat 8ths can double-dot from an off-beat
-        && 0.25 * g <= grain                                   // The second dot is at least as fine as the start grain
-        && grainOfBeat(divisions, b1 + 1.75 * g) > g           // Resolves onto a stronger division
-        && b > b1 + (b1 + 1.75 * g === b2 ? 1.75 * durationThreshold : 1 + durationThreshold) * g;
+        // Only sub-beat 8ths can double-dot from an off-beat
+    return g === 0.5
+        // The second dot is at least as fine as the start grain
+        && 0.25 * g <= grain
+        // Passes duration threshold
+        && b > b1 + (b1 + 1.75 * g === b2 ? 1.75 * durationThreshold : 1 + durationThreshold) * g
+        // Resolves onto a stronger division
+        && grainOfBeat(divisions, b1 + 1.75 * g) > g;
 }
 
-function isDownbeatDotted(divisions, b1, b2, b, g, grain, d2, durationThreshold) {
-    return 2 * g <= grain                                      // Starts on a strong downbeat grain
-        && (b1 + 1.5 * g === b2                                // Either stops at the end of the window...
-            || (b1 + 2 * g <= b2 && grainOfBeat(divisions, b1 + 2 * g) >= 2 * g)) // ...or its enclosing 2g unit does not cross a division
-        && (g <= grain || b <= b1 + (1 + durationThreshold) * g) // On a weaker beat, do not overshoot into a note that still needs a tie
-        && b > b1 + (b2 !== d2 && b1 + 1.5 * g === b2 ? 1.5 * durationThreshold : 1 + 0.5 * durationThreshold) * g;
+function isDownbeatDotted(divisions, b1, b2, g, grain) {
+        // Starts on a strong downbeat grain
+    return 2 * g <= grain
+        // Either stops at the end of the window...
+        && (b1 + 1.5 * g === b2
+        // ...or its enclosing 2g unit does not cross a division
+        || (b1 + 2 * g <= b2 && grainOfBeat(divisions, b1 + 2 * g) >= 2 * g));
 }
 
-function isUpbeatDotted(divisions, b1, b2, b, g, grain, d2, durationThreshold) {
-    return 0.5 * g <= grain                                    // The dot is never coarser than the beat it starts on
-        && grainOfBeat(divisions, b1 + 1.5 * g) > g            // Lands on a stronger division
-        && (g <= grain || b <= b1 + (1 + durationThreshold) * g) // On a weaker beat, do not overshoot into a note that still needs a tie
-        && b > b1 + (b2 !== d2 && b1 + 1.5 * g === b2 ? 1.5 * durationThreshold : 1 + 0.5 * durationThreshold) * g;
+function isUpbeatDotted(divisions, b1, b2, g, grain) {
+        // The dot is never coarser than the beat it starts on
+    return 0.5 * g <= grain
+        // Lands on a stronger division
+        && grainOfBeat(divisions, b1 + 1.5 * g) > g ;
 }
 
 
@@ -309,9 +314,10 @@ export default class Stave {
         // Grain search from 2 * grain down to 0.0625
         else {
             while ((g /= 2) >= 0.125) {
-                // Double-dotted 1.75g
-                if (g >= 0.5                  // Dot at least 32nd grain
-                    && b1 + 1.75 * g <= b2    // Fits within the available window
+                // Double-dotted 1.75g - second dot at least 32nd grain
+                if (g >= 0.5
+                    // Fits within the available window
+                    && b1 + 1.75 * g <= b2
                     && (isDownbeatDoubleDotted(bar.divisions, b1, b2, b, g, grain, d2, durationThreshold)
                     ||  isUpbeatDoubleDotted(bar.divisions, b1, b2, b, g, grain, d2, durationThreshold))
                 ) {
@@ -319,11 +325,16 @@ export default class Stave {
                     break;
                 }
 
-                // Dotted 1.5g
-                if (g >= 0.25                 // Dot at least 32nd grain
-                    && b1 + 1.5 * g <= b2     // Fits within the available window
-                    && (isDownbeatDotted(bar.divisions, b1, b2, b, g, grain, d2, durationThreshold)
-                    ||  isUpbeatDotted(bar.divisions, b1, b2, b, g, grain, d2, durationThreshold))
+                // Dotted 1.5g - dot at least 32nd grain
+                if (g >= 0.25
+                    // Fits within the available window
+                    && b1 + 1.5 * g <= b2
+                    // Passes duration threshold
+                    && b > b1 + (b2 !== d2 && b1 + 1.5 * g === b2 ? 1.5 * durationThreshold : 1 + 0.5 * durationThreshold) * g
+                    // On a weaker beat, do not overshoot into a note that still needs a tie
+                    && (g <= grain || b <= b1 + (1 + durationThreshold) * g)
+                    && (isDownbeatDotted(bar.divisions, b1, b2, g, grain)
+                    ||  isUpbeatDotted(bar.divisions, b1, b2, g, grain))
                 ) {
                     b = b1 + 1.5 * g;
                     break;
@@ -332,21 +343,26 @@ export default class Stave {
                 // Whole 1g
                 // Higher threshold above a beat or grain so smaller dotted notes are not rounded up
                 if (b > b1 + (g > 1 || g > grain ? (0.5 + 0.5 * durationThreshold) : staccatoThreshold) * g) {
-                    // Staccato 2g
-                    if (!tied                 // Tied notes cannot be staccato
-                        && g < grain          // Shorter than the beat's grain
-                        && g < bar.divisor    // Shorter than the bar divisor
-                        && b < b2             // Followed by silence
-                        && b1 + 2 * g <= b2   // Room to double the written duration
+                    // Staccato 2g - tied notes cannot be staccato
+                    if (!tied
+                        // Shorter than the beat's grain
+                        && g < grain
+                        // Shorter than the bar divisor
+                        && g < bar.divisor
+                        // Followed by silence
+                        && b < b2
+                        // Room to double the written duration
+                        && b1 + 2 * g <= b2
                     ) {
                         b = b1 + 2 * g;
                         staccato = true;
                         break;
                     }
 
-                    // Standard 1g
-                    if (b1 + g <= b2                                  // Fits within the available window
-                        && grainOfBeat(bar.divisions, b1 + g) >= (g <= grain ? g : 2 * g) // Subdivisions must not cross an irregular division; off-beats must resolve onto a stronger boundary
+                    // Standard 1g - fits within the available window
+                    if (b1 + g <= b2
+                        // Subdivisions must not cross an irregular division; off-beats must resolve onto a stronger boundary
+                        && grainOfBeat(bar.divisions, b1 + g) >= (g <= grain ? g : 2 * g)
                     ) {
                         b = b1 + g;
                         break;
