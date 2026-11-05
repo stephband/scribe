@@ -357,8 +357,8 @@ detector and employs subgrids for multi-stave scoring
 - Vertical grid (`<music-stave>`) inherits subgrid from horizontal grid (`<music-bar>`) enabling multi-stave rendering
 - Recurrent Neural Network trained for local key and pitch spelling
 - Elastic Phase-Locked Metrical Quantiser for better rhythm detection
-- Adds automatic staccato and tenuto accents based on duration
-- Adds automatic ghost, emphasis and marcato accents based on dynamics
+- Automatic staccato and tenuto accents based on duration
+- Automatic ghost, emphasis and marcato accents based on dynamics
 
 ### 0.5 – Clean up
 

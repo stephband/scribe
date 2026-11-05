@@ -411,6 +411,65 @@ Deno.test('Meterless sequence renders as a single bar containing all notes', asy
     is(3, notes.length, 'All notes rendered in the single bar');
 });
 
+Deno.test('Text events quantise and symbolise correctly in their own voice', async () => {
+    const sequence = new Sequence([
+        [0, "key", "C"],
+        [0, "meter", 4, 1],
+        [0, "text", 2, "Intro"],
+        [2, "text", 2, "verse"]
+    ]);
+
+    const tree = await createTree(sequence);
+    assert(tree[0], 'Bar 0 exists');
+
+    const part = tree[0][0];
+    const textSymbols = part.symbols.filter((s) => s.type === 'text');
+    is(2, textSymbols.length, '2 text symbols created');
+
+    is(0, textSymbols[0].beat, 'First text at beat 0');
+    is(2, textSymbols[0].duration, 'First text duration 2');
+    is('Intro', textSymbols[0].value, 'First text value is "Intro"');
+    is('text', textSymbols[0].voice.name, 'First text voice is "text"');
+    assert(textSymbols[0].stave, 'First text has stave');
+
+    is(2, textSymbols[1].beat, 'Second text at beat 2');
+    is(2, textSymbols[1].duration, 'Second text duration 2');
+    is('verse', textSymbols[1].value, 'Second text value is "verse"');
+    is('text', textSymbols[1].voice.name, 'Second text voice is "text"');
+
+    // Bar has only text events, so whole bar rest should exist with stave's default voice (not 'text')
+    const rest = part.symbols.find((s) => s.type === 'rest' && s.whole);
+    assert(rest, 'Whole bar rest exists when bar has only text');
+    is('main', rest.voice.name, 'Whole bar rest has default stave voice, not text voice');
+});
+
+Deno.test('Text events truncate duration at bar line and coexist with notes', async () => {
+    const sequence = new Sequence([
+        [0, "key", "C"],
+        [0, "meter", 4, 1],
+        [0, "note", 60, 0.8, 1],
+        [3, "text", 2, "overlapping-text"] // crosses bar boundary at beat 4
+    ]);
+
+    const tree = await createTree(sequence);
+    assert(tree[0], 'Bar 0 exists');
+
+    const part = tree[0][0];
+    const textSymbols = part.symbols.filter((s) => s.type === 'text');
+    is(1, textSymbols.length, '1 text symbol in bar 0');
+    is(3, textSymbols[0].beat, 'Text symbol at beat 3');
+    is(1, textSymbols[0].duration, 'Text symbol duration truncated to 1 at bar end');
+    is('overlapping-text', textSymbols[0].value);
+
+    const noteSymbols = part.symbols.filter((s) => s.type === 'note');
+    is(1, noteSymbols.length, 'Note symbol exists');
+
+    // Since note exists, no whole bar rest
+    const wholeRest = part.symbols.find((s) => s.type === 'rest' && s.whole);
+    is(undefined, wholeRest, 'No whole bar rest when note is present');
+});
+
+
 
 
 

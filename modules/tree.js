@@ -71,6 +71,7 @@ function getPart(settings, bar, name) {
 
 function toVoice(settings, stave, event) {
     if (event.type === 'chord') return 'chord';
+    if (event.type === 'text') return 'text';
     if (event.voice !== undefined) return event.voice + '';
     const voice = stave.getVoice ? stave.getVoice(event[2]) : stave.voices?.[0];
     return voice ? voice.name : '0';
@@ -217,7 +218,8 @@ function metricQuantise(settings, sequence, parts, spellables, buffers, tree) {
                 break;
 
             case "note":
-            case "chord": {
+            case "chord":
+            case "text": {
                 // Extend stop beat
                 const endBeat = toStopBeat(event);
                 if (endBeat > stopBeat) stopBeat = endBeat;
@@ -243,7 +245,7 @@ function metricQuantise(settings, sequence, parts, spellables, buffers, tree) {
                 parts[partName] = true;
 
                 // Push event into global part only if stave is pitched
-                if (part.stave.pitched) {
+                if (part.stave.pitched && event.type !== 'text') {
                     if (!spellables[partName]) {
                         spellables[partName] = keyEvents.map((e) => Event.from(e));
                     }
@@ -261,28 +263,6 @@ function metricQuantise(settings, sequence, parts, spellables, buffers, tree) {
                 buffer.push(event);
                 break;
             }
-
-//            case "symbol":
-//                symbols.push({
-//                    type: 'symbol' + event[2],
-//                    stave
-//                });
-//                break;
-
-//            case "text":
-//                symbols.push({
-//                    type: 'text',
-//                    beat: event[0] - beat,
-//                    // Does text cross into next bar? The symbol should not
-//                    duration: event[0] + event[2] > beat + duration ?
-//                        duration - event[0] + beat :
-//                        event[2],
-//                    value: event[3],
-//                    event,
-//                    stave
-//                });
-//                break;
-
 
             default:
                 log('event type "' + event.type + '" ignored', '');
@@ -396,6 +376,38 @@ function symboliseChords(settings, bar, stave, symbols, voice) {
     }
 }
 
+function symboliseText(settings, bar, stave, symbols, voice) {
+    const { tuplets } = voice;
+    if (!tuplets) return;
+    let t = -1, tuplet;
+    while (tuplet = tuplets[++t]) {
+        let i = -1, event;
+        while (event = tuplet[++i]) {
+            const eventDuration = event[2] !== undefined ? event[2] : (event.duration || 0);
+            symbols.push({
+                type: 'text',
+                beat: event[0] - bar.beat,
+                // Does text cross into next bar? The symbol should not
+                duration: event[0] + eventDuration > bar.beat + bar.duration ?
+                    bar.duration - event[0] + bar.beat :
+                    eventDuration,
+                value: event[3] !== undefined ? event[3] : (event.text !== undefined ? event.text : event.value),
+                event,
+                stave,
+                voice
+            });
+        }
+    }
+}
+
+function getNoteVoice(part) {
+    let i = -1;
+    while (part[++i]) {
+        if (part[i].name !== 'chord' && part[i].name !== 'text') return part[i];
+    }
+    return undefined;
+}
+
 function symboliseTree(settings, parts, buffers, tree) {
     // Loop over bars
     let n = -1;
@@ -450,6 +462,9 @@ function symbolisePart(settings, buffers, bar, part) {
         if (voice.name === 'chord') {
             symboliseChords(settings, bar, stave, symbols, voice);
         }
+        else if (voice.name === 'text') {
+            symboliseText(settings, bar, stave, symbols, voice);
+        }
         else {
             const notes = buffers[part.name + '.' + voice.name];
             const l = symbols.length;
@@ -485,7 +500,7 @@ function symbolisePart(settings, buffers, bar, part) {
                 duration: bar.duration,
                 whole:    true,
                 stave,
-                voice:    part[0] || stave.voices[0]
+                voice:    getNoteVoice(part) || stave.voices[0]
             });
         }
     }
