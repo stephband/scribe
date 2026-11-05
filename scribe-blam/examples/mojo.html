@@ -10,7 +10,7 @@
     <style>
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #111417;
+            background: #000000;
             color: #e5e9f0;
             margin: 0;
             padding: 2rem;
@@ -78,10 +78,10 @@
             min-height: 280px;
             background: #ffffff;
             color: #000000;
+            border: 0.75em solid white;
             border-radius: 8px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             margin-top: 1.5rem;
-            --signature-label: 3em;
         }
     </style>
 
@@ -92,7 +92,7 @@
             "fn/":        "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.8/modules/",
             "midi/":      "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.5/modules/",
             "neuron/":    "https://cdn.jsdelivr.net/gh/stephband/neuron@0.1.1/",
-            "sequence/":  "https://cdn.jsdelivr.net/gh/soundio/sequence@0.4.7/",
+            "sequence/":  "/sequence/",
             "hyperblam/": "https://hyperblam.how/static/hyperblam/dist/hyperblam/"
         }
     }</script>
@@ -122,7 +122,9 @@
 
 <body>
     <header>
+        <img src="./logo.svg" alt="Hyperblam" width="160" height="76" style="margin-bottom: 1rem;" />
         <h1>A motif with some mojo</h1>
+        <p>Real-time multi-part score visualiser</p>
     </header>
 
     <div class="controls">
@@ -155,7 +157,7 @@
         </note-blam>
 
         <!-- Garage Kit Drum Pads -->
-        <pad-blam id="kick" out="bus" detune="300">
+        <pad-blam id="kick" note="36" out="bus" detune="300">
             <bank-blam>
                 <sample-blam src="https://cdn.jsdelivr.net/gh/Heydon/hyperblam-docs@main/src/static/sounds/kit-garage/kick/01.mp3"></sample-blam>
                 <sample-blam src="https://cdn.jsdelivr.net/gh/Heydon/hyperblam-docs@main/src/static/sounds/kit-garage/kick/02.mp3"></sample-blam>
@@ -165,13 +167,13 @@
 
         <pad-blam id="hat" choke="" out="bus" detune="300">
             <bank-blam>
-                <sample-blam src="https://cdn.jsdelivr.net/gh/Heydon/hyperblam-docs@main/src/static/sounds/kit-garage/hat/01.mp3"></sample-blam>
-                <sample-blam src="https://cdn.jsdelivr.net/gh/Heydon/hyperblam-docs@main/src/static/sounds/kit-garage/hat/02.mp3"></sample-blam>
-                <sample-blam src="https://cdn.jsdelivr.net/gh/Heydon/hyperblam-docs@main/src/static/sounds/kit-garage/hat/03.mp3"></sample-blam>
+                <sample-blam note="closed-hi-hat" src="https://cdn.jsdelivr.net/gh/Heydon/hyperblam-docs@main/src/static/sounds/kit-garage/hat/01.mp3"></sample-blam>
+                <sample-blam note="closed-hi-hat" src="https://cdn.jsdelivr.net/gh/Heydon/hyperblam-docs@main/src/static/sounds/kit-garage/hat/02.mp3"></sample-blam>
+                <sample-blam note="open-hi-hat" src="https://cdn.jsdelivr.net/gh/Heydon/hyperblam-docs@main/src/static/sounds/kit-garage/hat/03.mp3"></sample-blam>
             </bank-blam>
         </pad-blam>
 
-        <pad-blam id="snare" out="bus" detune="200">
+        <pad-blam id="snare" note="38" out="bus" detune="200">
             <bank-blam>
                 <sample-blam src="https://cdn.jsdelivr.net/gh/Heydon/hyperblam-docs@main/src/static/sounds/kit-garage/snare-hard/01.mp3"></sample-blam>
                 <sample-blam src="https://cdn.jsdelivr.net/gh/Heydon/hyperblam-docs@main/src/static/sounds/kit-garage/snare-hard/02.mp3"></sample-blam>
@@ -179,7 +181,7 @@
             </bank-blam>
         </pad-blam>
 
-        <pad-blam id="snareSoft" out="bus">
+        <pad-blam id="snareSoft" note="38" out="bus">
             <bank-blam>
                 <sample-blam src="https://cdn.jsdelivr.net/gh/Heydon/hyperblam-docs@main/src/static/sounds/kit-garage/snare-soft/01.mp3"></sample-blam>
                 <sample-blam src="https://cdn.jsdelivr.net/gh/Heydon/hyperblam-docs@main/src/static/sounds/kit-garage/snare-soft/02.mp3"></sample-blam>

@@ -22,7 +22,7 @@ export const displays = {
     'double-bass':  { staff: 'bass',        transpose: 12, },
     'contrabass':   { staff: 'bass',        transpose: 12, },
     'piano':        { staff: 'grand',       transpose: 0,  },
-    'bass':         { staff: 'bass',        transpose: 0, },
+    'bass':         { staff: 'bass',        transpose: 12, },
     'default':      { staff: 'treble',      transpose: 0,  },
     'cowbell':      { staff: 'percussion' },
     'drums':        { staff: 'drum' }

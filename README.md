@@ -348,7 +348,19 @@ hear from you.
 
 ## Changes
 
-### 0.5.x –
+### 0.6 – Multi-stave scoring
+
+Version 0.6 introduces a neural network for note spelling, refines the rhythm
+detector and employs subgrids for multi-stave scoring
+
+- HTML now renders as (unregistered) custom elements: `<music-bar>`, `<music-stave>`, `<music-note>`, etc.
+- Vertical grid (`<music-stave>`) inherits subgrid from horizontal grid (`<music-bar>`) enabling multi-stave rendering
+- Recurrent Neural Network trained for local key and pitch spelling
+- Elastic Phase-Locked Metrical Quantiser for better rhythm detection
+- Adds automatic staccato and tenuto accents based on duration
+- Adds automatic ghost, emphasis and marcato accents based on dynamics
+
+### 0.5 – Clean up
 
 Version 0.5 rewrites the rhythm detector to better support drums and percussion.
 
@@ -358,7 +370,7 @@ Version 0.5 rewrites the rhythm detector to better support drums and percussion.
 - Adds 32nd note tail glyphs to JazzFont
 - Renders whole bar rests as semibrieve rests
 
-### 0.4.x – The Lead Sheet
+### 0.4 – The Lead Sheet
 
 Version 0.4 is capable of rendering a reasonable lead sheet. Features:
 
@@ -374,7 +386,7 @@ Version 0.4 is capable of rendering a reasonable lead sheet. Features:
 - Setting `settings.swingAsStraight16ths` makes 16th tuplets display as straight 16ths
 - `<scribe-music>` `swing` attribute corresponds to `.swingAsStraight8ths`
 
-### 0.3.x – Proof of concept
+### 0.3 – Proof of concept
 
 - Triplet detection and rendering
 - Supports nested sequences to level 2 nesting

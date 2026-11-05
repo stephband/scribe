@@ -10,7 +10,7 @@
     <style>
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #111417;
+            background: #000000;
             color: #e5e9f0;
             margin: 0;
             padding: 2rem;
@@ -49,6 +49,7 @@
             padding: 0.75rem 1.75rem;
             font-size: 1rem;
             font-weight: 600;
+            border: 0.75em solid white;
             border-radius: 6px;
             cursor: pointer;
             transition: background 0.15s ease, transform 0.05s ease;
@@ -90,7 +91,7 @@
             "fn/":        "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.8/modules/",
             "midi/":      "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.5/modules/",
             "neuron/":    "https://cdn.jsdelivr.net/gh/stephband/neuron@0.1.1/",
-            "sequence/":  "https://cdn.jsdelivr.net/gh/soundio/sequence@0.4.7/",
+            "sequence/":  "/sequence/",
             "hyperblam/": "https://hyperblam.how/static/hyperblam/dist/hyperblam/"
         }
     }</script>
@@ -121,7 +122,9 @@
 
 <body>
     <header>
+        <img src="./examples/logo.svg" alt="Hyperblam" width="160" height="76" style="margin-bottom: 1rem;" />
         <h1>&lt;scribe-hyperblam&gt;</h1>
+        <p>Live music notation visualiser for declarative Web Audio</p>
     </header>
 
     <div class="controls">

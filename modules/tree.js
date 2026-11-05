@@ -262,12 +262,12 @@ function metricQuantise(settings, sequence, parts, spellables, buffers, tree) {
                 break;
             }
 
-            case "symbol":
-                symbols.push({
-                    type: 'symbol' + event[2],
-                    stave
-                });
-                break;
+//            case "symbol":
+//                symbols.push({
+//                    type: 'symbol' + event[2],
+//                    stave
+//                });
+//                break;
 
 //            case "text":
 //                symbols.push({

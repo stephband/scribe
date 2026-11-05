@@ -1,8 +1,15 @@
 import { Handle }     from 'hyperblam/primitives/Handle.js';
 import { nameToNum }  from 'hyperblam/tools/nameToNum.js';
 import { Sequence }   from 'sequence/module.js';
-import { timesigToMeter, meterToTimesig } from 'sequence/modules/event/meter.js';
+import { timesigToMeter, meterToTimesig, getDivisions } from 'sequence/modules/event/meter.js';
 import { toNoteNumber } from 'midi/note.js';
+
+function toPitch(val) {
+    if (val === null || val === undefined || val === '') return undefined;
+    const num = Number(val);
+    if (!isNaN(num) && num > 0) return num;
+    return toNoteNumber(val);
+}
 
 import Stave from '../modules/stave.js';
 import { renderDOM, renderStyle, remove } from '../modules/render-dom.js';
@@ -30,9 +37,12 @@ class ScribeHyperblam extends Handle {
         ];
 
         this.defaultTo = () => [this];
-        this.defaultFor = ['blam', 'blamplay', 'blamstop', 'blamend', 'midiOn'];
+        this.defaultFor = ['blam', 'blamplay', 'blamstop', 'blamend'/*, 'midiOn'*/];
         this.notes = [];
         this.renderPending = false;
+        this.isRendering = false;
+        this.renderQueued = false;
+        this.clockStep = 0;
 
         // Shadow DOM for encapsulated notation rendering
         const shadow = this.attachShadow({ mode: 'open' });
@@ -81,12 +91,23 @@ class ScribeHyperblam extends Handle {
             || this.fromElems[0]?.closest('sequencer-blam')
             || document.querySelector('sequencer-blam');
 
-        // Sequencer fires clock 'blam' ticks on every step; attach if not already a fromElem
-        if (this.sequencerElem && !this.fromElems.includes(this.sequencerElem)) {
-            this.sequencerElem.addEventListener('blam', this);
-            this.sequencerElem.addEventListener('blamplay', this);
-            this.sequencerElem.addEventListener('blamstop', this);
-        }
+        // Ensure our listener runs strictly after all <track-blam> instances have updated their
+        // target players (note-blam, pad-blam) by moving scribe-hyperblam to the end of the listener queue.
+        this.attachToSequencer = () => {
+            if (this.sequencerElem) {
+                this.sequencerElem.removeEventListener('blam', this);
+                this.sequencerElem.removeEventListener('blamplay', this);
+                this.sequencerElem.removeEventListener('blamstop', this);
+
+                this.sequencerElem.addEventListener('blam', this);
+                this.sequencerElem.addEventListener('blamplay', this);
+                this.sequencerElem.addEventListener('blamstop', this);
+            }
+        };
+
+        this.attachToSequencer();
+        setTimeout(() => this.attachToSequencer(), 0);
+        window.addEventListener('blamready', () => this.attachToSequencer(), { once: true });
 
         this.resetEvents();
         this.requestRender();
@@ -108,6 +129,7 @@ class ScribeHyperblam extends Handle {
     resetEvents() {
         this.notes = [];
         this.startAudioTime = undefined;
+        this.clockStep = 0;
 
         const meter = this.meter;
         this.meterEvent = assign([0], timesigToMeter(meter));
@@ -143,6 +165,8 @@ class ScribeHyperblam extends Handle {
                 ]
             });
         }
+
+        console.log('<scribe-hyperblam> sequence:', this.sequence);
     }
 
     /**
@@ -152,6 +176,8 @@ class ScribeHyperblam extends Handle {
         switch (event.type) {
             case 'blamplay':
                 // Sequencer playback started from the beginning: reset notation
+                this.clockStep = 0;
+                this.attachToSequencer?.();
                 if (this.sequencerElem && (this.sequencerElem.time <= (this.context()?.currentTime || 0) + 0.15)) {
                     this.resetEvents();
                     this.requestRender();
@@ -166,9 +192,9 @@ class ScribeHyperblam extends Handle {
                 this.handleBlam(event);
                 break;
 
-            case 'midiOn':
-                this.handleMidi(event);
-                break;
+            // case 'midiOn':
+            //     this.handleMidi(event);
+            //     break;
         }
     }
 
@@ -185,6 +211,9 @@ class ScribeHyperblam extends Handle {
             const scale = sequencer.scale || 1;
             const stepBeats = 0.25 * scale; // Duration of one step in crotchet beats
 
+            if (this.clockStep === undefined) this.clockStep = 0;
+            const beat = this.clockStep * stepBeats;
+
             // Filter tracks to those matching this.track attribute or this.fromElems
             const targetTracks = detail.tracks.filter(t => {
                 if (this.track) return t.id === this.track;
@@ -193,12 +222,15 @@ class ScribeHyperblam extends Handle {
                 return true;
             });
 
+            let hasNewNotes = false;
+
             for (const t of targetTracks) {
                 // Determine whether this track plays on this step
                 const isPlaying = t.playOrNot ? t.playOrNot(detail.tracks) : (t.cipher !== 0 && t.cipher !== '0' && t.probable);
                 if (!isPlaying) continue;
 
-                const targetPlayer = t.toElems?.[0];
+                const targetPlayer = t.toElems?.[0]
+                    || (t.getAttribute('to') ? document.querySelector(t.getAttribute('to')) : null);
 
                 // Determine part: explicit attribute or inferred from track/target
                 let part = t.getAttribute('part-name')
@@ -217,29 +249,64 @@ class ScribeHyperblam extends Handle {
                     }
                 }
 
-                let pitch = 60;
+                let pitch;
                 if (part === 'drums') {
-                    const explicit = t.getAttribute('note') || targetPlayer?.getAttribute('note');
-                    if (explicit) {
-                        pitch = toNoteNumber(explicit);
-                    } else {
-                        const targetId = (targetPlayer?.id || t.getAttribute('to') || '').toLowerCase();
-                        if (targetId.includes('kick')) {
-                            pitch = 36; // Bass drum
-                        } else if (targetId.includes('hat')) {
-                            pitch = 42; // Closed hi-hat
-                        } else if (targetId.includes('snare')) {
-                            pitch = 38; // Snare drum
-                        } else if (t.cipher && !isNaN(t.cipher) && parseInt(t.cipher, 10) > 12) {
-                            pitch = parseInt(t.cipher, 10);
-                        } else {
-                            pitch = 36;
+                    // Check if cipher itself is an explicit General MIDI note number (> 12) or drum name
+                    if (typeof t.cipher === 'string' && isNaN(t.cipher) && t.cipher !== '?') {
+                        pitch = toPitch(t.cipher);
+                    } else if (t.cipher && !isNaN(t.cipher) && parseInt(t.cipher, 10) > 12) {
+                        pitch = parseInt(t.cipher, 10);
+                    }
+
+                    if (!pitch) {
+                        // Determine active sample index in the player's bank
+                        let activeIndex;
+                        if (t.cipher !== undefined && !isNaN(t.cipher)) {
+                            activeIndex = parseInt(t.cipher, 10) - 1;
+                        } else if (targetPlayer?.time === detail.time && targetPlayer?.sample?.index !== undefined) {
+                            activeIndex = targetPlayer.sample.index - 1;
+                        } else if (targetPlayer?.prevIndex !== undefined) {
+                            activeIndex = targetPlayer.prevIndex;
+                        }
+
+                        const sampleElems = targetPlayer?.bankElem?.sampleElems
+                            || targetPlayer?.querySelectorAll?.('sample-blam');
+                        const sampleElem = (sampleElems && activeIndex !== undefined)
+                            ? sampleElems[activeIndex]
+                            : null;
+
+                        // Check explicit note attribute:
+                        // First on the active sample element (e.g. <sample-blam note="42">)
+                        // Then on the track element (e.g. <track-blam note="36">)
+                        // Then on the target player pad (e.g. <pad-blam id="kick" note="36">)
+                        pitch = toPitch(sampleElem?.getAttribute?.('note'))
+                            || toPitch(t.getAttribute('note'))
+                            || toPitch(targetPlayer?.getAttribute?.('note'));
+
+                        // Fallback to standard General MIDI drum map based on player or track ID
+                        if (!pitch) {
+                            const targetId = (targetPlayer?.id || t.getAttribute('to') || '').toLowerCase();
+                            if (targetId.includes('kick')) {
+                                pitch = 36; // Bass drum (C2 in MIDI = 36)
+                            } else if (targetId.includes('snare')) {
+                                pitch = 38; // Snare drum (D2 in MIDI = 38)
+                            } else if (targetId.includes('hat')) {
+                                // In standard kit-garage banks, sample 3 (index 2) is open hi-hat (46); samples 1 & 2 are closed (42)
+                                pitch = (activeIndex === 2) ? 46 : 42;
+                            } else {
+                                pitch = 36;
+                            }
                         }
                     }
                 } else {
                     // Pitched / Melodic part (e.g. Bass)
-                    if (typeof t.cipher === 'string' && isNaN(t.cipher)) {
+                    // If target player already executed for this step, targetPlayer.noteNum is the exact played pitch
+                    if (targetPlayer?.time === detail.time && targetPlayer?.noteNum !== undefined) {
+                        pitch = targetPlayer.noteNum;
+                    } else if (typeof t.cipher === 'string' && isNaN(t.cipher)) {
                         pitch = nameToNum(t.cipher);
+                    } else if (targetPlayer?.noteNum !== undefined) {
+                        pitch = targetPlayer.noteNum;
                     } else if (t.cipher !== undefined && !isNaN(t.cipher)) {
                         const playerNotes = targetPlayer?.notes;
                         if (playerNotes && playerNotes.length) {
@@ -249,7 +316,7 @@ class ScribeHyperblam extends Handle {
                             pitch = 60 + parseInt(t.cipher, 10);
                         }
                     } else if (t.cipher === undefined) {
-                        // Generative '?' cipher
+                        // Generative '?' cipher fallback
                         if (targetPlayer?.notes?.length) {
                             const pool = targetPlayer.notes;
                             pitch = nameToNum(pool[Math.floor(Math.random() * pool.length)]);
@@ -259,33 +326,35 @@ class ScribeHyperblam extends Handle {
                     }
                 }
 
-                // Calculate precise musical beat from completed bars and current step.
-                // If Track.handle has already run for this tick, t.time === detail.time,
-                // meaning t.step was already incremented by Track.
-                const barSteps = t.getBar()?.steps?.length || 16;
-                let currentStep, currentBars;
-                if (t.time === detail.time) {
-                    if (t.step === 0 && t.bars > 0) {
-                        currentStep = barSteps - 1;
-                        currentBars = t.bars - 1;
-                    } else {
-                        currentStep = t.step - 1;
-                        currentBars = t.bars;
-                    }
+                if (!pitch) pitch = 60;
+
+                let duration;
+                if (part === 'drums') {
+                    duration = stepBeats;
+                } else if (this.noteDuration) {
+                    duration = this.noteDuration;
                 } else {
-                    currentStep = t.step;
-                    currentBars = t.bars;
+                    const divisor = this.divisor;
+                    const nextDivisorBeat = (Math.floor(beat / divisor + 1e-9) + 1) * divisor;
+                    duration = Math.round((nextDivisorBeat - beat) * 1000) / 1000;
                 }
 
-                const beat = (currentBars * barSteps + currentStep) * stepBeats;
-                const duration = part === 'drums' ? stepBeats : (this.noteDuration || stepBeats * 2);
+                if (this.pushNote(beat, pitch, 0.1, duration, part)) {
+                    hasNewNotes = true;
+                }
+            }
 
-                this.addNote(beat, pitch, 0.1, duration, part);
+            this.clockStep++;
+
+            if (hasNewNotes) {
+                this.updateSequence();
+                this.requestRender();
             }
         }
+        /*
         // 2. Direct event from <synth-blam> (frequency & scheduled time)
         else if (detail.frequency) {
-            const midi = Math.round(69 + 12 * Math.log2(detail.frequency / 440));
+            let midi = Math.round(69 + 12 * Math.log2(detail.frequency / 440));
             const bpm = this.audioElem?.bpm || 120;
             const beatSec = 60 / bpm;
 
@@ -296,13 +365,16 @@ class ScribeHyperblam extends Handle {
             const rawBeat = (detail.time - this.startAudioTime) / beatSec;
             // Quantise to nearest sixteenth note (0.25 beats)
             const beat = Math.max(0, Math.round(rawBeat * 4) / 4);
-            const duration = this.noteDuration || 0.5;
+            const divisor = this.divisor;
+            const nextDivisorBeat = (Math.floor(beat / divisor + 1e-9) + 1) * divisor;
+            const duration = this.noteDuration || Math.round((nextDivisorBeat - beat) * 1000) / 1000;
+            const part = (event.target.id?.includes('bass') || event.target.nodeName === 'SYNTH-BLAM') ? 'bass' : 'default';
 
-            this.addNote(beat, midi, 0.1, duration, 'default');
+            this.addNote(beat, midi, 0.1, duration, part);
         }
         // 3. Direct event from <note-blam> (sampler instance & time)
         else if (event.target?.noteNum !== undefined) {
-            const midi = event.target.noteNum;
+            let midi = event.target.noteNum;
             const bpm = this.audioElem?.bpm || 120;
             const beatSec = 60 / bpm;
 
@@ -312,16 +384,17 @@ class ScribeHyperblam extends Handle {
 
             const rawBeat = (detail.time - this.startAudioTime) / beatSec;
             const beat = Math.max(0, Math.round(rawBeat * 4) / 4);
-            const duration = this.noteDuration || 0.5;
+            const divisor = this.divisor;
+            const nextDivisorBeat = (Math.floor(beat / divisor + 1e-9) + 1) * divisor;
+            const duration = this.noteDuration || Math.round((nextDivisorBeat - beat) * 1000) / 1000;
             const part = (event.target.id?.includes('bass') || event.target.nodeName === 'NOTE-BLAM') ? 'bass' : 'default';
 
             this.addNote(beat, midi, 0.1, duration, part);
         }
+        */
     }
 
-    /**
-     * Handle incoming Web MIDI note-on events
-     */
+    /*
     handleMidi(event) {
         const detail = event.detail;
         if (!detail || detail.note === undefined) return;
@@ -336,27 +409,63 @@ class ScribeHyperblam extends Handle {
 
         const rawBeat = (curTime - this.startAudioTime) / beatSec;
         const beat = Math.max(0, Math.round(rawBeat * 4) / 4);
-        const duration = this.noteDuration || 0.5;
+        const divisor = this.divisor;
+        const nextDivisorBeat = (Math.floor(beat / divisor + 1e-9) + 1) * divisor;
+        const duration = this.noteDuration || Math.round((nextDivisorBeat - beat) * 1000) / 1000;
         const velocity = detail.velocity !== undefined ? (detail.velocity / 127) * 0.1 : 0.1;
 
         this.addNote(beat, detail.note, velocity, duration, 'default');
     }
+    */
 
     /**
-     * Append a note event to the live sequence
+     * Push a note without triggering immediate sequence rebuild or render
      */
-    addNote(beat, pitch, velocity = 0.1, duration = 0.5, part = 'default') {
-        // Prevent accidental duplicate notes at the exact same beat, pitch, and part
-        const duplicate = this.notes.some(n => Math.abs(n[0] - beat) < 0.001 && n[2] === pitch && (n.part || 'default') === part);
-        if (duplicate) return;
+    pushNote(beat, pitch, velocity = 0.1, duration = null, part = 'default') {
+        const duplicate = this.notes.some(n =>
+            Math.abs(n[0] - beat) < 0.001 && n[2] === pitch && (n.part || 'default') === part
+        );
+        if (duplicate) return false;
+
+        if (duration === null || duration === undefined) {
+            if (part === 'drums') {
+                const scale = this.sequencerElem?.scale || 1;
+                duration = 0.25 * scale;
+            } else if (this.noteDuration) {
+                duration = this.noteDuration;
+            } else {
+                const divisor = this.divisor;
+                const nextDivisorBeat = (Math.floor(beat / divisor + 1e-9) + 1) * divisor;
+                duration = Math.round((nextDivisorBeat - beat) * 1000) / 1000;
+            }
+        }
+
+        // In monophonic pitched parts (like bass), clamp the previous note's duration so it doesn't overlap
+        if (part !== 'drums') {
+            const prevNote = this.notes.slice().reverse().find(n => (n.part || 'default') === part);
+            if (prevNote && beat > prevNote[0]) {
+                const gap = beat - prevNote[0];
+                if (prevNote[4] > gap) {
+                    prevNote[4] = gap;
+                }
+            }
+        }
 
         const note = [beat, 'note', pitch, velocity, duration];
         note.part = part;
         this.notes.push(note);
         this.notes.sort((a, b) => a[0] - b[0]);
+        return true;
+    }
 
-        this.updateSequence();
-        this.requestRender();
+    /**
+     * Append a note event to the live sequence
+     */
+    addNote(beat, pitch, velocity = 0.1, duration = null, part = 'default') {
+        if (this.pushNote(beat, pitch, velocity, duration, part)) {
+            this.updateSequence();
+            this.requestRender();
+        }
     }
 
     /**
@@ -367,8 +476,11 @@ class ScribeHyperblam extends Handle {
         const keyEv = [0, 'key', this.key];
 
         const lastNote = this.notes[this.notes.length - 1];
-        const currentBeat = lastNote ? lastNote[0] : 0;
         const beatsPerBar = meterEv[2] || 4;
+        const scale = this.sequencerElem?.scale || 1;
+        const currentBeat = this.clockStep !== undefined && this.clockStep > 0
+            ? (this.clockStep - 1) * 0.25 * scale
+            : (lastNote ? lastNote[0] : 0);
         const barCount = this.bars;
 
         const parts = this.parts || [...new Set(this.notes.map(n => n.part || 'default'))];
@@ -438,18 +550,34 @@ class ScribeHyperblam extends Handle {
                 this.sequence = Sequence.from({ events: [keyEv, meterEv, ...windowNotes] });
             }
         }
+
+        console.log('<scribe-hyperblam> sequence:', this.sequence);
     }
 
     /**
-     * Debounce renders to the next animation frame
+     * Debounce renders to the next animation frame, safely handling re-entrancy
      */
     requestRender() {
+        if (this.isRendering) {
+            this.renderQueued = true;
+            return;
+        }
+
         if (this.renderPending) return;
         this.renderPending = true;
 
         requestAnimationFrame(async () => {
             this.renderPending = false;
-            await this.render();
+            this.isRendering = true;
+            try {
+                await this.render();
+            } finally {
+                this.isRendering = false;
+                if (this.renderQueued) {
+                    this.renderQueued = false;
+                    this.requestRender();
+                }
+            }
         });
     }
 
@@ -502,6 +630,28 @@ class ScribeHyperblam extends Handle {
         }
         this.setAttribute('staff', value);
         this.requestRender();
+    }
+
+    get divisor() {
+        return this.meterEvent?.[3] || 1;
+    }
+
+    get divisions() {
+        const divs = getDivisions(this.meterEvent?.[2] || 4, this.meterEvent?.[3] || 1);
+        return divs && divs.length ? divs : [this.meterEvent?.[2] || 4];
+    }
+
+    get noteDuration() {
+        const val = this.getAttribute('note-duration');
+        return val ? parseFloat(val) : null;
+    }
+
+    set noteDuration(value) {
+        if (value === null || value === undefined) {
+            this.removeAttribute('note-duration');
+        } else {
+            this.setAttribute('note-duration', value);
+        }
     }
 
     get key() {
@@ -595,7 +745,7 @@ class ScribeHyperblam extends Handle {
     }
 
     static get observedAttributes() {
-        return ['staff', 'key', 'meter', 'bars', 'transpose', 'swing', 'shuffle', 'track', 'tenuto-threshold', 'parts'];
+        return ['staff', 'key', 'meter', 'bars', 'transpose', 'swing', 'shuffle', 'track', 'tenuto-threshold', 'parts', 'note-duration'];
     }
 
     attributeChangedCallback(name, oldVal, newVal) {
