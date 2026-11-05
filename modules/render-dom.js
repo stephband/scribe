@@ -7,7 +7,7 @@ import rect             from 'dom/rect.js';
 //import SequenceIterator from 'sequence/modules/sequence-iterator.js';
 //import { toKeyName }      from 'sequence/modules/event/key.js';
 //import Stave            from './stave.js';
-import createTree       from './tree.js';
+import requestTree      from './tree.js';
 import { createBarElement, createSigElement } from './create-element.js';
 //import { renderBeam }   from './beam.js';
 import * as glyphs      from './glyphs.js';
@@ -99,7 +99,7 @@ export async function renderDOM(sequence, key, meter, transpose, displace, durat
         && sequence.create(0, 'meter', meter[2], meter[3]) ;
 
     // Create render tree
-    const tree = await createTree(sequence, settings, transpose, displace, duration);
+    const tree = await requestTree(sequence, settings, transpose, displace, duration);
 
     // Create DOM tree
     const fragment = document.createDocumentFragment();

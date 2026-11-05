@@ -8,7 +8,7 @@ import {
 } from 'jsr:@std/assert@1';
 
 import { Sequence } from 'sequence/module.js';
-import createTree   from '../modules/tree.js';
+import requestTree   from '../modules/tree.js';
 import quantise     from '../modules/quantise.js';
 import grainPow2    from '../modules/number/grain-pow-2.js';
 import grainOfBeat  from '../modules/bar/grain-of-beat.js';
@@ -45,7 +45,7 @@ Deno.test('showAtConcertPitch: true preserves concert key on parts', async () =>
         [0, "meter", 4, 1],
         [0, "note", "C4", 0.5, 1]
     ]);
-    const tree = await createTree(sequence, { showAtConcertPitch: true });
+    const tree = await requestTree(sequence, { showAtConcertPitch: true });
     assert(tree[0]);
     assert(tree[0][0]);
     is(tree[0][0].key, 0);
@@ -59,7 +59,7 @@ Deno.test('quantise chords with minDivision 1/3 and primes [2, 3]', async () => 
         [0.04, "chord", "C", "", 1],
         [0.52, "chord", "G", "7", 1]
     ]);
-    const tree = await createTree(sequence);
+    const tree = await requestTree(sequence);
     assert(tree[0]);
     const part = tree[0][0];
     const chordSymbols = part.symbols.filter((s) => s.type === 'chord');
@@ -75,7 +75,7 @@ Deno.test('symbolise slash chords with new extension format {n}/', async () => {
         [0, "chord", "E", "{8}/", 2],
         [2, "chord", "B", "{8}7/", 2]
     ]);
-    const tree = await createTree(sequence);
+    const tree = await requestTree(sequence);
     assert(tree[0]);
     const part = tree[0][0];
     const chordSymbols = part.symbols.filter((s) => s.type === 'chord');
@@ -93,7 +93,7 @@ Deno.test('symbolise slash chords from chord symbol strings', async () => {
         [0, "chord", "C/E", 2],
         [2, "chord", "G7/B", 2]
     ]);
-    const tree = await createTree(sequence);
+    const tree = await requestTree(sequence);
     assert(tree[0]);
     const part = tree[0][0];
     const chordSymbols = part.symbols.filter((s) => s.type === 'chord');
@@ -112,7 +112,7 @@ Deno.test('DrumStave delegates spelling directly without RNN speller', async () 
         [1, "note", 42, 0.8, 1]
     ]);
     sequence.display = { staff: 'drum' };
-    const tree = await createTree(sequence);
+    const tree = await requestTree(sequence);
     assert(tree[0]);
     const part = tree[0][0];
     is(part.stave.pitched, false);
@@ -135,7 +135,7 @@ Deno.test('DrumStave stem directions: upper voice (cymbals/hands) stemup true, l
         [1, "note", 44, 0.8, 1]  // Pedal Hi-Hat -> lower voice
     ]);
     sequence.display = { staff: 'drum' };
-    const tree = await createTree(sequence);
+    const tree = await requestTree(sequence);
     assert(tree[0]);
     const part = tree[0][0];
 
@@ -178,7 +178,7 @@ Deno.test('All voice-associated symbols have symbol.voice.name attached', async 
         [1, "note", 65, 0.5, 1], // F4 in bar 0
         [4, "note", 67, 0.5, 1]  // G4 in bar 1
     ]);
-    const tree = await createTree(sequence);
+    const tree = await requestTree(sequence);
     assert(tree[0]);
     assert(tree[1]);
 
@@ -227,7 +227,7 @@ Deno.test('Whole bar rest has voice.name attached on empty bars', async () => {
             }
         ]
     });
-    const tree = await createTree(sequence);
+    const tree = await requestTree(sequence);
     assert(tree[0]);
     assert(tree[1]);
 
@@ -254,7 +254,7 @@ Deno.test('Percussion swing straightening quantises swung 8ths to straight 8ths 
         [3.63, "note", "F3", 0.1, 0.2]
     ]);
 
-    const tree = await createTree(sequence, { display: 'percussion', swingAsStraight8ths: true });
+    const tree = await requestTree(sequence, { display: 'percussion', swingAsStraight8ths: true });
     assert(tree[0]);
     const part = tree[0][0];
     assert(part);
@@ -281,7 +281,7 @@ Deno.test('Swing quantisation is restricted to whole beat meters (integer diviso
         [0.66, "note", "F3", 0.1, 0.2]
     ]);
 
-    const tree305 = await createTree(sequence305, { display: 'percussion', swingAsStraight8ths: true });
+    const tree305 = await requestTree(sequence305, { display: 'percussion', swingAsStraight8ths: true });
     assert(tree305[0]);
     const part305 = tree305[0][0];
     const tuplets305 = part305.symbols.filter((s) => s.type === 'tuplet');
@@ -307,7 +307,7 @@ Deno.test('Swing quantisation is restricted to whole beat meters (integer diviso
         [1.63, "note", "F3", 0.1, 0.2]
     ]);
 
-    const tree22 = await createTree(sequence22, { display: 'percussion', swingAsStraight8ths: true });
+    const tree22 = await requestTree(sequence22, { display: 'percussion', swingAsStraight8ths: true });
     assert(tree22[0]);
     const part22 = tree22[0][0];
     const notes22 = part22.symbols.filter((s) => s.type === 'note');
@@ -324,7 +324,7 @@ Deno.test('Tuplet deterministic slot rendering with empty slot rest and chord', 
         [1.67, "note", 67, 0.1, 0.3]  // G4 in slot 2
     ]);
 
-    const tree = await createTree(sequence);
+    const tree = await requestTree(sequence);
     assert(tree[0]);
     const part = tree[0][0];
 
@@ -376,7 +376,7 @@ Deno.test('PLL spring state (drift) is preserved across bar boundaries', async (
         [7.03, "note", 60, 0.1, 0.5]
     ]);
 
-    const tree = await createTree(sequence);
+    const tree = await requestTree(sequence);
     assert(tree[0], 'Bar 0 exists');
     assert(tree[1], 'Bar 1 exists');
 
@@ -400,7 +400,7 @@ Deno.test('Meterless sequence renders as a single bar containing all notes', asy
         [2, "note", 64, 0.1, 1]
     ]);
 
-    const tree = await createTree(sequence);
+    const tree = await requestTree(sequence);
     is(1, Object.keys(tree).length, 'Tree has exactly one bar');
     is(3, tree[0].duration, 'Bar duration spans all notes');
     is(tree[0].divisions[0], 3, 'Bar divisions end at bar duration');
@@ -419,7 +419,7 @@ Deno.test('Text events quantise and symbolise correctly in their own voice', asy
         [2, "text", 2, "verse"]
     ]);
 
-    const tree = await createTree(sequence);
+    const tree = await requestTree(sequence);
     assert(tree[0], 'Bar 0 exists');
 
     const part = tree[0][0];
@@ -451,7 +451,7 @@ Deno.test('Text events truncate duration at bar line and coexist with notes', as
         [3, "text", 2, "overlapping-text"] // crosses bar boundary at beat 4
     ]);
 
-    const tree = await createTree(sequence);
+    const tree = await requestTree(sequence);
     assert(tree[0], 'Bar 0 exists');
 
     const part = tree[0][0];
