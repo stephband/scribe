@@ -90,13 +90,16 @@
 
 .piano-stave > .rest,
 .piano-stave > .timesig,
+.piano-stave > .barrepeat,
 .piano-stave > .rest[voice="rh"],
-.piano-stave > .timesig[voice="rh"] {
+.piano-stave > .timesig[voice="rh"],
+.piano-stave > .barrepeat[voice="rh"] {
     grid-row: B4;
 }
 
 .piano-stave > .rest[voice="lh"],
-.piano-stave > .timesig[voice="lh"] {
+.piano-stave > .timesig[voice="lh"],
+.piano-stave > .barrepeat[voice="lh"] {
     grid-row: D3;
 }
 

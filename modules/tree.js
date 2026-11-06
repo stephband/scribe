@@ -129,8 +129,6 @@ function flagEndBar(bar, sequenceEvent) {
 }
 
 function metricQuantise(settings, sequence, parts, spellables, buffers, tree) {
-//    const jsons  = [];
-
     const drifts    = {};
     const keyEvents = [];
     // Guarantee the render of at least 1 bar
@@ -153,7 +151,6 @@ function metricQuantise(settings, sequence, parts, spellables, buffers, tree) {
         // While event time is beyond end of bar create bar from current state
         while (event[0] >= bar.beat + bar.duration) {
             quantiseNotesFromBuffers(settings, bar, buffers, drifts);
-//            detectBarRepeats(bars, jsons, bar);
             if (flagEndBar(bar, sequenceEvent)) sequenceEvent = undefined;
             push(tree, bar);
 

@@ -9,6 +9,7 @@ import { createRests }        from '../symbol/rest.js';
 import { closeTuplet }        from '../symbol/tuplet.js';
 import { isTupletSymbol }     from '../tuplet.js';
 import { getPart }            from '../tree.js';
+import BarRepeater            from './bar-repeater.js';
 
 
 const { isInteger } = Number;
@@ -114,16 +115,17 @@ function getNoteVoice(part) {
     return undefined;
 }
 
-export function symboliseBar(settings, parts, buffers, bar) {
+export function symboliseBar(settings, parts, buffers, bar, detectors) {
     // Ensure all score parts exist on this bar
     let name;
     for (name in parts) {
-        const part = getPart(settings, bar, name);
-        symbolisePart(settings, buffers, bar, part);
+        const part    = getPart(settings, bar, name);
+        const repeats = detectors[name] || (detectors[name] = new BarRepeater(settings));
+        symbolisePart(settings, buffers, bar, part, repeats);
     }
 }
 
-export function symbolisePart(settings, buffers, bar, part) {
+export function symbolisePart(settings, buffers, bar, part, repeats) {
     const { stave, symbols } = part;
 
     const transpose = settings.showAtConcertPitch ?
@@ -153,9 +155,14 @@ export function symbolisePart(settings, buffers, bar, part) {
         event:       bar.meterEvent
     });
 
+    // Symbols from here on are the musical content of the bar, the stuff that
+    // may be replaced by a bar repeat
+    const start = symbols.length;
+
     // Loop over voices
     let n = -1;
     let hasNotes = false;
+    let tied     = false;
     while (part[++n]) {
         const voice = part[n];
         if (voice.name === 'chord') {
@@ -167,6 +174,8 @@ export function symbolisePart(settings, buffers, bar, part) {
         else {
             const notes = buffers[part.name + '.' + voice.name];
             const l = symbols.length;
+            // Notes left in the buffer are tied in from the previous bar
+            if (notes.length) tied = true;
             symboliseVoice(settings, bar, stave, part.key, notes, symbols, voice);
             if (symbols.length > l) hasNotes = true;
         }
@@ -203,6 +212,10 @@ export function symbolisePart(settings, buffers, bar, part) {
             });
         }
     }
+
+    // Fingerprint the bar and replace it, and possibly preceding bars, with
+    // bar repeats if this part is repeating itself
+    repeats.push(bar, part, start, tied);
 }
 
 function fillToBeat(settings, bar, stave, voice, accidentals, notes, symbols, beam, beat, stopBeat) {
@@ -313,8 +326,16 @@ export function symboliseVoice(settings, bar, stave, key, notes, symbols, voice)
 }
 
 export default function symbolise(settings, parts, buffers, tree) {
+    // Per-part bar repeat detectors
+    let detectors = {};
+
     // Loop over bars
     let n = -1;
-    while (tree[++n]) symboliseBar(settings, parts, buffers, tree[n]);
+    while (tree[++n]) {
+        // Never repeat material from before a double bar line
+        if (n && tree[n - 1].doubleBarLine) detectors = {};
+        symboliseBar(settings, parts, buffers, tree[n], detectors);
+    }
+
     return tree;
 }

@@ -555,16 +555,6 @@ in their duration span. */
     white-space: nowrap;
 }
 
-.bar > .barrepeat {
-    justify-self: center;
-    /* A bar repeat spans a whole bar, which may have unequal left and right
-       paddings, but we want to centre the symbol */
-    margin-left: calc(0.625em - var(--bar-padding-left));
-    margin-right: calc(0.625em - var(--bar-padding-right));
-    grid-column: bar-begin / bar-end;
-    /*grid-column-end: span calc(var(--columns-per-beat) * var(--duration));*/
-}
-
 .end-bar + .bar::before {
     /* Bar count */
     content: attr(count);

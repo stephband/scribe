@@ -426,4 +426,20 @@
 .stave > .barrepeat {
     align-self: center;
     grid-row: stave-center;
+    grid-column: bar-begin / bar-end;
+    justify-self: center;
+    /* A bar repeat spans a whole bar, which may have unequal left and right
+       paddings, but we want to centre the symbol */
+    margin-left: calc(0.625em - var(--bar-padding-left));
+    margin-right: calc(0.625em - var(--bar-padding-right));
+}
+
+/* 2 and 4 bar repeats straddle the barline at the start of their bar, which
+   is the middle barline of the phrase they repeat */
+.stave > .barrepeat[count="2"],
+.stave > .barrepeat[count="4"] {
+    justify-self: start;
+    margin-left: calc(-1 * var(--bar-padding-left));
+    margin-right: 0;
+    transform: translateX(-50%);
 }

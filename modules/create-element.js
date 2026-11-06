@@ -151,11 +151,11 @@ export function createSigElement(bar0, defaultKeyName) {
 }
 
 const createSymbolElement = overload(get('type'), {
-    barrepeat: ({ count, duration }) => create('span', {
+    barrepeat: ({ count, voice }) => create('music-barrepeat', {
         class: 'barrepeat',
         html: glyphs['barRepeat' + count],
-        beat: 0,
-        duration
+        count,
+        voice: voice && voice.name
     }),
 
     clef: ({ clef }) => create('music-clef', {
