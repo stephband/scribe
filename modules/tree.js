@@ -55,11 +55,7 @@ export default async function requestTree(sequence, settings = {}, transpose = 0
             return spell(events);
         }));
     }
-console.log('PARTS', parts);
-console.log('SPELLABLES', spellables);
-console.log('BUFFERS', buffers);
-console.log('TREE', tree);
-debugger
+
     // 3. Loop over bars, parts, voices and populate with symbols
     symbolise(settings, parts, buffers, tree);
 
