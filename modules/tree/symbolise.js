@@ -8,7 +8,7 @@ import { createBeam, closeBeam } from '../symbol/beam.js';
 import { createRests }        from '../symbol/rest.js';
 import { closeTuplet }        from '../symbol/tuplet.js';
 import { isTupletSymbol }     from '../tuplet.js';
-import { getPart }            from '../tree.js';
+import { getPart }            from './read.js';
 import BarRepeater            from './bar-repeater.js';
 
 
