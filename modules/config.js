@@ -24,7 +24,7 @@ export default {
     // Ratio of note duration below which note is accented staccato
     staccatoThreshold: 0.5,
     // Ratio of note duration above which note is accented as tenuto
-    tenutoThreshold:   1,//23/24,
+    tenutoThreshold:   1,
 
     // Number of consecutive repeats of a 1, 2 or 4 bar phrase required before
     // the repeats are notated with bar repeat symbols. 0 disables.
