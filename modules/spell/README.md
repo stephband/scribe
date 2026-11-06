@@ -178,10 +178,10 @@ speller/
 ### Running Inference on CPU
 
 ```javascript
-import { SpellerNetwork } from "./speller/speller-network.js";
+import { SpellerNetwork } from "./spell/speller-network.js";
 
 // Load pre-trained weights from binary (-8b.bin or -32b.bin) or ES module
-const weightBuffer = await Deno.readFile("./speller/speller-weights-8b.bin");
+const weightBuffer = await Deno.readFile("./spell/speller-weights-8b.bin");
 
 const speller = SpellerNetwork.from(weightBuffer);
 
@@ -207,10 +207,10 @@ console.log(results);
 ### Running Inference on WebGPU
 
 ```javascript
-import SpellerRNN from "./speller/speller-rnn.js";
+import SpellerRNN from "./spell/speller-rnn.js";
 
 // Initializes WebGPU, validates byte length, and loads weights in one step:
-const weightBuffer = await Deno.readFile("./speller/speller-weights-8b.bin");
+const weightBuffer = await Deno.readFile("./spell/speller-weights-8b.bin");
 const gpuSpeller = await SpellerRNN.from(weightBuffer);
 
 const results = await gpuSpeller.process(events);

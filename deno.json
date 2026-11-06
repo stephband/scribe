@@ -11,7 +11,7 @@
 
     "tasks": {
         "test":  "deno test --allow-read test.js",
-        "train": "deno run -A modules/speller/train.js"
+        "train": "deno run -A modules/spell/train.js"
     },
 
     "lock": false

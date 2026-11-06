@@ -2,20 +2,13 @@
 import Transform        from 'sequence/modules/transform.js';
 import SequenceIterator from 'sequence/modules/sequence-iterator.js';
 import config           from './config.js';
-import speller          from './speller.js';
+import spell            from './spell.js';
 import read             from './tree/read.js';
 import quantise         from './tree/quantise.js';
 import symbolise        from './tree/symbolise.js';
 
 
 const { assign } = Object;
-
-
-function spell(notes) {
-    if (!notes || !notes.length) return;
-    if (!notes.some((e) => e.type === 'note' || e.type === 'chord')) return;
-    return speller.process(notes);
-}
 
 export default async function requestTree(sequence, settings = {}, transpose = 0, displace = 0, duration = Infinity) {
     settings = assign({ display: sequence.display }, config, settings);
@@ -33,7 +26,7 @@ export default async function requestTree(sequence, settings = {}, transpose = 0
     // Ingest sequence into voice buffers, bar frames, and ordered parts
     const { parts, spellables, tree } = read(settings, iterator);
 
-    // Metric quantisation across timeline
+    // Metric quantisation of event beats
     quantise(settings, parts, tree);
 
     // Spell pitched notes and chords
