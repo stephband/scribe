@@ -7,7 +7,8 @@
     { "id": 3, "name": "Alto sax" },
     { "id": 4, "name": "Tenor sax" },
     { "id": 5, "name": "Trombone" },
-    { "id": 6, "name": "Bass" }
+    { "id": 6, "name": "Bass" },
+    { "id": 7, "name": "Drums" }
 ],
 
 "events": [
