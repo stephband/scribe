@@ -1,4 +1,6 @@
-import detect from './rhythm-eplmq.js';
+
+import detect   from '../rhythm-eplmq.js';
+import getVoice from './get-voice.js';
 
 
 const { isInteger } = Number;
@@ -6,10 +8,9 @@ const { max, round } = Math;
 
 
 /**
-straighten(data)
+straighten(tuplet)
 Straightens out swing rhythms - any `4` or `5` rhythms with divisor `3`.
 **/
-
 function straighten(tuplet) {
     if (tuplet.divisor === 3) switch (tuplet.rhythm) {
         case 4:
@@ -50,7 +51,8 @@ function quantiseTupletEvents(tuplet, buffer) {
     }
 }
 
-export default function quantise(settings, bar, buffer, minDivision, primes, drift = 0) {
+// Export for testing
+export function quantiseBar(settings, bar, buffer, minDivision, primes, drift = 0) {
     const { beat, duration, divisor } = bar;
 
     const tuplets = detect(beat, duration, buffer, minDivision, primes, drift);
@@ -68,4 +70,45 @@ export default function quantise(settings, bar, buffer, minDivision, primes, dri
     }
 
     return tuplets;
+}
+
+export default function quantise(settings, parts, tree) {
+    const drifts = {};
+
+    let n = -1;
+    let bar;
+    while (bar = tree[++n]) {
+        let p = -1;
+        let part;
+        while (part = bar[++p]) {
+            const partInfo = parts[p];
+            let voiceName;
+            for (voiceName in partInfo.buffers) {
+                const buffer = partInfo.buffers[voiceName];
+                const driftKey = part.name + '.' + voiceName;
+
+                if (!buffer.length) {
+                    drifts[driftKey] = 0;
+                    continue;
+                }
+
+                const drift = drifts[driftKey] || 0;
+
+                const tuplets = voiceName === 'chord' ?
+                    quantiseBar(settings, bar, buffer, 1/3, [2, 3], drift) :
+                    quantiseBar(settings, bar, buffer, undefined, undefined, drift);
+
+                if (!tuplets) continue;
+
+                const voice = getVoice(part, voiceName);
+                voice.tuplets = tuplets;
+
+                if (tuplets.length) {
+                    drifts[driftKey] = tuplets[tuplets.length - 1].driftOut;
+                }
+            }
+        }
+    }
+
+    return tree;
 }

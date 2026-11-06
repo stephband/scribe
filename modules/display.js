@@ -45,3 +45,11 @@ export function byDisplayOrder(b, a) {
         // a and b are at the same time, prioritise by event type
         0 ;
 }
+
+export function byPartOrder(a, b) {
+    const aSlug = slugify(a.name);
+    const bSlug = slugify(b.name);
+    const aIndex = displays[aSlug] ? slugs.indexOf(aSlug) : slugs.indexOf('default');
+    const bIndex = displays[bSlug] ? slugs.indexOf(bSlug) : slugs.indexOf('default');
+    return aIndex - bIndex;
+}

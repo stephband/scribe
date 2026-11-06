@@ -1,22 +1,21 @@
 
-import byBeat           from 'sequence/modules/events/by-priority.js';
 import Transform        from 'sequence/modules/transform.js';
 import SequenceIterator from 'sequence/modules/sequence-iterator.js';
 import config           from './config.js';
 import speller          from './speller.js';
+import read             from './tree/read.js';
+import quantise         from './tree/quantise.js';
 import symbolise        from './tree/symbolise.js';
-import read, { toDisplayObject, getPart } from './tree/read.js';
 
 
-const { assign, entries, values } = Object;
+const { assign } = Object;
 
 
 function spell(notes) {
-    if (!notes.length) return;
+    if (!notes || !notes.length) return;
+    if (!notes.some((e) => e.type === 'note' || e.type === 'chord')) return;
     return speller.process(notes);
 }
-
-export { getPart, toDisplayObject };
 
 export default async function requestTree(sequence, settings = {}, transpose = 0, displace = 0, duration = Infinity) {
     settings = assign({ display: sequence.display }, config, settings);
@@ -29,36 +28,28 @@ export default async function requestTree(sequence, settings = {}, transpose = 0
         Transform.from(array) :
         Transform.identity ;
 
-    const iterator   = new SequenceIterator(sequence, transform, 0, duration);
-    const parts      = {};
-    const spellables = {};
-    const buffers    = {};
-    const tree       = {};
+    const iterator = new SequenceIterator(sequence, transform, 0, duration);
 
-    // 1. Sort out timing
-    // Loop over iterator, extract events into bars, parts and voices, and
-    // quantise events
-    read(settings, iterator, parts, spellables, buffers, tree);
+    // Ingest sequence into voice buffers, bar frames, and ordered parts
+    const { parts, spellables, tree } = read(settings, iterator);
 
-    // 2. Sort out pitch
-    // Assign note spelling per-part
+    // Metric quantisation across timeline
+    quantise(settings, parts, tree);
+
+    // Spell pitched notes and chords
     if (settings.showAtConcertPitch) {
-        // Spell parts in concert pitch
-        await spell([].concat.apply([], values(spellables)).sort(byBeat));
+        await spell(spellables);
     }
     else {
         // Spell parts in per-part transposition
-        await Promise.all(entries(spellables).map(([name, events]) => {
-            const display   = toDisplayObject(settings, name);
-            const transform = Transform.of('transpose', display.transpose || 0);
-            events.forEach((event) => transform.apply(event));
-            return spell(events);
+        await Promise.all(parts.map((part) => {
+            if (!part.spellables || !part.spellables.length) return;
+            const transform = Transform.of('transpose', part.display.transpose || 0);
+            part.spellables.forEach((event) => transform.apply(event));
+            return spell(part.spellables);
         }));
     }
 
-    // 3. Loop over bars, parts, voices and populate with symbols
-    symbolise(settings, parts, buffers, tree);
-
-    // Return tree object
-    return tree;
+    // 4. Construct tree symbols, beams and bar repeats
+    return symbolise(settings, parts, tree);
 }

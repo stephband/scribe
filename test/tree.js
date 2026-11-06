@@ -9,7 +9,7 @@ import {
 
 import { Sequence } from 'sequence/module.js';
 import requestTree   from '../modules/tree.js';
-import quantise     from '../modules/quantise.js';
+import { quantiseBar as quantise } from '../modules/tree/quantise.js';
 import grainPow2    from '../modules/number/grain-pow-2.js';
 import grainOfBeat  from '../modules/bar/grain-of-beat.js';
 

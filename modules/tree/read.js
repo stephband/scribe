@@ -1,20 +1,17 @@
 
-import insert                 from 'fn/insert.js';
 import slugify                from 'fn/slugify.js';
 import Event                  from 'sequence/modules/event.js';
 import { getDivisions }       from 'sequence/modules/event/meter.js';
 import Stave                  from '../stave.js';
-import quantise               from '../quantise.js';
-import push                   from '../object/push.js';
-import { toDisplay, byDisplayOrder } from '../display.js';
+import { toDisplay, byPartOrder } from '../display.js';
 import log                    from '../log.js';
 import toStopBeat             from '../event/to-stop-beat.js';
 
 
-const { assign } = Object;
+const { assign, values } = Object;
 
 
-export function toDisplayObject(settings, name) {
+function toDisplayObject(settings, name) {
     const slug = slugify(name);
 
     if (slug === 'default' && settings.display) {
@@ -23,40 +20,18 @@ export function toDisplayObject(settings, name) {
             return { staff: settings.display, transpose: 0 };
         }
 
-        return settings.display ;
+        return settings.display;
     }
 
     return toDisplay(slug);
 }
 
-export function toPartName(settings, event) {
-    // Use the object name as the part name
+function toPartName(settings, event) {
     if (event.object && event.object.name) return event.object.name;
-
-    // Use default sequence object default
     return 'default';
 }
 
-export function getPart(settings, bar, name) {
-    //const index = toPartIndex(settings, name);
-    let i = -1;
-    while (bar[++i]) if (bar[i].name === name) {
-        return bar[i];
-    }
-
-    const display = toDisplayObject(settings, name);
-    const part = assign({
-        type:    'part',
-        name,
-        stave:   Stave[display.staff || display.clef],
-        symbols: []
-    }, display);
-
-    insert(byDisplayOrder, bar, part);
-    return part;
-}
-
-export function toVoice(settings, stave, event) {
+function toVoice(settings, stave, event) {
     if (event.type === 'chord') return 'chord';
     if (event.type === 'text') return 'text';
     if (event.voice !== undefined) return event.voice + '';
@@ -64,54 +39,25 @@ export function toVoice(settings, stave, event) {
     return voice ? voice.name : '0';
 }
 
-export function getVoice(settings, part, name) {
-    let i = -1;
-    while (part[++i]) if (part[i].name === name) {
-        return part[i];
-    }
+function getOrCreatePart(settings, parts, keyEvents, name) {
+    if (parts[name]) return parts[name];
 
-    const staveVoice = part.stave && part.stave.voices && part.stave.voices.find((v) => v.name === name);
-    const voice = assign({
-        type: 'voice',
-        name
-    }, staveVoice);
+    const display = toDisplayObject(settings, name);
+    const stave   = Stave[display.staff || display.clef];
 
-    push(part, voice);
-    return voice;
+    const part = {
+        name,
+        display,
+        stave,
+        spellables: undefined,
+        buffers:    {}
+    };
+
+    parts[name] = part;
+    return part;
 }
 
-function quantiseNotesFromBuffers(settings, bar, buffers, drifts) {
-    let name;
-    for (name in buffers) {
-        const buffer = buffers[name];
-        // There is nothing to put in this bar
-        if (!buffer.length) {
-            // Reset drift to 0
-            drifts[name] = 0;
-            // Move to next buffer
-            continue;
-        }
-
-        const [partname, voicename] = name.split('.');
-        const part  = getPart(settings, bar, partname);
-        const drift = drifts[name] || 0;
-
-        const tuplets = voicename === 'chord' ?
-            quantise(settings, bar, buffer, 1/3, [2, 3], drift) :
-            quantise(settings, bar, buffer, undefined, undefined, drift) ;
-
-        if (!tuplets) continue;
-        const voice = getVoice(settings, part, voicename);
-        voice.tuplets = tuplets;
-
-        if (tuplets.length) {
-            drifts[name] = tuplets[tuplets.length - 1].driftOut;
-        }
-    }
-}
-
-// Flags bar with a double bar line if the top-level sequence event stops
-// inside it. Returns true if bar was flagged.
+// Flags bar with a double bar line if the top-level sequence event stops inside it
 function flagEndBar(bar, sequenceEvent) {
     if (!sequenceEvent) return false;
     const stopBeat = toStopBeat(sequenceEvent);
@@ -122,9 +68,12 @@ function flagEndBar(bar, sequenceEvent) {
     return false;
 }
 
-export default function read(settings, sequence, parts, spellables, buffers, tree) {
-    const drifts    = {};
-    const keyEvents = [];
+export default function read(settings, sequence) {
+    const tree       = [];
+    const parts      = {};
+    const spellables = [];
+    const keyEvents  = [];
+
     // Guarantee the render of at least 1 bar
     let stopBeat = 1;
     let event;
@@ -132,21 +81,20 @@ export default function read(settings, sequence, parts, spellables, buffers, tre
     let count = 0;
 
     let bar = {
-        type:     'bar',
-        count:    ++count,
-        beat:     0,
-        key:      0,
-        duration: Infinity,
-        divisor:  0
+        type:      'bar',
+        count:     ++count,
+        beat:      0,
+        key:       0,
+        duration:  Infinity,
+        divisor:   0
     };
 
     // Extract events from sequence iterator and divide them into voices
     for (event of sequence) {
-        // While event time is beyond end of bar create bar from current state
+        // While event time is beyond end of bar advance bar state
         while (event[0] >= bar.beat + bar.duration) {
-            quantiseNotesFromBuffers(settings, bar, buffers, drifts);
             if (flagEndBar(bar, sequenceEvent)) sequenceEvent = undefined;
-            push(tree, bar);
+            tree.push(bar);
 
             // Start new bar
             bar = {
@@ -163,15 +111,8 @@ export default function read(settings, sequence, parts, spellables, buffers, tre
         // Handle event types
         switch (event.type) {
             case "sequence":
-                // If this sequence event comes from the top level sequence
-                // flag a double bar line at the end of the sequence
                 if (event.events === sequence.events) sequenceEvent = event;
-
-                // Extend stop beat
-                stopBeat = stopBeat < toStopBeat(event) ?
-                    toStopBeat(event) :
-                    stopBeat ;
-
+                stopBeat = stopBeat < toStopBeat(event) ? toStopBeat(event) : stopBeat;
                 break;
 
             case "key": {
@@ -186,65 +127,63 @@ export default function read(settings, sequence, parts, spellables, buffers, tre
 
                 // Push copy of key event to parts already discovered
                 let name;
-                for (name in spellables) spellables[name].push(Event.from(event));
+                for (name in parts) {
+                    if (parts[name].spellables) {
+                        parts[name].spellables.push(Event.from(event));
+                    }
+                }
                 break;
             }
 
             case "meter":
                 if (event[0] !== bar.beat) throw new Error(`Scribe "meter" event at beat ${ event[0] } not at start of bar at beat ${ bar.beat }`);
-                // Store the event on the bar, timesig symbols are created per
-                // part in symbolisePart()
                 bar.meterEvent = event;
-                // Meter events set bar meter
-                bar.duration  = event[2];
-                bar.divisor   = event[3];
-                bar.divisions = getDivisions(bar.duration, bar.divisor);
+                bar.duration   = event[2];
+                bar.divisor    = event[3];
+                bar.divisions  = getDivisions(bar.duration, bar.divisor);
                 break;
 
             case "note":
-            case "chord":
-            case "text": {
-                // Extend stop beat
+            case "chord": {
                 const endBeat = toStopBeat(event);
                 if (endBeat > stopBeat) stopBeat = endBeat;
 
                 const partName  = toPartName(settings, event);
-                const part      = getPart(settings, bar, partName);
+                const part      = getOrCreatePart(settings, parts, keyEvents, partName);
                 const voiceName = toVoice(settings, part.stave, event);
-                //const staveType = toStave(settings, event.part);
-                // Push
-//                pushEventToPart(stave, key, parts, event);
-                // If part is pitched
-//                if (stave.pitched) {
-//                    // Push note event to spellables
-//                    if (!spellables[part]) spellables[part] = keyEvent ? [keyEvent] : [];
-//                    spellables[part].push(event);
-//                    spellables['*'].push(event);
-//                }
 
                 event.part  = partName;
                 event.voice = voiceName;
                 event.stave = part.stave;
 
-                parts[partName] = true;
-
-                // Push event into global part only if stave is pitched
-                if (part.stave.pitched && event.type !== 'text') {
-                    if (!spellables[partName]) {
-                        spellables[partName] = keyEvents.map((e) => Event.from(e));
-                    }
-                    spellables[partName].push(event);
-                }
-                else if (event.type === 'note') {
-                    // Delegate spelling directly to unpitched stave
-                    event.pitchSpelling = part.stave.getSpelling(event[2]);
+                // Push event into spellables if pitched stave
+                if (part.stave.pitched) {
+                    if (!part.spellables) part.spellables = keyEvents.map((e) => Event.from(e));
+                    part.spellables.push(event);
+                    spellables.push(event);
                 }
 
-                // Push event into part.voice buffer
-                const name = partName + '.' + voiceName;
-                if (!buffers[name]) buffers[name] = [];
-                const buffer = buffers[name];
-                buffer.push(event);
+                // Push event into voice buffer
+                const voiceBuffer = part.buffers[voiceName] || (part.buffers[voiceName] = []);
+                voiceBuffer.push(event);
+                break;
+            }
+
+            case "text": {
+                const endBeat = toStopBeat(event);
+                if (endBeat > stopBeat) stopBeat = endBeat;
+
+                const partName  = toPartName(settings, event);
+                const part      = getOrCreatePart(settings, parts, keyEvents, partName);
+                const voiceName = toVoice(settings, part.stave, event);
+
+                event.part  = partName;
+                event.voice = voiceName;
+                event.stave = part.stave;
+
+                // Push event into voice buffer
+                const voiceBuffer = part.buffers[voiceName] || (part.buffers[voiceName] = []);
+                voiceBuffer.push(event);
                 break;
             }
 
@@ -253,19 +192,17 @@ export default function read(settings, sequence, parts, spellables, buffers, tre
         }
     }
 
-    // If no meter was declared this is a bar with indeterminate duration.
-    // Set duration to contain all notes in a single bar.
+    // If no meter was declared, set duration to contain all notes in a single bar
     if (!bar.divisions) {
         bar.duration  = stopBeat - bar.beat;
         bar.divisor   = 1;
         bar.divisions = [bar.duration];
     }
 
-    // Create bars up to stop beat or while voices still has events
+    // Create bars up to stop beat
     while (stopBeat > bar.beat + bar.duration) {
-        quantiseNotesFromBuffers(settings, bar, buffers, drifts);
         if (flagEndBar(bar, sequenceEvent)) sequenceEvent = undefined;
-        push(tree, bar);
+        tree.push(bar);
 
         // Start new bar
         bar = {
@@ -279,10 +216,28 @@ export default function read(settings, sequence, parts, spellables, buffers, tre
         };
     }
 
-    quantiseNotesFromBuffers(settings, bar, buffers, drifts);
-    push(tree, bar);
+    tree.push(bar);
 
     // Always render last bar with a double bar line
     bar.doubleBarLine = true;
-    return tree;
+
+    // Sort parts once by display order
+    const orderedParts = values(parts).sort(byPartOrder);
+
+    // Assign part shells to each bar by order number
+    let b = -1, barItem;
+    while (barItem = tree[++b]) {
+        barItem.length = orderedParts.length;
+        let p = -1, partInfo;
+        while (partInfo = orderedParts[++p]) {
+            barItem[p] = assign({
+                type:    'part',
+                name:    partInfo.name,
+                stave:   partInfo.stave,
+                symbols: []
+            }, partInfo.display);
+        }
+    }
+
+    return { tree, parts: orderedParts, spellables };
 }

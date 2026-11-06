@@ -267,10 +267,10 @@ const createSymbolElement = overload(get('type'), {
             ${ staccato ? `<music-accent class="staccato-accent accent"></music-accent>` : '' }
             ${ tenuto ? `<music-accent class="tenuto-accent accent"></music-accent>` : '' }
         `,
-        title: `${ event.pitchSpelling } (${ event[2] })`,
+        title: `${ pitch } (${ event[2] })`,
         beat:     truncate(4, beat),
         duration: truncate(4, duration),
-        pitch:    event.pitchSpelling,
+        pitch:    pitch,
         voice:    voice.name,
         stem:     stemup ? 'up' : 'down',
         beam:     beam && beam.id,

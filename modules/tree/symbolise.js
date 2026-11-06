@@ -8,7 +8,7 @@ import { createBeam, closeBeam } from '../symbol/beam.js';
 import { createRests }        from '../symbol/rest.js';
 import { closeTuplet }        from '../symbol/tuplet.js';
 import { isTupletSymbol }     from '../tuplet.js';
-import { getPart }            from './read.js';
+import getVoice               from './get-voice.js';
 import BarRepeater            from './bar-repeater.js';
 
 
@@ -115,17 +115,7 @@ function getNoteVoice(part) {
     return undefined;
 }
 
-export function symboliseBar(settings, parts, buffers, bar, detectors) {
-    // Ensure all score parts exist on this bar
-    let name;
-    for (name in parts) {
-        const part    = getPart(settings, bar, name);
-        const repeats = detectors[name] || (detectors[name] = new BarRepeater(settings));
-        symbolisePart(settings, buffers, bar, part, repeats);
-    }
-}
-
-export function symbolisePart(settings, buffers, bar, part, repeats) {
+export function symbolisePart(settings, activeNotes, bar, part, repeats) {
     const { stave, symbols } = part;
 
     const transpose = settings.showAtConcertPitch ?
@@ -172,7 +162,9 @@ export function symbolisePart(settings, buffers, bar, part, repeats) {
             symboliseText(settings, bar, stave, symbols, voice);
         }
         else {
-            const notes = buffers[part.name + '.' + voice.name];
+            const voiceKey = part.name + '.' + voice.name;
+            if (!activeNotes[voiceKey]) activeNotes[voiceKey] = [];
+            const notes = activeNotes[voiceKey];
             const l = symbols.length;
             // Notes left in the buffer are tied in from the previous bar
             if (notes.length) tied = true;
@@ -325,16 +317,36 @@ export function symboliseVoice(settings, bar, stave, key, notes, symbols, voice)
     if (notes.length) console.log(notes.length + ' notes tied over to next bar');
 }
 
-export default function symbolise(settings, parts, buffers, tree) {
-    // Per-part bar repeat detectors
+export default function symbolise(settings, parts, tree) {
+    const activeNotes = {};
     let detectors = {};
 
     // Loop over bars
     let n = -1;
-    while (tree[++n]) {
+    let bar;
+    while (bar = tree[++n]) {
         // Never repeat material from before a double bar line
         if (n && tree[n - 1].doubleBarLine) detectors = {};
-        symboliseBar(settings, parts, buffers, tree[n], detectors);
+
+        let p = -1;
+        let part;
+        while (part = bar[++p]) {
+            // Ensure voices with notes tied in from previous bars exist on part
+            const partInfo = parts[p];
+            if (partInfo && partInfo.buffers) {
+                let voiceName;
+                for (voiceName in partInfo.buffers) {
+                    const notes = activeNotes[part.name + '.' + voiceName];
+                    if (notes && notes.length) {
+                        const voice = getVoice(part, voiceName);
+                        if (!voice.tuplets) voice.tuplets = [];
+                    }
+                }
+            }
+
+            const repeats = detectors[part.name] || (detectors[part.name] = new BarRepeater(settings));
+            symbolisePart(settings, activeNotes, bar, part, repeats);
+        }
     }
 
     return tree;
