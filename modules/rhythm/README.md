@@ -1,8 +1,8 @@
 # Rhythm Detection Architecture & Design
 
-> **Proposal**: Elastic Phase-Locked Metrical Quantizer (EPL-MQ)  
-> **Author**: Antigravity & Stephen Band  
-> **Date**: October 2026  
+> **Proposal**: Elastic Phase-Locked Metrical Quantizer (EPL-MQ)
+> **Author**: Antigravity & Stephen Band
+> **Date**: October 2026
 
 ---
 
@@ -175,3 +175,9 @@ To make it follow drift with an elastic band:
 1. **Reintroduce $\sin$ (quadrature)**: Use the complex magnitude $\sqrt{R^2 + I^2}$ for the rhythmic pattern strength, and $\text{atan2}(I, R)$ for the drift angle.
 2. **Add a state variable $\delta$ to the recursion**: Pass the running drift $\delta$ down the recursion tree, updated by an elasticity factor $\alpha$ and restored by $\lambda$.
 3. **Use the progressive span exponent** $p(d) = 1/d^2$ to allow rests at large scales while maintaining swing grouping at small scales.
+
+## 7. Implementation
+
+We tried implementing this as a Rust -> WASM module and benchmarked it against the straight JS implementation.
+It only achieved a 1.5x - 2.0x speed increase, and with Rust's trigonometric functions compiled in it was >120kB.
+That wasn't considered worth it.

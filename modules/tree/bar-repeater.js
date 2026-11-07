@@ -28,6 +28,7 @@ const IGNORE = { id: true, stave: true, event: true };
 
 function empty(entry) {
     entry.part.symbols.length = entry.start;
+    entry.part.repeated = true;
 }
 
 function replace(entry, count) {
@@ -35,6 +36,7 @@ function replace(entry, count) {
     const { stave, symbols } = part;
 
     symbols.length = start;
+    part.repeated = true;
 
     // Grand staves get a repeat symbol in each stave, like whole bar rests
     if (stave.type === 'grand') {

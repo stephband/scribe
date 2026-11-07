@@ -1,5 +1,5 @@
 
-import detect   from '../rhythm-eplmq.js';
+import detect   from '../rhythm.js';
 import getVoice from './get-voice.js';
 
 

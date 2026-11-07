@@ -1,11 +1,11 @@
 
 import Transform        from 'sequence/modules/transform.js';
 import SequenceIterator from 'sequence/modules/sequence-iterator.js';
-import config           from './config.js';
-import spell            from './spell.js';
+import spell            from './tree/spell.js';
 import read             from './tree/read.js';
 import quantise         from './tree/quantise.js';
 import symbolise        from './tree/symbolise.js';
+import config           from './config.js';
 
 
 const { assign } = Object;
@@ -21,6 +21,7 @@ export default async function requestTree(sequence, settings = {}, transpose = 0
         Transform.from(array) :
         Transform.identity ;
 
+    // Create iterator from sequence, transform, startBeat, stopBeat
     const iterator = new SequenceIterator(sequence, transform, 0, duration);
 
     // Ingest sequence into voice buffers, bar frames, and ordered parts
@@ -43,6 +44,6 @@ export default async function requestTree(sequence, settings = {}, transpose = 0
         }));
     }
 
-    // 4. Construct tree symbols, beams and bar repeats
+    // Construct tree symbols, beams and bar repeats
     return symbolise(settings, parts, tree);
 }

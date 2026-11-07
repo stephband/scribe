@@ -7,13 +7,35 @@ import push                   from '../object/push.js';
 import { createBeam, closeBeam } from '../symbol/beam.js';
 import { createRests }        from '../symbol/rest.js';
 import { closeTuplet }        from '../symbol/tuplet.js';
-import { isTupletSymbol }     from '../tuplet.js';
 import getVoice               from './get-voice.js';
 import BarRepeater            from './bar-repeater.js';
 
 
 const { isInteger } = Number;
 
+
+function isTupletSymbol(swing, shuffle, data) {
+    if (data.straightened) return false;
+
+    if (data.rhythm === 1) return false;
+
+    if (data.divisor === 2) {
+        // If we are rendering swing rhythms decide whether a duplet
+        // should render as a tuplet
+        switch (data.duration) {
+            case 0.5:
+                if (!shuffle) return false;
+                break;
+            case 1:
+                if (!swing) return false;
+                break;
+            default:
+                return false;
+        }
+    }
+
+    return true;
+}
 
 function updateBeamWithNoteSymbols(symbols, bar, stave, voice, beam, noteSymbols) {
     const { beat, duration } = noteSymbols[0];
@@ -317,6 +339,44 @@ export function symboliseVoice(settings, bar, stave, key, notes, symbols, voice)
     if (notes.length) console.log(notes.length + ' notes tied over to next bar');
 }
 
+/**
+hasPartContent(part)
+Returns true if `part` contains actual musical content (notes, chords, text,
+bar repeats, or slashes). Returns false if the part contains only rests or
+stave header symbols (clefs, key/meter signatures).
+**/
+function hasPartContent(part) {
+    if (!part) return false;
+    // Parts emptied or modified by BarRepeater are part of a repeat phrase
+    if (part.repeated) return true;
+    if (!part.symbols) return false;
+    let s = -1;
+    let symbol;
+    while (symbol = part.symbols[++s]) {
+        if (symbol.type === 'note' ||
+            symbol.type === 'chord' ||
+            symbol.type === 'text' ||
+            symbol.type === 'barrepeat' ||
+            symbol.type === 'slash') {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+hasBarContent(bar)
+Returns true if any part within `bar` contains musical content.
+**/
+function hasBarContent(bar) {
+    let p = -1;
+    let part;
+    while (part = bar[++p]) {
+        if (hasPartContent(part)) return true;
+    }
+    return false;
+}
+
 export default function symbolise(settings, parts, tree) {
     const activeNotes = {};
     let detectors = {};
@@ -347,6 +407,33 @@ export default function symbolise(settings, parts, tree) {
             const repeats = detectors[part.name] || (detectors[part.name] = new BarRepeater(settings));
             symbolisePart(settings, activeNotes, bar, part, repeats);
         }
+    }
+
+    // Prune phantom trailing bars:
+    // When ingesting raw events, read() estimates stopBeat using unquantised
+    // physical event durations: toStopBeat(event) = event[0] + duration.
+    // In human performances, note releases frequently overhang a barline by
+    // 20–50ms (e.g. stopping at beat 4.05 instead of 4.00). Because 4.05 > 4.00,
+    // read() provisionally creates an additional bar to contain the note.
+    //
+    // However, once metric quantisation and symbolisation run, stave duration
+    // thresholds truncate the note at the barline (or splice it out within
+    // 32nd-note release tolerance) without tying across. The provisional
+    // trailing bar therefore finishes symbolisation completely empty (holding
+    // only whole rests) despite no notes sounding in it.
+    //
+    // We prune trailing bars that:
+    // 1. Have no musical content (no notes, chords, text, or repeats across any part)
+    // 2. Were not explicitly demanded by a sequence event (bar.endOfSequence)
+    //
+    // We always preserve at least 1 bar (tree.length > 1), and ensure the true
+    // final bar carries the double barline.
+    while (tree.length > 1 && !tree[tree.length - 1].endOfSequence && !hasBarContent(tree[tree.length - 1])) {
+        tree.pop();
+    }
+
+    if (tree.length) {
+        tree[tree.length - 1].doubleBarLine = true;
     }
 
     return tree;

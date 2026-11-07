@@ -63,6 +63,7 @@ function flagEndBar(bar, sequenceEvent) {
     const stopBeat = toStopBeat(sequenceEvent);
     if (stopBeat > bar.beat && stopBeat <= bar.beat + bar.duration) {
         bar.doubleBarLine = true;
+        bar.endOfSequence = true;
         return true;
     }
     return false;
@@ -78,11 +79,9 @@ export default function read(settings, sequence) {
     let stopBeat = 1;
     let event;
     let sequenceEvent;
-    let count = 0;
-
     let bar = {
         type:      'bar',
-        count:     ++count,
+        count:     1,
         beat:      0,
         key:       0,
         duration:  Infinity,
@@ -99,7 +98,7 @@ export default function read(settings, sequence) {
             // Start new bar
             bar = {
                 type:      'bar',
-                count:     ++count,
+                count:     bar.count + 1,
                 beat:      bar.beat + bar.duration,
                 key:       bar.key,
                 duration:  bar.duration,
@@ -207,7 +206,7 @@ export default function read(settings, sequence) {
         // Start new bar
         bar = {
             type:      'bar',
-            count:     ++count,
+            count:     bar.count + 1,
             beat:      bar.beat + bar.duration,
             key:       bar.key,
             duration:  bar.duration,
@@ -217,9 +216,6 @@ export default function read(settings, sequence) {
     }
 
     tree.push(bar);
-
-    // Always render last bar with a double bar line
-    bar.doubleBarLine = true;
 
     // Sort parts once by display order
     const orderedParts = values(parts).sort(byPartOrder);

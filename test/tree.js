@@ -469,6 +469,33 @@ Deno.test('Text events truncate duration at bar line and coexist with notes', as
     is(undefined, wholeRest, 'No whole bar rest when note is present');
 });
 
+Deno.test('Prune phantom trailing bars caused by raw note release overhang', async () => {
+    // Note on beat 3 of 4/4 with raw duration 1.05 stops at beat 4.05.
+    // In read(), stopBeat 4.05 creates Bar 2.
+    // In symbolise(), the note is quantised to beat 3..4 without tying into Bar 2.
+    // Bar 2 is pruned, leaving exactly 1 bar with doubleBarLine true.
+    const sequence = new Sequence([
+        [0, "key", "C"],
+        [0, "meter", 4, 1],
+        [3, "note", "C4", 0.5, 1.05]
+    ]);
+    const tree = await requestTree(sequence);
+    is(tree.length, 1, 'Should prune phantom trailing bar 2');
+    is(tree[0].doubleBarLine, true, 'First bar should now have double bar line');
+});
+
+Deno.test('Retain trailing bar when note genuinely ties across bar line', async () => {
+    const sequence = new Sequence([
+        [0, "key", "C"],
+        [0, "meter", 4, 1],
+        [3, "note", "C4", 0.5, 2.0]
+    ]);
+    const tree = await requestTree(sequence);
+    is(tree.length, 2, 'Should keep Bar 2 when note ties over');
+    is(tree[1].doubleBarLine, true, 'Last bar should have double bar line');
+});
+
+
 
 
 

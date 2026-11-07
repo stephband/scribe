@@ -6,11 +6,14 @@ const sharpRoots = fathercharles.slice(0, 7).map((p) => p[0]);
 const flatRoots  = fathercharles.slice(7, 14).map((p) => p[0]);
 
 
-/* Accidentals */
+/**
+accidentalsFromKey(key)
+Returns a map of natural root numbers against `1` or `-1` to denote sharps
+or flats.
+**/
 
 export function accidentalsFromKey(key) {
-    const keyNum = key && key[2] !== undefined ? key[2] : key;
-    const k      = typeof keyNum === 'number' ? keyNum : toKeyNumber(keyNum || 0);
+    const k = toKeyNumber(key);
     const accidentals = {};
 
     if (k > 0) {

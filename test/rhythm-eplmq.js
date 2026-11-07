@@ -6,7 +6,7 @@ import {
     assertObjectMatch as matches
 } from 'jsr:@std/assert@1';
 
-import detect from '../modules/rhythm-eplmq.js';
+import detect from '../modules/rhythm.js';
 
 
 Deno.test('Duplets', () => {

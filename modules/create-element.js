@@ -96,9 +96,9 @@ function store(element, data) {
 // Elements
 
 export function createBarElement(bar) {
-    const { beat, duration, divisions, count } = bar;
+    const { beat, duration, divisions, count, doubleBarLine, error } = bar;
     const element = create('music-bar', {
-        class: `${ bar.doubleBarLine ? 'end-bar ' : '' }bar${ bar.error ? ' error ': '' }`,
+        class: `${ doubleBarLine ? 'end-bar ' : '' }bar${ error ? ' error ': '' }`,
         beat, duration, divisions, count
     });
 

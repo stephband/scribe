@@ -1,6 +1,6 @@
 
 /**
-rhythm-eplmq.js
+rhythm.js
 Elastic Phase-Locked Metrical Quantizer (EPL-MQ)
 
 Rhythm detection using complex harmonic oscillators combined with a
@@ -14,7 +14,13 @@ import { floorPow2 } from './number/power-of-2.js';
 
 
 const DEBUG = globalThis.DEBUG;
-const { cos, sin, round, PI, abs, pow, atan2 } = Math;
+const { cos, sin, round, abs, pow, atan2 } = Math;
+const TAU = 2 * Math.PI;
+// Default elastic band parameters (all in units of beats)
+const MIN_DIVISION = 1 / 12;
+const PRIMES       = [2, 3, 5, 7, 9];
+const alpha        = 0.25;  // PLL tracking elasticity (pull toward performer's local phase)
+const lambda       = 0.15;  // Spring restoring force back toward the absolute beat (0)
 
 
 function count1s(n) {
@@ -22,13 +28,6 @@ function count1s(n) {
     while (n) { n &= n - 1; ++count; }
     return count;
 }
-
-// Default elastic band parameters (all in units of beats)
-const MIN_DIVISION = 1 / 12;
-const PRIMES       = [2, 3, 5, 7, 9];
-const alpha        = 0.25;  // PLL tracking elasticity (pull toward performer's local phase)
-const lambda       = 0.15;  // Spring restoring force back toward the absolute beat (0)
-
 
 /**
 test(beat, duration, divisor, events, index, rhythmIndex, rhythmCount, drift)
@@ -56,8 +55,8 @@ function test(beat, duration, divisor, events, index, rhythmIndex, rhythmCount, 
         beatError += abs(b - gridBeat);
 
         // Accumulate complex phasor components
-        rSum += cos(x * 2 * PI);
-        iSum += sin(x * 2 * PI);
+        rSum += cos(x * TAU);
+        iSum += sin(x * TAU);
 
         if (slot < divisor) {
             rhythm |= (1 << slot);
@@ -91,7 +90,7 @@ function test(beat, duration, divisor, events, index, rhythmIndex, rhythmCount, 
 //    const amplitude = sqrt(rSum * rSum + iSum * iSum);
     const phaseAngle = atan2(iSum, rSum);
     const division = duration / divisor;
-    const phaseDriftBeats = (division * phaseAngle) / (2 * PI);
+    const phaseDriftBeats = (division * phaseAngle) / TAU;
 //    const driftWeight = gaussian(sigma, phaseDriftBeats);
 
     // Score combines phase alignment (rSum) with coherence (amplitude) weighted by drift
@@ -173,12 +172,12 @@ function detectRhythmPrime(primes, minDivision, beat, duration, events, index, r
 }
 
 /**
-detectBestFit(beat, duration, events, index, rhythmIndex, rhythms, indent, drift)
+detectBestFit(primes, minDivision, minDuration, beat, duration, events, index, rhythmIndex, rhythms, drift)
 Recursive metrical tree search comparing single tuplet candidate `a` against
 bifurcated sub-windows with continuous duration-scaled span penalty and
 elastic phase propagation.
 **/
-function detectBestFit(primes, minDivision, minDuration, beat, duration, events, index, rhythmIndex = index, rhythms = [], indent = '', drift = 0) {
+function detectBestFit(primes, minDivision, minDuration, beat, duration, events, index, rhythmIndex = index, rhythms = [], drift = 0) {
     let i = index;
     let r = rhythmIndex;
     let dState = drift;
@@ -219,7 +218,7 @@ function detectBestFit(primes, minDivision, minDuration, beat, duration, events,
         let last;
 
         // Window 1: [beat, beat + d/2)
-        dState = detectBestFit(primes, minDivision, minDuration, beat, d / 2, events, i, r, array, indent + '| ', dState);
+        dState = detectBestFit(primes, minDivision, minDuration, beat, d / 2, events, i, r, array, dState);
         last = array[array.length - 1];
         if (last) {
             i = last.index + last.count;
@@ -227,7 +226,7 @@ function detectBestFit(primes, minDivision, minDuration, beat, duration, events,
         }
 
         // Window 2: [beat + d/2, beat + d) receives evolved phase state dState
-        dState = detectBestFit(primes, minDivision, minDuration, beat + d / 2, d / 2, events, i, r, array, indent + '| ', dState);
+        dState = detectBestFit(primes, minDivision, minDuration, beat + d / 2, d / 2, events, i, r, array, dState);
         last = array[array.length - 1];
         if (last) {
             i = last.index + last.count;
@@ -236,7 +235,14 @@ function detectBestFit(primes, minDivision, minDuration, beat, duration, events,
 
         // Fit by overall average score of all events, weighted by count coverage
         const count = i - index;
-        let bfit = count && array.reduce((sum, item) => sum + item.score * pow(item.count, 0.1), 0) / count;
+        let bfit = 0;
+        if (count) {
+            let sum = 0;
+            for (let k = 0; k < array.length; ++k) {
+                sum += array[k].score * pow(array[k].count, 0.1);
+            }
+            bfit = sum / count;
+        }
 
         // Progressive span penalty:
         // Exponent decays smoothly as 1 / d^2 so small-scale swing (d <= 1) is protected,
@@ -244,7 +250,10 @@ function detectBestFit(primes, minDivision, minDuration, beat, duration, events,
         if (a && a.count && bfit && count > 1) {
             const eventSpan = events[i - 1][0] - events[index][0];
             if (eventSpan > d / 2) {
-                const span = array.reduce((sum, item) => sum + item.duration, 0);
+                let span = 0;
+                for (let k = 0; k < array.length; ++k) {
+                    span += array[k].duration;
+                }
                 if (span < d) {
                     bfit *= pow(span / d, 1 / (d * d));
                 }
@@ -253,7 +262,9 @@ function detectBestFit(primes, minDivision, minDuration, beat, duration, events,
 
         // Require meaningful improvement over afit to justify splitting
         if (bfit > afit + 1e-4) {
-            rhythms.push.apply(rhythms, array);
+            for (let k = 0; k < array.length; ++k) {
+                rhythms.push(array[k]);
+            }
         }
         else if (a) {
             rhythms.push(a);
@@ -265,12 +276,11 @@ function detectBestFit(primes, minDivision, minDuration, beat, duration, events,
 
     // Continue consuming duration across the remaining window
     if (beat + d < duration) {
-        return detectBestFit(primes, minDivision, minDuration, beat + d, duration - d, events, i, r, rhythms, indent, dState);
+        return detectBestFit(primes, minDivision, minDuration, beat + d, duration - d, events, i, r, rhythms, dState);
     }
 
     return dState;
 }
-
 
 /**
 detect(beat, duration, events, minDivision = defaults.minDivision, primes = defaults.primes)
@@ -286,6 +296,6 @@ export default function detect(beat, duration, events, minDivision = MIN_DIVISIO
     if (!events[n] || events[n][0] >= beat + duration) return undefined;
 
     const tuplets = [];
-    detectBestFit(primes, minDivision, minDuration, beat, duration, events, n, 0, tuplets, '', drift);
+    detectBestFit(primes, minDivision, minDuration, beat, duration, events, n, 0, tuplets, drift);
     return tuplets;
 }
