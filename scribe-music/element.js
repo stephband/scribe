@@ -157,7 +157,7 @@ export default define(element('scribe-music', {
         staff="treble"
         Choose the default staff to render. Not that if the rendered sequence
         contains staff events, they override this choice. Possible staves are
-        `"treble"`, `"bass"`, `"piano"`, `"drum"`, `"percussion"`, `"chord"`.
+        `"treble"`, `"bass"`, `"grand"`, `"drum"`, `"percussion"`, `"chord"`.
         **/
         attribute: function(value) { this.staff = value; },
 
@@ -165,7 +165,7 @@ export default define(element('scribe-music', {
         .staff = "treble"
         Choose the default staff to render. Not that if the rendered sequence
         contains staff events, they override this choice. Possible staves are
-        `"treble"`, `"bass"`, `"piano"`, `"drum"`, `"percussion"`, `"chord"`.
+        `"treble"`, `"bass"`, `"grand"`, `"drum"`, `"percussion"`, `"chord"`.
         **/
         get: function() {  return getInternals(this).staff.value; },
         set: function(value) {

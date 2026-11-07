@@ -275,7 +275,7 @@ function detectBestFit(primes, minDivision, minDuration, beat, duration, events,
     }
 
     // Continue consuming duration across the remaining window
-    if (beat + d < duration) {
+    if (d < duration) {
         return detectBestFit(primes, minDivision, minDuration, beat + d, duration - d, events, i, r, rhythms, dState);
     }
 

@@ -16,8 +16,8 @@ Documentation and examples at [stephen.band/scribe](https://stephen.band/scribe)
 To use the `<scribe-music>` custom element, import the CSS and JS from the CDN:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/stephband/scribe@0.5.8/build/scribe-music/element.css" />
-<script type="module" src="https://cdn.jsdelivr.net/gh/stephband/scribe@0.5.8/build/scribe-music/element.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/stephband/scribe@0.6.8/build/scribe-music/element.css" />
+<script type="module" src="https://cdn.jsdelivr.net/gh/stephband/scribe@0.6.8/build/scribe-music/element.js"></script>
 ```
 
 The `<scribe-music>` element is now registered. It renders music notation from
@@ -166,7 +166,7 @@ The URL of a JSON file, or a hash reference to a script element in the document.
 
 Both an attribute and a property.
 The name of the clef, one of `"treble"`, `"treble-up"`, `"treble-down"`, `"alto"`,
-`"bass"`, `"piano"`, `"drum"` or `"percussion"`. Defaults to `"treble"`.
+`"bass"`, `"grand"`, `"drum"` or `"percussion"`. Defaults to `"treble"`.
 
 ```html
 <scribe-music staff="bass">...</scribe-music>

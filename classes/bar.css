@@ -386,12 +386,11 @@ in their duration span. */
 	max-width: none;
     /* Beams span from first head column to last head column */
     grid-column-end: span calc(round((var(--beat) + var(--duration)) * var(--columns-per-beat)) - round(var(--beat) * var(--columns-per-beat)));
+    /* TODO: Doesn't account for different head sizes (eg. drum parts) */
+    margin-right: calc(-0.8em * var(--stem-width) - var(--bar-column-gap));
 }
 
 .bar .up-beam {
-    /*margin-left: calc(-1 * var(--bar-column-gap) - 1px);*/
-	/*margin-left: calc(-1em * var(--stem-width));*/
-	margin-right: calc(-1 * var(--bar-column-gap));
     /* TODO: This doesnt take account of different head sizes */
 	transform: translate3d(calc(1em * var(--head-1-size) - 1px), calc(1em * var(--translate-y, 0)), 0);
 }
@@ -403,8 +402,6 @@ in their duration span. */
 }
 
 .bar .down-beam {
-	margin-left:  0;
-	margin-right: calc(-1em * var(--stem-width) - var(--bar-column-gap));
 	transform: translate3d(0, calc(1em * var(--translate-y, 0)), 0);
 }
 

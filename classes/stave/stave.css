@@ -388,7 +388,7 @@
 
 .stave > .up-beam {
     position: relative;
-    top: calc(-0.9375em * var(--stem-height));
+    top: calc(-1em * var(--stem-height));
 }
 
 .stave > .down-beam {

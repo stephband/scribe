@@ -124,13 +124,14 @@ export function createPartElement({ name, stave, key, symbols }) {
 
 export function createSigElement(bar0, defaultKeyName) {
     const element = create('music-sig');
+    const hasMultipleParts = bar0.length > 1;
     let n = -1;
     while (bar0[++n]) {
         const part = bar0[n];
         const stave = part.stave;
         const keyName = toKeyName(part.key !== undefined ? part.key : (defaultKeyName || bar0.key || 0));
-        // Don't display "default" part name
-        const labelElement = part.name === 'default' ? null : create('h2', {
+        // Don't display "default" part name, or any part name if there is only one part
+        const labelElement = (!hasMultipleParts || part.name === 'default') ? null : create('h2', {
             class: `part-name`,
             text: part.name
         });
@@ -143,8 +144,8 @@ export function createSigElement(bar0, defaultKeyName) {
         const symbols = stave.createSignatureSymbols(keyName);
         let i = -1;
         while (symbols[++i]) staveElement.appendChild(createSymbolElement(symbols[i]));
-        // Don't display "default" part name
-        if (part.name !== 'default') element.appendChild(labelElement);
+        // Don't display "default" part name or single part name
+        if (labelElement) element.appendChild(labelElement);
         element.appendChild(staveElement);
     }
     return element;

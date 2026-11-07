@@ -1,4 +1,5 @@
 
+.grand-stave,
 .piano-stave {
     padding-top: 0.0625em;
     padding-bottom: 0.0625em;
@@ -88,25 +89,36 @@
     background-size: 100% 3.75em;
 }
 
+.grand-stave > .rest,
 .piano-stave > .rest,
+.grand-stave > .timesig,
 .piano-stave > .timesig,
+.grand-stave > .barrepeat,
 .piano-stave > .barrepeat,
+.grand-stave > .rest[voice="rh"],
 .piano-stave > .rest[voice="rh"],
+.grand-stave > .timesig[voice="rh"],
 .piano-stave > .timesig[voice="rh"],
+.grand-stave > .barrepeat[voice="rh"],
 .piano-stave > .barrepeat[voice="rh"] {
     grid-row: B4;
 }
 
+.grand-stave > .rest[voice="lh"],
 .piano-stave > .rest[voice="lh"],
+.grand-stave > .timesig[voice="lh"],
 .piano-stave > .timesig[voice="lh"],
+.grand-stave > .barrepeat[voice="lh"],
 .piano-stave > .barrepeat[voice="lh"] {
     grid-row: D3;
 }
 
+.grand-stave > .lyric,
 .piano-stave > .lyric {
     align-self: center;
 }
 
+.bar.grand-stave::before,
 .bar.piano-stave::before {
     grid-row: D2;
 }
@@ -151,46 +163,58 @@
 [voice^="bass"][pitch^="C"][pitch$="4"]  { grid-row: lh-C4; }
 
 /* Map unoctaved pitches to stave lines for key signatures. */
-.piano-stave > [pitch="F♭"] { grid-row-start: F4; }
-.piano-stave > [pitch="C♭"] { grid-row-start: C5; }
-.piano-stave > [pitch="G♭"] { grid-row-start: G4; }
-.piano-stave > [pitch="D♭"] { grid-row-start: D5; }
-.piano-stave > [pitch="A♭"] { grid-row-start: A4; }
-.piano-stave > [pitch="E♭"] { grid-row-start: E5; }
-.piano-stave > [pitch="B♭"] { grid-row-start: B4; }
-.piano-stave > [pitch="F♯"] { grid-row-start: F5; }
-.piano-stave > [pitch="C♯"] { grid-row-start: C5; }
-.piano-stave > [pitch="G♯"] { grid-row-start: G5; }
-.piano-stave > [pitch="D♯"] { grid-row-start: D5; }
-.piano-stave > [pitch="A♯"] { grid-row-start: A4; }
-.piano-stave > [pitch="E♯"] { grid-row-start: E5; }
-.piano-stave > [pitch="B♯"] { grid-row-start: B4; }
+.grand-stave > [pitch="F♭"], .piano-stave > [pitch="F♭"] { grid-row-start: F4; }
+.grand-stave > [pitch="C♭"], .piano-stave > [pitch="C♭"] { grid-row-start: C5; }
+.grand-stave > [pitch="G♭"], .piano-stave > [pitch="G♭"] { grid-row-start: G4; }
+.grand-stave > [pitch="D♭"], .piano-stave > [pitch="D♭"] { grid-row-start: D5; }
+.grand-stave > [pitch="A♭"], .piano-stave > [pitch="A♭"] { grid-row-start: A4; }
+.grand-stave > [pitch="E♭"], .piano-stave > [pitch="E♭"] { grid-row-start: E5; }
+.grand-stave > [pitch="B♭"], .piano-stave > [pitch="B♭"] { grid-row-start: B4; }
+.grand-stave > [pitch="F♯"], .piano-stave > [pitch="F♯"] { grid-row-start: F5; }
+.grand-stave > [pitch="C♯"], .piano-stave > [pitch="C♯"] { grid-row-start: C5; }
+.grand-stave > [pitch="G♯"], .piano-stave > [pitch="G♯"] { grid-row-start: G5; }
+.grand-stave > [pitch="D♯"], .piano-stave > [pitch="D♯"] { grid-row-start: D5; }
+.grand-stave > [pitch="A♯"], .piano-stave > [pitch="A♯"] { grid-row-start: A4; }
+.grand-stave > [pitch="E♯"], .piano-stave > [pitch="E♯"] { grid-row-start: E5; }
+.grand-stave > [pitch="B♯"], .piano-stave > [pitch="B♯"] { grid-row-start: B4; }
 
-.piano-stave > [pitch="F♭"][voice="lh"] { grid-row-start: F2; }
-.piano-stave > [pitch="C♭"][voice="lh"] { grid-row-start: C3; }
-.piano-stave > [pitch="G♭"][voice="lh"] { grid-row-start: G2; }
-.piano-stave > [pitch="D♭"][voice="lh"] { grid-row-start: D3; }
-.piano-stave > [pitch="A♭"][voice="lh"] { grid-row-start: A2; }
-.piano-stave > [pitch="E♭"][voice="lh"] { grid-row-start: E3; }
-.piano-stave > [pitch="B♭"][voice="lh"] { grid-row-start: B2; }
-.piano-stave > [pitch="F♯"][voice="lh"] { grid-row-start: F3; }
-.piano-stave > [pitch="C♯"][voice="lh"] { grid-row-start: C3; }
-.piano-stave > [pitch="G♯"][voice="lh"] { grid-row-start: G3; }
-.piano-stave > [pitch="D♯"][voice="lh"] { grid-row-start: D3; }
-.piano-stave > [pitch="A♯"][voice="lh"] { grid-row-start: A2; }
-.piano-stave > [pitch="E♯"][voice="lh"] { grid-row-start: E3; }
-.piano-stave > [pitch="B♯"][voice="lh"] { grid-row-start: B2; }
+.grand-stave > [pitch="F♭"][voice="lh"], .piano-stave > [pitch="F♭"][voice="lh"] { grid-row-start: F2; }
+.grand-stave > [pitch="C♭"][voice="lh"], .piano-stave > [pitch="C♭"][voice="lh"] { grid-row-start: C3; }
+.grand-stave > [pitch="G♭"][voice="lh"], .piano-stave > [pitch="G♭"][voice="lh"] { grid-row-start: G2; }
+.grand-stave > [pitch="D♭"][voice="lh"], .piano-stave > [pitch="D♭"][voice="lh"] { grid-row-start: D3; }
+.grand-stave > [pitch="A♭"][voice="lh"], .piano-stave > [pitch="A♭"][voice="lh"] { grid-row-start: A2; }
+.grand-stave > [pitch="E♭"][voice="lh"], .piano-stave > [pitch="E♭"][voice="lh"] { grid-row-start: E3; }
+.grand-stave > [pitch="B♭"][voice="lh"], .piano-stave > [pitch="B♭"][voice="lh"] { grid-row-start: B2; }
+.grand-stave > [pitch="F♯"][voice="lh"], .piano-stave > [pitch="F♯"][voice="lh"] { grid-row-start: F3; }
+.grand-stave > [pitch="C♯"][voice="lh"], .piano-stave > [pitch="C♯"][voice="lh"] { grid-row-start: C3; }
+.grand-stave > [pitch="G♯"][voice="lh"], .piano-stave > [pitch="G♯"][voice="lh"] { grid-row-start: G3; }
+.grand-stave > [pitch="D♯"][voice="lh"], .piano-stave > [pitch="D♯"][voice="lh"] { grid-row-start: D3; }
+.grand-stave > [pitch="A♯"][voice="lh"], .piano-stave > [pitch="A♯"][voice="lh"] { grid-row-start: A2; }
+.grand-stave > [pitch="E♯"][voice="lh"], .piano-stave > [pitch="E♯"][voice="lh"] { grid-row-start: E3; }
+.grand-stave > [pitch="B♯"][voice="lh"], .piano-stave > [pitch="B♯"][voice="lh"] { grid-row-start: B2; }
 
 /* TODO: The distinction between part and staff and vertical range really needs sorting out */
+.grand-stave > .up-ledge[voice="soprano"],
 .piano-stave > .up-ledge[voice="soprano"],
+.grand-stave > .up-ledge[voice="alto"],
 .piano-stave > .up-ledge[voice="alto"],
+.grand-stave > .up-ledge[voice="rh"],
 .piano-stave > .up-ledge[voice="rh"]   { grid-row-end:   rh-top; }
+.grand-stave > .down-ledge[voice="soprano"],
 .piano-stave > .down-ledge[voice="soprano"],
+.grand-stave > .down-ledge[voice="alto"],
 .piano-stave > .down-ledge[voice="alto"],
+.grand-stave > .down-ledge[voice="rh"],
 .piano-stave > .down-ledge[voice="rh"] { grid-row-start: rh-bottom; }
+.grand-stave > .up-ledge[voice="tenor"],
 .piano-stave > .up-ledge[voice="tenor"],
+.grand-stave > .up-ledge[voice="bass"],
 .piano-stave > .up-ledge[voice="bass"],
+.grand-stave > .up-ledge[voice="lh"],
 .piano-stave > .up-ledge[voice="lh"]   { grid-row-end:   lh-top; }
+.grand-stave > .down-ledge[voice="tenor"],
 .piano-stave > .down-ledge[voice="tenor"],
+.grand-stave > .down-ledge[voice="bass"],
 .piano-stave > .down-ledge[voice="bass"],
+.grand-stave > .down-ledge[voice="lh"],
 .piano-stave > .down-ledge[voice="lh"] { grid-row-start: lh-bottom; }

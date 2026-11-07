@@ -32,13 +32,14 @@
             "dom/":      "/dom/modules/",
             "fn/":       "/fn/modules/",
             "midi/":     "/midi/modules/",
+            "neuron/":   "/neuron/",
             "sequence/": "/sequence/"
         }
     }</script>
 
     <!-- Import <scribe-music> -->
-    <link rel="stylesheet" href="./build/scribe-music/element.css" />
-    <script type="module" src="./build/scribe-music/element.js"></script>
+    <link rel="stylesheet" href="./scribe-music/element.css" />
+    <script type="module" src="./scribe-music/element.js"></script>
 
     <style>
     @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/elements/html.css';
@@ -261,6 +262,20 @@
     </style>
 
     <script type="application/json" id="a-fond">{
+    "objects": [
+        { "id": 1, "name": "Accompaniment" },
+        { "id": 2, "name": "Melody" }
+    ],
+
+    "parts": [{
+        "staff": "grand",
+        "name": "Piano",
+        "voices": {
+            "rh": 2,
+            "lh": 1
+        }
+    }],
+
     "events": [
         [0,  "key",   0],
         [0,  "meter", 3, 1],
@@ -308,6 +323,20 @@
     }]
     }</script>
     <script type="application/json" id="fare-thee">{
+        "objects": [
+            { "id": 1, "name": "Accompaniment" },
+            { "id": 2, "name": "Melody" }
+        ],
+
+        "parts": [{
+            "staff": "grand",
+            "name": "Piano",
+            "voices": {
+                "rh": 2,
+                "lh": 1
+            }
+        }],
+
         "events": [
             [0,  "key",   0],
             [0,  "meter", 3, 1],
@@ -360,6 +389,20 @@
         }]
     }</script>
     <script type="application/json" id="thine-be">{
+        "objects": [
+            { "id": 1, "name": "Accompaniment" },
+            { "id": 2, "name": "Melody" }
+        ],
+
+        "parts": [{
+            "staff": "grand",
+            "name": "Piano",
+            "voices": {
+                "rh": 2,
+                "lh": 1
+            }
+        }],
+
         "events": [
             [0,  "key",   0],
             [0,  "meter", 3, 1],
@@ -414,6 +457,20 @@
         }]
     }</script>
     <script type="application/json" id="where-in">{
+        "objects": [
+            { "id": 1, "name": "Accompaniment" },
+            { "id": 2, "name": "Melody" }
+        ],
+
+        "parts": [{
+            "staff": "grand",
+            "name": "Piano",
+            "voices": {
+                "rh": 2,
+                "lh": 1
+            }
+        }],
+
         "events": [
             [0,  "key",   0],
             [0,  "meter", 3, 1],
@@ -473,7 +530,7 @@
 </head>
 <body>
     <header class="header-section 9x-grid grid" style="--y-gap: 0em;">
-        <h1 class="font-01 darkpink-fg no-wrap 9x @1-x2 @1-6x @3-4x">Scribe<span class="font-03" style="font-weight: 300;"> 0.5</span></h1>
+        <h1 class="font-01 darkpink-fg no-wrap 9x @1-x2 @1-6x @3-4x">Scribe<span class="font-03" style="font-weight: 300;"> 0.6</span></h1>
         <p class="font-04 9x @1-x2 @1-6x @2-5x @3-4x">
         <strong>Scribe</strong> is a CSS-powered technique for displaying <strong>music notation</strong>, packaged in a <strong>custom element</strong> that turns sequence data into HTML.
         Scribe is laid out using <strong>flex</strong> and <strong>grid</strong>, sized in <strong>relative font sizes</strong>, and <strong>responds</strong> to the flow of the web, making it very readable,
@@ -486,11 +543,11 @@
         <pre class="9x @1-x2 @1-8x"><code class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">src=<span class="attribute-value">"./blue-in-green.json"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</code></pre>
         <scribe-music class="9x @1-x2 @1-7x @3-6x" staff="treble" src="./data/blue-in-green.json"></scribe-music>
 
-        <pre class="9x @1-x2 @1-8x"><code class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">clef=<span class="attribute-value">"drum"</span></span> <span class="attribute">src=<span class="attribute-value">"./caravan-drums.json"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</code></pre>
+        <pre class="9x @1-x2 @1-8x"><code class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">staff=<span class="attribute-value">"drum"</span></span> <span class="attribute">src=<span class="attribute-value">"./caravan-drums.json"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</code></pre>
         <scribe-music class="9x @1-x2 @1-7x @3-6x" staff="drum" src="./data/caravan-drums.json"></scribe-music>
 
-        <pre class="9x @1-x2 @1-8x"><code class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">clef=<span class="attribute-value">"piano"</span></span> <span class="attribute">src=<span class="attribute-value">"./ae-fond-kiss.json"</span></span> <span class="attribute">transpose=<span class="attribute-value">"4"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</code></pre>
-        <scribe-music class="9x @1-x2 @1-7x @3-6x" staff="piano" src="./data/ae-fond-kiss.json" transpose="4"></scribe-music>
+        <pre class="9x @1-x2 @1-8x"><code class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">staff=<span class="attribute-value">"grand"</span></span> <span class="attribute">src=<span class="attribute-value">"./ae-fond-kiss.json"</span></span> <span class="attribute">transpose=<span class="attribute-value">"4"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</code></pre>
+        <scribe-music class="9x @1-x2 @1-7x @3-6x" staff="grand" src="./data/ae-fond-kiss.json" transpose="4"></scribe-music>
 
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">There are more examples on <a href="https://the-dots.app">the-dots.app</a>.</p>
 
@@ -498,21 +555,19 @@
 
         <h3 class="font-03 darkpink-fg 6x @1-x2 @3-4x">Import the custom element</h3>
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">Include the CSS and JS from the CDN in your document <code class="tag">&lt;head&gt;</code>:</p>
-        <pre class="9x @1-x2 @1-8x"><code><span class="tag">&lt;link</span> <span class="attribute">rel=</span><span class="attribute-value">"stylesheet"</span> <span class="attribute">href=</span><span class="attribute-value">"https://cdn.jsdelivr.net/gh/stephband/scribe@0.5.x/build/scribe-music/element.css"</span> <span class="tag">/&gt;</span>
-<span class="tag">&lt;script </span><span class="attribute">type=</span><span class="attribute-value">"module"</span> <span class="attribute">src=</span><span class="attribute-value">"https://cdn.jsdelivr.net/gh/stephband/scribe@0.5.x/build/scribe-music/element.js"</span><span class="tag">&gt;&lt;/script&gt;</span></code></pre>
+        <pre class="9x @1-x2 @1-8x"><code><span class="tag">&lt;link</span> <span class="attribute">rel=</span><span class="attribute-value">"stylesheet"</span> <span class="attribute">href=</span><span class="attribute-value">"https://cdn.jsdelivr.net/gh/stephband/scribe@0.6.x/build/scribe-music/element.css"</span> <span class="tag">/&gt;</span>
+<span class="tag">&lt;script </span><span class="attribute">type=</span><span class="attribute-value">"module"</span> <span class="attribute">src=</span><span class="attribute-value">"https://cdn.jsdelivr.net/gh/stephband/scribe@0.6.x/build/scribe-music/element.js"</span><span class="tag">&gt;&lt;/script&gt;</span></code></pre>
         <!--p class="9x @1-x2 @1-6x @2-5x @3-4x">The element is now registered and ready to author into your document.</p-->
 
         <h3 class="font-03 darkpink-fg 6x @1-x2 @3-4x">Write a tune</h3>
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">Write some sequence data and use <code class="tag">&lt;scribe-music&gt;</code> to render it:</p>
-        <pre class="9x @1-x2 @1-8x"><code><span class="tag">&lt;script <span class="attribute">type=</span><span class="attribute-value">"application/json"</span> <span class="attribute">id=</span><span class="attribute-value">"tune"</span>&gt;</span><span class="json" id="tune">{
-    <span class="property">"events"</span>: [
-        [<span class="number">0</span>, <span class="string">"key"</span>, <span class="string">"D"</span>],
-        [<span class="number">0</span>, <span class="string">"meter"</span>, <span class="number">4</span>, <span class="number">1</span>],
-        [<span class="number">0</span>, <span class="string">"note"</span>, <span class="string">"D4"</span>, <span class="number">0.1</span>, <span class="number">1</span>],
-        [<span class="number">1</span>, <span class="string">"note"</span>, <span class="string">"F#4"</span>, <span class="number">0.1</span>, <span class="number">1</span>],
-        [<span class="number">2</span>, <span class="string">"note"</span>, <span class="string">"A4"</span>, <span class="number">0.1</span>, <span class="number">1</span>]
-    ]
-}</span><span class="tag">&lt;/script&gt;</span>
+        <pre class="9x @1-x2 @1-8x"><code><span class="tag">&lt;script <span class="attribute">type=</span><span class="attribute-value">"text/sequence"</span> <span class="attribute">id=</span><span class="attribute-value">"tune"</span>&gt;</span><span class="sequence" id="tune" type="text/sequence">
+    <span class="number">0</span> <span class="string">key</span> <span class="string">D</span>
+    <span class="number">0</span> <span class="string">meter</span> <span class="number">4/4</span>
+    <span class="number">0</span> <span class="string">D4</span> <span class="number">1</span>
+    <span class="number">1</span> <span class="string">F#4</span> <span class="number">1</span>
+    <span class="number">2</span> <span class="string">A4</span> <span class="number">1</span>
+</span><span class="tag">&lt;/script&gt;</span>
 <span class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">src=<span class="attribute-value">"#tune"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</span></code></pre>
         <scribe-music class="9x @1-x2 @1-6x @2-5x @3-4x" src="#tune"></scribe-music>
     </section>
@@ -533,7 +588,7 @@
               <td><code>src</code></td>
               <td><code>.src</code></td>
               <td><code>URL</code></td>
-              <td>URL of a JSON file or hashref of a script containing sequence data</td>
+              <td>URL of a JSON or text file, or hashref of a script, containing sequence data</td>
             </tr>
             <tr>
               <td>&nbsp;</td>
@@ -542,10 +597,10 @@
               <td>The sequence data object</td>
             </tr>
             <tr>
-              <td><code>clef</code></td>
-              <td><code>.clef</code></td>
+              <td><code>staff</code></td>
+              <td><code>.staff</code></td>
               <td><code>string</code></td>
-              <td><code>"treble"</code>, <code>"bass"</code>, <code>"piano"</code>, <code>"alto"</code>, <code>"drum"</code> or <code>"percussion"</code></td>
+              <td><code>"treble"</code>, <code>"bass"</code>, <code>"grand"</code>, <code>"alto"</code>, <code>"drum"</code> or <code>"percussion"</code></td>
             </tr>
             <tr>
               <td><code>key</code></td>
@@ -563,7 +618,7 @@
               <td><code>transpose</code></td>
               <td><code>.transpose</code></td>
               <td><code>number</code></td>
-              <td>Transpose notation, but not the underlying data, by a given number of semitones</td>
+              <td>Transposition in semitones</td>
             </tr>
             <tr>
               <td><code>layout</code></td>
@@ -594,7 +649,8 @@
         A sequence is an object with an <code class="property">events</code> property, an array of events.
         An event has the form <code>[beat, type, ...data]</code>.
         In Scribe, 1 beat is a quarter note.
-        A sequence may also have a <code class="property">sequences</code> property, an array of 'child' sequences.
+        A sequence may also have a <code class="property">sequences</code> property, an array of nested sequences.
+        A nested sequence has the same sequence structure, and must have an id.
         As an example, here are the first four bars of Herbie Hancock's <a href="https://www.youtube.com/watch?v=RaHCnfI7y74&list=RDRaHCnfI7y74">Dolphin Dance</a> as sequence data:
         </p>
 
@@ -799,10 +855,10 @@
             To change the look of your music include one of these stylesheets:
         </p>
 
-        <pre class="9x @1-x2 @1-8x"><code><span class="tag">&lt;link <span class="attribute">rel=<span class="attribute-value">"stylesheet"</span></span> <span class="attribute">href=<span class="attribute-value">"https://cdn.jsdelivr.net/gh/stephband/scribe@0.5/build/fonts/petaluma.css"</span></span> /&gt;</span>
-<span class="tag">&lt;link <span class="attribute">rel=<span class="attribute-value">"stylesheet"</span></span> <span class="attribute">href=<span class="attribute-value">"https://cdn.jsdelivr.net/gh/stephband/scribe@0.5/build/fonts/bravura.css"</span></span> /&gt;</span>
-<span class="tag">&lt;link <span class="attribute">rel=<span class="attribute-value">"stylesheet"</span></span> <span class="attribute">href=<span class="attribute-value">"https://cdn.jsdelivr.net/gh/stephband/scribe@0.5/build/fonts/broadway.css"</span></span> /&gt;</span>
-<span class="tag">&lt;link <span class="attribute">rel=<span class="attribute-value">"stylesheet"</span></span> <span class="attribute">href=<span class="attribute-value">"https://cdn.jsdelivr.net/gh/stephband/scribe@0.5/build/fonts/ash.css"</span></span> /&gt;</span></code></pre>
+        <pre class="9x @1-x2 @1-8x"><code><span class="tag">&lt;link <span class="attribute">rel=<span class="attribute-value">"stylesheet"</span></span> <span class="attribute">href=<span class="attribute-value">"https://cdn.jsdelivr.net/gh/stephband/scribe@0.6/build/fonts/petaluma.css"</span></span> /&gt;</span>
+<span class="tag">&lt;link <span class="attribute">rel=<span class="attribute-value">"stylesheet"</span></span> <span class="attribute">href=<span class="attribute-value">"https://cdn.jsdelivr.net/gh/stephband/scribe@0.6/build/fonts/bravura.css"</span></span> /&gt;</span>
+<span class="tag">&lt;link <span class="attribute">rel=<span class="attribute-value">"stylesheet"</span></span> <span class="attribute">href=<span class="attribute-value">"https://cdn.jsdelivr.net/gh/stephband/scribe@0.6/build/fonts/broadway.css"</span></span> /&gt;</span>
+<span class="tag">&lt;link <span class="attribute">rel=<span class="attribute-value">"stylesheet"</span></span> <span class="attribute">href=<span class="attribute-value">"https://cdn.jsdelivr.net/gh/stephband/scribe@0.6/build/fonts/ash.css"</span></span> /&gt;</span></code></pre>
 
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
             And set the new font-family:
@@ -812,46 +868,50 @@
             <h3 class="petaluma-font">Petaluma</h3>
             <pre>font-family: Petaluma, PetalumaText;</pre>
         </div>
-        <scribe-music class="9x @1-x2 @1-8x @2-x1 @2-4x @2-y5 @2-2y y-start petaluma-font" staff="piano" transpose="3" src="#a-fond"></scribe-music>
+        <scribe-music class="9x @1-x2 @1-8x @2-x1 @2-4x @2-y5 @2-2y y-start petaluma-font" staff="grand" transpose="3" src="#a-fond"></scribe-music>
 
         <div class="9x @1-x2 @1-8x @2-x5 @2-4x @2-y5">
             <h3 class="bravura-font">Bravura</h3>
             <pre>font-family: Bravura, BravuraText;</pre>
         </div>
-        <scribe-music class="9x @1-x2 @1-8x @2-x5 @2-4x @2-y6 @2-2y y-start bravura-font" staff="piano" transpose="3" src="#fare-thee"></scribe-music>
+        <scribe-music class="9x @1-x2 @1-8x @2-x5 @2-4x @2-y6 @2-2y y-start bravura-font" staff="grand" transpose="3" src="#fare-thee"></scribe-music>
 
         <div class="9x @1-x2 @1-8x @2-x2 @2-4x @2-y10">
             <h3 class="broadway-font">Broadway</h3>
             <pre>font-family: Broadway, BroadwayText;</pre>
         </div>
-        <scribe-music class="9x @1-x2 @1-8x @2-x2 @2-4x @2-y8 @2-2y y-start broadway-font" staff="piano" transpose="3" src="#thine-be"></scribe-music>
+        <scribe-music class="9x @1-x2 @1-8x @2-x2 @2-4x @2-y8 @2-2y y-start broadway-font" staff="grand" transpose="3" src="#thine-be"></scribe-music>
 
         <div class="9x @1-x2 @1-8x @2-x6 @2-4x @2-y8">
             <h3 class="ash-font">Ash</h3>
             <pre>font-family: Ash, AshText;</pre>
         </div>
-        <scribe-music class="9x @1-x2 @1-8x @2-x6 @2-4x @2-y9 @2-2y y-start ash-font" staff="piano" transpose="3" src="#where-in"></scribe-music>
+        <scribe-music class="9x @1-x2 @1-8x @2-x6 @2-4x @2-y9 @2-2y y-start ash-font" staff="grand" transpose="3" src="#where-in"></scribe-music>
     </section>
 
     <section class="status-section 9x-grid grid">
         <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Status</h2>
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-            Scribe 0.5 is an <strong>evaluation release</strong>.
-            It is capable of rendering <strong>a decent lead sheet</strong>, and there are some example lead sheets at <a href="https://the-dots.app">the-dots.app</a>.
-            It does have some rough edges, and I am looking for feedback.
-            Leave an issue on <strong>GitHub</strong> <a href="https://github.com/stephband/scribe/">github.com/stephband/scribe/</a> or bleat me on <strong>BlueSky</strong> <a href="https://bsky.app/profile/stephen.band">bsky.app/profile/stephen.band</a>.
+            Scribe 0.6 introduces a Recurrent Neural Network for note spelling,
+            refines the Elastic Phase-Locked Metrical Quantiser for rhythm detection,
+            employs CSS sub-grids to support multi-stave scoring and supports a small
+            set of automatically rendered dynamic and duration accents.
+            It does have some rough edges, and I am happy to get feedback:
+            leave an issue on <strong>GitHub</strong> <a href="https://github.com/stephband/scribe/">github.com/stephband/scribe/</a>,
+            bleat me on <strong>BlueSky</strong> <a href="https://bsky.app/profile/stephen.band">bsky.app/profile/stephen.band</a>.
         </p>
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-            If you're curious about how the CSS works, there's a blog post outlining the approach at <a class="no-wrap" href="https://cruncher.ch/blog/printing-music-with-css-grid/">cruncher.ch/blog/printing-music-with-css-grid/</a>.
+            If you are curious about how the CSS lays out music notation, there's a blog post introducing the approach at <a class="no-wrap" href="https://cruncher.ch/blog/printing-music-with-css-grid/">cruncher.ch/blog/printing-music-with-css-grid/</a>.
+            Scribe's CSS has changed since that was written, but the technique is the same.
         </p>
     </section>
 
     <footer class="footer-section 9x-grid grid">
         <h2 class="font-02 x1 9x @1-x4 @1-5x @2-x6 @2-3x y1 y-end">About me</h2>
         <p class="font-04 x1 9x @1-x4 @1-5x @2-x6 @2-3x y2 y-start">
-            I'm a sound and design engineer exploring web technologies for music production.
+            I'm a musician/engineer exploring web technologies.
             Bleat me on <a href="https://bsky.app/profile/stephen.band" style="color: white;">BlueSky</a>,
-            <a href="https://cruncher.ch" style="color: white;">hire me</a>, or please fund me on <a href="https://github.com/sponsors/stephband" style="color: white;">Github Sponsors</a> or <a href="https://buymeacoffee.com/stephband" style="color: white;">Buy Me a Coffee</a> to continue work on Scribe.
+            <a href="https://cruncher.ch" style="color: white;">hire me</a>, or fund Scribe on <a href="https://github.com/sponsors/stephband" style="color: white;">Github Sponsors</a> or <a href="https://buymeacoffee.com/stephband" style="color: white;">Buy Me a Coffee</a>.
         </p>
     </footer>
 </body>

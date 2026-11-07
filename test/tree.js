@@ -495,6 +495,267 @@ Deno.test('Retain trailing bar when note genuinely ties across bar line', async 
     is(tree[1].doubleBarLine, true, 'Last bar should have double bar line');
 });
 
+Deno.test('Score parts: routes multiple sources to voices on a grand stave', async () => {
+    const sequence = Sequence.from({
+        objects: [
+            { id: 1, name: "Accompaniment" },
+            { id: 2, name: "Melody" }
+        ],
+        events: [
+            [0, "meter", 4, 1],
+            [0, "key", "C"],
+            [0, "sequence", 1, 2, 4], // Melody (source 2)
+            [0, "sequence", 2, 1, 4]  // Accompaniment (source 1)
+        ],
+        sequences: [
+            { id: 1, events: [[0, "note", "E4", 0.1, 4]] },
+            { id: 2, events: [[0, "note", "C3", 0.1, 4]] }
+        ],
+        parts: [{
+            staff: "grand",
+            name: "Piano",
+            voices: {
+                rh: 2,
+                lh: 1
+            }
+        }]
+    });
+
+    const tree = await requestTree(sequence);
+    is(tree.length, 1);
+    is(tree[0].length, 1);
+    is(tree[0][0].name, 'Piano');
+    is(tree[0][0].stave.type, 'grand');
+
+    const notes = tree[0][0].symbols.filter((s) => s.type === 'note');
+    is(notes.length, 2);
+    is(notes.find((n) => n.pitch === 'E4').voice.name, 'rh');
+    is(notes.find((n) => n.pitch === 'C3').voice.name, 'lh');
+});
+
+Deno.test('Score parts: routes sources to open score staves', async () => {
+    const sequence = Sequence.from({
+        objects: [
+            { id: "mel", name: "Melody" },
+            { id: "acc", name: "Accompaniment" }
+        ],
+        events: [
+            [0, "meter", 4, 1],
+            [0, "key", "C"],
+            [0, "sequence", 1, "mel", 4],
+            [0, "sequence", 2, "acc", 4]
+        ],
+        sequences: [
+            { id: 1, events: [[0, "note", "E4", 0.1, 4]] },
+            { id: 2, events: [[0, "note", "C3", 0.1, 4]] }
+        ],
+        parts: [
+            { staff: "treble", name: "Melody", voices: { main: "mel" } },
+            { staff: "bass", name: "Accompaniment", voices: { main: "acc" } }
+        ]
+    });
+
+    const tree = await requestTree(sequence);
+    is(tree.length, 1);
+    is(tree[0].length, 2);
+    is(tree[0][0].name, 'Melody');
+    is(tree[0][0].stave.type, 'treble');
+    is(tree[0][1].name, 'Accompaniment');
+    is(tree[0][1].stave.type, 'bass');
+
+    const p0Notes = tree[0][0].symbols.filter((s) => s.type === 'note');
+    const p1Notes = tree[0][1].symbols.filter((s) => s.type === 'note');
+    is(p0Notes.length, 1);
+    is(p0Notes[0].pitch, 'E4');
+    is(p1Notes.length, 1);
+    is(p1Notes[0].pitch, 'C3');
+});
+
+Deno.test('Score parts: routes SATB to four voices on a single grand stave', async () => {
+    const sequence = Sequence.from({
+        objects: [
+            { id: 1, name: "Soprano" },
+            { id: 2, name: "Alto" },
+            { id: 3, name: "Tenor" },
+            { id: 4, name: "Bass" }
+        ],
+        events: [
+            [0, "meter", 4, 1],
+            [0, "key", "C"],
+            [0, "sequence", 1, 1, 4],
+            [0, "sequence", 2, 2, 4],
+            [0, "sequence", 3, 3, 4],
+            [0, "sequence", 4, 4, 4]
+        ],
+        sequences: [
+            { id: 1, events: [[0, "note", "G5", 0.1, 4]] },
+            { id: 2, events: [[0, "note", "E4", 0.1, 4]] },
+            { id: 3, events: [[0, "note", "C4", 0.1, 4]] },
+            { id: 4, events: [[0, "note", "C3", 0.1, 4]] }
+        ],
+        parts: [{
+            staff: "grand",
+            name: "Choir",
+            voices: {
+                soprano: 1,
+                alto:    2,
+                tenor:   3,
+                bass:    4
+            }
+        }]
+    });
+
+    const tree = await requestTree(sequence);
+    is(tree.length, 1);
+    is(tree[0].length, 1);
+    is(tree[0][0].name, 'Choir');
+    is(tree[0][0].stave.type, 'grand');
+
+    const notes = tree[0][0].symbols.filter((s) => s.type === 'note');
+    is(notes.length, 4);
+    is(notes.find((n) => n.pitch === 'G5').voice.name, 'soprano');
+    is(notes.find((n) => n.pitch === 'E4').voice.name, 'alto');
+    is(notes.find((n) => n.pitch === 'C4').voice.name, 'tenor');
+    is(notes.find((n) => n.pitch === 'C3').voice.name, 'bass');
+});
+
+Deno.test('Score parts: undefined voices implicitly maps { 0: 0 } and distributes voice 0 on grand stave', async () => {
+    const sequence = Sequence.from({
+        events: [
+            [0, "meter", 4, 1],
+            [0, "key", "C"],
+            [0, "note", "E4", 0.1, 4], // >= 60 -> rh
+            [0, "note", "C3", 0.1, 4]  // < 60  -> lh
+        ],
+        parts: [{
+            staff: "grand",
+            name: "Piano"
+            // voices undefined -> implicit { 0: 0 }
+        }]
+    });
+
+    const tree = await requestTree(sequence);
+    is(tree.length, 1);
+    is(tree[0].length, 1);
+    is(tree[0][0].name, 'Piano');
+    is(tree[0][0].stave.type, 'grand');
+
+    const notes = tree[0][0].symbols.filter((s) => s.type === 'note');
+    is(notes.length, 2);
+    is(notes.find((n) => n.pitch === 'E4').voice.name, 'rh');
+    is(notes.find((n) => n.pitch === 'C3').voice.name, 'lh');
+});
+
+Deno.test('Score parts: numeric voice keys map to grand stave voices (1: rh, 2: lh)', async () => {
+    const sequence = Sequence.from({
+        objects: [
+            { id: 1, name: "BassPart" },
+            { id: 2, name: "TreblePart" }
+        ],
+        events: [
+            [0, "meter", 4, 1],
+            [0, "key", "C"],
+            [0, "sequence", 1, 2, 4],
+            [0, "sequence", 2, 1, 4]
+        ],
+        sequences: [
+            { id: 1, events: [[0, "note", "G4", 0.1, 4]] },
+            { id: 2, events: [[0, "note", "F2", 0.1, 4]] }
+        ],
+        parts: [{
+            staff: "grand",
+            name: "Piano",
+            voices: {
+                1: 2, // voice 1 -> rh
+                2: 1  // voice 2 -> lh
+            }
+        }]
+    });
+
+    const tree = await requestTree(sequence);
+    is(tree[0][0].name, 'Piano');
+    const notes = tree[0][0].symbols.filter((s) => s.type === 'note');
+    is(notes.length, 2);
+    is(notes.find((n) => n.pitch === 'G4').voice.name, 'rh');
+    is(notes.find((n) => n.pitch === 'F2').voice.name, 'lh');
+});
+
+Deno.test('Score parts: numeric voice keys map to SATB on grand stave (3: soprano, 4: alto, 5: tenor, 6: bass)', async () => {
+    const sequence = Sequence.from({
+        objects: [
+            { id: 1, name: "Sop" },
+            { id: 2, name: "Alt" },
+            { id: 3, name: "Ten" },
+            { id: 4, name: "Bas" }
+        ],
+        events: [
+            [0, "meter", 4, 1],
+            [0, "key", "C"],
+            [0, "sequence", 1, 1, 4],
+            [0, "sequence", 2, 2, 4],
+            [0, "sequence", 3, 3, 4],
+            [0, "sequence", 4, 4, 4]
+        ],
+        sequences: [
+            { id: 1, events: [[0, "note", "G5", 0.1, 4]] },
+            { id: 2, events: [[0, "note", "E4", 0.1, 4]] },
+            { id: 3, events: [[0, "note", "C4", 0.1, 4]] },
+            { id: 4, events: [[0, "note", "C3", 0.1, 4]] }
+        ],
+        parts: [{
+            staff: "grand",
+            name: "SATB",
+            voices: {
+                3: 1,
+                4: 2,
+                5: 3,
+                6: 4
+            }
+        }]
+    });
+
+    const tree = await requestTree(sequence);
+    is(tree[0][0].name, 'SATB');
+    const notes = tree[0][0].symbols.filter((s) => s.type === 'note');
+    is(notes.length, 4);
+    is(notes.find((n) => n.pitch === 'G5').voice.name, 'soprano');
+    is(notes.find((n) => n.pitch === 'E4').voice.name, 'alto');
+    is(notes.find((n) => n.pitch === 'C4').voice.name, 'tenor');
+    is(notes.find((n) => n.pitch === 'C3').voice.name, 'bass');
+});
+
+Deno.test('3/4 meter: notes and text on third beat stay within their bar', async () => {
+    const sequence = Sequence.from({
+        events: [
+            [0, "meter", 3, 1],
+            [0, "key", "C"],
+            [0, "text", 2, "kiss"],
+            [0, "note", "G4", 0.1, 2],
+            [2, "text", 1, "and"],
+            [2, "note", "G3", 0.1, 1],
+            [3, "text", 2, "then"],
+            [3, "note", "A3", 0.1, 2],
+            [5, "text", 1, "we"],
+            [5, "note", "G3", 0.1, 1]
+        ]
+    });
+
+    const tree = await requestTree(sequence);
+    is(tree.length, 2);
+
+    // Bar 0: beat 0
+    const bar0Texts = tree[0][0].symbols.filter((s) => s.type === 'text');
+    const bar0Notes = tree[0][0].symbols.filter((s) => s.type === 'note');
+    is(bar0Texts.map((s) => s.value).join(' '), 'kiss and');
+    is(bar0Notes.length, 2);
+
+    // Bar 1: beat 3
+    const bar1Texts = tree[1][0].symbols.filter((s) => s.type === 'text');
+    const bar1Notes = tree[1][0].symbols.filter((s) => s.type === 'note');
+    is(bar1Texts.map((s) => s.value).join(' '), 'then we');
+    is(bar1Notes.length, 2);
+});
+
 
 
 

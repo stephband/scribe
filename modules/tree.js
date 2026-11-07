@@ -11,7 +11,7 @@ import config           from './config.js';
 const { assign } = Object;
 
 export default async function requestTree(sequence, settings = {}, transpose = 0, displace = 0, duration = Infinity) {
-    settings = assign({ display: sequence.display }, config, settings);
+    settings = assign({ display: sequence.display, parts: sequence.parts }, config, settings);
 
     // Make transforms list
     const array = [];

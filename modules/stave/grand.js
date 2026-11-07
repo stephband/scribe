@@ -1,6 +1,6 @@
 
 import * as glyphs from "../glyphs.js";
-import { toNoteName } from 'midi/note.js';
+import { toNoteName, toNoteNumber } from 'midi/note.js';
 import { rflatsharp } from '../pitch.js';
 import Stave       from './stave.js';
 
@@ -80,17 +80,17 @@ export default class GrandStave extends Stave {
     staffs = ['treble', 'bass'];
 
     voices = [{
-        name:      'lh',
-        staff:     'bass',
-        topRow:    29,
-        centerRow: 33,
-        bottomRow: 38
-    }, {
         name:      'rh',
         staff:     'treble',
         topRow:    9,
         centerRow: 13,
         bottomRow: 18
+    }, {
+        name:      'lh',
+        staff:     'bass',
+        topRow:    29,
+        centerRow: 33,
+        bottomRow: 38
     }, {
         // Voice range C4-C6
         // Soprano sax Ab3-Eb6
@@ -145,26 +145,25 @@ export default class GrandStave extends Stave {
         return i > -1 ? i : undefined ;
     }
 
-    getVoice(number) {
-        return typeof number === 'number' ?
-            number < 60 ?
-                this.voices[0] :
-                this.voices[1] :
-            /[012]$|[AC-G](?:bb|𝄫|##|𝄪|[b#♭♯])*3$/u.test(number) ?
-                this.voices[0] :
-                this.voices[1] ;
+    getVoice(pitch) {
+        const number = typeof pitch === 'number' ? pitch : toNoteNumber(pitch);
+        return number < 60 ?
+            this.voices.find((v) => v.name === 'lh') :
+            this.voices.find((v) => v.name === 'rh');
     }
 
-    getPart(number) {
-        return this.getVoice(number);
+    getPart(pitch) {
+        return this.getVoice(pitch);
     }
 
     createKeySymbols(key) {
         const keysig  = super.createKeySymbols(key);
         const symbols = [];
+        const rhVoice = this.voices.find((v) => v.name === 'rh');
+        const lhVoice = this.voices.find((v) => v.name === 'lh');
         // Add key signature to both staffs
-        symbols.push.apply(symbols, keysig.map((symbol) => assign({}, symbol, { voice: this.voices[0] })));
-        symbols.push.apply(symbols, keysig.map((symbol) => assign({}, symbol, { voice: this.voices[1] })));
+        symbols.push.apply(symbols, keysig.map((symbol) => assign({}, symbol, { voice: rhVoice })));
+        symbols.push.apply(symbols, keysig.map((symbol) => assign({}, symbol, { voice: lhVoice })));
         return symbols;
     }
 
@@ -172,12 +171,12 @@ export default class GrandStave extends Stave {
         const symbols = [{
             type:  'clef',
             clef:  'treble',
-            voice: this.voices[0],
+            voice: this.voices.find((v) => v.name === 'rh'),
             stave: this
         }, {
             type:  'clef',
             clef:  'bass',
-            voice: this.voices[1],
+            voice: this.voices.find((v) => v.name === 'lh'),
             stave: this
         }];
 

@@ -74,7 +74,9 @@ export function renderStyle(element, root = element) {
     const c = Array.from(staves).map((element) => counts[element.getAttribute('key')] || 0);
     c.push(0);
     const count = Math.max.apply(Math, c);
-console.log('COUNT', count, (0.25 + 2.375 + count * 0.625 + 0.5).toFixed(6));
+    const sig = root.querySelector('.side music-sig');
+    const hasPartNames = Boolean(sig && sig.querySelectorAll('.part-name').length > 0 && sig.querySelectorAll('music-stave').length > 1);
+    const labelWidth = hasPartNames ? 'var(--signature-label) + var(--signature-gap) + ' : '';
     return `
         --head-1-size:       ${ truncate(6, head1Width / fontSize) };
         --head-2-size:       ${ truncate(6, head2Width / fontSize) };
@@ -83,7 +85,9 @@ console.log('COUNT', count, (0.25 + 2.375 + count * 0.625 + 0.5).toFixed(6));
         --head-diamond-size: ${ truncate(6, headDiamondWidth / fontSize) };
         --acci-flat-size:    ${ truncate(6, acciFlatWidth / fontSize) };
         --acci-sharp-size:   ${ truncate(6, acciSharpWidth / fontSize) };
-        --signature-width: calc(var(--signature-label) + var(--signature-gap) + ${ (0.25 + 2.375 + count * 0.625 + 0.5).toFixed(6) }em);
+        --signature-label:   ${ hasPartNames ? '0.3125em' : '0em' };
+        --signature-gap:     ${ hasPartNames ? '0.1875em' : '0em' };
+        --signature-width:   calc(${ labelWidth }${ (0.25 + 2.375 + count * 0.625 + 0.5).toFixed(6) }em);
     `;               // label and gap | margin | clef | accidentals | margin
 }
 

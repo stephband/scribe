@@ -87,7 +87,7 @@
     flex-wrap: wrap !important;
     flex-direction: row !important;
     column-gap: 0 !important;
-    row-gap: 3em !important;
+    row-gap: 0;
     align-content: start !important;
 
     /* Encourage scribe not to stretch vertically when in a grid context – it
@@ -116,6 +116,13 @@
 :host([staff="drum"]),
 :host([staff="percussion"]) {
     --signature-width: 1em;
+}
+
+/* Multi-part scores: 3em row-gap between systems */
+:host:has(music-bar > music-stave:nth-of-type(2)),
+:host(:has(music-bar > music-stave:nth-of-type(2))),
+.scribe:has(music-bar > music-stave:nth-of-type(2)) {
+    row-gap: 3em;
 }
 
 :host > .side,
@@ -174,6 +181,22 @@ music-sig > music-stave {
     /* Keep stave the same scale as bar */
     font-size: 1em !important;
     padding-left: calc(1px + 0.125em) !important;
+}
+
+/* Hide .part-name and drop first column when there is only one part or no .part-name elements */
+music-sig:not(:has(> .part-name)),
+music-sig:has(> music-stave:only-of-type) {
+    grid-template-columns: auto;
+    column-gap: 0;
+}
+
+music-sig:not(:has(> .part-name)) > music-stave,
+music-sig:has(> music-stave:only-of-type) > music-stave {
+    grid-column: 1;
+}
+
+music-sig:has(> music-stave:only-of-type) > .part-name {
+    display: none;
 }
 
 

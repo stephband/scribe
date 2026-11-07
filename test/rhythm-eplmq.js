@@ -363,3 +363,12 @@ Deno.test("EPL-MQ: Elastic Restoring Spring back to absolute pulse", () => {
     matches(result[1], { beat: 1, duration: 1, divisor: 2, rhythm: 3 });
     matches(result[2], { beat: 3, duration: 1, divisor: 2, rhythm: 3 });
 });
+
+Deno.test("Rhythm detection across non-zero start beats in 3-beat measures", () => {
+    // In a 3/4 bar starting at beat 3 (duration 3), events at beats 3 and 5 must both be detected
+    const events = [[3], [5]];
+    const result = detect(3, 3, events);
+    equals(result.length, 2);
+    matches(result[0], { beat: 3, duration: 2, count: 1 });
+    matches(result[1], { beat: 5, duration: 1, count: 1 });
+});

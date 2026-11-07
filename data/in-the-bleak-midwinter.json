@@ -309,7 +309,7 @@
         ]
     }],
 
-    "scribe": {
-        "clef": "piano"
+    "display": {
+        "staff": "grand"
     }
 }
