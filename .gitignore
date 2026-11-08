@@ -1,4 +1,3 @@
-.claude/
 .venv/
 .nova/
 archive/*
@@ -11,5 +10,3 @@ TODO.md
 local.*
 *.local
 *.local.*
-scribe-blam/
-scripts/
