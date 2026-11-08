@@ -104,17 +104,16 @@
 </head>
 <body>
     <header class="header-section 9x-grid grid" style="--y-gap: 0em;">
-        <p class="breadcrumb 9x @1-x2 @1-6x @3-4x"><a href="../index.html">Scribe</a> / Documentation</p>
-        <h1 class="font-01 darkpink-fg no-wrap 9x @1-x2 @1-6x @3-4x">Multi-Stave Scoring</h1>
+        <p class="breadcrumb 9x @1-x2 @1-6x @2-5x @3-4x"><a href="../index.html">Scribe</a> / <a href="index.html">API</a> / Multi-Stave Scoring</p>
+        <h1 class="font-01 darkpink-fg no-wrap 9x @1-x2 @1-6x @2-5x @3-4x">Multi-Stave Scoring</h1>
         <p class="font-04 9x @1-x2 @1-6x @2-5x @3-4x">
-            In Western musical tradition, cramming an entire ensemble onto a solitary stave is generally considered poor form.
-            Scribe approaches multi-part and multi-stave scores by rigorously disentangling the musical sound generators (<code class="property">"objects"</code>)
-            from visual engraving instructions (<code class="property">"parts"</code>).
+            Scribe decouples instruments (<code class="property">"objects"</code>)
+            from the staves they are rendered on (<code class="property">"parts"</code>).
         </p>
     </header>
 
     <section class="content-section 9x-grid grid">
-        <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Open Scores: Miles Davis' "So What"</h2>
+        <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Objects and parts</h2>
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
             When multiple instruments play concurrently, Scribe stacks their staves synchronously within each flex measure.
             In <a href="https://www.youtube.com/watch?v=ylXk1LBvIqU">So What</a>, five separate voices (Trumpet, Alto sax, Tenor sax, Trombone, and Bass)
@@ -122,9 +121,9 @@
         </p>
 
         <pre class="9x @1-x2 @1-8x"><code class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">src=<span class="attribute-value">"../data/so-what.json"</span></span> <span class="attribute">duration=<span class="attribute-value">"16"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</code></pre>
-        <scribe-music class="9x @1-x2 @1-8x" src="../data/so-what.json" duration="16"></scribe-music>
+        <scribe-music class="9x @1-x2 @1-7x @3-6x" src="../data/so-what.json" duration="16"></scribe-music>
 
-        <h3 class="font-03 darkpink-fg 9x @1-x2 @3-4x">1. Declaring Sound Sources: <code class="property">"objects"</code></h3>
+        <h3 class="font-03 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">1. Declaring Sound Sources: <code class="property">"objects"</code></h3>
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
             The top-level sequence declares an <code class="property">"objects"</code> array. Each object assigns an identifier and human-readable instrument name:
         </p>
@@ -153,7 +152,7 @@
     [<span class="number">0</span>, <span class="string">"sequence"</span>, <span class="number">6</span>, <span class="number">6</span>, <span class="number">4</span>]  <span class="nt">// routes sequence 6 to object 6 (Bass)</span>
 ]</code></pre>
 
-        <h3 class="font-03 darkpink-fg 9x @1-x2 @3-4x">2. Automatic Stave Resolution</h3>
+        <h3 class="font-03 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">2. Automatic Stave Resolution</h3>
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
             When no explicit <code class="property">"parts"</code> definition is supplied, Scribe inspects each object's name and applies sensible instrument defaults:
             Trumpet, Alto, and Tenor resolve to treble staves; Trombone and Bass resolve to bass staves.
@@ -168,7 +167,7 @@
         </p>
 
         <pre class="9x @1-x2 @1-8x"><code class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">staff=<span class="attribute-value">"grand"</span></span> <span class="attribute">src=<span class="attribute-value">"../data/ae-fond-kiss.json"</span></span> <span class="attribute">duration=<span class="attribute-value">"12"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</code></pre>
-        <scribe-music class="9x @1-x2 @1-8x" staff="grand" src="../data/ae-fond-kiss.json" duration="12"></scribe-music>
+        <scribe-music class="9x @1-x2 @1-7x @3-6x" staff="grand" src="../data/ae-fond-kiss.json" duration="12"></scribe-music>
 
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
             In Robert Burns' traditional air <a href="https://en.wikipedia.org/wiki/Ae_Fond_Kiss_(song)">Ae Fond Kiss</a>, the melody (object 2) is explicitly directed
@@ -193,8 +192,8 @@
     </section>
 
     <section class="table-section 9x-grid grid">
-        <h2 class="font-02 x1 9x @1-x2 @1-7x @2-6x @3-4x">The <code class="property">"parts"</code> Specification</h2>
-        <table class="striped-table x1 9x @2-x2 @2-7x @3-6x">
+        <h2 class="font-02 9x @1-x2 @1-6x @2-5x @3-4x">Parts</h2>
+        <table class="striped-table 9x @1-x2 @1-7x @3-6x">
             <thead>
                 <tr>
                     <th>property</th>
@@ -221,7 +220,7 @@
                 <tr>
                     <td><code>transpose</code></td>
                     <td><code>number</code></td>
-                    <td>Per-part transposition in semitones (e.g. <code>2</code> for Bb Trumpet/Tenor, <code>9</code> for Eb Alto)</td>
+                    <td>Per-part transposition in semitones</td>
                 </tr>
                 <tr>
                     <td><code>voices</code></td>
@@ -231,11 +230,11 @@
             </tbody>
         </table>
 
-        <h3 class="font-03 x1 9x @1-x2 @1-7x @2-6x @3-4x" style="margin-top: 2em;">Voice Targets in Grand Staves</h3>
-        <p class="x1 9x @1-x2 @1-7x @2-6x @3-4x">
+        <h3 class="font-03 9x @1-x2 @1-6x @2-5x @3-4x" style="margin-top: 2em;">Voice Targets in Grand Staves</h3>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
             When targeting a <code class="string">"grand"</code> stave, the keys of the <code class="property">"voices"</code> object determine how lines are routed across staves and stem directions:
         </p>
-        <table class="striped-table x1 9x @2-x2 @2-7x @3-6x">
+        <table class="striped-table 9x @1-x2 @1-7x @3-6x">
             <thead>
                 <tr>
                     <th>voice key</th>
@@ -282,11 +281,5 @@
             </tbody>
         </table>
     </section>
-
-    <footer class="content-section 9x-grid grid" style="padding-top: 2em; padding-bottom: 4em;">
-        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-            <a href="../index.html">← Return to Scribe overview</a>
-        </p>
-    </footer>
 </body>
 </html>

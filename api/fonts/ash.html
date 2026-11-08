@@ -123,10 +123,8 @@
 <body>
     <header class="header-section 9x-grid grid" style="--y-gap: 0em;">
         <p class="breadcrumb 9x @1-x2 @1-6x @3-4x"><a href="../../index.html">Scribe</a> / <a href="../../index.html#fonts">Fonts</a> / Ash</p>
-        <h1 class="font-01 darkpink-fg no-wrap 9x @1-x2 @1-6x @3-4x ash-font">Ash</h1>
-        <p class="font-04 9x @1-x2 @1-6x @2-5x @3-4x">
-            <strong>Ash</strong> is an expressive handwritten font originally bundled with Finale.
-        </p>
+
+        <h1 class="font-01 darkpink-fg no-wrap 9x @1-x2 @1-6x @3-4x">Fonts</h1>
 
         <nav class="font-nav 9x @1-x2 @1-8x">
             <a href="jazz.html">Jazz</a>
@@ -134,30 +132,25 @@
             <a href="petaluma.html">Petaluma</a>
             <a href="broadway.html">Broadway</a>
             <a href="ash.html" class="active">Ash</a>
-            <a href="leipzig.html">Leipzig</a>
+            <!--a href="leipzig.html">Leipzig</a-->
         </nav>
+
+        <p class="font-04 9x @1-x2 @1-6x @2-5x @3-4x">
+            <strong>Ash</strong> is an expressive handwritten font originally bundled with Finale.
+        </p>
     </header>
 
     <section class="content-section 9x-grid grid">
-        <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Preview: "Ae Fond Kiss"</h2>
-        <pre class="9x @1-x2 @1-8x"><code class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">class=<span class="attribute-value">"ash-font"</span></span> <span class="attribute">staff=<span class="attribute-value">"grand"</span></span> <span class="attribute">src=<span class="attribute-value">"../../data/ae-fond-kiss.json"</span></span> <span class="attribute">transpose=<span class="attribute-value">"4"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</code></pre>
-        <scribe-music class="9x @1-x2 @1-8x ash-font" staff="grand" src="../../data/ae-fond-kiss.json" transpose="4"></scribe-music>
-
-        <div class="9x @1-x2 @1-6x @2-5x @3-4x font-warning">
-            <strong>Compatibility Note:</strong> Ash has incomplete SMuFL glyph coverage; certain chord extension symbols and specialised noteheads may fall back or render blank.
-        </div>
-
-        <h3 class="font-03 darkpink-fg 9x @1-x2 @3-4x">Usage</h3>
+        <h2 class="font-02 darkpink-fg 9x @1-x2 @1-7x @3-6x x-center ash-font">Ae Fond Kiss</h2>
+        <scribe-music class="9x @1-x2 @1-7x @3-6x ash-font" staff="grand" src="../../data/ae-fond-kiss.json" transpose="4"></scribe-music>
+        <h3 class="font-03 darkpink-fg 9x @1-x2 @1-6x @3-4x">Usage</h3>
         <pre class="9x @1-x2 @1-8x"><code><span class="tag">&lt;link</span> <span class="attribute">rel=</span><span class="attribute-value">"stylesheet"</span> <span class="attribute">href=</span><span class="attribute-value">"https://cdn.jsdelivr.net/gh/stephband/scribe@0.6/build/fonts/ash.css"</span> <span class="tag">/&gt;</span></code></pre>
         <pre class="9x @1-x2 @1-8x"><code>.ash-font {
     font-family: Ash, AshText;
 }</code></pre>
+        <!--div class="9x @1-x2 @1-6x @2-5x @3-4x font-warning">
+            <strong>Compatibility Note:</strong> Ash has incomplete SMuFL glyph coverage; certain chord extension symbols and specialised noteheads may fall back or render blank.
+        </div-->
     </section>
-
-    <footer class="content-section 9x-grid grid" style="padding-top: 2em; padding-bottom: 4em;">
-        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-            <a href="../../index.html">← Return to Scribe overview</a>
-        </p>
-    </footer>
 </body>
 </html>

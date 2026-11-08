@@ -259,6 +259,63 @@
     pre {
         overflow: auto;
     }
+
+    .tab-nav {
+        display: flex;
+        gap: 0.5em;
+        margin-top: 0.75em;
+    }
+
+    .tab-button {
+        height: 1.5rem;
+        padding: 0 0.65rem;
+        border-radius: 4px;
+        background: #f0ede6;
+        color: #333;
+        font-family: inherit;
+        font-size: 0.8rem;
+        line-height: 1.5rem;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .tab-button:hover:not(.active) {
+        background: #e4e0d7;
+    }
+
+    .tab-button.active {
+        background: oklch(0.51 0.23 0);
+        color: white;
+        font-weight: 600;
+    }
+
+    .code-tabs {
+        display: grid;
+        grid-template-areas: "code";
+    }
+
+    .code-tabs > .tab-panel {
+        grid-area: code;
+        margin: 0;
+        transition: opacity 0.25s ease-in-out, visibility 0.25s ease-in-out;
+    }
+
+    .code-tabs > .tab-panel:not(.active) {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    .code-tabs > .tab-panel.active {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
     </style>
 
     <script type="application/json" id="a-fond">{
@@ -532,10 +589,9 @@
     <header class="header-section 9x-grid grid" style="--y-gap: 0em;">
         <h1 class="font-01 darkpink-fg no-wrap 9x @1-x2 @1-6x @3-4x">Scribe<span class="font-03" style="font-weight: 300;"> 0.6</span></h1>
         <p class="font-04 9x @1-x2 @1-6x @2-5x @3-4x">
-        <strong>Scribe</strong> is a CSS-powered technique for displaying <strong>music notation</strong>, packaged in a <strong>custom element</strong> that turns sequence data into HTML.
-        Scribe is laid out using <strong>flex</strong> and <strong>grid</strong>, sized in <strong>relative font sizes</strong>, and <strong>responds</strong> to the flow of the web, making it very readable,
-        <!--And because it's largely CSS it's highly&nbsp;customisable.-->
-        and perfect for embedding musical examples in tutorials, for publishing lead sheets to be read on a phone at a gig, or for live feedback of, say, MIDI input in a web app.
+        <strong>Scribe</strong> is a <strong>music notator</strong> packaged in a <strong>custom element</strong> that turns <strong>sequences of musical events</strong> into <strong>HTML</strong>.
+        Music is laid out using <strong>flex</strong> and <strong>grid</strong>, sized in <strong>relative font sizes</strong>, and <strong>responsive</strong> to the flow of the web, making it readable,
+        customisable, and perfect for embedding musical examples in tutorials, for publishing lead sheets to be read on a phone at a gig, or for live feedback of, say, MIDI input in a web app.
         </p>
     </header>
 
@@ -549,7 +605,7 @@
         <pre class="9x @1-x2 @1-8x"><code class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">staff=<span class="attribute-value">"grand"</span></span> <span class="attribute">src=<span class="attribute-value">"./ae-fond-kiss.json"</span></span> <span class="attribute">transpose=<span class="attribute-value">"4"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</code></pre>
         <scribe-music class="9x @1-x2 @1-7x @3-6x" staff="grand" src="./data/ae-fond-kiss.json" transpose="4"></scribe-music>
 
-        <p class="9x @1-x2 @1-6x @2-5x @3-4x">There are more examples on <a href="https://the-dots.app">the-dots.app</a>.</p>
+        <!--p class="9x @1-x2 @1-6x @2-5x @3-4x">There are more examples on <a href="https://the-dots.app">the-dots.app</a>.</p-->
 
         <h2 class="font-02 darkpink-fg 6x @1-x2 @3-4x">Get started</h2>
 
@@ -561,7 +617,9 @@
 
         <h3 class="font-03 darkpink-fg 6x @1-x2 @3-4x">Write a tune</h3>
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">Write some sequence data and use <code class="tag">&lt;scribe-music&gt;</code> to render it:</p>
-        <pre class="9x @1-x2 @1-8x"><code><span class="tag">&lt;script <span class="attribute">type=</span><span class="attribute-value">"text/sequence"</span> <span class="attribute">id=</span><span class="attribute-value">"tune"</span>&gt;</span><span class="sequence" id="tune" type="text/sequence">
+        <div class="code-block 9x @1-x2 @1-8x">
+            <div class="code-tabs">
+                <pre class="tab-panel active" role="tabpanel" id="tune-text-panel" aria-labelledby="tab-text" data-panel="text"><code><span class="tag">&lt;script <span class="attribute">type=</span><span class="attribute-value">"text/sequence"</span> <span class="attribute">id=</span><span class="attribute-value">"tune"</span>&gt;</span><span class="sequence" id="tune" type="text/sequence">
     <span class="number">0</span> <span class="string">key</span> <span class="string">D</span>
     <span class="number">0</span> <span class="string">meter</span> <span class="number">4/4</span>
     <span class="number">0</span> <span class="string">D4</span> <span class="number">1</span>
@@ -569,6 +627,22 @@
     <span class="number">2</span> <span class="string">A4</span> <span class="number">1</span>
 </span><span class="tag">&lt;/script&gt;</span>
 <span class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">src=<span class="attribute-value">"#tune"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</span></code></pre>
+                <pre class="tab-panel" role="tabpanel" id="tune-json-panel" aria-labelledby="tab-json" data-panel="json"><code><span class="tag">&lt;script <span class="attribute">type=</span><span class="attribute-value">"application/json"</span> <span class="attribute">id=</span><span class="attribute-value">"tune"</span>&gt;</span>{
+    <span class="property">"events"</span>: [
+        [<span class="number">0</span>, <span class="string">"key"</span>, <span class="string">"D"</span>],
+        [<span class="number">0</span>, <span class="string">"meter"</span>, <span class="number">4</span>, <span class="number">1</span>],
+        [<span class="number">0</span>, <span class="string">"note"</span>, <span class="string">"D4"</span>, <span class="number">0.1</span>, <span class="number">1</span>],
+        [<span class="number">1</span>, <span class="string">"note"</span>, <span class="string">"F#4"</span>, <span class="number">0.1</span>, <span class="number">1</span>],
+        [<span class="number">2</span>, <span class="string">"note"</span>, <span class="string">"A4"</span>, <span class="number">0.1</span>, <span class="number">1</span>]
+    ]
+}<span class="tag">&lt;/script&gt;</span>
+<span class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">src=<span class="attribute-value">"#tune"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</span></code></pre>
+            </div>
+            <nav class="tab-nav" role="tablist" aria-label="Code format">
+                <button type="button" class="tab-button active" role="tab" aria-selected="true" aria-controls="tune-text-panel" id="tab-text" data-tab="text">Text</button>
+                <button type="button" class="tab-button" role="tab" aria-selected="false" aria-controls="tune-json-panel" id="tab-json" data-tab="json">JSON</button>
+            </nav>
+        </div>
         <scribe-music class="9x @1-x2 @1-6x @2-5x @3-4x" src="#tune"></scribe-music>
     </section>
 
@@ -585,76 +659,76 @@
           </thead>
           <tbody>
             <tr>
-              <td><code>src</code></td>
-              <td><code>.src</code></td>
+              <td class="bold-text"><code>src</code></td>
+              <td class="bold-text"><code>.src</code></td>
               <td><code>URL</code></td>
               <td>URL of a JSON or text file, or hashref of a script, containing sequence data</td>
             </tr>
             <tr>
-              <td><code>type</code></td>
-              <td><code>.type</code></td>
+              <td class="bold-text"><code>type</code></td>
+              <td class="bold-text"><code>.type</code></td>
               <td><code>string</code></td>
-              <td>Mimetype or type of data to fetch: <code>"application/json"</code> (or <code>"json"</code>), <code>"sequence"</code>, <code>"text/plain"</code></td>
+              <td>Mimetype or type of data to fetch: <code>"application/json"</code> (or <code>"json"</code>), <code>"text/sequence"</code></td>
             </tr>
             <tr>
-              <td>&nbsp;</td>
-              <td><code>.data</code></td>
-              <td><code>object</code></td>
-              <td>The sequence data object</td>
-            </tr>
-            <tr>
-              <td><code>staff</code></td>
-              <td><code>.staff</code></td>
+              <td class="bold-text"><code>staff</code></td>
+              <td class="bold-text"><code>.staff</code></td>
               <td><code>string</code></td>
-              <td><code>"treble"</code>, <code>"treble-up"</code>, <code>"treble-down"</code>, <code>"alto"</code>, <code>"tenor"</code>, <code>"bass"</code>, <code>"grand"</code>, <code>"drum"</code> or <code>"percussion"</code></td>
+              <td><code>"treble"</code>, <code>"alto"</code>, <code>"tenor"</code>, <code>"bass"</code>, <code>"grand"</code>, <code>"drum"</code> or <code>"percussion"</code></td>
             </tr>
             <tr>
-              <td><code>key</code></td>
-              <td><code>.key</code></td>
+              <td class="bold-text"><code>key</code></td>
+              <td class="bold-text"><code>.key</code></td>
               <td><code>string</code></td>
               <td>The name of a major key, accepts <code>"Ab"</code> or <code>"A♭"</code> and <code>"F#"</code> or <code>"F♯"</code></td>
             </tr>
             <tr>
-              <td><code>meter</code></td>
-              <td><code>.meter</code></td>
+              <td class="bold-text"><code>meter</code></td>
+              <td class="bold-text"><code>.meter</code></td>
               <td><code>string</code></td>
               <td>A meter expressed as a standard time signature, such as <code>"4/4"</code> or <code>"6/8"</code></td>
             </tr>
             <tr>
-              <td><code>beat</code></td>
-              <td><code>.beat</code></td>
+              <td class="bold-text"><code>beat</code></td>
+              <td class="bold-text"><code>.beat</code></td>
               <td><code>number</code></td>
-              <td>Sets the start beat from which notation rendering begins. Defaults to <code>0</code></td>
+              <td>Beat at which render begins</td>
             </tr>
             <tr>
-              <td><code>duration</code></td>
-              <td><code>.duration</code></td>
+              <td class="bold-text"><code>duration</code></td>
+              <td class="bold-text"><code>.duration</code></td>
               <td><code>number</code></td>
-              <td>Sets the total duration (in beats) to render from the sequence. Defaults to <code>Infinity</code></td>
+              <td>Duration in beats to render</td>
             </tr>
             <tr>
-              <td><code>transpose</code></td>
-              <td><code>.transpose</code></td>
+              <td class="bold-text"><code>transpose</code></td>
+              <td class="bold-text"><code>.transpose</code></td>
               <td><code>number</code></td>
               <td>Transposition in semitones</td>
             </tr>
             <tr>
-              <td><code>layout</code></td>
-              <td>&nbsp;</td>
-              <td><code>string</code></td>
-              <td>Controls bar distribution across lines: <code>"compact"</code> (default) or <code>"regular"</code> (fits an even number of bars per line)</td>
-            </tr>
-            <tr>
-              <td><code>shuffle</code></td>
-              <td>&nbsp;</td>
+              <td class="bold-text"><code>shuffle</code></td>
+              <td class="bold-text">&nbsp;</td>
               <td><code>boolean</code></td>
               <td>Boolean attribute, displays swung 16ths as straight 16ths</td>
             </tr>
             <tr>
-              <td><code>swing</code></td>
-              <td>&nbsp;</td>
+              <td class="bold-text"><code>swing</code></td>
+              <td class="bold-text">&nbsp;</td>
               <td><code>boolean</code></td>
               <td>Boolean attribute, displays swung 8ths as straight 8ths</td>
+            </tr>
+            <tr>
+              <td class="bold-text"><code>layout</code></td>
+              <td class="bold-text">&nbsp;</td>
+              <td><code>string</code></td>
+              <td>Controls bar distribution <code>"compact"</code> (the default) or <code>"regular"</code> (even number of bars per line)</td>
+            </tr>
+            <tr>
+              <td>&nbsp;</td>
+              <td><code><b>.data</b></code></td>
+              <td><code>object</code></td>
+              <td>The sequence as a reactive object – mutating this causes the element to re-render</td>
             </tr>
           </tbody>
         </table>
@@ -849,7 +923,7 @@
         </div>
 
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-        For multi-part and multi-stave scores, see the <a href="./api/parts.html">multi-stave scoring documentation</a>.
+        For more, see the <a href="./api/index.html">API reference</a> and the <a href="./api/parts.html">multi-stave scoring documentation</a>.
         Some examples of sequence JSON can be found in the repository's <a href="https://github.com/stephband/scribe/tree/main/data">data</a> folder.
         </p>
     </section>
@@ -870,12 +944,7 @@
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
             Scribe supports <a href="https://w3c.github.io/smufl/latest/">SMuFL fonts</a>, W3C-standard fonts for rendering musical symbols.
             By default Scribe uses <a href="./api/fonts/jazz.html">Jazz</a> font, as seen in the examples on this page.
-            It comes tested with a number of other openly licensed SMuFL fonts:
-            <a href="./api/fonts/bravura.html">Bravura</a>,
-            <a href="./api/fonts/petaluma.html">Petaluma</a>,
-            <a href="./api/fonts/broadway.html">Broadway</a>,
-            <a href="./api/fonts/ash.html">Ash</a>, and
-            <a href="./api/fonts/leipzig.html">Leipzig</a>.
+            It comes tested with a number of other openly licensed SMuFL fonts.
             To change the look of your music include one of these stylesheets:
         </p>
 
@@ -916,8 +985,8 @@
     <section class="status-section 9x-grid grid">
         <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Status</h2>
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-            Scribe 0.6 introduces a Recurrent Neural Network for note spelling,
-            refines the Elastic Phase-Locked Metrical Quantiser for rhythm detection,
+            Scribe 0.6 introduces a neural network for note spelling,
+            refines the elastic phase-locked metrical quantiser (or rhythm detector),
             employs CSS sub-grids to support multi-stave scoring and supports a small
             set of automatically rendered dynamic and duration accents.
             It does have some rough edges, and I am happy to get feedback:
@@ -938,5 +1007,24 @@
             <a href="https://cruncher.ch" style="color: white;">hire me</a>, or fund Scribe on <a href="https://github.com/sponsors/stephband" style="color: white;">Github Sponsors</a> or <a href="https://buymeacoffee.com/stephband" style="color: white;">Buy Me a Coffee</a>.
         </p>
     </footer>
+
+    <script type="module">
+        const buttons = document.querySelectorAll('.code-block .tab-button');
+        const panels  = document.querySelectorAll('.code-block .tab-panel');
+
+        buttons.forEach((button) => {
+            button.addEventListener('click', () => {
+                const tab = button.dataset.tab;
+                buttons.forEach((btn) => {
+                    const isActive = btn === button;
+                    btn.classList.toggle('active', isActive);
+                    btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+                });
+                panels.forEach((panel) => {
+                    panel.classList.toggle('active', panel.dataset.panel === tab);
+                });
+            });
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Scribe – API Reference</title>
+
+    <meta charset="utf-8" />
+    <meta name="author" content="@stephband" />
+    <meta name="description" content="Scribe API Reference: sequence documents, bar repeats, shorthand grammar, DOM properties, and key/clef conventions." />
+    <meta name="viewport" content="width=device-width" />
+
+    <script title="load">
+        document.documentElement.className += ' js loading';
+        window.addEventListener('load', () => window.requestAnimationFrame(() => document.documentElement.classList.remove('loading')));
+        window.DEBUG = true;
+    </script>
+
+    <script type="importmap">{
+        "imports": {
+            "bolt/":     "/bolt/",
+            "dom/":      "/dom/modules/",
+            "fn/":       "/fn/modules/",
+            "midi/":     "/midi/modules/",
+            "neuron/":   "/neuron/",
+            "sequence/": "/sequence/"
+        }
+    }</script>
+
+    <!-- Import <scribe-music> -->
+    <link rel="stylesheet" href="../scribe-music/element.css" />
+    <script type="module" src="../scribe-music/element.js"></script>
+
+    <style>
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/elements/html.css';
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/ratio.css';
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/atoms.css';
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/striped-table.css';
+    @import '../assets/font.css';
+
+    @import '../fonts/ash.css';
+    @import '../fonts/bravura.css';
+    @import '../fonts/broadway.css';
+    @import '../fonts/jazz.css';
+    @import '../fonts/leipzig.css';
+    @import '../fonts/petaluma.css';
+
+    body {
+        font-family: system-ui, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    pre {
+        font-family: MartianMono, monospace;
+    }
+
+    .nt, .orange-fg, .tag { font-weight: 400; color: oklch(0.51 0.23 0); }
+    .na, .yellow-fg, .attribute, .property { font-weight: 400; color: oklch(0.51 0.23 180); }
+    .s,  .lime-fg, .attribute-value   { font-weight: 400; color: oklch(0.51 0.23 90); }
+    .number { color: oklch(0.51 0.23 30); }
+    .string { color: oklch(0.51 0.23 120); }
+    .json   { color: oklch(0.2 0.2 210); }
+
+    body > .grid {
+        padding-left:  calc(0.5 * var(--x-gap));
+        padding-right: calc(0.5 * var(--x-gap));
+    }
+
+    .ash-font      { font-family: Ash, AshText; }
+    .bravura-font  { font-family: Bravura, BravuraText; }
+    .broadway-font { font-family: Broadway, BroadwayText; }
+    .jazz-font     { font-family: Jazz, JazzText; }
+    .petaluma-font { font-family: Petaluma, PetalumaText; }
+    .leipzig-font  { font-family: Leipzig; }
+
+    .header-section,
+    .content-section,
+    .table-section {
+        padding-top: 3em;
+        padding-bottom: 3em;
+    }
+
+    .table-section {
+        color: oklch(0.31 0.06 279.08);
+        background-color: oklch(0.8 0.19 95.26);
+        background-image: linear-gradient(205deg, oklch(0.75 0.18 81.43), oklch(0.89 0.21 94.26));
+    }
+
+    .breadcrumb {
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 0.85em;
+    }
+
+    .breadcrumb a {
+        color: oklch(0.51 0.23 0);
+        text-decoration: none;
+    }
+
+    .breadcrumb a:hover {
+        text-decoration: underline;
+    }
+
+    .api-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75em;
+        margin-top: 1.5em;
+        margin-bottom: 0.5em;
+    }
+
+    .api-nav a {
+        padding: 0.35em 0.85em;
+        border-radius: 4px;
+        background: #f0ede6;
+        color: #333;
+        text-decoration: none;
+        font-size: 0.9em;
+    }
+
+    .api-nav a.active {
+        background: oklch(0.51 0.23 0);
+        color: white;
+        font-weight: 600;
+    }
+    </style>
+</head>
+<body>
+    <header class="header-section 9x-grid grid" style="--y-gap: 0em;">
+        <p class="breadcrumb 9x @1-x2 @1-6x @2-5x @3-4x"><a href="../index.html">Scribe</a> / API</p>
+        <h1 class="font-01 darkpink-fg no-wrap 9x @1-x2 @1-6x @2-5x @3-4x">API Reference</h1>
+        <p class="font-04 9x @1-x2 @1-6x @2-5x @3-4x">
+            Technical specifications for Scribe: Sequence documents, shorthand grammar, automatic repeat engraving, live DOM properties, and key/clef conventions.
+        </p>
+
+        <nav class="api-nav 9x @1-x2 @1-8x">
+            <a href="index.html" class="active">API Overview</a>
+            <a href="parts.html">Multi-Stave Scoring</a>
+            <a href="fonts/jazz.html">SMuFL Fonts</a>
+        </nav>
+    </header>
+
+    <section class="content-section 9x-grid grid">
+        <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Sequence Documents &amp; Musical Structure</h2>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            Scribe consumes <a href="https://github.com/soundio/sequence/">Sequence data</a>. The only strictly required property is an <code class="property">"events"</code> array.
+            By convention, Scribe treats the <strong>top-level sequence</strong> as describing the overarching formal structure of the composition.
+        </p>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            Child <code class="string">"sequence"</code> events placed in the top-level array cue movements, sections, or phrases defined in the <code class="property">"sequences"</code> array.
+            Scribe automatically renders <strong>double bar lines</strong> at the end of each cued section:
+        </p>
+
+        <pre class="9x @1-x2 @1-8x"><code class="json">{
+    <span class="property">"name"</span>: <span class="string">"So What"</span>,
+    <span class="property">"author"</span>: { <span class="property">"name"</span>: <span class="string">"Miles Davis"</span> },
+    <span class="property">"events"</span>: [
+        [<span class="number">0</span>,  <span class="string">"key"</span>, <span class="string">"C"</span>],
+        [<span class="number">0</span>,  <span class="string">"meter"</span>, <span class="number">4</span>, <span class="number">1</span>],
+        [<span class="number">0</span>,  <span class="string">"sequence"</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">32</span>],
+        [<span class="number">32</span>, <span class="string">"sequence"</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">32</span>],
+        [<span class="number">64</span>, <span class="string">"sequence"</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">32</span>, <span class="string">"transpose"</span>, <span class="number">1</span>],
+        [<span class="number">96</span>, <span class="string">"sequence"</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">32</span>]
+    ],
+
+    <span class="property">"sequences"</span>: [{
+        <span class="property">"id"</span>: <span class="number">1</span>,
+        <span class="property">"name"</span>: <span class="string">"Section"</span>,
+        <span class="property">"events"</span>: [
+            [<span class="number">0</span>,  <span class="string">"sequence"</span>, <span class="number">2</span>, <span class="number">0</span>, <span class="number">8</span>],
+            [<span class="number">8</span>,  <span class="string">"sequence"</span>, <span class="number">2</span>, <span class="number">0</span>, <span class="number">8</span>],
+            [<span class="number">16</span>, <span class="string">"sequence"</span>, <span class="number">2</span>, <span class="number">0</span>, <span class="number">8</span>],
+            [<span class="number">24</span>, <span class="string">"sequence"</span>, <span class="number">2</span>, <span class="number">0</span>, <span class="number">8</span>]
+        ]
+    }, {
+        <span class="property">"id"</span>: <span class="number">2</span>,
+        <span class="property">"name"</span>: <span class="string">"Horns"</span>,
+        <span class="property">"events"</span>: [
+            [<span class="number">0</span>,   <span class="string">"chord"</span>, <span class="string">"D"</span>, <span class="string">"-7"</span>, <span class="number">8</span>],
+            [<span class="number">2</span>,   <span class="string">"note"</span>, <span class="string">"B4"</span>, <span class="number">0.1</span>, <span class="number">1.6</span>],
+            [<span class="number">2</span>,   <span class="string">"note"</span>, <span class="string">"G4"</span>, <span class="number">0.1</span>, <span class="number">1.6</span>],
+            [<span class="number">2</span>,   <span class="string">"note"</span>, <span class="string">"D4"</span>, <span class="number">0.1</span>, <span class="number">1.6</span>],
+            [<span class="number">2</span>,   <span class="string">"note"</span>, <span class="string">"A3"</span>, <span class="number">0.1</span>, <span class="number">1.6</span>],
+            [<span class="number">3.6</span>, <span class="string">"note"</span>, <span class="string">"A4"</span>, <span class="number">0.1</span>, <span class="number">0.4</span>],
+            [<span class="number">3.6</span>, <span class="string">"note"</span>, <span class="string">"F4"</span>, <span class="number">0.1</span>, <span class="number">0.4</span>],
+            [<span class="number">3.6</span>, <span class="string">"note"</span>, <span class="string">"C4"</span>, <span class="number">0.1</span>, <span class="number">0.4</span>],
+            [<span class="number">3.6</span>, <span class="string">"note"</span>, <span class="string">"G3"</span>, <span class="number">0.1</span>, <span class="number">0.4</span>]
+        ]
+    }]
+}</code></pre>
+
+        <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Automatic Bar Repeat Detection</h2>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            Rather than writing out verbatim identical measures, Scribe detects repeated bar patterns across sequences and automatically replaces them with standard bar repeat symbols.
+        </p>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            Repeat replacement rules:
+        </p>
+        <ul class="list 9x @1-x2 @1-6x @2-5x @3-4x" style="padding-left: 1.25em;">
+            <li><strong>1-bar repeats:</strong> Activated after 3 repetitions (<code class="string">"AAAA"</code> renders as <code class="string">"x %1 %1 %1"</code>).</li>
+            <li><strong>2-bar repeats:</strong> Activated after 2 repetitions of a 2-bar figure (<code class="string">"ABABAB"</code> renders as <code class="string">"x x - %2 - %2"</code>).</li>
+            <li><strong>4-bar repeats:</strong> Activated after 1 repetition of a 4-bar section (<code class="string">"ABCDABCD"</code> renders as <code class="string">"x x x x - - %4 -"</code>).</li>
+            <li><strong>Structural protection:</strong> Repeats never cross double bar lines (the first bar of a new section is always fully engraved), and bars with incoming tied notes are protected from repeat substitution.</li>
+        </ul>
+
+        <h3 class="font-03 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">2-Bar Repeat Example</h3>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            In the 8-bar phrase below, the 2-bar "Horns" motif repeats across bars 3–8. Scribe preserves the first statement and places 2-bar repeat signs for the rest:
+        </p>
+
+        <script type="application/json" id="so-what-repeat-demo">{
+            "name": "So What Riff",
+            "events": [
+                [0, "key", "C"],
+                [0, "meter", 4, 1],
+                [0, "sequence", 1, 0, 32]
+            ],
+            "sequences": [{
+                "id": 1,
+                "name": "Section",
+                "events": [
+                    [0,  "sequence", 2, 0, 8],
+                    [8,  "sequence", 2, 0, 8],
+                    [16, "sequence", 2, 0, 8],
+                    [24, "sequence", 2, 0, 8]
+                ]
+            }, {
+                "id": 2,
+                "name": "Horns",
+                "events": [
+                    [0,   "chord", "D", "-7", 8],
+                    [2,   "note", "B4", 0.1, 1.6],
+                    [2,   "note", "G4", 0.1, 1.6],
+                    [2,   "note", "D4", 0.1, 1.6],
+                    [2,   "note", "A3", 0.1, 1.6],
+                    [3.6, "note", "A4", 0.1, 0.4],
+                    [3.6, "note", "F4", 0.1, 0.4],
+                    [3.6, "note", "C4", 0.1, 0.4],
+                    [3.6, "note", "G3", 0.1, 0.4]
+                ]
+            }]
+        }</script>
+        <scribe-music class="9x @1-x2 @1-7x @3-6x" src="#so-what-repeat-demo"></scribe-music>
+
+        <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Sequence Shorthand (<code class="string">"text/sequence"</code>)</h2>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            For rapid authoring in HTML documents, Scribe parses a whitespace-delimited shorthand format embedded inside <code class="tag">&lt;script type="text/sequence"&gt;</code> elements:
+        </p>
+
+        <pre class="9x @1-x2 @1-8x"><code class="tag">&lt;script <span class="attribute">type=</span><span class="attribute-value">"text/sequence"</span> <span class="attribute">id=</span><span class="attribute-value">"tune"</span>&gt;</span><span class="sequence" id="tune" type="text/sequence">
+    <span class="number">0</span> <span class="string">key</span> <span class="string">D</span>
+    <span class="number">0</span> <span class="string">meter</span> <span class="number">4/4</span>
+    <span class="number">0</span> <span class="string">D4</span> <span class="number">1</span>
+    <span class="number">1</span> <span class="string">F#4</span> <span class="number">1</span>
+    <span class="number">2</span> <span class="string">A4</span> <span class="number">1</span>
+</span><span class="tag">&lt;/script&gt;</span>
+<span class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">src=<span class="attribute-value">"#tune"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</span></code></pre>
+        <scribe-music class="9x @1-x2 @1-7x @3-6x" src="#tune"></scribe-music>
+
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            Shorthand type inference:
+        </p>
+        <ul class="list 9x @1-x2 @1-6x @2-5x @3-4x" style="padding-left: 1.25em;">
+            <li><strong>Bare note names:</strong> Tokens like <code class="string">D4</code>, <code class="string">F#4</code>, or <code class="string">Bb3</code> automatically resolve as note events without the <code class="string">"note"</code> keyword.</li>
+            <li><strong>Chord symbols:</strong> Standard chord notation (e.g. <code class="string">Cmaj7</code>, <code class="string">D-7</code>, <code class="string">G7alt</code>) is inferred directly without requiring explicit <code class="string">"chord"</code> keywords.</li>
+            <li><strong>Whitespace delineation:</strong> Each event line follows <code class="string">[beat] [token] [duration]</code> or keyword declarations like <code class="string">0 key D</code> and <code class="string">0 meter 4/4</code>.</li>
+        </ul>
+    </section>
+
+    <section class="table-section 9x-grid grid">
+        <h2 class="font-02 9x @1-x2 @1-6x @2-5x @3-4x">Programmatic DOM &amp; JavaScript API</h2>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            The <code class="tag">&lt;scribe-music&gt;</code> element reflects all attributes as live JavaScript DOM properties.
+            Querying and mutating these properties triggers an immediate, reactive re-render:
+        </p>
+
+        <table class="striped-table 9x @1-x2 @1-7x @3-6x">
+            <thead>
+                <tr>
+                    <th>property</th>
+                    <th>attribute</th>
+                    <th>type</th>
+                    <th>description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>.src</code></td>
+                    <td><code>src</code></td>
+                    <td><code>URL | string</code></td>
+                    <td>URL of sequence file or selector to an inline script (e.g. <code>"#tune"</code>)</td>
+                </tr>
+                <tr>
+                    <td><code>.type</code></td>
+                    <td><code>type</code></td>
+                    <td><code>string</code></td>
+                    <td>Mimetype: <code>"application/json"</code> (or <code>"json"</code>), <code>"text/sequence"</code></td>
+                </tr>
+                <tr>
+                    <td><code>.staff</code></td>
+                    <td><code>staff</code></td>
+                    <td><code>string</code></td>
+                    <td>Clef/stave configuration (defaults to <code>"treble"</code>)</td>
+                </tr>
+                <tr>
+                    <td><code>.key</code></td>
+                    <td><code>key</code></td>
+                    <td><code>string</code></td>
+                    <td>Tonic of major key signature (e.g. <code>"C"</code>, <code>"F#"</code>, <code>"B♭"</code>)</td>
+                </tr>
+                <tr>
+                    <td><code>.meter</code></td>
+                    <td><code>meter</code></td>
+                    <td><code>string</code></td>
+                    <td>Time signature (e.g. <code>"4/4"</code>, <code>"3/4"</code>, <code>"6/8"</code>)</td>
+                </tr>
+                <tr>
+                    <td><code>.beat</code></td>
+                    <td><code>beat</code></td>
+                    <td><code>number</code></td>
+                    <td>Starting beat from which notation rendering begins (defaults to <code>0</code>)</td>
+                </tr>
+                <tr>
+                    <td><code>.duration</code></td>
+                    <td><code>duration</code></td>
+                    <td><code>number</code></td>
+                    <td>Total duration in beats to render (defaults to <code>Infinity</code>)</td>
+                </tr>
+                <tr>
+                    <td><code>.transpose</code></td>
+                    <td><code>transpose</code></td>
+                    <td><code>number</code></td>
+                    <td>Pitch and key transposition offset in semitones</td>
+                </tr>
+                <tr>
+                    <td><code>.swing</code></td>
+                    <td><code>swing</code></td>
+                    <td><code>boolean</code></td>
+                    <td>Boolean flag; displays swung 8ths as straight 8ths</td>
+                </tr>
+                <tr>
+                    <td><code>.shuffle</code></td>
+                    <td><code>shuffle</code></td>
+                    <td><code>boolean</code></td>
+                    <td>Boolean flag; displays swung 16ths as straight 16ths</td>
+                </tr>
+                <tr>
+                    <td><code>.data</code></td>
+                    <td>&mdash;</td>
+                    <td><code>object</code></td>
+                    <td>Reactive sequence data object; mutating this immediately triggers a re-render</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 class="font-03 9x @1-x2 @1-6x @2-5x @3-4x" style="margin-top: 2em;">JavaScript DOM Manipulation</h3>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            Attributes and properties can be manipulated imperatively via standard DOM methods or direct property assignment:
+        </p>
+
+        <pre class="9x @1-x2 @1-8x"><code><span class="comment">// Query the music element</span>
+<span class="keyword">const</span> scribe = document.<span class="function">querySelector</span>(<span class="string">'scribe-music'</span>);
+
+<span class="comment">// Inspect reflected properties</span>
+console.<span class="function">log</span>(scribe.staff);      <span class="comment">// "treble"</span>
+console.<span class="function">log</span>(scribe.key);        <span class="comment">// "C"</span>
+
+<span class="comment">// Programmatically update properties (triggers dynamic re-render)</span>
+scribe.key = <span class="string">"B♭"</span>;
+scribe.meter = <span class="string">"3/4"</span>;
+scribe.transpose = <span class="number">2</span>;
+scribe.staff = <span class="string">"bass"</span>;
+
+<span class="comment">// Push events into the reactive data structure</span>
+scribe.data.events.<span class="function">push</span>([<span class="number">12</span>, <span class="string">"note"</span>, <span class="string">"C4"</span>, <span class="number">0.1</span>, <span class="number">1</span>]);</code></pre>
+    </section>
+
+    <section class="content-section 9x-grid grid">
+        <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Key Signatures, Transposition &amp; Clefs</h2>
+        
+        <h3 class="font-03 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">The Relative Major Rule</h3>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            Scribe has no provision for declaring minor key signatures directly (e.g. setting <code class="string">key="Dm"</code> is not supported).
+            Always declare the <strong>relative major</strong> tonic (e.g. use <code class="string">key="F"</code> for D minor, or <code class="string">key="Eb"</code> for C minor).
+        </p>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            Key names accept both Unicode accidentals (<code class="string">"♯"</code>, <code class="string">"♭"</code>) and ASCII symbols (<code class="string">"#"</code>, <code class="string">"b"</code>).
+        </p>
+
+        <h3 class="font-03 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Key Signature Transposition</h3>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            The <code class="property">key</code> attribute sets the pre-transposition key signature.
+            When <code class="property">transpose</code> is specified (e.g. <code class="attribute">transpose=</code><code class="attribute-value">"2"</code>),
+            the key signature is automatically transposed alongside all notes and chord symbols before engraving.
+        </p>
+
+        <h3 class="font-03 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Supported Staves and Clefs</h3>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            The <code class="property">staff</code> attribute accepts standard clefs as well as octave-transposing clefs:
+        </p>
+        <ul class="list 9x @1-x2 @1-6x @2-5x @3-4x" style="padding-left: 1.25em;">
+            <li><code class="string">"treble"</code> (default): Standard G-clef on second line.</li>
+            <li><code class="string">"treble-up"</code>: Treble clef 8va (sounds one octave higher than written).</li>
+            <li><code class="string">"treble-down"</code>: Treble clef 8vb (tenor vocal clef, sounds one octave lower than written).</li>
+            <li><code class="string">"alto"</code>: C-clef on third line.</li>
+            <li><code class="string">"tenor"</code>: C-clef on fourth line.</li>
+            <li><code class="string">"bass"</code>: Standard F-clef on fourth line.</li>
+            <li><code class="string">"grand"</code>: Braced piano stave combining treble and bass staves.</li>
+            <li><code class="string">"drum"</code> / <code class="string">"percussion"</code>: Neutral percussion clef with unpitched drum kit mappings.</li>
+        </ul>
+    </section>
+
+    <footer class="content-section 9x-grid grid" style="padding-top: 2em; padding-bottom: 4em;">
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            <a href="../index.html">← Return to Scribe overview</a>
+        </p>
+    </footer>
+</body>
+</html>

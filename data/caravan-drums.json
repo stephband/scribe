@@ -2,6 +2,7 @@
     "name": "Caravan – drum transcription",
 
     "events": [
+        [0, "meter", 4, 1],
         [0,  "sequence", 1, 0, 32]
     ],
 
@@ -17,7 +18,6 @@
     }, {
         "id": 2,
         "events": [
-            [0, "meter", 4, 1],
             [1,   "note", "A♭2", 0.1, 0.5],
             [3,   "note", "A♭2", 0.1, 0.5],
             [5,   "note", "A♭2", 0.1, 0.5],
