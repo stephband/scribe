@@ -8,6 +8,7 @@ archive/*
 AGENTS.md
 CLAUDE.md
 TODO.md
+local.*
 *.local
 *.local.*
 scribe-blam/
