@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Scribe Font – Jazz</title>
+
+    <meta charset="utf-8" />
+    <meta name="author" content="@stephband" />
+    <meta name="description" content="Scribe SMuFL font preview: Jazz" />
+    <meta name="viewport" content="width=device-width" />
+
+    <script title="load">
+        document.documentElement.className += ' js loading';
+        window.addEventListener('load', () => window.requestAnimationFrame(() => document.documentElement.classList.remove('loading')));
+        window.DEBUG = true;
+    </script>
+
+    <script type="importmap">{
+        "imports": {
+            "bolt/":     "/bolt/",
+            "dom/":      "/dom/modules/",
+            "fn/":       "/fn/modules/",
+            "midi/":     "/midi/modules/",
+            "neuron/":   "/neuron/",
+            "sequence/": "/sequence/"
+        }
+    }</script>
+
+    <!-- Import <scribe-music> -->
+    <link rel="stylesheet" href="../../scribe-music/element.css" />
+    <script type="module" src="../../scribe-music/element.js"></script>
+
+    <!-- Font stylesheet -->
+    <link rel="stylesheet" href="../../fonts/jazz.css" />
+
+    <style>
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/elements/html.css';
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/ratio.css';
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/atoms.css';
+    @import '../../assets/font.css';
+
+    body {
+        font-family: system-ui, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    pre {
+        font-family: MartianMono, monospace;
+    }
+
+    .nt, .orange-fg, .tag { font-weight: 400; color: oklch(0.51 0.23 0); }
+    .na, .yellow-fg, .attribute, .property { font-weight: 400; color: oklch(0.51 0.23 180); }
+    .s,  .lime-fg, .attribute-value   { font-weight: 400; color: oklch(0.51 0.23 90); }
+
+    body > .grid {
+        padding-left:  calc(0.5 * var(--x-gap));
+        padding-right: calc(0.5 * var(--x-gap));
+    }
+
+    .jazz-font {
+        font-family: Jazz, JazzText;
+    }
+
+    h1.jazz-font,
+    h2.jazz-font,
+    h3.jazz-font {
+        font-family: Jazz, JazzText;
+        height: 1.5em;
+        line-height: 2em;
+    }
+
+    .header-section,
+    .content-section {
+        padding-top: 3em;
+        padding-bottom: 3em;
+    }
+
+    .breadcrumb {
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 0.85em;
+    }
+
+    .breadcrumb a {
+        color: oklch(0.51 0.23 0);
+        text-decoration: none;
+    }
+
+    .font-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75em;
+        margin-top: 1em;
+        margin-bottom: 2em;
+    }
+
+    .font-nav a {
+        padding: 0.35em 0.85em;
+        border-radius: 4px;
+        background: #f0ede6;
+        color: #333;
+        text-decoration: none;
+        font-size: 0.9em;
+    }
+
+    .font-nav a.active {
+        background: oklch(0.51 0.23 0);
+        color: white;
+        font-weight: 600;
+    }
+    </style>
+</head>
+<body>
+    <header class="header-section 9x-grid grid" style="--y-gap: 0em;">
+        <p class="breadcrumb 9x @1-x2 @1-6x @3-4x"><a href="../../index.html">Scribe</a> / <a href="../../index.html#fonts">Fonts</a> / Jazz</p>
+        <h1 class="font-01 darkpink-fg no-wrap 9x @1-x2 @1-6x @3-4x jazz-font">Jazz</h1>
+        <p class="font-04 9x @1-x2 @1-6x @2-5x @3-4x">
+            <strong>Jazz</strong> is Scribe's default SMuFL font, offering the unmistakable hand-copied aesthetic of the classic Real Book and Finale jazz charts.
+        </p>
+
+        <nav class="font-nav 9x @1-x2 @1-8x">
+            <a href="jazz.html" class="active">Jazz</a>
+            <a href="bravura.html">Bravura</a>
+            <a href="petaluma.html">Petaluma</a>
+            <a href="broadway.html">Broadway</a>
+            <a href="ash.html">Ash</a>
+            <a href="leipzig.html">Leipzig</a>
+        </nav>
+    </header>
+
+    <section class="content-section 9x-grid grid">
+        <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Preview: "Ae Fond Kiss"</h2>
+        <pre class="9x @1-x2 @1-8x"><code class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">class=<span class="attribute-value">"jazz-font"</span></span> <span class="attribute">staff=<span class="attribute-value">"grand"</span></span> <span class="attribute">src=<span class="attribute-value">"../../data/ae-fond-kiss.json"</span></span> <span class="attribute">transpose=<span class="attribute-value">"4"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</code></pre>
+        <scribe-music class="9x @1-x2 @1-8x jazz-font" staff="grand" src="../../data/ae-fond-kiss.json" transpose="4"></scribe-music>
+
+        <h3 class="font-03 darkpink-fg 9x @1-x2 @3-4x">Usage</h3>
+        <pre class="9x @1-x2 @1-8x"><code><span class="tag">&lt;link</span> <span class="attribute">rel=</span><span class="attribute-value">"stylesheet"</span> <span class="attribute">href=</span><span class="attribute-value">"https://cdn.jsdelivr.net/gh/stephband/scribe@0.6/build/fonts/jazz.css"</span> <span class="tag">/&gt;</span></code></pre>
+        <pre class="9x @1-x2 @1-8x"><code>.jazz-font {
+    font-family: Jazz, JazzText;
+}</code></pre>
+    </section>
+
+    <footer class="content-section 9x-grid grid" style="padding-top: 2em; padding-bottom: 4em;">
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            <a href="../../index.html">← Return to Scribe overview</a>
+        </p>
+    </footer>
+</body>
+</html>
