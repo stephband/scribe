@@ -67,7 +67,7 @@ these event types:
 
 | beat   | type         | 2 | 3 | 4 | 5 |
 | :----- | :----------- | :--- | :--- | :--- | :--- |
-| `beat` | `"chord"`    | `root` | `extension` | `duration` | `bass` |
+| `beat` | `"chord"`    | `root` | `extension` | `duration` | |
 | `beat` | `"text"`     | `duration` | `text` | | |
 | `beat` | `"note"`     | `pitch` | `dynamic` | `duration` | |
 | `beat` | `"meter"`    | `duration` | `divisor` | | |

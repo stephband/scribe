@@ -591,6 +591,12 @@
               <td>URL of a JSON or text file, or hashref of a script, containing sequence data</td>
             </tr>
             <tr>
+              <td><code>type</code></td>
+              <td><code>.type</code></td>
+              <td><code>string</code></td>
+              <td>Mimetype or type of data to fetch: <code>"application/json"</code> (or <code>"json"</code>), <code>"sequence"</code>, <code>"text/plain"</code></td>
+            </tr>
+            <tr>
               <td>&nbsp;</td>
               <td><code>.data</code></td>
               <td><code>object</code></td>
@@ -600,7 +606,7 @@
               <td><code>staff</code></td>
               <td><code>.staff</code></td>
               <td><code>string</code></td>
-              <td><code>"treble"</code>, <code>"bass"</code>, <code>"grand"</code>, <code>"alto"</code>, <code>"drum"</code> or <code>"percussion"</code></td>
+              <td><code>"treble"</code>, <code>"treble-up"</code>, <code>"treble-down"</code>, <code>"alto"</code>, <code>"tenor"</code>, <code>"bass"</code>, <code>"grand"</code>, <code>"drum"</code> or <code>"percussion"</code></td>
             </tr>
             <tr>
               <td><code>key</code></td>
@@ -615,6 +621,18 @@
               <td>A meter expressed as a standard time signature, such as <code>"4/4"</code> or <code>"6/8"</code></td>
             </tr>
             <tr>
+              <td><code>beat</code></td>
+              <td><code>.beat</code></td>
+              <td><code>number</code></td>
+              <td>Sets the start beat from which notation rendering begins. Defaults to <code>0</code></td>
+            </tr>
+            <tr>
+              <td><code>duration</code></td>
+              <td><code>.duration</code></td>
+              <td><code>number</code></td>
+              <td>Sets the total duration (in beats) to render from the sequence. Defaults to <code>Infinity</code></td>
+            </tr>
+            <tr>
               <td><code>transpose</code></td>
               <td><code>.transpose</code></td>
               <td><code>number</code></td>
@@ -624,7 +642,7 @@
               <td><code>layout</code></td>
               <td>&nbsp;</td>
               <td><code>string</code></td>
-              <td>When set to <code>"regular"</code>, fits an even number of bars per line</td>
+              <td>Controls bar distribution across lines: <code>"compact"</code> (default) or <code>"regular"</code> (fits an even number of bars per line)</td>
             </tr>
             <tr>
               <td><code>shuffle</code></td>

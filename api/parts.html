@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Scribe – Multi-Stave Scoring</title>
+
+    <meta charset="utf-8" />
+    <meta name="author" content="@stephband" />
+    <meta name="description" content="Multi-stave and multi-part scoring in Scribe: objects, parts, and voice routing" />
+    <meta name="viewport" content="width=device-width" />
+
+    <script title="load">
+        document.documentElement.className += ' js loading';
+        window.addEventListener('load', () => window.requestAnimationFrame(() => document.documentElement.classList.remove('loading')));
+        window.DEBUG = true;
+    </script>
+
+    <script type="importmap">{
+        "imports": {
+            "bolt/":     "/bolt/",
+            "dom/":      "/dom/modules/",
+            "fn/":       "/fn/modules/",
+            "midi/":     "/midi/modules/",
+            "neuron/":   "/neuron/",
+            "sequence/": "/sequence/"
+        }
+    }</script>
+
+    <!-- Import <scribe-music> -->
+    <link rel="stylesheet" href="../scribe-music/element.css" />
+    <script type="module" src="../scribe-music/element.js"></script>
+
+    <style>
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/elements/html.css';
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/ratio.css';
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/atoms.css';
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/striped-table.css';
+    @import '../assets/font.css';
+
+    @import '../fonts/ash.css';
+    @import '../fonts/bravura.css';
+    @import '../fonts/broadway.css';
+    @import '../fonts/jazz.css';
+    @import '../fonts/leipzig.css';
+    @import '../fonts/petaluma.css';
+
+    body {
+        font-family: system-ui, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    pre {
+        font-family: MartianMono, monospace;
+    }
+
+    .nt, .orange-fg, .tag { font-weight: 400; color: oklch(0.51 0.23 0); }
+    .na, .yellow-fg, .attribute, .property { font-weight: 400; color: oklch(0.51 0.23 180); }
+    .s,  .lime-fg, .attribute-value   { font-weight: 400; color: oklch(0.51 0.23 90); }
+    .number { color: oklch(0.51 0.23 30); }
+    .string { color: oklch(0.51 0.23 120); }
+    .json   { color: oklch(0.2 0.2 210); }
+
+    body > .grid {
+        padding-left:  calc(0.5 * var(--x-gap));
+        padding-right: calc(0.5 * var(--x-gap));
+    }
+
+    .ash-font      { font-family: Ash, AshText; }
+    .bravura-font  { font-family: Bravura, BravuraText; }
+    .broadway-font { font-family: Broadway, BroadwayText; }
+    .jazz-font     { font-family: Jazz, JazzText; }
+    .petaluma-font { font-family: Petaluma, PetalumaText; }
+    .leipzig-font  { font-family: Leipzig; }
+
+    .header-section,
+    .content-section,
+    .table-section {
+        padding-top: 3em;
+        padding-bottom: 3em;
+    }
+
+    .table-section {
+        color: oklch(0.31 0.06 279.08);
+        background-color: oklch(0.8 0.19 95.26);
+        background-image: linear-gradient(205deg, oklch(0.75 0.18 81.43), oklch(0.89 0.21 94.26));
+    }
+
+    .breadcrumb {
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 0.85em;
+    }
+
+    .breadcrumb a {
+        color: oklch(0.51 0.23 0);
+        text-decoration: none;
+    }
+
+    .breadcrumb a:hover {
+        text-decoration: underline;
+    }
+    </style>
+</head>
+<body>
+    <header class="header-section 9x-grid grid" style="--y-gap: 0em;">
+        <p class="breadcrumb 9x @1-x2 @1-6x @3-4x"><a href="../index.html">Scribe</a> / Documentation</p>
+        <h1 class="font-01 darkpink-fg no-wrap 9x @1-x2 @1-6x @3-4x">Multi-Stave Scoring</h1>
+        <p class="font-04 9x @1-x2 @1-6x @2-5x @3-4x">
+            In Western musical tradition, cramming an entire ensemble onto a solitary stave is generally considered poor form.
+            Scribe approaches multi-part and multi-stave scores by rigorously disentangling the musical sound generators (<code class="property">"objects"</code>)
+            from visual engraving instructions (<code class="property">"parts"</code>).
+        </p>
+    </header>
+
+    <section class="content-section 9x-grid grid">
+        <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Open Scores: Miles Davis' "So What"</h2>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            When multiple instruments play concurrently, Scribe stacks their staves synchronously within each flex measure.
+            In <a href="https://www.youtube.com/watch?v=ylXk1LBvIqU">So What</a>, five separate voices (Trumpet, Alto sax, Tenor sax, Trombone, and Bass)
+            are declared in the sequence data. Here are the opening four bars:
+        </p>
+
+        <pre class="9x @1-x2 @1-8x"><code class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">src=<span class="attribute-value">"../data/so-what.json"</span></span> <span class="attribute">duration=<span class="attribute-value">"16"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</code></pre>
+        <scribe-music class="9x @1-x2 @1-8x" src="../data/so-what.json" duration="16"></scribe-music>
+
+        <h3 class="font-03 darkpink-fg 9x @1-x2 @3-4x">1. Declaring Sound Sources: <code class="property">"objects"</code></h3>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            The top-level sequence declares an <code class="property">"objects"</code> array. Each object assigns an identifier and human-readable instrument name:
+        </p>
+        <pre class="9x @1-x2 @1-8x"><code class="json">{
+    <span class="property">"name"</span>: <span class="string">"So What"</span>,
+    <span class="property">"objects"</span>: [
+        { <span class="property">"id"</span>: <span class="number">2</span>, <span class="property">"name"</span>: <span class="string">"Trumpet"</span> },
+        { <span class="property">"id"</span>: <span class="number">3</span>, <span class="property">"name"</span>: <span class="string">"Alto sax"</span> },
+        { <span class="property">"id"</span>: <span class="number">4</span>, <span class="property">"name"</span>: <span class="string">"Tenor sax"</span> },
+        { <span class="property">"id"</span>: <span class="number">5</span>, <span class="property">"name"</span>: <span class="string">"Trombone"</span> },
+        { <span class="property">"id"</span>: <span class="number">6</span>, <span class="property">"name"</span>: <span class="string">"Bass"</span> }
+    ],
+    <span class="property">"events"</span>: [ ... ]
+}</code></pre>
+
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            Sequence events route musical material into these objects using their id in the fourth parameter of a <code class="string">"sequence"</code> event:
+            <code>[beat, "sequence", sequenceId, targetObjectId, duration]</code>.
+        </p>
+
+        <pre class="9x @1-x2 @1-8x"><code class="json">[
+    [<span class="number">0</span>, <span class="string">"sequence"</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">8</span>], <span class="nt">// routes sequence 2 to object 2 (Trumpet)</span>
+    [<span class="number">0</span>, <span class="string">"sequence"</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">8</span>], <span class="nt">// routes sequence 3 to object 3 (Alto sax)</span>
+    [<span class="number">0</span>, <span class="string">"sequence"</span>, <span class="number">4</span>, <span class="number">4</span>, <span class="number">8</span>], <span class="nt">// routes sequence 4 to object 4 (Tenor sax)</span>
+    [<span class="number">0</span>, <span class="string">"sequence"</span>, <span class="number">5</span>, <span class="number">5</span>, <span class="number">8</span>], <span class="nt">// routes sequence 5 to object 5 (Trombone)</span>
+    [<span class="number">0</span>, <span class="string">"sequence"</span>, <span class="number">6</span>, <span class="number">6</span>, <span class="number">4</span>]  <span class="nt">// routes sequence 6 to object 6 (Bass)</span>
+]</code></pre>
+
+        <h3 class="font-03 darkpink-fg 9x @1-x2 @3-4x">2. Automatic Stave Resolution</h3>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            When no explicit <code class="property">"parts"</code> definition is supplied, Scribe inspects each object's name and applies sensible instrument defaults:
+            Trumpet, Alto, and Tenor resolve to treble staves; Trombone and Bass resolve to bass staves.
+        </p>
+    </section>
+
+    <section class="content-section 9x-grid grid" style="background-color: #faf8f5;">
+        <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Grand Stave & Voice Routing: "Ae Fond Kiss"</h2>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            For keyboard or polyphonic instruments, multiple independent musical lines frequently funnel into a single grand stave.
+            The <code class="property">"parts"</code> array configures how objects map into stave hands and voices.
+        </p>
+
+        <pre class="9x @1-x2 @1-8x"><code class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">staff=<span class="attribute-value">"grand"</span></span> <span class="attribute">src=<span class="attribute-value">"../data/ae-fond-kiss.json"</span></span> <span class="attribute">duration=<span class="attribute-value">"12"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</code></pre>
+        <scribe-music class="9x @1-x2 @1-8x" staff="grand" src="../data/ae-fond-kiss.json" duration="12"></scribe-music>
+
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            In Robert Burns' traditional air <a href="https://en.wikipedia.org/wiki/Ae_Fond_Kiss_(song)">Ae Fond Kiss</a>, the melody (object 2) is explicitly directed
+            to the right hand (<code class="string">"rh"</code>) while the accompaniment (object 1) is directed to the left hand (<code class="string">"lh"</code>):
+        </p>
+
+        <pre class="9x @1-x2 @1-8x"><code class="json">{
+    <span class="property">"name"</span>: <span class="string">"Ae Fond Kiss"</span>,
+    <span class="property">"objects"</span>: [
+        { <span class="property">"id"</span>: <span class="number">1</span>, <span class="property">"name"</span>: <span class="string">"Accompaniment"</span> },
+        { <span class="property">"id"</span>: <span class="number">2</span>, <span class="property">"name"</span>: <span class="string">"Melody"</span> }
+    ],
+    <span class="property">"parts"</span>: [{
+        <span class="property">"staff"</span>: <span class="string">"grand"</span>,
+        <span class="property">"name"</span>: <span class="string">"Piano"</span>,
+        <span class="property">"voices"</span>: {
+            <span class="property">"rh"</span>: <span class="number">2</span>,
+            <span class="property">"lh"</span>: <span class="number">1</span>
+        }
+    }]
+}</code></pre>
+    </section>
+
+    <section class="table-section 9x-grid grid">
+        <h2 class="font-02 x1 9x @1-x2 @1-7x @2-6x @3-4x">The <code class="property">"parts"</code> Specification</h2>
+        <table class="striped-table x1 9x @2-x2 @2-7x @3-6x">
+            <thead>
+                <tr>
+                    <th>property</th>
+                    <th>type</th>
+                    <th>description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>staff</code></td>
+                    <td><code>string</code></td>
+                    <td>Stave type: <code>"grand"</code>, <code>"treble"</code>, <code>"treble-up"</code>, <code>"treble-down"</code>, <code>"alto"</code>, <code>"tenor"</code>, <code>"bass"</code>, <code>"drum"</code>, <code>"percussion"</code></td>
+                </tr>
+                <tr>
+                    <td><code>name</code></td>
+                    <td><code>string</code></td>
+                    <td>Part name used for labelling, system matching, and fallback display resolution</td>
+                </tr>
+                <tr>
+                    <td><code>clef</code></td>
+                    <td><code>string</code></td>
+                    <td>Optional clef override if different from the default stave clef</td>
+                </tr>
+                <tr>
+                    <td><code>transpose</code></td>
+                    <td><code>number</code></td>
+                    <td>Per-part transposition in semitones (e.g. <code>2</code> for Bb Trumpet/Tenor, <code>9</code> for Eb Alto)</td>
+                </tr>
+                <tr>
+                    <td><code>voices</code></td>
+                    <td><code>object</code></td>
+                    <td>Dictionary mapping voice destinations to source object IDs</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 class="font-03 x1 9x @1-x2 @1-7x @2-6x @3-4x" style="margin-top: 2em;">Voice Targets in Grand Staves</h3>
+        <p class="x1 9x @1-x2 @1-7x @2-6x @3-4x">
+            When targeting a <code class="string">"grand"</code> stave, the keys of the <code class="property">"voices"</code> object determine how lines are routed across staves and stem directions:
+        </p>
+        <table class="striped-table x1 9x @2-x2 @2-7x @3-6x">
+            <thead>
+                <tr>
+                    <th>voice key</th>
+                    <th>voice name</th>
+                    <th>stave / behavior</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>"0"</code></td>
+                    <td>Auto-split</td>
+                    <td>Automatically splits notes across treble and bass staves based on pitch (middle C threshold)</td>
+                </tr>
+                <tr>
+                    <td><code>"1"</code> or <code>"rh"</code></td>
+                    <td>Right hand</td>
+                    <td>Treble stave, upward/standard stem distribution</td>
+                </tr>
+                <tr>
+                    <td><code>"2"</code> or <code>"lh"</code></td>
+                    <td>Left hand</td>
+                    <td>Bass stave, downward/standard stem distribution</td>
+                </tr>
+                <tr>
+                    <td><code>"3"</code></td>
+                    <td>Soprano</td>
+                    <td>Upper voice on treble stave (stems up)</td>
+                </tr>
+                <tr>
+                    <td><code>"4"</code></td>
+                    <td>Alto</td>
+                    <td>Lower voice on treble stave (stems down)</td>
+                </tr>
+                <tr>
+                    <td><code>"5"</code></td>
+                    <td>Tenor</td>
+                    <td>Upper voice on bass stave (stems up)</td>
+                </tr>
+                <tr>
+                    <td><code>"6"</code></td>
+                    <td>Bass</td>
+                    <td>Lower voice on bass stave (stems down)</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <footer class="content-section 9x-grid grid" style="padding-top: 2em; padding-bottom: 4em;">
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            <a href="../index.html">← Return to Scribe overview</a>
+        </p>
+    </footer>
+</body>
+</html>
