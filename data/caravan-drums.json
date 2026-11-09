@@ -47,9 +47,9 @@
         ]
     }],
 
-    "display": {
-        "clef": "drum"
-    },
+    "parts": [{
+        "staff": "drum"
+    }],
 
     "notes": {
         "links": [{

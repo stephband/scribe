@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Scribe – Chord Events</title>
+
+    <meta charset="utf-8" />
+    <meta name="author" content="@stephband" />
+    <meta name="description" content="Chord symbols and voicings in Scribe" />
+    <meta name="viewport" content="width=device-width" />
+
+    <script title="load">
+        document.documentElement.className += ' js loading';
+        window.addEventListener('load', () => window.requestAnimationFrame(() => document.documentElement.classList.remove('loading')));
+        window.DEBUG = true;
+    </script>
+
+    <script type="importmap">{
+        "imports": {
+            "bolt/":     "/bolt/",
+            "dom/":      "/dom/modules/",
+            "fn/":       "/fn/modules/",
+            "midi/":     "/midi/modules/",
+            "neuron/":   "/neuron/",
+            "sequence/": "/sequence/"
+        }
+    }</script>
+
+    <!-- Import <scribe-music> -->
+    <link rel="stylesheet" href="../../scribe-music/element.css" />
+    <script type="module" src="../../scribe-music/element.js"></script>
+
+    <style>
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/elements/html.css';
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/ratio.css';
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/atoms.css';
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/striped-table.css';
+    @import '../../assets/font.css';
+    @import '../../fonts/ash.css';
+    @import '../../fonts/bravura.css';
+    @import '../../fonts/broadway.css';
+    @import '../../fonts/jazz.css';
+    @import '../../fonts/leipzig.css';
+    @import '../../fonts/petaluma.css';
+
+    body {
+        font-family: system-ui, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    pre {
+        font-family: MartianMono, monospace;
+    }
+
+    .nt, .orange-fg, .tag { font-weight: 400; color: oklch(0.51 0.23 0); }
+    .na, .yellow-fg, .attribute, .property { font-weight: 400; color: oklch(0.51 0.23 180); }
+    .s,  .lime-fg, .attribute-value   { font-weight: 400; color: oklch(0.51 0.23 90); }
+    .number { color: oklch(0.51 0.23 30); }
+    .string { color: oklch(0.51 0.23 120); }
+    .json   { color: oklch(0.2 0.2 210); }
+
+
+    body > .grid {
+        padding-left:  calc(0.5 * var(--x-gap));
+        padding-right: calc(0.5 * var(--x-gap));
+    }
+    </style>
+</head>
+<body>
+    <section class="9x-grid grid">
+        <div class="9x @2-6x @2-x2 @2-6x-grid grid">
+            <div class="2x">
+                <script type="application/json" id="1">{
+                    "events": [
+                        [0, "chord", "C", ""],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "E4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#1"></scribe-music>
+                <p><code>"" – 3962</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="2">{
+                    "events": [
+                        [0, "chord", "C", "+"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "E4", 0.1, 4],
+                        [0, "note", "G#4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#2"></scribe-music>
+                <p><code>"+" – 5258</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="3">{
+                    "events": [
+                        [0, "chord", "C", "sus"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "F4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#3"></scribe-music>
+                <p><code>"sus" – 2702</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="4">{
+                    "events": [
+                        [0, "chord", "C", "sus♭9"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "F4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "Db5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#4"></scribe-music>
+                <p><code>"sus♭9" – 2737</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="5">{
+                    "events": [
+                        [0, "chord", "C", "-"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "Eb4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#5"></scribe-music>
+                <p><code>"-" – 5222</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="6">{
+                    "events": [
+                        [0, "chord", "C", "°"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "Eb4", 0.1, 4],
+                        [0, "note", "Gb4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#6"></scribe-music>
+                <p><code>"°" – 3926</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="7">{
+                    "events": [
+                        [0, "chord", "C", "{8}/"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "Eb4", 0.1, 4],
+                        [0, "note", "Ab4", 0.1, 4],
+                        [0, "note", "Bb4", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#7"></scribe-music>
+                <p><code>"{8}/" – 2775</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="8">{
+                    "events": [
+                        [0, "chord", "C", "{5}/"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "F4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "A4", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#8"></scribe-music>
+                <p><code>"{5}/" – 2669</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="9">{
+                    "events": [
+                        [0, "chord", "C", "{4}/"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "E4", 0.1, 4],
+                        [0, "note", "G#4", 0.1, 4],
+                        [0, "note", "B4", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#9"></scribe-music>
+                <p><code>"{4}/" – 4036</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="10">{
+                    "events": [
+                        [0, "chord", "C", "{9}-/"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "E4", 0.1, 4],
+                        [0, "note", "A4", 0.1, 4],
+                        [0, "note", "B4", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#10"></scribe-music>
+                <p><code>"{9}-/" – 2776</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="11">{
+                    "events": [
+                        [0, "chord", "C", "{5}-/"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "F4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "Ab4", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#11"></scribe-music>
+                <p><code>"{5}-/" – 1373</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="12">{
+                    "events": [
+                        [0, "chord", "C", "{1}/"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "F4", 0.1, 4],
+                        [0, "note", "Ab4", 0.1, 4],
+                        [0, "note", "Db5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#12"></scribe-music>
+                <p><code>"{1}/" – 4033</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="13">{
+                    "events": [
+                        [0, "chord", "C", "{11}/"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "D#4", 0.1, 4],
+                        [0, "note", "F#4", 0.1, 4],
+                        [0, "note", "B4", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#13"></scribe-music>
+                <p><code>"{11}/" – 6591</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="14">{
+                    "events": [
+                        [0, "chord", "C", "{8}7/"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "Gb4", 0.1, 4],
+                        [0, "note", "Ab4", 0.1, 4],
+                        [0, "note", "Bb4", 0.1, 4],
+                        [0, "note", "Eb5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#14"></scribe-music>
+                <p><code>"{8}7/" – 96015</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="15">{
+                    "events": [
+                        [0, "chord", "C", "{5}7/"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "F4", 0.1, 4],
+                        [0, "note", "A4", 0.1, 4],
+                        [0, "note", "Eb5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#15"></scribe-music>
+                <p><code>"{5}7/" – 5259</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="16">{
+                    "events": [
+                        [0, "chord", "C", "ø"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "Gb4", 0.1, 4],
+                        [0, "note", "Bb4", 0.1, 4],
+                        [0, "note", "Eb5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#16"></scribe-music>
+                <p><code>"ø" – 5295</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="17">{
+                    "events": [
+                        [0, "chord", "C", "∆6"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "A4", 0.1, 4],
+                        [0, "note", "E5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#17"></scribe-music>
+                <p><code>"∆6" – 2704</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="18">{
+                    "events": [
+                        [0, "chord", "C", "∆6/9"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "A4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4],
+                        [0, "note", "E5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#18"></scribe-music>
+                <p><code>"∆6/9" – 97274</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="19">{
+                    "events": [
+                        [0, "chord", "C", "∆"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "B4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4],
+                        [0, "note", "E5", 0.1, 4],
+                        [0, "note", "A5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#19"></scribe-music>
+                <p><code>"∆" – 3456506</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="20">{
+                    "events": [
+                        [0, "chord", "C", "∆♯11"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "B4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4],
+                        [0, "note", "E5", 0.1, 4],
+                        [0, "note", "F#5", 0.1, 4],
+                        [0, "note", "A5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#20"></scribe-music>
+                <p><code>"∆♯11" – 124340906</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="21">{
+                    "events": [
+                        [0, "chord", "C", "7sus"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "F4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "Bb4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#21"></scribe-music>
+                <p><code>"7sus" – 142670</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="22">{
+                    "events": [
+                        [0, "chord", "C", "7"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "Bb4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4],
+                        [0, "note", "E5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#22"></scribe-music>
+                <p><code>"7" – 143930</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="23">{
+                    "events": [
+                        [0, "chord", "C", "13sus"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "F4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "Bb4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4],
+                        [0, "note", "A5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#23"></scribe-music>
+                <p><code>"13sus" – 1775630</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="24">{
+                    "events": [
+                        [0, "chord", "C", "13"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "Bb4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4],
+                        [0, "note", "E5", 0.1, 4],
+                        [0, "note", "A5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#24"></scribe-music>
+                <p><code>"13" – 1776890</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="25">{
+                    "events": [
+                        [0, "chord", "C", "-11"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "Eb4", 0.1, 4],
+                        [0, "note", "Bb4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4],
+                        [0, "note", "F5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#25"></scribe-music>
+                <p><code>"-11" – 235910</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="26">{
+                    "events": [
+                        [0, "chord", "C", "-6"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "Eb4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "A4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4],
+                        [0, "note", "F5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#26"></scribe-music>
+                <p><code>"-6" – 3455174</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="27">{
+                    "events": [
+                        [0, "chord", "C", "-7"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "Bb4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4],
+                        [0, "note", "Eb5", 0.1, 4],
+                        [0, "note", "F5", 0.1, 4],
+                        [0, "note", "A5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#27"></scribe-music>
+                <p><code>"-7" – 63921350</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="28">{
+                    "events": [
+                        [0, "chord", "C", "-∆"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "B4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4],
+                        [0, "note", "Eb5", 0.1, 4],
+                        [0, "note", "F5", 0.1, 4],
+                        [0, "note", "A5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#28"></scribe-music>
+                <p><code>"-∆" – 124387526</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="29">{
+                    "events": [
+                        [0, "chord", "C", "7♯11"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "Bb4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4],
+                        [0, "note", "E5", 0.1, 4],
+                        [0, "note", "F#5", 0.1, 4],
+                        [0, "note", "A5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#29"></scribe-music>
+                <p><code>"7♯11" – 63874730</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="30">{
+                    "events": [
+                        [0, "chord", "C", "7♭13"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "Bb4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4],
+                        [0, "note", "E5", 0.1, 4],
+                        [0, "note", "F5", 0.1, 4],
+                        [0, "note", "Ab5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#30"></scribe-music>
+                <p><code>"7♭13" – 122706650</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="31">{
+                    "events": [
+                        [0, "chord", "C", "+7"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "E4", 0.1, 4],
+                        [0, "note", "Bb4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4],
+                        [0, "note", "F#5", 0.1, 4],
+                        [0, "note", "G#5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#31"></scribe-music>
+                <p><code>"+7" – 3455210</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="32">{
+                    "events": [
+                        [0, "chord", "C", "°7"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "Eb4", 0.1, 4],
+                        [0, "note", "Gb4", 0.1, 4],
+                        [0, "note", "A4", 0.1, 4],
+                        [0, "note", "B4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4],
+                        [0, "note", "F5", 0.1, 4],
+                        [0, "note", "Ab5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#32"></scribe-music>
+                <p><code>"°7" – 4417439366</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="33">{
+                    "events": [
+                        [0, "chord", "C", "7♯9"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "Bb4", 0.1, 4],
+                        [0, "note", "Eb5", 0.1, 4],
+                        [0, "note", "E5", 0.1, 4],
+                        [0, "note", "F#5", 0.1, 4],
+                        [0, "note", "A5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#33"></scribe-music>
+                <p><code>"7♯9" – 63874695</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="34">{
+                    "events": [
+                        [0, "chord", "C", "7alt"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "E4", 0.1, 4],
+                        [0, "note", "Bb4", 0.1, 4],
+                        [0, "note", "Db5", 0.1, 4],
+                        [0, "note", "Eb5", 0.1, 4],
+                        [0, "note", "F#5", 0.1, 4],
+                        [0, "note", "Ab5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#34"></scribe-music>
+                <p><code>"7alt" – 124386265</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="35">{
+                    "events": [
+                        [0, "chord", "C", "7♭9"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "Bb4", 0.1, 4],
+                        [0, "note", "Db5", 0.1, 4],
+                        [0, "note", "Eb5", 0.1, 4],
+                        [0, "note", "E5", 0.1, 4],
+                        [0, "note", "F#5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#35"></scribe-music>
+                <p><code>"7♭9" – 183172825</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="36">{
+                    "events": [
+                        [0, "chord", "C", "13♭9"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "Bb4", 0.1, 4],
+                        [0, "note", "Db5", 0.1, 4],
+                        [0, "note", "Eb5", 0.1, 4],
+                        [0, "note", "E5", 0.1, 4],
+                        [0, "note", "F#5", 0.1, 4],
+                        [0, "note", "A5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#36"></scribe-music>
+                <p><code>"13♭9" – 2299488985</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="37">{
+                    "events": [
+                        [0, "chord", "C", "7sus♭9"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "F4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "Bb4", 0.1, 4],
+                        [0, "note", "Db5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#37"></scribe-music>
+                <p><code>"7sus♭9" – 142705</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="38">{
+                    "events": [
+                        [0, "chord", "C", "13sus♭9"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "F4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "Bb4", 0.1, 4],
+                        [0, "note", "Db5", 0.1, 4],
+                        [0, "note", "Eb5", 0.1, 4],
+                        [0, "note", "A5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#38"></scribe-music>
+                <p><code>"13sus♭9" – 63921385</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="39">{
+                    "events": [
+                        [0, "chord", "C", "7♭9♭13"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "Bb4", 0.1, 4],
+                        [0, "note", "Db5", 0.1, 4],
+                        [0, "note", "E5", 0.1, 4],
+                        [0, "note", "F5", 0.1, 4],
+                        [0, "note", "Ab5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#39"></scribe-music>
+                <p><code>"7♭9♭13" – 122706685</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="40">{
+                    "events": [
+                        [0, "chord", "C", "-♭6"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "Bb4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4],
+                        [0, "note", "Eb5", 0.1, 4],
+                        [0, "note", "F5", 0.1, 4],
+                        [0, "note", "Ab5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#40"></scribe-music>
+                <p><code>"-♭6" – 122707910</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="41">{
+                    "events": [
+                        [0, "chord", "C", "-♭9"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "Bb4", 0.1, 4],
+                        [0, "note", "Db5", 0.1, 4],
+                        [0, "note", "Eb5", 0.1, 4],
+                        [0, "note", "F5", 0.1, 4],
+                        [0, "note", "Ab5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#41"></scribe-music>
+                <p><code>"-♭9" – 122707945</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="42">{
+                    "events": [
+                        [0, "chord", "C", "ø9"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "Gb4", 0.1, 4],
+                        [0, "note", "Bb4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4],
+                        [0, "note", "Eb5", 0.1, 4],
+                        [0, "note", "F5", 0.1, 4],
+                        [0, "note", "Ab5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#42"></scribe-music>
+                <p><code>"ø9" – 124340870</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="43">{
+                    "events": [
+                        [0, "chord", "C", "∆♯4♯5"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "G#4", 0.1, 4],
+                        [0, "note", "B4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4],
+                        [0, "note", "E5", 0.1, 4],
+                        [0, "note", "F#5", 0.1, 4],
+                        [0, "note", "A5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#43"></scribe-music>
+                <p><code>"∆♯4♯5" – 122707946</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="44">{
+                    "events": [
+                        [0, "chord", "C", "-∆♭6"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "B4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4],
+                        [0, "note", "Eb5", 0.1, 4],
+                        [0, "note", "F5", 0.1, 4],
+                        [0, "note", "Ab5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#44"></scribe-music>
+                <p><code>"-∆♭6" – 183174086</code></p>
+            </div>
+
+            <div class="2x">
+                <script type="application/json" id="45">{
+                    "events": [
+                        [0, "chord", "C", "∆♭6"],
+                        [0, "note", "C4", 0.1, 4],
+                        [0, "note", "G4", 0.1, 4],
+                        [0, "note", "B4", 0.1, 4],
+                        [0, "note", "D5", 0.1, 4],
+                        [0, "note", "E5", 0.1, 4],
+                        [0, "note", "Ab5", 0.1, 4]
+                    ]
+                }</script>
+                <scribe-music src="#45"></scribe-music>
+                <p><code>"∆♭6" – 5089466</code></p>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

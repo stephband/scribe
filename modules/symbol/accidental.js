@@ -1,5 +1,5 @@
 
-import { rflat, rsharp, rdoubleflat, rdoublesharp, rflatsharp } from '../pitch.js';
+import { rflat, rsharp, rdoubleflat, rdoublesharp, rflatsharp } from 'sequence/modules/pitch.js';
 
 
 function createAccidental(voice, accidentals, beat, note, clump, cluster) {

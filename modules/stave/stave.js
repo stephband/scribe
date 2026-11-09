@@ -2,6 +2,8 @@
 //import get                   from 'fn/get.js';
 import nothing               from 'fn/nothing.js';
 import { toNoteName, toNoteNumber } from 'midi/note.js';
+import { rflatsharp }        from 'sequence/modules/pitch.js';
+import { toKeyNumber }       from 'sequence/modules/event/key.js';
 import toStopBeat            from '../event/to-stop-beat.js';
 import grainOfBeat           from '../bar/grain-of-beat.js';
 import { createAccents }     from '../symbol/accent.js';
@@ -10,9 +12,7 @@ import { createLedges }      from '../symbol/ledge.js';
 import { createNotes }       from '../symbol/note.js';
 import { createTies }        from '../symbol/tie.js';
 import { getDivisionBefore } from '../bar/divisions.js';
-import { accidentalsFromKey } from '../accidentals.js';
-import { toKeyNumber }       from 'sequence/modules/event/key.js';
-import { rflatsharp, accidentalChars, fathercharles } from '../pitch.js';
+import { accidentalsFromKey, fathercharles } from '../accidentals.js';
 import config                from '../config.js';
 import * as glyphs           from "../glyphs.js";
 
@@ -28,6 +28,14 @@ const noteDurations = [
     4,     6,
     8
 ];
+
+const accidentalChars = {
+    '-2': '𝄫',
+    '-1': '♭',
+    '0':  '',
+    '1':  '♯',
+    '2':  '𝄪'
+};
 
 
 function isDownbeatDoubleDotted(divisions, b1, b2, b, g, grain, d2, durationThreshold) {
@@ -183,8 +191,8 @@ export default class Stave {
     **/
     getRow(voice, pitch) {
         const name = typeof pitch === 'string' ? pitch : toNoteName(pitch) ;
-        const row  = name.replace(rflatsharp, '');
-        const i    = this.rows.indexOf(row);
+        const row  = typeof name === 'string' ? name.replace(rflatsharp, '') : undefined ;
+        const i    = row !== undefined ? this.rows.indexOf(row) : -1 ;
         //if (DEBUG && i === -1) throw new Error('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name);
         if (i === -1) console.warn('Pitch "' + pitch + '" is not supported by stave ' + this.constructor.name);
         return i > -1 ? i : undefined ;

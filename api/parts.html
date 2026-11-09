@@ -100,6 +100,29 @@
     .breadcrumb a:hover {
         text-decoration: underline;
     }
+
+    .api-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75em;
+        margin-top: 1.5em;
+        margin-bottom: 0.5em;
+    }
+
+    .api-nav a {
+        padding: 0.35em 0.85em;
+        border-radius: 4px;
+        background: #f0ede6;
+        color: #333;
+        text-decoration: none;
+        font-size: 0.9em;
+    }
+
+    .api-nav a.active {
+        background: oklch(0.51 0.23 0);
+        color: white;
+        font-weight: 600;
+    }
     </style>
 </head>
 <body>
@@ -110,6 +133,12 @@
             Scribe decouples instruments (<code class="property">"objects"</code>)
             from the staves they are rendered on (<code class="property">"parts"</code>).
         </p>
+
+        <nav class="api-nav 9x @1-x2 @1-8x">
+            <a href="index.html">API Overview</a>
+            <a href="parts.html" class="active">Multi-Stave Scoring</a>
+            <a href="fonts/jazz.html">SMuFL Fonts</a>
+        </nav>
     </header>
 
     <section class="content-section 9x-grid grid">
@@ -183,9 +212,9 @@
     <span class="property">"parts"</span>: [{
         <span class="property">"staff"</span>: <span class="string">"grand"</span>,
         <span class="property">"name"</span>: <span class="string">"Piano"</span>,
-        <span class="property">"voices"</span>: {
-            <span class="property">"rh"</span>: <span class="number">2</span>,
-            <span class="property">"lh"</span>: <span class="number">1</span>
+        <span class="property">"routing"</span>: {
+            <span class="property">"2"</span>: <span class="string">"rh"</span>,
+            <span class="property">"1"</span>: <span class="string">"lh"</span>
         }
     }]
 }</code></pre>
@@ -213,31 +242,26 @@
                     <td>Part name used for labelling, system matching, and fallback display resolution</td>
                 </tr>
                 <tr>
-                    <td><code>clef</code></td>
-                    <td><code>string</code></td>
-                    <td>Optional clef override if different from the default stave clef</td>
-                </tr>
-                <tr>
                     <td><code>transpose</code></td>
                     <td><code>number</code></td>
                     <td>Per-part transposition in semitones</td>
                 </tr>
                 <tr>
-                    <td><code>voices</code></td>
+                    <td><code>routing</code></td>
                     <td><code>object</code></td>
-                    <td>Dictionary mapping voice destinations to source object IDs</td>
+                    <td>Dictionary mapping source object IDs to voice destinations (e.g. <code>{"2": "rh", "1": "lh"}</code>)</td>
                 </tr>
             </tbody>
         </table>
 
         <h3 class="font-03 9x @1-x2 @1-6x @2-5x @3-4x" style="margin-top: 2em;">Voice Targets in Grand Staves</h3>
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-            When targeting a <code class="string">"grand"</code> stave, the keys of the <code class="property">"voices"</code> object determine how lines are routed across staves and stem directions:
+            When targeting a <code class="string">"grand"</code> stave, the values of the <code class="property">"routing"</code> object determine how lines are routed across staves and stem directions:
         </p>
         <table class="striped-table 9x @1-x2 @1-7x @3-6x">
             <thead>
                 <tr>
-                    <th>voice key</th>
+                    <th>voice destination</th>
                     <th>voice name</th>
                     <th>stave / behavior</th>
                 </tr>

@@ -309,7 +309,7 @@
         ]
     }],
 
-    "display": {
+    "parts": [{
         "staff": "grand"
-    }
+    }]
 }

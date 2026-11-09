@@ -16,17 +16,12 @@
 
     "tags": ["celtic", "folk"],
 
-    "objects": [
-        { "id": 1, "name": "Accompaniment" },
-        { "id": 2, "name": "Melody" }
-    ],
-
     "parts": [{
         "staff": "grand",
         "name": "Piano",
-        "voices": {
-            "rh": 2,
-            "lh": 1
+        "routing": {
+            "2": "rh",
+            "1": "lh"
         }
     }],
 
@@ -252,9 +247,5 @@
             [12, "chord", "C", "∆", 3],
             [12, "note", "C3", 0.1, 3]
         ]
-    }],
-
-    "display": {
-        "staff": "grand"
-    }
+    }]
 }

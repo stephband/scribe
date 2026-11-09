@@ -1,39 +1,30 @@
 
-import slugify                from 'fn/slugify.js';
-import Event                  from 'sequence/modules/event.js';
-import { getDivisions }       from 'sequence/modules/event/meter.js';
-import Stave                  from '../stave.js';
+import insert                  from 'fn/insert.js';
+import slugify                 from 'fn/slugify.js';
+import Event                   from 'sequence/modules/event.js';
+import { getDivisions }        from 'sequence/modules/event/meter.js';
+import Stave                   from '../stave.js';
+import Part                    from '../part.js';
+import push                    from '../object/push.js';
 import { toDisplay, byPartOrder } from '../display.js';
-import log                    from '../log.js';
-import toStopBeat             from '../event/to-stop-beat.js';
+import log                     from '../log.js';
+import toStopBeat              from '../event/to-stop-beat.js';
 
 
-const { assign, values } = Object;
+const { assign } = Object;
 
 
-function toDisplayObject(settings, name) {
-    const slug = slugify(name);
-
-    if (slug === 'default' && settings.display) {
-        if (typeof settings.display === 'string') {
-            if (!Stave[settings.display]) throw new Error(`Sequence display must be a display object or a stave type string`);
-            return { staff: settings.display, transpose: 0 };
-        }
-
-        return settings.display;
-    }
-
-    return toDisplay(slug);
-}
-
-function toPartName(settings, event) {
+function toPartName(event) {
     if (event.object && event.object.name) return event.object.name;
     return 'default';
 }
 
 function toVoiceName(stave, voiceKey) {
+    if (voiceKey === 0 || voiceKey === '0') {
+        if (stave && stave.getVoice) return '0';
+    }
+
     if (stave && stave.type === 'grand') {
-        if (voiceKey === 0 || voiceKey === '0') return '0';
         if (voiceKey === 1 || voiceKey === '1') return 'rh';
         if (voiceKey === 2 || voiceKey === '2') return 'lh';
         if (voiceKey === 3 || voiceKey === '3') return 'soprano';
@@ -53,9 +44,24 @@ function toVoiceName(stave, voiceKey) {
     return voiceKey + '';
 }
 
-function getRoute(event, routes) {
+function addRoute(routes, sourceId, route) {
+    let list = routes.get(sourceId);
+    if (!list) {
+        list = [];
+        routes.set(sourceId, list);
+        routes.set(sourceId + '', list);
+        if (!isNaN(sourceId)) {
+            routes.set(Number(sourceId), list);
+        }
+    }
+    list.push(route);
+}
+
+function getRoutes(event, routes) {
     if (!routes || routes.size === 0) return undefined;
-    const id = event.object && event.object.id !== undefined ? event.object.id : 0;
+    const id = event.target !== undefined ? event.target :
+        event.object && event.object.id !== undefined ? event.object.id :
+        0;
     return routes.get(id);
 }
 
@@ -67,21 +73,15 @@ function toVoice(settings, stave, event) {
     return voice ? voice.name : '0';
 }
 
-function getOrCreatePart(settings, parts, keyEvents, name) {
-    if (parts[name]) return parts[name];
+function getOrCreatePart(parts, name) {
+    let p = -1;
+    while (parts[++p]) if (parts[p].name === name) return parts[p];
 
-    const display = toDisplayObject(settings, name);
+    const display = toDisplay(name);
     const stave   = Stave[display.staff || display.clef];
-
-    const part = {
-        name,
-        display,
-        stave,
-        spellables: undefined,
-        buffers:    {}
-    };
-
-    parts[name] = part;
+    const part    = new Part(name, stave, display.transpose);
+    part.buffers  = {};
+    insert(byPartOrder, parts, part);
     return part;
 }
 
@@ -97,69 +97,69 @@ function flagEndBar(bar, sequenceEvent) {
     return false;
 }
 
-export default function read(settings, sequence) {
-    const tree       = [];
-    const parts      = {};
-    const spellables = [];
-    const keyEvents  = [];
-    const routes     = new Map();
+export default function read(settings, sequence, parts, keyEvent, meterEvent) {
+    const tree = {
+        keys:       [],
+        spellables: [],
+        parts:      []
+    };
 
-    // If settings.parts is an array, initialize parts and routes
-    if (settings.parts) {
-        let p = -1;
-        let partItem;
-        while (partItem = settings.parts[++p]) {
-            const name    = partItem.name || partItem.staff || 'default';
-            const display = {
-                staff:     partItem.staff,
-                clef:      partItem.clef,
-                transpose: partItem.transpose || 0
-            };
-            const stave   = Stave[display.staff || display.clef];
-            if (!stave) {
-                throw new Error(`Scribe parts staff "${ display.staff || display.clef }" not found`);
-            }
+    const routes = new Map();
 
-            const part = {
-                name,
-                display,
-                stave,
-                spellables: undefined,
-                buffers:    {}
-            };
-            parts[name] = part;
-
-            const voices = partItem.voices || { 0: 0 };
-            for (const [voiceKey, sourceId] of Object.entries(voices)) {
-                const voiceName = toVoiceName(stave, voiceKey);
-                routes.set(sourceId, { part, voiceName });
-                routes.set(sourceId + '', { part, voiceName });
-                if (!isNaN(sourceId)) {
-                    routes.set(Number(sourceId), { part, voiceName });
-                }
-            }
-        }
-    }
+    let bar = {
+        type:      'bar',
+        count:     1,
+        beat:      0,
+        duration:  Infinity,
+        divisor:   0,
+        divisions: undefined,
+        key:       0
+    };
 
     // Guarantee the render of at least 1 bar
     let stopBeat = 1;
     let event;
     let sequenceEvent;
-    let bar = {
-        type:      'bar',
-        count:     1,
-        beat:      0,
-        key:       0,
-        duration:  Infinity,
-        divisor:   0
-    };
+
+    // If parts is an array, initialize parts and routes
+    if (parts) {
+        let p = -1;
+        while (parts[++p]) {
+            // Clone part
+            // WHY ARE WE CLONING PART HERE?
+            const part = Part.from(parts[p]);
+            part.buffers = {};
+            // Assign it to tree
+            tree.parts.push(part);
+            // Create route from part.routing
+            for (const [sourceId, voiceKey] of Object.entries(part.routing)) {
+                const voiceName = toVoiceName(part.stave, voiceKey);
+                addRoute(routes, sourceId, { part, voiceName });
+            }
+        }
+    }
+
+    // Initial key
+    if (keyEvent) {
+        tree.keys.push(keyEvent);
+        bar.keyEvent   = keyEvent;
+        bar.key        = keyEvent[2];
+    }
+
+    // Initial meter
+    if (meterEvent) {
+        bar.meterEvent = meterEvent;
+        bar.duration   = meterEvent[2];
+        bar.divisor    = meterEvent[3];
+        bar.divisions  = meterEvent.divisions;
+    }
 
     // Extract events from sequence iterator and divide them into voices
     for (event of sequence) {
         // While event time is beyond end of bar advance bar state
         while (event[0] >= bar.beat + bar.duration) {
             if (flagEndBar(bar, sequenceEvent)) sequenceEvent = undefined;
-            tree.push(bar);
+            push(tree, bar);
 
             // Start new bar
             bar = {
@@ -182,26 +182,25 @@ export default function read(settings, sequence) {
 
             case "key": {
                 // Ignore redundant key events that do not change the key
-                if (keyEvents.length && keyEvents[keyEvents.length - 1][2] === event[2]) {
-                    break;
-                }
+                if (tree.keys.length && tree.keys[tree.keys.length - 1][2] === event[2]) break;
                 if (event[0] !== bar.beat) throw new Error(`Scribe "key" event at beat ${ event[0] } not at start of bar at beat ${ bar.beat }`);
                 bar.keyEvent = event;
                 bar.key = event[2];
-                keyEvents.push(event);
+                tree.keys.push(event);
 
                 // Push copy of key event to parts already discovered
-                let name;
-                for (name in parts) {
-                    if (parts[name].spellables) {
-                        parts[name].spellables.push(Event.from(event));
+                let p = -1;
+                while (tree.parts[++p]) {
+                    if (tree.parts[p].spellables) {
+                        tree.parts[p].spellables.push(Event.from(event));
                     }
                 }
                 break;
             }
 
             case "meter":
-                if (event[0] !== bar.beat) throw new Error(`Scribe "meter" event at beat ${ event[0] } not at start of bar at beat ${ bar.beat }`);
+                console.log('METER', event);
+                if (event[0] !== bar.beat) throw new Error(`Scribe "meter" event at beat ${ event[0] } not at start of bar beat ${ bar.beat }`);
                 bar.meterEvent = event;
                 bar.duration   = event[2];
                 bar.divisor    = event[3];
@@ -213,38 +212,55 @@ export default function read(settings, sequence) {
                 const endBeat = toStopBeat(event);
                 if (endBeat > stopBeat) stopBeat = endBeat;
 
-                const route = getRoute(event, routes);
-                const part  = route ? route.part : getOrCreatePart(settings, parts, keyEvents, toPartName(settings, event));
-                let voiceName;
+                const dests = getRoutes(event, routes);
+                if (dests && dests.length) {
+                    for (let i = 0; i < dests.length; i++) {
+                        const { part, voiceName: routeVoice } = dests[i];
+                        let voiceName;
 
-                if (event.type === 'chord') {
-                    voiceName = 'chord';
-                } else if (route) {
-                    if (part.stave.type === 'grand' && (route.voiceName === '0' || route.voiceName === 0)) {
-                        // Voice 0 on a grand staff distributes to voices 1 (rh) and 2 (lh) by splitting
-                        const voice = part.stave.getVoice ? part.stave.getVoice(event[2]) : undefined;
-                        voiceName = voice ? voice.name : 'rh';
-                    } else {
-                        voiceName = route.voiceName;
+                        if (event.type === 'chord') {
+                            voiceName = 'chord';
+                        } else if (routeVoice === '0' || routeVoice === 0) {
+                            voiceName = toVoice(settings, part.stave, event);
+                        } else {
+                            voiceName = routeVoice;
+                        }
+
+                        const e = dests.length > 1 && i < dests.length - 1 ? Event.from(event) : event;
+                        e.part  = part.name;
+                        e.voice = voiceName;
+                        e.stave = part.stave;
+
+                        // Push event into spellables if pitched stave
+                        if (part.stave.pitched) {
+                            if (!part.spellables) part.spellables = tree.keys.map((ev) => Event.from(ev));
+                            part.spellables.push(e);
+                            tree.spellables.push(e);
+                        }
+
+                        // Push event into voice buffer
+                        const voiceBuffer = part.buffers[voiceName] || (part.buffers[voiceName] = []);
+                        voiceBuffer.push(e);
                     }
                 } else {
-                    voiceName = toVoice(settings, part.stave, event);
+                    const part  = getOrCreatePart(tree.parts, toPartName(event));
+                    const voiceName = event.type === 'chord' ? 'chord' : toVoice(settings, part.stave, event);
+
+                    event.part  = part.name;
+                    event.voice = voiceName;
+                    event.stave = part.stave;
+
+                    // Push event into spellables if pitched stave
+                    if (part.stave.pitched) {
+                        if (!part.spellables) part.spellables = tree.keys.map((e) => Event.from(e));
+                        part.spellables.push(event);
+                        tree.spellables.push(event);
+                    }
+
+                    // Push event into voice buffer
+                    const voiceBuffer = part.buffers[voiceName] || (part.buffers[voiceName] = []);
+                    voiceBuffer.push(event);
                 }
-
-                event.part  = part.name;
-                event.voice = voiceName;
-                event.stave = part.stave;
-
-                // Push event into spellables if pitched stave
-                if (part.stave.pitched) {
-                    if (!part.spellables) part.spellables = keyEvents.map((e) => Event.from(e));
-                    part.spellables.push(event);
-                    spellables.push(event);
-                }
-
-                // Push event into voice buffer
-                const voiceBuffer = part.buffers[voiceName] || (part.buffers[voiceName] = []);
-                voiceBuffer.push(event);
                 break;
             }
 
@@ -252,17 +268,33 @@ export default function read(settings, sequence) {
                 const endBeat = toStopBeat(event);
                 if (endBeat > stopBeat) stopBeat = endBeat;
 
-                const route     = getRoute(event, routes);
-                const part      = route ? route.part : getOrCreatePart(settings, parts, keyEvents, toPartName(settings, event));
-                const voiceName = 'text';
+                const dests = getRoutes(event, routes);
+                if (dests && dests.length) {
+                    for (let i = 0; i < dests.length; i++) {
+                        const { part } = dests[i];
+                        const voiceName = 'text';
 
-                event.part  = part.name;
-                event.voice = voiceName;
-                event.stave = part.stave;
+                        const e = dests.length > 1 && i < dests.length - 1 ? Event.from(event) : event;
+                        e.part  = part.name;
+                        e.voice = voiceName;
+                        e.stave = part.stave;
 
-                // Push event into voice buffer
-                const voiceBuffer = part.buffers[voiceName] || (part.buffers[voiceName] = []);
-                voiceBuffer.push(event);
+                        // Push event into voice buffer
+                        const voiceBuffer = part.buffers[voiceName] || (part.buffers[voiceName] = []);
+                        voiceBuffer.push(e);
+                    }
+                } else {
+                    const part      = getOrCreatePart(tree.parts, toPartName(event));
+                    const voiceName = 'text';
+
+                    event.part  = part.name;
+                    event.voice = voiceName;
+                    event.stave = part.stave;
+
+                    // Push event into voice buffer
+                    const voiceBuffer = part.buffers[voiceName] || (part.buffers[voiceName] = []);
+                    voiceBuffer.push(event);
+                }
                 break;
             }
 
@@ -281,7 +313,7 @@ export default function read(settings, sequence) {
     // Create bars up to stop beat
     while (stopBeat > bar.beat + bar.duration) {
         if (flagEndBar(bar, sequenceEvent)) sequenceEvent = undefined;
-        tree.push(bar);
+        push(tree, bar);
 
         // Start new bar
         bar = {
@@ -295,27 +327,22 @@ export default function read(settings, sequence) {
         };
     }
 
-    tree.push(bar);
-
-    // Sort parts once by display order, or preserve parts order if parts was provided
-    const orderedParts = settings.parts ?
-        settings.parts.map((item) => parts[item.name || item.staff || 'default']).filter(Boolean) :
-        values(parts).sort(byPartOrder);
+    push(tree, bar);
 
     // Assign part shells to each bar by order number
-    let b = -1, barItem;
-    while (barItem = tree[++b]) {
-        barItem.length = orderedParts.length;
-        let p = -1, partInfo;
-        while (partInfo = orderedParts[++p]) {
-            barItem[p] = assign({
-                type:    'part',
-                name:    partInfo.name,
-                stave:   partInfo.stave,
-                symbols: []
-            }, partInfo.display);
+    let b = -1;
+    while (bar = tree[++b]) {
+        bar.length = tree.parts.length;
+        let p = -1;
+        while (tree.parts[++p]) {
+            // Clone part
+            const part = Part.from(tree.parts[p]);
+            part.symbols = [];
+            // Assign to bar
+            bar[p] = part;
         }
     }
 
-    return { tree, parts: orderedParts, spellables };
+    tree.length = b;
+    return tree;
 }

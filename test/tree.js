@@ -45,7 +45,7 @@ Deno.test('showAtConcertPitch: true preserves concert key on parts', async () =>
         [0, "meter", 4, 1],
         [0, "note", "C4", 0.5, 1]
     ]);
-    const tree = await requestTree(sequence, { showAtConcertPitch: true });
+    const tree = await requestTree(sequence, undefined, undefined, undefined, 0, 0, Infinity, { showAtConcertPitch: true });
     assert(tree[0]);
     assert(tree[0][0]);
     is(tree[0][0].key, 0);
@@ -111,7 +111,7 @@ Deno.test('DrumStave delegates spelling directly without RNN speller', async () 
         [0, "note", 38, 0.8, 1],
         [1, "note", 42, 0.8, 1]
     ]);
-    sequence.display = { staff: 'drum' };
+    sequence.parts = [{ staff: 'drum' }];
     const tree = await requestTree(sequence);
     assert(tree[0]);
     const part = tree[0][0];
@@ -134,7 +134,7 @@ Deno.test('DrumStave stem directions: upper voice (cymbals/hands) stemup true, l
         [1, "note", 42, 0.8, 1], // Closed Hi-Hat -> upper voice
         [1, "note", 44, 0.8, 1]  // Pedal Hi-Hat -> lower voice
     ]);
-    sequence.display = { staff: 'drum' };
+    sequence.parts = [{ staff: 'drum' }];
     const tree = await requestTree(sequence);
     assert(tree[0]);
     const part = tree[0][0];
@@ -202,9 +202,9 @@ Deno.test('All voice-associated symbols have symbol.voice.name attached', async 
 
 Deno.test('Whole bar rest has voice.name attached on empty bars', async () => {
     const sequence = Sequence.from({
-        objects: [
-            { id: 1, name: "Lead" },
-            { id: 2, name: "Bass" }
+        parts: [
+            { staff: "treble", name: "Lead", routing: { 1: 0 } },
+            { staff: "bass", name: "Bass", routing: { 2: 0 } }
         ],
         events: [
             [0, "meter", 4, 1],
@@ -254,7 +254,7 @@ Deno.test('Percussion swing straightening quantises swung 8ths to straight 8ths 
         [3.63, "note", "F3", 0.1, 0.2]
     ]);
 
-    const tree = await requestTree(sequence, { display: 'percussion', swingAsStraight8ths: true });
+    const tree = await requestTree(sequence, [{ staff: 'percussion' }], undefined, undefined, 0, 0, Infinity, { swingAsStraight8ths: true });
     assert(tree[0]);
     const part = tree[0][0];
     assert(part);
@@ -281,7 +281,7 @@ Deno.test('Swing quantisation is restricted to whole beat meters (integer diviso
         [0.66, "note", "F3", 0.1, 0.2]
     ]);
 
-    const tree305 = await requestTree(sequence305, { display: 'percussion', swingAsStraight8ths: true });
+    const tree305 = await requestTree(sequence305, [{ staff: 'percussion' }], undefined, undefined, 0, 0, Infinity, { swingAsStraight8ths: true });
     assert(tree305[0]);
     const part305 = tree305[0][0];
     const tuplets305 = part305.symbols.filter((s) => s.type === 'tuplet');
@@ -307,7 +307,7 @@ Deno.test('Swing quantisation is restricted to whole beat meters (integer diviso
         [1.63, "note", "F3", 0.1, 0.2]
     ]);
 
-    const tree22 = await requestTree(sequence22, { display: 'percussion', swingAsStraight8ths: true });
+    const tree22 = await requestTree(sequence22, [{ staff: 'percussion' }], undefined, undefined, 0, 0, Infinity, { swingAsStraight8ths: true });
     assert(tree22[0]);
     const part22 = tree22[0][0];
     const notes22 = part22.symbols.filter((s) => s.type === 'note');
@@ -401,7 +401,7 @@ Deno.test('Meterless sequence renders as a single bar containing all notes', asy
     ]);
 
     const tree = await requestTree(sequence);
-    is(1, Object.keys(tree).length, 'Tree has exactly one bar');
+    is(1, tree.length, 'Tree has exactly one bar');
     is(3, tree[0].duration, 'Bar duration spans all notes');
     is(tree[0].divisions[0], 3, 'Bar divisions end at bar duration');
     is(undefined, tree[0].meterEvent, 'Bar has no meterEvent');
@@ -497,10 +497,6 @@ Deno.test('Retain trailing bar when note genuinely ties across bar line', async 
 
 Deno.test('Score parts: routes multiple sources to voices on a grand stave', async () => {
     const sequence = Sequence.from({
-        objects: [
-            { id: 1, name: "Accompaniment" },
-            { id: 2, name: "Melody" }
-        ],
         events: [
             [0, "meter", 4, 1],
             [0, "key", "C"],
@@ -514,9 +510,9 @@ Deno.test('Score parts: routes multiple sources to voices on a grand stave', asy
         parts: [{
             staff: "grand",
             name: "Piano",
-            voices: {
-                rh: 2,
-                lh: 1
+            routing: {
+                2: "rh",
+                1: "lh"
             }
         }]
     });
@@ -535,10 +531,6 @@ Deno.test('Score parts: routes multiple sources to voices on a grand stave', asy
 
 Deno.test('Score parts: routes sources to open score staves', async () => {
     const sequence = Sequence.from({
-        objects: [
-            { id: "mel", name: "Melody" },
-            { id: "acc", name: "Accompaniment" }
-        ],
         events: [
             [0, "meter", 4, 1],
             [0, "key", "C"],
@@ -550,8 +542,8 @@ Deno.test('Score parts: routes sources to open score staves', async () => {
             { id: 2, events: [[0, "note", "C3", 0.1, 4]] }
         ],
         parts: [
-            { staff: "treble", name: "Melody", voices: { main: "mel" } },
-            { staff: "bass", name: "Accompaniment", voices: { main: "acc" } }
+            { staff: "treble", name: "Melody", routing: { mel: "main" } },
+            { staff: "bass", name: "Accompaniment", routing: { acc: "main" } }
         ]
     });
 
@@ -573,12 +565,6 @@ Deno.test('Score parts: routes sources to open score staves', async () => {
 
 Deno.test('Score parts: routes SATB to four voices on a single grand stave', async () => {
     const sequence = Sequence.from({
-        objects: [
-            { id: 1, name: "Soprano" },
-            { id: 2, name: "Alto" },
-            { id: 3, name: "Tenor" },
-            { id: 4, name: "Bass" }
-        ],
         events: [
             [0, "meter", 4, 1],
             [0, "key", "C"],
@@ -596,11 +582,11 @@ Deno.test('Score parts: routes SATB to four voices on a single grand stave', asy
         parts: [{
             staff: "grand",
             name: "Choir",
-            voices: {
-                soprano: 1,
-                alto:    2,
-                tenor:   3,
-                bass:    4
+            routing: {
+                1: "soprano",
+                2: "alto",
+                3: "tenor",
+                4: "bass"
             }
         }]
     });
@@ -619,7 +605,7 @@ Deno.test('Score parts: routes SATB to four voices on a single grand stave', asy
     is(notes.find((n) => n.pitch === 'C3').voice.name, 'bass');
 });
 
-Deno.test('Score parts: undefined voices implicitly maps { 0: 0 } and distributes voice 0 on grand stave', async () => {
+Deno.test('Score parts: undefined routing implicitly maps { 0: 0 } and distributes voice 0 on grand stave', async () => {
     const sequence = Sequence.from({
         events: [
             [0, "meter", 4, 1],
@@ -630,7 +616,7 @@ Deno.test('Score parts: undefined voices implicitly maps { 0: 0 } and distribute
         parts: [{
             staff: "grand",
             name: "Piano"
-            // voices undefined -> implicit { 0: 0 }
+            // routing undefined -> implicit { 0: 0 }
         }]
     });
 
@@ -648,10 +634,6 @@ Deno.test('Score parts: undefined voices implicitly maps { 0: 0 } and distribute
 
 Deno.test('Score parts: numeric voice keys map to grand stave voices (1: rh, 2: lh)', async () => {
     const sequence = Sequence.from({
-        objects: [
-            { id: 1, name: "BassPart" },
-            { id: 2, name: "TreblePart" }
-        ],
         events: [
             [0, "meter", 4, 1],
             [0, "key", "C"],
@@ -665,9 +647,9 @@ Deno.test('Score parts: numeric voice keys map to grand stave voices (1: rh, 2: 
         parts: [{
             staff: "grand",
             name: "Piano",
-            voices: {
-                1: 2, // voice 1 -> rh
-                2: 1  // voice 2 -> lh
+            routing: {
+                2: 1, // source 2 -> voice 1 (rh)
+                1: 2  // source 1 -> voice 2 (lh)
             }
         }]
     });
@@ -682,12 +664,6 @@ Deno.test('Score parts: numeric voice keys map to grand stave voices (1: rh, 2: 
 
 Deno.test('Score parts: numeric voice keys map to SATB on grand stave (3: soprano, 4: alto, 5: tenor, 6: bass)', async () => {
     const sequence = Sequence.from({
-        objects: [
-            { id: 1, name: "Sop" },
-            { id: 2, name: "Alt" },
-            { id: 3, name: "Ten" },
-            { id: 4, name: "Bas" }
-        ],
         events: [
             [0, "meter", 4, 1],
             [0, "key", "C"],
@@ -705,11 +681,11 @@ Deno.test('Score parts: numeric voice keys map to SATB on grand stave (3: sopran
         parts: [{
             staff: "grand",
             name: "SATB",
-            voices: {
-                3: 1,
-                4: 2,
-                5: 3,
-                6: 4
+            routing: {
+                1: 3,
+                2: 4,
+                3: 5,
+                4: 6
             }
         }]
     });
@@ -722,6 +698,70 @@ Deno.test('Score parts: numeric voice keys map to SATB on grand stave (3: sopran
     is(notes.find((n) => n.pitch === 'E4').voice.name, 'alto');
     is(notes.find((n) => n.pitch === 'C4').voice.name, 'tenor');
     is(notes.find((n) => n.pitch === 'C3').voice.name, 'bass');
+});
+
+Deno.test('Score parts: routes multiple sources to a single voice', async () => {
+    const sequence = Sequence.from({
+        events: [
+            [0, "meter", 4, 1],
+            [0, "key", "C"],
+            [0, "sequence", 1, "flute1", 4],
+            [0, "sequence", 2, "flute2", 4]
+        ],
+        sequences: [
+            { id: 1, events: [[0, "note", "G5", 0.1, 4]] },
+            { id: 2, events: [[0, "note", "E5", 0.1, 4]] }
+        ],
+        parts: [{
+            staff: "treble",
+            name: "Flutes",
+            routing: {
+                flute1: 0,
+                flute2: 0
+            }
+        }]
+    });
+
+    const tree = await requestTree(sequence);
+    is(tree.length, 1);
+    is(tree[0].length, 1);
+    is(tree[0][0].name, 'Flutes');
+    const notes = tree[0][0].symbols.filter((s) => s.type === 'note');
+    is(notes.length, 2);
+    is(notes[0].voice.name, 'main');
+    is(notes[1].voice.name, 'main');
+});
+
+Deno.test('Score parts: routes one source to multiple parts', async () => {
+    const sequence = Sequence.from({
+        events: [
+            [0, "meter", 4, 1],
+            [0, "key", "C"],
+            [0, "sequence", 1, "lead", 4]
+        ],
+        sequences: [
+            { id: 1, events: [[0, "note", "A4", 0.1, 4]] }
+        ],
+        parts: [
+            { staff: "treble", name: "Solo", routing: { lead: 0 } },
+            { staff: "treble", name: "Condensed", routing: { lead: 0 } }
+        ]
+    });
+
+    const tree = await requestTree(sequence);
+    is(tree[0].length, 2);
+    is(tree[0][0].name, 'Solo');
+    is(tree[0][1].name, 'Condensed');
+
+    const part0Notes = tree[0][0].symbols.filter((s) => s.type === 'note');
+    const part1Notes = tree[0][1].symbols.filter((s) => s.type === 'note');
+    is(part0Notes.length, 1);
+    is(part0Notes[0].pitch, 'A4');
+    is(part0Notes[0].event.part, 'Solo');
+
+    is(part1Notes.length, 1);
+    is(part1Notes[0].pitch, 'A4');
+    is(part1Notes[0].event.part, 'Condensed');
 });
 
 Deno.test('3/4 meter: notes and text on third beat stay within their bar', async () => {
@@ -755,6 +795,60 @@ Deno.test('3/4 meter: notes and text on third beat stay within their bar', async
     is(bar1Texts.map((s) => s.value).join(' '), 'then we');
     is(bar1Notes.length, 2);
 });
+
+Deno.test('requestTree: default key and timesig without mutating sequence', async () => {
+    const sequence = new Sequence([
+        [0, "note", "D4", 0.1, 1],
+        [3, "note", "E4", 0.1, 1],
+        [5, "note", "F#4", 0.1, 1]
+    ]);
+
+    const initialLength = sequence.events.length;
+    const tree = await requestTree(sequence, undefined, 'D', '3/4');
+
+    // Does not mutate underlying sequence
+    is(sequence.events.length, initialLength);
+
+    // Segmented into 2 bars of 3/4
+    is(tree.length, 2);
+    is(tree[0].duration, 3);
+    is(tree[0].key, 2); // D major = 2 sharps
+    is(tree[0].meterEvent.timesig, '3/4');
+    is(tree[1].beat, 3);
+    is(tree[1].duration, 3);
+});
+
+Deno.test('requestTree: sequence events override default key and timesig', async () => {
+    const sequence = new Sequence([
+        [0, "key", "Eb"],
+        [0, "meter", 4, 1],
+        [0, "note", "Eb4", 0.1, 1]
+    ]);
+
+    const tree = await requestTree(sequence, undefined, 'D', '3/4');
+
+    // Overridden by beat 0 sequence events
+    is(tree[0].duration, 4);
+    is(tree[0].key, -3); // Eb major = 3 flats
+});
+
+Deno.test('requestTree: spells parts and resolves stave rows without showAtConcertPitch', async () => {
+    const sequence = new Sequence([
+        [0, "note", 60, 1, 1],
+        [1, "note", 62, 1, 1],
+        [2, "note", 64, 1, 1],
+        [3, "note", 65, 1, 1]
+    ]);
+
+    const tree = await requestTree(sequence, undefined, 'C', '4/4');
+    assert(tree[0]);
+    assert(tree[0][0]);
+    const noteSymbols = tree[0][0].symbols.filter((s) => s.type === 'note');
+    is(noteSymbols.length, 4);
+    is(noteSymbols[0].pitch, 'C4');
+    is(typeof noteSymbols[0].row, 'number');
+});
+
 
 
 

@@ -319,17 +319,12 @@
     </style>
 
     <script type="application/json" id="a-fond">{
-    "objects": [
-        { "id": 1, "name": "Accompaniment" },
-        { "id": 2, "name": "Melody" }
-    ],
-
     "parts": [{
         "staff": "grand",
         "name": "Piano",
-        "voices": {
-            "rh": 2,
-            "lh": 1
+        "routing": {
+            "2": "rh",
+            "1": "lh"
         }
     }],
 
@@ -380,17 +375,12 @@
     }]
     }</script>
     <script type="application/json" id="fare-thee">{
-        "objects": [
-            { "id": 1, "name": "Accompaniment" },
-            { "id": 2, "name": "Melody" }
-        ],
-
         "parts": [{
             "staff": "grand",
             "name": "Piano",
-            "voices": {
-                "rh": 2,
-                "lh": 1
+            "routing": {
+                "2": "rh",
+                "1": "lh"
             }
         }],
 
@@ -446,17 +436,12 @@
         }]
     }</script>
     <script type="application/json" id="thine-be">{
-        "objects": [
-            { "id": 1, "name": "Accompaniment" },
-            { "id": 2, "name": "Melody" }
-        ],
-
         "parts": [{
             "staff": "grand",
             "name": "Piano",
-            "voices": {
-                "rh": 2,
-                "lh": 1
+            "routing": {
+                "2": "rh",
+                "1": "lh"
             }
         }],
 
@@ -514,17 +499,12 @@
         }]
     }</script>
     <script type="application/json" id="where-in">{
-        "objects": [
-            { "id": 1, "name": "Accompaniment" },
-            { "id": 2, "name": "Melody" }
-        ],
-
         "parts": [{
             "staff": "grand",
             "name": "Piano",
-            "voices": {
-                "rh": 2,
-                "lh": 1
+            "routing": {
+                "2": "rh",
+                "1": "lh"
             }
         }],
 
@@ -617,6 +597,7 @@
 
         <h3 class="font-03 darkpink-fg 6x @1-x2 @3-4x">Write a tune</h3>
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">Write some sequence data and use <code class="tag">&lt;scribe-music&gt;</code> to render it:</p>
+
         <div class="code-block 9x @1-x2 @1-8x">
             <div class="code-tabs">
                 <pre class="tab-panel active" role="tabpanel" id="tune-text-panel" aria-labelledby="tab-text" data-panel="text"><code><span class="tag">&lt;script <span class="attribute">type=</span><span class="attribute-value">"text/sequence"</span> <span class="attribute">id=</span><span class="attribute-value">"tune"</span>&gt;</span><span class="sequence" id="tune" type="text/sequence">
@@ -638,12 +619,16 @@
 }<span class="tag">&lt;/script&gt;</span>
 <span class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">src=<span class="attribute-value">"#tune"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</span></code></pre>
             </div>
+
             <nav class="tab-nav" role="tablist" aria-label="Code format">
                 <button type="button" class="tab-button active" role="tab" aria-selected="true" aria-controls="tune-text-panel" id="tab-text" data-tab="text">Text</button>
                 <button type="button" class="tab-button" role="tab" aria-selected="false" aria-controls="tune-json-panel" id="tab-json" data-tab="json">JSON</button>
             </nav>
         </div>
         <scribe-music class="9x @1-x2 @1-6x @2-5x @3-4x" src="#tune"></scribe-music>
+
+        <h2 class="font-02 darkpink-fg 6x @1-x2 @3-4x">Documentation</h2>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x"><a href="./api/">API Reference</a></p>
     </section>
 
     <section class="attributes-section 9x-grid grid">
@@ -732,200 +717,6 @@
             </tr>
           </tbody>
         </table>
-    </section>
-
-    <section class="data-section 9x-grid grid dense-grid">
-        <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Sequences</h2>
-        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-        Scribe consumes sequence data.
-        A sequence is an object with an <code class="property">events</code> property, an array of events.
-        An event has the form <code>[beat, type, ...data]</code>.
-        In Scribe, 1 beat is a quarter note.
-        A sequence may also have a <code class="property">sequences</code> property, an array of nested sequences.
-        A nested sequence has the same sequence structure, and must have an id.
-        As an example, here are the first four bars of Herbie Hancock's <a href="https://www.youtube.com/watch?v=RaHCnfI7y74&list=RDRaHCnfI7y74">Dolphin Dance</a> as Sequence JSON:
-        </p>
-
-        <pre class="9x @1-8x @1-x2"><code class="json" id="dolphin-dance-intro">{
-    <span class="property">"name"</span>: <span class="string">"Dolphin Dance"</span>,
-    <span class="property">"events"</span>: [
-        [<span class="number">0</span>, <span class="string">"key"</span>, <span class="string">"Eb"</span>],
-        [<span class="number">0</span>, <span class="string">"meter"</span>, <span class="number">4</span>, <span class="number">1</span>],
-        [<span class="number">0</span>, <span class="string">"sequence"</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">16</span>]
-    ],
-    <span class="property">"sequences"</span>: [{
-        <span class="property">"id"</span>: <span class="number">1</span>,
-        <span class="property">"name"</span>: <span class="string">"Intro"</span>,
-        <span class="property">"events"</span>: [
-            [<span class="number">0</span>,    <span class="string">"chord"</span>, <span class="number">3</span>, <span class="string">"∆"</span>, <span class="number">4</span>],
-            [<span class="number">2</span>,    <span class="string">"note"</span>,  <span class="number">67</span>, <span class="number">0.1</span>, <span class="number">0.5</span>],
-            [<span class="number">2.5</span>,  <span class="string">"note"</span>,  <span class="number">68</span>, <span class="number">0.1</span>, <span class="number">0.5</span>],
-            [<span class="number">3</span>,    <span class="string">"note"</span>,  <span class="number">70</span>, <span class="number">0.1</span>, <span class="number">0.5</span>],
-            [<span class="number">3.5</span>,  <span class="string">"note"</span>,  <span class="number">65</span>, <span class="number">0.1</span>, <span class="number">3.5</span>],
-            [<span class="number">4</span>,    <span class="string">"chord"</span>, <span class="number">10</span>, <span class="string">"-"</span>, <span class="number">4</span>],
-            [<span class="number">8</span>,    <span class="string">"chord"</span>, <span class="number">3</span>, <span class="string">"∆"</span>, <span class="number">4</span>],
-            [<span class="number">10</span>,   <span class="string">"note"</span>,  <span class="number">67</span>, <span class="number">0.1</span>, <span class="number">0.5</span>],
-            [<span class="number">10.5</span>, <span class="string">"note"</span>,  <span class="number">68</span>, <span class="number">0.1</span>, <span class="number">0.5</span>],
-            [<span class="number">11</span>,   <span class="string">"note"</span>,  <span class="number">70</span>, <span class="number">0.1</span>, <span class="number">0.5</span>],
-            [<span class="number">11.5</span>, <span class="string">"note"</span>,  <span class="number">65</span>, <span class="number">0.1</span>, <span class="number">3.5</span>],
-            [<span class="number">12</span>,   <span class="string">"chord"</span>, <span class="number">2</span>, <span class="string">"ø"</span>, <span class="number">2</span>],
-            [<span class="number">14</span>,   <span class="string">"chord"</span>, <span class="number">7</span>, <span class="string">"7alt"</span>, <span class="number">2</span>]
-        ]
-    }]
-}</code></pre>
-
-        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-        What's going on here? The main <code class="property">events</code> array declares the key and the meter at beat <code class="number">0</code>, then cues the <code class="string">"Intro"</code> sequence to 'play' for <code class="number">16</code> beats.
-        The intro sequence contains the melody and chords.
-        The result renders as:
-        </p>
-
-        <scribe-music class="9x @1-x2 @1-7x @3-6x" staff="treble" src="#dolphin-dance-intro"></scribe-music>
-
-        <div class="x-sub-grid y-start-grid grid 9x @1-x2 @1-8x @3-x2 @3-3x">
-            <h3 class="font-03 darkpink-fg 9x @1-6x @2-5x @3-3x">Events</h3>
-
-            <p class="9x @1-6x @2-5x @3-3x">
-            Scribe understands the following event types:
-            </p>
-
-            <table class="striped-table events-table 9x @1-7x @3-3x">
-                <thead>
-                    <tr>
-                        <th>beat</th>
-                        <th>type</th>
-                        <th>data</th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!--tr>
-                        <td><code>beat</code></td>
-                        <td><code>"param"</code></td>
-                        <td><code>name</code></td>
-                        <td><code>value</code></td>
-                        <td><code>curve</code></td>
-                        <td><code>duration</code></td>
-                    </tr-->
-                    <!--tr>
-                        <td><code>beat</code></td>
-                        <td><code>"rate"</code></td>
-                        <td><code>number</code></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr-->
-                    <tr>
-                        <td><code>beat</code></td>
-                        <td><code class="string">"chord"</code></td>
-                        <td><code>root</code> | <code>number</code></td>
-                        <td><code>extension</code></td>
-                        <td><code>duration</code></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td><code>beat</code></td>
-                        <td><code class="string">"key"</code></td>
-                        <td><code>name</code> | <code>number</code></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td><code>beat</code></td>
-                        <td><code class="string">"meter"</code></td>
-                        <td><code>beats</code></td>
-                        <td><code>divisor</code></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td><code>beat</code></td>
-                        <td><code class="string">"note"</code></td>
-                        <td><code>name</code> | <code>number</code></td>
-                        <td><code>dynamic</code></td>
-                        <td><code>duration</code></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td><code>beat</code></td>
-                        <td><code class="string">"sequence"</code></td>
-                        <td><code>id</code></td>
-                        <td><code>target</code></td>
-                        <td><code>duration</code></td>
-                        <td><code>transforms</code></td>
-                    </tr>
-                    <tr>
-                        <td><code>beat</code></td>
-                        <td><code class="string">"text"</code></td>
-                        <td><code>duration</code></td>
-                        <td><code>string</code></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <p class="9x @1-6x @2-5x @3-3x">
-            Unrecognised types are ignored.
-            </p>
-        </div>
-
-        <div class="x-sub-grid y-start-grid grid 9x @1-x2 @1-8x @3-x5 @3-5x">
-            <h3 class="font-03 darkpink-fg 9x @1-6x @2-5x @3-3x">Transforms</h3>
-
-            <p class="9x @1-6x @2-5x @3-3x">
-            Sequence events may carry transforms for the sequences they cue:
-            </p>
-
-            <pre class="9x @1-8x @3-5x"><code class="json">[<span class="number">0</span>, <span class="string">"sequence"</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">16</span>, <span class="string">"transpose"</span>, <span class="number">-3</span>, <span class="string">"rate"</span>, <span class="number">2</span>]</code></pre>
-
-            <p class="9x @1-6x @2-5x @3-3x">
-            This renders as:
-            </p>
-
-            <script type="application/json" id="dolphin-dance-intro-transformed">{"name":"Dolphin Dance","events":[[0,"key","Eb"],[0,"meter",4,1],[0,"sequence",1,0,16,"transpose",-3,"rate",2]],"sequences":[{"id":1,"name":"Intro","events":[[0,"chord",3,"∆",4],[2,"note",67,0.1,0.5],[2.5,"note",68,0.1,0.5],[3,"note",70,0.1,0.5],[3.5,"note",65,0.1,3.5],[4,"chord",10,"-",4],[8,"chord",3,"∆",4],[10,"note",67,0.1,0.5],[10.5,"note",68,0.1,0.5],[11,"note",70,0.1,0.5],[11.5,"note",65,0.1,3.5],[12,"chord",2,"ø",2],[14,"chord",7,"7alt",2]]}]}</script>
-            <scribe-music class="9x @1-7x @3-4x" staff="treble" src="#dolphin-dance-intro-transformed"></scribe-music>
-
-            <p class="9x @1-6x @2-5x @3-3x">
-            Notice that all 16 beats are still rendered – the duration of the event itself is not transformed – but the rate of the melody is transposed down a minor third and is twice as fast.
-            Transforms are applied to sequences in the order they are declared. Scribe supports the transforms:
-            </p>
-
-            <table class="striped-table 9x @1-6x @2-5x @3-3x">
-                <thead>
-                    <tr>
-                        <th>transform</th>
-                        <th>data</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><code class="string">"displace"</code></td>
-                        <td><code>float</code> (beats)</td>
-                    </tr>
-                    <tr>
-                        <td><code class="string">"gain"</code></td>
-                        <td><code>float</code> (gain)</td>
-                    </tr>
-                    <tr>
-                        <td><code class="string">"rate"</code></td>
-                        <td><code>float</code> (playback rate)</td>
-                    </tr>
-                    <tr>
-                        <td><code class="string">"transpose"</code></td>
-                        <td><code>integer</code> (semitones)</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-        For more, see the <a href="./api/index.html">API reference</a> and the <a href="./api/parts.html">multi-stave scoring documentation</a>.
-        Some examples of sequence JSON can be found in the repository's <a href="https://github.com/stephband/scribe/tree/main/data">data</a> folder.
-        </p>
     </section>
 
     <!--section class="style-section 9x-grid grid y-start-grid" style="--y-gap: 0em;">

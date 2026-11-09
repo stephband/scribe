@@ -429,7 +429,7 @@ export default function symbolise(settings, parts, tree) {
     // We always preserve at least 1 bar (tree.length > 1), and ensure the true
     // final bar carries the double barline.
     while (tree.length > 1 && !tree[tree.length - 1].endOfSequence && !hasBarContent(tree[tree.length - 1])) {
-        tree.pop();
+        delete tree[--tree.length];
     }
 
     if (tree.length) {

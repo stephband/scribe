@@ -2,17 +2,10 @@
 import create           from 'dom/create.js';
 import px               from 'dom/parse-length.js';
 import rect             from 'dom/rect.js';
-//import Event            from 'sequence/modules/event.js';
-//import Transform        from 'sequence/modules/transform.js';
-//import SequenceIterator from 'sequence/modules/sequence-iterator.js';
-//import { toKeyName }      from 'sequence/modules/event/key.js';
-//import Stave            from './stave.js';
 import requestTree      from './tree.js';
 import { createBarElement, createSigElement } from './create-element.js';
-//import { renderBeam }   from './beam.js';
 import * as glyphs      from './glyphs.js';
 import truncate         from './number/truncate.js';
-import config           from './config.js';
 import log              from './log.js';
 
 
@@ -91,29 +84,14 @@ export function renderStyle(element, root = element) {
     `;               // label and gap | margin | clef | accidentals | margin
 }
 
-export async function renderDOM(sequence, key, meter, transpose, displace, duration, settings) {
-    // If events contains no initial key and key is available insert a key event
-    const keyEvent = sequence.find({ beat: 0, type: 'key' })
-        || key
-        && sequence.create(0, 'key', key) ;
-
-    // If events contains no initial meter and meter is available insert a meter event
-    const meterEvent = sequence.find({ beat: 0, type: 'meter' })
-        || meter
-        && sequence.create(0, 'meter', meter[2], meter[3]) ;
-
+export async function renderDOM(sequence, parts, key, timesig, transpose, displace, duration, settings) {
     // Create render tree
-    const tree = await requestTree(sequence, settings, transpose, displace, duration);
+    const tree = await requestTree(sequence, parts, key, timesig, transpose, displace, duration, settings);
 
     // Create DOM tree
     const fragment = document.createDocumentFragment();
-
     let n = -1;
-    let bar, element;
-    while (bar = tree[++n]) {
-        element = createBarElement(bar);
-        fragment.appendChild(element);
-    }
+    while (tree[++n]) fragment.appendChild(createBarElement(tree[n]));
 
     // Create side column with signatures
     if (tree[0]) {

@@ -2,13 +2,12 @@
 "name": "So What",
 "author": { "name": "Miles Davis / Bill Evans" },
 
-"objects": [
-    { "id": 2, "name": "Trumpet" },
-    { "id": 3, "name": "Alto sax" },
-    { "id": 4, "name": "Tenor sax" },
-    { "id": 5, "name": "Trombone" },
-    { "id": 6, "name": "Bass" },
-    { "id": 7, "name": "Drums" }
+"parts": [
+    { "name": "Trumpet",   "staff": "treble", "routing": { "2": 0 } },
+    { "name": "Alto sax",  "staff": "treble", "routing": { "3": 0 } },
+    { "name": "Tenor sax", "staff": "treble", "routing": { "4": 0 } },
+    { "name": "Trombone",  "staff": "treble", "routing": { "5": 0 } },
+    { "name": "Bass",      "staff": "bass",   "routing": { "6": 0 } }
 ],
 
 "events": [

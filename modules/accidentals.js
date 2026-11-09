@@ -1,10 +1,23 @@
 
 import { toKeyNumber }   from 'sequence/modules/event/key.js';
-import { fathercharles } from './pitch.js';
+
+export const fathercharles = [
+    // Father Charles Goes Down And Ends Battle,
+    'F♯', 'C♯', 'G♯', 'D♯', 'A♯', 'E♯', 'B♯',
+    // Battle Ends And Down Goes Charles Father
+    'B♭', 'E♭', 'A♭', 'D♭', 'G♭', 'C♭', 'F♭'
+];
 
 const sharpRoots = fathercharles.slice(0, 7).map((p) => p[0]);
 const flatRoots  = fathercharles.slice(7, 14).map((p) => p[0]);
 
+/*
+export function byFatherCharlesPitch(a, b) {
+    const ai = fathercharles.indexOf(a.pitch);
+    const bi = fathercharles.indexOf(b.pitch);
+    return ai > bi ? 1 : ai < bi ? -1 : 0;
+}
+*/
 
 /**
 accidentalsFromKey(key)

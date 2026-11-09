@@ -44,7 +44,7 @@ export default define(element('scribe-music', {
         internals.data      = Signal.of();
         internals.staff     = Signal.of('treble');
         internals.key       = Signal.of('C');
-        internals.meter     = Signal.of();
+        internals.timesig   = Signal.of();
         internals.beat      = Signal.of(0);
         internals.duration  = Signal.of(Infinity);
         internals.transpose = Signal.of(0);
@@ -87,10 +87,12 @@ export default define(element('scribe-music', {
             const fragment = await renderDOM(
                 // Events from data
                 internals.data.value,
+                // Parts (override with staff attribute if sequence defines no parts)
+                internals.data.value.parts || (internals.staff.value ? [{ staff: internals.staff.value }] : undefined),
                 // Key name
                 internals.key.value,
                 // Create an initial [0, "meter", ...] event
-                internals.meter.value,
+                internals.timesig.value,
                 // Transpose is a number
                 internals.transpose.value,
                 // Beat is a number
@@ -99,9 +101,6 @@ export default define(element('scribe-music', {
                 internals.duration.value,
                 // Override settings from attributes
                 assign({}, config, {
-                    display: internals.staff.value ?
-                        { staff: internals.staff.value } :
-                        undefined,
                     swingAsStraight8ths:  internals.swingAsStraight8ths.value,
                     swingAsStraight16ths: internals.swingAsStraight16ths.value
                 })
@@ -222,8 +221,8 @@ export default define(element('scribe-music', {
         Sets the meter. Note that this is overridden by any `"meter"` event
         found at beat `0` in the data.
         **/
-        get: function() { return meterToTimesig(getInternals(this).meter.value); },
-        set: function(value) { getInternals(this).meter.value = assign([0], timesigToMeter(value)); }
+        get: function() { return getInternals(this).timesig.value; },
+        set: function(value) { getInternals(this).timesig.value = value; }
     },
 
     beat: {

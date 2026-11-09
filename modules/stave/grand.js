@@ -1,7 +1,7 @@
 
 import * as glyphs from "../glyphs.js";
 import { toNoteName, toNoteNumber } from 'midi/note.js';
-import { rflatsharp } from '../pitch.js';
+import { rflatsharp } from 'sequence/modules/pitch.js';
 import Stave       from './stave.js';
 
 
@@ -138,8 +138,9 @@ export default class GrandStave extends Stave {
     **/
     getRow(part, pitch) {
         pitch = typeof pitch === 'string' ? pitch : toNoteName(pitch) ;
-        const name = part.name + '-' + pitch.replace(rflatsharp, '');
-        const i = this.rows.findIndex((row) => row.includes(name));
+        const row = typeof pitch === 'string' ? pitch.replace(rflatsharp, '') : undefined ;
+        const name = row ? part.name + '-' + row : '' ;
+        const i = name ? this.rows.findIndex((r) => r.includes(name)) : -1 ;
         if (global.DEBUG && i === -1) throw new Error('Pitch "' + name + '" is not supported by ' + this.constructor.name);
         if (i === -1) console.warn('Pitch "' + name + '" is not supported by ' + this.constructor.name);
         return i > -1 ? i : undefined ;

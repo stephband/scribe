@@ -40,7 +40,7 @@ function fromPattern(pattern) {
 }
 
 async function summarisePattern(pattern, settings) {
-    return summarise(await requestTree(fromPattern(pattern), settings));
+    return summarise(await requestTree(fromPattern(pattern), undefined, undefined, undefined, 0, 0, Infinity, settings));
 }
 
 
@@ -98,7 +98,7 @@ Deno.test('Bar repeats: never repeat material from before a double bar line', as
         }]
     });
 
-    const tree = await requestTree(sequence, { barRepeat1Threshold: 1 });
+    const tree = await requestTree(sequence, undefined, undefined, undefined, 0, 0, Infinity, { barRepeat1Threshold: 1 });
     equals(summarise(tree), 'x %1 x %1 x %1');
 });
 
@@ -113,9 +113,9 @@ Deno.test('Bar repeats: bars with notes tied in are not repeated', async () => {
 
 Deno.test('Bar repeats: detected per part', async () => {
     const sequence = Sequence.from({
-        objects: [
-            { id: 1, name: 'Lead' },
-            { id: 2, name: 'Bass' }
+        parts: [
+            { staff: 'treble', name: 'Lead', routing: { 1: 0 } },
+            { staff: 'bass', name: 'Bass', routing: { 2: 0 } }
         ],
         events: [
             [0, 'meter', 4, 1],
@@ -150,7 +150,7 @@ Deno.test('Bar repeats: time signatures survive replacement', async () => {
         [12, 'note', 62, 0.1, 4]
     ]);
 
-    const tree  = await requestTree(sequence, { barRepeat1Threshold: 1 });
+    const tree  = await requestTree(sequence, undefined, undefined, undefined, 0, 0, Infinity, { barRepeat1Threshold: 1 });
     const types = tree[1][0].symbols.map((symbol) => symbol.type);
     equals(summarise(tree), 'x %1 %1 %1');
     equals(types, ['timesig', 'barrepeat']);
