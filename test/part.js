@@ -32,22 +32,26 @@ Deno.test('Part constructor expects stave to be a stave object', () => {
     }, TypeError);
 });
 
-Deno.test('Part constructor defaults name and routing', () => {
+Deno.test('Part constructor defaults transpose and routing, requires name', () => {
     const bass = Stave['bass'];
-    const part = new Part(undefined, bass);
+    const part = new Part('Bass', bass);
 
     is(part.stave, bass);
-    is(part.name, '');
+    is(part.name, 'Bass');
     is(part.transpose, 0);
     equals(part.routing, { 0: 0 });
+
+    assertThrows(() => {
+        new Part(undefined, bass);
+    }, TypeError);
 });
 
 Deno.test('Part.from() resolves string stave and destructures to constructor', () => {
-    const part1 = Part.from({ stave: 'grand', name: 'Piano', transpose: 2, routing: { 2: 'rh', 1: 'lh' } });
+    const part1 = Part.from({ stave: 'grand', name: 'Piano', transpose: 2, routing: { 2: 1, 1: 2 } });
     is(part1.stave, Stave['grand']);
     is(part1.name, 'Piano');
     is(part1.transpose, 2);
-    equals(part1.routing, { 2: 'rh', 1: 'lh' });
+    equals(part1.routing, { 2: 1, 1: 2 });
 
     // Also supports 'staff' property
     const part2 = Part.from({ staff: 'bass', name: 'Bass' });
@@ -65,8 +69,7 @@ Deno.test('Part.from() resolves string stave and destructures to constructor', (
     is(clone1.symbols, undefined);
     is(clone1.buffers, undefined);
 
-    // Throws on unknown staff
-    assertThrows(() => {
-        Part.from({ staff: 'non-existent' });
-    });
+    // Defaults to treble on omitted/undefined staff
+    const part3 = Part.from({ name: 'Melody' });
+    is(part3.stave, Stave['treble']);
 });

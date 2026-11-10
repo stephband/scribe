@@ -1,8 +1,7 @@
 
 import insert                  from 'fn/insert.js';
-import slugify                 from 'fn/slugify.js';
+import nothing                 from 'fn/nothing.js';
 import Event                   from 'sequence/modules/event.js';
-import { getDivisions }        from 'sequence/modules/event/meter.js';
 import Stave                   from '../stave.js';
 import Part                    from '../part.js';
 import push                    from '../object/push.js';
@@ -20,28 +19,9 @@ function toPartName(event) {
 }
 
 function toVoiceName(stave, voiceKey) {
-    if (voiceKey === 0 || voiceKey === '0') {
-        if (stave && stave.getVoice) return '0';
-    }
-
-    if (stave && stave.type === 'grand') {
-        if (voiceKey === 1 || voiceKey === '1') return 'rh';
-        if (voiceKey === 2 || voiceKey === '2') return 'lh';
-        if (voiceKey === 3 || voiceKey === '3') return 'soprano';
-        if (voiceKey === 4 || voiceKey === '4') return 'alto';
-        if (voiceKey === 5 || voiceKey === '5') return 'tenor';
-        if (voiceKey === 6 || voiceKey === '6') return 'bass';
-    }
-
-    if (stave && stave.voices) {
-        if (stave.voices[voiceKey]) return stave.voices[voiceKey].name;
-        const voice = stave.voices.find((v) => v.name === voiceKey);
-        if (voice) return voice.name;
-        if ((voiceKey === 1 || voiceKey === '1') && stave.voices.length === 1) {
-            return stave.voices[0].name;
-        }
-    }
-    return voiceKey + '';
+    return voiceKey ?
+        stave.voices[voiceKey - 1].name :
+        undefined ;
 }
 
 function addRoute(routes, sourceId, route) {
@@ -65,12 +45,11 @@ function getRoutes(event, routes) {
     return routes.get(id);
 }
 
-function toVoice(settings, stave, event) {
+function toVoice(stave, event) {
     if (event.type === 'chord') return 'chord';
     if (event.type === 'text') return 'text';
     if (event.voice !== undefined) return event.voice + '';
-    const voice = stave.getVoice ? stave.getVoice(event[2]) : stave.voices?.[0];
-    return voice ? voice.name : '0';
+    return stave.getVoice(event[2]).name;
 }
 
 function getOrCreatePart(parts, name) {
@@ -97,7 +76,7 @@ function flagEndBar(bar, sequenceEvent) {
     return false;
 }
 
-export default function read(settings, sequence, parts, keyEvent, meterEvent) {
+export default function read(settings, sequence, parts, keyEvent, meter, beat = 0) {
     const tree = {
         keys:       [],
         spellables: [],
@@ -109,15 +88,15 @@ export default function read(settings, sequence, parts, keyEvent, meterEvent) {
     let bar = {
         type:      'bar',
         count:     1,
-        beat:      0,
+        beat,
         duration:  Infinity,
         divisor:   0,
-        divisions: undefined,
+        divisions: nothing,
         key:       0
     };
 
     // Guarantee the render of at least 1 bar
-    let stopBeat = 1;
+    let stopBeat = beat + 1;
     let event;
     let sequenceEvent;
 
@@ -147,11 +126,12 @@ export default function read(settings, sequence, parts, keyEvent, meterEvent) {
     }
 
     // Initial meter
-    if (meterEvent) {
-        bar.meterEvent = meterEvent;
-        bar.duration   = meterEvent[2];
-        bar.divisor    = meterEvent[3];
-        bar.divisions  = meterEvent.divisions;
+    if (meter) {
+        const offset   = beat % meter.duration;
+        bar.meterEvent = meter;
+        bar.duration   = meter.duration - offset;
+        bar.divisor    = meter.denominator;
+        bar.divisions  = meter.divisions.map((n) => n - offset).filter((n) => n > 0);
     }
 
     // Extract events from sequence iterator and divide them into voices
@@ -167,15 +147,18 @@ export default function read(settings, sequence, parts, keyEvent, meterEvent) {
                 count:     bar.count + 1,
                 beat:      bar.beat + bar.duration,
                 key:       bar.key,
-                duration:  bar.duration,
-                divisor:   bar.divisor,
-                divisions: bar.divisions
+                duration:  meter ? meter.duration : Infinity,
+                divisor:   meter ? meter.denominator : 0,
+                divisions: meter ? meter.divisions : nothing
             };
         }
 
         // Handle event types
         switch (event.type) {
             case "sequence":
+                // Ignore sequence events that stop at or before beat
+                if (toStopBeat(event) <= beat) break;
+
                 if (event.events === sequence.events) sequenceEvent = event;
                 stopBeat = stopBeat < toStopBeat(event) ? toStopBeat(event) : stopBeat;
                 break;
@@ -183,7 +166,7 @@ export default function read(settings, sequence, parts, keyEvent, meterEvent) {
             case "key": {
                 // Ignore redundant key events that do not change the key
                 if (tree.keys.length && tree.keys[tree.keys.length - 1][2] === event[2]) break;
-                if (event[0] !== bar.beat) throw new Error(`Scribe "key" event at beat ${ event[0] } not at start of bar at beat ${ bar.beat }`);
+                if (event[0] > bar.beat) throw new Error(`Scribe "key" event at beat ${ event[0] } not at start of bar at beat ${ bar.beat }`);
                 bar.keyEvent = event;
                 bar.key = event[2];
                 tree.keys.push(event);
@@ -199,16 +182,55 @@ export default function read(settings, sequence, parts, keyEvent, meterEvent) {
             }
 
             case "meter":
-                console.log('METER', event);
-                if (event[0] !== bar.beat) throw new Error(`Scribe "meter" event at beat ${ event[0] } not at start of bar beat ${ bar.beat }`);
-                bar.meterEvent = event;
-                bar.duration   = event[2];
-                bar.divisor    = event[3];
-                bar.divisions  = getDivisions(bar.duration, bar.divisor);
+                meter = event;
+
+                // Meter falls on bar
+                if (meter[0] === bar.beat) {
+                    bar.meterEvent = event;
+                    bar.duration   = meter.duration;
+                    bar.divisor    = meter.denominator;
+                    bar.divisions  = meter.divisions;
+                    break;
+                }
+
+                console.warn(`Scribe "meter" event at beat ${ event[0] } not at start of bar beat ${ bar.beat }`);
+
+                // Meter falls before bar, which should only occur at the beginning
+                if (meter[0] < bar.beat) {
+                    const offset   = (bar.beat - event[0]) % meter.duration;
+                    bar.meterEvent = event;
+                    bar.duration   = meter.duration - offset;
+                    bar.divisor    = meter.denominator;
+                    bar.divisions  = meter.divisions.map((n) => n - offset).filter((n) => n > 0);
+                    break;
+                }
+
+                // Meter falls mid-bar
+                bar.duration  = event[0] - bar.beat;
+                bar.divisions = bar.divisions.filter((n) => n < bar.duration).concat(bar.duration);
+                if (flagEndBar(bar, sequenceEvent)) sequenceEvent = undefined;
+                push(tree, bar);
+
+                // Start new bar
+                bar = {
+                    type:       'bar',
+                    count:      bar.count + 1,
+                    beat:       bar.beat + bar.duration,
+                    key:        bar.key,
+                    meterEvent: event,
+                    duration:   meter.duration,
+                    divisor:    meter.denominator,
+                    divisions:  meter.divisions
+                };
+
+                //throw new Error(`Scribe "meter" event at beat ${ event[0] } not at start of bar beat ${ bar.beat }`);
                 break;
 
             case "note":
             case "chord": {
+                // Ignore events before beat
+                if (event[0] < beat) break;
+
                 const endBeat = toStopBeat(event);
                 if (endBeat > stopBeat) stopBeat = endBeat;
 
@@ -216,15 +238,8 @@ export default function read(settings, sequence, parts, keyEvent, meterEvent) {
                 if (dests && dests.length) {
                     for (let i = 0; i < dests.length; i++) {
                         const { part, voiceName: routeVoice } = dests[i];
-                        let voiceName;
-
-                        if (event.type === 'chord') {
-                            voiceName = 'chord';
-                        } else if (routeVoice === '0' || routeVoice === 0) {
-                            voiceName = toVoice(settings, part.stave, event);
-                        } else {
-                            voiceName = routeVoice;
-                        }
+                        const voiceName = event.type === 'chord' ? 'chord' :
+                            routeVoice || toVoice(part.stave, event);
 
                         const e = dests.length > 1 && i < dests.length - 1 ? Event.from(event) : event;
                         e.part  = part.name;
@@ -242,9 +257,10 @@ export default function read(settings, sequence, parts, keyEvent, meterEvent) {
                         const voiceBuffer = part.buffers[voiceName] || (part.buffers[voiceName] = []);
                         voiceBuffer.push(e);
                     }
-                } else {
-                    const part  = getOrCreatePart(tree.parts, toPartName(event));
-                    const voiceName = event.type === 'chord' ? 'chord' : toVoice(settings, part.stave, event);
+                }
+                else {
+                    const part      = getOrCreatePart(tree.parts, toPartName(event));
+                    const voiceName = toVoice(part.stave, event);
 
                     event.part  = part.name;
                     event.voice = voiceName;
@@ -265,6 +281,9 @@ export default function read(settings, sequence, parts, keyEvent, meterEvent) {
             }
 
             case "text": {
+                // Ignore events before beat
+                if (event[0] < beat) break;
+
                 const endBeat = toStopBeat(event);
                 if (endBeat > stopBeat) stopBeat = endBeat;
 
@@ -283,7 +302,8 @@ export default function read(settings, sequence, parts, keyEvent, meterEvent) {
                         const voiceBuffer = part.buffers[voiceName] || (part.buffers[voiceName] = []);
                         voiceBuffer.push(e);
                     }
-                } else {
+                }
+                else {
                     const part      = getOrCreatePart(tree.parts, toPartName(event));
                     const voiceName = 'text';
 
@@ -304,7 +324,7 @@ export default function read(settings, sequence, parts, keyEvent, meterEvent) {
     }
 
     // If no meter was declared, set duration to contain all notes in a single bar
-    if (!bar.divisions) {
+    if (!bar.divisions.length) {
         bar.duration  = stopBeat - bar.beat;
         bar.divisor   = 1;
         bar.divisions = [bar.duration];
@@ -321,9 +341,9 @@ export default function read(settings, sequence, parts, keyEvent, meterEvent) {
             count:     bar.count + 1,
             beat:      bar.beat + bar.duration,
             key:       bar.key,
-            duration:  bar.duration,
-            divisor:   bar.divisor,
-            divisions: bar.divisions
+            duration:  meter.duration,
+            divisor:   meter.denominator,
+            divisions: meter.divisions
         };
     }
 

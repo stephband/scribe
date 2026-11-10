@@ -511,8 +511,8 @@ Deno.test('Score parts: routes multiple sources to voices on a grand stave', asy
             staff: "grand",
             name: "Piano",
             routing: {
-                2: "rh",
-                1: "lh"
+                2: 1,
+                1: 2
             }
         }]
     });
@@ -542,8 +542,8 @@ Deno.test('Score parts: routes sources to open score staves', async () => {
             { id: 2, events: [[0, "note", "C3", 0.1, 4]] }
         ],
         parts: [
-            { staff: "treble", name: "Melody", routing: { mel: "main" } },
-            { staff: "bass", name: "Accompaniment", routing: { acc: "main" } }
+            { staff: "treble", name: "Melody", routing: { mel: 1 } },
+            { staff: "bass", name: "Accompaniment", routing: { acc: 1 } }
         ]
     });
 
@@ -583,10 +583,10 @@ Deno.test('Score parts: routes SATB to four voices on a single grand stave', asy
             staff: "grand",
             name: "Choir",
             routing: {
-                1: "soprano",
-                2: "alto",
-                3: "tenor",
-                4: "bass"
+                1: 3,
+                2: 4,
+                3: 5,
+                4: 6
             }
         }]
     });
@@ -847,6 +847,49 @@ Deno.test('requestTree: spells parts and resolves stave rows without showAtConce
     is(noteSymbols.length, 4);
     is(noteSymbols[0].pitch, 'C4');
     is(typeof noteSymbols[0].row, 'number');
+});
+
+Deno.test('requestTree: anacrusis bar at beat=1 in 4/4 has duration 3, divisions [1, 3], 4/4 timesig, and following bars duration 4, divisions [2, 4]', async () => {
+    const sequence = new Sequence([
+        [0, "key", "C"],
+        [0, "meter", 4, 1],
+        [0.5, "note", "D3", 0.1, 0.5],
+        [1, "note", "E3", 0.1, 1],
+        [2, "note", "F3", 0.1, 1],
+        [3, "note", "G3", 0.1, 1],
+        [4, "note", "A3", 0.1, 4]
+    ]);
+
+    const tree = await requestTree(sequence, undefined, undefined, undefined, 0, 1);
+
+    is(tree.length, 2);
+
+    // 1) Rendering starts on beat 1
+    is(tree[0].beat, 1);
+
+    // 2) First bar is duration 3, divisor 1, divisions [1, 3]
+    is(tree[0].duration, 3);
+    is(tree[0].divisor, 1);
+    equals(tree[0].divisions, [1, 3]);
+
+    // 3) Following bar starts at beat 4 with duration 4, divisor 1, divisions [2, 4]
+    is(tree[1].beat, 4);
+    is(tree[1].duration, 4);
+    is(tree[1].divisor, 1);
+    equals(tree[1].divisions, [2, 4]);
+
+    // 4) Time signature of 4/4 is displayed at the start of the first bar
+    const timesig = tree[0][0].symbols.find((s) => s.type === 'timesig');
+    assert(timesig, 'First bar should contain a timesig symbol');
+    is(timesig.numerator, 4);
+    is(timesig.denominator, 4);
+
+    // Note at 0.5 (before beat 1) was ignored; notes at 1, 2, 3 are in bar 0
+    const bar0Notes = tree[0][0].symbols.filter((s) => s.type === 'note');
+    is(bar0Notes.length, 3);
+    is(bar0Notes[0].beat, 0);
+    is(bar0Notes[1].beat, 1);
+    is(bar0Notes[2].beat, 2);
 });
 
 

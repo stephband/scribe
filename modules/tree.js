@@ -33,16 +33,15 @@ export default async function requestTree(sequence, parts = sequence.parts, key,
     // Make transforms list
     const array = [];
     if (transpose) array.push(Transform.TYPES.transpose, transpose);
-    if (beat)      array.push(Transform.TYPES.displace,  -1 * beat);
     const transform = array.length ?
         Transform.from(array) :
         Transform.identity ;
 
     // Create iterator from sequence, transform, startBeat, stopBeat
-    const iterator = new SequenceIterator(sequence, transform, 0, duration);
+    const iterator = new SequenceIterator(sequence, transform, 0, beat + duration);
 
     // Ingest sequence into tree of bars, parts and spellables
-    const tree = read(settings, iterator, parts, keyEvent, meterEvent);
+    const tree = read(settings, iterator, parts, keyEvent, meterEvent, beat);
 
     // Metric quantisation of event beats
     quantise(settings, tree.parts, tree);

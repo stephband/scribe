@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Scribe – Multi-Stave Scoring</title>
+    <title>Scribe – Score Parts</title>
 
     <meta charset="utf-8" />
     <meta name="author" content="@stephband" />
-    <meta name="description" content="Multi-stave and multi-part scoring in Scribe: objects, parts, and voice routing" />
+    <meta name="description" content="Multi-stave and multi-part scoring in Scribe: parts, staves, and target voice routing" />
     <meta name="viewport" content="width=device-width" />
 
     <script title="load">
@@ -128,10 +128,9 @@
 <body>
     <header class="header-section 9x-grid grid" style="--y-gap: 0em;">
         <p class="breadcrumb 9x @1-x2 @1-6x @2-5x @3-4x"><a href="../index.html">Scribe</a> / <a href="index.html">API</a> / Multi-Stave Scoring</p>
-        <h1 class="font-01 darkpink-fg no-wrap 9x @1-x2 @1-6x @2-5x @3-4x">Multi-Stave Scoring</h1>
+        <h1 class="font-01 darkpink-fg no-wrap 9x @1-x2 @1-6x @2-5x @3-4x">Score Parts</h1>
         <p class="font-04 9x @1-x2 @1-6x @2-5x @3-4x">
-            Scribe decouples instruments (<code class="property">"objects"</code>)
-            from the staves they are rendered on (<code class="property">"parts"</code>).
+            Scribe configures multi-part layouts, staves, transpositions, and voice destinations via the top-level <code class="property">"parts"</code> array.
         </p>
 
         <nav class="api-nav 9x @1-x2 @1-8x">
@@ -142,166 +141,211 @@
     </header>
 
     <section class="content-section 9x-grid grid">
-        <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Objects and parts</h2>
-        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-            When multiple instruments play concurrently, Scribe stacks their staves synchronously within each flex measure.
-            In <a href="https://www.youtube.com/watch?v=ylXk1LBvIqU">So What</a>, five separate voices (Trumpet, Alto sax, Tenor sax, Trombone, and Bass)
-            are declared in the sequence data. Here are the opening four bars:
-        </p>
-
-        <pre class="9x @1-x2 @1-8x"><code class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">src=<span class="attribute-value">"../data/so-what.json"</span></span> <span class="attribute">duration=<span class="attribute-value">"16"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</code></pre>
-        <scribe-music class="9x @1-x2 @1-7x @3-6x" src="../data/so-what.json" duration="16"></scribe-music>
-
-        <h3 class="font-03 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">1. Declaring Sound Sources: <code class="property">"objects"</code></h3>
-        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-            The top-level sequence declares an <code class="property">"objects"</code> array. Each object assigns an identifier and human-readable instrument name:
-        </p>
-        <pre class="9x @1-x2 @1-8x"><code class="json">{
-    <span class="property">"name"</span>: <span class="string">"So What"</span>,
-    <span class="property">"objects"</span>: [
-        { <span class="property">"id"</span>: <span class="number">2</span>, <span class="property">"name"</span>: <span class="string">"Trumpet"</span> },
-        { <span class="property">"id"</span>: <span class="number">3</span>, <span class="property">"name"</span>: <span class="string">"Alto sax"</span> },
-        { <span class="property">"id"</span>: <span class="number">4</span>, <span class="property">"name"</span>: <span class="string">"Tenor sax"</span> },
-        { <span class="property">"id"</span>: <span class="number">5</span>, <span class="property">"name"</span>: <span class="string">"Trombone"</span> },
-        { <span class="property">"id"</span>: <span class="number">6</span>, <span class="property">"name"</span>: <span class="string">"Bass"</span> }
-    ],
-    <span class="property">"events"</span>: [ ... ]
-}</code></pre>
+<pre class="9x @1-x2 @1-8x"><code class="json"><span style="margin-left: -2em">{</span>
+</code></pre>
 
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-            Sequence events route musical material into these objects using their id in the fourth parameter of a <code class="string">"sequence"</code> event:
-            <code>[beat, "sequence", sequenceId, targetObjectId, duration]</code>.
+            Scores are layed out in a parts array. Each part object has a
+            <strong>stave</strong>, <strong>transpose</strong>, and a
+            <strong>routing</strong> map that maps instrument ids to voices.
         </p>
 
-        <pre class="9x @1-x2 @1-8x"><code class="json">[
-    [<span class="number">0</span>, <span class="string">"sequence"</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">8</span>], <span class="nt">// routes sequence 2 to object 2 (Trumpet)</span>
-    [<span class="number">0</span>, <span class="string">"sequence"</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">8</span>], <span class="nt">// routes sequence 3 to object 3 (Alto sax)</span>
-    [<span class="number">0</span>, <span class="string">"sequence"</span>, <span class="number">4</span>, <span class="number">4</span>, <span class="number">8</span>], <span class="nt">// routes sequence 4 to object 4 (Tenor sax)</span>
-    [<span class="number">0</span>, <span class="string">"sequence"</span>, <span class="number">5</span>, <span class="number">5</span>, <span class="number">8</span>], <span class="nt">// routes sequence 5 to object 5 (Trombone)</span>
-    [<span class="number">0</span>, <span class="string">"sequence"</span>, <span class="number">6</span>, <span class="number">6</span>, <span class="number">4</span>]  <span class="nt">// routes sequence 6 to object 6 (Bass)</span>
+<pre class="9x @1-x2 @1-8x"><code class="json"><span class="property">"parts"</span>: [
+    { <span class="property">"name"</span>: <span class="string">"Trumpet"</span>,   <span class="property">"stave"</span>: <span class="string">"treble"</span>, <span class="property">"transpose"</span>: <span class="number">2</span>,  <span class="property">"routing"</span>: { <span class="property">"2"</span>: <span class="number">0</span> }},  // Route instrument 2 to part voice 0
+    { <span class="property">"name"</span>: <span class="string">"Alto sax"</span>,  <span class="property">"stave"</span>: <span class="string">"treble"</span>, <span class="property">"transpose"</span>: <span class="number">9</span>,  <span class="property">"routing"</span>: { <span class="property">"3"</span>: <span class="number">0</span> }},  // Route instrument 3 to part voice 0
+    { <span class="property">"name"</span>: <span class="string">"Tenor sax"</span>, <span class="property">"stave"</span>: <span class="string">"treble"</span>, <span class="property">"transpose"</span>: <span class="number">14</span>, <span class="property">"routing"</span>: { <span class="property">"4"</span>: <span class="number">0</span> }},  // Route instrument 4 to part voice 0
+    { <span class="property">"name"</span>: <span class="string">"Bass"</span>,      <span class="property">"stave"</span>: <span class="string">"bass"</span>,   <span class="property">"transpose"</span>: <span class="number">12</span>, <span class="property">"routing"</span>: { <span class="property">"6"</span>: <span class="number">0</span> }}   // Route instrument 6 to part voice 0
+],</code></pre>
+
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            Sequences are cued on instruments by sequence events, which identify
+            a <strong>sequence id</strong>, an <strong>instrument id</strong>,
+            and a <strong>duration</strong> in beats to play for.
+        </p>
+
+<pre class="9x @1-x2 @1-8x"><code class="json"><span class="property">"events"</span>: [
+    [<span class="number">0</span>, <span class="string">"sequence"</span>, <span class="number">1</span>, <span class="number">6</span>, <span class="number">16</span>],  // Send sequence 1 to instrument 6
+    [<span class="number">4</span>, <span class="string">"sequence"</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">12</span>],  // Send sequence 2 to instrument 2
+    [<span class="number">4</span>, <span class="string">"sequence"</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">12</span>],  // Send sequence 2 to instrument 3
+    [<span class="number">4</span>, <span class="string">"sequence"</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">12</span>]   // Send sequence 2 to instrument 4
+],
+
+<span class="property">"sequences"</span>: [...]</code></pre>
+
+        <!--pre class="9x @1-x2 @1-8x"><code class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">src=<span class="attribute-value">"../data/so-what.json"</span></span> <span class="attribute">duration=<span class="attribute-value">"16"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</code></pre-->
+        <scribe-music class="9x @1-x2 @1-7x @3-6x" src="../data/so-what.json" duration="16">
+            <!--scribe-part name="Boo" staff="treble" transpose="2">
+                <scribe-voice object="1" voice="0"></scribe-voice>
+            </scribe-part-->
+        </scribe-music>
+
+
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            The same sequences and instruments can be mapped to voices on a grand
+            staff by replacing the parts array.
+        </p>
+
+<pre class="9x @1-x2 @1-8x"><code class="json"><span class="property">"parts"</span>: [
+    { <span class="property">"name"</span>: <span class="string">"Horns/Bass"</span>, <span class="property">"stave"</span>: <span class="string">"grand"</span>, <span class="property">"routing"</span>: { <span class="property">"2"</span>: <span class="number">3</span> <span class="property">"3"</span>: <span class="number">4</span> <span class="property">"4"</span>: <span class="number">5</span> <span class="property">"6"</span>: <span class="number">6</span> }}
 ]</code></pre>
 
-        <h3 class="font-03 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">2. Automatic Stave Resolution</h3>
+TODO
+
+        <h3 class="font-03 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Automatic Parts</h3>
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-            When no explicit <code class="property">"parts"</code> definition is supplied, Scribe inspects each object's name and applies sensible instrument defaults:
-            Trumpet, Alto, and Tenor resolve to treble staves; Trombone and Bass resolve to bass staves.
+            When a part omits explicit <code class="property">"staff"</code> and <code class="property">"transpose"</code> properties, Scribe inspects the part's <code class="property">"name"</code> and applies standard orchestral presets:
+            Trumpet resolves to treble (+2 semitones), Alto sax to treble (+9), Tenor sax to treble (+14), Trombone to bass (concert pitch), and Bass to bass (+12 for double-bass sounding an octave below written).
         </p>
     </section>
 
-    <section class="content-section 9x-grid grid" style="background-color: #faf8f5;">
-        <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Grand Stave & Voice Routing: "Ae Fond Kiss"</h2>
+    <!--section class="content-section 9x-grid grid" style="background-color: #faf8f5;">
+        <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Grand Stave & Voice Routing</h2>
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-            For keyboard or polyphonic instruments, multiple independent musical lines frequently funnel into a single grand stave.
-            The <code class="property">"parts"</code> array configures how objects map into stave hands and voices.
+            For keyboard and polyphonic instruments, multiple independent musical lines frequently funnel into a single grand stave.
+            The <code class="property">"parts"</code> array configures how targets map into hands or voices.
         </p>
 
         <pre class="9x @1-x2 @1-8x"><code class="tag">&lt;<span class="tag-name">scribe-music</span> <span class="attribute">staff=<span class="attribute-value">"grand"</span></span> <span class="attribute">src=<span class="attribute-value">"../data/ae-fond-kiss.json"</span></span> <span class="attribute">duration=<span class="attribute-value">"12"</span></span>&gt;&lt;/<span class="tag-name">scribe-music</span>&gt;</code></pre>
         <scribe-music class="9x @1-x2 @1-7x @3-6x" staff="grand" src="../data/ae-fond-kiss.json" duration="12"></scribe-music>
 
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-            In Robert Burns' traditional air <a href="https://en.wikipedia.org/wiki/Ae_Fond_Kiss_(song)">Ae Fond Kiss</a>, the melody (object 2) is explicitly directed
-            to the right hand (<code class="string">"rh"</code>) while the accompaniment (object 1) is directed to the left hand (<code class="string">"lh"</code>):
+            In Robert Burns' traditional air <a href="https://en.wikipedia.org/wiki/Ae_Fond_Kiss_(song)">Ae Fond Kiss</a>, the melody (target 2) is explicitly directed
+            to voice <code>1</code> (right hand) while the accompaniment (target 1) is directed to voice <code>2</code> (left hand):
         </p>
 
         <pre class="9x @1-x2 @1-8x"><code class="json">{
     <span class="property">"name"</span>: <span class="string">"Ae Fond Kiss"</span>,
-    <span class="property">"objects"</span>: [
-        { <span class="property">"id"</span>: <span class="number">1</span>, <span class="property">"name"</span>: <span class="string">"Accompaniment"</span> },
-        { <span class="property">"id"</span>: <span class="number">2</span>, <span class="property">"name"</span>: <span class="string">"Melody"</span> }
-    ],
     <span class="property">"parts"</span>: [{
         <span class="property">"staff"</span>: <span class="string">"grand"</span>,
         <span class="property">"name"</span>: <span class="string">"Piano"</span>,
         <span class="property">"routing"</span>: {
-            <span class="property">"2"</span>: <span class="string">"rh"</span>,
-            <span class="property">"1"</span>: <span class="string">"lh"</span>
+            <span class="property">"2"</span>: <span class="number">1</span>,
+            <span class="property">"1"</span>: <span class="number">2</span>
         }
     }]
 }</code></pre>
-    </section>
+    </section-->
 
     <section class="table-section 9x-grid grid">
-        <h2 class="font-02 9x @1-x2 @1-6x @2-5x @3-4x">Parts</h2>
+        <h2 class="font-02 9x @1-x2 @1-6x @2-5x @3-4x">Part Properties</h2>
         <table class="striped-table 9x @1-x2 @1-7x @3-6x">
             <thead>
                 <tr>
                     <th>property</th>
                     <th>type</th>
+                    <th>default</th>
                     <th>description</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td><code>staff</code></td>
-                    <td><code>string</code></td>
-                    <td>Stave type: <code>"grand"</code>, <code>"treble"</code>, <code>"treble-up"</code>, <code>"treble-down"</code>, <code>"alto"</code>, <code>"tenor"</code>, <code>"bass"</code>, <code>"drum"</code>, <code>"percussion"</code></td>
-                </tr>
-                <tr>
                     <td><code>name</code></td>
                     <td><code>string</code></td>
-                    <td>Part name used for labelling, system matching, and fallback display resolution</td>
+                    <td><code>""</code></td>
+                    <td>Part name</td>
+                </tr>
+                <tr>
+                    <td><code>stave</code></td>
+                    <td><code>string</code></td>
+                    <td><code>"treble"</code></td>
+                    <td>Stave type: <code>"grand"</code>, <code>"treble"</code>, <code>"treble-up"</code>, <code>"treble-down"</code>, <code>"alto"</code>, <code>"tenor"</code>, <code>"bass"</code>, <code>"drum"</code>, <code>"percussion"</code></td>
                 </tr>
                 <tr>
                     <td><code>transpose</code></td>
                     <td><code>number</code></td>
-                    <td>Per-part transposition in semitones</td>
+                    <td><code>0</code></td>
+                    <td>Transposition in semitones (except when <code>showAtConcertPitch</code> is <code>true</code>)</td>
                 </tr>
                 <tr>
                     <td><code>routing</code></td>
                     <td><code>object</code></td>
-                    <td>Dictionary mapping source object IDs to voice destinations (e.g. <code>{"2": "rh", "1": "lh"}</code>)</td>
+                    <td><code>{"0": 0}</code></td>
+                    <td>Map of instrument IDs to voice indexes</td>
                 </tr>
             </tbody>
         </table>
 
-        <h3 class="font-03 9x @1-x2 @1-6x @2-5x @3-4x" style="margin-top: 2em;">Voice Targets in Grand Staves</h3>
+        <!--h3 class="font-03 9x @1-x2 @1-6x @2-5x @3-4x" style="margin-top: 2.5em;">Voice Targets in Grand Staves</h3>
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-            When targeting a <code class="string">"grand"</code> stave, the values of the <code class="property">"routing"</code> object determine how lines are routed across staves and stem directions:
+            Voice keys in <code class="property">"routing"</code> are 1-indexed into the stave's <code class="property">voices</code> array (with <code>0</code> selecting automatic pitch-based distribution). On a <code class="string">"grand"</code> stave:
         </p>
         <table class="striped-table 9x @1-x2 @1-7x @3-6x">
             <thead>
                 <tr>
-                    <th>voice destination</th>
+                    <th>voice key</th>
                     <th>voice name</th>
                     <th>stave / behavior</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td><code>"0"</code></td>
+                    <td><code>0</code></td>
                     <td>Auto-split</td>
                     <td>Automatically splits notes across treble and bass staves based on pitch (middle C threshold)</td>
                 </tr>
                 <tr>
-                    <td><code>"1"</code> or <code>"rh"</code></td>
-                    <td>Right hand</td>
+                    <td><code>1</code></td>
+                    <td>Right hand (<code>"rh"</code>)</td>
                     <td>Treble stave, upward/standard stem distribution</td>
                 </tr>
                 <tr>
-                    <td><code>"2"</code> or <code>"lh"</code></td>
-                    <td>Left hand</td>
+                    <td><code>2</code></td>
+                    <td>Left hand (<code>"lh"</code>)</td>
                     <td>Bass stave, downward/standard stem distribution</td>
                 </tr>
                 <tr>
-                    <td><code>"3"</code></td>
-                    <td>Soprano</td>
+                    <td><code>3</code></td>
+                    <td>Soprano (<code>"soprano"</code>)</td>
                     <td>Upper voice on treble stave (stems up)</td>
                 </tr>
                 <tr>
-                    <td><code>"4"</code></td>
-                    <td>Alto</td>
+                    <td><code>4</code></td>
+                    <td>Alto (<code>"alto"</code>)</td>
                     <td>Lower voice on treble stave (stems down)</td>
                 </tr>
                 <tr>
-                    <td><code>"5"</code></td>
-                    <td>Tenor</td>
+                    <td><code>5</code></td>
+                    <td>Tenor (<code>"tenor"</code>)</td>
                     <td>Upper voice on bass stave (stems up)</td>
                 </tr>
                 <tr>
-                    <td><code>"6"</code></td>
-                    <td>Bass</td>
+                    <td><code>6</code></td>
+                    <td>Bass (<code>"bass"</code>)</td>
                     <td>Lower voice on bass stave (stems down)</td>
                 </tr>
+            </tbody>
+        </table-->
+
+        <h3 class="font-03 9x @1-x2 @1-6x @2-5x @3-4x" style="margin-top: 2.5em;">Built-in Instrument Presets</h3>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            If <code class="property">"staff"</code> is omitted, Scribe matches the part's <code class="property">"name"</code> against built-in instrument defaults:
+        </p>
+        <table class="striped-table 9x @1-x2 @1-7x @3-6x">
+            <thead>
+                <tr>
+                    <th>instrument name</th>
+                    <th>stave (<code>staff</code>)</th>
+                    <th>transposition (<code>transpose</code>)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><code>"Soprano"</code></td><td><code>"treble"</code></td><td>0</td></tr>
+                <tr><td><code>"Alto"</code></td><td><code>"treble"</code></td><td>0</td></tr>
+                <tr><td><code>"Tenor"</code></td><td><code>"treble-down"</code></td><td>0</td></tr>
+                <tr><td><code>"Soprano sax"</code></td><td><code>"treble"</code></td><td>+2 (B♭)</td></tr>
+                <tr><td><code>"Trumpet"</code></td><td><code>"treble"</code></td><td>+2 (B♭)</td></tr>
+                <tr><td><code>"Alto sax"</code></td><td><code>"treble"</code></td><td>+9 (E♭)</td></tr>
+                <tr><td><code>"French horn"</code></td><td><code>"treble"</code></td><td>+7 (F)</td></tr>
+                <tr><td><code>"Tenor sax"</code></td><td><code>"treble"</code></td><td>+14 (B♭)</td></tr>
+                <tr><td><code>"Trombone"</code></td><td><code>"bass"</code></td><td>0</td></tr>
+                <tr><td><code>"Baritone sax"</code></td><td><code>"treble"</code></td><td>+21 (E♭)</td></tr>
+                <tr><td><code>"Violin"</code></td><td><code>"treble"</code></td><td>0</td></tr>
+                <tr><td><code>"Viola"</code></td><td><code>"alto"</code></td><td>0</td></tr>
+                <tr><td><code>"Cello"</code></td><td><code>"bass"</code></td><td>0</td></tr>
+                <tr><td><code>"Double bass"</code> / <code>"Bass"</code></td><td><code>"bass"</code></td><td>+12</td></tr>
+                <tr><td><code>"Piano"</code></td><td><code>"grand"</code></td><td>0</td></tr>
+                <tr><td><code>"Drums"</code></td><td><code>"drum"</code></td><td>—</td></tr>
+                <tr><td><code>"Cowbell"</code></td><td><code>"percussion"</code></td><td>—</td></tr>
             </tbody>
         </table>
     </section>

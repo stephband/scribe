@@ -1,14 +1,13 @@
 
-import Stave from './stave.js';
+import slugify from 'fn/slugify.js';
+import Stave   from './stave.js';
 
 const defaultRouting = { 0: 0 };
 
 export default class Part {
-    constructor(name = '', stave = Stave.treble, transpose = 0, routing = defaultRouting) {
-        // Part must have a valid stave
-        if (!stave || typeof stave !== 'object') {
-            throw new TypeError(`Part() requires a Stave object, get ${ stave }`);
-        }
+    constructor(name, stave, transpose = 0, routing = defaultRouting) {
+        if (typeof name !== 'string') throw new TypeError(`Part() requires a name`);
+        if (!stave || typeof stave !== 'object') throw new TypeError(`Part() requires a Stave object ${ stave }`);
 
         this.stave     = stave;
         this.staff     = stave.type;
@@ -18,13 +17,17 @@ export default class Part {
     }
 
     static from(data) {
-        const { name = '', transpose = 0, routing = defaultRouting } = data;
+        const name     = data.name || '';
+        const slug     = slugify(name);
+        const template = Part[slug];
+        const stave    = typeof data.stave === 'object' && data.stave
+            || Stave[data.stave || data.staff]
+            || template?.stave
+            || Stave.treble;
 
-        const stave = typeof data.stave === 'object' && data.stave !== null ?
-            data.stave :
-            Stave[data.stave || data.staff];
+        const transpose = data.transpose || template?.transpose;
 
-        return new Part(name, stave, transpose, routing);
+        return new Part(name, stave, transpose, data.routing);
     }
 
     toJSON() {

@@ -99,14 +99,14 @@ An array defining the staves to be rendered and how voices/objects route into th
     "staff": "grand",
     "name": "Piano",
     "routing": {
-        "1": "rh",
-        "2": "lh"
+        "1": 1,
+        "2": 2
     }
 }]
 ```
 
 - **Open scores**: Multiple entries in `"parts"` generate stacked staves within each measure.
-- **Voice routing**: Maps source IDs to voice destinations (e.g. `{"1": "rh", "2": "lh"}`). Grand staves support `1` (`rh`), `2` (`lh`), or SATB voices `3` (`soprano`), `4` (`alto`), `5` (`tenor`), `6` (`bass`). Destination `0` automatically splits across treble and bass.
+- **Voice routing**: Maps source IDs to numeric voice keys (e.g. `{"1": 1, "2": 2}`). Grand staves support `1` (`rh`), `2` (`lh`), or SATB voices `3` (`soprano`), `4` (`alto`), `5` (`tenor`), `6` (`bass`). Destination `0` automatically splits across treble and bass.
 - **Single parts**: If `"parts"` is omitted, Scribe defaults to a single stave (treble, or as determined by the `<scribe-music staff="...">` attribute).
 
 ### Sequences

@@ -3,11 +3,11 @@
 "author": { "name": "Miles Davis / Bill Evans" },
 
 "parts": [
-    { "name": "Trumpet",   "staff": "treble", "routing": { "2": 0 } },
-    { "name": "Alto sax",  "staff": "treble", "routing": { "3": 0 } },
-    { "name": "Tenor sax", "staff": "treble", "routing": { "4": 0 } },
-    { "name": "Trombone",  "staff": "treble", "routing": { "5": 0 } },
-    { "name": "Bass",      "staff": "bass",   "routing": { "6": 0 } }
+    { "name": "Trumpet",   "routing": { "2": 0 } },
+    { "name": "Alto sax",  "routing": { "3": 0 } },
+    { "name": "Tenor sax", "routing": { "4": 0 } },
+    { "name": "Trombone",  "routing": { "5": 0 } },
+    { "name": "Bass",      "routing": { "6": 0 } }
 ],
 
 "events": [
