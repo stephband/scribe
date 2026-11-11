@@ -38,14 +38,16 @@ export default function parseSource(type, source) {
     }
 */
     // Data is step sequence text
-    else if (type === 'sequence' || type === 'text/plain') {
+    else if (type === 'sequence' || type === 'text/plain' || type === 'text/sequence' || type?.endsWith('sequence')) {
         return Sequence.parse(source);
     }
     // Data is JSON
     else {
-        const events = JSON.parse(source);
-        return Array.isArray(events) ?
-            { id: 0, events } :
-            events ;
+        const data = JSON.parse(source);
+        return typeof data === 'object' && data.files ?
+            fromGist(data) :
+            Array.isArray(data) ?
+                { id: 0, events: data } :
+                data ;
     }
 }

@@ -1,5 +1,6 @@
 import { exportAsModule, serializeWeights } from "neuron/modules/serialize.js";
 import { toKeyName, toKeyNumber } from "sequence/modules/event/key.js";
+import Sequence from "sequence/module.js";
 import { SpellerNetwork } from "./speller-network.js";
 import { encode, encodeTargets } from "./sequence-encoder.js";
 
@@ -18,10 +19,19 @@ import * as minor251s     from "../../data/scales/minor-ii-v-i.js";
 import * as substitutions from "../../data/scales/substitutions.js";
 import * as blues         from "../../data/blues.js";
 
+const chordsCText = await Deno.readTextFile(new URL("../../data/changes/chords-C.sequence", import.meta.url));
+const chordsC = Sequence.parse(chordsCText);
 
 const assign = Object.assign;
-const sequences = assign({}, chromatic, major, melodic, bebop, diminished, triads, tetrads, bach, major251s, minor251s, substitutions, blues, alteredDiminished, giantSteps);
+const sequences = assign({}, chromatic, major, melodic, bebop, diminished, triads, tetrads, bach, major251s, minor251s, substitutions, blues, alteredDiminished, giantSteps, { chordsC });
 
+
+function parseExpected(note) {
+    const [expectedKey, expectedSpelling = note.sourcePitch] = note.label ?
+        note.label.trim().split(/\s+/) :
+        [];
+    return { expectedKey, expectedSpelling };
+}
 
 console.log("=== Pitch Speller Sequence Training & Weight Serialization ===\n");
 
@@ -40,13 +50,13 @@ for (const [name, seq] of Object.entries(sequences)) {
     if (!enc.noteCount) continue;
 
     const targets = enc.notes.map((n) => {
-        const spelling = n.expectedSpelling ?? n.pitchSpelling ?? n.spelling ?? n[2];
-        const key = n.expectedKey ?? n.key;
+        const { expectedKey, expectedSpelling } = parseExpected(n);
+        const spelling = expectedSpelling ?? n.pitchSpelling ?? n.spelling ?? n[2];
         const tpc = typeof spelling === "number"
             ? spelling
             : toKeyNumber(String(spelling).replace(/\d+$/, ""));
-        const keyCoord = key !== undefined && key !== null
-            ? (typeof key === "number" ? key : toKeyNumber(key))
+        const keyCoord = expectedKey !== undefined && expectedKey !== null
+            ? (typeof expectedKey === "number" ? expectedKey : toKeyNumber(expectedKey))
             : initialKey;
         return { tpc, key: keyCoord };
     });
@@ -101,8 +111,7 @@ for (const [name, seq] of Object.entries(sequences)) {
     let keyMatches = 0;
 
     notes.forEach((note) => {
-        const expectedSpelling = note.expectedSpelling;
-        const expectedKey = note.expectedKey;
+        const { expectedKey, expectedSpelling } = parseExpected(note);
         const noteKeyName = toKeyName(note.keySpelling);
         const spellingMatch = !expectedSpelling || expectedSpelling === note.pitchSpelling;
         const keyMatch = !expectedKey || expectedKey === noteKeyName;

@@ -13,8 +13,8 @@ import * as minor251s         from "../data/scales/minor-ii-v-i.js";
 import * as substitutions     from "../data/scales/substitutions.js";
 import * as blues             from "../data/blues.js";
 
-import SpellerRNN from '../modules/spell/speller-rnn.js';
-import weights from '../modules/spell/speller-weights-8b.js';
+import SpellerRNN from '../modules/speller/speller-rnn.js';
+import weights from '../modules/speller/speller-weights-8b.js';
 import { toKeyName } from 'sequence/modules/event/key.js';
 import { renderDOM, renderStyle, renderBeams } from '../modules/render.js';
 import { identify } from '../modules/event.js';
@@ -87,8 +87,9 @@ export async function runSpellerTests(testSource = tests, containerId = 'tests-c
         const diffs = [];
 
         predictedNotes.forEach((note) => {
-            const expectedSpelling = note.expectedSpelling;
-            const expectedKey = note.expectedKey;
+            const [expectedKey, expectedSpelling = note.sourcePitch] = note.label ?
+                note.label.trim().split(/\s+/) :
+                [];
             const predKeyName = toKeyName(note.keySpelling);
 
             note[2] = note.pitchSpelling;

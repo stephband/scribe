@@ -5,13 +5,16 @@
         "bolt/":      "https://cdn.jsdelivr.net/gh/stephband/bolt-2@1.0.9/",
         "neuron/":    "https://cdn.jsdelivr.net/gh/stephband/neuron@0.1.2/",
         "midi/":      "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.8/modules/",
-        "sequence/":  "https://cdn.jsdelivr.net/gh/soundio/sequence@0.5.0/",
+        "sequence/":  "https://cdn.jsdelivr.net/gh/soundio/sequence@0.5.2/",
         "hyperblam/": "https://hyperblam.how/static/hyperblam/dist/hyperblam/"
     },
 
     "tasks": {
-        "test":  "deno test --allow-read test.js",
-        "train": "deno run -A modules/spell/train.js"
+        "test":            "deno test --allow-read test.js",
+        "train":           "deno run -A modules/speller/train.js",
+        "test:local":      "deno test --config deno.local.json --allow-read test.js",
+        "train:local":     "deno run -A --config deno.local.json modules/speller/train.js",
+        "transpose-pitch": "deno run --allow-read=. --allow-write=. sequence/deno/transpose-pitch.js"
     },
 
     "lock": false

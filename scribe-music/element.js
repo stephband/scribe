@@ -4,7 +4,7 @@ import element, { getInternals } from 'dom/element.js';
 import { Sequence }              from 'sequence/module.js';
 import { timesigToMeter, meterToTimesig } from 'sequence/modules/event/meter.js';
 
-import requestData       from '../modules/request-data.js';
+import parse               from '../modules/parse.js';
 import Stave             from '../modules/stave.js';
 import { renderDOM, renderStyle, remove } from '../modules/render-dom.js';
 import config            from '../modules/config.js';
@@ -285,8 +285,10 @@ export default define(element('scribe-music', {
 
     type: {
         /**
-        type="application/json"
+        type="sequence"
         Mimetype or type of data to fetch. Possible mimetypes:
+        - `"sequence"`
+        - `"text/sequence"`
         - `"text/x-abc"`
         - `"text/plain"`
         - `"application/json"`
@@ -294,14 +296,11 @@ export default define(element('scribe-music', {
         attribute: function(value) { this.type = value; },
 
         /**
-        .type = "application/json"
-        Mimetype or type of data to fetch. Possible mimetypes:
-        - `"text/x-abc"`
-        - `"text/plain"`
-        - `"application/json"`
+        .type
+        Mimetype or type of data to fetch.
         **/
-        writable: true,
-        value: 'application/json'
+        get: function() { return getInternals(this).type; },
+        set: function(value) { getInternals(this).type = value; }
     },
 
     /**
@@ -340,8 +339,18 @@ export default define(element('scribe-music', {
                 this.data = parseScript(script);
             }
             else {
-                requestData(this.type, url.href)
-                .then((data) => this.data = data);
+                const type = this.type
+                    || (/\.sequence(?:\?.*)?$/i.test(url.pathname) ? 'sequence' : undefined)
+                    || (/\.abc(?:\?.*)?$/i.test(url.pathname) ? 'text/x-abc' : undefined)
+                    || 'application/json';
+
+                fetch(url)
+                .then((response) => {
+                    if (!response.ok) throw new Error(`${ response.status } ${ response.statusText } "${ url.href }"`);
+                    return response.text();
+                })
+                .then((text) => this.data = parse(type, text))
+                .catch((error) => console.error(error));
             }
         },
         default:   null

@@ -17,8 +17,7 @@ export function createTriads(name, key, duration, ...data) {
         const spelling    = data[i];
         const expectedKey = data[i + 1];
         const event = sequence.create(beat, "note", toNoteNumber(spelling), 0.1, duration);
-        event.expectedSpelling = spelling;
-        event.expectedKey      = expectedKey;
+        event.label = expectedKey + ' ' + spelling;
     }
 
     return sequence;
@@ -37,8 +36,7 @@ export function createTetrads(name, key, duration, ...data) {
         const spelling    = data[i];
         const expectedKey = data[i + 1];
         const event = sequence.create(beat, "note", toNoteNumber(spelling), 0.1, duration);
-        event.expectedSpelling = spelling;
-        event.expectedKey      = expectedKey;
+        event.label = expectedKey + ' ' + spelling;
     }
 
     return sequence;
@@ -57,8 +55,7 @@ export function createScale(name, key, duration, ...data) {
         const spelling    = data[i];
         const expectedKey = data[i + 1];
         const event = sequence.create(beat, "note", toNoteNumber(spelling), 0.1, duration);
-        event.expectedSpelling = spelling;
-        event.expectedKey      = expectedKey;
+        event.label = expectedKey + ' ' + spelling;
     }
 
     return sequence;
@@ -79,8 +76,7 @@ export function createMelody(name, key, meter, options, ...data) {
         const expectedKey = data[i + 2];
         if (spelling) {
             const event = sequence.create(beat, "note", toNoteNumber(spelling), 0.1, duration);
-            event.expectedSpelling = spelling;
-            event.expectedKey      = expectedKey;
+            event.label = expectedKey + ' ' + spelling;
         }
         beat += duration;
     }
@@ -104,8 +100,7 @@ export function createSequence(name, key, meter, options, ...data) {
         const duration    = data[i + 2];
         const expectedKey = data[i + 3];
         const event = sequence.create(beat, "note", toNoteNumber(spelling), 0.1, duration);
-        event.expectedSpelling = spelling;
-        event.expectedKey      = expectedKey;
+        event.label = expectedKey + ' ' + spelling;
     }
 
     sequence.options = options;
