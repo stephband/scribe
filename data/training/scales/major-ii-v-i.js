@@ -1,4 +1,4 @@
-import { createMelody, createSequence } from '../create-data.js';
+import { createMelody, createSequence } from '../../create-data.js';
 
 /**
  * Major II–V–I & Turnaround Phrases in C Major

@@ -1,5 +1,5 @@
 
-import { createScale } from '../create-data.js';
+import { createScale } from '../../create-data.js';
 
 export const diminishedC7 = createScale('C7♭9 diminished', 'C', 0.5,
     'C4','A♭', 'D♭4','A♭', 'D♯4','B', 'E4','B', 'F♯4','D', 'G4','D', 'A4','F', 'B♭4','F',

@@ -1,4 +1,4 @@
-import { createScale, createMelody, createSequence } from './create-data.js';
+import { createScale, createMelody, createSequence } from '../../create-data.js';
 
 /**
  * J.S. Bach — Pitch-Spelling Benchmark Excerpts

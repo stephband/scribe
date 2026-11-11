@@ -1,4 +1,4 @@
-import { createMelody, createSequence } from '../create-data.js';
+import { createMelody, createSequence } from '../../create-data.js';
 
 /**
  * Minor II–V–I Phrases & Chord Progressions (in Key Signature 'C')

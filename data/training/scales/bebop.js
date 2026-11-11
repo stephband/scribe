@@ -1,4 +1,4 @@
-import { createScale } from '../create-data.js';
+import { createScale } from '../../create-data.js';
 
 export const bebopFs = createScale('F♯ bebop', 'F♯', 0.5,
     // F♯

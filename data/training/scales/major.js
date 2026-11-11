@@ -1,4 +1,4 @@
-import { createScale } from '../create-data.js';
+import { createScale } from '../../create-data.js';
 
 export const majorCs = createScale('C♯ major', 'C♯', 0.5,
     'C♯4', 'C♯',

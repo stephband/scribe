@@ -1,4 +1,4 @@
-import { createScale } from '../create-data.js';
+import { createScale } from '../../create-data.js';
 
 export const triadsInCs = createScale('C♯ triads', 'C♯', 1/3,
     'C♯4', 'C♯', 'G♯4', 'C♯', 'E♯5', 'C♯',

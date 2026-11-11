@@ -12,9 +12,10 @@
     "tasks": {
         "test":            "deno test --allow-read test.js",
         "train":           "deno run -A modules/speller/train.js",
+        "transpose":       "deno run --allow-read=. --allow-write=. sequence/deno/transpose-file.js",
         "test:local":      "deno test --config deno.local.json --allow-read test.js",
         "train:local":     "deno run -A --config deno.local.json modules/speller/train.js",
-        "transpose-pitch": "deno run --allow-read=. --allow-write=. sequence/deno/transpose-pitch.js"
+        "transpose:local": "deno run --config deno.local.json --allow-read=. --allow-write=. sequence/deno/transpose-file.js"
     },
 
     "lock": false

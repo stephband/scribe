@@ -4,40 +4,93 @@ import Sequence from "sequence/module.js";
 import { SpellerNetwork } from "./speller-network.js";
 import { encode, encodeTargets } from "./sequence-encoder.js";
 
-import * as chromatic  from "../../data/scales/chromatic.js";
-import * as major      from "../../data/scales/major.js";
-import * as melodic    from "../../data/scales/melodic.js";
-import * as bebop      from "../../data/scales/bebop.js";
-import * as diminished from "../../data/scales/diminished.js";
-import * as triads     from "../../data/scales/triads.js";
-import * as tetrads    from "../../data/scales/tetrads.js";
-import * as bach       from "../../data/bach.js";
-import * as alteredDiminished from '../../data/scales/altered-diminished.js';
-import * as giantSteps        from '../../data/giant-steps.js';
-import * as major251s     from "../../data/scales/major-ii-v-i.js";
-import * as minor251s     from "../../data/scales/minor-ii-v-i.js";
-import * as substitutions from "../../data/scales/substitutions.js";
-import * as blues         from "../../data/blues.js";
+const targetDir = Deno.args[0];
 
-const chordsCText = await Deno.readTextFile(new URL("../../data/changes/chords-C.sequence", import.meta.url));
-const chordsC = Sequence.parse(chordsCText);
+if (!targetDir) {
+    console.error("Usage: deno task train <path/to/directory>");
+    Deno.exit(1);
+}
 
-const assign = Object.assign;
-const sequences = assign({}, chromatic, major, melodic, bebop, diminished, triads, tetrads, bach, major251s, minor251s, substitutions, blues, alteredDiminished, giantSteps, { chordsC });
+const cwdUrl = new URL(`file://${Deno.cwd()}/`);
+const targetUrl = new URL(targetDir.endsWith("/") ? targetDir : `${targetDir}/`, cwdUrl);
 
+async function collectFiles(dirUrl, files = []) {
+    for await (const entry of Deno.readDir(dirUrl)) {
+        if (entry.name.startsWith(".") || entry.name.startsWith("_")) continue;
+        const entryUrl = new URL(entry.name + (entry.isDirectory ? "/" : ""), dirUrl);
+        if (entry.isDirectory) {
+            await collectFiles(entryUrl, files);
+        } else if (entry.isFile) {
+            files.push({ name: entry.name, url: entryUrl });
+        }
+    }
+    return files;
+}
+
+const sequences = {};
+let entries = [];
+
+try {
+    entries = await collectFiles(targetUrl);
+} catch (err) {
+    console.error(`Failed to read directory "${targetDir}": ${err.message}`);
+    Deno.exit(1);
+}
+
+entries.sort((a, b) => a.url.href.localeCompare(b.url.href));
+
+for (const entry of entries) {
+    const fileUrl = entry.url;
+
+    if (entry.name.endsWith(".sequence")) {
+        const text = await Deno.readTextFile(fileUrl);
+        const seq = Sequence.parse(text);
+        seq.name = seq.name || entry.name.replace(/\.sequence$/, "");
+        sequences[seq.name] = seq;
+    } else if (entry.name.endsWith(".json")) {
+        const mod = await import(fileUrl.href, { with: { type: "json" } });
+        const data = mod.default;
+        if (data && (data.events || data.sequences)) {
+            const seq = Sequence.from(data);
+            seq.name = seq.name || entry.name.replace(/\.json$/, "");
+            sequences[seq.name] = seq;
+        } else if (typeof data === "object" && data !== null) {
+            for (const [k, v] of Object.entries(data)) {
+                if (v && (v.events || Array.isArray(v))) {
+                    const seq = Sequence.from(v);
+                    sequences[seq.name || k] = seq;
+                }
+            }
+        }
+    } else if (entry.name.endsWith(".js")) {
+        const mod = await import(fileUrl.href);
+        for (const [key, val] of Object.entries(mod)) {
+            if (val && (val instanceof Sequence || Array.isArray(val.events))) {
+                const seq = val instanceof Sequence ? val : Sequence.from(val);
+                sequences[seq.name || key] = seq;
+            }
+        }
+    }
+}
+
+if (Object.keys(sequences).length === 0) {
+    console.error(`No sequences found in "${targetDir}"`);
+    Deno.exit(1);
+}
 
 function parseExpected(note) {
-    const [expectedKey, expectedSpelling = note.sourcePitch] = note.label ?
-        note.label.trim().split(/\s+/) :
-        [];
-    return { expectedKey, expectedSpelling };
+    if (note.label) {
+        const [expectedKey, expectedSpelling = note.sourcePitch] = note.label.trim().split(/\s+/);
+        return { expectedKey, expectedSpelling };
+    }
+    return { expectedKey: undefined, expectedSpelling: note.sourcePitch };
 }
 
 console.log("=== Pitch Speller Sequence Training & Weight Serialization ===\n");
 
 // 1. Prepare Dataset directly from Sequence objects
 console.log(
-    "1. Preparing training dataset directly from sequences in data/...",
+    `1. Preparing training dataset directly from sequences in ${targetDir}...`,
 );
 const dataset = [];
 
@@ -106,7 +159,8 @@ let totalKeyMatches = 0;
 
 for (const [name, seq] of Object.entries(sequences)) {
     const preds = network.process(seq);
-    const notes = seq.events.filter((e) => e.type === "note");
+    const notes = preds.length ? preds : seq.events.filter((e) => e.type === "note");
+    if (!notes.length) continue;
     let spellingMatches = 0;
     let keyMatches = 0;
 

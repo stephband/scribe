@@ -1,4 +1,4 @@
-import { createMelody, createSequence } from '../create-data.js';
+import { createMelody, createSequence } from '../../create-data.js';
 
 /**
  * Altered Dominant & Symmetrical Diminished Phrases in C

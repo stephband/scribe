@@ -1,5 +1,5 @@
 
-import { createTetrads } from '../create-data.js';
+import { createTetrads } from '../../create-data.js';
 
 export const tetradsGb = createTetrads('G♭ tetrads open ⬇︎', 'F', 1,
     'G♭4', 'G♭',   'F5', 'G♭',  'B♭5', 'G♭',  'D♭6', 'G♭',  // G♭∆

@@ -1,4 +1,4 @@
-import { createMelody, createSequence } from '../create-data.js';
+import { createMelody, createSequence } from '../../create-data.js';
 
 /**
  * Tritone & Minor 3rd Substitution Phrases in C Major
