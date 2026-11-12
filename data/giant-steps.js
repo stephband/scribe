@@ -12,7 +12,7 @@ import { createMelody, createSequence } from './create-data.js';
 
 // 1. John Coltrane — "Countdown" (Major-3rd Reharmonization of Dm7 – G7 – C∆, 60% swing: 0.6 / 0.4)
 // Progression: | Dm7  E♭7 | A♭∆  B7 | E∆  G7 | C∆ |
-export const coltraneCountdownInC = createMelody('John Coltrane — "Countdown" II–V–I in C', 'C', 4, { swingAsStraight8ths: true },
+export const coltraneCountdownInC = createMelody('John Coltrane — "Countdown" II–V–I in C', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: Dm7 (beats 1–2: D4 - F4 - A4 - C5) -> E♭7 (beats 3–4: B♭4 - G4 - F4 - E♭4)
      'D4', 0.6,  'C',   'F4', 0.4,  'C',   'A4', 0.6,  'C',   'C5', 0.4,  'C',
     'B♭4', 0.6, 'A♭',   'G4', 0.4, 'A♭',   'F4', 0.6, 'A♭',  'E♭4', 0.4, 'A♭',
@@ -28,7 +28,7 @@ export const coltraneCountdownInC = createMelody('John Coltrane — "Countdown" 
 );
 
 // 2. John Coltrane — "Giant Steps" Theme & Solo Line in C (60% swing: 0.6 / 0.4)
-export const coltraneGiantStepsInC = createMelody('John Coltrane — "Giant Steps" Cycle in C', 'C', 4, { swingAsStraight8ths: true },
+export const coltraneGiantStepsInC = createMelody('John Coltrane — "Giant Steps" Cycle in C', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: C∆ (G5 - E5) -> E♭7 (C5 - G4)
      'G5', 1.0,  'C',   'E5', 1.0,  'C',   'C5', 1.0, 'A♭',   'G4', 1.0, 'A♭',
     // Bar 2: A♭∆ (B♭4) -> B7 (G4 - F♯4)
@@ -51,7 +51,7 @@ export const coltraneGiantStepsInC = createMelody('John Coltrane — "Giant Step
 );
 
 // 3. Wynton Marsalis / Sonny Rollins — Smooth Guide-Tone Line Through C – A♭ – E (60% swing: 0.6 / 0.4)
-export const wyntonMajorThirdsInC = createMelody('Wynton Marsalis — Smooth Voice-Leading Over C – A♭ – E', 'C', 4, { swingAsStraight8ths: true },
+export const wyntonMajorThirdsInC = createMelody('Wynton Marsalis — Smooth Voice-Leading Over C – A♭ – E', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: C∆ (B4 - C5 - E5 - G5) -> E♭7 (F5 - E♭5 - D♭5 - B♭4)
      'B4', 0.6,  'C',   'C5', 0.4,  'C',   'E5', 0.6,  'C',   'G5', 0.4,  'C',
      'F5', 0.6, 'A♭',  'E♭5', 0.4, 'A♭',  'D♭5', 0.6, 'A♭',  'B♭4', 0.4, 'A♭',
@@ -66,7 +66,7 @@ export const wyntonMajorThirdsInC = createMelody('Wynton Marsalis — Smooth Voi
 );
 
 // 4. John Scofield — Ascending Major-3rd Cycle (C∆ – B7 – E∆ – E♭7 – A♭∆ – G7 – C∆, 60% swing: 0.6 / 0.4)
-export const scofieldAscendingMajorThirdsInC = createMelody('John Scofield — Ascending Major-3rd Cycle', 'C', 4, { swingAsStraight8ths: true },
+export const scofieldAscendingMajorThirdsInC = createMelody('John Scofield — Ascending Major-3rd Cycle', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: C∆ (E4 - B4 - D5 - G5) -> B7 (F♯5 - D♯5 - B4 - A4)
      'E4', 0.6,  'C',   'B4', 0.4,  'C',   'D5', 0.6,  'C',   'G5', 0.4,  'C',
     'F♯5', 0.6,  'E',  'D♯5', 0.4,  'E',   'B4', 0.6,  'E',   'A4', 0.4,  'E',
@@ -81,7 +81,7 @@ export const scofieldAscendingMajorThirdsInC = createMelody('John Scofield — A
 );
 
 // 5. Coltrane Changes ("Countdown" / "Giant Steps" in C) Voice-Led Chords
-export const giantStepsChordsInC = createSequence('Coltrane Changes ("Countdown" in C) Chords', 'C', 4, {},
+export const giantStepsChordsInC = createSequence('Coltrane Changes ("Countdown" in C) Chords', 'C', 0b1010, {},
     // Bar 1: Dm9 (2 beats) -> E♭9 (2 beats)
     0.0,  'F4', 2.0, 'C',  0.0,  'A4', 2.0, 'C',  0.0,  'C5', 2.0, 'C',  0.0,  'E5', 2.0, 'C',
     2.0,  'G4', 2.0,'A♭',  2.0, 'B♭4', 2.0,'A♭',  2.0, 'D♭5', 2.0,'A♭',  2.0,  'F5', 2.0,'A♭',

@@ -2,7 +2,7 @@
     "name": "Caravan – drum transcription",
 
     "events": [
-        [0, "meter", 4, 1],
+        [0, "meter", 10, 1],
         [0,  "sequence", 1, 0, 32]
     ],
 

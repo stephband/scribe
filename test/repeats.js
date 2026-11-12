@@ -25,7 +25,7 @@ const pitches = { A: 60, B: 62, C: 64, D: 65, E: 67, F: 69, G: 71 };
 // Sequence of 4/4 bars from a pattern string where each character is a bar,
 // '.' is an empty bar and a letter is a bar of notes unique to that letter
 function fromPattern(pattern) {
-    const events = [[0, 'meter', 4, 1]];
+    const events = [[0, 'meter', 0b1010, 1]];
     let n = -1;
     while (pattern[++n]) {
         const pitch = pitches[pattern[n]];
@@ -87,7 +87,7 @@ Deno.test('Bar repeats: thresholds are configurable', async () => {
 Deno.test('Bar repeats: never repeat material from before a double bar line', async () => {
     const sequence = Sequence.from({
         events: [
-            [0,  'meter', 4, 1],
+            [0,  'meter', 0b1010, 1],
             [0,  'sequence', 10, 0, 8],
             [8,  'sequence', 10, 0, 8],
             [16, 'sequence', 10, 0, 8]
@@ -104,7 +104,7 @@ Deno.test('Bar repeats: never repeat material from before a double bar line', as
 
 Deno.test('Bar repeats: bars with notes tied in are not repeated', async () => {
     // Each bar ties a note into the next
-    const events = [[0, 'meter', 4, 1]];
+    const events = [[0, 'meter', 0b1010, 1]];
     let n = -1;
     while (++n < 6) events.push([n * 4, 'note', 60, 0.1, 3], [n * 4 + 3, 'note', 62, 0.1, 2]);
     const tree = await requestTree(new Sequence(events));
@@ -118,7 +118,7 @@ Deno.test('Bar repeats: detected per part', async () => {
             { staff: 'bass', name: 'Bass', routing: { 2: 0 } }
         ],
         events: [
-            [0, 'meter', 4, 1],
+            [0, 'meter', 0b1010, 1],
             [0, 'sequence', 10, 1, 24],
             [0, 'sequence', 20, 2, 24]
         ],
@@ -141,10 +141,10 @@ Deno.test('Bar repeats: detected per part', async () => {
 Deno.test('Bar repeats: time signatures survive replacement', async () => {
     const sequence = new Sequence([
         [0,  'key', 'D'],
-        [0,  'meter', 4, 1],
+        [0,  'meter', 0b1010, 1],
         [0,  'note', 62, 0.1, 4],
         // Restated time signature
-        [4,  'meter', 4, 1],
+        [4,  'meter', 0b1010, 1],
         [4,  'note', 62, 0.1, 4],
         [8,  'note', 62, 0.1, 4],
         [12, 'note', 62, 0.1, 4]
@@ -158,7 +158,7 @@ Deno.test('Bar repeats: time signatures survive replacement', async () => {
 
 Deno.test('Bar repeats: fingerprints ignore floating point noise in beats', async () => {
     // Triplets, whose beats are computed relative to bar beat
-    const events = [[0, 'meter', 4, 1]];
+    const events = [[0, 'meter', 0b1010, 1]];
     let n = -1;
     while (++n < 4) events.push(
         [n * 4 + 1,   'note', 60, 0.1, 0.3],

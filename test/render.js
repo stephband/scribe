@@ -13,7 +13,7 @@ import requestTree  from '../modules/tree.js';
 Deno.test('Render', async () => {
     await requestTree(new Sequence([
         [0, "key", "Bb"],
-        [0, "meter", 4, 1],
+        [0, "meter", 0b1010, 1],
         [1.333, "note", "D4", 0.1, 0.333],
         [1.667, "note", "C4", 0.1, 0.333],
         [1.667, "note", "E4", 0.1, 0.333],

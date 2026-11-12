@@ -130,7 +130,7 @@ export default function read(settings, sequence, parts, keyEvent, meter, beat = 
         const offset   = beat % meter.duration;
         bar.meterEvent = meter;
         bar.duration   = meter.duration - offset;
-        bar.divisor    = meter.denominator;
+        bar.divisor    = meter.divisor;
         bar.divisions  = meter.divisions.map((n) => n - offset).filter((n) => n > 0);
     }
 
@@ -148,7 +148,7 @@ export default function read(settings, sequence, parts, keyEvent, meter, beat = 
                 beat:      bar.beat + bar.duration,
                 key:       bar.key,
                 duration:  meter ? meter.duration : Infinity,
-                divisor:   meter ? meter.denominator : 0,
+                divisor:   meter ? meter.divisor : 0,
                 divisions: meter ? meter.divisions : nothing
             };
         }
@@ -188,7 +188,7 @@ export default function read(settings, sequence, parts, keyEvent, meter, beat = 
                 if (meter[0] === bar.beat) {
                     bar.meterEvent = event;
                     bar.duration   = meter.duration;
-                    bar.divisor    = meter.denominator;
+                    bar.divisor    = meter.divisor;
                     bar.divisions  = meter.divisions;
                     break;
                 }
@@ -200,7 +200,7 @@ export default function read(settings, sequence, parts, keyEvent, meter, beat = 
                     const offset   = (bar.beat - event[0]) % meter.duration;
                     bar.meterEvent = event;
                     bar.duration   = meter.duration - offset;
-                    bar.divisor    = meter.denominator;
+                    bar.divisor    = meter.divisor;
                     bar.divisions  = meter.divisions.map((n) => n - offset).filter((n) => n > 0);
                     break;
                 }
@@ -219,7 +219,7 @@ export default function read(settings, sequence, parts, keyEvent, meter, beat = 
                     key:        bar.key,
                     meterEvent: event,
                     duration:   meter.duration,
-                    divisor:    meter.denominator,
+                    divisor:    meter.divisor,
                     divisions:  meter.divisions
                 };
 
@@ -342,7 +342,7 @@ export default function read(settings, sequence, parts, keyEvent, meter, beat = 
             beat:      bar.beat + bar.duration,
             key:       bar.key,
             duration:  meter.duration,
-            divisor:   meter.denominator,
+            divisor:   meter.divisor,
             divisions: meter.divisions
         };
     }

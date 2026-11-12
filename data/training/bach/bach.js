@@ -82,7 +82,7 @@ export const bachPreludeInCm = createScale('Bach BWV 847 Prelude in Cm', 'E♭',
 );
 
 // BWV 849: Prelude No. 4 in C♯ Minor (6/4 pastoral: dotted quarters 1.5, quarters 1.0, and eighths 0.5)
-export const bachPreludeInCsm = createMelody('Bach BWV 849 Prelude in C♯m', 'E', [0, 'meter', 6, 2], {},
+export const bachPreludeInCsm = createMelody('Bach BWV 849 Prelude in C♯m', 'E', [0, 'meter', 0b111, 2], {},
     // Bar 1 (6 beats): C♯m pastoral motif
     'G♯4', 1.5, 'E',  'A4', 0.5, 'E',  'B4', 0.5, 'E', 'C♯5', 0.5, 'E', 'D♯5', 1.0, 'E', 'G♯4', 1.0, 'E',  'E5', 1.0, 'E',
     // Bar 2 (6 beats): Melodic minor ascent with A♯4 & B♯4 leading to C♯5
@@ -94,7 +94,7 @@ export const bachPreludeInCsm = createMelody('Bach BWV 849 Prelude in C♯m', 'E
 );
 
 // BWV 853: Prelude No. 8 in E♭ Minor (3/2 sarabande: quarters 1.0, dotted quarters 1.5, eighths 0.5, halves 2.0)
-export const bachPreludeInEbm = createMelody('Bach BWV 853 Prelude in E♭m', 'G♭', [0, 'meter', 6, 2], {},
+export const bachPreludeInEbm = createMelody('Bach BWV 853 Prelude in E♭m', 'G♭', [0, 'meter', 0b111, 2], {},
     // Bar 1 (6 beats): E♭m sarabande opening & subdominant A♭m (with C♭5)
     'E♭4', 1.0, 'G♭', 'G♭4', 1.0, 'G♭', 'B♭4', 1.5, 'G♭', 'C♭5', 0.5, 'G♭', 'A♭4', 1.0, 'G♭', 'B♭4', 1.0, 'G♭',
     // Bar 2 (6 beats): B♭7 with D♮4 leading tone resolving to E♭m
@@ -106,7 +106,7 @@ export const bachPreludeInEbm = createMelody('Bach BWV 853 Prelude in E♭m', 'G
 );
 
 // BWV 772: Invention No. 1 in C Major (4/4: 16th rest, seven 16ths, four 8th notes)
-export const bachInventionInC = createMelody('Bach BWV 772 Invention in C', 'C', 4, {},
+export const bachInventionInC = createMelody('Bach BWV 772 Invention in C', 'C', 0b1010, {},
     // Bar 1: Subject in C (16th rest + seven 16ths + four 8ths)
     null,  0.25, null, 'C4', 0.25, 'C',  'D4', 0.25, 'C',  'E4', 0.25, 'C',
     'F4',  0.25, 'C',  'D4', 0.25, 'C',  'E4', 0.25, 'C',  'C4', 0.25, 'C',
@@ -128,7 +128,7 @@ export const bachInventionInC = createMelody('Bach BWV 772 Invention in C', 'C',
 );
 
 // BWV 775: Invention No. 4 in D Minor (3/8 meter = 1.5 beats/bar: 16th runs & 8th-note cadential figures)
-export const bachInventionInDm = createMelody('Bach BWV 775 Invention in Dm', 'F', [0, 'meter', 1.5, 0.5], {},
+export const bachInventionInDm = createMelody('Bach BWV 775 Invention in Dm', 'F', [0, 'meter', 0b100, 0.5], {},
     // Bars 1–2: Dm harmonic minor subject (B♭4 vs C♯4)
     'D4', 0.25, 'F',  'E4', 0.25, 'F',  'F4', 0.25, 'F',  'G4', 0.25, 'F',  'A4', 0.25, 'F', 'B♭4', 0.25, 'F',
    'C♯4', 0.25, 'D', 'B♭4', 0.25, 'F',  'A4', 0.25, 'F',  'G4', 0.25, 'F',  'F4', 0.25, 'F',  'E4', 0.25, 'F',
@@ -144,7 +144,7 @@ export const bachInventionInDm = createMelody('Bach BWV 775 Invention in Dm', 'F
 );
 
 // BWV 784: Invention No. 13 in A Minor (4/4: 16th rest, seven 16ths, and 8th-note leaps)
-export const bachInventionInAm = createMelody('Bach BWV 784 Invention in Am', 'C', 4, {},
+export const bachInventionInAm = createMelody('Bach BWV 784 Invention in Am', 'C', 0b1010, {},
     // Bar 1: 16th rest + seven 16ths + four 8th notes (with G♯4)
     null, 0.25, null, 'E4', 0.25, 'C',  'A4', 0.25, 'C',  'C5', 0.25, 'C',
     'B4', 0.25, 'C',  'E4', 0.25, 'C',  'B4', 0.25, 'C',  'D5', 0.25, 'C',
@@ -161,7 +161,7 @@ export const bachInventionInAm = createMelody('Bach BWV 784 Invention in Am', 'C
 );
 
 // BWV 999: Prelude in C Minor (3/4 meter: six 16th notes + two 8th notes per bar)
-export const bachPrelude999InCm = createMelody('Bach BWV 999 Prelude in Cm', 'E♭', 3, {},
+export const bachPrelude999InCm = createMelody('Bach BWV 999 Prelude in Cm', 'E♭', 0b100, {},
     // Bar 1: Cm (six 16ths + two 8ths)
     'C4', 0.25, 'E♭', 'E♭4', 0.25, 'E♭',  'G4', 0.25, 'E♭',  'C5', 0.25, 'E♭', 'E♭5', 0.25, 'E♭',  'G4', 0.25, 'E♭',  'C5', 0.5, 'E♭', 'E♭5', 0.5, 'E♭',
     // Bar 2: Fm7/C
@@ -199,7 +199,7 @@ export const bachCelloPreludeInG = createScale('Bach BWV 1007 Prelude in G', 'G'
 );
 
 // BWV 244.3: Chorale "Herzliebster Jesu" (4/4 SATB: quarter chords, passing 8ths & half-note cadences)
-export const bachChoraleInBm = createSequence('Bach BWV 244 Chorale in Bm', 'D', 4, {},
+export const bachChoraleInBm = createSequence('Bach BWV 244 Chorale in Bm', 'D', 0b1010, {},
     // Bar 1: Bm (1.0) -> Em/G (1.0) -> F♯/A♯ (1.0) -> Bm with passing A♮3 8th in bass (0.5 + 0.5)
     0.0,  'B3', 1.0, 'D',  0.0, 'F♯4', 1.0, 'D',  0.0,  'D5', 1.0, 'D',  0.0,  'B5', 1.0, 'D',
     1.0,  'G3', 1.0, 'D',  1.0,  'E4', 1.0, 'D',  1.0,  'B4', 1.0, 'D',  1.0,  'B5', 1.0, 'D',
@@ -217,7 +217,7 @@ export const bachChoraleInBm = createSequence('Bach BWV 244 Chorale in Bm', 'D',
 );
 
 // BWV 245: Chorale in A Minor with Picardy Third (4/4 SATB: quarter chords, passing 8ths & half-note cadences)
-export const bachChoraleInAm = createSequence('Bach Chorale in Am', 'C', 4, {},
+export const bachChoraleInAm = createSequence('Bach Chorale in Am', 'C', 0b1010, {},
     // Bar 1: Am (1.0) -> Dm/F (1.0) -> E/G♯ (1.0) -> Am with passing G♮3 8th (0.5 + 0.5)
     0.0,  'A3', 1.0, 'C',  0.0,  'E4', 1.0, 'C',  0.0,  'C5', 1.0, 'C',  0.0,  'A5', 1.0, 'C',
     1.0,  'F3', 1.0, 'C',  1.0,  'D4', 1.0, 'C',  1.0,  'A4', 1.0, 'C',  1.0,  'D5', 1.0, 'C',

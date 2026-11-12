@@ -158,14 +158,19 @@ export function symbolisePart(settings, activeNotes, bar, part, repeats) {
     }
 
     // Push in time signature
-    if (bar.meterEvent) symbols.push({
-        type:        'timesig',
-        beat:        0,
-        numerator:   bar.meterEvent[3] === 1.5 ? bar.meterEvent[2] / 0.5 : bar.meterEvent[2] / bar.meterEvent[3],
-        denominator: bar.meterEvent[3] === 1.5 ? 8 : 4 / bar.meterEvent[3],
-        stave,
-        event:       bar.meterEvent
-    });
+    if (bar.meterEvent) {
+        const meter = bar.meterEvent.numerator ?
+            bar.meterEvent :
+            Event.from(bar.meterEvent);
+        symbols.push({
+            type:        'timesig',
+            beat:        0,
+            numerator:   meter.numerator,
+            denominator: meter.denominator,
+            stave,
+            event:       bar.meterEvent
+        });
+    }
 
     // Symbols from here on are the musical content of the bar, the stuff that
     // may be replaced by a bar repeat

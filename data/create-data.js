@@ -7,7 +7,7 @@ const { floor } = Math;
 export function createTriads(name, key, duration, ...data) {
     const events = [
         [0, "key", key],
-        [0, "meter", 4, 1]
+        [0, "meter", 0b1010, 1]
     ];
 
     const sequence = Sequence.from({ name, events });
@@ -26,7 +26,7 @@ export function createTriads(name, key, duration, ...data) {
 export function createTetrads(name, key, duration, ...data) {
     const events = [
         [0, "key", key],
-        [0, "meter", 4, 1]
+        [0, "meter", 0b1010, 1]
     ];
 
     const sequence = Sequence.from({ name, events });
@@ -45,7 +45,7 @@ export function createTetrads(name, key, duration, ...data) {
 export function createScale(name, key, duration, ...data) {
     const events = [
         [0, "key", key],
-        [0, "meter", 4, 1]
+        [0, "meter", 0b1010, 1]
     ];
 
     const sequence = Sequence.from({ name, events });
@@ -61,10 +61,10 @@ export function createScale(name, key, duration, ...data) {
     return sequence;
 }
 
-export function createMelody(name, key, meter, options, ...data) {
+export function createMelody(name, key, rsid = 0b1010, options, ...data) {
     const events = [
         [0, "key", key],
-        Array.isArray(meter) ? meter : [0, "meter", meter, 1]
+        Array.isArray(rsid) ? rsid : [0, "meter", rsid, 1]
     ];
 
     const sequence = Sequence.from({ name, events });
@@ -86,10 +86,10 @@ export function createMelody(name, key, meter, options, ...data) {
     return sequence;
 }
 
-export function createSequence(name, key, meter, options, ...data) {
+export function createSequence(name, key, rsid = 0b1010, options, ...data) {
     const events = [
         [0, "key", key],
-        Array.isArray(meter) ? meter : [0, "meter", meter, 1]
+        Array.isArray(rsid) ? rsid : [0, "meter", rsid, 1]
     ];
 
     const sequence = Sequence.from({ name, events });

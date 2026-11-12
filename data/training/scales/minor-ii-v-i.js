@@ -12,12 +12,12 @@ import { createMelody, createSequence } from '../../create-data.js';
  */
 
 // 1. Chet Baker — "My Funny Valentine" / "Alone Together" Minor II–V–I in Cm (65% swing: 0.65 / 0.35)
-export const chetBakerMinorIiVIInCm = createMelody('Chet Baker — Minor II–V–I in Cm', 'C', 4, { swingAsStraight8ths: true },
+export const chetBakerMinorIiVIInCm = createMelody('Chet Baker — Minor II–V–I in Cm', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: Dm7♭5 — Lyrical pickup and descending half-diminished arpeggio (C5 - A♭4 - G4 - F4 - D4)
     null,  1.0,  null,  'C5', 1.0, 'E♭', 'A♭4', 0.65,'E♭',   'G4', 0.35,'E♭',
      'F4', 0.65,'E♭',   'D4', 0.35,'E♭',
     // Bar 2: G7♭9 — Rising B♮3 -> D4 -> F4 -> A♭4 -> G4 with F♯4 chromatic neighbor
-     'B3', 0.65, 'C',   'D4', 0.35, 'C',   'F4', 0.65,'E♭',  'A♭4', 0.35,'E♭',
+      'B3', 0.65, 'C',   'D4', 0.35, 'C',   'F4', 0.65,'E♭',  'A♭4', 0.35,'E♭',
      'G4', 0.65, 'C',  'F♯4', 0.35, 'G',   'G4', 0.65,'E♭',   'D5', 0.35,'E♭',
     // Bar 3: Cm -> Cm(∆7) — C5 (1.65) -> E♭4 (0.35) -> G4 (0.65) -> B♮4 (1.35)
      'C5', 1.65,'E♭',  'E♭4', 0.35,'E♭',   'G4', 0.65, 'G',   'B4', 1.35, 'G',
@@ -26,7 +26,7 @@ export const chetBakerMinorIiVIInCm = createMelody('Chet Baker — Minor II–V�
 );
 
 // 2. Sonny Rollins — "Softly, as in a Morning Sunrise" / "Airegin" Minor II–V–I in Cm (65% swing: 0.65 / 0.35)
-export const rollinsMinorIiVIInCm = createMelody('Sonny Rollins — Bebop Minor II–V–I in Cm', 'C', 4, { swingAsStraight8ths: true },
+export const rollinsMinorIiVIInCm = createMelody('Sonny Rollins — Bebop Minor II–V–I in Cm', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: Dm7♭5 — Arpeggiating D4 - F4 - A♭4 - C5 - D5 - C5 - A♭4 - F4
      'D4', 0.65,'E♭',   'F4', 0.35,'E♭',  'A♭4', 0.65,'E♭',   'C5', 0.35,'E♭',
      'D5', 0.65,'E♭',   'C5', 0.35,'E♭',  'A♭4', 0.65,'E♭',   'F4', 0.35,'E♭',
@@ -41,7 +41,7 @@ export const rollinsMinorIiVIInCm = createMelody('Sonny Rollins — Bebop Minor 
 );
 
 // 3. Wynton Marsalis — Relative Minor II–V–I in Am (Bm7♭5 – E7alt – Am∆9) (60% swing: 0.6 / 0.4)
-export const wyntonMinorIiVIInAm = createMelody('Wynton Marsalis — Relative Minor II–V–I in Am', 'C', 4, { swingAsStraight8ths: true },
+export const wyntonMinorIiVIInAm = createMelody('Wynton Marsalis — Relative Minor II–V–I in Am', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: Bm7♭5 — Starting on F5 -> D5 -> B4 -> A4, rising through C♯5 (Locrian ♮2 = D melodic minor)
      'F5', 0.6,  'C',   'D5', 0.4,  'C',   'B4', 0.6,  'C',   'A4', 0.4,  'C',
      'B4', 0.6,  'D',  'C♯5', 0.4,  'D',   'D5', 0.6,  'C',   'F5', 0.4,  'C',
@@ -56,7 +56,7 @@ export const wyntonMinorIiVIInAm = createMelody('Wynton Marsalis — Relative Mi
 );
 
 // 4. John Scofield — Modern Melodic Minor II–V–I in Cm (Dm7♭5 – G7alt – Cm∆9) (60% swing: 0.6 / 0.4)
-export const scofieldMelodicMinorIiVIInCm = createMelody('John Scofield — Modern Minor II–V–I in Cm', 'C', 4, { swingAsStraight8ths: true },
+export const scofieldMelodicMinorIiVIInCm = createMelody('John Scofield — Modern Minor II–V–I in Cm', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: Dm7♭5 (♮9) — F melodic minor (D4 - E4 - F4 - A♭4 - C5 - E5 - D5 - A♭4)
      'D4', 0.6,  'C',   'E4', 0.4,  'C',   'F4', 0.6, 'E♭',  'A♭4', 0.4, 'E♭',
      'C5', 0.6, 'E♭',   'E5', 0.4,  'C',   'D5', 0.6, 'E♭',  'A♭4', 0.4, 'E♭',
@@ -71,7 +71,7 @@ export const scofieldMelodicMinorIiVIInCm = createMelody('John Scofield — Mode
 );
 
 // 5. Minor II–V–I Chord Voicings (Cm and Am in Key 'C')
-export const minorIiVIChordsInC = createSequence('Minor II–V–I Voicings in Cm & Am', 'C', 4, {},
+export const minorIiVIChordsInC = createSequence('Minor II–V–I Voicings in Cm & Am', 'C', 0b1010, {},
     // Bar 1: Dm7♭5 (2 beats) -> G7♭13♭9 (2 beats)
     0.0,  'F4', 2.0,'E♭',  0.0, 'A♭4', 2.0,'E♭',  0.0,  'C5', 2.0,'E♭',  0.0,  'D5', 2.0,'E♭',
     2.0,  'F4', 2.0, 'C',  2.0, 'A♭4', 2.0,'E♭',  2.0,  'B4', 2.0, 'C',  2.0, 'E♭5', 2.0,'E♭',

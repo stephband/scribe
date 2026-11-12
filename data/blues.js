@@ -12,7 +12,7 @@ import { createMelody, createSequence } from './create-data.js';
  */
 
 // 1. Sonny Rollins — "Tenor Madness" / "Blue 7" 12-Bar Bop-Blues in C (65% swing: 0.65 / 0.35)
-export const rollinsBluesInC = createMelody('Sonny Rollins — 12-Bar Jazz Blues in C', 'C', 4, { swingAsStraight8ths: true },
+export const rollinsBluesInC = createMelody('Sonny Rollins — 12-Bar Jazz Blues in C', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: C7 — Classic Rollins blues pickup & riff (G4 - B♭4 - B♮4 - C5 - E4 - G4)
     null,  0.65, null,  'G4', 0.35, 'F',  'B♭4', 0.65, 'F',   'B4', 0.35, 'C',
      'C5', 1.0,  'C',   'E4', 0.65, 'C',   'G4', 0.35, 'F',
@@ -52,7 +52,7 @@ export const rollinsBluesInC = createMelody('Sonny Rollins — 12-Bar Jazz Blues
 );
 
 // 2. Wynton Marsalis — New Orleans / Hard-Bop 12-Bar Blues in C (60% swing: 0.6 / 0.4)
-export const wyntonBluesInC = createMelody('Wynton Marsalis — Hard-Bop 12-Bar Blues in C', 'C', 4, { swingAsStraight8ths: true },
+export const wyntonBluesInC = createMelody('Wynton Marsalis — Hard-Bop 12-Bar Blues in C', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: C7 — Trumpet call with D♯5 -> E5 slip and B♭4 blue 7th
      'G4', 0.6,  'C',   'C5', 0.4,  'C',  'D♯5', 0.25, 'E',   'E5', 0.75, 'C',
      'C5', 0.6,  'F',  'B♭4', 0.4,  'F',   'G4', 1.0,  'C',
@@ -92,7 +92,7 @@ export const wyntonBluesInC = createMelody('Wynton Marsalis — Hard-Bop 12-Bar 
 );
 
 // 3. John Scofield — Funk-Jazz / Mixo-Blues 12-Bar Chorus in C (60% swing: 0.6 / 0.4)
-export const scofieldFunkBluesInC = createMelody('John Scofield — Funk-Jazz 12-Bar Blues in C', 'C', 4, { swingAsStraight8ths: true },
+export const scofieldFunkBluesInC = createMelody('John Scofield — Funk-Jazz 12-Bar Blues in C', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: C7 — Syncopated Mixo-blues riff (D♯4 -> E4 -> G4 -> A4 -> B♭4 -> G4 -> E4 -> C4)
     null,  0.6,  null, 'D♯4', 0.2,  'E',   'E4', 0.2,  'C',   'G4', 0.6,  'C',
      'A4', 0.4,  'F',  'B♭4', 0.6,  'F',   'G4', 0.4,  'C',   'E4', 0.6,  'C',
@@ -133,7 +133,7 @@ export const scofieldFunkBluesInC = createMelody('John Scofield — Funk-Jazz 12
 );
 
 // 4. Charlie Parker / Chet Baker — "Blues for Alice" (Bird Blues in C: 0.65 / 0.35)
-export const birdBluesInC = createMelody('Charlie Parker — "Blues for Alice" (Bird Blues in C)', 'C', 4, { swingAsStraight8ths: true },
+export const birdBluesInC = createMelody('Charlie Parker — "Blues for Alice" (Bird Blues in C)', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: C∆ — Descending major 7th line (G5 - E5 - C5 - B4 - A4 - G4 - E4)
      'G5', 1.0,  'C',   'E5', 0.65, 'C',   'C5', 0.35, 'C',   'B4', 0.65, 'C',
      'A4', 0.35, 'C',   'G4', 0.65, 'C',   'E4', 0.35, 'C',
@@ -173,7 +173,7 @@ export const birdBluesInC = createMelody('Charlie Parker — "Blues for Alice" (
 );
 
 // 5. 12-Bar Jazz Blues Comping Voicings in C
-export const bluesChordsInC = createSequence('12-Bar Jazz Blues Voicings in C', 'C', 4, {},
+export const bluesChordsInC = createSequence('12-Bar Jazz Blues Voicings in C', 'C', 0b1010, {},
     // Bar 1: C13 (E4-A4-B♭4-D5)
     0.0,  'E4', 4.0, 'F',  0.0,  'A4', 4.0, 'F',  0.0, 'B♭4', 4.0, 'F',  0.0,  'D5', 4.0, 'F',
     // Bar 2: F9 (E♭4-G4-A4-C5)

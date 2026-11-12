@@ -28,7 +28,7 @@ export default async function requestTree(sequence, parts = sequence.parts, key,
     const keyEvent = key && Event.key(0, key);
 
     // If events contains no initial meter and meter is available insert a meter event
-    const meterEvent = timesig && assign(Event.meter(0, 4, 1), { timesig });
+    const meterEvent = timesig && assign(Event.meter(0, 0b1010, 1), { timesig });
 
     // Make transforms list
     const array = [];

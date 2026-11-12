@@ -42,7 +42,7 @@ Deno.test('createSignatureSymbols() with string key', () => {
 Deno.test('showAtConcertPitch: true preserves concert key on parts', async () => {
     const sequence = new Sequence([
         [0, "key", "C"],
-        [0, "meter", 4, 1],
+        [0, "meter", 0b1010, 1],
         [0, "note", "C4", 0.5, 1]
     ]);
     const tree = await requestTree(sequence, undefined, undefined, undefined, 0, 0, Infinity, { showAtConcertPitch: true });
@@ -55,7 +55,7 @@ Deno.test('showAtConcertPitch: true preserves concert key on parts', async () =>
 Deno.test('quantise chords with minDivision 1/3 and primes [2, 3]', async () => {
     const sequence = new Sequence([
         [0, "key", "C"],
-        [0, "meter", 4, 1],
+        [0, "meter", 0b1010, 1],
         [0.04, "chord", "C", "", 1],
         [0.52, "chord", "G", "7", 1]
     ]);
@@ -71,7 +71,7 @@ Deno.test('quantise chords with minDivision 1/3 and primes [2, 3]', async () => 
 Deno.test('symbolise slash chords with new extension format {n}/', async () => {
     const sequence = new Sequence([
         [0, "key", "C"],
-        [0, "meter", 4, 1],
+        [0, "meter", 0b1010, 1],
         [0, "chord", "E", "{8}/", 2],
         [2, "chord", "B", "{8}7/", 2]
     ]);
@@ -89,7 +89,7 @@ Deno.test('symbolise slash chords with new extension format {n}/', async () => {
 Deno.test('symbolise slash chords from chord symbol strings', async () => {
     const sequence = new Sequence([
         [0, "key", "C"],
-        [0, "meter", 4, 1],
+        [0, "meter", 0b1010, 1],
         [0, "chord", "C/E", 2],
         [2, "chord", "G7/B", 2]
     ]);
@@ -107,7 +107,7 @@ Deno.test('symbolise slash chords from chord symbol strings', async () => {
 Deno.test('DrumStave delegates spelling directly without RNN speller', async () => {
     const sequence = new Sequence([
         [0, "key", "D"],
-        [0, "meter", 4, 1],
+        [0, "meter", 0b1010, 1],
         [0, "note", 38, 0.8, 1],
         [1, "note", 42, 0.8, 1]
     ]);
@@ -128,7 +128,7 @@ Deno.test('DrumStave delegates spelling directly without RNN speller', async () 
 
 Deno.test('DrumStave stem directions: upper voice (cymbals/hands) stemup true, lower voice (feet) stemup false', async () => {
     const sequence = new Sequence([
-        [0, "meter", 4, 1],
+        [0, "meter", 0b1010, 1],
         [0, "note", 49, 0.8, 1], // Crash Cymbal 1 -> upper voice
         [0, "note", 36, 0.8, 1], // Bass Drum 1 -> lower voice
         [1, "note", 42, 0.8, 1], // Closed Hi-Hat -> upper voice
@@ -173,7 +173,7 @@ Deno.test('DrumStave stem directions: upper voice (cymbals/hands) stemup true, l
 Deno.test('All voice-associated symbols have symbol.voice.name attached', async () => {
     const sequence = new Sequence([
         [0, "key", "Eb"],
-        [0, "meter", 4, 1],
+        [0, "meter", 0b1010, 1],
         [0, "note", 63, 0.5, 1], // Eb4 in bar 0
         [1, "note", 65, 0.5, 1], // F4 in bar 0
         [4, "note", 67, 0.5, 1]  // G4 in bar 1
@@ -207,7 +207,7 @@ Deno.test('Whole bar rest has voice.name attached on empty bars', async () => {
             { staff: "bass", name: "Bass", routing: { 2: 0 } }
         ],
         events: [
-            [0, "meter", 4, 1],
+            [0, "meter", 0b1010, 1],
             [0, "sequence", 10, 1, 8],
             [0, "sequence", 20, 2, 8]
         ],
@@ -245,7 +245,7 @@ Deno.test('Whole bar rest has voice.name attached on empty bars', async () => {
 
 Deno.test('Percussion swing straightening quantises swung 8ths to straight 8ths without NaN rests', async () => {
     const sequence = new Sequence([
-        [0, "meter", 4, 1],
+        [0, "meter", 0b1010, 1],
         [0,    "note", "F3", 0.1, 0.6],
         [1,    "note", "F3", 0.1, 0.2],
         [1.63, "note", "F3", 0.1, 0.2],
@@ -276,7 +276,7 @@ Deno.test('Percussion swing straightening quantises swung 8ths to straight 8ths 
 Deno.test('Swing quantisation is restricted to whole beat meters (integer divisor)', async () => {
     // Meter with divisor 0.5 (non-integer)
     const sequence305 = new Sequence([
-        [0, "meter", 3, 0.5],
+        [0, "meter", 0b100100, 0.5],
         [0,    "note", "F3", 0.1, 0.2],
         [0.66, "note", "F3", 0.1, 0.2]
     ]);
@@ -302,7 +302,7 @@ Deno.test('Swing quantisation is restricted to whole beat meters (integer diviso
 
     // 2/2 meter has divisor 2 (integer)
     const sequence22 = new Sequence([
-        [0, "meter", 4, 2],
+        [0, "meter", 0b11, 2],
         [1,    "note", "F3", 0.1, 0.2],
         [1.63, "note", "F3", 0.1, 0.2]
     ]);
@@ -318,7 +318,7 @@ Deno.test('Swing quantisation is restricted to whole beat meters (integer diviso
 Deno.test('Tuplet deterministic slot rendering with empty slot rest and chord', async () => {
     // Triplet on beat 1 with notes at slot 0 (C4, E4 chord) and slot 2 (G4), slot 1 is empty rest
     const sequence = new Sequence([
-        [0, "meter", 4, 1],
+        [0, "meter", 0b1010, 1],
         [1.00, "note", 60, 0.1, 0.3], // C4 in slot 0
         [1.01, "note", 64, 0.1, 0.3], // E4 in slot 0
         [1.67, "note", 67, 0.1, 0.3]  // G4 in slot 2
@@ -365,7 +365,7 @@ Deno.test('grainPow2 and grainOfBeat on quantised beat divisions', () => {
 Deno.test('PLL spring state (drift) is preserved across bar boundaries', async () => {
     // 2 bars of quarter notes in 4/4 with consistent laid-back drift (+0.03 beats)
     const sequence = new Sequence([
-        [0, "meter", 4, 1],
+        [0, "meter", 0b1010, 1],
         [0.03, "note", 60, 0.1, 0.5],
         [1.03, "note", 60, 0.1, 0.5],
         [2.03, "note", 60, 0.1, 0.5],
@@ -375,7 +375,6 @@ Deno.test('PLL spring state (drift) is preserved across bar boundaries', async (
         [6.03, "note", 60, 0.1, 0.5],
         [7.03, "note", 60, 0.1, 0.5]
     ]);
-
     const tree = await requestTree(sequence);
     assert(tree[0], 'Bar 0 exists');
     assert(tree[1], 'Bar 1 exists');
@@ -414,7 +413,7 @@ Deno.test('Meterless sequence renders as a single bar containing all notes', asy
 Deno.test('Text events quantise and symbolise correctly in their own voice', async () => {
     const sequence = new Sequence([
         [0, "key", "C"],
-        [0, "meter", 4, 1],
+        [0, "meter", 0b1010, 1],
         [0, "text", 2, "Intro"],
         [2, "text", 2, "verse"]
     ]);
@@ -446,7 +445,7 @@ Deno.test('Text events quantise and symbolise correctly in their own voice', asy
 Deno.test('Text events truncate duration at bar line and coexist with notes', async () => {
     const sequence = new Sequence([
         [0, "key", "C"],
-        [0, "meter", 4, 1],
+        [0, "meter", 0b1010, 1],
         [0, "note", 60, 0.8, 1],
         [3, "text", 2, "overlapping-text"] // crosses bar boundary at beat 4
     ]);
@@ -476,7 +475,7 @@ Deno.test('Prune phantom trailing bars caused by raw note release overhang', asy
     // Bar 2 is pruned, leaving exactly 1 bar with doubleBarLine true.
     const sequence = new Sequence([
         [0, "key", "C"],
-        [0, "meter", 4, 1],
+        [0, "meter", 0b1010, 1],
         [3, "note", "C4", 0.5, 1.05]
     ]);
     const tree = await requestTree(sequence);
@@ -487,7 +486,7 @@ Deno.test('Prune phantom trailing bars caused by raw note release overhang', asy
 Deno.test('Retain trailing bar when note genuinely ties across bar line', async () => {
     const sequence = new Sequence([
         [0, "key", "C"],
-        [0, "meter", 4, 1],
+        [0, "meter", 0b1010, 1],
         [3, "note", "C4", 0.5, 2.0]
     ]);
     const tree = await requestTree(sequence);
@@ -498,7 +497,7 @@ Deno.test('Retain trailing bar when note genuinely ties across bar line', async 
 Deno.test('Score parts: routes multiple sources to voices on a grand stave', async () => {
     const sequence = Sequence.from({
         events: [
-            [0, "meter", 4, 1],
+            [0, "meter", 0b1010, 1],
             [0, "key", "C"],
             [0, "sequence", 1, 2, 4], // Melody (source 2)
             [0, "sequence", 2, 1, 4]  // Accompaniment (source 1)
@@ -532,7 +531,7 @@ Deno.test('Score parts: routes multiple sources to voices on a grand stave', asy
 Deno.test('Score parts: routes sources to open score staves', async () => {
     const sequence = Sequence.from({
         events: [
-            [0, "meter", 4, 1],
+            [0, "meter", 0b1010, 1],
             [0, "key", "C"],
             [0, "sequence", 1, "mel", 4],
             [0, "sequence", 2, "acc", 4]
@@ -566,7 +565,7 @@ Deno.test('Score parts: routes sources to open score staves', async () => {
 Deno.test('Score parts: routes SATB to four voices on a single grand stave', async () => {
     const sequence = Sequence.from({
         events: [
-            [0, "meter", 4, 1],
+            [0, "meter", 0b1010, 1],
             [0, "key", "C"],
             [0, "sequence", 1, 1, 4],
             [0, "sequence", 2, 2, 4],
@@ -608,7 +607,7 @@ Deno.test('Score parts: routes SATB to four voices on a single grand stave', asy
 Deno.test('Score parts: undefined routing implicitly maps { 0: 0 } and distributes voice 0 on grand stave', async () => {
     const sequence = Sequence.from({
         events: [
-            [0, "meter", 4, 1],
+            [0, "meter", 0b1010, 1],
             [0, "key", "C"],
             [0, "note", "E4", 0.1, 4], // >= 60 -> rh
             [0, "note", "C3", 0.1, 4]  // < 60  -> lh
@@ -635,7 +634,7 @@ Deno.test('Score parts: undefined routing implicitly maps { 0: 0 } and distribut
 Deno.test('Score parts: numeric voice keys map to grand stave voices (1: rh, 2: lh)', async () => {
     const sequence = Sequence.from({
         events: [
-            [0, "meter", 4, 1],
+            [0, "meter", 0b1010, 1],
             [0, "key", "C"],
             [0, "sequence", 1, 2, 4],
             [0, "sequence", 2, 1, 4]
@@ -665,7 +664,7 @@ Deno.test('Score parts: numeric voice keys map to grand stave voices (1: rh, 2: 
 Deno.test('Score parts: numeric voice keys map to SATB on grand stave (3: soprano, 4: alto, 5: tenor, 6: bass)', async () => {
     const sequence = Sequence.from({
         events: [
-            [0, "meter", 4, 1],
+            [0, "meter", 0b1010, 1],
             [0, "key", "C"],
             [0, "sequence", 1, 1, 4],
             [0, "sequence", 2, 2, 4],
@@ -703,7 +702,7 @@ Deno.test('Score parts: numeric voice keys map to SATB on grand stave (3: sopran
 Deno.test('Score parts: routes multiple sources to a single voice', async () => {
     const sequence = Sequence.from({
         events: [
-            [0, "meter", 4, 1],
+            [0, "meter", 0b1010, 1],
             [0, "key", "C"],
             [0, "sequence", 1, "flute1", 4],
             [0, "sequence", 2, "flute2", 4]
@@ -735,7 +734,7 @@ Deno.test('Score parts: routes multiple sources to a single voice', async () => 
 Deno.test('Score parts: routes one source to multiple parts', async () => {
     const sequence = Sequence.from({
         events: [
-            [0, "meter", 4, 1],
+            [0, "meter", 0b1010, 1],
             [0, "key", "C"],
             [0, "sequence", 1, "lead", 4]
         ],
@@ -767,7 +766,7 @@ Deno.test('Score parts: routes one source to multiple parts', async () => {
 Deno.test('3/4 meter: notes and text on third beat stay within their bar', async () => {
     const sequence = Sequence.from({
         events: [
-            [0, "meter", 3, 1],
+            [0, "meter", 0b100, 1],
             [0, "key", "C"],
             [0, "text", 2, "kiss"],
             [0, "note", "G4", 0.1, 2],
@@ -821,7 +820,7 @@ Deno.test('requestTree: default key and timesig without mutating sequence', asyn
 Deno.test('requestTree: sequence events override default key and timesig', async () => {
     const sequence = new Sequence([
         [0, "key", "Eb"],
-        [0, "meter", 4, 1],
+        [0, "meter", 0b1010, 1],
         [0, "note", "Eb4", 0.1, 1]
     ]);
 
@@ -852,7 +851,7 @@ Deno.test('requestTree: spells parts and resolves stave rows without showAtConce
 Deno.test('requestTree: anacrusis bar at beat=1 in 4/4 has duration 3, divisions [1, 3], 4/4 timesig, and following bars duration 4, divisions [2, 4]', async () => {
     const sequence = new Sequence([
         [0, "key", "C"],
-        [0, "meter", 4, 1],
+        [0, "meter", 0b1010, 1],
         [0.5, "note", "D3", 0.1, 0.5],
         [1, "note", "E3", 0.1, 1],
         [2, "note", "F3", 0.1, 1],

@@ -8,7 +8,6 @@ import {
 
 import Event                  from 'sequence/modules/event.js';
 import Stave                  from '../modules/stave.js';
-import { getDivisions }       from 'sequence/modules/event/meter.js';
 import { accidentalsFromKey } from '../modules/accidentals.js';
 import config                 from '../modules/config.js';
 
@@ -22,7 +21,7 @@ Deno.test('Notes at 0 in 4/4 bar', () => {
         beat:      0,
         duration:  4,
         divisor:   1,
-        divisions: getDivisions(4, 1),
+        divisions: [2, 4],
         key:       0
     };
 
@@ -49,7 +48,7 @@ Deno.test('Notes at 0 in 4/4 bar, analysis window set to duration', () => {
         beat:      0,
         duration:  4,
         divisor:   1,
-        divisions: getDivisions(4, 1),
+        divisions: [2, 4],
         key:       0
     };
 
@@ -76,7 +75,7 @@ Deno.test('Notes stopping at end of 4/4 bar', () => {
         beat:      0,
         duration:  4,
         divisor:   1,
-        divisions: getDivisions(4, 1),
+        divisions: [2, 4],
         key:       0
     };
 
@@ -104,7 +103,7 @@ Deno.test('Notes at 0 in 3/4 bar', () => {
         beat:      0,
         duration:  3,
         divisor:   1,
-        divisions: getDivisions(3, 1),
+        divisions: [3],
         key:       0
     };
 
@@ -135,7 +134,7 @@ Deno.test('Notes at 0 in 3/4 bar, analysis window set to duration', () => {
         beat:      0,
         duration:  3,
         divisor:   1,
-        divisions: getDivisions(3, 1),
+        divisions: [3],
         key:       0
     };
 
@@ -182,7 +181,7 @@ Deno.test('Notes at 0.5 in 3/4 bar', () => {
         beat:      0,
         duration:  3,
         divisor:   1,
-        divisions: getDivisions(3, 1),
+        divisions: [3],
         key:       0
     };
 
@@ -208,7 +207,7 @@ Deno.test('Notes at 0.5 in 3/4 bar, analysis window set to duration', () => {
         beat:      0,
         duration:  3,
         divisor:   1,
-        divisions: getDivisions(3, 1),
+        divisions: [3],
         key:       0
     };
 
@@ -243,7 +242,7 @@ Deno.test('Notes at 0 in 6/8 bar', () => {
         beat:      0,
         duration:  3,
         divisor:   0.5,
-        divisions: getDivisions(3, 0.5),
+        divisions: [1.5, 3],
         key:       0
     };
 
@@ -270,7 +269,7 @@ Deno.test('Notes at 0 in 6/8 bar, analysis window set to duration', () => {
         beat:      0,
         duration:  3,
         divisor:   0.5,
-        divisions: getDivisions(3, 0.5),
+        divisions: [1.5, 3],
         key:       0
     };
 
@@ -297,7 +296,7 @@ Deno.test('Notes at 0.5 in 6/8 bar', () => {
         beat:      0,
         duration:  3,
         divisor:   0.5,
-        divisions: getDivisions(3, 0.5),
+        divisions: [1.5, 3],
         key:       0
     };
 
@@ -322,7 +321,7 @@ Deno.test('Notes at 0 in 7/8 bar', () => {
         beat:      0,
         duration:  3.5,
         divisor:   0.5,
-        divisions: getDivisions(3.5, 0.5),
+        divisions: [2, 3.5],
         key:       0
     };
 
@@ -349,7 +348,7 @@ Deno.test('Notes at 0 in 7/8 bar, analysis window set to duration', () => {
         beat:      0,
         duration:  3.5,
         divisor:   0.5,
-        divisions: getDivisions(3.5, 0.5),
+        divisions: [2, 3.5],
         key:       0
     };
 
@@ -376,7 +375,7 @@ Deno.test('Notes at 0.5 in 7/8 bar', () => {
         beat:      0,
         duration:  3.5,
         divisor:   0.5,
-        divisions: getDivisions(3.5, 0.5),
+        divisions: [2, 3.5],
         key:       0
     };
 
@@ -401,7 +400,7 @@ Deno.test('Notes at 2 in 7/8 bar', () => {
         beat:      0,
         duration:  3.5,
         divisor:   0.5,
-        divisions: getDivisions(3.5, 0.5),
+        divisions: [2, 3.5],
         key:       0
     };
 

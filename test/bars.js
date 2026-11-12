@@ -13,13 +13,13 @@ console.log(createBars(new Sequence([
 ]), stave));
 
 console.log(createBars(new Sequence([
-    [0, "meter", 4, 1],
+    [0, "meter", 0b1010, 1],
     [10, "note", "C4", 0.1, 4]
 ]), stave));
 
 console.log(createBars(new Sequence([
     [0, "key", "Bb"],
-    [0, "meter", 4, 1],
+    [0, "meter", 0b1010, 1],
     [0,    "note", "C4", 0.1, 0.67],
     [0.67, "note", "C4", 0.1, 0.67],
     [1.33, "note", "C4", 0.1, 0.67]
@@ -27,7 +27,7 @@ console.log(createBars(new Sequence([
 
 console.log(createBars(new Sequence([
     [0, "key", "Bb"],
-    [0, "meter", 4, 1],
+    [0, "meter", 0b1010, 1],
     [1, "note", "G3", 0.1, 3],
     [2, "note", "C4", 0.1, 4],
     [4, "note", "E4", 0.1, 2],
@@ -38,7 +38,7 @@ console.log(createBars(new Sequence([
 
 console.log(createBars(new Sequence([
     [0, "key", "Bb"],
-    [0, "meter", 4, 1],
+    [0, "meter", 0b1010, 1],
     [1.333, "note", "D4", 0.1, 0.333],
     [1.667, "note", "C4", 0.1, 0.333],
     [1.667, "note", "E4", 0.1, 0.333],

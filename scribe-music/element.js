@@ -2,7 +2,6 @@
 import Signal                    from 'fn/signal.js';
 import element, { getInternals } from 'dom/element.js';
 import { Sequence }              from 'sequence/module.js';
-import { timesigToMeter, meterToTimesig } from 'sequence/modules/event/meter.js';
 
 import parse               from '../modules/parse.js';
 import Stave             from '../modules/stave.js';

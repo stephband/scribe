@@ -11,7 +11,7 @@ import { createMelody, createSequence } from '../../create-data.js';
  */
 
 // 1. Sonny Rollins — "St. Thomas" / "Tenor Madness" style syncopated II–V–I in C (65% swing: 0.65 / 0.35)
-export const rollinsIiVIInC = createMelody('Sonny Rollins — Major II–V–I in C', 'C', 4, { swingAsStraight8ths: true },
+export const rollinsIiVIInC = createMelody('Sonny Rollins — Major II–V–I in C', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: Dm7 — 8th pickup from C♯4 into D4, arpeggiating Dm9 (D-F-A-C-E)
     null,  0.65, null, 'C♯4', 0.35, 'D',   'D4', 0.65, 'C',   'F4', 0.35, 'C',
      'A4', 0.65, 'C',   'C5', 0.35, 'C',   'E5', 0.65, 'C',   'D5', 0.35, 'C',
@@ -26,7 +26,7 @@ export const rollinsIiVIInC = createMelody('Sonny Rollins — Major II–V–I i
 );
 
 // 2. Chet Baker — "There Will Never Be Another You" lyrical West Coast II–V–I (65% swing: 0.65 / 0.35)
-export const chetBakerIiVIInC = createMelody('Chet Baker — Lyrical II–V–I in C', 'C', 4, { swingAsStraight8ths: true },
+export const chetBakerIiVIInC = createMelody('Chet Baker — Lyrical II–V–I in C', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: Dm9 — Entering on the 9th (E5), descending smoothly through Dm9
     null,  1.0,  null,  'E5', 1.0,  'C',   'D5', 0.65, 'C',   'C5', 0.35, 'C',
      'A4', 0.65, 'C',   'F4', 0.35, 'C',
@@ -41,7 +41,7 @@ export const chetBakerIiVIInC = createMelody('Chet Baker — Lyrical II–V–I 
 );
 
 // 3. Wynton Marsalis — Hard-Bop / "Cherokee" crisp neo-bop trumpet II–V–I (60% swing: 0.6 / 0.4)
-export const wyntonIiVIInC = createMelody('Wynton Marsalis — Neo-Bop II–V–I in C', 'C', 4, { swingAsStraight8ths: true },
+export const wyntonIiVIInC = createMelody('Wynton Marsalis — Neo-Bop II–V–I in C', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: Dm11 — Crisp swung 8ths & 16th turn starting from the 11th (G4) and 9th (E5)
      'G4', 0.6,  'C',   'A4', 0.4,  'C',   'C5', 0.6,  'C',   'E5', 0.4,  'C',
      'F5', 0.25, 'C',   'G5', 0.25, 'C',   'F5', 0.25, 'C',   'E5', 0.25, 'C',
@@ -57,7 +57,7 @@ export const wyntonIiVIInC = createMelody('Wynton Marsalis — Neo-Bop II–V–
 );
 
 // 4. John Scofield — Angular Post-Bop / Quartal II–V–I in C (60% swing: 0.6 / 0.4)
-export const scofieldIiVIInC = createMelody('John Scofield — Angular II–V–I in C', 'C', 4, { swingAsStraight8ths: true },
+export const scofieldIiVIInC = createMelody('John Scofield — Angular II–V–I in C', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: Dm11 — Quartal stacks (D4 - G4 - C5 - F5 - E5 - A4) with chromatic slip C♯4 -> D4
     null,  0.6,  null, 'C♯4', 0.2,  'D',   'D4', 0.2,  'C',   'G4', 0.6,  'C',
      'C5', 0.4,  'C',   'F5', 0.6,  'C',   'E5', 0.4,  'C',   'A4', 0.6,  'C',
@@ -73,7 +73,7 @@ export const scofieldIiVIInC = createMelody('John Scofield — Angular II–V–
 );
 
 // 5. Charlie Parker — "Confirmation" / "Donna Lee" Bebop Turnaround (65% swing: 0.65 / 0.35)
-export const parkerTurnaroundInC = createMelody('Charlie Parker — Bebop I–VI–II–V–I in C', 'C', 4, { swingAsStraight8ths: true },
+export const parkerTurnaroundInC = createMelody('Charlie Parker — Bebop I–VI–II–V–I in C', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: C∆ (beats 1–2) -> A7♭9 (beats 3–4: C♯5 - E5 - G5 - B♭5)
      'E5', 0.65, 'C',   'G5', 0.35, 'C',   'B4', 0.65, 'C',   'D5', 0.35, 'C',
     'C♯5', 0.65, 'D',   'E5', 0.35, 'D',   'G5', 0.65, 'F',  'B♭5', 0.35, 'F',
@@ -90,7 +90,7 @@ export const parkerTurnaroundInC = createMelody('Charlie Parker — Bebop I–VI
 );
 
 // 6. Bill Evans — Rootless & Voice-Led I–VI–II–V–I Chords in C
-export const billEvansIiVIChordsInC = createSequence('Bill Evans — Rootless II–V–I–VI Chords in C', 'C', 4, {},
+export const billEvansIiVIChordsInC = createSequence('Bill Evans — Rootless II–V–I–VI Chords in C', 'C', 0b1010, {},
     // Bar 1: Dm9 (2 beats) -> G13 (2 beats)
     0.0,  'F4', 2.0, 'C',  0.0,  'A4', 2.0, 'C',  0.0,  'C5', 2.0, 'C',  0.0,  'E5', 2.0, 'C',
     2.0,  'F4', 2.0, 'C',  2.0,  'A4', 2.0, 'C',  2.0,  'B4', 2.0, 'C',  2.0,  'E5', 2.0, 'C',

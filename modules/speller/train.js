@@ -13,6 +13,7 @@ if (!targetDir) {
 
 const cwdUrl = new URL(`file://${Deno.cwd()}/`);
 const targetUrl = new URL(targetDir.endsWith("/") ? targetDir : `${targetDir}/`, cwdUrl);
+const rvalidExt = /\.(?:sequence|json|js)$/i;
 
 async function collectFiles(dirUrl, files = []) {
     for await (const entry of Deno.readDir(dirUrl)) {
@@ -20,7 +21,7 @@ async function collectFiles(dirUrl, files = []) {
         const entryUrl = new URL(entry.name + (entry.isDirectory ? "/" : ""), dirUrl);
         if (entry.isDirectory) {
             await collectFiles(entryUrl, files);
-        } else if (entry.isFile) {
+        } else if (entry.isFile && rvalidExt.test(entry.name)) {
             files.push({ name: entry.name, url: entryUrl });
         }
     }

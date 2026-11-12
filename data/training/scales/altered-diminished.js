@@ -13,7 +13,7 @@ import { createMelody, createSequence } from '../../create-data.js';
  */
 
 // 1. John Scofield — Symmetrical Half-Whole Diminished Line (60% swing: 0.6 / 0.4)
-export const scofieldHalfWholeDimInC = createMelody('John Scofield — G7 Half-Whole Diminished to C∆', 'C', 4, { swingAsStraight8ths: true },
+export const scofieldHalfWholeDimInC = createMelody('John Scofield — G7 Half-Whole Diminished to C∆', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: Dm7 — Syncopated swung 8th Dorian setup
     null,  0.6,  null,  'A4', 0.4,  'C',   'C5', 0.6,  'C',   'D5', 0.4,  'C',
      'F5', 0.6,  'C',   'E5', 0.4,  'C',   'D5', 0.6,  'C',   'A4', 0.4,  'C',
@@ -28,7 +28,7 @@ export const scofieldHalfWholeDimInC = createMelody('John Scofield — G7 Half-W
 );
 
 // 2. Wynton Marsalis — Altered Dominant Trumpet Run (Dm7 – G7alt – C∆9) (60% swing: 0.6 / 0.4)
-export const wyntonAlteredDominantInC = createMelody('Wynton Marsalis — G7alt Melodic Minor Run in C', 'C', 4, { swingAsStraight8ths: true },
+export const wyntonAlteredDominantInC = createMelody('Wynton Marsalis — G7alt Melodic Minor Run in C', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: Dm9 — Crisp arpeggio up to the 9th (E5) and 11th (G5)
      'D4', 0.6,  'C',   'F4', 0.4,  'C',   'A4', 0.6,  'C',   'C5', 0.4,  'C',
      'E5', 0.6,  'C',   'G5', 0.4,  'C',   'F5', 0.6,  'C',   'D5', 0.4,  'C',
@@ -43,7 +43,7 @@ export const wyntonAlteredDominantInC = createMelody('Wynton Marsalis — G7alt 
 );
 
 // 3. Sonny Rollins — Chromatic Passing Diminished (65% swing: 0.65 / 0.35)
-export const rollinsPassingDiminishedInC = createMelody('Sonny Rollins — Chromatic Passing Diminished in C', 'C', 4, { swingAsStraight8ths: true },
+export const rollinsPassingDiminishedInC = createMelody('Sonny Rollins — Chromatic Passing Diminished in C', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: C∆ (beats 1–2) -> C♯°7 (beats 3–4: C♯4 - E4 - G4 - B♭4)
      'C4', 0.65, 'C',   'E4', 0.35, 'C',   'G4', 0.65, 'C',   'E4', 0.35, 'C',
     'C♯4', 0.65, 'D',   'E4', 0.35, 'D',   'G4', 0.65, 'F',  'B♭4', 0.35, 'F',
@@ -59,7 +59,7 @@ export const rollinsPassingDiminishedInC = createMelody('Sonny Rollins — Chrom
 );
 
 // 4. Chet Baker — Lyrical Altered Enclosure (Dm9 – G7♯9♭9 – C∆9) (65% swing: 0.65 / 0.35)
-export const chetBakerAlteredEnclosureInC = createMelody('Chet Baker — Lyrical G7♯9♭9 to C∆9', 'C', 4, { swingAsStraight8ths: true },
+export const chetBakerAlteredEnclosureInC = createMelody('Chet Baker — Lyrical G7♯9♭9 to C∆9', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: Dm9 — Dotted-quarter + swung 8th lyrical opening
      'E5', 1.65, 'C',   'C5', 0.35, 'C',   'A4', 1.0,  'C',   'F4', 1.0,  'C',
     // Bar 2: G7♯9♭9 — Rising B4 -> D5 -> F5 -> B♭5 (♯9) -> A♭5 (♭9) -> G5 -> F5 -> D♭5 (♭5)
@@ -73,7 +73,7 @@ export const chetBakerAlteredEnclosureInC = createMelody('Chet Baker — Lyrical
 );
 
 // 5. Altered & Passing Diminished Chord Voicings in C
-export const alteredDiminishedChordsInC = createSequence('Altered & Passing Diminished Chords in C', 'C', 4, {},
+export const alteredDiminishedChordsInC = createSequence('Altered & Passing Diminished Chords in C', 'C', 0b1010, {},
     // Bar 1: C∆9 (2 beats) -> C♯°7 (2 beats)
     0.0,  'E4', 2.0, 'C',  0.0,  'G4', 2.0, 'C',  0.0,  'B4', 2.0, 'C',  0.0,  'D5', 2.0, 'C',
     2.0,  'E4', 2.0, 'D',  2.0,  'G4', 2.0, 'F',  2.0, 'B♭4', 2.0, 'F',  2.0, 'C♯5', 2.0, 'D',

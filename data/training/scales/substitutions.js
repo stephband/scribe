@@ -14,7 +14,7 @@ import { createMelody, createSequence } from '../../create-data.js';
  */
 
 // 1. Sonny Rollins — Tritone Substitution II–subV–I (Dm7 – D♭7♯11 – C∆9) (65% swing: 0.65 / 0.35)
-export const rollinsTritoneSubInC = createMelody('Sonny Rollins — Tritone Sub (Dm7 – D♭7♯11 – C∆)', 'C', 4, { swingAsStraight8ths: true },
+export const rollinsTritoneSubInC = createMelody('Sonny Rollins — Tritone Sub (Dm7 – D♭7♯11 – C∆)', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: Dm7 — Swung 8th-note line up the Dm9 arpeggio
      'D4', 0.65, 'C',   'F4', 0.35, 'C',   'A4', 0.65, 'C',   'C5', 0.35, 'C',
      'E5', 0.65, 'C',   'D5', 0.35, 'C',   'C5', 0.65, 'C',   'A4', 0.35, 'C',
@@ -29,7 +29,7 @@ export const rollinsTritoneSubInC = createMelody('Sonny Rollins — Tritone Sub 
 );
 
 // 2. Chet Baker — Backdoor Progression / Minor 3rd Sub (Fm9 – B♭13♯11 – C∆9) (65% swing: 0.65 / 0.35)
-export const chetBakerBackdoorInC = createMelody('Chet Baker — Backdoor Cadence (Fm7 – B♭7♯11 – C∆)', 'C', 4, { swingAsStraight8ths: true },
+export const chetBakerBackdoorInC = createMelody('Chet Baker — Backdoor Cadence (Fm7 – B♭7♯11 – C∆)', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: Fm9 — Lyrical swung 8th line from the 9th (G4 -> A♭4 -> C5 -> E♭5 -> C5 -> A♭4)
     null,  0.65, null,  'G4', 0.35,'E♭',  'A♭4', 0.65,'E♭',   'C5', 0.35,'E♭',
     'E♭5', 1.0, 'E♭',   'C5', 0.65,'E♭',  'A♭4', 0.35,'E♭',
@@ -44,7 +44,7 @@ export const chetBakerBackdoorInC = createMelody('Chet Baker — Backdoor Cadenc
 );
 
 // 3. John Scofield — Tadd Dameron / "Lady Bird" Turnaround (60% swing: 0.6 / 0.4)
-export const scofieldLadyBirdTurnaroundInC = createMelody('John Scofield — Lady Bird Turnaround', 'C', 4, { swingAsStraight8ths: true },
+export const scofieldLadyBirdTurnaroundInC = createMelody('John Scofield — Lady Bird Turnaround', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: C∆ (beats 1–2: E4 - G4 - B4 - D5) -> E♭7 (beats 3–4: D♭5 - B♭4 - G4 - E♭4)
      'E4', 0.6,  'C',   'G4', 0.4,  'C',   'B4', 0.6,  'C',   'D5', 0.4,  'C',
     'D♭5', 0.6, 'A♭',  'B♭4', 0.4, 'A♭',   'G4', 0.6, 'A♭',  'E♭4', 0.4, 'A♭',
@@ -59,7 +59,7 @@ export const scofieldLadyBirdTurnaroundInC = createMelody('John Scofield — Lad
 );
 
 // 4. Wynton Marsalis — Minor-3rd Dominant Axis (C∆ – E7 – B♭7 – D♭7 – C∆) (60% swing: 0.6 / 0.4)
-export const wyntonMinorThirdAxisInC = createMelody('Wynton Marsalis — Minor-3rd Dominant Axis in C', 'C', 4, { swingAsStraight8ths: true },
+export const wyntonMinorThirdAxisInC = createMelody('Wynton Marsalis — Minor-3rd Dominant Axis in C', 'C', 0b1010, { swingAsStraight8ths: true },
     // Bar 1: C∆ (beats 1–2) -> E7 (beats 3–4: G♯4 - B4 - D5 - F♮5)
      'G4', 0.6,  'C',   'C5', 0.4,  'C',   'E5', 0.6,  'C',   'B4', 0.4,  'C',
     'G♯4', 0.6,  'A',   'B4', 0.4,  'A',   'D5', 0.6,  'C',   'F5', 0.4,  'C',
@@ -74,7 +74,7 @@ export const wyntonMinorThirdAxisInC = createMelody('Wynton Marsalis — Minor-3
 );
 
 // 5. Chromatic & Tritone Substitution Chord Voicings in C
-export const substitutionChordsInC = createSequence('Tritone & Minor-3rd Substitution Chords in C', 'C', 4, {},
+export const substitutionChordsInC = createSequence('Tritone & Minor-3rd Substitution Chords in C', 'C', 0b1010, {},
     // Bar 1: C∆9 (2 beats) -> E♭9 (2 beats)
     0.0,  'E4', 2.0, 'C',  0.0,  'G4', 2.0, 'C',  0.0,  'B4', 2.0, 'C',  0.0,  'D5', 2.0, 'C',
     2.0,  'G4', 2.0,'A♭',  2.0, 'B♭4', 2.0,'A♭',  2.0, 'D♭5', 2.0,'A♭',  2.0,  'F5', 2.0,'A♭',

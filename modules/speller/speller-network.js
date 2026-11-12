@@ -1,6 +1,5 @@
 import { RecurrentNetwork } from "neuron/modules/rnn/network-cpu.js";
 import schema from "./schema.js";
-import { tpcToSpelledPitch } from "./key-tpc.js";
 import { decodePredictions, encode } from "./sequence-encoder.js";
 
 /**

@@ -23,7 +23,7 @@ import truncate from '../modules/number/truncate.js';
 const assign = Object.assign;
 const tests  = assign({}, alteredDiminished, substitutions, blues, giantSteps, chromatic, major, melodic, bebop, diminished, triads, tetrads, bach, major251s, minor251s);
 
-async function renderNotation(sequence, clef = 'treble', keyName = 'C', meter = [0, 'meter', 4, 1]) {
+async function renderNotation(sequence, clef = 'treble', keyName = 'C', meter = [0, 'meter', 0b1010, 1]) {
     const container = document.createElement('div');
     container.className = 'scribe';
     const elements = await renderElements(sequence, clef, keyName, meter, 0, 0, sequence.options);

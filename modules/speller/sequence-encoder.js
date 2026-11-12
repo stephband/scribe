@@ -1,5 +1,5 @@
 import floorPow2 from "sequence/modules/number/floor-pow-2.js";
-import { toKeyName, toKeyNumber } from "sequence/modules/event/key.js";
+import { toKeyNumber } from "sequence/modules/event/key.js";
 import { toChordHSID, toChordName } from "sequence/modules/event/chord.js";
 import { hsidToNumbers } from "sequence/modules/harmony/hsid.js";
 import { toNoteNumber, toRootNumber } from "midi/note.js";

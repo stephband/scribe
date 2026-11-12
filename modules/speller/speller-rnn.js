@@ -1,7 +1,6 @@
 import RNN from "neuron/modules/rnn.js";
 import { initWebGPU } from "neuron/modules/gpu/context.js";
 import schema from "./schema.js";
-import { tpcToSpelledPitch } from "./key-tpc.js";
 import { decodePredictions, encode } from "./sequence-encoder.js";
 
 /**

@@ -1,0 +1,47 @@
+{
+  "version": "5",
+  "specifiers": {
+    "jsr:@std/assert@1": "1.0.13",
+    "jsr:@std/internal@^1.0.6": "1.0.14"
+  },
+  "jsr": {
+    "@std/assert@1.0.13": {
+      "integrity": "ae0d31e41919b12c656c742b22522c32fb26ed0cba32975cb0de2a273cb68b29",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
+    },
+    "@std/internal@1.0.14": {
+      "integrity": "291516b3d4c35024d6ffbc0a9df5bf4c64116e05b50012cf846710152d2ffdf7"
+    }
+  },
+  "remote": {
+    "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.7/modules/weak-cache.js": "197faeaf5949d13a912f380bc4c61542ca4c943d35b4233b0fdfbaebfa8e3992",
+    "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.8/modules/arg.js": "8886e09cb323fe28f0018ab831780a8cf7089afdcd95ad71e3060031ba28f447",
+    "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.8/modules/cache-by-key.js": "68b573b3adeb9765e5ba6d51088d180bbaa858fa285ba95d2793a6ff23eec594",
+    "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.8/modules/cache.js": "4d3740689a7e614161822360282d678b19a022f3368eaff902593437f37f33f0",
+    "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.8/modules/curry.js": "4761de84cb05e2d916e3d5363383d98c02dc2025e04fbd52b7d1b4314aed3a53",
+    "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.8/modules/get.js": "e7c7d9d3eb4d4e74185b1c29feb8559c65466a03545237c20e38630132add474",
+    "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.8/modules/id.js": "9c90e26a082d67afdeb83fb64bd795c469f317dca5850c404d6a6f0aa82331dc",
+    "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.8/modules/insert.js": "9bd803f0027bfa11ea782b1b6f2d8c9bf54f4ea693c188525caf534830e694a8",
+    "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.8/modules/matches.js": "58e93677c938f140acd0f5c2e2254e565af0439b781c30e2446574b194b5bd1b",
+    "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.8/modules/mod.js": "1d6c2c141c1104158942106de8b1f979e9ba17bc5bbdec6f7b9b3fe746560d19",
+    "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.8/modules/noop.js": "3be7f93ead642d9f6bc860649ba683cf6d47e37fe7c63c6c8e17c3187140ba96",
+    "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.8/modules/nothing.js": "a630a4e99485f66dceef4f6bcadf2ba933fa7b43968ee6467ddfd34445460be1",
+    "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.8/modules/overload.js": "92a50c40abda323cc5bcbbeb8b69845c11fcc6606bc0dcd8fc914787e2f41891",
+    "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.8/modules/parse-value.js": "a623223347434ca36f66bceb35f0348e75d5a008d7cc1e2e9661b49d80563068",
+    "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.8/modules/remove.js": "1bde0421594633d8af4fdd7859c5ce1229eafb59395756c540a417f431bcebc5",
+    "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.8/modules/self.js": "c0208917a31ade85516ce45834e5bde94688f28f1bf821c867fd7f863a14af68",
+    "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.8/modules/slugify.js": "d9bdfd7c1225560fcf9f8f9c2d2be24c39fd7a3fd622f6a9c3dafedbc14e5560",
+    "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.8/modules/to-db.js": "3707fc83bda901ff47db16e2a46ef6d17289a559c2e3cb1318e8f0e0a25cb20f",
+    "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.8/modules/to-gain.js": "6da427e9d82ee282496bb6cbb0bcbe657f279a89ac054e3fba9847a674a91b45",
+    "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.8/modules/note.js": "0294710bcf1cb7ed5319659a1c1b4f06c150669e2d03b8ac9a283db0a527183e"
+  },
+  "workspace": {
+    "links": {
+      "npm:dom@1.3.1": {},
+      "npm:fn@1.5.7": {},
+      "npm:midi@1.0.0": {}
+    }
+  }
+}
