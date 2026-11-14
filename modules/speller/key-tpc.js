@@ -55,11 +55,36 @@ export function tpcToAccClass(n) {
   return accOffset + ACC_OFFSET;
 }
 
+// Precomputed [NUM_ACCIDENTALS x 12] lookup table: (accClass * 12 + pc) -> tpc in [-15..19]
+const ACC_PC_TO_TPC = new Int8Array(NUM_ACCIDENTALS * 12);
+for (let accClass = 0; accClass < NUM_ACCIDENTALS; accClass++) {
+  for (let pc = 0; pc < 12; pc++) {
+    let bestTpc = 0;
+    let bestDist = Infinity;
+
+    for (let tpc = -15; tpc <= 19; tpc++) {
+      if ((((tpc * 7) % 12) + 12) % 12 === pc) {
+        const candidateAccClass = Math.floor((tpc + 1) / 7) + ACC_OFFSET;
+        const dist = Math.abs(candidateAccClass - accClass);
+        // Break ties by distance from D (tpc = 2), the geometric centre of the C-major
+        // white notes [-1..5] (F..B) and of key-signature closeness (G=+1 has F#, D=+2 has
+        // F#+C#). Around D, C# (+5), Eb (-5), F# (+4) and Bb (-4) fall closest, leaving
+        // Ab (-6) and G# (+6) equidistant at the antipode.
+        if (dist < bestDist || (dist === bestDist && Math.abs(tpc - 2) < Math.abs(bestTpc - 2))) {
+          bestDist = dist;
+          bestTpc = tpc;
+        }
+      }
+    }
+
+    ACC_PC_TO_TPC[accClass * 12 + pc] = bestTpc;
+  }
+}
+
 /**
  * Maps 0-based accidental class index (0 to 4) and MIDI note / pitch class
- * back to the exact Line-of-Fifths TPC coordinate (-15 to +19).
- * If the predicted accidental bucket does not contain a spelling for the given
- * pitch class, snaps to the nearest valid accidental bucket for that pitch class.
+ * back to the exact Line-of-Fifths TPC coordinate (-15 to +19) in O(1) via
+ * precomputed lookup table.
  */
 export function accidentalToTpc(accClass, midi) {
   if (accClass < 0 || accClass >= NUM_ACCIDENTALS) {
@@ -67,26 +92,7 @@ export function accidentalToTpc(accClass, midi) {
   }
   const midiNum = typeof midi === "string" ? toNoteNumber(midi) : midi;
   const pc = ((midiNum % 12) + 12) % 12;
-
-  let bestTpc = 0;
-  let bestDist = Infinity;
-
-  for (let tpc = -15; tpc <= 19; tpc++) {
-    if ((((tpc * 7) % 12) + 12) % 12 === pc) {
-      const candidateAccClass = Math.floor((tpc + 1) / 7) + ACC_OFFSET;
-      const dist = Math.abs(candidateAccClass - accClass);
-      // Break ties by distance from D (tpc = 2), the geometric centre of the C-major
-      // white notes [-1..5] (F..B) and of key-signature closeness (G=+1 has F#, D=+2 has
-      // F#+C#). Around D, C# (+5), Eb (-5), F# (+4) and Bb (-4) fall closest, leaving
-      // Ab (-6) and G# (+6) equidistant at the antipode.
-      if (dist < bestDist || (dist === bestDist && Math.abs(tpc - 2) < Math.abs(bestTpc - 2))) {
-        bestDist = dist;
-        bestTpc = tpc;
-      }
-    }
-  }
-
-  return bestTpc;
+  return ACC_PC_TO_TPC[accClass * 12 + pc];
 }
 
 const letters = ["F", "C", "G", "D", "A", "E", "B"];

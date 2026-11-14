@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../fonts/petaluma.css"],
+  "sourcesContent": ["\n@font-face {\n    font-family: PetalumaText;\n    src: url('../fonts/Petaluma/redist/woff/PetalumaScript.woff2') format('woff2');\n    font-weight: normal;\n    font-style: normal;\n}\n\n@font-face {\n    font-family: Petaluma;\n    src: url('../fonts/Petaluma/redist/woff/Petaluma.woff2') format('woff2');\n    font-weight: normal;\n    font-style: normal;\n}\n\n.petaluma-font {\n    font-family: Petaluma, PetalumaText;\n}\n"],
+  "mappings": ";;;;AACA,WACI,YAAa,aACb,IAAK,2DAA0D,OAAO,SACtE,YAAa,IACb,WAAY,MAChB,CAEA,WACI,YAAa,SACb,IAAK,qDAAoD,OAAO,SAChE,YAAa,IACb,WAAY,MAChB,CAEA,CAAC,cACG,YAAa,QAAQ,CAAE,YAC3B",
+  "names": []
+}

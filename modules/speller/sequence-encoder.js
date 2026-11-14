@@ -83,7 +83,7 @@ function writeStepFeatures(features, offset, pitchClass, durBucket, deltaBucket,
  *
  * @param {Array} events - Array of Sequence events
  * @param {Object} [options] - Optional configuration (e.g. initialKey)
- * @returns {Object} { features: Float32Array, noteCount: number, initialKey: number, notes: Array }
+ * @returns {Object} { features: Float32Array, noteCount: number, initialKey: number, notes: Array, noteKeys: Array }
  */
 export function encode(events, options = {}) {
     let initialKey = options.initialKey !== undefined
@@ -97,18 +97,32 @@ export function encode(events, options = {}) {
     let T = 0;
 
     for (const e of list) {
-        const type = e.type || e[1];
-        if (type === "key" || type === 5) {
+        if (e.type === "key") {
             const keyVal = e[2];
             currentKey = typeof keyVal === "number" ? keyVal : toKeyNumber(keyVal);
             if (initialKey === null) {
                 initialKey = currentKey;
             }
-        } else if (type === "note" || type === 2) {
+        } else if (e.type === "note") {
+            let j = notes.length;
             notes.push(e);
             noteKeys.push(currentKey);
+            while (
+                j > 0 &&
+                notes[j - 1].type === "note" &&
+                e[0] - notes[j - 1][0] < 1 / 16 &&
+                e[2] < notes[j - 1][2]
+            ) {
+                notes[j] = notes[j - 1];
+                noteKeys[j] = noteKeys[j - 1];
+                j--;
+            }
+            if (j < notes.length - 1) {
+                notes[j] = e;
+                noteKeys[j] = currentKey;
+            }
             T += 1;
-        } else if (type === "chord" || type === 7) {
+        } else if (e.type === "chord") {
             const hsid = typeof e[3] === "number" ? e[3] : toChordHSID(e[3]);
             const numbers = HSID.toNumbers(hsid);
             notes.push(e);
@@ -132,13 +146,12 @@ export function encode(events, options = {}) {
 
     for (let i = 0; i < notes.length; i++) {
         const event = notes[i];
-        const type = event.type || event[1];
         const beat = Number(event[0]);
         const duration = Number(event[4]);
         const durBucket = durationToBucketIndex(duration);
         const keyClass = inKeyToClass(noteKeys[i]);
 
-        if (type === "chord" || type === 7) {
+        if (event.type === "chord") {
             const root = typeof event[2] === "number" ? event[2] : toRootNumber(event[2]);
             const hsid = typeof event[3] === "number" ? event[3] : toChordHSID(event[3]);
             const numbers = HSID.toNumbers(hsid);
@@ -169,6 +182,7 @@ export function encode(events, options = {}) {
         noteCount: T,
         initialKey,
         notes,
+        noteKeys,
     };
 }
 
@@ -199,7 +213,7 @@ export function encodeTargets(annotatedNotes) {
  * Decodes model prediction class indices [T] back to note names and TPC coordinates
  *
  * @param {Uint32Array|Array} accidentals - Predicted accidental class indices [0..4]
- * @param {Uint32Array|Array} [keys=null] - Predicted key class indices [0..24]
+ * @param {Uint32Array|Array} keys - Predicted key class indices [0..24]
  * @param {Array} notes - Original note and chord events
  * @returns {Array} Array of events with assigned spelling properties
  */
@@ -208,9 +222,8 @@ export function decodePredictions(accidentals, keys, notes) {
     let t = 0;
     while (++i < notes.length) {
         const event = notes[i];
-        const type  = event.type || event[1];
 
-        if (type === "chord" || type === 7) {
+        if (event.type === "chord") {
             const root      = typeof event[2] === "number" ? event[2] : toRootNumber(event[2]);
             const hsid      = typeof event[3] === "number" ? event[3] : toChordHSID(event[3]);
             const numbers   = HSID.toNumbers(hsid);

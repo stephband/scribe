@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../fonts/broadway.css"],
+  "sourcesContent": ["\n@font-face {\n    font-family: BroadwayText;\n    src: url('../fonts/BroadwayText/finalebroadwaytext-webfont.woff2') format('woff2');\n    font-weight: normal;\n    font-style: normal;\n}\n\n@font-face {\n    font-family: Broadway;\n    src: url('../fonts/Broadway/finalebroadway-webfont.woff2') format('woff2');\n    font-weight: normal;\n    font-style: normal;\n}\n\n.broadway-font {\n    font-family: Broadway, BroadwayText;\n}\n"],
+  "mappings": ";;;;AACA,WACI,YAAa,aACb,IAAK,+DAA8D,OAAO,SAC1E,YAAa,IACb,WAAY,MAChB,CAEA,WACI,YAAa,SACb,IAAK,uDAAsD,OAAO,SAClE,YAAa,IACb,WAAY,MAChB,CAEA,CAAC,cACG,YAAa,QAAQ,CAAE,YAC3B",
+  "names": []
+}

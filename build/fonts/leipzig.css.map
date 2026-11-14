@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../fonts/leipzig.css"],
+  "sourcesContent": ["\n@font-face {\n    font-family: Leipzig;\n    src: url('../fonts/Leipzig/Leipzig.woff2') format('woff2');\n    font-weight: normal;\n    font-style: normal;\n}\n\n.leipzig-font {\n    font-family: Leipzig;\n}\n"],
+  "mappings": ";;;;AACA,WACI,YAAa,QACb,IAAK,uCAAsC,OAAO,SAClD,YAAa,IACb,WAAY,MAChB,CAEA,CAAC,aACG,YAAa,OACjB",
+  "names": []
+}

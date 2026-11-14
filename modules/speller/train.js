@@ -103,7 +103,7 @@ for (const [name, seq] of Object.entries(sequences)) {
     const enc = encode(seq, { initialKey });
     if (!enc.noteCount) continue;
 
-    const targets = enc.notes.map((n) => {
+    const targets = enc.notes.map((n, i) => {
         const { expectedKey, expectedSpelling } = parseExpected(n);
         const spelling = expectedSpelling ?? n.pitchSpelling ?? n.spelling ?? n[2];
         const tpc = typeof spelling === "number"
@@ -111,7 +111,7 @@ for (const [name, seq] of Object.entries(sequences)) {
             : toKeyNumber(String(spelling).replace(/\d+$/, ""));
         const keyCoord = expectedKey !== undefined && expectedKey !== null
             ? (typeof expectedKey === "number" ? expectedKey : toKeyNumber(expectedKey))
-            : initialKey;
+            : (enc.noteKeys[i] ?? enc.initialKey);
         return { tpc, key: keyCoord };
     });
 
@@ -199,7 +199,7 @@ console.log(
 // 5. Serialize Trained Weights
 console.log("\n5. Serializing Trained Weights...");
 const binary32 = serializeWeights(network, 32);
-const bin32Path = new URL("./speller-weights-32b.bin", import.meta.url);
+const bin32Path = new URL("./speller-weights-32b.local.bin", import.meta.url);
 await Deno.writeFile(bin32Path, binary32);
 console.log(
     `   ✓ Exported Float32 binary weights: ${bin32Path.pathname} (${
@@ -208,7 +208,7 @@ console.log(
 );
 
 const binary8 = serializeWeights(network, 8);
-const bin8Path = new URL("./speller-weights-8b.bin", import.meta.url);
+const bin8Path = new URL("./speller-weights-8b.local.bin", import.meta.url);
 await Deno.writeFile(bin8Path, binary8);
 console.log(
     `   ✓ Exported Int8 binary weights:    ${bin8Path.pathname} (${

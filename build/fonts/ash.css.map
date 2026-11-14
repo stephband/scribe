@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../fonts/ash.css"],
+  "sourcesContent": ["\n@font-face {\n    font-family: AshText;\n    src: url('../fonts/AshText/finaleashtext-webfont.woff2') format('woff2');\n    font-weight: normal;\n    font-style: normal;\n}\n\n@font-face {\n    font-family: Ash;\n    src: url('../fonts/Ash/finaleash-webfont.woff2') format('woff2');\n    font-weight: normal;\n    font-style: normal;\n}\n\n.ash-font {\n    font-family: Ash, AshText;\n}\n"],
+  "mappings": ";;;;AACA,WACI,YAAa,QACb,IAAK,qDAAoD,OAAO,SAChE,YAAa,IACb,WAAY,MAChB,CAEA,WACI,YAAa,IACb,IAAK,6CAA4C,OAAO,SACxD,YAAa,IACb,WAAY,MAChB,CAEA,CAAC,SACG,YAAa,GAAG,CAAE,OACtB",
+  "names": []
+}
