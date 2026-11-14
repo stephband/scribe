@@ -12,15 +12,15 @@ for (let c = 0; c < NUM_KEYS; c++) {
  *
  * Defines the complete structural topology for both CPU and WebGPU Spellers:
  * - 39-dim Sequence note event feature input (12 pitch class + 4 duration + 8 delta + 15 key)
- * - 2-layer stacked bidirectional GRU (Layer 0 hiddenDim = 24, Layer 1 hiddenDim = 8)
+ * - 2-layer stacked bidirectional GRU (Layer 0 hiddenDim = 32, Layer 1 hiddenDim = 12)
  * - Multi-task Head 1: Local key classification (layer 0, 25 classes [-12..12], weight 0.3, simplicity prior)
  * - Multi-task Head 2: Accidental spelling classification (layer 1, 5 classes [𝄫, ♭, ♮, ♯, 𝄪], weight 1.0)
  */
 export default {
     inDim: FEATURE_DIM,
     layers: [
-        { hiddenDim: 24, bidirectional: true },
-        { hiddenDim: 8,  bidirectional: true },
+        { hiddenDim: 32, bidirectional: true },
+        { hiddenDim: 12, bidirectional: true },
     ],
     heads: [{
         name: "key",

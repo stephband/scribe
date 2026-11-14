@@ -15,9 +15,9 @@ export default {
     swingAsStraight16ths: false,
 
     // Accent thresholds
-    marcatoThreshold: parseGain('-6dB'),
-    accentThreshold:  parseGain('-12dB'),
-    ghostThreshold:   parseGain('-30dB'),
+    marcatoThreshold: parseGain('-3dB'),  // MIDI 107 (GM2 square law)
+    accentThreshold:  parseGain('-6dB'),  // MIDI 90
+    ghostThreshold:   parseGain('-30dB'), // MIDI 23
 
     // Ratio of note duration below which a shorter note duration is displayed
     durationThreshold: GR,

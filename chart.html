@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- This document is a basic web page set up as a music chart -->
+    <title>My Tune</title>
+
+    <meta charset="utf-8" />
+    <meta name="author" content="" />
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width" />
+
+    <script type="importmap">{
+        "imports": {
+            "bolt/":     "/bolt/",
+            "dom/":      "/dom/modules/",
+            "fn/":       "/fn/modules/",
+            "midi/":     "/midi/modules/",
+            "neuron/":   "/neuron/",
+            "sequence/": "/sequence/"
+        }
+    }</script>
+
+    <!-- Import <scribe-music> -->
+    <link rel="stylesheet" href="./scribe-music/element.css" />
+    <script type="module" src="./scribe-music/element.js"></script>
+
+    <!-- CSS Style rules -->
+    <style>
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@1.x/classes/atoms.css';
+    @import './module.css';
+
+    * {
+        box-sizing: border-box;
+    }
+
+    html {
+        height: 100%;
+    }
+
+    body {
+        font-family: system-ui, sans-serif;
+        margin: 0;
+        padding: 1em 1.5em 0.5em;
+        min-height: 100%;
+        display: flex;
+        flex-direction: column;
+
+        --selection-fg: oklch(0.64 0.15 203.61);
+        --zone-duration: 0.5;
+    }
+
+    body > footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 2;
+    }
+
+    header {
+        font-family: JazzText, cursive;
+        display: grid;
+        grid-template-columns: [part] auto [title] 1fr [credits] auto;
+        align-items: last baseline;
+    }
+
+    header > * {
+        margin: 0;
+        grid-row: 1;
+    }
+
+    header > .title {
+        font-size: 3em;
+        grid-column: title;
+        justify-self: center;
+        text-align: center;
+    }
+
+    header > .part {
+        grid-column: part;
+        justify-self: start;
+        text-align: left;
+    }
+
+    header > .credit {
+        grid-column: credit;
+        justify-self: end;
+        text-align: right;
+    }
+
+    footer {
+        font-size: 0.625em;
+        margin-top: auto;
+        padding-bottom: 0.5em;
+        background-color: white;
+    }
+
+    a {
+        color: oklch(0.6 0.27 1.54);
+        text-decoration: none;
+    }
+
+    /* For a more classic look... */
+    /*@import 'https://cdn.jsdelivr.net/gh/stephband/scribe@0.4.x/build/fonts/bravura.css';
+
+    header {
+      font-family: BravuraText, serif;
+    }
+
+    scribe-music {
+      font-family: Bravura, BravuraText;
+    }*/
+    </style>
+
+    <script type="module">
+        function update() {
+            const params = new URLSearchParams(window.location.search);
+            const src    = params.get('sequence');
+            const music  = document.getElementById('music');
+            const title  = document.getElementById('title');
+
+            if (src && music.src !== src) music.src = src;
+
+            const grep = /\/([\w\s-]+)\.\w+$/.exec(src);
+            title.textContent = grep[1];
+
+            setTimeout(() => {
+                const sequence = music.data;
+            }, 300);
+        }
+
+        // Browser navigation & URL changes
+        window.addEventListener('popstate', update);
+        window.addEventListener('hashchange', update);
+
+        if (window.navigation) {
+            window.navigation.addEventListener('currententrychange', update);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', update);
+        }
+        else {
+            update();
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1 class="title" id="title">Chords data</h1>
+        <p class="part"></p>
+        <p class="credit"></p>
+    </header>
+
+    <scribe-music id="music"></scribe-music>
+</body>
+</html>

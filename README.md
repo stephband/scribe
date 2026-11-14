@@ -202,6 +202,7 @@ detector and employs subgrids for multi-stave scoring
 - Elastic Phase-Locked Metrical Quantiser for better rhythm detection
 - Automatic staccato and tenuto accents based on duration
 - Automatic ghost, emphasis and marcato accents based on dynamics
+- Meter events carry divisions, previously divisions were inferred
 
 ### 0.5 – Clean up
 

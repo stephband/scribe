@@ -1,7 +1,7 @@
 import floorPow2 from "sequence/modules/number/floor-pow-2.js";
 import { toKeyNumber } from "sequence/modules/event/key.js";
 import { toChordHSID, toChordName } from "sequence/modules/event/chord.js";
-import { hsidToNumbers } from "sequence/modules/harmony/hsid.js";
+import * as HSID from "sequence/modules/hsid.js";
 import { toNoteNumber, toRootNumber } from "midi/note.js";
 import { accidentalToTpc, classToKey, inKeyToClass, keyToClass, NUM_IN_KEYS, tpcToAccClass, tpcToSpelledPitch, tpcToSpelledRoot } from "./key-tpc.js";
 
@@ -11,16 +11,16 @@ const rslashextension = /^\{(\d{1,2})\}/;
 
 /**
  * Maps arbitrary continuous duration in beats to a 4-bucket index [0..3]:
- * - Bucket 0: 1/16 beat (64th note and shorter)
- * - Bucket 1: 1/8 beat  (32nd note)
- * - Bucket 2: 1/4 beat  (16th note)
- * - Bucket 3: >= 1/2 beat (8th note and longer)
+ * - Bucket 0: <= 1/4 beat (16th note and shorter)
+ * - Bucket 1: 1/2 beat    (8th note)
+ * - Bucket 2: 1 beat      (quarter note)
+ * - Bucket 3: >= 2 beats  (half note and longer)
  */
 export function durationToBucketIndex(duration) {
     const floored = floorPow2(duration);
-    const clamped = Math.max(1 / 16, Math.min(1 / 2, floored));
+    const clamped = Math.max(1/4, Math.min(2, floored));
     const exp = Math.round(Math.log2(clamped));
-    return exp + 4; // exp in [-4..-1] -> index in [0..3]
+    return exp + 2; // exp in [-2..1] -> index in [0..3]
 }
 
 /**
@@ -44,11 +44,40 @@ export function deltaToBucketIndex(delta) {
 }
 
 /**
+ * Encodes a single step into the preallocated feature matrix.
+ * - [0..11]:  One-hot pitch class (12)
+ * - [12..15]: Thermometer duration buckets (4: <= 1/4 to >= 2)
+ * - [16..23]: Simultaneous flag (16) + thermometer delta timing (17..23: 1/16 to >= 4)
+ * - [24..38]: One-hot key signature (15, C♭=-7 to C♯=+7)
+ */
+function writeStepFeatures(features, offset, pitchClass, durBucket, deltaBucket, keyClass) {
+    // 1. One-hot pitch class: features 0..11
+    features[offset + pitchClass] = 1.0;
+
+    // 2. Thermometer 4-bucket duration: features 12..15
+    for (let b = 0; b <= durBucket; b++) {
+        features[offset + 12 + b] = 1.0;
+    }
+
+    // 3. Simultaneous flag (16) or cumulative 7-bucket delta thermometer (17..23)
+    if (deltaBucket === 0) {
+        features[offset + 16] = 1.0;
+    } else {
+        for (let b = 1; b <= deltaBucket; b++) {
+            features[offset + 16 + b] = 1.0;
+        }
+    }
+
+    // 4. One-hot 15-class current key signature: features 24..38
+    features[offset + 24 + keyClass] = 1.0;
+}
+
+/**
  * Encodes a sequence of events into numeric feature matrices for the BiGRU network:
  * - D_in = 39 dimensions:
  *   - [0..11]:  One-hot Pitch Class (12)
- *   - [12..15]: One-hot Duration Buckets (4: 1/16 to 1/2)
- *   - [16..23]: One-hot Inter-Onset Delta Timing (8: 0, 1/16 to 4)
+ *   - [12..15]: Thermometer Duration Buckets (4: <= 1/4 to >= 2)
+ *   - [16..23]: Simultaneous Flag + Thermometer Inter-Onset Delta Timing (8: 0, 1/16 to 4)
  *   - [24..38]: One-hot Current Key Signature (15, C♭=-7 to C♯=+7)
  * - Meter-agnostic & Octave-invariant.
  *
@@ -81,7 +110,7 @@ export function encode(events, options = {}) {
             T += 1;
         } else if (type === "chord" || type === 7) {
             const hsid = typeof e[3] === "number" ? e[3] : toChordHSID(e[3]);
-            const numbers = hsidToNumbers(hsid);
+            const numbers = HSID.toNumbers(hsid);
             notes.push(e);
             noteKeys.push(currentKey);
             T += numbers.length;
@@ -112,25 +141,13 @@ export function encode(events, options = {}) {
         if (type === "chord" || type === 7) {
             const root = typeof event[2] === "number" ? event[2] : toRootNumber(event[2]);
             const hsid = typeof event[3] === "number" ? event[3] : toChordHSID(event[3]);
-            const numbers = hsidToNumbers(hsid);
+            const numbers = HSID.toNumbers(hsid);
 
             for (let k = 0; k < numbers.length; k++) {
                 const pitchClass = (((root + numbers[k]) % 12) + 12) % 12;
-                const offset = t * FEATURE_DIM;
-
-                // 1. One-hot pitch class: features 0..11
-                features[offset + pitchClass] = 1.0;
-
-                // 2. One-hot 4-bucket duration: features 12..15
-                features[offset + 12 + durBucket] = 1.0;
-
-                // 3. One-hot 8-bucket inter-onset delta timing: features 16..23
                 const delta = t === 0 ? 0.0 : Math.max(0.0, beat - prevBeat);
                 const deltaBucket = deltaToBucketIndex(delta);
-                features[offset + 16 + deltaBucket] = 1.0;
-
-                // 4. One-hot 15-class current key signature: features 24..38
-                features[offset + 24 + keyClass] = 1.0;
+                writeStepFeatures(features, t * FEATURE_DIM, pitchClass, durBucket, deltaBucket, keyClass);
 
                 prevBeat = beat;
                 t++;
@@ -138,21 +155,9 @@ export function encode(events, options = {}) {
         } else {
             const midi = typeof event[2] === "number" ? event[2] : toNoteNumber(event[2]);
             const pitchClass = ((midi % 12) + 12) % 12;
-            const offset = t * FEATURE_DIM;
-
-            // 1. One-hot pitch class: features 0..11
-            features[offset + pitchClass] = 1.0;
-
-            // 2. One-hot 4-bucket duration: features 12..15
-            features[offset + 12 + durBucket] = 1.0;
-
-            // 3. One-hot 8-bucket inter-onset delta timing: features 16..23
             const delta = t === 0 ? 0.0 : Math.max(0.0, beat - prevBeat);
             const deltaBucket = deltaToBucketIndex(delta);
-            features[offset + 16 + deltaBucket] = 1.0;
-
-            // 4. One-hot 15-class current key signature: features 24..38
-            features[offset + 24 + keyClass] = 1.0;
+            writeStepFeatures(features, t * FEATURE_DIM, pitchClass, durBucket, deltaBucket, keyClass);
 
             prevBeat = beat;
             t++;
@@ -208,7 +213,7 @@ export function decodePredictions(accidentals, keys, notes) {
         if (type === "chord" || type === 7) {
             const root      = typeof event[2] === "number" ? event[2] : toRootNumber(event[2]);
             const hsid      = typeof event[3] === "number" ? event[3] : toChordHSID(event[3]);
-            const numbers   = hsidToNumbers(hsid);
+            const numbers   = HSID.toNumbers(hsid);
             const extension = event.extension ?? toChordName(hsid);
             const slashext  = rslashextension.exec(extension);
             const tpc       = accidentalToTpc(accidentals[t], root);

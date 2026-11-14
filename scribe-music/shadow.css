@@ -119,14 +119,16 @@
 }
 
 /* Multi-part scores: 3em row-gap between systems */
-:host:has(music-bar > music-stave:nth-of-type(2)),
-:host(:has(music-bar > music-stave:nth-of-type(2))),
+:host([parts]),
+:host(.parts),
 .scribe:has(music-bar > music-stave:nth-of-type(2)) {
-    row-gap: 3em;
+    row-gap: var(--row-gap, 3em);
 }
 
 :host > .side,
-.scribe > .side {
+:host > header,
+.scribe > .side,
+.scribe > header {
     position: absolute !important;
     top: 0 !important;
     bottom: 0 !important;

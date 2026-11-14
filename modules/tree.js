@@ -37,8 +37,8 @@ export default async function requestTree(sequence, parts = sequence.parts, key,
         Transform.from(array) :
         Transform.identity ;
 
-    // Create iterator from sequence, transform, startBeat, stopBeat
-    const iterator = new SequenceIterator(sequence, transform, 0, beat + duration);
+    // Create iterator from sequence, transform, startBeat, stopBeat, sequences, settings
+    const iterator = new SequenceIterator(sequence, transform, 0, beat + duration, undefined, { outputInBeats: true });
 
     // Ingest sequence into tree of bars, parts and spellables
     const tree = read(settings, iterator, parts, keyEvent, meterEvent, beat);

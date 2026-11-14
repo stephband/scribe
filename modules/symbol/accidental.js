@@ -37,7 +37,7 @@ function createAccidental(voice, accidentals, beat, note, clump, cluster) {
 }
 
 function getAccidentalAboveRowAtBeat(symbols, beat, maxRow) {
-    let n = -1, symbol, row = 0, o;
+    let n = -1, symbol, row = -Infinity, o;
     while (symbol = symbols[++n]) if (
         symbol.type === 'acci'
         && symbol.beat === beat
@@ -73,7 +73,7 @@ export function createAccidentals(symbols, voice, accidentals, beat, notes) {
         above = getAccidentalAboveRowAtBeat(symbols, beat, note.row);
 
         // Is any new accidental part of a clump
-        clump = above && above.row - note.row < 6 ?
+        clump = above && note.row - above.row < 6 ?
             above.cluster === cluster ?
                 above.clump + 1 :
                 0 :

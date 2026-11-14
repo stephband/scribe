@@ -75,7 +75,11 @@ export function accidentalToTpc(accClass, midi) {
     if ((((tpc * 7) % 12) + 12) % 12 === pc) {
       const candidateAccClass = Math.floor((tpc + 1) / 7) + ACC_OFFSET;
       const dist = Math.abs(candidateAccClass - accClass);
-      if (dist < bestDist || (dist === bestDist && Math.abs(tpc) < Math.abs(bestTpc))) {
+      // Break ties by distance from D (tpc = 2), the geometric centre of the C-major
+      // white notes [-1..5] (F..B) and of key-signature closeness (G=+1 has F#, D=+2 has
+      // F#+C#). Around D, C# (+5), Eb (-5), F# (+4) and Bb (-4) fall closest, leaving
+      // Ab (-6) and G# (+6) equidistant at the antipode.
+      if (dist < bestDist || (dist === bestDist && Math.abs(tpc - 2) < Math.abs(bestTpc - 2))) {
         bestDist = dist;
         bestTpc = tpc;
       }

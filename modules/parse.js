@@ -18,6 +18,11 @@ function fromTheSession(object) {
 }
 
 export default function parseSource(type, source) {
+    // source is an ArrayBuffer or binary view (e.g. MIDI)
+    if (source instanceof ArrayBuffer || ArrayBuffer.isView(source)) {
+        return Sequence.from(source);
+    }
+
     // source is an object
     if (typeof source === 'object') {
         // source is json from api.github.com/gists/

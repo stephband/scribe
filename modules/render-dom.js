@@ -70,6 +70,15 @@ export function renderStyle(element, root = element) {
     const sig = root.querySelector('.side music-sig');
     const hasPartNames = Boolean(sig && sig.querySelectorAll('.part-name').length > 0 && sig.querySelectorAll('music-stave').length > 1);
     const labelWidth = hasPartNames ? 'var(--signature-label) + var(--signature-gap) + ' : '';
+    const hasMultipleParts = Boolean(
+        root.querySelector('music-bar > music-stave:nth-of-type(2)') ||
+        root.querySelector('.side music-stave:nth-of-type(2)')
+    );
+
+    if (element && element.toggleAttribute) {
+        element.toggleAttribute('parts', hasMultipleParts);
+    }
+
     return `
         --head-1-size:       ${ truncate(6, head1Width / fontSize) };
         --head-2-size:       ${ truncate(6, head2Width / fontSize) };
@@ -81,6 +90,7 @@ export function renderStyle(element, root = element) {
         --signature-label:   ${ hasPartNames ? '0.3125em' : '0em' };
         --signature-gap:     ${ hasPartNames ? '0.1875em' : '0em' };
         --signature-width:   calc(${ labelWidth }${ (0.25 + 2.375 + count * 0.625 + 0.5).toFixed(6) }em);
+        row-gap:             ${ hasMultipleParts ? 'var(--row-gap, 3em)' : 'var(--row-gap, 0)' };
     `;               // label and gap | margin | clef | accidentals | margin
 }
 

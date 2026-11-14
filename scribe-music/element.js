@@ -341,14 +341,17 @@ export default define(element('scribe-music', {
                 const type = this.type
                     || (/\.sequence(?:\?.*)?$/i.test(url.pathname) ? 'sequence' : undefined)
                     || (/\.abc(?:\?.*)?$/i.test(url.pathname) ? 'text/x-abc' : undefined)
+                    || (/\.midi?(?:\?.*)?$/i.test(url.pathname) ? 'audio/midi' : undefined)
                     || 'application/json';
+
+                const isBinary = type === 'audio/midi' || type === 'midi';
 
                 fetch(url)
                 .then((response) => {
                     if (!response.ok) throw new Error(`${ response.status } ${ response.statusText } "${ url.href }"`);
-                    return response.text();
+                    return isBinary ? response.arrayBuffer() : response.text();
                 })
-                .then((text) => this.data = parse(type, text))
+                .then((data) => this.data = parse(type, data))
                 .catch((error) => console.error(error));
             }
         },
