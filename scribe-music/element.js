@@ -109,6 +109,7 @@ export default define(element('scribe-music', {
             shadow.querySelectorAll('.side, .bar').forEach(remove);
             shadow.appendChild(fragment);
             internals.style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
+            this.dispatchEvent(new CustomEvent('render'));
 
             // DEBUG
 /*

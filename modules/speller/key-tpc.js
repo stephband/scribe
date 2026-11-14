@@ -11,13 +11,13 @@ export const NUM_ACCIDENTALS = 5; // -2 (𝄫), -1 (♭), 0 (♮), +1 (♯), +2 
 export const ACC_OFFSET = 2;      // Index = accOffset + 2 in [0..4]
 
 /**
- * Maps input Key signature coordinate (-7 to +7) to 0-based feature index (0 to 14)
+ * Maps input Key signature coordinate (-7 to +7) to 0-based feature index (0 to 14).
+ * Enharmonically wraps coordinates outside [-7, 7] (e.g. G♯ = +8 -> A♭ = -4) by 12.
  */
 export function inKeyToClass(n) {
-  const num = typeof n === "number" ? n : toKeyNumber(String(n).replace(/\d+$/, ""));
-  if (num < -7 || num > 7) {
-    throw new Error(`Input key coordinate ${num} outside valid range [-7, 7]`);
-  }
+  let num = typeof n === "number" ? n : toKeyNumber(String(n).replace(/\d+$/, ""));
+  while (num > 7) num -= 12;
+  while (num < -7) num += 12;
   return num + IN_KEY_OFFSET;
 }
 

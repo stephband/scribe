@@ -71,26 +71,26 @@ multi-task prediction heads:
 
 ```
 Inputs per note X_t: [Pitch Class (12), Duration (4), Delta Beat (8), Key (15)] (39 dims)
-                 │                                              │
-                 ▼                                              │
-┌────────────────────────────────────────────────────┐          │
-│ Layer 0: Bidirectional GRU (H_0 = 24 per dir)      │          │
-│ • Output: H0_t = [h_fwd_t ; h_bwd_t] (48 dims)     │          │
-└────────┬───────────────────────────────────┬───────┘          │
-         │                                   │                  │
-         ▼                                   │                  │
-┌────────────────────────────────┐           │                  │
-│ Multi-Task Head 1:             │           │                  │
-│ Local Key Classifier           │           │                  │
-│ (25 classes: D𝄫=-12 to B♯=+12) │           │                  │
-└────────┬───────────────────────┘           │                  │
-         │ P(key_t) (25 dims)                │ H0_t (48 dims)   │ X_t (39 dims)
-         └───────────────────────────────────┼──────────────────┘
-                                             ▼
-                         ┌──────────────────────────────────────┐
-                         │ Concat: [H0_t ; P(key_t) ; X_t]      │
-                         │ (48 + 25 + 39 = 112 dims)            │
-                         └───────────────────┬──────────────────┘
+                 │
+                 ▼
+┌────────────────────────────────────────────────────┐
+│ Layer 0: Bidirectional GRU (H_0 = 24 per dir)      │
+│ • Output: H0_t = [h_fwd_t ; h_bwd_t] (48 dims)     │
+└────────┬───────────────────────────────────┬───────┘
+         │                                   │
+         ▼                                   │
+┌────────────────────────────────┐           │
+│ Multi-Task Head 1:             │           │
+│ Local Key Classifier           │           │
+│ (25 classes: D𝄫=-12 to B♯=+12) │           │
+└────────┬───────────────────────┘           │
+         │ P(key_t) (25 dims)                │ H0_t (48 dims)
+         └───────────────────────────────────┼──────────────────┐
+                                             ▼                  │
+                         ┌──────────────────────────────────────┴─┐
+                         │ Concat: [H0_t ; P(key_t)]              │
+                         │ (48 + 25 = 73 dims)                    │
+                         └───────────────────┬────────────────────┘
                                              ▼
                          ┌──────────────────────────────────────┐
                          │ Layer 1: BiGRU (H_1 = 8 per dir)     │
@@ -115,7 +115,7 @@ Inputs per note X_t: [Pitch Class (12), Duration (4), Delta Beat (8), Key (15)] 
 2. **Layer 0 (Key Tracker)**: A BiGRU ($H_0 = 24$) aggregates harmonic context
    across the timeline. Multi-Task Head 1 projects Layer 0 activations ($48$ dims) to the
    25-class local key distribution ($D\flat\flat = -12$ to $B\sharp = +12$) with simplicity prior.
-3. **Layer 1 (Spelling Classifier)**: A compact BiGRU ($H_1 = 8$) receives the concatenation of Layer 0 hidden states ($48$ dims), Head 1 key probabilities ($25$ dims), and raw note input features ($39$ dims) — $112$ dims total (`concat: ["key", "input"]`) — to resolve individual note spellings. Multi-Task Head 2 projects Layer 1 activations ($16$ dims) to the 5 accidental classes (`𝄫`, `♭`, `♮`, `♯`, `𝄪`), which combine with the note's MIDI pitch class to resolve the exact TPC in $[-15, +19]$.
+3. **Layer 1 (Spelling Classifier)**: A compact BiGRU ($H_1 = 8$) receives the concatenation of Layer 0 hidden states ($48$ dims) and Head 1 key probabilities ($25$ dims) — $73$ dims total (`concat: ["key"]`) — to resolve individual note spellings. Multi-Task Head 2 projects Layer 1 activations ($16$ dims) to the 5 accidental classes (`𝄫`, `♭`, `♮`, `♯`, `𝄪`), which combine with the note's MIDI pitch class to resolve the exact TPC in $[-15, +19]$.
 4. **Loss Function**:
    $$\mathcal{L} = \mathcal{L}_{\text{spelling}} + \lambda_{\text{key}} \mathcal{L}_{\text{key}}$$
    with $\lambda_{\text{key}} = 0.3$ (and full BPTT gradient routing from $\mathcal{L}_{\text{spelling}}$ back through both $H_0$ and the softmax Jacobian of $P(\text{key}_t)$).
@@ -126,9 +126,9 @@ Inputs per note X_t: [Pitch Class (12), Duration (4), Delta Beat (8), Key (15)] 
 | :------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Layer 0 (Context BiGRU)**<br>• Forward GRU<br><br><br><br>• Backward GRU | <br>`layer0_Wih_fwd`<br>`layer0_Whh_fwd`<br>`layer0_bih_fwd`<br>`layer0_bhh_fwd`<br>`layer0_Wih_bwd`<br>`layer0_Whh_bwd`<br>`layer0_bih_bwd`<br>`layer0_bhh_bwd` | <br>$[72 \times 39]$<br>$[72 \times 24]$<br>$[72]$<br>$[72]$<br>$[72 \times 39]$<br>$[72 \times 24]$<br>$[72]$<br>$[72]$       | <br>2,808<br>1,728<br>72<br>72<br>2,808<br>1,728<br>72<br>72     | Processes raw note features ($D_{\text{in}}=39$) across sequence time steps to aggregate broad harmonic context.<br><br>Produces concatenated output:<br>$H_0 = [h_{\text{fwd}} ; h_{\text{bwd}}] \in \mathbb{R}^{48}$ |
 | **Head 1 (Local Key Head)**                                                | `head_key_W`<br>`head_key_b`                                                                                                                                     | $[25 \times 48]$<br>$[25]$                                                                                                     | 1,200<br>25                                                      | Tapped directly from Layer 0 output ($48$ dims). Classifies local key into 25 key coordinates ($-12$ to $+12$)                                                                                                         |
-| **Layer 1 (Tonal BiGRU)**<br>• Forward GRU<br><br><br><br>• Backward GRU   | <br>`layer1_Wih_fwd`<br>`layer1_Whh_fwd`<br>`layer1_bih_fwd`<br>`layer1_bhh_fwd`<br>`layer1_Wih_bwd`<br>`layer1_Whh_bwd`<br>`layer1_bih_bwd`<br>`layer1_bhh_bwd` | <br>$[24 \times 112]$<br>$[24 \times 8]$<br>$[24]$<br>$[24]$<br>$[24 \times 112]$<br>$[24 \times 8]$<br>$[24]$<br>$[24]$       | <br>2,688<br>192<br>24<br>24<br>2,688<br>192<br>24<br>24         | Receives $[H_0 ; P(\text{key}) ; X]$ ($D_{\text{in}}=112$) to resolve individual note spelling ambiguities.<br><br>Produces concatenated output:<br>$H_1 = [h_{\text{fwd}} ; h_{\text{bwd}}] \in \mathbb{R}^{16}$      |
+| **Layer 1 (Tonal BiGRU)**<br>• Forward GRU<br><br><br><br>• Backward GRU   | <br>`layer1_Wih_fwd`<br>`layer1_Whh_fwd`<br>`layer1_bih_fwd`<br>`layer1_bhh_fwd`<br>`layer1_Wih_bwd`<br>`layer1_Whh_bwd`<br>`layer1_bih_bwd`<br>`layer1_bhh_bwd` | <br>$[24 \times 73]$<br>$[24 \times 8]$<br>$[24]$<br>$[24]$<br>$[24 \times 73]$<br>$[24 \times 8]$<br>$[24]$<br>$[24]$         | <br>1,752<br>192<br>24<br>24<br>1,752<br>192<br>24<br>24         | Receives $[H_0 ; P(\text{key})]$ ($D_{\text{in}}=73$) to resolve individual note spelling ambiguities.<br><br>Produces concatenated output:<br>$H_1 = [h_{\text{fwd}} ; h_{\text{bwd}}] \in \mathbb{R}^{16}$            |
 | **Head 2 (Spelling Head)**                                                 | `head_spelling_W`<br>`head_spelling_b`                                                                                                                           | $[5 \times 16]$<br>$[5]$                                                                                                       | 80<br>5                                                          | Tapped from Layer 1 output ($16$ dims). Classifies note accidental into 5 classes (`𝄫`, `♭`, `♮`, `♯`, `𝄪`)                                                                                                            |
-| **Total**                                                                  | **20 tensors**                                                                                                                                                   |                                                                                                                                | **16,134**                                                       | **~63.0 KiB (`Float32`) / ~15.8 KiB (`Int8`)**                                                                                                                                                                         |
+| **Total**                                                                  | **20 tensors**                                                                                                                                                   |                                                                                                                                | **14,262**                                                       | **~55.7 KiB (`Float32`) / ~13.9 KiB (`Int8`)**                                                                                                                                                                         |
 
 ---
 

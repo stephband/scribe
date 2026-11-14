@@ -22,6 +22,55 @@ const heads = [
 
 const counts = { 'F♭': 7, 'C♭': 7, 'G♭': 6, 'D♭': 5, 'A♭': 4, 'E♭': 3, 'B♭': 2, 'F':  1, 'C':  0, 'G':  1, 'D':  2, 'A':  3, 'E':  4, 'B':  5, 'F♯': 6, 'C♯': 7, 'G♯': 7 };
 
+const fontMetricsCache = new Map();
+if (global.document?.fonts) {
+    global.document.fonts.addEventListener('loadingdone', () => fontMetricsCache.clear());
+}
+
+function measureHeadMetrics(element, root) {
+    let cacheKey;
+    if (element && element.nodeType === 1) {
+        const hostStyle = getComputedStyle(element);
+        cacheKey = `${ hostStyle.fontFamily }|${ hostStyle.fontSize }`;
+        const cached = fontMetricsCache.get(cacheKey);
+        if (cached) return cached;
+    }
+
+    // Measure head widths. Be aware that root may be a fragment (a shadow root)
+    // and getComputedStyle() won't work on a fragment
+    root.append.apply(root, heads);
+
+    const head1Width       = rect(heads[0]).width;
+    const head2Width       = rect(heads[1]).width;
+    const head3Width       = rect(heads[2]).width;
+    const headXWidth       = rect(heads[3]).width;
+    const headDiamondWidth = rect(heads[4]).width;
+    const acciFlatWidth    = rect(heads[5]).width;
+    const acciSharpWidth   = rect(heads[6]).width;
+    const computed         = getComputedStyle(heads[0]);
+    const fontSize         = px(computed.fontSize);
+
+    if (global.DEBUG) log('post render font-size', fontSize, 'heads', `${ head1Width }, ${ head2Width }, ${ head3Width }`);
+
+    heads.forEach(remove);
+
+    const metrics = {
+        head1Size:       truncate(6, head1Width / fontSize),
+        head2Size:       truncate(6, head2Width / fontSize),
+        head4Size:       truncate(6, head3Width / fontSize),
+        headXSize:       truncate(6, headXWidth / fontSize),
+        headDiamondSize: truncate(6, headDiamondWidth / fontSize),
+        acciFlatSize:    truncate(6, acciFlatWidth / fontSize),
+        acciSharpSize:   truncate(6, acciSharpWidth / fontSize)
+    };
+
+    if (cacheKey && fontSize > 0 && head1Width > 0) {
+        fontMetricsCache.set(cacheKey, metrics);
+    }
+
+    return metrics;
+}
+
 
 /* Glyphs for triplet mark d d = d 3 d, instead of saying Swing 8ths, for example
 text = glyphs.textNoteShort
@@ -40,23 +89,7 @@ export function remove(element) {
 }
 
 export function renderStyle(element, root = element) {
-    // Measure head widths. Be aware that root may be a fragment (a shadow root)
-    // and getComputedStyle() won't work on a fragment
-    root.append.apply(root, heads);
-
-    const head1Width       = rect(heads[0]).width;
-    const head2Width       = rect(heads[1]).width;
-    const head3Width       = rect(heads[2]).width;
-    const headXWidth       = rect(heads[3]).width;
-    const headDiamondWidth = rect(heads[4]).width;
-    const acciFlatWidth    = rect(heads[5]).width;
-    const acciSharpWidth   = rect(heads[6]).width;
-    const computed         = getComputedStyle(heads[0]);
-    const fontSize         = px(computed.fontSize);
-
-    if (global.DEBUG) log('post render font-size', fontSize, 'heads', `${ head1Width }, ${ head2Width }, ${ head3Width }`);
-
-    heads.forEach(remove);
+    const metrics = measureHeadMetrics(element, root);
 
     // Calculate clef and key signature width
 
@@ -80,13 +113,13 @@ export function renderStyle(element, root = element) {
     }
 
     return `
-        --head-1-size:       ${ truncate(6, head1Width / fontSize) };
-        --head-2-size:       ${ truncate(6, head2Width / fontSize) };
-        --head-4-size:       ${ truncate(6, head3Width / fontSize) };
-        --head-x-size:       ${ truncate(6, headXWidth / fontSize) };
-        --head-diamond-size: ${ truncate(6, headDiamondWidth / fontSize) };
-        --acci-flat-size:    ${ truncate(6, acciFlatWidth / fontSize) };
-        --acci-sharp-size:   ${ truncate(6, acciSharpWidth / fontSize) };
+        --head-1-size:       ${ metrics.head1Size };
+        --head-2-size:       ${ metrics.head2Size };
+        --head-4-size:       ${ metrics.head4Size };
+        --head-x-size:       ${ metrics.headXSize };
+        --head-diamond-size: ${ metrics.headDiamondSize };
+        --acci-flat-size:    ${ metrics.acciFlatSize };
+        --acci-sharp-size:   ${ metrics.acciSharpSize };
         --signature-label:   ${ hasPartNames ? '0.3125em' : '0em' };
         --signature-gap:     ${ hasPartNames ? '0.1875em' : '0em' };
         --signature-width:   calc(${ labelWidth }${ (0.25 + 2.375 + count * 0.625 + 0.5).toFixed(6) }em);

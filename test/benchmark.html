@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Scribe — Render Speed Benchmark</title>
+
+    <meta charset="utf-8" />
+    <meta name="author" content="@stephband" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <script title="load">
+        document.documentElement.className += ' js loading';
+        window.addEventListener('load', () => window.requestAnimationFrame(() => document.documentElement.classList.remove('loading')));
+        window.DEBUG = false;
+    </script>
+
+    <script type="importmap">{
+        "imports": {
+            "bolt/":     "/bolt/",
+            "dom/":      "/dom/modules/",
+            "fn/":       "/fn/modules/",
+            "midi/":     "/midi/modules/",
+            "sequence/": "/sequence/",
+            "neuron/":   "/neuron/"
+        }
+    }</script>
+
+    <style>
+        @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/elements/html.css';
+        @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/atoms.css';
+        @import '../fonts/jazz.css';
+        @import '../fonts/bravura.css';
+
+        :root {
+            --bg: #f7f9fa;
+            --card: #ffffff;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --muted: #64748b;
+            --accent: #2563eb;
+            --good: #16a34a;
+            --bad: #dc2626;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 2rem 1.5rem 4rem;
+            max-width: 1120px;
+            margin-inline: auto;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            margin: 0 0 0.25rem;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            margin: 0 0 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .controls label {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .controls input,
+        .controls select {
+            font: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text);
+            padding: 0.45rem 0.65rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: #fff;
+        }
+
+        .controls .spacer {
+            flex: 1;
+        }
+
+        button {
+            font: inherit;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 0.55rem 1rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        button.primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        button:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .progress-wrap {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.85rem 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .progress-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-bottom: 0.45rem;
+        }
+
+        progress {
+            width: 100%;
+            height: 8px;
+            accent-color: var(--accent);
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .metric {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.85rem 1rem;
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .metric-val {
+            font-size: 1.45rem;
+            font-weight: 700;
+            margin-top: 0.25rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .metric-sub {
+            font-size: 0.78rem;
+            color: var(--muted);
+            margin-top: 0.15rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.25rem;
+            overflow-x: auto;
+        }
+
+        .card h2 {
+            font-size: 1rem;
+            margin: 0 0 0.75rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 0.5rem 0.6rem;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        th {
+            color: var(--muted);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .good { color: var(--good); font-weight: 600; }
+        .bad  { color: var(--bad);  font-weight: 600; }
+
+        .chart-svg {
+            width: 100%;
+            height: 110px;
+            display: block;
+            margin-bottom: 0.75rem;
+        }
+
+        .stage {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+        }
+
+        .stage-header {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin-bottom: 0.75rem;
+        }
+
+        scribe-music {
+            display: block;
+            font-family: Jazz, JazzText;
+        }
+    </style>
+</head>
+<body>
+    <h1>&lt;scribe-music&gt; Render Speed Benchmark</h1>
+    <p class="subtitle">
+        Measures full end-to-end <strong>Time to Glass</strong> (<code>Signal.frame</code> &rarr; <code>renderDOM</code> &rarr; WebGPU/CPU speller &rarr; shadow DOM mount &rarr; <code>renderStyle</code> &rarr; next paint frame) across repeated renders, persisted in <code>localStorage</code>.
+    </p>
+
+    <div class="controls">
+        <label>
+            Target
+            <select id="mode-select">
+                <option value="build">build/scribe-music/element.js</option>
+                <option value="source">scribe-music/element.js (source)</option>
+            </select>
+        </label>
+        <label>
+            Piece
+            <select id="piece-select">
+                <option value="../data/ae-fond-kiss.json">Ae Fond Kiss (grand staff + chords, index.html)</option>
+                <option value="../data/in-the-bleak-midwinter.json">In The Bleak Midwinter (grand staff SATB + chords, 16 bars)</option>
+                <option value="../data/dolphin-dance.json">Dolphin Dance (lead sheet)</option>
+                <option value="../data/so-what.json">So What (lead sheet)</option>
+            </select>
+        </label>
+        <label>
+            Renders
+            <input id="count-input" type="number" min="10" max="1000" step="10" value="200" style="width: 5.5rem;" />
+        </label>
+        <label>
+            Run Label
+            <input id="label-input" type="text" placeholder="e.g. baseline, post-concat-key" style="width: 14rem;" />
+        </label>
+        <div class="spacer"></div>
+        <button id="run-btn" class="primary">Run Benchmark</button>
+        <button id="export-btn">Export JSON</button>
+        <button id="clear-btn">Clear History</button>
+    </div>
+
+    <div class="progress-wrap">
+        <div class="progress-row">
+            <span id="status-text">Ready.</span>
+            <span id="env-text"></span>
+        </div>
+        <progress id="progress-bar" value="0" max="200"></progress>
+    </div>
+
+    <div class="metrics" id="latest-metrics">
+        <div class="metric">
+            <div class="metric-label">Glass Median (p50)</div>
+            <div class="metric-val" id="m-glass-p50">—</div>
+            <div class="metric-sub" id="m-glass-mean">mean —</div>
+        </div>
+        <div class="metric">
+            <div class="metric-label">Glass p95 / Max</div>
+            <div class="metric-val" id="m-glass-p95">—</div>
+            <div class="metric-sub" id="m-glass-cold">cold #1 —</div>
+        </div>
+        <div class="metric">
+            <div class="metric-label">Render Median (p50)</div>
+            <div class="metric-val" id="m-render-p50">—</div>
+            <div class="metric-sub" id="m-render-mean">JS + GPU + DOM</div>
+        </div>
+        <div class="metric">
+            <div class="metric-label">Total Wall Time</div>
+            <div class="metric-val" id="m-total">—</div>
+            <div class="metric-sub" id="m-throughput">— renders/sec</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>History (<code>localStorage</code>)</h2>
+        <svg id="trend-chart" class="chart-svg" viewBox="0 0 800 110" preserveAspectRatio="none"></svg>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Label</th>
+                    <th>Piece</th>
+                    <th>N</th>
+                    <th>Cold #1</th>
+                    <th>Glass p50</th>
+                    <th>Glass Mean</th>
+                    <th>Glass p95</th>
+                    <th>Render p50</th>
+                    <th>&Delta; vs Prev</th>
+                    <th>Env</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="history-body"></tbody>
+        </table>
+    </div>
+
+    <div class="stage">
+        <div class="stage-header">Live Render Target (&lt;scribe-music&gt;)</div>
+        <scribe-music id="scribe-target"></scribe-music>
+    </div>
+
+    <script type="module">
+        const STORAGE_KEY = 'scribe.benchmark.history.v1';
+
+        const mode = new URLSearchParams(location.search).get('mode') === 'source' ? 'source' : 'build';
+        const base = mode === 'build' ? '../build/scribe-music' : '../scribe-music';
+        const cssLink = document.createElement('link');
+        cssLink.rel = 'stylesheet';
+        cssLink.href = `${base}/element.css`;
+        document.head.appendChild(cssLink);
+        await import(`${base}/element.js`);
+
+        const modeSelect  = document.getElementById('mode-select');
+        const pieceSelect = document.getElementById('piece-select');
+        modeSelect.value = mode;
+        modeSelect.addEventListener('change', () => {
+            const url = new URL(location.href);
+            url.searchParams.set('mode', modeSelect.value);
+            location.href = url.toString();
+        });
+        const countInput  = document.getElementById('count-input');
+        const labelInput  = document.getElementById('label-input');
+        const runBtn      = document.getElementById('run-btn');
+        const exportBtn   = document.getElementById('export-btn');
+        const clearBtn    = document.getElementById('clear-btn');
+        const statusText  = document.getElementById('status-text');
+        const envText     = document.getElementById('env-text');
+        const progressBar = document.getElementById('progress-bar');
+        const historyBody = document.getElementById('history-body');
+        const trendChart  = document.getElementById('trend-chart');
+        const scribe      = document.getElementById('scribe-target');
+
+        function nextFrame() {
+            return new Promise((resolve) => requestAnimationFrame(resolve));
+        }
+
+        function percentile(sorted, p) {
+            if (!sorted.length) return 0;
+            const idx = Math.min(sorted.length - 1, Math.floor((sorted.length - 1) * p));
+            return sorted[idx];
+        }
+
+        function stats(values) {
+            const sorted = values.slice().sort((a, b) => a - b);
+            const sum = values.reduce((a, b) => a + b, 0);
+            return {
+                min: sorted[0] || 0,
+                max: sorted[sorted.length - 1] || 0,
+                mean: values.length ? sum / values.length : 0,
+                p50: percentile(sorted, 0.50),
+                p95: percentile(sorted, 0.95),
+            };
+        }
+
+        function shortBrowser() {
+            const ua = navigator.userAgent;
+            if (ua.includes('Chrome/')) return 'Chrome ' + (ua.match(/Chrome\/(\d+)/)?.[1] || '');
+            if (ua.includes('Firefox/')) return 'Firefox ' + (ua.match(/Firefox\/(\d+)/)?.[1] || '');
+            if (ua.includes('Safari/')) return 'Safari ' + (ua.match(/Version\/([\d.]+)/)?.[1] || '');
+            return 'Browser';
+        }
+
+        async function detectEnv() {
+            let gpu = 'No WebGPU';
+            if (navigator.gpu) {
+                try {
+                    const adapter = await navigator.gpu.requestAdapter();
+                    gpu = adapter?.info?.architecture || adapter?.info?.description || 'WebGPU';
+                } catch {
+                    gpu = 'WebGPU err';
+                }
+            }
+            return `${shortBrowser()} / ${gpu}`;
+        }
+
+        function loadHistory() {
+            try {
+                return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            } catch {
+                return [];
+            }
+        }
+
+        function saveHistory(list) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+        }
+
+        function waitForShadowRender(el) {
+            return new Promise((resolve) => {
+                el.addEventListener('render', () => {
+                    const renderDone = performance.now();
+                    requestAnimationFrame(() => {
+                        const glassDone = performance.now();
+                        resolve({ renderDone, glassDone });
+                    });
+                }, { once: true });
+            });
+        }
+
+        function renderSummary(run) {
+            document.getElementById('m-glass-p50').textContent = `${run.glassP50.toFixed(2)} ms`;
+            document.getElementById('m-glass-mean').textContent = `mean ${run.glassMean.toFixed(2)} ms`;
+            document.getElementById('m-glass-p95').textContent = `${run.glassP95.toFixed(2)} ms`;
+            document.getElementById('m-glass-cold').textContent = `cold #1 ${run.coldGlass.toFixed(1)} ms`;
+            document.getElementById('m-render-p50').textContent = `${run.renderP50.toFixed(2)} ms`;
+            document.getElementById('m-render-mean').textContent = `mean ${run.renderMean.toFixed(2)} ms`;
+            document.getElementById('m-total').textContent = `${(run.totalMs / 1000).toFixed(2)} s`;
+            document.getElementById('m-throughput').textContent = `${(run.count / (run.totalMs / 1000)).toFixed(1)} renders/sec`;
+        }
+
+        function renderChart(history) {
+            if (history.length < 2) {
+                trendChart.innerHTML = '';
+                return;
+            }
+            const vals = history.map((h) => h.glassP50);
+            const maxV = Math.max(...vals) * 1.1;
+            const minV = Math.min(...vals) * 0.9;
+            const span = Math.max(1, maxV - minV);
+            const w = 800;
+            const h = 110;
+            const pad = 10;
+
+            const pts = vals.map((v, i) => {
+                const x = pad + (i / (vals.length - 1)) * (w - pad * 2);
+                const y = h - pad - ((v - minV) / span) * (h - pad * 2);
+                return `${x.toFixed(1)},${y.toFixed(1)}`;
+            });
+
+            const circles = vals.map((v, i) => {
+                const x = pad + (i / (vals.length - 1)) * (w - pad * 2);
+                const y = h - pad - ((v - minV) / span) * (h - pad * 2);
+                return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="#2563eb"><title>${history[i].label || history[i].date}: ${v.toFixed(2)} ms</title></circle>`;
+            }).join('');
+
+            trendChart.innerHTML = `
+                <polyline fill="none" stroke="#2563eb" stroke-width="2" points="${pts.join(' ')}" />
+                ${circles}
+            `;
+        }
+
+        function renderHistory() {
+            const history = loadHistory();
+            renderChart(history);
+            if (history.length) {
+                renderSummary(history[history.length - 1]);
+            }
+
+            historyBody.innerHTML = '';
+            for (let i = history.length - 1; i >= 0; i--) {
+                const row = history[i];
+                const prev = i > 0 ? history[i - 1] : null;
+                let deltaHtml = '—';
+                if (prev) {
+                    const pct = ((row.glassP50 - prev.glassP50) / prev.glassP50) * 100;
+                    const cls = pct <= 0 ? 'good' : 'bad';
+                    const sign = pct > 0 ? '+' : '';
+                    deltaHtml = `<span class="${cls}">${sign}${pct.toFixed(1)}%</span>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${new Date(row.timestamp).toLocaleString()}</td>
+                    <td>${row.label || '—'}</td>
+                    <td>${row.piece}</td>
+                    <td>${row.count}</td>
+                    <td>${row.coldGlass.toFixed(1)} ms</td>
+                    <td><strong>${row.glassP50.toFixed(2)} ms</strong></td>
+                    <td>${row.glassMean.toFixed(2)} ms</td>
+                    <td>${row.glassP95.toFixed(2)} ms</td>
+                    <td>${row.renderP50.toFixed(2)} ms</td>
+                    <td>${deltaHtml}</td>
+                    <td>${row.env}</td>
+                    <td><button data-del="${i}" style="padding:0.2rem 0.5rem;font-size:0.75rem;">&times;</button></td>
+                `;
+                historyBody.appendChild(tr);
+            }
+        }
+
+        historyBody.addEventListener('click', (e) => {
+            const btn = e.target.closest('button[data-del]');
+            if (!btn) return;
+            const idx = Number(btn.dataset.del);
+            const history = loadHistory();
+            history.splice(idx, 1);
+            saveHistory(history);
+            renderHistory();
+        });
+
+        exportBtn.addEventListener('click', () => {
+            const blob = new Blob([localStorage.getItem(STORAGE_KEY) || '[]'], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `scribe-benchmark-${new Date().toISOString().slice(0, 10)}.json`;
+            a.click();
+        });
+
+        clearBtn.addEventListener('click', () => {
+            localStorage.removeItem(STORAGE_KEY);
+            renderHistory();
+        });
+
+        const envLabel = await detectEnv();
+        envText.textContent = envLabel;
+        renderHistory();
+
+        runBtn.addEventListener('click', async () => {
+            const count = Math.max(10, Math.min(1000, Number(countInput.value) || 200));
+            const pieceUrl = pieceSelect.value;
+            const pieceName = pieceUrl.split('/').pop();
+            const label = labelInput.value.trim();
+
+            runBtn.disabled = true;
+            progressBar.max = count;
+            progressBar.value = 0;
+            statusText.textContent = `Loading ${pieceName} & fonts…`;
+
+            await document.fonts.ready;
+            const res = await fetch(pieceUrl);
+            const json = await res.json();
+            if (!json.parts && pieceName === 'in-the-bleak-midwinter.json') {
+                json.parts = [{ name: 'Choir', staff: 'grand', routing: { 1: 2, 3: 3, 4: 4 } }];
+            }
+
+            // Cold render (#0): fresh data assignment
+            const coldPromise = waitForShadowRender(scribe);
+            const coldStart = performance.now();
+            scribe.transpose = 0;
+            scribe.data = json;
+            const coldResult = await coldPromise;
+            const coldGlass = coldResult.glassDone - coldStart;
+
+            // 200 sequential renders varying transpose so every pass executes the full pipeline
+            const glassTimes = [];
+            const renderTimes = [];
+
+            const wallStart = performance.now();
+            for (let i = 0; i < count; i++) {
+                await nextFrame();
+                const donePromise = waitForShadowRender(scribe);
+                const t0 = performance.now();
+                scribe.transpose = (i % 11) + 1;
+                const { renderDone, glassDone } = await donePromise;
+
+                renderTimes.push(renderDone - t0);
+                glassTimes.push(glassDone - t0);
+
+                if ((i + 1) % 5 === 0 || i === count - 1) {
+                    progressBar.value = i + 1;
+                    statusText.textContent = `Rendering ${i + 1} / ${count}…`;
+                }
+            }
+            const totalMs = performance.now() - wallStart;
+
+            const g = stats(glassTimes);
+            const r = stats(renderTimes);
+
+            const entry = {
+                timestamp: Date.now(),
+                label,
+                piece: pieceName,
+                count,
+                coldGlass,
+                glassP50: g.p50,
+                glassMean: g.mean,
+                glassP95: g.p95,
+                renderP50: r.p50,
+                renderMean: r.mean,
+                totalMs,
+                env: `${mode} / ${envLabel}`,
+            };
+
+            const history = loadHistory();
+            history.push(entry);
+            saveHistory(history);
+            renderHistory();
+
+            statusText.textContent = `Done: ${count} renders in ${(totalMs / 1000).toFixed(2)}s (Glass p50 ${g.p50.toFixed(2)} ms, Render p50 ${r.p50.toFixed(2)} ms).`;
+            runBtn.disabled = false;
+        });
+    </script>
+</body>
+</html>
