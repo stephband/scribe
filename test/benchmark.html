@@ -24,6 +24,7 @@
         }
     }</script>
 
+    <link rel="stylesheet" href="../scribe-music/element.css" />
     <style>
         @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/elements/html.css';
         @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/atoms.css';
@@ -244,26 +245,21 @@
             margin-bottom: 0.75rem;
         }
 
-        scribe-music {
+        #render-host {
             display: block;
             font-family: Jazz, JazzText;
+            letter-spacing: 0.004em;
+            word-spacing: 0.125em;
         }
     </style>
 </head>
 <body>
-    <h1>&lt;scribe-music&gt; Render Speed Benchmark</h1>
+    <h1>renderDOM() Speed Benchmark</h1>
     <p class="subtitle">
-        Measures full end-to-end <strong>Time to Glass</strong> (<code>Signal.frame</code> &rarr; <code>renderDOM</code> &rarr; WebGPU/CPU speller &rarr; shadow DOM mount &rarr; <code>renderStyle</code> &rarr; next paint frame) across repeated renders, persisted in <code>localStorage</code>.
+        Measures <code>renderDOM()</code> &rarr; WebGPU/CPU speller &rarr; shadow DOM mount &rarr; <code>renderStyle()</code> &rarr; next paint frame (<strong>Time to Glass</strong>) across repeated renders, persisted in <code>localStorage</code>.
     </p>
 
     <div class="controls">
-        <label>
-            Target
-            <select id="mode-select">
-                <option value="build">build/scribe-music/element.js</option>
-                <option value="source">scribe-music/element.js (source)</option>
-            </select>
-        </label>
         <label>
             Piece
             <select id="piece-select">
@@ -343,29 +339,18 @@
     </div>
 
     <div class="stage">
-        <div class="stage-header">Live Render Target (&lt;scribe-music&gt;)</div>
-        <scribe-music id="scribe-target"></scribe-music>
+        <div class="stage-header">Live Render Target (renderDOM)</div>
+        <div id="render-host"></div>
     </div>
 
     <script type="module">
+        import { Sequence } from 'sequence/module.js';
+        import { renderDOM, renderStyle, remove } from '../modules/render-dom.js';
+        import config from '../modules/config.js';
+
         const STORAGE_KEY = 'scribe.benchmark.history.v1';
 
-        const mode = new URLSearchParams(location.search).get('mode') === 'source' ? 'source' : 'build';
-        const base = mode === 'build' ? '../build/scribe-music' : '../scribe-music';
-        const cssLink = document.createElement('link');
-        cssLink.rel = 'stylesheet';
-        cssLink.href = `${base}/element.css`;
-        document.head.appendChild(cssLink);
-        await import(`${base}/element.js`);
-
-        const modeSelect  = document.getElementById('mode-select');
         const pieceSelect = document.getElementById('piece-select');
-        modeSelect.value = mode;
-        modeSelect.addEventListener('change', () => {
-            const url = new URL(location.href);
-            url.searchParams.set('mode', modeSelect.value);
-            location.href = url.toString();
-        });
         const countInput  = document.getElementById('count-input');
         const labelInput  = document.getElementById('label-input');
         const runBtn      = document.getElementById('run-btn');
@@ -376,7 +361,10 @@
         const progressBar = document.getElementById('progress-bar');
         const historyBody = document.getElementById('history-body');
         const trendChart  = document.getElementById('trend-chart');
-        const scribe      = document.getElementById('scribe-target');
+        const host        = document.getElementById('render-host');
+        const shadow      = host.attachShadow({ mode: 'open' });
+        shadow.innerHTML  = `<link rel="stylesheet" href="../scribe-music/shadow.css" /><style></style>`;
+        const styleEl     = shadow.querySelector('style');
 
         function nextFrame() {
             return new Promise((resolve) => requestAnimationFrame(resolve));
@@ -431,18 +419,6 @@
 
         function saveHistory(list) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-        }
-
-        function waitForShadowRender(el) {
-            return new Promise((resolve) => {
-                el.addEventListener('render', () => {
-                    const renderDone = performance.now();
-                    requestAnimationFrame(() => {
-                        const glassDone = performance.now();
-                        resolve({ renderDone, glassDone });
-                    });
-                }, { once: true });
-            });
         }
 
         function renderSummary(run) {
@@ -552,6 +528,27 @@
         envText.textContent = envLabel;
         renderHistory();
 
+        async function renderOnce(seq, transpose) {
+            const t0 = performance.now();
+            const fragment = await renderDOM(
+                seq,
+                seq.parts || [{ staff: 'treble' }],
+                'C',
+                undefined,
+                transpose,
+                0,
+                Infinity,
+                config
+            );
+            shadow.querySelectorAll('.side, .bar').forEach(remove);
+            shadow.appendChild(fragment);
+            styleEl.textContent = `:host { ${ renderStyle(host, shadow) } }`;
+            const renderDone = performance.now();
+            await nextFrame();
+            const glassDone = performance.now();
+            return { renderMs: renderDone - t0, glassMs: glassDone - t0 };
+        }
+
         runBtn.addEventListener('click', async () => {
             const count = Math.max(10, Math.min(1000, Number(countInput.value) || 200));
             const pieceUrl = pieceSelect.value;
@@ -569,14 +566,11 @@
             if (!json.parts && pieceName === 'in-the-bleak-midwinter.json') {
                 json.parts = [{ name: 'Choir', staff: 'grand', routing: { 1: 2, 3: 3, 4: 4 } }];
             }
+            const seq = Sequence.from(json);
 
-            // Cold render (#0): fresh data assignment
-            const coldPromise = waitForShadowRender(scribe);
-            const coldStart = performance.now();
-            scribe.transpose = 0;
-            scribe.data = json;
-            const coldResult = await coldPromise;
-            const coldGlass = coldResult.glassDone - coldStart;
+            // Cold render (#0)
+            const coldResult = await renderOnce(seq, 0);
+            const coldGlass = coldResult.glassMs;
 
             // 200 sequential renders varying transpose so every pass executes the full pipeline
             const glassTimes = [];
@@ -585,13 +579,10 @@
             const wallStart = performance.now();
             for (let i = 0; i < count; i++) {
                 await nextFrame();
-                const donePromise = waitForShadowRender(scribe);
-                const t0 = performance.now();
-                scribe.transpose = (i % 11) + 1;
-                const { renderDone, glassDone } = await donePromise;
+                const { renderMs, glassMs } = await renderOnce(seq, (i % 11) + 1);
 
-                renderTimes.push(renderDone - t0);
-                glassTimes.push(glassDone - t0);
+                renderTimes.push(renderMs);
+                glassTimes.push(glassMs);
 
                 if ((i + 1) % 5 === 0 || i === count - 1) {
                     progressBar.value = i + 1;
@@ -615,7 +606,7 @@
                 renderP50: r.p50,
                 renderMean: r.mean,
                 totalMs,
-                env: `${mode} / ${envLabel}`,
+                env: envLabel,
             };
 
             const history = loadHistory();
