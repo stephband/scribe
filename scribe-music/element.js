@@ -1,4 +1,5 @@
 
+import Data                      from 'fn/data.js';
 import Signal                    from 'fn/signal.js';
 import element, { getInternals } from 'dom/element.js';
 import { Sequence }              from 'sequence/module.js';
@@ -85,7 +86,7 @@ export default define(element('scribe-music', {
 
             const fragment = await renderDOM(
                 // Events from data
-                internals.data.value,
+                Data.of(internals.data.value),
                 // Parts (override with staff attribute if sequence defines no parts)
                 internals.data.value.parts || (internals.staff.value ? [{ staff: internals.staff.value }] : undefined),
                 // Key name
@@ -363,7 +364,7 @@ export default define(element('scribe-music', {
     .data
     **/
     data: {
-        get: function() { return getInternals(this).data.value; },
+        get: function() { return Data.of(getInternals(this).data.value); },
         set: function(data) {
             getInternals(this).data.value = data instanceof Sequence ?
                 data :

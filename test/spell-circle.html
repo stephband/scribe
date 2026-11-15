@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Spell Circle — Line of Fifths Vector Visualiser</title>
+
+    <script type="importmap">{
+        "imports": {
+            "bolt/":     "/bolt/",
+            "dom/":      "/dom/modules/",
+            "fn/":       "/fn/modules/",
+            "midi/":     "/midi/modules/",
+            "neuron/":   "/neuron/",
+            "sequence/": "/sequence/"
+        }
+    }</script>
+
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 1.25rem 1.5rem;
+            background: #fafafa;
+            color: #1a1a1a;
+        }
+        h1 { font-size: 1.1rem; margin: 0 0 1rem; }
+        .layout {
+            display: grid;
+            grid-template-columns: 460px minmax(280px, 1fr);
+            gap: 1.5rem;
+            align-items: start;
+        }
+        canvas {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: block;
+        }
+        .panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 0.9rem 1rem;
+        }
+        .card h2 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #666;
+            margin: 0 0 0.6rem;
+        }
+        .notes, .presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+        }
+        button {
+            font: inherit;
+            font-size: 0.85rem;
+            padding: 0.35rem 0.6rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: #fff;
+            cursor: pointer;
+        }
+        button.active {
+            background: #1a1a1a;
+            color: #fff;
+            border-color: #1a1a1a;
+        }
+        button:hover:not(.active) {
+            background: #f0f0f0;
+        }
+        label {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.9rem;
+        }
+        select { font: inherit; padding: 0.25rem 0.4rem; }
+        .legend {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.35rem 0.7rem;
+            font-size: 0.85rem;
+            align-items: center;
+        }
+        .swatch {
+            width: 16px;
+            height: 3px;
+            border-radius: 2px;
+        }
+        pre {
+            margin: 0;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 0.82rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Line of Fifths — <code>toKeyCentre()</code> Vector Visualiser</h1>
+
+    <div class="layout">
+        <canvas id="circle" width="460" height="460"></canvas>
+
+        <div class="panel">
+            <div class="card">
+                <h2>Presets</h2>
+                <div class="presets" id="presets"></div>
+            </div>
+
+            <div class="card">
+                <h2>Notes (Chromatic Pitch Classes)</h2>
+                <div class="notes" id="notes"></div>
+            </div>
+
+            <div class="card">
+                <h2>Active Key Signature</h2>
+                <label>
+                    Key:
+                    <select id="key-select"></select>
+                </label>
+            </div>
+
+            <div class="card">
+                <h2>Vectors</h2>
+                <div class="legend">
+                    <span class="swatch" style="background:#2563eb"></span><span><b>Raw Dorian</b> (<code>debug.raw</code>)</span>
+                    <span class="swatch" style="background:#d97706"></span><span><b>Key Bias</b> (<code>debug.bias</code>, drawn 10× for visibility)</span>
+                    <span class="swatch" style="background:#16a34a"></span><span><b>Dorian + Bias</b> (<code>debug.dorian</code>)</span>
+                    <span class="swatch" style="background:#7c3aed"></span><span><b>Rotated Key Vector</b> (<code>debug.rotated</code>, −60°)</span>
+                    <span class="swatch" style="background:#dc2626"></span><span><b>±π Wrap Seam + Push</b> (<code>π + push</code>)</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Readout</h2>
+                <pre id="readout"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { fifths } from '../modules/spell/circle.js';
+        import { toKeyCentre } from '../modules/spell/to-key.js';
+
+        const { PI, cos, sin } = Math;
+        const deg30 = PI / 6;
+
+        // Rotate screen coordinates by -150 deg so Dorian D (+2) sits at 12 o'clock
+        const SCREEN_OFFSET = -5 * deg30;
+
+        const PC_LABELS = ['C', 'C♯/D♭', 'D', 'E♭/D♯', 'E', 'F', 'F♯/G♭', 'G', 'A♭/G♯', 'A', 'B♭/A♯', 'B'];
+        const FIFTH_LABELS = ['C', 'G', 'D', 'A', 'E', 'B', 'F♯/G♭', 'C♯/D♭', 'A♭/G♯', 'E♭/D♯', 'B♭', 'F'];
+        const KEY_NAMES = {
+            [-8]: 'F♭', [-7]: 'C♭', [-6]: 'G♭', [-5]: 'D♭', [-4]: 'A♭', [-3]: 'E♭', [-2]: 'B♭', [-1]: 'F',
+            0: 'C', 1: 'G', 2: 'D', 3: 'A', 4: 'E', 5: 'B', 6: 'F♯', 7: 'C♯', 8: 'G♯'
+        };
+
+        const PRESETS = [
+            { label: 'G♭4 in D♭', notes: [66], key: -5 },
+            { label: 'E4 + B♭4 in C', notes: [64, 70], key: 0 },
+            { label: 'C m6 cluster in C', notes: [60, 62, 63, 65, 67, 68], key: 0 },
+            { label: '+ D♭ (61) in C', notes: [60, 61, 62, 63, 65, 67, 68], key: 0 },
+            { label: 'F–A–C in C', notes: [65, 69, 72], key: 0 },
+            { label: 'A–C–E in C', notes: [69, 72, 76], key: 0 },
+            { label: 'C♯ maj in B', notes: [61, 63, 65, 66, 68, 70, 72], key: 5 }
+        ];
+
+        const selected = new Set([66]);
+        let activeKey = -5;
+
+        const canvas = document.getElementById('circle');
+        const ctx = canvas.getContext('2d');
+        const presetsEl = document.getElementById('presets');
+        const notesEl = document.getElementById('notes');
+        const keySelect = document.getElementById('key-select');
+        const readout = document.getElementById('readout');
+
+        // Build key selector (-7..+7)
+        for (let k = -7; k <= 7; k++) {
+            const opt = document.createElement('option');
+            opt.value = k;
+            opt.textContent = `${ k >= 0 ? '+' + k : k } (${ KEY_NAMES[k] })`;
+            if (k === activeKey) opt.selected = true;
+            keySelect.appendChild(opt);
+        }
+
+        // Build preset buttons
+        PRESETS.forEach((p) => {
+            const btn = document.createElement('button');
+            btn.textContent = p.label;
+            btn.addEventListener('click', () => {
+                selected.clear();
+                p.notes.forEach((n) => selected.add(60 + (n % 12)));
+                activeKey = p.key;
+                keySelect.value = String(activeKey);
+                syncUI();
+            });
+            presetsEl.appendChild(btn);
+        });
+
+        // Build 12 pitch class toggles
+        const noteButtons = PC_LABELS.map((label, pc) => {
+            const btn = document.createElement('button');
+            btn.textContent = label;
+            btn.addEventListener('click', () => {
+                const midi = 60 + pc;
+                if (selected.has(midi)) {
+                    if (selected.size > 1) selected.delete(midi);
+                } else {
+                    selected.add(midi);
+                }
+                syncUI();
+            });
+            notesEl.appendChild(btn);
+            return btn;
+        });
+
+        keySelect.addEventListener('change', () => {
+            activeKey = Number(keySelect.value);
+            syncUI();
+        });
+
+        function toScreen(a, r, cx, cy, scale) {
+            const sa = a + SCREEN_OFFSET;
+            return [cx + r * scale * cos(sa), cy + r * scale * sin(sa)];
+        }
+
+        function drawArrow(cx, cy, a, r, scale, color, width = 2.5, dashed = false) {
+            const [x2, y2] = toScreen(a, r, cx, cy, scale);
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = width;
+            if (dashed) ctx.setLineDash([5, 4]);
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+
+            if (r * scale > 8) {
+                const sa = a + SCREEN_OFFSET;
+                const head = 8;
+                ctx.setLineDash([]);
+                ctx.beginPath();
+                ctx.moveTo(x2, y2);
+                ctx.lineTo(x2 - head * cos(sa - 0.35), y2 - head * sin(sa - 0.35));
+                ctx.lineTo(x2 - head * cos(sa + 0.35), y2 - head * sin(sa + 0.35));
+                ctx.closePath();
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        function draw() {
+            const numbers = Array.from(selected);
+            const debug = {};
+            const resultKey = toKeyCentre(numbers, activeKey, debug);
+
+            const W = canvas.width;
+            const H = canvas.height;
+            const cx = W / 2;
+            const cy = H / 2;
+            const R = 165;
+
+            ctx.clearRect(0, 0, W, H);
+
+            // Outer unit circle
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(cx, cy, R, 0, 2 * PI);
+            ctx.stroke();
+
+            // Confidence ring for dorian.r
+            ctx.strokeStyle = 'rgba(22, 163, 74, 0.25)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(cx, cy, debug.dorian.r * R, 0, 2 * PI);
+            ctx.stroke();
+
+            // ±π seam and push arc (in rotated key-centre frame)
+            const seamDefault = PI;
+            const seamPushed = PI + debug.push;
+            drawArrow(cx, cy, seamDefault, 1.08, R, 'rgba(220, 38, 38, 0.25)', 1.5, true);
+            drawArrow(cx, cy, seamPushed, 1.08, R, '#dc2626', 2, true);
+
+            // Arc showing push angle
+            if (Math.abs(debug.push) > 1e-4) {
+                ctx.save();
+                ctx.strokeStyle = 'rgba(220, 38, 38, 0.45)';
+                ctx.lineWidth = 6;
+                ctx.beginPath();
+                ctx.arc(
+                    cx, cy, R * 0.35,
+                    seamDefault + SCREEN_OFFSET,
+                    seamPushed + SCREEN_OFFSET,
+                    debug.push < 0
+                );
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // 12 clock ticks & labels
+            const activeFifths = new Set(numbers.map(fifths));
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            for (let f = 0; f < 12; f++) {
+                const a = f * deg30;
+                const [tx, ty] = toScreen(a, 1, cx, cy, R);
+                const [lx, ly] = toScreen(a, 1.18, cx, cy, R);
+                const isHit = activeFifths.has(f);
+
+                ctx.fillStyle = isHit ? '#111827' : '#d1d5db';
+                ctx.beginPath();
+                ctx.arc(tx, ty, isHit ? 6 : 3.5, 0, 2 * PI);
+                ctx.fill();
+
+                ctx.font = isHit ? 'bold 13px system-ui' : '12px system-ui';
+                ctx.fillStyle = isHit ? '#111827' : '#6b7280';
+                ctx.fillText(FIFTH_LABELS[f], lx, ly);
+            }
+
+            // Vectors
+            drawArrow(cx, cy, debug.raw.a, debug.raw.r, R, '#2563eb', 2.5);
+            drawArrow(cx, cy, debug.bias.a, Math.min(1, debug.bias.r * 10), R, '#d97706', 2);
+            drawArrow(cx, cy, debug.dorian.a, debug.dorian.r, R, '#16a34a', 3);
+            drawArrow(cx, cy, debug.rotated.a, debug.rotated.r, R, '#7c3aed', 2.5);
+
+            const keyLabel = KEY_NAMES[resultKey] ?? `(${ resultKey })`;
+            readout.textContent = [
+                `notes:       [${ numbers.map((n) => PC_LABELS[n % 12]).join(', ') }]`,
+                `active key:  ${ activeKey } (${ KEY_NAMES[activeKey] ?? activeKey })`,
+                `raw dorian:  a = ${ (debug.raw.a / deg30).toFixed(2) } fifths, r = ${ debug.raw.r.toFixed(3) }`,
+                `bias:        a = ${ (debug.bias.a / deg30).toFixed(2) } fifths, r = ${ debug.bias.r.toFixed(4) }`,
+                `dorian+bias: a = ${ (debug.dorian.a / deg30).toFixed(2) } fifths, r = ${ debug.dorian.r.toFixed(3) }`,
+                `rotated:     a = ${ (debug.rotated.a / deg30).toFixed(2) } fifths`,
+                `push:        ${ (debug.push / deg30).toFixed(2) } fifths (${ (debug.push * 180 / PI).toFixed(1) }°)`,
+                `unwrapped:   angle = ${ (debug.angle / deg30).toFixed(2) } fifths`,
+                `result key:  ${ resultKey } → ${ keyLabel }`
+            ].join('\n');
+        }
+
+        function syncUI() {
+            noteButtons.forEach((btn, pc) => {
+                btn.classList.toggle('active', selected.has(60 + pc));
+            });
+            draw();
+        }
+
+        syncUI();
+    </script>
+</body>
+</html>
