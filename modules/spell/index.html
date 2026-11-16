@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spell Visualisations</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 2rem;
+            background: #fafafa;
+            color: #111;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .card {
+            max-width: 600px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 1.25rem;
+        }
+        h2 {
+            font-size: 0.95rem;
+            margin: 0 0 0.25rem;
+        }
+        p.sub {
+            font-size: 0.8rem;
+            color: #666;
+            margin: 0 0 0.75rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-variant-numeric: tabular-nums;
+        }
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.8rem;
+        }
+        .controls input[type="range"] {
+            flex: 1;
+            max-width: 260px;
+            accent-color: #2563eb;
+        }
+        .controls .readout {
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-variant-numeric: tabular-nums;
+            width: 4.5rem;
+            text-align: right;
+        }
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem 1rem;
+            font-size: 0.78rem;
+            color: #444;
+            margin-top: 0.5rem;
+        }
+        .legend span {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .swatch {
+            display: inline-block;
+            width: 12px;
+            height: 2px;
+        }
+        canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .tracker-grid {
+            display: grid;
+            grid-template-columns: 1.2fr repeat(4, 1fr);
+            gap: 0.4rem;
+            font-size: 0.78rem;
+            align-items: center;
+        }
+        .tracker-head {
+            font-weight: 600;
+            color: #555;
+            text-align: center;
+            padding: 0.35rem;
+        }
+        .tracker-head:first-child {
+            text-align: left;
+        }
+        .tracker-key {
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-weight: 600;
+            padding: 0.35rem;
+        }
+        .tracker-cell {
+            padding: 0.45rem 0.35rem;
+            border-radius: 6px;
+            background: #f2f2f2;
+            text-align: center;
+            color: #444;
+        }
+        .tracker-cell.muted {
+            opacity: 0.55;
+        }
+        .tracker-cell.win {
+            background: #2563eb;
+            color: #fff;
+            font-weight: 600;
+        }
+        .tracker-note {
+            font-size: 0.78rem;
+            color: #555;
+            margin-top: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- =================================================================== -->
+    <!-- 1. Anacrusis Time Window                                            -->
+    <!-- =================================================================== -->
+    <div class="card">
+        <h2>Why Continuous Time Beats Hard Barlines (Anacrusis)</h2>
+        <p class="sub">A pickup at beat 3.5 sits 0.5 beats from Bar 2's chord — and 3.5 beats from Bar 1's</p>
+        <canvas id="anacrusis-canvas" width="520" height="165"></canvas>
+    </div>
+
+    <script>
+    // Script for #anacrusis-canvas
+    {
+        const c = document.getElementById('anacrusis-canvas');
+        const ctx = c.getContext('2d');
+        const W = c.width, H = c.height, pL = 24, pR = 20, pT = 18, pB = 34;
+        const pw = W - pL - pR, ph = H - pT - pB;
+
+        const toX = (b) => pL + (b / 8) * pw;
+        const toY = (y) => pT + (1 - y) * ph;
+
+        // Barline at beat 4
+        ctx.save();
+        ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+        ctx.setLineDash([4, 4]);
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(toX(4), pT);
+        ctx.lineTo(toX(4), pT + ph);
+        ctx.stroke();
+        ctx.restore();
+
+        // Beat ticks
+        ctx.font = '12px system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        for (let b = 0; b <= 8; b++) {
+            ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(toX(b), pT);
+            ctx.lineTo(toX(b), pT + ph);
+            ctx.stroke();
+            ctx.fillStyle = '#444';
+            ctx.fillText(b === 4 ? '4 (Bar 2)' : b, toX(b), pT + ph + 8);
+        }
+
+        // Window centred at pickup beat 3.5
+        const fn = (b) => 0.5 ** (Math.abs(b - 3.5) / 2);
+        ctx.beginPath();
+        ctx.moveTo(toX(0), toY(0));
+        for (let i = 0; i <= 160; i++) {
+            const b = (i / 160) * 8;
+            ctx.lineTo(toX(b), toY(fn(b)));
+        }
+        ctx.lineTo(toX(8), toY(0));
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(37, 99, 235, 0.14)';
+        ctx.fill();
+
+        ctx.strokeStyle = '#2563eb';
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        for (let i = 0; i <= 160; i++) {
+            const b = (i / 160) * 8;
+            if (i === 0) ctx.moveTo(toX(b), toY(fn(b)));
+            else ctx.lineTo(toX(b), toY(fn(b)));
+        }
+        ctx.stroke();
+
+        // Note markers
+        const drawNote = (b, col, r, label) => {
+            const y = toY(fn(b));
+            ctx.fillStyle = col;
+            ctx.beginPath();
+            ctx.arc(toX(b), y, r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.font = '12px system-ui, sans-serif';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText(label, toX(b), y - r - 4);
+        };
+
+        drawNote(0, '#d97706', 5, 'Bar 1 chord');
+        drawNote(3.5, '#cf5a78', 4, 'Pickup');
+        drawNote(4, '#059669', 6, 'Bar 2 chord (wins)');
+    }
+    </script>
+
+
+    <!-- =================================================================== -->
+    <!-- 2. Two-Factor Prior: Near Home Key × Simple Key Signature           -->
+    <!-- =================================================================== -->
+    <div class="card">
+        <h2>Two-Factor Prior: Near Home Key × Simple Key Signature</h2>
+        <p id="prior-label" class="sub">Home key: -3 (E♭)</p>
+
+        <div class="controls">
+            <span>key:</span>
+            <input id="prior-key" type="range" min="-7" max="7" step="1" value="-3" />
+            <span id="prior-key-val" class="readout">-3 (E♭)</span>
+        </div>
+
+        <canvas id="prior-canvas" width="520" height="190"></canvas>
+
+        <div class="legend">
+            <span><i class="swatch" style="background:#f59e0b"></i>Near home key (centred at key)</span>
+            <span><i class="swatch" style="background:#10b981"></i>Avoid double ♯/♭ (centred at C = 0)</span>
+            <span><i class="swatch" style="background:#2563eb"></i>Combined prior (product)</span>
+        </div>
+    </div>
+
+    <script>
+    // Script for #prior-canvas
+    {
+        const NAMES = {
+            '-9':'B𝄫', '-8':'F♭', '-7':'C♭', '-6':'G♭', '-5':'D♭',
+            '-4':'A♭', '-3':'E♭', '-2':'B♭', '-1':'F',   '0':'C',
+             '1':'G',   '2':'D',   '3':'A',   '4':'E',   '5':'B',
+             '6':'F♯',  '7':'C♯',  '8':'G♯',  '9':'D♯'
+        };
+
+        const keyEl  = document.getElementById('prior-key');
+        const keyVal = document.getElementById('prior-key-val');
+        const lblEl  = document.getElementById('prior-label');
+        const canvas = document.getElementById('prior-canvas');
+        const ctx    = canvas.getContext('2d');
+
+        function renderPrior() {
+            const key  = parseInt(keyEl.value, 10);
+            const name = NAMES[key] || key;
+            keyVal.textContent = `${key >= 0 ? '+' : ''}${key} (${name})`;
+            lblEl.textContent  = `Home key: ${key} (${name}) — peak stays on ${name}, double ♯/♭ past ±7 drop off`;
+
+            const W = canvas.width, H = canvas.height;
+            const pL = 26, pR = 16, pT = 14, pB = 26;
+            const pw = W - pL - pR, ph = H - pT - pB;
+            ctx.clearRect(0, 0, W, H);
+
+            const xMin = -10, xMax = 10;
+            const toX = (x) => pL + ((x - xMin) / (xMax - xMin)) * pw;
+            const toY = (y) => pT + (1 - y) * ph;
+
+            ctx.strokeStyle = 'rgba(0,0,0,0.10)';
+            ctx.lineWidth = 1;
+            for (const y of [0, 0.5, 1]) {
+                ctx.beginPath();
+                ctx.moveTo(pL, toY(y));
+                ctx.lineTo(pL + pw, toY(y));
+                ctx.stroke();
+            }
+
+            ctx.font = '12px system-ui, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            for (let x = -9; x <= 9; x += 3) {
+                ctx.strokeStyle = 'rgba(0,0,0,0.10)';
+                ctx.beginPath();
+                ctx.moveTo(toX(x), pT);
+                ctx.lineTo(toX(x), pT + ph);
+                ctx.stroke();
+                ctx.fillStyle = '#555';
+                ctx.fillText(NAMES[x], toX(x), pT + ph + 7);
+            }
+
+            const modFn = (x) => 0.5 ** (((x - key) / 3) ** 2);
+            const capFn = (x) => 0.5 ** (Math.abs(x / 8.5) ** 12);
+            const totFn = (x) => modFn(x) * capFn(x);
+
+            const draw = (fn, col, dashed) => {
+                ctx.save();
+                ctx.strokeStyle = col;
+                ctx.lineWidth = dashed ? 1.7 : 2.5;
+                if (dashed) ctx.setLineDash([4, 4]);
+                ctx.beginPath();
+                for (let i = 0; i <= 200; i++) {
+                    const x = xMin + (i / 200) * (xMax - xMin);
+                    if (i === 0) ctx.moveTo(toX(x), toY(fn(x)));
+                    else ctx.lineTo(toX(x), toY(fn(x)));
+                }
+                ctx.stroke();
+                ctx.restore();
+            };
+
+            ctx.beginPath();
+            ctx.moveTo(toX(xMin), toY(0));
+            for (let i = 0; i <= 200; i++) {
+                const x = xMin + (i / 200) * (xMax - xMin);
+                ctx.lineTo(toX(x), toY(totFn(x)));
+            }
+            ctx.lineTo(toX(xMax), toY(0));
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(37, 99, 235, 0.14)';
+            ctx.fill();
+
+            draw(modFn, '#f59e0b', true);
+            draw(capFn, '#10b981', true);
+            draw(totFn, '#2563eb', false);
+
+            ctx.fillStyle = '#2563eb';
+            ctx.beginPath();
+            ctx.arc(toX(key), toY(totFn(key)), 4.5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        keyEl.addEventListener('input', renderPrior);
+        renderPrior();
+    }
+    </script>
+
+
+    <!-- =================================================================== -->
+    <!-- 3. 19 Identical Key-Trackers Watching the Same Beats                -->
+    <!-- =================================================================== -->
+    <div class="card">
+        <h2>19 Identical Key-Trackers Watching the Same Beats</h2>
+        <p class="sub">Each row runs the exact same tiny width-8 RNN (~600 weights total) left-to-right and right-to-left</p>
+
+        <div class="tracker-grid">
+            <div class="tracker-head">Key chair k</div>
+            <div class="tracker-head">Beat 1 (C)</div>
+            <div class="tracker-head">Beat 2 (G♯/A♭)</div>
+            <div class="tracker-head">Beat 3 (E7)</div>
+            <div class="tracker-head">Beat 4 (Am)</div>
+
+            <div class="tracker-key">k = +3 (A)</div>
+            <div class="tracker-cell muted">low</div>
+            <div class="tracker-cell win">wins &larr;</div>
+            <div class="tracker-cell win">wins</div>
+            <div class="tracker-cell">mid</div>
+
+            <div class="tracker-key">k = 0 (C)</div>
+            <div class="tracker-cell win">wins</div>
+            <div class="tracker-cell muted">0</div>
+            <div class="tracker-cell muted">0</div>
+            <div class="tracker-cell win">wins</div>
+
+            <div class="tracker-key">k = -3 (E♭)</div>
+            <div class="tracker-cell muted">low</div>
+            <div class="tracker-cell">tied raw, fades</div>
+            <div class="tracker-cell muted">low</div>
+            <div class="tracker-cell muted">low</div>
+        </div>
+
+        <p class="tracker-note">
+            At Beat 2, <code>A (+3)</code> and <code>E♭ (-3)</code> tie on raw notes — but row <code>A</code> sees <code>E7</code> coming right next at Beat 3 and wins automatically.
+        </p>
+    </div>
+
+</body>
+</html>

@@ -18,6 +18,7 @@
 
 
 import mod12 from 'sequence/modules/number/mod-12.js';
+import { KEYNAMES } from 'sequence/modules/event/key.js';
 import { fifths } from './circle.js';
 
 const { abs, cos, pow, PI } = Math;
@@ -59,6 +60,39 @@ export function roll(numbers) {
     return scores;
 }
 
+
+
+/**
+spell(number, key = 0)
+**/
+
+export function spell(number, key = 0) {
+    const dorian   = key + 2;
+    const fifth    = fifths(number);
+    const distance = mod12(fifth - dorian + 6) - 6;
+    // distance is now ±6 from dorian
+    const rootnumber = dorian + distance;
+    const rootname = KEYNAMES[rootnumber];
+    // Count the accidentals
+    const accidentals = Math.floor((rootnumber + 1) / 7);
+    // Get octave number
+    const octave = Math.floor((number - accidentals) / 12) - 1;
+    // Return full spelling
+    return rootname + octave;
+}
+
+/**
+spellAll(number, key = 0)
+**/
+
+export function spellAll(numbers, key = 0) {
+    const spellings = [];
+    let number;
+    for (number of numbers) {
+        spellings.push(spell(number, key));
+    }
+    return spellings;
+}
 
 
 
