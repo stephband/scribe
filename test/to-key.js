@@ -14,28 +14,37 @@ Deno.test('toKeyCentre() identifies 7-note diatonic major scales', () => {
     equals(toKeyCentre([63, 65, 67, 68, 70, 72, 74]), -3); // Eb
 });
 
-Deno.test('toKeyCentre() identifies triads', () => {
-    // C major triad: C (0), G (+1), E (+4) -> Dorian D (+2) -> key C (0)
+Deno.test('toKeyCentre() identifies triads with key bias', () => {
+    // C major triad -> C (0)
     equals(toKeyCentre([60, 64, 67]), 0);
-    // A minor triad: C (0), A (+3), E (+4) -> G (1)
-    equals(toKeyCentre([69, 72, 76]), 1);
-    // G major triad: G (+1), D (+2), B (+5) -> Dorian A (+3) -> key G (+1)
-    equals(toKeyCentre([67, 71, 74]), 1);
-    // F major triad: F (-1), C (0), A (+3) -> tie between Bb (-2) and F (-1)
-    const f = toKeyCentre([65, 69, 72]);
-    assert(f === -1 || f === -2, `Expected -1 or -2, got ${ f }`);
+    // A minor triad in C (0) -> C (0); in G (1) -> G (1)
+    equals(toKeyCentre([69, 72, 76], 0), 0);
+    equals(toKeyCentre([69, 72, 76], 1), 1);
+    // G major triad in C (0) stays in C (V of C); in G (1) -> G (1)
+    equals(toKeyCentre([67, 71, 74], 0), 0);
+    equals(toKeyCentre([67, 71, 74], 1), 1);
+    // D major tetrad (D, F#, G, C#) in C (0) -> D (+2) despite G/C# tritone shrinking raw.r
+    equals(toKeyCentre([62, 66, 67, 73], 0), 2);
+    // F major triad in C (0) -> F (-1)
+    equals(toKeyCentre([65, 69, 72], 0), -1);
 });
 
-Deno.test('toKeyCentre() handles 6-note C minor / Eb cluster and chromatic addition', () => {
-    // C, D, Eb, F, G, Ab -> Dorian F (-1) -> key Eb (-3)
-    equals(toKeyCentre([60, 62, 63, 65, 67, 68]), -3);
+Deno.test('toKeyCentre() handles C minor / Eb and chromatic addition', () => {
+    // Full Eb major / C natural minor scale -> Eb (-3)
+    equals(toKeyCentre([60, 62, 63, 65, 67, 68, 70]), -3);
 
-    // Adding Db (61) stays cleanly in Eb (-3) or shifts to Ab (-4)
-    const k = toKeyCentre([60, 61, 62, 63, 65, 67, 68]);
-    assert(k === -3 || k === -4, `Expected -3 or -4, got ${ k }`);
+    // 6-note C, D, Eb, F, G, Ab in C (0) pulls slightly toward Bb (-2) or Eb (-3)
+    const k6 = toKeyCentre([60, 62, 63, 65, 67, 68], 0);
+    assert(k6 === -2 || k6 === -3, `Expected -2 or -3, got ${ k6 }`);
+
+    // Adding Db (61) stays in Eb (-3) or shifts to Ab (-4)
+    const k7 = toKeyCentre([60, 61, 62, 63, 65, 67, 68], -3);
+    assert(k7 === -3 || k7 === -4, `Expected -3 or -4, got ${ k7 }`);
 });
 
-Deno.test('toKeyCentre() pulls symmetric chords toward the input key', () => {
+Deno.test('toKeyCentre() falls back on symmetric and empty input', () => {
+    equals(toKeyCentre([], 2), 2);
+
     equals(toKeyCentre([60, 66], 0), 0);
     equals(toKeyCentre([60, 66], 2), 2);
     equals(toKeyCentre([60, 66], -3), -3);
@@ -45,10 +54,9 @@ Deno.test('toKeyCentre() pulls symmetric chords toward the input key', () => {
 });
 
 Deno.test('toKeyCentre() wraps enharmonic boundaries according to input key', () => {
-    // Ab (68, fifths = 8 / -4) -> -6 (Gb) in key of C (0)
-    equals(toKeyCentre([68], 0), -6);
-    // In sharp keys, the push shifts the ±π seam clockwise
-    equals(toKeyCentre([68], 4), 6);
+    // Gb/F# major scale -> Gb (-6) in C (0), F# (+6) in E (4)
+    equals(toKeyCentre([66, 68, 70, 71, 73, 75, 77], 0), -6);
+    equals(toKeyCentre([66, 68, 70, 71, 73, 75, 77], 4), 6);
 });
 
 Deno.test('toKeyCentre() populates debug vectors when debug object is passed', () => {

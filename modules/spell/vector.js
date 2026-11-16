@@ -1,11 +1,13 @@
 
 /**
 Vector([x, y])
-A lazily evaluated cartesian and polar vector object.
+A lazily evaluated simultaneously cartesian and polar vector. When operations
+are made in one mode values cached in the other mode are trashed and only
+evaluated again when needed. Some might say this borders on over-engineering.
 **/
 
 
-const { atan2, cos, round, sin, sqrt, PI } = Math;
+const { abs, atan2, cos, round, sin, sqrt, PI } = Math;
 const assign = Object.assign;
 const tau = 2 * PI;
 
@@ -57,7 +59,7 @@ export default class Vector {
     set r(r) {
         this.a;
         this.#x = this.#y = undefined;
-        this.#r = r;
+        this.#r = abs(r);
     }
 
     get a()  {
@@ -73,10 +75,45 @@ export default class Vector {
         this.#a = a - tau * round(a / tau);
     }
 
-    // Enable assignment from [x, y] array
+    // Enable assignment to and reading from [x, y]
 
+    get [0]()  { return this.x; }
     set [0](x) { this.x = x; }
+    get [1]()  { return this.y; }
     set [1](y) { this.y = y; }
+
+    // Operations
+
+    // This is so simple to do in user space I'm not sure we need methods for it
+    /*
+    add(vector) {
+        // Fast out
+        if (!vector[0] && !vector[1]) return this;
+        // Evaluate x, y
+        const { x, y } = this;
+        // Trash r, a
+        this.#r = this.#a = undefined;
+        // Mutate vector
+        this.#x = x + vector[0];
+        this.#y = y + vector[1];
+        // Return vector
+        return this;
+    }
+
+    multiply(scalar) {
+        // Fast out
+        if (scalar === 1) return this;
+        // Evaluate x, y
+        const { x, y } = this;
+        // Trash r, a
+        this.#r = this.#a = undefined;
+        // Mutate vector
+        this.#x = scalar * x;
+        this.#y = scalar * y;
+        // Return vector
+        return this;
+    }
+    */
 
     // JSON to array
 

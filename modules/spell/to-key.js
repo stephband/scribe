@@ -83,19 +83,16 @@ function toDorianCentre(numbers) {
     return vector;
 }*/
 
-const biasRadius = 0.1;
+const biasRatio = 0.15;
 
 export function toDorianCentre(numbers, biasDorian = 2, debug) {
-    const length = numbers.length;
     // Get vector of dorian for numbers
     const dorian = toDorianVector(numbers);
     if (debug) debug.raw = Vector.from({ x: dorian.x, y: dorian.y });
 
-    // Prepare key centre bias vector
-    const vector = Vector.from({ r: 1, a: biasDorian * deg30 });
-    vector.x -= dorian.x;
-    vector.y -= dorian.y;
-    vector.r *= biasRadius;
+    // Prepare key centre bias vector proportional to raw radius (bounded angular pull)
+    const r = Math.max(dorian.r, 1e-6) * biasRatio;
+    const vector = Vector.from({ r, a: biasDorian * deg30 });
     if (debug) debug.bias = vector;
 
     // Add bias vector in to the average vector
@@ -103,12 +100,13 @@ export function toDorianCentre(numbers, biasDorian = 2, debug) {
     dorian.y += vector.y;
     if (debug) debug.dorian = Vector.from({ x: dorian.x, y: dorian.y });
 
-    if (dorian.r < 1e-15) console.warn('TODO: We have to determine something here.');
+    if (dorian.r < 1e-15) return Vector.from({ r, a: biasDorian * deg30 });
 
     return dorian;
 }
 
 export function toKeyCentre(numbers, key = 0, debug) {
+    if (!numbers.length) return key;
     // Get dorian centre vector
     const vector = toDorianCentre(numbers, key + 2, debug);
     // Rotate back to key centre
