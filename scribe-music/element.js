@@ -7,7 +7,9 @@ import { Sequence }              from 'sequence/module.js';
 
 import parse               from '../modules/parse.js';
 import Stave             from '../modules/stave.js';
-import { renderDOM, renderStyle, remove } from '../modules/render-dom.js';
+import renderHTML  from '../modules/render-dom.js';
+import renderStyle from '../modules/render-style.js';
+//import { renderDOM, renderStyle, remove } from '../modules/render-dom.js';
 import config            from '../modules/config.js';
 
 
@@ -93,7 +95,7 @@ export default define(element('scribe-music', {
             if (debug) debug.t0 = performance.now();
 
             //const fragment = await renderDOM(
-            const html = await renderDOM(
+            const html = await renderHTML(
                 // Events from data
                 internals.data.value,
                 // Parts (override with staff attribute if sequence defines no parts)
@@ -126,9 +128,10 @@ export default define(element('scribe-music', {
             if (debug) debug.t4 = performance.now();
 
         //    internals.style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
-            this.dispatchEvent(new CustomEvent('render'));
+        //    this.dispatchEvent(new CustomEvent('render'));
             if (debug) debug.t5 = performance.now();
 
+            // Print performance logs
             if (debug) {
                 const key   = `debug-scribe-music-${ slugify(debug.name) }`;
                 const stats = JSON.parse(localStorage.getItem(key) || '[]');
