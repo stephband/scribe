@@ -15,7 +15,9 @@ export function createNotes(stave, voice, notes, beat, duration, staccato = fals
     let n = -1, event;
 
     while (event = notes[++n]) {
-        const pitch = event.pitchSpelling || (stave.getSpelling && stave.getSpelling(event[2]));
+        const pitch = stave.getSpelling ?
+            stave.getSpelling(event[2]) :
+            event.spell ? event.spell(event.key) : event[2] ;
 
         // Create symbols with pitch, row
         symbols.push({

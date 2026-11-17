@@ -1,20 +1,19 @@
-import * as chromatic         from '../data/scales/chromatic.js';
-import * as major             from '../data/scales/major.js';
-import * as melodic           from '../data/scales/melodic.js';
-import * as bebop             from '../data/scales/bebop.js';
-import * as diminished        from '../data/scales/diminished.js';
-import * as triads            from '../data/scales/triads.js';
-import * as tetrads           from '../data/scales/tetrads.js';
-import * as alteredDiminished from '../data/scales/altered-diminished.js';
+import * as chromatic         from '../data/training/scales/chromatic.js';
+import * as major             from '../data/training/scales/major.js';
+import * as melodic           from '../data/training/scales/melodic.js';
+import * as bebop             from '../data/training/scales/bebop.js';
+import * as diminished        from '../data/training/scales/diminished.js';
+import * as triads            from '../data/training/scales/triads.js';
+import * as tetrads           from '../data/training/scales/tetrads.js';
+import * as alteredDiminished from '../data/training/scales/altered-diminished.js';
 import * as giantSteps        from '../data/giant-steps.js';
-import * as bach              from '../data/bach.js';
-import * as major251s         from "../data/scales/major-ii-v-i.js";
-import * as minor251s         from "../data/scales/minor-ii-v-i.js";
-import * as substitutions     from "../data/scales/substitutions.js";
+import * as bach              from '../data/training/bach/bach.js';
+import * as major251s         from "../data/training/scales/major-ii-v-i.js";
+import * as minor251s         from "../data/training/scales/minor-ii-v-i.js";
+import * as substitutions     from "../data/training/scales/substitutions.js";
 import * as blues             from "../data/blues.js";
 
-import SpellerRNN from '../modules/speller/speller-rnn.js';
-import weights from '../modules/speller/speller-weights-8b.js';
+import spell from '../modules/tree/spell.js';
 import { toKeyName } from 'sequence/modules/event/key.js';
 import { renderDOM, renderStyle, renderBeams } from '../modules/render.js';
 import { identify } from '../modules/event.js';
@@ -48,22 +47,6 @@ export async function runSpellerTests(testSource = tests, containerId = 'tests-c
 
     container.innerHTML = '';
 
-    let speller;
-    try {
-        speller = await SpellerRNN.from(weights);
-    } catch (err) {
-        console.error('Failed to initialize SpellerRNN WebGPU context:', err);
-        if (summaryEl) {
-            summaryEl.innerHTML = `
-                <div class="summary-metric metric-highlight" style="grid-column: 1 / -1; color: var(--accent-warn);">
-                    <span class="metric-val">WebGPU Error</span>
-                    <span class="metric-lbl">${err.message || 'WebGPU failed to initialize.'}</span>
-                </div>
-            `;
-        }
-        return;
-    }
-
     const sequences = Object.values(testSource);
 
     let totalNotes = 0;
@@ -80,25 +63,26 @@ export async function runSpellerTests(testSource = tests, containerId = 'tests-c
 
         const keyEvent = seq.find({ type: 'key' });
         const keyName = toKeyName(keyEvent ? keyEvent[2] : 0);
-        const predictedNotes = await speller.process(seq);
+        await spell(seq.events);
 
         let spellingMatches = 0;
         let keyMatches = 0;
         const diffs = [];
 
-        predictedNotes.forEach((note) => {
+        notes.forEach((note) => {
             const [expectedKey, expectedSpelling = note.sourcePitch] = note.label ?
                 note.label.trim().split(/\s+/) :
                 [];
-            const predKeyName = toKeyName(note.keySpelling);
+            const predKeyName = toKeyName(note.key);
+            const pitchSpelling = note.spell(note.key);
 
-            note[2] = note.pitchSpelling;
-            note.spelling = note.pitchSpelling;
+            note[2] = pitchSpelling;
+            note.spelling = pitchSpelling;
             note.resultKey = predKeyName;
 
             seq.create(note[0], 'text', note[4], note.resultKey);
 
-            const spellingMatch = !expectedSpelling || expectedSpelling === note.pitchSpelling;
+            const spellingMatch = !expectedSpelling || expectedSpelling === pitchSpelling;
             const keyMatch = !expectedKey || expectedKey === predKeyName;
 
             if (spellingMatch) spellingMatches++;
@@ -111,7 +95,7 @@ export async function runSpellerTests(testSource = tests, containerId = 'tests-c
                     keyMatch,
                     expectedSpelling,
                     expectedKey,
-                    predictedSpelling: note.pitchSpelling,
+                    predictedSpelling: pitchSpelling,
                     predictedKey: predKeyName
                 });
             }

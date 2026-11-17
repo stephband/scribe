@@ -114,6 +114,58 @@
             color: #555;
             margin-top: 0.75rem;
         }
+        .bench-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-variant-numeric: tabular-nums;
+            font-size: 0.76rem;
+            text-align: right;
+        }
+        .bench-table th {
+            font-family: system-ui, -apple-system, sans-serif;
+            color: #555;
+            font-weight: 600;
+            padding: 0.4rem 0.5rem;
+            border-bottom: 1px solid #ddd;
+        }
+        .bench-table td {
+            padding: 0.45rem 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        .bench-table th:first-child,
+        .bench-table td:first-child {
+            text-align: left;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .bench-slow { color: #dc2626; }
+        .bench-warn { color: #d97706; }
+        .bench-fast { color: #059669; font-weight: 700; }
+        .bench-bold { font-weight: 700; }
+        .bench-notes {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.6rem;
+            margin-top: 0.9rem;
+            font-size: 0.76rem;
+            color: #444;
+        }
+        .bench-box {
+            border: 1px solid #e2e2e2;
+            border-radius: 8px;
+            background: #f8f8f8;
+            padding: 0.65rem;
+            line-height: 1.4;
+        }
+        .bench-box.highlight {
+            border: 2px solid #2563eb;
+            background: #eff6ff;
+        }
+        .bench-box strong.title {
+            display: block;
+            color: #111;
+            margin-bottom: 0.25rem;
+        }
     </style>
 </head>
 <body>
@@ -363,6 +415,72 @@
         <p class="tracker-note">
             At Beat 2, <code>A (+3)</code> and <code>E♭ (-3)</code> tie on raw notes — but row <code>A</code> sees <code>E7</code> coming right next at Beat 3 and wins automatically.
         </p>
+    </div>
+
+
+    <!-- =================================================================== -->
+    <!-- 4. Measured Inference Latency: WebGPU vs CPU vs Forward-Only JS     -->
+    <!-- =================================================================== -->
+    <div class="card">
+        <h2>Measured Inference Latency (<code>29 &rarr; 12&times;2 BiGRU &rarr; 19</code>)</h2>
+        <p class="sub">3,575 weights (3.5 KB Int8 / 14 KB Float32 &mdash; fits in L1 CPU cache)</p>
+
+        <table class="bench-table">
+            <thead>
+                <tr>
+                    <th>Slice Count (<code>T</code>)</th>
+                    <th>WebGPU (<code>RNN.predict</code>)</th>
+                    <th>CPU (<code>network-cpu.js</code>)</th>
+                    <th class="bench-fast">Forward-Only JS</th>
+                    <th>Speedup vs WebGPU</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>32 slices</strong> (<em>Giant Steps</em>)</td>
+                    <td class="bench-slow">13.98 ms</td>
+                    <td>0.15 ms (147 &mu;s)</td>
+                    <td class="bench-fast">0.10 ms (98 &mu;s)</td>
+                    <td class="bench-bold">142&times; faster</td>
+                </tr>
+                <tr>
+                    <td><strong>128 slices</strong> (32-bar piece)</td>
+                    <td class="bench-slow">15.06 ms</td>
+                    <td>0.56 ms (557 &mu;s)</td>
+                    <td class="bench-fast">0.40 ms (398 &mu;s)</td>
+                    <td class="bench-bold">38&times; faster</td>
+                </tr>
+                <tr>
+                    <td><strong>512 slices</strong> (multi-page score)</td>
+                    <td class="bench-warn">17.96 ms</td>
+                    <td>2.12 ms</td>
+                    <td class="bench-fast">1.61 ms</td>
+                    <td class="bench-bold">11&times; faster</td>
+                </tr>
+                <tr>
+                    <td><strong>2,000 slices</strong> (symphony mvt)</td>
+                    <td class="bench-warn">25.86 ms</td>
+                    <td>8.38 ms</td>
+                    <td class="bench-fast">6.38 ms</td>
+                    <td class="bench-bold">4&times; faster</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="bench-notes">
+            <div class="bench-box">
+                <strong class="title">1. Why WebGPU Loses</strong>
+                GRUs are sequential along <code>t = 0..T</code>, and <code>hiddenDim = 12</code> uses less than half of a single 32-thread GPU warp. Buffer readback (<code>mapAsync</code>) adds a hard ~14 ms floor.
+            </div>
+            <div class="bench-box highlight">
+                <strong class="title">2. <code>compileWorker()</code> + JS</strong>
+                Forward-only BiGRU + Int8 unpacker is <strong>~65 lines of zero-dependency JS</strong> (~2 KB) plus 4.9 KB weights. Transferring <code>data.buffer</code> to a Worker is zero-copy (~0.2 ms) and keeps 100% of math off the main thread.
+            </div>
+            <div class="bench-box">
+                <strong class="title">3. Rust &rarr; WASM?</strong>
+                V8/JSC already JITs tight <code>Float32Array</code> loops to native machine loops (98 &mu;s for 32 slices). WASM might shave 0.4 ms to 0.2 ms at the cost of a Rust toolchain and WASM memory copies.
+            </div>
+        </div>
     </div>
 
 </body>

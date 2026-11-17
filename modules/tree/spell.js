@@ -1,11 +1,16 @@
 
-import weights    from '../speller/speller-weights-8b.js';
-import SpellerRNN from '../speller/speller-rnn.js';
+import WorkerRNN from 'neuron/modules/rnn/network-worker.js';
+import batch     from '../spell/batch.js';
+import schema, { encode, decode } from '../spell/schema.js';
+import weights   from '../spell/weights-8b.js';
 
-const speller = await SpellerRNN.from(weights);
+const rnn = new WorkerRNN(schema, weights);
 
-export default function spell(events) {
+export default async function spell(events) {
     if (!events || !events.length) return;
-    if (!events.some((e) => e.type === 'note' || e.type === 'chord')) return;
-    return speller.process(events);
+    const head = batch(events);
+    if (!head.length) return;
+    const data    = encode(head);
+    const outputs = await rnn.predict(data, head.count);
+    return decode(head, outputs);
 }

@@ -69,10 +69,10 @@ function updateBeamWithNoteSymbols(symbols, bar, stave, voice, beam, noteSymbols
 const rslashextension = /^\{(\d{1,2})\}/;
 
 function substituteSpelling(settings, name) {
-    if (name === 'C♭' && settings.spellChordRootCFlatAsB)  return 'B';
-    if (name === 'E♯' && settings.spellChordRootESharpAsF) return 'F';
-    if (name === 'B♯' && settings.spellChordRootBSharpAsC) return 'C';
-    if (name === 'F♭' && settings.spellChordRootFFlatAsE)  return 'E';
+    if (settings.spellChordRootCFlatAsB)  name = name.replace('C♭', 'B');
+    if (settings.spellChordRootESharpAsF) name = name.replace('E♯', 'F');
+    if (settings.spellChordRootBSharpAsC) name = name.replace('B♯', 'C');
+    if (settings.spellChordRootFFlatAsE)  name = name.replace('F♭', 'E');
     return name;
 }
 
@@ -82,26 +82,18 @@ function symboliseChords(settings, bar, stave, symbols, voice) {
     let t = -1, tuplet;
     while (tuplet = tuplets[++t]) {
         let i = -1, event;
-        while (event = tuplet[++i]) {
-            const extension = event.extension;
-            const root      = substituteSpelling(settings, event.rootSpelling);
-            const name      = event.bassSpelling ?
-                extension.replace(rslashextension, root) + substituteSpelling(settings, event.bassSpelling) :
-                root ? root + extension : (event.toChordSymbol ? event.toChordSymbol(bar.key) : event.root + extension);
-
-            symbols.push({
-                type: 'chord',
-                beat: event[0] - bar.beat,
-                name,
-                // Does chord cross into next bar? The symbol should not
-                duration: event[0] + event[4] > bar.beat + bar.duration ?
-                    bar.duration - event[0] + bar.beat :
-                    event[4],
-                event,
-                stave,
-                voice
-            });
-        }
+        while (event = tuplet[++i]) symbols.push({
+            type: 'chord',
+            beat: event[0] - bar.beat,
+            name: substituteSpelling(settings, event.spell(event.key)),
+            // Does chord cross into next bar? The symbol should not
+            duration: event[0] + event[4] > bar.beat + bar.duration ?
+                bar.duration - event[0] + bar.beat :
+                event[4],
+            event,
+            stave,
+            voice
+        });
     }
 }
 

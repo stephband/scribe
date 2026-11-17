@@ -1,0 +1,70 @@
+# Giant Steps (B♭)
+0 meter 4/4
+0 key C
+0 sequence 1 0 64
+0 sequence 2 0 64
+
+#1 Chords
+0  chord D♭maj7 2
+2  chord E7     2
+4  chord Amaj7  2
+6  chord C7     2
+8  chord Fmaj7  4
+12 chord Bm7    2
+14 chord E7     2
+
+16 chord Amaj7  2
+18 chord C7     2
+20 chord Fmaj7  2
+22 chord A♭7    2
+24 chord D♭maj7 4
+28 chord Gm7    2
+30 chord C7     2
+
+32 chord Fmaj7  4
+36 chord Bm7    2
+38 chord E7     2
+40 chord Amaj7  4
+44 chord E♭m7   2
+46 chord A♭7    2
+
+48 chord D♭maj7 4
+52 chord Gm7    2
+54 chord C7     2
+56 chord Fmaj7  4
+60 chord E♭m7   2
+62 chord A♭7    2
+
+#2 Melody
+0    A♭5 2
+2    E5  2
+4    C♯5 2
+6    A4  1.5
+7.5  C5  3.5
+12   C♯5 1.5
+13.5 B4  0.25
+
+16   E5  2
+18   C5  2
+20   A4  2
+22   F4  1.5
+23.5 A♭4 3.5
+
+28   A4  2
+30   G4  1.5
+31.5 C5  4.5
+
+36   C♯5 2
+38   B4  1.5
+39.5 E5  4.5
+
+44   F5  2
+46   F5  1.5
+47.5 A♭5 4.5
+
+52   A5  2
+54   A5  1.5
+55.5 C6  4.5
+
+60   A♭5 1.5
+61.5 A♭5 0.25
