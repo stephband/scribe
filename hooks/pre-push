@@ -3,7 +3,7 @@
 # Activate once per clone with: git config core.hooksPath hooks
 # Bypass in a pinch with: git push --no-verify
 
-deno test || {
+deno test --allow-read || {
     echo "✘ deno test failed — push aborted (use --no-verify to override)"
     exit 1
 }
