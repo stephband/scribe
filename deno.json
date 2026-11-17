@@ -1,11 +1,11 @@
 {
     "imports": {
         "dom/":       "https://cdn.jsdelivr.net/gh/stephband/dom@1.4.9/modules/",
-        "fn/":        "https://cdn.jsdelivr.net/gh/stephband/fn@1.6.9/modules/",
+        "fn/":        "https://cdn.jsdelivr.net/gh/stephband/fn@1.7.0/modules/",
         "bolt/":      "https://cdn.jsdelivr.net/gh/stephband/bolt-2@1.0.9/",
         "neuron/":    "https://cdn.jsdelivr.net/gh/stephband/neuron@0.1.4/",
-        "midi/":      "https://cdn.jsdelivr.net/gh/stephband/midi@1.1.9/modules/",
-        "sequence/":  "https://cdn.jsdelivr.net/gh/soundio/sequence@0.5.6/"
+        "midi/":      "https://cdn.jsdelivr.net/gh/stephband/midi@1.2.0/modules/",
+        "sequence/":  "https://cdn.jsdelivr.net/gh/soundio/sequence@0.5.8/"
     },
 
     "tasks": {
