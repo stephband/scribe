@@ -1,7 +1,7 @@
 # telemabrusse1734_41003m
 0 meter 4/4
-3.5 sequence 1 voice-1 0
-3.5 sequence 3 voice-3 0
+3.5 sequence 1 0 0
+3.5 sequence 3 0 0
 
 #1 Voice 1
 0 G♯5 0.5

@@ -21,7 +21,7 @@ function spellPart({ spellables, transpose }) {
     return spell(spellables);
 }
 
-export default async function requestTree(sequence, parts = sequence.parts, key, timesig, transpose = 0, beat = 0, duration = Infinity, settings = {}) {
+export default async function requestTree(sequence, parts = sequence.parts, key, timesig, transpose = 0, beat = 0, duration = Infinity, settings = {}, debug) {
     settings = assign({}, config, settings);
 
     // If events contains no initial key and key is available insert a key event
@@ -39,12 +39,15 @@ export default async function requestTree(sequence, parts = sequence.parts, key,
 
     // Create iterator from sequence, transform, startBeat, stopBeat, sequences, settings
     const iterator = new SequenceIterator(sequence, transform, 0, beat + duration, undefined, { outputInBeats: true });
+if (debug) debug.ta = performance.now();
 
     // Ingest sequence into tree of bars, parts and spellables
     const tree = read(settings, iterator, parts, keyEvent, meterEvent, beat);
+if (debug) debug.tb = performance.now();
 
     // Metric quantisation of event beats
     quantise(settings, tree.parts, tree);
+if (debug) debug.tc = performance.now();
 
     // Spell pitched notes and chords
     if (settings.showAtConcertPitch) {
@@ -53,6 +56,7 @@ export default async function requestTree(sequence, parts = sequence.parts, key,
     else {
         await Promise.all(tree.parts.map(spellPart));
     }
+if (debug) debug.td = performance.now();
 
     // Construct tree symbols, beams and bar repeats
     return symbolise(settings, tree.parts, tree);

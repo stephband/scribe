@@ -1,7 +1,7 @@
 # telemabrusse1734_40804m
 0 meter 2/4
-0 sequence 1 voice-1 0
-0 sequence 3 voice-3 0
+0 sequence 1 0 0
+0 sequence 3 0 0
 
 #1 Voice 1
 0 D5 0.5

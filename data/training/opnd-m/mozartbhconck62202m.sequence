@@ -1,17 +1,17 @@
 # mozartbhconck62202m
 0 meter 3/4
-0 sequence 1 voice-1 0
-0 sequence 2 voice-2 0
-0 sequence 3 voice-3 0
-0 sequence 4 voice-4 0
-0 sequence 5 voice-5 0
-0 sequence 6 voice-6 0
-0 sequence 7 voice-7 0
-0 sequence 8 voice-8 0
-0 sequence 9 voice-9 0
-0 sequence 10 voice-10 0
-0 sequence 11 voice-11 0
-0 sequence 12 voice-12 0
+0 sequence 1  0 0
+0 sequence 2  0 0
+0 sequence 3  0 0
+0 sequence 4  0 0
+0 sequence 5  0 0
+0 sequence 6  0 0
+0 sequence 7  0 0
+0 sequence 8  0 0
+0 sequence 9  0 0
+0 sequence 10 0 0
+0 sequence 11 0 0
+0 sequence 12 0 0
 
 #1 Voice 1
 24 A5 6

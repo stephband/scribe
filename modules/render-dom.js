@@ -3,7 +3,8 @@ import create           from 'dom/create.js';
 import px               from 'dom/parse-length.js';
 import rect             from 'dom/rect.js';
 import requestTree      from './tree.js';
-import { createBarElement, createSigElement } from './create-element.js';
+//import { createBarElement, createSigElement } from './create-element.js';
+import { createBarHTML, createSigHTML } from './create-html.js';
 import * as glyphs      from './glyphs.js';
 import truncate         from './number/truncate.js';
 import log              from './log.js';
@@ -127,26 +128,48 @@ export function renderStyle(element, root = element) {
     `;               // label and gap | margin | clef | accidentals | margin
 }
 
-export async function renderDOM(sequence, parts, key, timesig, transpose, displace, duration, settings) {
+export async function renderDOM(sequence, parts, key, timesig, transpose, displace, duration, settings, debug) {
     // Create render tree
-    const tree = await requestTree(sequence, parts, key, timesig, transpose, displace, duration, settings);
+    const tree = await requestTree(sequence, parts, key, timesig, transpose, displace, duration, settings, debug);
+
+    if (debug) debug.t1 = performance.now();
 
     // Create DOM tree
-    const fragment = document.createDocumentFragment();
+    //const fragment = document.createDocumentFragment();
+    //let n = -1;
+    //while (tree[++n]) fragment.appendChild(createBarElement(tree[n]));
+
+    // Create HTML string
+    let html = '';
     let n = -1;
-    while (tree[++n]) fragment.appendChild(createBarElement(tree[n]));
+    while (tree[++n]) html += createBarHTML(tree[n]);
+
+    if (debug) debug.t2 = performance.now();
 
     // Create side column with signatures
+    //if (tree[0]) {
+    //    const bar0   = tree[0];
+    //    const sig    = createSigElement(bar0);
+    //    const column = create('header', { id: 'side', class: 'side' });
+    //
+    //    let n = 24;
+    //    while (n--) column.appendChild(sig.cloneNode(true));
+    //
+    //    fragment.prepend(column);
+    //}
+
     if (tree[0]) {
-        const bar0   = tree[0];
-        const sig    = createSigElement(bar0);
-        const column = create('header', { id: 'side', class: 'side' });
+        let header = '<header id="side" class="side">';
+        const bar0 = tree[0];
+        const sig  = createSigHTML(bar0);
 
         let n = 24;
-        while (n--) column.appendChild(sig.cloneNode(true));
+        while (n--) header += sig;
 
-        fragment.prepend(column);
+        header += '</header>';
+        html = header + html;
     }
 
-    return fragment;
+    //return fragment;
+    return html;
 }

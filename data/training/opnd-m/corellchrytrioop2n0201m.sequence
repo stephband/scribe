@@ -1,8 +1,8 @@
 # corellchrytrioop2n0201m
 0 meter 4/4
-3.5 sequence 1 voice-1 0
-3.5 sequence 2 voice-2 0
-3.5 sequence 4 voice-4 0
+3.5 sequence 1 0 0
+3.5 sequence 2 0 0
+3.5 sequence 4 0 0
 
 #1 Voice 1
 0.25 A4 0.25

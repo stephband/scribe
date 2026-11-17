@@ -1,6 +1,7 @@
 
 import Data                      from 'fn/data.js';
 import Signal                    from 'fn/signal.js';
+import slugify                   from 'fn/slugify.js';
 import element, { getInternals } from 'dom/element.js';
 import { Sequence }              from 'sequence/module.js';
 
@@ -9,6 +10,8 @@ import Stave             from '../modules/stave.js';
 import { renderDOM, renderStyle, remove } from '../modules/render-dom.js';
 import config            from '../modules/config.js';
 
+
+const DEBUG  = globalThis.DEBUG;
 const assign = Object.assign;
 const define = Object.defineProperties;
 
@@ -16,13 +19,15 @@ const define = Object.defineProperties;
 const shadowCSSUrl = new URL('shadow.css', import.meta.url);
 const stylesheet = Signal.of();
 
+
 function parseScript(script) {
     const type = (script.type || script.getAttribute('type') || '').trim().split(';')[0].toLowerCase();
     return type.endsWith('sequence') ?
+        // Script contains sequence format text
         Sequence.parse(script.textContent) :
+        // Script contains JSON
         Sequence.from(JSON.parse(script.textContent)) ;
 }
-
 
 /* Register <scribe-music> */
 
@@ -34,8 +39,8 @@ export default define(element('scribe-music', {
 
     construct: function(shadow, internals) {
         // Listen to updates to ScribeMusic.stylesheet and update the link
-        const link  = shadow.querySelector('link');
-        if (stylesheet.value) link.href = stylesheet.value;
+        internals.link = shadow.querySelector('link');
+        if (stylesheet.value) internals.link.href = stylesheet.value;
 
         // Shadow elements
         internals.style = shadow.querySelector('style');
@@ -84,9 +89,11 @@ export default define(element('scribe-music', {
         return Signal.frame(async () => {
             if (!internals.data.value) return;
 
-            const t0 = performance.now();
+            const debug = DEBUG && internals.data.value.name ? { name: internals.data.value.name } : null ;
+            if (debug) debug.t0 = performance.now();
 
-            const fragment = await renderDOM(
+            //const fragment = await renderDOM(
+            const html = await renderDOM(
                 // Events from data
                 internals.data.value,
                 // Parts (override with staff attribute if sequence defines no parts)
@@ -105,49 +112,47 @@ export default define(element('scribe-music', {
                 assign({}, config, {
                     swingAsStraight8ths:  internals.swingAsStraight8ths.value,
                     swingAsStraight16ths: internals.swingAsStraight16ths.value
-                })
+                }),
+                // Collect some stats
+                debug
             );
-
-            const t1 = performance.now();
+            if (debug) debug.t3 = performance.now();
 
             // Clear the shadow DOM of bars and style and put new elements in it
-            shadow.querySelectorAll('.side, .bar').forEach(remove);
-            shadow.appendChild(fragment);
-            internals.style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
+        //    shadow.querySelectorAll('.side, .bar').forEach(remove);
+        //    shadow.appendChild(fragment);
+            shadow.replaceChildren(internals.link, internals.style);
+            internals.style.insertAdjacentHTML('afterend', html);
+            if (debug) debug.t4 = performance.now();
+
+        //    internals.style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
             this.dispatchEvent(new CustomEvent('render'));
+            if (debug) debug.t5 = performance.now();
 
-            const t2 = performance.now();
-
-            console.log('Render time:', t1 - t0, t2 - t1);
-
-            // DEBUG
-/*
-            // Does bar contain symbols that add up to longer than bar?
-            if (internals.debug.value) {
-                shadow.querySelectorAll('.bar').forEach((bar) => {
-                    const duration = parseFloat(bar.getAttribute('duration') || bar.dataset.duration);
-                    let total = 0;
-                    let b, d;
-
-                    if (bar.querySelector('.barrepeat')) {
-                        return;
-                    }
-
-                    bar.querySelectorAll('.rest[duration], .note[duration]').forEach((element) => {
-                        // Ignore notes that are at same beat as previous notes
-                        const beat = parseFloat(element.getAttribute('beat') || element.dataset.beat);
-                        if (b !== beat) {
-                            b = beat;
-                            d = parseFloat(element.getAttribute('duration') || element.dataset.duration);
-                            total += d;
-                        }
-                    });
-                    if (Math.round(total / 0.0625) !== Math.round(duration / 0.0625)) {
-                        bar.classList.add('error');
-                    }
-                });
+            if (debug) {
+                const key   = `debug-scribe-music-${ slugify(debug.name) }`;
+                const stats = JSON.parse(localStorage.getItem(key) || '[]');
+                stats.push(debug);
+                localStorage.setItem(key, JSON.stringify(stats));
+                // Print title
+                console.log(
+                    debug.name,
+                    internals.data.value
+                );
+                // Print table
+                console.table(stats.map((debug) => ({
+                    treeA:  debug.ta  - debug.t0,
+                    treeB:  debug.tb  - debug.ta,
+                    treeC:  debug.tc  - debug.tb,
+                    treeD:  debug.td  - debug.tc,
+                    tree:   debug.t1  - debug.td,
+                    body:   debug.t2  - debug.t1,
+                    header: debug.t3  - debug.t2,
+                    DOM:    debug.t4  - debug.t3,
+                    style:  debug.t5  - debug.t4,
+                    total:  debug.t5  - debug.t0
+                })));
             }
-*/
         });
     },
 

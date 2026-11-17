@@ -333,7 +333,7 @@ export function symboliseVoice(settings, bar, stave, key, notes, symbols, voice)
 
     beam = fillToBeat(settings, bar, stave, voice, accidentals, notes, symbols, beam, beat, bar.beat + bar.duration);
     if (beam) beam = closeBeam(symbols, stave, voice, beam);
-    if (notes.length) console.log(notes.length + ' notes tied over to next bar');
+    //if (notes.length) console.log(notes.length + ' notes tied over to next bar');
 }
 
 /**
