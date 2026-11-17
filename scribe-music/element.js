@@ -84,9 +84,11 @@ export default define(element('scribe-music', {
         return Signal.frame(async () => {
             if (!internals.data.value) return;
 
+            const t0 = performance.now();
+
             const fragment = await renderDOM(
                 // Events from data
-                Data.of(internals.data.value),
+                internals.data.value,
                 // Parts (override with staff attribute if sequence defines no parts)
                 internals.data.value.parts || (internals.staff.value ? [{ staff: internals.staff.value }] : undefined),
                 // Key name
@@ -106,11 +108,17 @@ export default define(element('scribe-music', {
                 })
             );
 
+            const t1 = performance.now();
+
             // Clear the shadow DOM of bars and style and put new elements in it
             shadow.querySelectorAll('.side, .bar').forEach(remove);
             shadow.appendChild(fragment);
             internals.style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
             this.dispatchEvent(new CustomEvent('render'));
+
+            const t2 = performance.now();
+
+            console.log('Render time:', t1 - t0, t2 - t1);
 
             // DEBUG
 /*

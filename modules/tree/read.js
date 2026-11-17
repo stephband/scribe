@@ -76,9 +76,15 @@ function flagEndBar(bar, sequenceEvent) {
     return false;
 }
 
+function toPartSpellable(event) {
+    // Key events must be cloned per-part because spellPart() mutates them via .transpose()
+    return event.type === 'key' ? Event.from(event) : event;
+}
+
 export default function read(settings, sequence, parts, keyEvent, meter, beat = 0) {
     const tree = {
-        keys:       [],
+        // Key and meter events recorded for lazily seeding part.spellables
+        signatures: [],
         spellables: [],
         parts:      []
     };
@@ -120,16 +126,19 @@ export default function read(settings, sequence, parts, keyEvent, meter, beat = 
 
     // Initial key
     if (keyEvent) {
-        tree.keys.push(keyEvent);
+        tree.signatures.push(keyEvent);
+        tree.spellables.push(keyEvent);
         bar.keyEvent   = keyEvent;
         bar.key        = keyEvent[2];
     }
 
     // Initial meter
     if (meter) {
-        const offset   = beat % meter.duration;
+        const offset   = beat % meter.beats;
+        tree.signatures.push(meter);
+        tree.spellables.push(meter);
         bar.meterEvent = meter;
-        bar.duration   = meter.duration - offset;
+        bar.duration   = meter.beats - offset;
         bar.divisor    = meter.divisor;
         bar.divisions  = meter.divisions.map((n) => n - offset).filter((n) => n > 0);
     }
@@ -147,7 +156,7 @@ export default function read(settings, sequence, parts, keyEvent, meter, beat = 
                 count:     bar.count + 1,
                 beat:      bar.beat + bar.duration,
                 key:       bar.key,
-                duration:  meter ? meter.duration : Infinity,
+                duration:  meter ? meter.beats : Infinity,
                 divisor:   meter ? meter.divisor : 0,
                 divisions: meter ? meter.divisions : nothing
             };
@@ -165,29 +174,41 @@ export default function read(settings, sequence, parts, keyEvent, meter, beat = 
 
             case "key": {
                 // Ignore redundant key events that do not change the key
-                if (tree.keys.length && tree.keys[tree.keys.length - 1][2] === event[2]) break;
+                if (keyEvent && keyEvent[2] === event[2]) break;
                 if (event[0] > bar.beat) throw new Error(`Scribe "key" event at beat ${ event[0] } not at start of bar at beat ${ bar.beat }`);
+                keyEvent     = event;
                 bar.keyEvent = event;
-                bar.key = event[2];
-                tree.keys.push(event);
+                bar.key      = event[2];
+                tree.signatures.push(event);
 
-                // Push copy of key event to parts already discovered
+                // Clone key events per-part because spellPart() mutates them via .transpose()
                 let p = -1;
                 while (tree.parts[++p]) {
                     if (tree.parts[p].spellables) {
                         tree.parts[p].spellables.push(Event.from(event));
                     }
                 }
+                tree.spellables.push(event);
                 break;
             }
 
-            case "meter":
+            case "meter": {
                 meter = event;
+                tree.signatures.push(event);
+
+                // Meter events are not transposed, so parts can share the same event
+                let p = -1;
+                while (tree.parts[++p]) {
+                    if (tree.parts[p].spellables) {
+                        tree.parts[p].spellables.push(event);
+                    }
+                }
+                tree.spellables.push(event);
 
                 // Meter falls on bar
                 if (meter[0] === bar.beat) {
                     bar.meterEvent = event;
-                    bar.duration   = meter.duration;
+                    bar.duration   = meter.beats;
                     bar.divisor    = meter.divisor;
                     bar.divisions  = meter.divisions;
                     break;
@@ -197,9 +218,9 @@ export default function read(settings, sequence, parts, keyEvent, meter, beat = 
 
                 // Meter falls before bar, which should only occur at the beginning
                 if (meter[0] < bar.beat) {
-                    const offset   = (bar.beat - event[0]) % meter.duration;
+                    const offset   = (bar.beat - event[0]) % meter.beats;
                     bar.meterEvent = event;
-                    bar.duration   = meter.duration - offset;
+                    bar.duration   = meter.beats - offset;
                     bar.divisor    = meter.divisor;
                     bar.divisions  = meter.divisions.map((n) => n - offset).filter((n) => n > 0);
                     break;
@@ -218,13 +239,14 @@ export default function read(settings, sequence, parts, keyEvent, meter, beat = 
                     beat:       bar.beat + bar.duration,
                     key:        bar.key,
                     meterEvent: event,
-                    duration:   meter.duration,
+                    duration:   meter.beats,
                     divisor:    meter.divisor,
                     divisions:  meter.divisions
                 };
 
                 //throw new Error(`Scribe "meter" event at beat ${ event[0] } not at start of bar beat ${ bar.beat }`);
                 break;
+            }
 
             case "note":
             case "chord": {
@@ -248,7 +270,7 @@ export default function read(settings, sequence, parts, keyEvent, meter, beat = 
 
                         // Push event into spellables if pitched stave
                         if (part.stave.pitched) {
-                            if (!part.spellables) part.spellables = tree.keys.map((ev) => Event.from(ev));
+                            if (!part.spellables) part.spellables = tree.signatures.map(toPartSpellable);
                             part.spellables.push(e);
                             tree.spellables.push(e);
                         }
@@ -268,7 +290,7 @@ export default function read(settings, sequence, parts, keyEvent, meter, beat = 
 
                     // Push event into spellables if pitched stave
                     if (part.stave.pitched) {
-                        if (!part.spellables) part.spellables = tree.keys.map((e) => Event.from(e));
+                        if (!part.spellables) part.spellables = tree.signatures.map(toPartSpellable);
                         part.spellables.push(event);
                         tree.spellables.push(event);
                     }
@@ -341,7 +363,7 @@ export default function read(settings, sequence, parts, keyEvent, meter, beat = 
             count:     bar.count + 1,
             beat:      bar.beat + bar.duration,
             key:       bar.key,
-            duration:  meter.duration,
+            duration:  meter.beats,
             divisor:   meter.divisor,
             divisions: meter.divisions
         };

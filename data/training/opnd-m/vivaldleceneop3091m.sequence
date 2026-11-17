@@ -1,9 +1,10 @@
 # vivaldleceneop3091m
-0 sequence 1 voice-1 0
-0 sequence 3 voice-3 0
-0 sequence 4 voice-4 0
-0 sequence 6 voice-6 0
-0 sequence 8 voice-8 0
+0 meter 4/4
+3.75 sequence 1 voice-1 0
+3.75 sequence 3 voice-3 0
+3.75 sequence 4 voice-4 0
+3.75 sequence 6 voice-6 0
+3.75 sequence 8 voice-8 0
 
 #1 Voice 1
 34.75 F♯5 0.25

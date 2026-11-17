@@ -1,10 +1,11 @@
 # bachbgcant013606m
-0 sequence 1 voice-1 0
-0 sequence 4 voice-4 0
-0 sequence 6 voice-6 0
-0 sequence 8 voice-8 0
-0 sequence 10 voice-10 0
-0 sequence 11 voice-11 0
+0 meter 4/4
+3 sequence 1 voice-1 0
+3 sequence 4 voice-4 0
+3 sequence 6 voice-6 0
+3 sequence 8 voice-8 0
+3 sequence 10 voice-10 0
+3 sequence 11 voice-11 0
 
 #1 Voice 1
 0 B5 0.5

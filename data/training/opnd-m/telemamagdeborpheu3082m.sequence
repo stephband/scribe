@@ -1,6 +1,7 @@
 # telemamagdeborpheu3082m
-0 sequence 1 voice-1 0
-0 sequence 3 voice-3 0
+0 meter 3/4
+2 sequence 1 voice-1 0
+2 sequence 3 voice-3 0
 
 #1 Voice 1
 0 G4 1

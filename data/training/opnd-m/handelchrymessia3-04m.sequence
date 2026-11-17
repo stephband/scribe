@@ -1,10 +1,11 @@
 # handelchrymessia3-04m
-0 sequence 1 voice-1 0
-0 sequence 2 voice-2 0
-0 sequence 3 voice-3 0
-0 sequence 4 voice-4 0
-0 sequence 5 voice-5 0
-0 sequence 6 voice-6 0
+0 meter 3/4
+2 sequence 1 voice-1 0
+2 sequence 2 voice-2 0
+2 sequence 3 voice-3 0
+2 sequence 4 voice-4 0
+2 sequence 5 voice-5 0
+2 sequence 6 voice-6 0
 
 #1 Voice 1
 24 E5 1

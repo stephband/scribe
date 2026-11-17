@@ -36,6 +36,7 @@ Deno.test('batch() groups concurrent events into slices and counts them', () => 
 
     const events = [
         Event.key(0, 'D'),
+        Event.meter(0, 0b1010, 1),
         Event.note(0, 62, 0.1, 1),
         Event.note(0.01, 66, 0.1, 1),
         Event.note(1, 69, 0.1, 2)
@@ -43,15 +44,18 @@ Deno.test('batch() groups concurrent events into slices and counts them', () => 
     const head = batch(events);
     equals(head.count, 2);
     equals(head.key, 2);
+    equals(head.grain, 4);
     equals(head.length, 2);
     equals(head.next.beat, 1);
+    equals(head.next.grain, 1);
     equals(head.next.prev, head);
     equals(head.next.length, 1);
 });
 
-Deno.test('encode() produces 29-dim slice vectors and decode() writes event.key', () => {
+Deno.test('encode() produces 30-dim slice vectors and decode() writes event.key', () => {
     const events = [
         Event.key(0, 'A'),
+        Event.meter(0, 0b1010, 1),
         Event.note(0, 69, 0.1, 1),
         Event.note(1, 73, 0.1, 1)
     ];
@@ -60,12 +64,14 @@ Deno.test('encode() produces 29-dim slice vectors and decode() writes event.key'
     equals(data.length, 2 * IN_DIM);
     // Home key = A (+3) normalised by / 9
     equals(Math.abs(data[28] - 3 / 9) < 1e-6, true);
+    equals(data[29], 4);
+    equals(data[IN_DIM + 29], 1);
 
     decode(head, new Uint32Array([12, 12]));
-    equals(events[1].key, 3);
     equals(events[2].key, 3);
-    equals(events[1].spell(events[1].key), 'A4');
-    equals(events[2].spell(events[2].key), 'C♯5');
+    equals(events[3].key, 3);
+    equals(events[2].spell(events[2].key), 'A4');
+    equals(events[3].spell(events[3].key), 'C♯5');
 });
 
 Deno.test('spell() handles empty arrays, G♯/A♭ context, and Giant Steps', async () => {

@@ -1,23 +1,24 @@
 # haydndoversyms-10004m
-0 sequence 1 voice-1 0
-0 sequence 2 voice-2 0
-0 sequence 3 voice-3 0
-0 sequence 4 voice-4 0
-0 sequence 5 voice-5 0
-0 sequence 6 voice-6 0
-0 sequence 7 voice-7 0
-0 sequence 8 voice-8 0
-0 sequence 9 voice-9 0
-0 sequence 10 voice-10 0
-0 sequence 11 voice-11 0
-0 sequence 12 voice-12 0
-0 sequence 13 voice-13 0
-0 sequence 14 voice-14 0
-0 sequence 15 voice-15 0
-0 sequence 16 voice-16 0
-0 sequence 17 voice-17 0
-0 sequence 18 voice-18 0
-0 sequence 19 voice-19 0
+0 meter 6/8
+2.5 sequence 1 voice-1 0
+2.5 sequence 2 voice-2 0
+2.5 sequence 3 voice-3 0
+2.5 sequence 4 voice-4 0
+2.5 sequence 5 voice-5 0
+2.5 sequence 6 voice-6 0
+2.5 sequence 7 voice-7 0
+2.5 sequence 8 voice-8 0
+2.5 sequence 9 voice-9 0
+2.5 sequence 10 voice-10 0
+2.5 sequence 11 voice-11 0
+2.5 sequence 12 voice-12 0
+2.5 sequence 13 voice-13 0
+2.5 sequence 14 voice-14 0
+2.5 sequence 15 voice-15 0
+2.5 sequence 16 voice-16 0
+2.5 sequence 17 voice-17 0
+2.5 sequence 18 voice-18 0
+2.5 sequence 19 voice-19 0
 
 #1 Voice 1
 111.5 D5 0.5

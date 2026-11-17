@@ -1,6 +1,7 @@
 
-import fifths from 'sequence/modules/transforms/fifths.js';
 import * as HSID from 'sequence/modules/hsid.js';
+import grainOfBeat from '../bar/grain-of-beat.js';
+
 
 /*
 Batches events and reads their notes into slice objects.
@@ -9,6 +10,7 @@ Batches events and reads their notes into slice objects.
 export default function batch(events) {
     const head = {
         beat: 0,
+        grain: 0,
         key: 0,
         count: 1,
         index: 0,
@@ -16,11 +18,18 @@ export default function batch(events) {
         length: 0
     };
 
+    let meter;
     let slice = head;
     let n = -1, event;
     while (event = events[++n]) switch (event.type) {
         case 'key':
             slice.key = event[2];
+            continue;
+        case 'meter':
+            meter = event;
+            if (event[0] === slice.beat) {
+                slice.grain = grainOfBeat(meter.divisions, (event[0] - meter[0]) % meter.beats);
+            }
             continue;
         case 'chord':
         case 'note': {
@@ -28,7 +37,10 @@ export default function batch(events) {
             if (event[0] > slice.beat + 1/24) {
                 // If slice has no events repurpose it to current beat...
                 if (slice.length === 0) {
-                    slice.beat = event[0];
+                    slice.beat  = event[0];
+                    slice.grain = meter ?
+                        grainOfBeat(meter.divisions, (event[0] - meter[0]) % meter.beats) :
+                        0 ;
                 }
                 // otherwise create new slice
                 else {
@@ -36,6 +48,9 @@ export default function batch(events) {
                     slice = slice.next = {
                         prev:   slice,
                         beat:   event[0],
+                        grain:  meter ?
+                            grainOfBeat(meter.divisions, (event[0] - meter[0]) % meter.beats) :
+                            0 ,
                         key:    slice.key,
                         index:  slice.index + 1,
                         size:   0,

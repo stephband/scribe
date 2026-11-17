@@ -4,7 +4,7 @@ import analyseKeys from './analyse.js';
 
 const { log1p } = Math;
 
-export const IN_DIM  = 29;
+export const IN_DIM  = 30;
 export const OUT_DIM = 19;
 
 /**
@@ -32,9 +32,9 @@ export default {
 encode(head)
 
 Encodes a linked list of beat slices from `batch(events)` into a flat
-`Float32Array(T * 29)` input buffer for `RecurrentNetwork`.
+`Float32Array(T * 30)` input buffer for `RecurrentNetwork`.
 
-Input vector per beat slice (29 floats):
+Input vector per beat slice (30 floats):
 - [0..11]  12 notes present in slice (0 or 1), indexed by circle of fifths
 - [12..23] 12 analyseKey(slice) scores on the circle of fifths (0..11)
 - [24]     dtPrev: log1p(slice.beat - slice.prev.beat)
@@ -42,6 +42,7 @@ Input vector per beat slice (29 floats):
 - [26]     minDur: log1p(minDuration)
 - [27]     maxDur: log1p(maxDuration)
 - [28]     homeKey: slice.key / 9
+- [29]     grain: raw slice.grain
 **/
 
 export function encode(head) {
@@ -81,6 +82,9 @@ export function encode(head) {
 
         // [28] Home key normalised to [-1..+1] for keys -9..+9
         data[offset + 28] = slice.key / 9;
+
+        // [29] Metric grain at slice beat
+        data[offset + 29] = slice.grain || 0;
 
         offset += IN_DIM;
         slice = slice.next;

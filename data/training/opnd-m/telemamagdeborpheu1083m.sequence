@@ -1,7 +1,8 @@
 # telemamagdeborpheu1083m
-0 sequence 1 voice-1 0
-0 sequence 2 voice-2 0
-0 sequence 4 voice-4 0
+0 meter 2/4
+1.5 sequence 1 voice-1 0
+1.5 sequence 2 voice-2 0
+1.5 sequence 4 voice-4 0
 
 #1 Voice 1
 4.75 F♯4 0.25
