@@ -97,7 +97,7 @@ export default define(element('scribe-music', {
             //const fragment = await renderDOM(
             const html = await renderHTML(
                 // Events from data
-                internals.data.value,
+                Data.of(internals.data.value),
                 // Parts (override with staff attribute if sequence defines no parts)
                 internals.data.value.parts || (internals.staff.value ? [{ staff: internals.staff.value }] : undefined),
                 // Key name
