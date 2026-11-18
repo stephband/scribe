@@ -1,15 +1,13 @@
 
-import Data                      from 'fn/data.js';
-import Signal                    from 'fn/signal.js';
-import slugify                   from 'fn/slugify.js';
+import Data         from 'fn/data.js';
+import Signal       from 'fn/signal.js';
+import slugify      from 'fn/slugify.js';
 import element, { getInternals } from 'dom/element.js';
-import { Sequence }              from 'sequence/module.js';
-
-import parse               from '../modules/parse.js';
-import Stave             from '../modules/stave.js';
-import renderHTML        from '../modules/render-html.js';
-import renderStyle       from '../modules/render-style.js';
-import config            from '../modules/config.js';
+import { Sequence } from 'sequence/module.js';
+import Stave        from '../modules/stave.js';
+import renderHTML   from '../modules/render-html.js';
+import renderStyle  from '../modules/render-style.js';
+import config       from '../modules/config.js';
 
 
 const DEBUG  = globalThis.DEBUG;
@@ -187,7 +185,7 @@ export default define(element('scribe-music', {
 
             // Print performance logs
             if (debug) {
-                const key   = `debug-scribe-music-${ slugify(debug.name) }`;
+                const key = `debug-scribe-music-${ slugify(debug.name) }`;
                 const stats = JSON.parse(localStorage.getItem(key) || '[]');
                 stats.push(debug);
                 localStorage.setItem(key, JSON.stringify(stats));
@@ -381,7 +379,7 @@ export default define(element('scribe-music', {
     src: {
         attribute: function(src) { this.src = src; },
         get: function() { return getInternals(this).src; },
-        set: function(src) {
+        set: async function(src) {
             const internals = getInternals(this);
             internals.src = src;
             const url = new URL(src, window.location);
@@ -408,23 +406,33 @@ export default define(element('scribe-music', {
                     throw new Error('<scribe-music> src script "' + src + '" not found in document');
                 }
                 this.data = parseScript(script);
+                return;
             }
-            else {
-                const type = this.type
-                    || (/\.sequence(?:\?.*)?$/i.test(url.pathname) ? 'sequence' : undefined)
-                    || (/\.abc(?:\?.*)?$/i.test(url.pathname) ? 'text/x-abc' : undefined)
-                    || (/\.midi?(?:\?.*)?$/i.test(url.pathname) ? 'audio/midi' : undefined)
-                    || 'application/json';
 
-                const isBinary = type === 'audio/midi' || type === 'midi';
+            // Fetch url
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`${ response.status } ${ response.statusText } "${ url.href }"`);
 
-                fetch(url)
-                .then((response) => {
-                    if (!response.ok) throw new Error(`${ response.status } ${ response.statusText } "${ url.href }"`);
-                    return isBinary ? response.arrayBuffer() : response.text();
-                })
-                .then((data) => this.data = parse(type, data))
-                .catch((error) => console.error(error));
+            // Parse data by mimetype
+            const type = this.type
+                || (/\.sequence(?:\?.*)?$/i.test(url.pathname) && 'text/sequence')
+                //|| (/\.abc(?:\?.*)?$/i.test(url.pathname) ? 'text/x-abc')
+                || (/\.midi?(?:\?.*)?$/i.test(url.pathname) && 'audio/midi')
+                || 'application/json';
+
+            switch (type) {
+                case 'text/sequence': {
+                    const text = await response.text();
+                    return Sequence.parse(text);
+                }
+                case 'audio/midi': {
+                    const data = await response.arrayBuffer();
+                    return Sequence.parseMIDI(data);
+                }
+                case 'application/json': {
+                    const json = await response.json();
+                    return Sequence.from(json);
+                }
             }
         },
         default:   null
