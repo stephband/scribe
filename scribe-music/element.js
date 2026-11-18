@@ -421,17 +421,23 @@ export default define(element('scribe-music', {
                 || 'application/json';
 
             switch (type) {
+                case 'sequence':
                 case 'text/sequence': {
                     const text = await response.text();
-                    return Sequence.parse(text);
+                    this.data = Sequence.parse(text);
+                    break;
                 }
+                case 'midi':
                 case 'audio/midi': {
                     const data = await response.arrayBuffer();
-                    return Sequence.parseMIDI(data);
+                    this.data = Sequence.parseMIDI(data);
+                    break;
                 }
+                case 'json':
                 case 'application/json': {
                     const json = await response.json();
-                    return Sequence.from(json);
+                    this.data = Sequence.from(json);
+                    break;
                 }
             }
         },
