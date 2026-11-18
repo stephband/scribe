@@ -70,6 +70,21 @@ function measureHeadMetrics(element, root) {
     return metrics;
 }
 
+/* Glyphs for triplet mark d d = d 3 d, instead of saying Swing 8ths, for example
+text = glyphs.textNoteShort
+    + glyphs.textBeam8Short
+    + glyphs.textNote8Short
+    + '='
+    + glyphs.textNoteShort
+    + ' '
+    + glyphs.textTuplet3Long
+    + glyphs.note05Up
+*/
+
+export function remove(element) {
+    element.remove();
+}
+
 export default function renderStyle(element, root = element) {
     const metrics = measureHeadMetrics(element, root);
 

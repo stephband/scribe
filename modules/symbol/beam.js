@@ -11,6 +11,10 @@ const assign = Object.assign;
 
 let beamId = 0;
 
+export function resetBeamId() {
+    beamId = 0;
+}
+
 const beamSpacing = 1.6;
 
 function average(a, n, i, array) {

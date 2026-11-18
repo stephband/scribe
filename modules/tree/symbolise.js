@@ -4,7 +4,7 @@ import { accidentalsFromKey } from '../accidentals.js';
 import { getDivisionBefore }  from '../bar/divisions.js';
 import last                   from '../object/last.js';
 import push                   from '../object/push.js';
-import { createBeam, closeBeam } from '../symbol/beam.js';
+import { createBeam, closeBeam, resetBeamId } from '../symbol/beam.js';
 import { createRests }        from '../symbol/rest.js';
 import { closeTuplet }        from '../symbol/tuplet.js';
 import getVoice               from './get-voice.js';
@@ -382,6 +382,8 @@ export default function symbolise(settings, parts, tree) {
     let n = -1;
     let bar;
     while (bar = tree[++n]) {
+        // Number beams deterministically per bar so unchanged bars produce identical HTML
+        resetBeamId();
         // Never repeat material from before a double bar line
         if (n && tree[n - 1].doubleBarLine) detectors = {};
 

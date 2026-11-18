@@ -7,9 +7,8 @@ import { Sequence }              from 'sequence/module.js';
 
 import parse               from '../modules/parse.js';
 import Stave             from '../modules/stave.js';
-import renderHTML  from '../modules/render-dom.js';
-import renderStyle from '../modules/render-style.js';
-//import { renderDOM, renderStyle, remove } from '../modules/render-dom.js';
+import renderHTML        from '../modules/render-html.js';
+import renderStyle       from '../modules/render-style.js';
 import config            from '../modules/config.js';
 
 
@@ -29,6 +28,66 @@ function parseScript(script) {
         Sequence.parse(script.textContent) :
         // Script contains JSON
         Sequence.from(JSON.parse(script.textContent)) ;
+}
+
+function patchShadow(shadow, internals, header, bars) {
+    if (!internals.bars) {
+        shadow.replaceChildren(internals.link, internals.style);
+        internals.style.insertAdjacentHTML('afterend', header + bars.join(''));
+        internals.header = header;
+        internals.bars   = bars;
+        return;
+    }
+
+    // Patch side header only when signatures change
+    let side = internals.style.nextElementSibling;
+    if (side && side.id !== 'side') side = null;
+
+    if (header !== internals.header) {
+        if (header && side) {
+            side.outerHTML = header;
+            side = internals.style.nextElementSibling;
+        }
+        else if (header) {
+            internals.style.insertAdjacentHTML('afterend', header);
+            side = internals.style.nextElementSibling;
+        }
+        else if (side) {
+            side.remove();
+            side = null;
+        }
+        internals.header = header;
+    }
+
+    // Diff bars in place, replacing only changed bars and trailing differences
+    const prev = internals.bars;
+    let anchor = side || internals.style;
+    let el     = anchor.nextElementSibling;
+
+    for (let i = 0; i < bars.length; i++) {
+        if (!el) {
+            anchor.insertAdjacentHTML('afterend', bars.slice(i).join(''));
+            break;
+        }
+
+        const next = el.nextElementSibling;
+        if (bars[i] !== prev[i]) {
+            el.outerHTML = bars[i];
+            anchor = next ? next.previousElementSibling : shadow.lastElementChild;
+        }
+        else {
+            anchor = el;
+        }
+        el = next;
+    }
+
+    while (el) {
+        const next = el.nextElementSibling;
+        el.remove();
+        el = next;
+    }
+
+    internals.bars = bars;
 }
 
 /* Register <scribe-music> */
@@ -94,8 +153,7 @@ export default define(element('scribe-music', {
             const debug = DEBUG && internals.data.value.name ? { name: internals.data.value.name } : null ;
             if (debug) debug.t0 = performance.now();
 
-            //const fragment = await renderDOM(
-            const html = await renderHTML(
+            const { header, bars } = await renderHTML(
                 // Events from data
                 Data.of(internals.data.value),
                 // Parts (override with staff attribute if sequence defines no parts)
@@ -120,11 +178,7 @@ export default define(element('scribe-music', {
             );
             if (debug) debug.t3 = performance.now();
 
-            // Clear the shadow DOM of bars and style and put new elements in it
-        //    shadow.querySelectorAll('.side, .bar').forEach(remove);
-        //    shadow.appendChild(fragment);
-            shadow.replaceChildren(internals.link, internals.style);
-            internals.style.insertAdjacentHTML('afterend', html);
+            patchShadow(shadow, internals, header, bars);
             if (debug) debug.t4 = performance.now();
 
         //    internals.style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
