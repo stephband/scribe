@@ -3,8 +3,9 @@
 import requestTree from './tree.js';
 import { createBarHTML, createSigHTML } from './create-html.js';
 
+
 /**
-.renderHTML(sequence, parts, key, timesig, transpose, displace, duration, settings, debug)
+renderHTML(sequence, parts, key, timesig, transpose, displace, duration, settings, debug)
 Builds the render tree and returns `{ header, bars }` HTML strings for
 full or incremental shadow-DOM patching.
 **/
