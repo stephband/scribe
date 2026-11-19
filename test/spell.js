@@ -8,7 +8,7 @@ import Sequence   from 'sequence/module.js';
 import analyseKeys from '../modules/spell/analyse.js';
 import batch       from '../modules/spell/batch.js';
 import { encode, decode, IN_DIM } from '../modules/spell/schema.js';
-import spell       from '../modules/tree/spell.js';
+import spell       from '../modules/spell.js';
 
 Deno.test('analyseKeys() scores scales, tritones, and chromatic clusters', () => {
     const cMaj = analyseKeys([60, 62, 64, 65, 67, 69, 71]);

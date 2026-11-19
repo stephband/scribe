@@ -13,7 +13,7 @@ import * as minor251s         from "../data/training/scales/minor-ii-v-i.js";
 import * as substitutions     from "../data/training/scales/substitutions.js";
 import * as blues             from "../data/blues.js";
 
-import spell from '../modules/tree/spell.js';
+import spell from '../modules/spell.js';
 import { toKeyName } from 'sequence/modules/event/key.js';
 import { renderDOM, renderStyle, renderBeams } from '../modules/render.js';
 import { identify } from '../modules/event.js';

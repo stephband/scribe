@@ -1,4 +1,4 @@
-import { RecurrentNetwork } from 'neuron/modules/rnn/network-train.js';
+import RecurrentNetwork from 'neuron/modules/rnn/network-train.js';
 import { exportAsModule, serializeWeights } from 'neuron/modules/serialize.js';
 import Sequence from 'sequence/module.js';
 import batch from '../modules/spell/batch.js';
