@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Scribe – Render Process</title>
+
+    <meta charset="utf-8" />
+    <meta name="author" content="@stephband" />
+    <meta name="description" content="End-to-end flowchart of Scribe's off-thread music notation rendering pipeline" />
+    <meta name="viewport" content="width=device-width" />
+
+    <script title="load">
+        document.documentElement.className += ' js loading';
+        window.addEventListener('load', () => window.requestAnimationFrame(() => document.documentElement.classList.remove('loading')));
+    </script>
+
+    <style>
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/elements/html.css';
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/ratio.css';
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/atoms.css';
+    @import 'https://cdn.jsdelivr.net/gh/stephband/bolt-2@latest/classes/striped-table.css';
+    @import '../assets/font.css';
+
+    :root {
+        --pink: oklch(0.51 0.23 0);
+        --pink-soft: oklch(0.51 0.23 0 / 8%);
+        --pink-border: oklch(0.51 0.23 0 / 32%);
+        --teal: oklch(0.45 0.14 205);
+        --teal-soft: oklch(0.45 0.14 205 / 8%);
+        --teal-border: oklch(0.45 0.14 205 / 32%);
+        --amber: #8a5600;
+        --amber-border: rgba(196, 124, 12, 0.42);
+        --green: oklch(0.45 0.14 155);
+        --green-border: oklch(0.45 0.14 155 / 35%);
+        --paper: #ffffff;
+        --stone: #f4efe6;
+        --border: #dcd3c4;
+        --ink: #22262c;
+        --muted: #626973;
+    }
+
+    body {
+        font-family: system-ui, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    pre, code {
+        font-family: MartianMono, ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    code {
+        font-size: 0.85em;
+        background: rgba(34, 38, 44, 0.06);
+        padding: 0.08em 0.35em;
+        border-radius: 4px;
+    }
+
+    .nt, .orange-fg, .tag { font-weight: 400; color: oklch(0.51 0.23 0); }
+    .na, .yellow-fg, .attribute, .property { font-weight: 400; color: oklch(0.51 0.23 180); }
+    .s,  .lime-fg, .attribute-value { font-weight: 400; color: oklch(0.51 0.23 90); }
+    .number { color: oklch(0.51 0.23 30); }
+    .string { color: oklch(0.51 0.23 120); }
+
+    body > .grid {
+        padding-left:  calc(0.5 * var(--x-gap));
+        padding-right: calc(0.5 * var(--x-gap));
+    }
+
+    .header-section,
+    .content-section,
+    .table-section {
+        padding-top: 3em;
+        padding-bottom: 3em;
+    }
+
+    .header-section {
+        padding-bottom: 1.5em;
+    }
+
+    .content-section {
+        padding-top: 1.5em;
+    }
+
+    .table-section {
+        color: oklch(0.31 0.06 279.08);
+        background-color: oklch(0.8 0.19 95.26);
+        background-image: linear-gradient(205deg, oklch(0.75 0.18 81.43), oklch(0.89 0.21 94.26));
+    }
+
+    .breadcrumb {
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 0.85em;
+    }
+
+    .breadcrumb a {
+        color: var(--pink);
+        text-decoration: none;
+    }
+
+    .breadcrumb a:hover {
+        text-decoration: underline;
+    }
+
+    .api-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75em;
+        margin-top: 1.5em;
+        margin-bottom: 0.5em;
+    }
+
+    .api-nav a {
+        padding: 0.35em 0.85em;
+        border-radius: 4px;
+        background: #f0ede6;
+        color: #333;
+        text-decoration: none;
+        font-size: 0.9em;
+    }
+
+    .api-nav a.active {
+        background: var(--pink);
+        color: white;
+        font-weight: 600;
+    }
+
+    /* Controls Bar */
+    .flow-controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75em;
+        padding: 0.75em 1em;
+        background: var(--stone);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+    }
+
+    .filter-group,
+    .action-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4em;
+        align-items: center;
+    }
+
+    .filter-label {
+        font-size: 0.75em;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted);
+        margin-right: 0.25em;
+    }
+
+    .btn {
+        appearance: none;
+        border: 1px solid var(--border);
+        background: var(--paper);
+        color: var(--ink);
+        font-family: inherit;
+        font-size: 0.82em;
+        font-weight: 600;
+        padding: 0.34em 0.75em;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+
+    .btn:hover {
+        border-color: var(--ink);
+    }
+
+    .btn.active {
+        background: var(--pink);
+        border-color: var(--pink);
+        color: #ffffff;
+    }
+
+    /* Workspace Layout */
+    .workspace {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 330px;
+        gap: 1.5em;
+        align-items: start;
+    }
+
+    @media (max-width: 64em) {
+        .workspace {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Swimlanes */
+    .flow-column {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .lane {
+        position: relative;
+        border-radius: 12px;
+        padding: 1.15em 1.15em 1.25em;
+        border: 1.5px solid var(--border);
+        background: var(--paper);
+        transition: opacity 0.2s ease;
+    }
+
+    .lane.lane-main-in  { border-color: var(--pink-border); }
+    .lane.lane-worker   { border-color: var(--teal-border); }
+    .lane.lane-main-out { border-color: var(--green-border); }
+
+    .lane.dimmed {
+        opacity: 0.3;
+    }
+
+    .lane-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.5em;
+        margin-bottom: 0.9em;
+        padding-bottom: 0.6em;
+        border-bottom: 1px dashed var(--border);
+    }
+
+    .lane-title {
+        display: flex;
+        align-items: center;
+        gap: 0.55em;
+        font-size: 0.82em;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+
+    .dot-main   { background: var(--pink); }
+    .dot-worker { background: var(--teal); }
+    .dot-dom    { background: var(--green); }
+
+    .lane-main-in  .lane-title { color: var(--pink); }
+    .lane-worker   .lane-title { color: var(--teal); }
+    .lane-main-out .lane-title { color: var(--green); }
+
+    .lane-files {
+        font-family: MartianMono, monospace;
+        font-size: 0.72em;
+        color: var(--muted);
+    }
+
+    /* Transfer Bridges */
+    .bridge {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0.15em 0;
+    }
+
+    .bridge-line {
+        width: 2px;
+        height: 15px;
+        background: var(--amber);
+    }
+
+    .bridge-card {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 0.45em 0.8em;
+        background: #fff9ec;
+        border: 1.5px solid var(--amber-border);
+        color: #5b3800;
+        border-radius: 999px;
+        padding: 0.4em 0.95em;
+        font-size: 0.78em;
+        font-weight: 600;
+    }
+
+    .bridge-card code {
+        background: rgba(138, 86, 0, 0.1);
+        color: #4f3000;
+    }
+
+    .bridge-arrow {
+        width: 14px;
+        height: 12px;
+        display: block;
+    }
+
+    /* Connectors */
+    .step-connector {
+        display: flex;
+        justify-content: center;
+        height: 20px;
+    }
+
+    .step-connector svg {
+        width: 16px;
+        height: 20px;
+        overflow: visible;
+    }
+
+    /* Flow Nodes */
+    .node {
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        background: var(--paper);
+        padding: 0.85em 1em;
+        cursor: pointer;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .node:hover {
+        border-color: var(--teal);
+        box-shadow: 0 3px 12px rgba(18, 76, 88, 0.08);
+    }
+
+    .node.selected {
+        border-color: var(--pink);
+        box-shadow: 0 0 0 3px var(--pink-soft), 0 4px 16px rgba(254, 38, 126, 0.1);
+    }
+
+    .node-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.75em;
+    }
+
+    .node-title-wrap {
+        display: flex;
+        align-items: center;
+        gap: 0.65em;
+    }
+
+    .step-num {
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-family: MartianMono, monospace;
+        font-size: 0.78em;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .lane-main-in  .step-num { background: var(--pink); color: #fff; }
+    .lane-worker   .step-num { background: var(--teal); color: #fff; }
+    .lane-main-out .step-num { background: var(--green); color: #fff; }
+
+    .node-title {
+        font-weight: 700;
+        font-size: 0.96em;
+        margin: 0;
+    }
+
+    .node-tag {
+        font-family: MartianMono, monospace;
+        font-size: 0.7em;
+        color: var(--muted);
+        background: var(--stone);
+        padding: 0.16em 0.45em;
+        border-radius: 4px;
+        white-space: nowrap;
+        border: 1px solid var(--border);
+    }
+
+    .node-desc {
+        margin: 0.45em 0 0 2.35em;
+        font-size: 0.88em;
+        color: #363d47;
+        line-height: 1.45;
+    }
+
+    /* Sub-flows */
+    .subflow {
+        margin: 0.85em 0 0.15em 2.35em;
+        padding: 0.8em;
+        border-radius: 8px;
+        background: #fffbf5;
+        border: 1px solid var(--border);
+    }
+
+    .subflow.collapsed {
+        display: none;
+    }
+
+    .subflow-label {
+        font-size: 0.72em;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 0.55em;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5em;
+    }
+
+    .sub-grid {
+        display: grid;
+        gap: 0.5em;
+    }
+
+    .sub-grid-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .sub-grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .sub-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    @media (max-width: 52em) {
+        .sub-grid-5,
+        .sub-grid-4,
+        .sub-grid-3 {
+            grid-template-columns: 1fr;
+        }
+        .node-desc,
+        .subflow {
+            margin-left: 0;
+        }
+    }
+
+    .substep {
+        background: var(--paper);
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        padding: 0.55em 0.65em;
+        font-size: 0.78em;
+    }
+
+    .substep.branch {
+        border-style: dashed;
+        border-color: var(--pink-border);
+        background: #fff9fb;
+    }
+
+    .substep.rnn {
+        border-color: var(--teal);
+        background: #f2f9fb;
+    }
+
+    .substep-id {
+        font-family: MartianMono, monospace;
+        font-size: 0.7em;
+        font-weight: 700;
+        color: var(--teal);
+        margin-bottom: 0.2em;
+    }
+
+    .substep.branch .substep-id {
+        color: var(--pink);
+    }
+
+    .substep-title {
+        font-weight: 700;
+        color: var(--ink);
+        margin-bottom: 0.2em;
+    }
+
+    .substep-body {
+        color: var(--muted);
+        line-height: 1.35;
+    }
+
+    .decision-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.45em;
+        margin-bottom: 0.6em;
+        padding: 0.45em 0.65em;
+        border-radius: 6px;
+        background: var(--stone);
+        border: 1px solid var(--border);
+        font-size: 0.78em;
+    }
+
+    .diamond-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35em;
+        font-family: MartianMono, monospace;
+        font-size: 0.72em;
+        font-weight: 700;
+        color: var(--pink);
+        background: var(--pink-soft);
+        border: 1px solid var(--pink-border);
+        padding: 0.14em 0.45em;
+        border-radius: 4px;
+    }
+
+    /* Stride-8 Buffer Map */
+    .buffer-strip {
+        margin: 0.65em 0 0 2.35em;
+        display: grid;
+        grid-template-columns: repeat(8, minmax(0, 1fr));
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        overflow: hidden;
+        font-family: MartianMono, monospace;
+        font-size: 0.68em;
+    }
+
+    @media (max-width: 45em) {
+        .buffer-strip {
+            margin-left: 0;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+    }
+
+    .slot {
+        padding: 0.35em 0.35em;
+        border-right: 1px solid var(--border);
+        background: var(--stone);
+        text-align: center;
+    }
+
+    .slot:last-child { border-right: none; }
+
+    .slot b {
+        display: block;
+        color: var(--pink);
+        font-size: 0.68em;
+    }
+
+    .slot span {
+        color: var(--ink);
+        font-weight: 600;
+    }
+
+    .parallel-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.75em;
+    }
+
+    @media (max-width: 45em) {
+        .parallel-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Inspector Sidebar */
+    .inspector {
+        position: sticky;
+        top: 1.25em;
+        background: var(--paper);
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        padding: 1.15em;
+    }
+
+    @media (max-width: 64em) {
+        .inspector {
+            position: static;
+        }
+    }
+
+    .inspector-kicker {
+        font-family: MartianMono, monospace;
+        font-size: 0.7em;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--pink);
+        margin-bottom: 0.25em;
+    }
+
+    .inspector h2 {
+        margin: 0 0 0.55em;
+        font-size: 1.12em;
+        line-height: 1.25;
+    }
+
+    .inspector p {
+        margin: 0 0 0.8em;
+        font-size: 0.86em;
+        color: #363d47;
+    }
+
+    .kv-list {
+        display: grid;
+        gap: 0.55em;
+        border-top: 1px dashed var(--border);
+        padding-top: 0.8em;
+        margin: 0;
+    }
+
+    .kv-item dt {
+        font-size: 0.7em;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 0.15em;
+    }
+
+    .kv-item dd {
+        margin: 0;
+        font-size: 0.82em;
+        color: var(--ink);
+    }
+
+    .kv-item dd code {
+        word-break: break-word;
+    }
+
+    .inspector-list {
+        margin: 0.3em 0 0;
+        padding-left: 1.1em;
+        font-size: 0.82em;
+        color: #363d47;
+    }
+
+    .inspector-list li {
+        margin-bottom: 0.28em;
+    }
+
+    .legend-note {
+        margin-top: 0.6em;
+        font-size: 0.76em;
+        color: var(--muted);
+    }
+
+    /* Wire Format Section */
+    .contract-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1em;
+    }
+
+    @media (max-width: 56em) {
+        .contract-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .contract-card {
+        background: rgba(255, 255, 255, 0.55);
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        border-radius: 10px;
+        padding: 0.95em 1.05em;
+    }
+
+    .contract-card h3 {
+        margin: 0 0 0.45em;
+        font-size: 0.86em;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .contract-card pre {
+        margin: 0;
+        font-size: 0.75em;
+        line-height: 1.45;
+        overflow-x: auto;
+    }
+    </style>
+</head>
+<body>
+    <header class="header-section 9x-grid grid" style="--y-gap: 0em;">
+        <p class="breadcrumb 9x @1-x2 @1-6x @2-5x @3-4x"><a href="../index.html">Scribe</a> / <a href="index.html">API</a> / Render Process</p>
+        <h1 class="font-01 darkpink-fg no-wrap 9x @1-x2 @1-6x @2-5x @3-4x">Render Process</h1>
+        <p class="font-04 9x @1-x2 @1-6x @2-5x @3-4x">
+            Scribe serialises a sequence into a transferable stride-8 <code>Float64Array</code>, renders, spells, and hashes bars inside a Web Worker, and returns only the changed HTML bars to patch the shadow DOM.
+        </p>
+
+        <nav class="api-nav 9x @1-x2 @1-8x">
+            <a href="index.html">API Overview</a>
+            <a href="parts.html">Multi-Stave Scoring</a>
+            <a href="fonts/jazz.html">SMuFL Fonts</a>
+            <a href="render-process.html" class="active">Render Process</a>
+        </nav>
+    </header>
+
+    <section class="content-section 9x-grid grid">
+        <div class="flow-controls 9x @1-x2 @1-8x">
+            <div class="filter-group" role="group" aria-label="Filter by execution lane">
+                <span class="filter-label">Focus lane:</span>
+                <button class="btn active" data-lane="all">All steps (1–12)</button>
+                <button class="btn" data-lane="main-in">Main In (1–2)</button>
+                <button class="btn" data-lane="worker">Worker (3–10)</button>
+                <button class="btn" data-lane="main-out">DOM Patch (11–12)</button>
+            </div>
+            <div class="action-group">
+                <button class="btn" id="toggle-subflows">Collapse sub-steps</button>
+            </div>
+        </div>
+
+        <div class="workspace 9x @1-x2 @1-8x">
+            <div class="flow-column">
+
+                <!-- LANE 1: MAIN THREAD INPUT -->
+                <section class="lane lane-main-in" data-lane="main-in">
+                    <div class="lane-header">
+                        <div class="lane-title"><span class="dot dot-main"></span> Main Thread — Serialise &amp; Transfer</div>
+                        <div class="lane-files">render-html-on-worker.js → render/serialise.js</div>
+                    </div>
+
+                    <!-- STEP 1 -->
+                    <article class="node selected" data-step="1" tabindex="0">
+                        <div class="node-head">
+                            <div class="node-title-wrap">
+                                <span class="step-num">1</span>
+                                <h3 class="node-title">Flatten &amp; Serialise Sequence to Stride-8 <code>Float64Array</code></h3>
+                            </div>
+                            <span class="node-tag">serialise(iterator)</span>
+                        </div>
+                        <p class="node-desc">
+                            Expand the sequence via <code>SequenceIterator(..., { outputInBeats: true })</code> and pack renderable events (<code>note</code>, <code>chord</code>, <code>meter</code>, <code>key</code>, <code>text</code>, <code>clef</code>) into a stride-8 <code>Float64Array</code>, skipping <code>sequence</code>, <code>rate</code>, and <code>control</code> events. Assign and store event IDs via <code>identify(original(event))</code>, preserve <code>target</code> and <code>voice</code>, and store strings from <code>text</code> events in a companion <code>texts[]</code> lookup array.
+                        </p>
+                        <div class="buffer-strip" aria-label="Float64Array stride-8 memory layout">
+                            <div class="slot"><b>[+0]</b><span>beat</span></div>
+                            <div class="slot"><b>[+1]</b><span>type</span></div>
+                            <div class="slot"><b>[+2]</b><span>pitch / rsid / key / dur</span></div>
+                            <div class="slot"><b>[+3]</b><span>gain / hsid / div / textIdx</span></div>
+                            <div class="slot"><b>[+4]</b><span>duration</span></div>
+                            <div class="slot"><b>[+5]</b><span>target (-1)</span></div>
+                            <div class="slot"><b>[+6]</b><span>voice (-1)</span></div>
+                            <div class="slot"><b>[+7]</b><span>id (0+)</span></div>
+                        </div>
+                    </article>
+
+                    <div class="step-connector" aria-hidden="true">
+                        <svg viewBox="0 0 16 20">
+                            <line x1="8" y1="0" x2="8" y2="14" stroke="#c8beb0" stroke-width="2" />
+                            <polygon points="3,12 13,12 8,19" fill="oklch(0.51 0.23 0)" />
+                        </svg>
+                    </div>
+
+                    <!-- STEP 2 -->
+                    <article class="node" data-step="2" tabindex="0">
+                        <div class="node-head">
+                            <div class="node-title-wrap">
+                                <span class="step-num">2</span>
+                                <h3 class="node-title">Call <code>renderHTMLOnWorker()</code> &amp; Transfer Buffer</h3>
+                            </div>
+                            <span class="node-tag">compile-worker.js</span>
+                        </div>
+                        <p class="node-desc">
+                            Normalise <code>parts</code> with <code>part.toJSON()</code> and hand ownership of <code>[data.buffer]</code> to the Web Worker via zero-copy transferable <code>postMessage()</code> alongside <code>texts</code>, existing bar <code>hashes[]</code>, <code>key</code>, <code>timesig</code>, <code>beat</code>, <code>settings</code>, and <code>debug</code>.
+                        </p>
+                    </article>
+                </section>
+
+                <!-- BRIDGE 1 -->
+                <div class="bridge" aria-label="Main thread to Web Worker transfer">
+                    <div class="bridge-line"></div>
+                    <div class="bridge-card">
+                        <span>Main → Worker <code>postMessage</code></span>
+                        <code>{ data: Float64Array, texts, hashes, parts, key, timesig, beat, settings }</code>
+                        <span>Transfer: <code>[data.buffer]</code></span>
+                    </div>
+                    <div class="bridge-line"></div>
+                    <svg class="bridge-arrow" viewBox="0 0 14 12" aria-hidden="true">
+                        <polygon points="1,0 13,0 7,11" fill="#8a5600" />
+                    </svg>
+                </div>
+
+                <!-- LANE 2: WEB WORKER -->
+                <section class="lane lane-worker" data-lane="worker">
+                    <div class="lane-header">
+                        <div class="lane-title"><span class="dot dot-worker"></span> Web Worker — Quantise, Spell, Symbolise, Render &amp; Hash</div>
+                        <div class="lane-files">modules/render/worker.js (bundled → worker-code.js)</div>
+                    </div>
+
+                    <!-- STEP 3 -->
+                    <article class="node" data-step="3" tabindex="0">
+                        <div class="node-head">
+                            <div class="node-title-wrap">
+                                <span class="step-num">3</span>
+                                <h3 class="node-title">Deserialise <code>data</code> into <code>Event</code> Objects</h3>
+                            </div>
+                            <span class="node-tag">render/deserialise.js</span>
+                        </div>
+                        <p class="node-desc">
+                            Unpack each stride-8 record and <code>texts[index]</code> back into <code>NoteEvent</code>, <code>ChordEvent</code>, <code>MeterEvent</code>, <code>KeyEvent</code>, and <code>TextEvent</code> objects, restoring <code>event.id</code>, <code>event.target</code>, and <code>event.voice</code>.
+                        </p>
+                    </article>
+
+                    <div class="step-connector" aria-hidden="true">
+                        <svg viewBox="0 0 16 20">
+                            <line x1="8" y1="0" x2="8" y2="14" stroke="#c8beb0" stroke-width="2" />
+                            <polygon points="3,12 13,12 8,19" fill="oklch(0.45 0.14 205)" />
+                        </svg>
+                    </div>
+
+                    <!-- STEP 4 -->
+                    <article class="node" data-step="4" tabindex="0">
+                        <div class="node-head">
+                            <div class="node-title-wrap">
+                                <span class="step-num">4</span>
+                                <h3 class="node-title">Create Tree &amp; Analyse Metric Quantisation</h3>
+                            </div>
+                            <span class="node-tag">tree/read.js → tree/quantise.js</span>
+                        </div>
+                        <p class="node-desc">
+                            <code>read()</code> groups events into bars along meter boundaries, routes events to parts and voices in <code>part.buffers[voiceName]</code>, and collects <code>spellables</code>. Then <code>quantise()</code> runs the Elastic Phase-Locked Metrical Quantiser (EPL-MQ) across every bar, part, and voice.
+                        </p>
+
+                        <div class="subflow" data-subflow>
+                            <div class="subflow-label">
+                                <span>4.1 Quantisation Steps · <code>quantise.js</code> + <code>rhythm.js</code></span>
+                                <span>Per bar × part × voice</span>
+                            </div>
+                            <div class="sub-grid sub-grid-5">
+                                <div class="substep">
+                                    <div class="substep-id">4.1.1</div>
+                                    <div class="substep-title">Carry PLL Drift</div>
+                                    <div class="substep-body">Track expressive performer drift in <code>drifts[part.voice]</code>; reset to <code>0</code> if a bar buffer is empty.</div>
+                                </div>
+                                <div class="substep">
+                                    <div class="substep-id">4.1.2</div>
+                                    <div class="substep-title">Phasor Divisor Fit</div>
+                                    <div class="substep-body"><code>detectRhythmPrime()</code> scores <code>primes = [9,7,5,3,2]</code> (<code>[3,2]</code> for chords) via <code>cos/sin(x·2π)</code> in frame <code>t − drift</code>.</div>
+                                </div>
+                                <div class="substep branch">
+                                    <div class="substep-id">4.1.3 ◊ Split?</div>
+                                    <div class="substep-title">Binary-Tree Bifurcation</div>
+                                    <div class="substep-body"><code>detectBestFit()</code> compares coarse fit <code>afit</code> vs splitting <code>[beat, d/2)</code> + <code>[+d/2, d)</code>; split if <code>bfit &gt; afit + 1e-4</code>.</div>
+                                </div>
+                                <div class="substep">
+                                    <div class="substep-id">4.1.4</div>
+                                    <div class="substep-title">Swing Straightening</div>
+                                    <div class="substep-body"><code>straighten()</code> flattens triplet swing/shuffle bitmaps (<code>divisor 3</code>, <code>rhythm 4|5</code>) to <code>divisor 2</code> when configured.</div>
+                                </div>
+                                <div class="substep">
+                                    <div class="substep-id">4.1.5</div>
+                                    <div class="substep-title">Quantise &amp; Evolve</div>
+                                    <div class="substep-body"><code>quantiseTupletEvents()</code> snaps <code>event[0]</code> &amp; <code>event.slot</code>, attaches <code>voice.tuplets</code>, and passes <code>driftOut</code> forward.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <div class="step-connector" aria-hidden="true">
+                        <svg viewBox="0 0 16 20">
+                            <line x1="8" y1="0" x2="8" y2="14" stroke="#c8beb0" stroke-width="2" />
+                            <polygon points="3,12 13,12 8,19" fill="oklch(0.45 0.14 205)" />
+                        </svg>
+                    </div>
+
+                    <!-- STEP 5 -->
+                    <article class="node" data-step="5" tabindex="0">
+                        <div class="node-head">
+                            <div class="node-title-wrap">
+                                <span class="step-num">5</span>
+                                <h3 class="node-title">Spell Notes, Chords &amp; Keys</h3>
+                            </div>
+                            <span class="node-tag">modules/spell.js + neuron</span>
+                        </div>
+                        <p class="node-desc">
+                            Spell notes, chords, and keys by part, or across the whole document simultaneously when <code>settings.showAtConcertPitch</code> is enabled.
+                        </p>
+
+                        <div class="subflow" data-subflow>
+                            <div class="decision-row">
+                                <span class="diamond-badge">◊ settings.showAtConcertPitch?</span>
+                                <span><strong>true:</strong> run <code>spell(tree.spellables)</code> document-wide</span>
+                                <span>·</span>
+                                <span><strong>false:</strong> transpose &amp; spell per part in <code>Promise.all(tree.parts.map(spellPart))</code></span>
+                            </div>
+                            <div class="subflow-label">
+                                <span>5.1–5.4 Spelling Steps · <code>spell/batch.js</code> → <code>analyse.js</code> → <code>schema.js</code> → <code>network-cpu.js</code></span>
+                            </div>
+                            <div class="sub-grid sub-grid-4">
+                                <div class="substep">
+                                    <div class="substep-id">5.1</div>
+                                    <div class="substep-title">Group Time Slices</div>
+                                    <div class="substep-body"><code>batch(events)</code> groups concurrent events into timed slices with local beat, grain, and base key.</div>
+                                </div>
+                                <div class="substep">
+                                    <div class="substep-id">5.2</div>
+                                    <div class="substep-title">Analyse Key Fit</div>
+                                    <div class="substep-body"><code>analyseKeys()</code> deterministically scores slices against circle-of-fifths key profiles.</div>
+                                </div>
+                                <div class="substep rnn">
+                                    <div class="substep-id">5.3 BiGRU</div>
+                                    <div class="substep-title">RNN Key Inference</div>
+                                    <div class="substep-body"><code>encode()</code> passes circle-of-fifths pitches, key scores, beat, duration, Δt, home key, and grain into <code>rnn.predict()</code>.</div>
+                                </div>
+                                <div class="substep">
+                                    <div class="substep-id">5.4</div>
+                                    <div class="substep-title">Spell from Key</div>
+                                    <div class="substep-body"><code>decode()</code> sets chosen <code>event.key</code> on notes and chords for deterministic enharmonic spelling.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <div class="step-connector" aria-hidden="true">
+                        <svg viewBox="0 0 16 20">
+                            <line x1="8" y1="0" x2="8" y2="14" stroke="#c8beb0" stroke-width="2" />
+                            <polygon points="3,12 13,12 8,19" fill="oklch(0.45 0.14 205)" />
+                        </svg>
+                    </div>
+
+                    <!-- STEP 6 -->
+                    <article class="node" data-step="6" tabindex="0">
+                        <div class="node-head">
+                            <div class="node-title-wrap">
+                                <span class="step-num">6</span>
+                                <h3 class="node-title">Create Per-Bar, Per-Part, Per-Voice Symbol Lists</h3>
+                            </div>
+                            <span class="node-tag">tree/symbolise.js + bar-repeater.js</span>
+                        </div>
+                        <p class="node-desc">
+                            Transform quantised tuplets and sustained notes into symbol descriptors per bar, part, and voice, replace repeated bars with repeat signs, and prune empty trailing bars.
+                        </p>
+
+                        <div class="subflow" data-subflow>
+                            <div class="subflow-label">
+                                <span>6.1 Symbolisation Steps · <code>symbolise.js</code> + <code>bar-repeater.js</code> + <code>stave/*</code></span>
+                            </div>
+                            <div class="sub-grid sub-grid-3">
+                                <div class="substep">
+                                    <div class="substep-id">6.1.1</div>
+                                    <div class="substep-title">Reset Beams &amp; Bar Signatures</div>
+                                    <div class="substep-body">Call <code>resetBeamId()</code> per bar for deterministic HTML; resolve transposed <code>part.key</code> and prepend key <code>acci</code> + <code>timesig</code> symbols.</div>
+                                </div>
+                                <div class="substep">
+                                    <div class="substep-id">6.1.2</div>
+                                    <div class="substep-title">Chords, Lyrics &amp; Tied Voices</div>
+                                    <div class="substep-body"><code>symboliseChords()</code> / <code>symboliseText()</code> clip symbols at barlines; restore <code>activeNotes</code> tied over from the previous bar per voice.</div>
+                                </div>
+                                <div class="substep branch">
+                                    <div class="substep-id">6.1.3 ◊ Tuplet?</div>
+                                    <div class="substep-title">Tuplet Slots vs Duplet Flow</div>
+                                    <div class="substep-body"><code>isTupletSymbol()</code> true: emit <code>tuplet</code> bracket and walk slots <code>0..divisor-1</code>. False: group chord clusters at beat and call <code>fillToBeat()</code>.</div>
+                                </div>
+                                <div class="substep">
+                                    <div class="substep-id">6.1.4</div>
+                                    <div class="substep-title">Beams, Rests &amp; Accidentals</div>
+                                    <div class="substep-body"><code>createNoteSymbols</code> / <code>createDupletNoteSymbols</code> emit heads, accidentals, ties, accents, ledges; <code>updateBeamWithNoteSymbols()</code> beams across divisions; empty bars get whole rests.</div>
+                                </div>
+                                <div class="substep">
+                                    <div class="substep-id">6.1.5</div>
+                                    <div class="substep-title">Bar-Repeat Detection</div>
+                                    <div class="substep-body"><code>BarRepeater.push()</code> hashes bar content (resetting on <code>doubleBarLine</code>) and replaces 1-, 2-, or 4-bar runs with <code>barrepeat</code> glyphs.</div>
+                                </div>
+                                <div class="substep">
+                                    <div class="substep-id">6.1.6</div>
+                                    <div class="substep-title">Prune Phantom Overhang</div>
+                                    <div class="substep-body">Drop trailing empty overhang bars not marked <code>endOfSequence</code> (<code>hasBarContent()</code>), then flag <code>doubleBarLine = true</code> on the final bar.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <div class="step-connector" aria-hidden="true">
+                        <svg viewBox="0 0 16 20">
+                            <line x1="8" y1="0" x2="8" y2="14" stroke="#c8beb0" stroke-width="2" />
+                            <polygon points="3,12 13,12 8,19" fill="oklch(0.45 0.14 205)" />
+                        </svg>
+                    </div>
+
+                    <!-- STEP 7 -->
+                    <article class="node" data-step="7" tabindex="0">
+                        <div class="node-head">
+                            <div class="node-title-wrap">
+                                <span class="step-num">7</span>
+                                <h3 class="node-title">Render Per-Bar HTML &amp; Generate 53-bit Hash</h3>
+                            </div>
+                            <span class="node-tag">create-html.js + tree/hasher.js</span>
+                        </div>
+                        <p class="node-desc">
+                            Serialise each bar via <code>createBarHTML(bar)</code> (reading <code>event.id</code> directly onto DOM attributes) and compute a 53-bit <code>cyrb53</code> fingerprint via <code>hashString(html)</code>.
+                        </p>
+                    </article>
+
+                    <div class="step-connector" aria-hidden="true">
+                        <svg viewBox="0 0 16 20">
+                            <line x1="8" y1="0" x2="8" y2="14" stroke="#c8beb0" stroke-width="2" />
+                            <polygon points="3,12 13,12 8,19" fill="oklch(0.45 0.14 205)" />
+                        </svg>
+                    </div>
+
+                    <!-- STEPS 8 & 9 -->
+                    <div class="parallel-row">
+                        <article class="node" data-step="8" tabindex="0">
+                            <div class="node-head">
+                                <div class="node-title-wrap">
+                                    <span class="step-num">8</span>
+                                    <h3 class="node-title">Diff Against Incoming <code>hashes[]</code></h3>
+                                </div>
+                                <span class="node-tag">render/worker.js</span>
+                            </div>
+                            <p class="node-desc">
+                                Filter out bars whose hash equals <code>hashes[index]</code>; keep only new or changed bars as <code>{ index, beat, html, hash }</code>.
+                            </p>
+                        </article>
+
+                        <article class="node" data-step="9" tabindex="0">
+                            <div class="node-head">
+                                <div class="node-title-wrap">
+                                    <span class="step-num">9</span>
+                                    <h3 class="node-title">Create Single Signature Set</h3>
+                                </div>
+                                <span class="node-tag">createSigHTML(tree[0])</span>
+                            </div>
+                            <p class="node-desc">
+                                Build one <code>&lt;music-sig&gt;</code> HTML string for the staves and wrap it as <code>{ beat: 0, html, hash }</code> inside <code>signatures[]</code>.
+                            </p>
+                        </article>
+                    </div>
+
+                    <div class="step-connector" aria-hidden="true">
+                        <svg viewBox="0 0 16 20">
+                            <line x1="8" y1="0" x2="8" y2="14" stroke="#c8beb0" stroke-width="2" />
+                            <polygon points="3,12 13,12 8,19" fill="oklch(0.45 0.14 205)" />
+                        </svg>
+                    </div>
+
+                    <!-- STEP 10 -->
+                    <article class="node" data-step="10" tabindex="0">
+                        <div class="node-head">
+                            <div class="node-title-wrap">
+                                <span class="step-num">10</span>
+                                <h3 class="node-title">Return <code>{ signatures, bars, length }</code></h3>
+                            </div>
+                            <span class="node-tag">self.postMessage()</span>
+                        </div>
+                        <p class="node-desc">
+                            Post the diffed payload back to <code>renderHTMLOnWorker()</code> on the main thread (guarding against out-of-order async responses with <code>frameId</code>).
+                        </p>
+                    </article>
+                </section>
+
+                <!-- BRIDGE 2 -->
+                <div class="bridge" aria-label="Web Worker to Main thread response">
+                    <div class="bridge-line"></div>
+                    <div class="bridge-card">
+                        <span>Worker → Main <code>postMessage</code></span>
+                        <code>{ signatures: [{ beat: 0, html, hash }], bars: [{ index, beat, html, hash }], length }</code>
+                    </div>
+                    <div class="bridge-line"></div>
+                    <svg class="bridge-arrow" viewBox="0 0 14 12" aria-hidden="true">
+                        <polygon points="1,0 13,0 7,11" fill="#8a5600" />
+                    </svg>
+                </div>
+
+                <!-- LANE 3: MAIN THREAD OUTPUT -->
+                <section class="lane lane-main-out" data-lane="main-out">
+                    <div class="lane-header">
+                        <div class="lane-title"><span class="dot dot-dom"></span> Main Thread — Patch Shadow DOM</div>
+                        <div class="lane-files">scribe-music/element.js → patchShadow() &amp; toHeaderHTML()</div>
+                    </div>
+
+                    <div class="parallel-row">
+                        <!-- STEP 11 -->
+                        <article class="node" data-step="11" tabindex="0">
+                            <div class="node-head">
+                                <div class="node-title-wrap">
+                                    <span class="step-num">11</span>
+                                    <h3 class="node-title">Replace or Append Each Bar</h3>
+                                </div>
+                                <span class="node-tag">patchShadow()</span>
+                            </div>
+                            <p class="node-desc">
+                                Replace changed <code>&lt;music-bar&gt;</code> elements in place via <code>outerHTML</code> or append new bars via <code>insertAdjacentHTML('afterend', html)</code>, prune trailing bars if <code>barEls.length &gt; length</code>, and update <code>hashes[index]</code>.
+                            </p>
+                        </article>
+
+                        <!-- STEP 12 -->
+                        <article class="node" data-step="12" tabindex="0">
+                            <div class="node-head">
+                                <div class="node-title-wrap">
+                                    <span class="step-num">12</span>
+                                    <h3 class="node-title">Generate Signatures &amp; Prepend</h3>
+                                </div>
+                                <span class="node-tag">toHeaderHTML()</span>
+                            </div>
+                            <p class="node-desc">
+                                When <code>sigHash !== internals.sigHash</code>, repeat <code>signatures[0].html</code> 24 times to fill vertical space inside <code>&lt;header id="side" class="side"&gt;</code> and prepend it before bar <code>0</code>; CSS Grid + SMuFL fonts lay out the notation natively.
+                            </p>
+                        </article>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- INSPECTOR SIDEBAR -->
+            <aside class="inspector" aria-live="polite" id="inspector">
+                <div class="inspector-kicker" id="ins-kicker">Step 1 · Main Thread</div>
+                <h2 id="ins-title">Flatten &amp; Serialise Sequence</h2>
+                <p id="ins-summary"></p>
+                <dl class="kv-list">
+                    <div class="kv-item">
+                        <dt>Module &amp; Function</dt>
+                        <dd id="ins-module"></dd>
+                    </div>
+                    <div class="kv-item">
+                        <dt>Input → Output</dt>
+                        <dd id="ins-io"></dd>
+                    </div>
+                    <div class="kv-item">
+                        <dt>Key Details</dt>
+                        <dd><ul class="inspector-list" id="ins-notes"></ul></dd>
+                    </div>
+                </dl>
+                <p class="legend-note">Click any numbered step to inspect its modules, data structures, and rules.</p>
+            </aside>
+        </div>
+    </section>
+
+    <section class="table-section 9x-grid grid" aria-label="Wire format contracts">
+        <h2 class="font-02 9x @1-x2 @1-7x @2-6x @3-4x">Data Contracts</h2>
+        <div class="contract-grid 9x @1-x2 @1-8x">
+            <div class="contract-card">
+                <h3>1. Request Payload (Transferable)</h3>
+                <pre>{
+  data:     Float64Array, // 8 floats/event (transferred)
+  texts:    string[],     // lookup table for text events
+  hashes:   number[],     // previous 53-bit bar hashes
+  parts:    PartJSON[],   // plain objects via part.toJSON()
+  key, timesig, beat, settings, debug
+}</pre>
+            </div>
+            <div class="contract-card">
+                <h3>2. Worker Tree Structure</h3>
+                <pre>tree: Array&lt;Bar&gt;
+  bar[p]:   Part { stave, key, symbols[], [v]: Voice }
+  voice:    { name, staff, tuplets[] }
+  symbol:   { type, beat, duration, pitch, event, ... }
+  repeat:   { type: 'barrepeat', count: 1|2|4 }</pre>
+            </div>
+            <div class="contract-card">
+                <h3>3. Response Diff Payload</h3>
+                <pre>{
+  signatures: [{ beat: 0, html, hash }],
+  bars:       [{ index, beat, html, hash }],
+  length:     number, // total bars after pruning
+  debug:      { w0, ta, tb, tc, td, t1, t2, w3 }
+}</pre>
+            </div>
+        </div>
+    </section>
+
+<script type="module">
+const STEPS = {
+    1: {
+        kicker: 'Step 1 · Main Thread',
+        title: 'Flatten & Serialise Sequence to Stride-8 Float64Array',
+        summary: 'Flattens nested sequences and transforms via SequenceIterator and packs every renderable notation event into a single typed buffer.',
+        module: '<code>modules/render-html-on-worker.js</code> → <code>modules/render/serialise.js</code>',
+        io: '<code>Sequence</code> → <code>{ data: Float64Array(8N), texts: string[] }</code>',
+        notes: [
+            'Expands nested sequences and transforms via <code>SequenceIterator(..., { outputInBeats: true })</code>.',
+            'Skips non-notation events (<code>sequence</code>, <code>rate</code>, <code>control</code>); keeps <code>note</code>, <code>chord</code>, <code>meter</code>, <code>key</code>, <code>text</code>, and <code>clef</code>.',
+            'Stamps slot <code>[+7]</code> with <code>identify(original(event))</code> so HTML event IDs survive across renders and preserve bar hashes.',
+            'Appends lyric/text strings to <code>texts[]</code> and stores only the integer index in slot <code>[+3]</code>.'
+        ]
+    },
+    2: {
+        kicker: 'Step 2 · Main Thread → Worker',
+        title: 'Call renderHTMLOnWorker() & Transfer Buffer',
+        summary: 'Normalises Part configs via part.toJSON() and hands ownership of [data.buffer] to the worker with zero copying of event arrays.',
+        module: '<code>modules/render-html-on-worker.js</code> → <code>modules/compile-worker.js</code>',
+        io: '<code>postMessage(payload, [data.buffer])</code> → Promise&lt;{ signatures, bars, length }&gt;',
+        notes: [
+            '<code>compile-worker.js</code> boots <code>worker-code.js</code> once as a Blob Worker keyed by sequential request <code>id</code>.',
+            '<code>data.buffer</code> transfers ownership to the worker thread without structured-cloning event objects.',
+            'Previous bar <code>hashes[]</code> travel along so the worker can filter unchanged bars before posting back.'
+        ]
+    },
+    3: {
+        kicker: 'Step 3 · Web Worker',
+        title: 'Deserialise into Lightweight Event Objects',
+        summary: 'Rebuilds Event subclass instances directly from the Float64Array slots and texts[] table without pulling Sequence/Transform machinery into the worker.',
+        module: '<code>modules/render/deserialise.js</code> → <code>sequence/modules/event/{note,chord,meter,key,text}.js</code>',
+        io: '<code>(Float64Array, string[])</code> → <code>Event[]</code>',
+        notes: [
+            'Constructs <code>NoteEvent</code>, <code>ChordEvent</code>, <code>MeterEvent</code>, <code>KeyEvent</code>, or <code>TextEvent</code> directly by numeric <code>TYPES</code>.',
+            'Sets <code>event.id = id</code> (when non-zero), <code>event.target = target</code> (when ≥ 0), and <code>event.voice = voice</code> (when ≥ 0).',
+            'Keeps the compiled worker bundle slim by omitting <code>sequence/modules/event.js</code> and transforms.'
+        ]
+    },
+    4: {
+        kicker: 'Step 4 · Web Worker',
+        title: 'Create Tree & Analyse Metric Quantisation',
+        summary: 'Groups flat events into metrical bars, parts, and voice buffers, then quantises event timings using Elastic Phase-Locked Metrical Quantisation (EPL-MQ).',
+        module: '<code>modules/tree/read.js</code> → <code>modules/tree/quantise.js</code> → <code>modules/rhythm.js</code>',
+        io: '<code>Event[]</code> → <code>tree[bar][part][voice].tuplets[]</code>',
+        notes: [
+            '<code>read()</code> advances bars on <code>meter</code> boundaries, routes events by <code>target</code>/<code>part.routing</code>, and builds <code>spellables</code>.',
+            '<code>detectRhythmPrime()</code> evaluates descending prime divisors against complex phasors in an elastic frame shifted by <code>drift</code>.',
+            '<code>detectBestFit()</code> recursively bifurcates power-of-2 windows, propagating spring-damped <code>driftOut = (1 - λ)·drift + α·phaseDrift</code>.',
+            '<code>straighten()</code> optionally collapses triplet swing/shuffle bitmaps into straight 8ths/16ths before snapping <code>event[0]</code> &amp; <code>event.slot</code>.'
+        ]
+    },
+    5: {
+        kicker: 'Step 5 · Web Worker',
+        title: 'Spell Notes, Chords & Keys',
+        summary: 'Resolves enharmonic spelling via deterministic circle-of-fifths key analysis plus a bidirectional GRU neural network running inside the worker.',
+        module: '<code>modules/spell.js</code> → <code>spell/{batch,analyse,schema,weights-8b}.js</code> → <code>neuron/modules/rnn/network-cpu.js</code>',
+        io: '<code>spellables[]</code> → <code>event.key</code> (applied by <code>event.spell(event.key)</code>)',
+        notes: [
+            'If <code>settings.showAtConcertPitch</code>, spells <code>tree.spellables</code> together; otherwise transposes and spells each part in parallel.',
+            '<code>batch()</code> groups concurrent events into timed slices with local beat, grain, and base key.',
+            '<code>encode()</code> builds 30-dim slice vectors (circle-of-fifths pitches, key scores, beat, duration, Δt, home key, grain) for <code>rnn.predict()</code>.',
+            '<code>decode()</code> writes the predicted local key number back to <code>event.key</code> on notes and chords.'
+        ]
+    },
+    6: {
+        kicker: 'Step 6 · Web Worker',
+        title: 'Create Per-Bar, Per-Part, Per-Voice Symbol Lists',
+        summary: 'Walks bars × parts × voices to build SMuFL-ready symbol descriptors, detect 1/2/4-bar repeats, and remove empty overhang bars.',
+        module: '<code>modules/tree/symbolise.js</code> + <code>modules/tree/bar-repeater.js</code> + <code>modules/stave/*</code>',
+        io: '<code>tree</code> + <code>tuplets[]</code> → <code>part.symbols[]</code>',
+        notes: [
+            'Calls <code>resetBeamId()</code> at the top of each bar so unchanged bars produce identical HTML.',
+            'Carries sustained <code>activeNotes</code> across barlines into the next bar as ties.',
+            'Emits explicit <code>tuplet</code> brackets/rests when <code>isTupletSymbol()</code> passes, otherwise resolves notes + rests via <code>fillToBeat()</code>.',
+            '<code>BarRepeater.push()</code> replaces matching 1/2/4-bar runs with <code>barrepeat</code> glyphs; trailing contentless overhang bars are pruned.'
+        ]
+    },
+    7: {
+        kicker: 'Step 7 · Web Worker',
+        title: 'Render Per-Bar HTML & Generate Hash',
+        summary: 'Serialises each bar’s staves and symbol list into an HTML string and hashes it without touching the DOM.',
+        module: '<code>modules/create-html.js</code> + <code>modules/tree/hasher.js</code>',
+        io: '<code>bar</code> → <code>{ html: string, hash: number }</code>',
+        notes: [
+            '<code>createBarHTML()</code> → <code>createPartHTML()</code> → <code>createSymbolHTML()</code> renders <code>&lt;music-bar&gt;</code>, <code>&lt;music-stave&gt;</code>, and glyph tags.',
+            'Reads <code>event.id</code> directly from deserialised events to stamp <code>event="..."</code> attributes.',
+            '<code>hashString(html)</code> streams characters through <code>begin()</code> / <code>string()</code> / <code>end()</code> to produce a 53-bit <code>cyrb53</code> hash.'
+        ]
+    },
+    8: {
+        kicker: 'Step 8 · Web Worker',
+        title: 'Diff Against Incoming hashes[]',
+        summary: 'Compares each bar’s newly computed hash against the hashes[] array passed into the worker and returns only the diff.',
+        module: '<code>modules/render/worker.js</code>',
+        io: '<code>bars[] × hashes[]</code> → <code>bars: [{ index, beat, html, hash }]</code>',
+        notes: [
+            'Filters out any bar where <code>hashes && hashes[i] === hash</code>.',
+            'Changed or new bars are kept as <code>{ index: i, beat: bar.beat, html, hash }</code>.',
+            'Incremental edits typically return only 1–2 bar objects even on long scores.'
+        ]
+    },
+    9: {
+        kicker: 'Step 9 · Web Worker',
+        title: 'Create Single Signature Stave Set',
+        summary: 'Renders one set of signature staves from bar 0 (clefs, initial key signatures, and multi-part labels) plus its hash.',
+        module: '<code>modules/create-html.js</code> → <code>createSigHTML(tree[0])</code>',
+        io: '<code>tree[0]</code> → <code>signatures: [{ beat: 0, html, hash }]</code>',
+        notes: [
+            'Generates a single <code>&lt;music-sig&gt;</code> string rather than duplicating 24 copies inside the worker.',
+            'Hashes the signature HTML so the main thread skips rebuilding <code>#side</code> when signatures are unchanged.'
+        ]
+    },
+    10: {
+        kicker: 'Step 10 · Worker → Main Thread',
+        title: 'Return { signatures, bars, length }',
+        summary: 'Posts the diffed HTML payload back to renderHTMLOnWorker(). On the main thread, stale async responses are discarded via frameId.',
+        module: '<code>modules/render/worker.js</code> → <code>modules/render-html-on-worker.js</code>',
+        io: '<code>{ signatures, bars, length, debug }</code>',
+        notes: [
+            '<code>length</code> reports the pruned total bar count so the main thread can trim excess trailing DOM bars if the score shrank.',
+            '<code>rid !== internals.frameId || !this.isConnected</code> prevents out-of-order updates during rapid consecutive renders.'
+        ]
+    },
+    11: {
+        kicker: 'Step 11 · Main Thread DOM Patch',
+        title: 'Replace or Append Each Bar',
+        summary: 'First render populates shadow DOM in one shot; incremental renders update or append only the bars present in bars[].',
+        module: '<code>scribe-music/element.js</code> → <code>patchShadow()</code>',
+        io: '<code>bars[]</code> → mutated <code>internals.bars[]</code> &amp; <code>internals.hashes[]</code>',
+        notes: [
+            'When <code>index &lt; barEls.length</code>, swaps <code>el.outerHTML = html</code> and updates the reference in <code>internals.bars[index]</code>.',
+            'When <code>index &gt;= barEls.length</code>, appends after the last bar (or header) via <code>insertAdjacentHTML(\'afterend\', html)</code>.',
+            'If <code>barEls.length &gt; length</code>, pops and removes trailing bar elements and truncates <code>hashes.length</code>.'
+        ]
+    },
+    12: {
+        kicker: 'Step 12 · Main Thread DOM Patch',
+        title: 'Generate Signatures & Prepend',
+        summary: 'When sig.hash changes, tiles signatures[0].html 24 times inside #side and prepends it before the bars; CSS Grid + SMuFL fonts handle layout natively.',
+        module: '<code>scribe-music/element.js</code> → <code>toHeaderHTML()</code> + <code>shadow.css</code>',
+        io: '<code>signatures[0]</code> → <code>&lt;header id="side" class="side"&gt;</code>',
+        notes: [
+            'Skips touching <code>#side</code> altogether when <code>sigHash === internals.sigHash</code>.',
+            'Inserts, replaces, or removes <code>#side</code> next to <code>internals.style</code>.',
+            'Horizontal beat alignment, line wrapping, sub-grids, and glyph positioning run natively in browser CSS Grid.'
+        ]
+    }
+};
+
+const nodes = Array.from(document.querySelectorAll('.node[data-step]'));
+const lanes = Array.from(document.querySelectorAll('.lane[data-lane]'));
+const filterBtns = Array.from(document.querySelectorAll('.btn[data-lane]'));
+const toggleSubBtn = document.getElementById('toggle-subflows');
+const subflows = Array.from(document.querySelectorAll('[data-subflow]'));
+
+const insKicker  = document.getElementById('ins-kicker');
+const insTitle   = document.getElementById('ins-title');
+const insSummary = document.getElementById('ins-summary');
+const insModule  = document.getElementById('ins-module');
+const insIo      = document.getElementById('ins-io');
+const insNotes   = document.getElementById('ins-notes');
+
+function selectStep(stepId) {
+    const info = STEPS[stepId];
+    if (!info) return;
+
+    nodes.forEach((n) => n.classList.toggle('selected', n.dataset.step === String(stepId)));
+    insKicker.textContent  = info.kicker;
+    insTitle.textContent   = info.title;
+    insSummary.textContent = info.summary;
+    insModule.innerHTML    = info.module;
+    insIo.innerHTML        = info.io;
+    insNotes.innerHTML     = info.notes.map((item) => `<li>${item}</li>`).join('');
+}
+
+nodes.forEach((node) => {
+    node.addEventListener('click', () => selectStep(node.dataset.step));
+    node.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            selectStep(node.dataset.step);
+        }
+    });
+});
+
+filterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+        const target = btn.dataset.lane;
+        filterBtns.forEach((b) => b.classList.toggle('active', b === btn));
+        lanes.forEach((lane) => {
+            lane.classList.toggle('dimmed', target !== 'all' && lane.dataset.lane !== target);
+        });
+    });
+});
+
+let collapsed = false;
+toggleSubBtn.addEventListener('click', () => {
+    collapsed = !collapsed;
+    subflows.forEach((el) => el.classList.toggle('collapsed', collapsed));
+    toggleSubBtn.textContent = collapsed ? 'Expand sub-steps' : 'Collapse sub-steps';
+});
+
+selectStep(1);
+</script>
+</body>
+</html>

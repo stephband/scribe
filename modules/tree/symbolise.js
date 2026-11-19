@@ -133,7 +133,7 @@ function getNoteVoice(part) {
 export function symbolisePart(settings, activeNotes, bar, part, repeats) {
     const { stave, symbols } = part;
 
-    const transpose = settings.showAtConcertPitch ?
+    const transpose = settings.partsAtConcertPitch ?
         0 :
         part.transpose || 0 ;
 

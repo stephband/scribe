@@ -50,7 +50,7 @@ if (debug) debug.tb = performance.now();
 if (debug) debug.tc = performance.now();
 
     // Spell pitched notes and chords
-    if (settings.showAtConcertPitch) {
+    if (settings.partsAtConcertPitch) {
         await spell(tree.spellables);
     }
     else {

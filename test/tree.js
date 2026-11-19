@@ -39,13 +39,13 @@ Deno.test('createSignatureSymbols() with string key', () => {
     is(symbols[2].event, undefined);
 });
 
-Deno.test('showAtConcertPitch: true preserves concert key on parts', async () => {
+Deno.test('partsAtConcertPitch: true preserves concert key on parts', async () => {
     const sequence = new Sequence([
         [0, "key", "C"],
         [0, "meter", 0b1010, 1],
         [0, "note", "C4", 0.5, 1]
     ]);
-    const tree = await requestTree(sequence, undefined, undefined, undefined, 0, 0, Infinity, { showAtConcertPitch: true });
+    const tree = await requestTree(sequence, undefined, undefined, undefined, 0, 0, Infinity, { partsAtConcertPitch: true });
     assert(tree[0]);
     assert(tree[0][0]);
     is(tree[0][0].key, 0);
@@ -831,7 +831,7 @@ Deno.test('requestTree: sequence events override default key and timesig', async
     is(tree[0].key, -3); // Eb major = 3 flats
 });
 
-Deno.test('requestTree: spells parts and resolves stave rows without showAtConcertPitch', async () => {
+Deno.test('requestTree: spells parts and resolves stave rows without partsAtConcertPitch', async () => {
     const sequence = new Sequence([
         [0, "note", 60, 1, 1],
         [1, "note", 62, 1, 1],

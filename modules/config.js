@@ -2,7 +2,7 @@ import parseGain from 'sequence/modules/parse/parse-gain.js';
 import { GR }    from './constants.js';
 
 export default {
-    showAtConcertPitch: false,
+    partsAtConcertPitch: false,
 
     // Spelling
     spellChordRootCFlatAsB:  true,
