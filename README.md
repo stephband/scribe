@@ -202,7 +202,9 @@ detector and employs subgrids for multi-stave scoring
 - Elastic Phase-Locked Metrical Quantiser for better rhythm detection
 - Automatic staccato and tenuto accents based on duration
 - Automatic ghost, emphasis and marcato accents based on dynamics
-- Meter events carry divisions, previously divisions were inferred
+- Meter events carry divisions, previously divisions were inferred from timesig
+- Reduces overall render time by generating HTML diffs
+- Moves most processes off the main thread, the main thread is now occupied for typically <10ms per render
 
 ### 0.5 – Clean up
 
