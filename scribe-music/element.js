@@ -1,14 +1,15 @@
 
-import Data         from 'fn/data.js';
-import Signal       from 'fn/signal.js';
-import slugify      from 'fn/slugify.js';
+import Data          from 'fn/data.js';
+import Signal        from 'fn/signal.js';
+import slugify       from 'fn/slugify.js';
 import element, { getInternals } from 'dom/element.js';
-import { Sequence } from 'sequence/module.js';
-import Stave        from '../modules/stave.js';
-import renderHTML   from '../modules/render-html.js';
-import renderStyle  from '../modules/render-style.js';
-import config       from '../modules/config.js';
+import { Sequence }  from 'sequence/module.js';
+import Stave         from '../modules/stave.js';
+import renderHTML    from '../modules/render-html-on-worker.js';
+import renderStyle   from '../modules/render-style.js';
+import config        from '../modules/config.js';
 
+import '../modules/setup-data.js';
 
 const DEBUG  = globalThis.DEBUG;
 const assign = Object.assign;
@@ -28,12 +29,27 @@ function parseScript(script) {
         Sequence.from(JSON.parse(script.textContent)) ;
 }
 
-function patchShadow(shadow, internals, header, bars) {
+function toHeaderHTML(signatures) {
+    if (!signatures || !signatures[0]) return '';
+    const sig = signatures[0].html;
+    let html = '<header id="side" class="side">';
+    let i = 24;
+    while (i--) html += sig;
+    return html + '</header>';
+}
+
+function patchShadow(shadow, internals, signatures, bars, length) {
+    const sig     = signatures && signatures[0];
+    const sigHash = sig ? sig.hash : undefined;
+
     if (!internals.bars) {
+        const header = toHeaderHTML(signatures);
+        const body   = bars.map((b) => b.html).join('');
         shadow.replaceChildren(internals.link, internals.style);
-        internals.style.insertAdjacentHTML('afterend', header + bars.join(''));
-        internals.header = header;
-        internals.bars   = bars;
+        internals.style.insertAdjacentHTML('afterend', header + body);
+        internals.sigHash = sigHash;
+        internals.hashes  = bars.map((b) => b.hash);
+        internals.bars    = Array.from(shadow.querySelectorAll('music-bar'));
         return;
     }
 
@@ -41,7 +57,8 @@ function patchShadow(shadow, internals, header, bars) {
     let side = internals.style.nextElementSibling;
     if (side && side.id !== 'side') side = null;
 
-    if (header !== internals.header) {
+    if (sigHash !== internals.sigHash) {
+        const header = toHeaderHTML(signatures);
         if (header && side) {
             side.outerHTML = header;
             side = internals.style.nextElementSibling;
@@ -54,38 +71,33 @@ function patchShadow(shadow, internals, header, bars) {
             side.remove();
             side = null;
         }
-        internals.header = header;
+        internals.sigHash = sigHash;
     }
 
-    // Diff bars in place, replacing only changed bars and trailing differences
-    const prev = internals.bars;
-    let anchor = side || internals.style;
-    let el     = anchor.nextElementSibling;
-
-    for (let i = 0; i < bars.length; i++) {
-        if (!el) {
-            anchor.insertAdjacentHTML('afterend', bars.slice(i).join(''));
-            break;
-        }
-
-        const next = el.nextElementSibling;
-        if (bars[i] !== prev[i]) {
-            el.outerHTML = bars[i];
-            anchor = next ? next.previousElementSibling : shadow.lastElementChild;
+    // Patch only changed bars by index
+    const barEls = internals.bars;
+    const hashes = internals.hashes;
+    let i = -1;
+    let bar;
+    while (bar = bars[++i]) {
+        const { index, html, hash } = bar;
+        if (index < barEls.length) {
+            const el   = barEls[index];
+            const next = el.nextElementSibling;
+            el.outerHTML = html;
+            barEls[index] = next ? next.previousElementSibling : shadow.lastElementChild;
         }
         else {
-            anchor = el;
+            const anchor = barEls.length ? barEls[barEls.length - 1] : (side || internals.style);
+            anchor.insertAdjacentHTML('afterend', html);
+            barEls.push(anchor.nextElementSibling);
         }
-        el = next;
+        hashes[index] = hash;
     }
 
-    while (el) {
-        const next = el.nextElementSibling;
-        el.remove();
-        el = next;
-    }
-
-    internals.bars = bars;
+    // Remove trailing bars if score shrank
+    while (barEls.length > length) barEls.pop().remove();
+    hashes.length = length;
 }
 
 /* Register <scribe-music> */
@@ -151,32 +163,37 @@ export default define(element('scribe-music', {
             const debug = DEBUG && internals.data.value.name ? { name: internals.data.value.name } : null ;
             if (debug) debug.t0 = performance.now();
 
-            const { header, bars } = await renderHTML(
-                // Events from data
-                Data.of(internals.data.value),
-                // Parts (override with staff attribute if sequence defines no parts)
-                internals.data.value.parts || (internals.staff.value ? [{ staff: internals.staff.value }] : undefined),
-                // Key name
-                internals.key.value,
-                // Create an initial [0, "meter", ...] event
-                internals.timesig.value,
-                // Transpose is a number
-                internals.transpose.value,
-                // Beat is a number
-                internals.beat.value,
-                // Duration is a number
-                internals.duration.value,
-                // Override settings from attributes
-                assign({}, config, {
-                    swingAsStraight8ths:  internals.swingAsStraight8ths.value,
-                    swingAsStraight16ths: internals.swingAsStraight16ths.value
-                }),
-                // Collect some stats
-                debug
+            // Read through Data.of() synchronously before awaiting Worker so Signal
+            // tracks sequence/event mutations while Worker runs on plain tuples
+            const data      = internals.data.value;
+            const parts     = data.parts || (internals.staff.value ? [{ staff: internals.staff.value }] : undefined);
+            const key       = internals.key.value;
+            const timesig   = internals.timesig.value;
+            const transpose = internals.transpose.value;
+            const beat      = internals.beat.value;
+            const duration  = internals.duration.value;
+            const settings  = assign({}, config, {
+                swingAsStraight8ths:  internals.swingAsStraight8ths.value,
+                swingAsStraight16ths: internals.swingAsStraight16ths.value
+            });
+
+            const rid = internals.frameId = (internals.frameId || 0) + 1;
+            const { signatures, bars, length } = await renderHTML(
+                data,
+                parts,
+                key,
+                timesig,
+                transpose,
+                beat,
+                duration,
+                settings,
+                debug,
+                internals.hashes
             );
+            if (rid !== internals.frameId || !this.isConnected) return;
             if (debug) debug.t3 = performance.now();
 
-            patchShadow(shadow, internals, header, bars);
+            patchShadow(shadow, internals, signatures, bars, length);
             if (debug) debug.t4 = performance.now();
 
         //    internals.style.textContent = `:host { ${ renderStyle(this, shadow) } }`;
@@ -185,7 +202,7 @@ export default define(element('scribe-music', {
 
             // Print performance logs
             if (debug) {
-                const key = `debug-scribe-music-${ slugify(debug.name) }`;
+                const key   = `debug-scribe-music-${ slugify(debug.name) }`;
                 const stats = JSON.parse(localStorage.getItem(key) || '[]');
                 stats.push(debug);
                 localStorage.setItem(key, JSON.stringify(stats));
@@ -196,16 +213,19 @@ export default define(element('scribe-music', {
                 );
                 // Print table
                 console.table(stats.map((debug) => ({
-                    treeA:  debug.ta  - debug.t0,
-                    treeB:  debug.tb  - debug.ta,
-                    treeC:  debug.tc  - debug.tb,
-                    treeD:  debug.td  - debug.tc,
-                    tree:   debug.t1  - debug.td,
-                    body:   debug.t2  - debug.t1,
-                    header: debug.t3  - debug.t2,
-                    DOM:    debug.t4  - debug.t3,
-                    style:  debug.t5  - debug.t4,
-                    total:  debug.t5  - debug.t0
+                    serial: debug.ts - debug.t0,
+                    treeA:  debug.ta - debug.w0,
+                    treeB:  debug.tb - debug.ta,
+                    treeC:  debug.tc - debug.tb,
+                    treeD:  debug.td - debug.tc,
+                    tree:   debug.t1 - debug.td,
+                    body:   debug.t2 - debug.t1,
+                    header: debug.w3 - debug.t2,
+                    worker: debug.t3 - debug.ts,
+                    DOM:    debug.t4 - debug.t3,
+                    style:  debug.t5 - debug.t4,
+                    main:   (debug.ts - debug.t0) + (debug.t5 - debug.t3),
+                    total:  debug.t5 - debug.t0
                 })));
             }
         });

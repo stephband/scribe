@@ -112,6 +112,7 @@
     .example-section,
     .attributes-section,
     .font-section,
+    .comparison-section,
     .data-section,
     .status-section {
         padding-top: 3em;
@@ -161,6 +162,29 @@
         .space {
             margin-top: 2lh;
         }
+    }
+
+    .comparison-section {
+        background-color: #f4efe6;
+    }
+
+    .comparison-section .striped-table > tbody > tr:nth-child(2n) > th,
+    .comparison-section .striped-table > tbody > tr:nth-child(2n) > td {
+        background-color: hsl(0deg 0% 0% / 4%);
+    }
+
+    .comparison-section .striped-table > tbody > tr:first-child > td {
+        background-color: hsl(324.38deg 100% 43.92% / 12%)
+    }
+
+    @media (max-width: 35em) {
+        .comparison-table th:nth-child(4),
+        .comparison-table td:nth-child(4) { display: none; }
+    }
+
+    @media (max-width: 28em) {
+        .comparison-table th:nth-child(3),
+        .comparison-table td:nth-child(3) { display: none; }
     }
 
     .status-section {
@@ -773,20 +797,92 @@
         <scribe-music class="9x @1-x2 @1-8x @2-x6 @2-4x @2-y9 @2-2y y-start ash-font" staff="grand" transpose="3" src="#where-in"></scribe-music>
     </section>
 
+    <section class="comparison-section 9x-grid grid">
+        <h2 class="font-02 darkpink-fg 9x @1-x2 @1-7x @2-6x @3-4x">How it stacks up</h2>
+
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">
+            Scribe performs <strong>metric quantisation</strong> and <strong>harmonic spelling</strong>,
+            creates a <strong>symbol tree</strong> and computes <strong>incremental HTML diffs</strong>
+            in a Web Worker, offloading final layout to <strong>CSS Grid</strong>. This keeps main
+            thread rendering down to a few milliseconds. <strong>Scribe is <em>fast</em></strong>. It
+            does all this in possibly the smallest music rendering library available on the web. In
+            terms of features it's the baby of the bunch, so this is far from an
+            <span class="no-wrap">apples-to-apples</span> comparison, but here's how version 0.6
+            <span class="no-wrap">stacks up</span>:
+        </p>
+
+        <table class="comparison-table striped-table x1 9x @2-x2 @2-7x @3-6x">
+          <thead>
+            <tr>
+              <th>renderer</th>
+              <th>minified</th>
+              <th>formats</th>
+              <th>layout</th>
+              <th>processing &amp; rendering</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="bold-text">Scribe</td>
+              <td class="no-wrap"><strong>&lt; 200 kB</strong> JS<br/><strong>~ 80 kB</strong> CSS<br/><strong>~ 60 kB</strong> font</td>
+              <td>JSON, Sequence, MIDI</td>
+              <td>JS symbol tree &rarr; HTML, CSS &amp; SMuFL fonts</td>
+              <td>Web Worker, incremental rendering</td>
+            </tr>
+            <tr>
+              <td class="bold-text">abcjs</td>
+              <td><strong>~ 500 kB</strong></td>
+              <td>ABC</td>
+              <td>JS geometry &rarr; SVG</td>
+              <td>Main thread, full re-render</td>
+            </tr>
+            <tr>
+              <td class="bold-text">VexFlow</td>
+              <td><strong>&gt; 700 kB</strong></td>
+              <td>JS API only</td>
+              <td>JS geometry &rarr; SVG / Canvas</td>
+              <td>Main thread, manual redraw</td>
+            </tr>
+            <tr>
+              <td class="bold-text">alphaTab</td>
+              <td><strong>&gt; 900 kB</strong></td>
+              <td>Guitar Pro, MusicXML, CapXML, alphaTex</td>
+              <td>JS layout engine &rarr; SVG / Canvas</td>
+              <td>Web Worker supported</td>
+            </tr>
+            <tr>
+              <td class="bold-text">OSMD</td>
+              <td><strong>&gt; 1 MB</strong></td>
+              <td>MusicXML</td>
+              <td>JS via VexFlow &rarr; SVG</td>
+              <td>Main thread</td>
+            </tr>
+            <tr>
+              <td class="bold-text">Verovio</td>
+              <td><strong>&gt; 7 MB</strong></td>
+              <td>MusicXML, Humdrum, ABC</td>
+              <td>WASM (compiled C++) &rarr; SVG</td>
+              <td>Main thread / optional Worker</td>
+            </tr>
+          </tbody>
+        </table>
+    </section>
+
     <section class="status-section 9x-grid grid">
         <h2 class="font-02 darkpink-fg 9x @1-x2 @1-6x @2-5x @3-4x">Status</h2>
+        <p class="9x @1-x2 @1-6x @2-5x @3-4x">Under development.</p>
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
-            Scribe 0.6 introduces a neural network for note spelling,
-            refines the elastic phase-locked metrical quantiser (or rhythm detector),
-            employs CSS sub-grids to support multi-stave scoring and supports a small
-            set of automatically rendered dynamic and duration accents.
-            It does have some rough edges, and I am happy to get feedback:
+            In the latest release Scribe 0.6 introduced a neural network for note
+            spelling, refined the elastic phase-locked metrical quantiser (rhythm detector),
+            employed CSS sub-grids to support multi-stave scoring and started automatic
+            rendering of dynamics and duration accents. It does have some rough edges, and I'd
+            love to get feedback:
             leave an issue on <strong>GitHub</strong> <a href="https://github.com/stephband/scribe/">github.com/stephband/scribe/</a>,
             bleat me on <strong>BlueSky</strong> <a href="https://bsky.app/profile/stephen.band">bsky.app/profile/stephen.band</a>.
         </p>
         <p class="9x @1-x2 @1-6x @2-5x @3-4x">
             If you are curious about how the CSS lays out music notation, there's a blog post introducing the approach at <a class="no-wrap" href="https://cruncher.ch/blog/printing-music-with-css-grid/">cruncher.ch/blog/printing-music-with-css-grid/</a>.
-            Scribe's CSS has changed since that was written, but the technique is the same.
+            Scribe's CSS has changed since that was written, but the underlying technique is explained.
         </p>
     </section>
 

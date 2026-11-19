@@ -67,11 +67,12 @@ export default class GrandStave extends Stave {
     ];
 
     getTimeSigHTML(numerator, denominator, eventId) {
-        return `<span class="timesig" event="${ eventId }" voice="rh">
+        const attr = eventId !== undefined ? ` event="${ eventId }"` : '';
+        return `<span class="timesig"${ attr } voice="rh">
             <sup>${ glyphs['timeSig' + numerator] }</sup>
             <sub>${ glyphs['timeSig' + denominator] }</sub>
         </span>
-        <span class="timesig" event="${ eventId }" voice="lh">
+        <span class="timesig"${ attr } voice="lh">
             <sup>${ glyphs['timeSig' + numerator] }</sup>
             <sub>${ glyphs['timeSig' + denominator] }</sub>
         </span>`;

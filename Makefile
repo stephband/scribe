@@ -11,9 +11,10 @@ modules:
 	@rm -f deno.lock
 	rm -rf ./build
 
+	deno run --allow-read --allow-write --allow-net --allow-env --allow-run --no-lock --config ./deno.json ./deno/make-worker.js ./modules/render/worker-code.js ./modules/render/worker.js
 	deno run --allow-read --allow-write --allow-net --allow-env --allow-run --no-lock --reload --config ./deno.json https://cdn.jsdelivr.net/gh/stephband/fn@master/deno/make-modules.js ./build/ \
 		module.js \
-        scribe-music/element.js
+		scribe-music/element.js
 	deno run --allow-read --allow-write --allow-net --allow-env --allow-run --no-lock --reload --config ./deno.json https://cdn.jsdelivr.net/gh/stephband/fn@master/deno/make-css.js ./build/ \
 		module.css \
 		fonts/ash.css \

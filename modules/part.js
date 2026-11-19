@@ -31,9 +31,12 @@ export default class Part {
     }
 
     toJSON() {
-        const { stave, staff, ...data } = this;
-        data.stave = stave.type;
-        return data;
+        return {
+            name:      this.name,
+            stave:     this.stave.type,
+            transpose: this.transpose,
+            routing:   this.routing ? { ...this.routing } : undefined
+        };
     }
 }
 

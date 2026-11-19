@@ -1,7 +1,7 @@
 
 import insert                  from 'fn/insert.js';
 import nothing                 from 'fn/nothing.js';
-import Event                   from 'sequence/modules/event.js';
+import Event                   from 'sequence/modules/event/event.js';
 import Stave                   from '../stave.js';
 import Part                    from '../part.js';
 import push                    from '../object/push.js';

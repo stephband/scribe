@@ -1,13 +1,13 @@
-import { RecurrentNetwork } from 'neuron/modules/rnn/network-cpu.js';
+import { RecurrentNetwork } from 'neuron/modules/rnn/network-train.js';
 import { exportAsModule, serializeWeights } from 'neuron/modules/serialize.js';
 import Sequence from 'sequence/module.js';
-import batch from './batch.js';
-import schema, { encode, decode, OUT_DIM } from './schema.js';
+import batch from '../modules/spell/batch.js';
+import schema, { encode, decode, OUT_DIM } from '../modules/spell/schema.js';
 import spell  from 'sequence/modules/spell.js';
 
 
 if (!Deno.args.length) {
-    console.error('Usage: deno run --allow-read --allow-write modules/spell/train.js <path/to/dir-or-file> [...]');
+    console.error('Usage: deno run --allow-read --allow-write deno/train.js <path/to/dir-or-file> [...]');
     Deno.exit(1);
 }
 
@@ -257,16 +257,16 @@ console.log(`\n   ✓ Overall Note Spelling Accuracy: ${totalSpellingMatches}/${
 // 5. Serialize trained weights
 console.log('\n5. Serializing Trained Weights...');
 const binary32  = serializeWeights(network, 32);
-const bin32Path = new URL('./weights-32b.local.bin', import.meta.url);
+const bin32Path = new URL('../modules/spell/weights-32b.local.bin', import.meta.url);
 await Deno.writeFile(bin32Path, binary32);
 console.log(`   ✓ Exported Float32 binary weights: ${bin32Path.pathname} (${(binary32.byteLength / 1024).toFixed(1)} KB)`);
 
 const binary8  = serializeWeights(network, 8);
-const bin8Path = new URL('./weights-8b.local.bin', import.meta.url);
+const bin8Path = new URL('../modules/spell/weights-8b.local.bin', import.meta.url);
 await Deno.writeFile(bin8Path, binary8);
 console.log(`   ✓ Exported Int8 binary weights:    ${bin8Path.pathname} (${(binary8.byteLength / 1024).toFixed(1)} KB)`);
 
 const jsModuleCode = exportAsModule(network, 8);
-const jsPath       = new URL('./weights-8b.js', import.meta.url);
+const jsPath       = new URL('../modules/spell/weights-8b.js', import.meta.url);
 await Deno.writeTextFile(jsPath, jsModuleCode);
 console.log(`   ✓ Exported self-contained ES module: ${jsPath.pathname} (${(jsModuleCode.length / 1024).toFixed(1)} KB)`);

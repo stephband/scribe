@@ -3,7 +3,7 @@ import Transform        from 'sequence/modules/transform.js';
 import SequenceIterator from 'sequence/modules/sequence-iterator.js';
 import read             from './tree/read.js';
 import quantise         from './tree/quantise.js';
-import spell            from './tree/spell.js';
+import spell            from './spell.js';
 import symbolise        from './tree/symbolise.js';
 import config           from './config.js';
 

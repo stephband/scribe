@@ -1,5 +1,5 @@
 /* Scribe 
-   0.5.9
+   0.6.4
    By stephband */
 
 //# sourceMappingURL=module.js.map

@@ -1,5 +1,6 @@
 
-import Event                  from 'sequence/modules/event.js';
+import Event                  from 'sequence/modules/event/event.js';
+import KeyEvent               from 'sequence/modules/event/key.js';
 import { accidentalsFromKey } from '../accidentals.js';
 import { getDivisionBefore }  from '../bar/divisions.js';
 import last                   from '../object/last.js';
@@ -137,7 +138,7 @@ export function symbolisePart(settings, activeNotes, bar, part, repeats) {
         part.transpose || 0 ;
 
     part.key = transpose ?
-        Event.of(0, 'key', bar.key).transpose(transpose)[2] :
+        KeyEvent.of(0, bar.key).transpose(transpose)[2] :
         bar.key ;
 
     // Push in key signature
